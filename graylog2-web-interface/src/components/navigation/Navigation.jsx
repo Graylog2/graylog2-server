@@ -28,10 +28,12 @@ import StyledNavbar from './Navigation.styles';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const _isActive = (requestPath, prefix) => {
+  // eslint-disable-next-line import/no-named-as-default-member
   return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
+  // eslint-disable-next-line import/no-named-as-default-member
   const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {

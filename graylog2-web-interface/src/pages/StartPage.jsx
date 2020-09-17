@@ -47,6 +47,7 @@ const StartPage = createReactClass({
     const { currentUser: { startpage, permissions }, gettingStarted } = this.state;
 
     // Show getting started page if user is an admin and getting started wasn't dismissed
+    // eslint-disable-next-line import/no-named-as-default-member
     if (PermissionsMixin.isPermitted(permissions, ['inputs:create'])) {
       if (gettingStarted.show) {
         this._redirect(Routes.GETTING_STARTED);
