@@ -120,7 +120,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
-      default_roles: defaultRoles.toArray(),
+      default_roles: defaultRoles.toJS(),
       config: formattedConfig,
     };
   }
@@ -131,7 +131,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
-      default_roles: defaultRoles = [],
+      default_roles: defaultRoles,
       config,
     } = value;
 
@@ -142,7 +142,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
-      defaultRoles,
+      Immutable.List(defaultRoles),
       formattedConfig,
     );
   }

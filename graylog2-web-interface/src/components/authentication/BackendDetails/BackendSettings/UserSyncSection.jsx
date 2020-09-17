@@ -12,7 +12,7 @@ type Props = {
 };
 
 const UserSyncSection = ({ authenticationBackend }: Props) => {
-  const { userSearchBase, userSearchPattern, displayNameAttribute } = authenticationBackend.config;
+  const { userSearchBase, userSearchPattern, userNameAribute, userFullNameAttribute } = authenticationBackend.config;
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
@@ -24,7 +24,8 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
     <SectionComponent title="User Synchronisation" headerActions={<Link to={editLink}>Edit</Link>}>
       <ReadOnlyFormGroup label="Search Base DN" value={userSearchBase} />
       <ReadOnlyFormGroup label="User Search Pattern" value={userSearchPattern} />
-      <ReadOnlyFormGroup label="Display Name Attribute" value={displayNameAttribute} />
+      <ReadOnlyFormGroup label="User Name Attribute" value={userNameAribute} />
+      <ReadOnlyFormGroup label="User Full Name Attribute" value={userFullNameAttribute} />
     </SectionComponent>
   );
 };

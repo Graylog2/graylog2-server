@@ -6,7 +6,6 @@ type TransportSecurity = ?('tls' | 'start_tls');
 export type LdapConfig = {
   serverUrls: Array<string>,
   systemUserDn: ?string,
-  systemUserPassword: ?string,
   transportSecurity: TransportSecurity,
   type: string,
   userFullNameAttribute: string,
@@ -19,7 +18,6 @@ export type LdapConfig = {
 export type LdapConfigJson = {
   server_urls: Array<string>,
   system_user_dn: ?string,
-  system_user_password: ?string,
   transport_security: TransportSecurity,
   type: string,
   user_full_name_attribute: string,
@@ -31,7 +29,7 @@ export type LdapConfigJson = {
 
 export type LdapBackend = {
   id: $PropertyType<AuthenticationBackend, 'id'>,
-  defaultRoles: $PropertyType<AuthenticationBackend, 'default_roles'>,
+  defaultRoles: $PropertyType<AuthenticationBackend, 'defaultRoles'>,
   title: $PropertyType<AuthenticationBackend, 'title'>,
   description: $PropertyType<AuthenticationBackend, 'description'>,
   config: LdapConfig,
@@ -41,7 +39,9 @@ export type LdapCreate = {
   title: $PropertyType<AuthenticationBackendJson, 'title'>,
   description: $PropertyType<AuthenticationBackendJson, 'description'>,
   default_roles: $PropertyType<AuthenticationBackendJson, 'default_roles'>,
-  config: LdapConfigJson,
+  config: LdapConfigJson & {
+    system_password: string,
+  },
 };
 
 export type LdapUpdate = LdapCreate & {

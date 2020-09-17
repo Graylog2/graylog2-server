@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import SectionComponent from 'components/common/Section/SectionComponent';
 import { ReadOnlyFormGroup } from 'components/common';
 import Routes from 'routing/Routes';
+import SectionComponent from 'components/common/Section/SectionComponent';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 };
 
 const ServerConfigSection = ({ authenticationBackend }: Props) => {
-  const { serverUri, systemUsername } = authenticationBackend.config;
+  const { serverUrls = [], systemUserDn } = authenticationBackend.config;
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
@@ -22,8 +22,8 @@ const ServerConfigSection = ({ authenticationBackend }: Props) => {
 
   return (
     <SectionComponent title="Server Configuration" headerActions={<Link to={editLink}>Edit</Link>}>
-      <ReadOnlyFormGroup label="Server Address" value={serverUri} />
-      <ReadOnlyFormGroup label="System Username" value={systemUsername} />
+      <ReadOnlyFormGroup label="Server Address" value={serverUrls[0]} />
+      <ReadOnlyFormGroup label="System Username" value={systemUserDn} />
       <ReadOnlyFormGroup label="System Password" value="******" />
     </SectionComponent>
   );

@@ -17,11 +17,10 @@ type Props = {
 };
 
 export const prepareInitialValues = ({
-  defaultRoles = Immutable.Map(),
+  defaultRoles = Immutable.List(),
   config: {
     serverUrls = [],
     systemUserDn,
-    systemUserPassword,
     transportSecurity,
     userFullNameAttribute,
     userNameAribute,
@@ -37,7 +36,6 @@ export const prepareInitialValues = ({
     serverUrlHost: serverUrl.host(),
     serverUrlPort: serverUrl.port(),
     systemUserDn,
-    systemUserPassword,
     transportSecurity,
     userFullNameAttribute,
     userNameAribute,
