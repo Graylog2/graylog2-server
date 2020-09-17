@@ -31,9 +31,9 @@ const extractTimerangeParams = (timerange: TimeRange) => {
 };
 
 export const syncWithQueryParameters = (query: string, action: (string) => mixed = history.push) => {
-  const { view } = ViewStore.getInitialState() || {};
+  const { view, dirty } = ViewStore.getInitialState() || {};
 
-  if (view && view.type === View.Type.Search) {
+  if (view && view.type === View.Type.Search && dirty) {
     const { queries } = view.search;
 
     if (queries.size !== 1) {
