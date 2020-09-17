@@ -19,6 +19,7 @@ export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExternalLink } from './ExternalLink';
 export { default as ExternalLinkButton } from './ExternalLinkButton';
+export { default as FieldError } from './FieldError';
 export { default as FormikFormGroup } from './FormikFormGroup';
 export { default as FormikInput } from './FormikInput';
 export { default as HasOwnership } from './HasOwnership';
