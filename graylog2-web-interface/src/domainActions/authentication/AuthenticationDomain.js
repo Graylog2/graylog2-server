@@ -22,7 +22,7 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
 });
 
 const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
-  action: AuthenticationActions.load,
+  action: AuthenticationActions.loadActive,
   error: (error) => ({
     message: `Loading active authentication service failed with status: ${error}`,
   }),

@@ -69,7 +69,6 @@ const Routes = {
     OVERVIEW: '/system/overview',
     PROCESSBUFFERDUMP: (nodeId) => `/system/processbufferdump/${nodeId}`,
     AUTHENTICATION: {
-      OVERVIEW: '/system/authentication',
       ROLES: '/system/authentication/roles',
       USERS: {
         CREATE: '/system/authentication/users/new',
@@ -80,6 +79,8 @@ const Routes = {
         LIST: '/system/authentication/users',
       },
       PROVIDERS: {
+        ACTIVE: '/system/authentication',
+        OVERVIEW: '/system/authentication/services',
         CREATE: '/system/authentication/create',
         CREATE_BACKEND: (name) => `/system/authentication/create/${name}`,
         edit: (id) => `/system/authentication/edit/${id}`,

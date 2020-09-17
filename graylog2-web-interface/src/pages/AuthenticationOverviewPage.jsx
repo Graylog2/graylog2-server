@@ -1,34 +1,31 @@
 // @flow strict
 import * as React from 'react';
 
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import {} from 'components/authentication'; // Bind all authentication plugins
+import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
+import BackendsOverview from 'components/authentication/BackendsOverview';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import { useActiveBackend } from 'components/authentication/hooks';
 
-import BackendWizard from '../BackendWizard';
-
-const BackendCreate = () => {
+const AuthenticationCreatePage = () => {
   const { finishedLoading, activeBackend } = useActiveBackend();
 
   return (
-    <DocumentTitle title="Create LDAP Authentication Service">
-      <PageHeader title="Create LDAP Authentication Service">
+    <DocumentTitle title="Authentication Services">
+      <PageHeader title="Authentication Services">
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>
-          Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                             text="documentation" />.
+        <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                                 text="documentation" />.
         </span>
-
         <BackendOverviewLinks activeBackend={activeBackend}
                               finishedLoading={finishedLoading} />
       </PageHeader>
 
-      <BackendWizard onSubmit={AuthenticationDomain.create} authServiceType="ldap" />
+      <BackendsOverview />
     </DocumentTitle>
   );
 };
 
-export default BackendCreate;
+export default AuthenticationCreatePage;

@@ -3,10 +3,11 @@ import loadAsync from 'routing/loadAsync';
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
-const AuthenticationCreatePage = loadAsync(() => import('./AuthenticationCreatePage'));
-const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticationBackendCreatePage = loadAsync(() => import('./AuthenticationBackendCreatePage'));
 const AuthenticationBackendEditPage = loadAsync(() => import('./AuthenticationBackendEditPage'));
+const AuthenticationCreatePage = loadAsync(() => import('./AuthenticationCreatePage'));
+const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverviewPage'));
+const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -89,6 +90,7 @@ export {
   AuthenticationPage,
   AuthenticationBackendCreatePage,
   AuthenticationBackendEditPage,
+  AuthenticationOverviewPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,

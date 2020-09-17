@@ -6,6 +6,7 @@ import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
+import { useActiveBackend } from 'components/authentication/hooks';
 
 import BackendWizard from '../BackendWizard';
 
@@ -52,6 +53,8 @@ export const HELP = {
 };
 
 const BackendCreate = () => {
+  const { finishedLoading, activeBackend } = useActiveBackend();
+
   return (
     <DocumentTitle title="Create Active Directory Authentication Services">
       <PageHeader title="Create Active Directory Services">
@@ -61,9 +64,12 @@ const BackendCreate = () => {
                                                              text="documentation"
                                                              help="HELP" />.
         </span>
-        <BackendOverviewLinks />
+        <BackendOverviewLinks activeBackend={activeBackend}
+                              finishedLoading={finishedLoading} />
       </PageHeader>
-      <BackendWizard onSubmit={AuthenticationDomain.create} authServiceType="active-directory" />
+
+      <BackendWizard onSubmit={AuthenticationDomain.create}
+                     authServiceType="active-directory" />
     </DocumentTitle>
   );
 };

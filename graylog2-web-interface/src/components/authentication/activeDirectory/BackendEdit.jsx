@@ -7,6 +7,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
+import { useActiveBackend } from 'components/authentication/hooks';
 
 import { HELP } from './BackendCreate';
 
@@ -29,6 +30,7 @@ const _optionalWizardProps = (initialStep: ?string) => {
 };
 
 const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
+  const { finishedLoading, activeBackend } = useActiveBackend();
   const initialValues = prepareInitialValues(authenticationBackend.config);
   const optionalProps = _optionalWizardProps(initialStep);
   const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
@@ -45,8 +47,11 @@ const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
           Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                              text="documentation" />.
         </span>
-        <BackendOverviewLinks />
+
+        <BackendOverviewLinks activeBackend={activeBackend}
+                              finishedLoading={finishedLoading} />
       </PageHeader>
+
       <BackendWizard {...optionalProps}
                      initialValues={initialValues}
                      help={HELP}
