@@ -7,7 +7,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import FormsUtils from 'util/FormsUtils';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import history from 'util/History';
-import { Select, FormikInput } from 'components/common';
+import { Select, FieldError } from 'components/common';
 import { Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 
@@ -51,11 +51,7 @@ const BackendCreateSelect = () => {
                             onChange={(authService) => onChange({ target: { value: authService, name } })}
                             value={value}
                             clearable={false} />
-                    {error && (
-                      <FormikInput.ErrorMessage>
-                        {error}
-                      </FormikInput.ErrorMessage>
-                    )}
+                    {error && <FieldError>{error}</FieldError>}
                   </>
                 )}
               </Field>
