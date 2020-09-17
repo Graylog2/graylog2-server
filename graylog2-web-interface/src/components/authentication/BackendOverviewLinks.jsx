@@ -9,7 +9,7 @@ const BackendOverviewLinks = () => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.OVERVIEW}>
       <Button bsStyle="info">
-        View Active
+        Active Service
       </Button>
     </LinkContainer>
   </ButtonToolbar>

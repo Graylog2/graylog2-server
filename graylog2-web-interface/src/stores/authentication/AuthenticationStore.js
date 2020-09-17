@@ -63,6 +63,16 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
+    loadActive(): Promise<?AuthenticationBackend> {
+      // const url = qualifyUrl(ApiRoutes.Authentication.loadActive(encodeURIComponent(id)).url);
+      // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
+      const promise = Promise.resolve(services.first());
+
+      AuthenticationActions.loadActive.promise(promise);
+
+      return promise;
+    },
+
     update(backendId: ?$PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.update(backendId).url);
       const promise = fetch('DELETE', url, payload);

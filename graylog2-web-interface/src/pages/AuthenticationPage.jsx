@@ -7,39 +7,50 @@ import {} from 'components/authentication'; // Bind all authentication plugins
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocsHelper from 'util/DocsHelper';
-import BackendsOverview from 'components/authentication/BackendsOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import { ButtonToolbar, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import StringUtils from 'util/StringUtils';
 
-const DEFAULT_PAGINATION = {
-  count: undefined,
-  total: undefined,
-  page: 1,
-  perPage: 10,
-  query: '',
+const _pageTilte = (activeBackend: ?AuthenticationBackend) => {
+  const title = 'Authentication Services';
+
+  if (activeBackend) {
+    const backendTitle = StringUtils.truncateWithEllipses(activeBackend.title, 30);
+
+    return <>{title} - <i>{backendTitle}</i></>;
+  }
+
+  return title;
 };
 
 const AuthenticationPage = () => {
-  const [paginatedAuthBackends, setPaginatedAuthBackends] = useState();
+  const [activeBackend, setActiveBackend] = useState();
+  const [finishedLoading, setFinishedLoading] = useState(false);
+  const pageTitle = _pageTilte(activeBackend);
 
   useEffect(() => {
-    AuthenticationDomain.loadBackendsPaginated(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query).then((newServices) => newServices && setPaginatedAuthBackends(newServices));
+    AuthenticationDomain.loadActive().then((backend) => {
+      setFinishedLoading(true);
+
+      if (backend) {
+        setActiveBackend(backend);
+      }
+    });
   }, []);
 
-  if (!paginatedAuthBackends) {
+  if (!finishedLoading) {
     return <Spinner />;
   }
 
-  const activeBackend = paginatedAuthBackends.list.find((backend) => backend.id === paginatedAuthBackends.globalConfig.activeBackend);
-
   return (
-    <DocumentTitle title="Authentication Management">
+    <DocumentTitle title={pageTitle}>
       <>
-        <PageHeader title="Authentication Management"
+        <PageHeader title={pageTitle}
                     subactions={(activeBackend && (
                       <ButtonToolbar>
                         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(activeBackend.id)}>
@@ -64,10 +75,6 @@ const AuthenticationPage = () => {
         {!activeBackend && <BackendCreateGettingStarted />}
 
         {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
-
-        {paginatedAuthBackends.list.size >= 1 && (
-          <BackendsOverview paginatedAuthBackends={paginatedAuthBackends} />
-        )}
       </>
     </DocumentTitle>
   );

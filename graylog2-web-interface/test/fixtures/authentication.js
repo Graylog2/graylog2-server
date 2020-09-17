@@ -6,7 +6,7 @@ import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 const ldapService = AuthenticationBackend
   .builder()
   .id('ldap-service-id')
-  .title('LDAP Service')
+  .title('LDAP: ldap://localhost:389')
   .description('LDAP service description')
   .config({
     type: 'ldap',
@@ -22,7 +22,7 @@ const ldapService = AuthenticationBackend
 const activeDirectoryService = AuthenticationBackend
   .builder()
   .id('ad-service-id')
-  .title('Active Directory Service')
+  .title('Active Directory: ldap://localhost:389')
   .description('Active directory service description')
   .config({
     type: 'active-directory',
