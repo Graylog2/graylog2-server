@@ -8,14 +8,17 @@ const ldapService = AuthenticationBackend
   .id('ldap-service-id')
   .title('LDAP: ldap://localhost:389')
   .description('LDAP service description')
+  .defaultRoles(Immutable.List(['Reader']))
   .config({
+    serverUrls: ['ldap://localhost:389'],
+    systemUserDn: 'uid=admin,out=system',
+    transportSecurity: 'tls',
     type: 'ldap',
-    serverUri: 'ldap://localhost:389',
-    systemUsername: 'uid=admin,out=system',
-    encryptedSystemPassword: 'encrypted-password',
+    userFullNameAttribute: 'uid',
+    userNameAttribute: 'cn',
     userSearchBase: 'dc=example,dc=com',
     userSearchPattern: '(&(|(objectClass=inetOrgPerson))(uid={0}))',
-    displayNameAttribute: 'cn',
+    verifyCertificates: true,
   })
   .build();
 
@@ -24,14 +27,17 @@ const activeDirectoryService = AuthenticationBackend
   .id('ad-service-id')
   .title('Active Directory: ldap://localhost:389')
   .description('Active directory service description')
+  .defaultRoles(Immutable.List(['Reader']))
   .config({
+    serverUrls: ['ldap://localhost:389'],
+    systemUserDn: 'uid=admin,out=system',
+    transportSecurity: 'tls',
     type: 'active-directory',
-    serverUri: 'ldap://localhost:389',
-    systemUsername: 'uid=admin,out=system',
-    encryptedSystemPassword: 'encrypted-password',
+    userFullNameAttribute: 'uid',
+    userNameAttribute: 'cn',
     userSearchBase: 'dc=example,dc=com',
     userSearchPattern: '(&(|(objectClass=inetOrgPerson))(uid={0}))',
-    displayNameAttribute: 'cn',
+    verifyCertificates: true,
   })
   .build();
 

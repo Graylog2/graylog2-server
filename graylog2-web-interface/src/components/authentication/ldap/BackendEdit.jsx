@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import URI from 'urijs';
 
 import DocsHelper from 'util/DocsHelper';
@@ -18,29 +19,33 @@ type Props = {
 };
 
 export const prepareInitialValues = ({
-  defaultRoles,
-  displayNameAttribute,
-  serverUri,
-  systemUsername,
-  trustAllCertificates,
-  userSearchBase,
-  userSearchPattern,
-  useStartTls,
-  useSsl,
-}: $PropertyType<LdapBackend, 'config'>) => {
-  const serverUriObj = new URI(serverUri);
-
-  return {
-    defaultRoles,
-    displayNameAttribute,
-    systemUsername,
-    trustAllCertificates,
+  defaultRoles = Immutable.Map(),
+  config: {
+    serverUrls = [],
+    systemUserDn,
+    systemUserPassword,
+    transportSecurity,
+    userFullNameAttribute,
+    userNameAribute,
     userSearchBase,
     userSearchPattern,
-    useStartTls,
-    useSsl,
-    serverUriHost: serverUriObj.hostname(),
-    serverUriPort: serverUriObj.port(),
+    verifyCertificates,
+  },
+}: LdapBackend) => {
+  const serverUrl = new URI(serverUrls[0]);
+
+  return {
+    defaultRoles: defaultRoles.join(),
+    serverUrlHost: serverUrl.host(),
+    serverUrlPort: serverUrl.port(),
+    systemUserDn,
+    systemUserPassword,
+    transportSecurity,
+    userFullNameAttribute,
+    userNameAribute,
+    userSearchBase,
+    userSearchPattern,
+    verifyCertificates,
   };
 };
 
@@ -56,7 +61,7 @@ const _optionalWizardProps = (initialStep: ?string) => {
 
 const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
   const { finishedLoading, activeBackend } = useActiveBackend();
-  const initialValues = prepareInitialValues(authenticationBackend.config);
+  const initialValues = prepareInitialValues(authenticationBackend);
   const optionalProps = _optionalWizardProps(initialStep);
   const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
     {

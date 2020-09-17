@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 
 import {} from 'components/authentication'; // Bind all authentication plugins
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
@@ -10,7 +9,6 @@ import { useActiveBackend } from 'components/authentication/hooks';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import StringUtils from 'util/StringUtils';
 

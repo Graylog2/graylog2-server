@@ -17,7 +17,7 @@ type Props = {
 };
 
 const checkboxProps = (value) => {
-  return { checked: value ?? false };
+  return { defaultChecked: value ?? false };
 };
 
 const inputProps = (value) => {
@@ -28,7 +28,7 @@ const inputProps = (value) => {
 const FormikInput = ({ component: Component, label, name, type, help, validate, ...rest }: Props) => (
   <Component name={name} validate={validate}>
     {({ field: { value, onChange }, meta: { error } }) => {
-      const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
+      const typeSepcificProps = type === 'checkbox' || type === 'radio' ? checkboxProps(value) : inputProps(value);
 
       return (
         <Input {...rest}

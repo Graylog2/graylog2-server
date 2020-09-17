@@ -1,45 +1,49 @@
 // @flow strict
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import AuthenticationBackend, { type AuthenticationBackendJson } from 'logic/authentication/AuthenticationBackend';
+
+type TransportSecurity = ?('tls' | 'start_tls');
 
 export type LdapConfig = {
+  serverUrls: Array<string>,
+  systemUserDn: ?string,
+  systemUserPassword: ?string,
+  transportSecurity: TransportSecurity,
   type: string,
-  defaultRoles: Array<string>,
-  displayNameAttribute: string,
-  serverUri: string,
-  systemUsername: string,
-  trustAllCertificates: boolean,
+  userFullNameAttribute: string,
+  userNameAribute: string,
   userSearchBase: string,
   userSearchPattern: string,
-  useStartTls: boolean,
-  useSsl: boolean,
+  verifyCertificates: boolean,
 };
 
 export type LdapConfigJson = {
+  server_urls: Array<string>,
+  system_user_dn: ?string,
+  system_user_password: ?string,
+  transport_security: TransportSecurity,
   type: string,
-  default_roles: Array<string>,
-  display_name_attribute: string,
-  server_uri: string,
-  system_username: string,
-  trust_all_certificates: boolean,
+  user_full_name_attribute: string,
+  user_name_attribute: string,
   user_search_base: string,
   user_search_pattern: string,
-  use_start_tls: boolean,
-  use_ssl: boolean,
+  verify_certificates: boolean,
 };
 
 export type LdapBackend = {
   id: $PropertyType<AuthenticationBackend, 'id'>,
+  defaultRoles: $PropertyType<AuthenticationBackend, 'default_roles'>,
   title: $PropertyType<AuthenticationBackend, 'title'>,
   description: $PropertyType<AuthenticationBackend, 'description'>,
   config: LdapConfig,
 };
 
 export type LdapCreate = {
-  title: $PropertyType<AuthenticationBackend, 'title'>,
-  description: $PropertyType<AuthenticationBackend, 'description'>,
+  title: $PropertyType<AuthenticationBackendJson, 'title'>,
+  description: $PropertyType<AuthenticationBackendJson, 'description'>,
+  default_roles: $PropertyType<AuthenticationBackendJson, 'defaultRoles'>,
   config: LdapConfigJson,
 };
 
 export type LdapUpdate = LdapCreate & {
-  id: $PropertyType<AuthenticationBackend, 'id'>,
+  id: $PropertyType<AuthenticationBackendJson, 'id'>,
 };

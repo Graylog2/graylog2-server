@@ -11,7 +11,7 @@ import { useActiveBackend } from 'components/authentication/hooks';
 import BackendWizard from '../BackendWizard';
 
 export const HELP = {
-  systemUsername: (
+  systemUserDn: (
     <span>
       The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.<br />
       This needs to match the <code>userPrincipalName</code> of that user.
@@ -29,7 +29,7 @@ export const HELP = {
       The string <code>{'{0}'}</code> will be replaced by the entered username.
     </span>
   ),
-  displayNameAttribute: (
+  userNameAttribute: (
     <span>
       Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.<br />
       Try to load a test user using the form below, if you are unsure which attribute to use.

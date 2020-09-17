@@ -25,32 +25,35 @@ type Props = {
 
 const _prepareSubmitPayload = (authServiceType) => ({
   defaultRoles,
-  serverUriHost,
-  serverUriPort,
-  systemUsername,
+  serverUrlHost,
+  serverUrlPort,
+  systemUserDn,
+  systemUserPassword,
+  transportSecuriy,
+  userFullNameAttribute,
+  userNameAttribute,
   userSearchBase,
   userSearchPattern,
-  displayNameAttribute,
-  trustAllCertificates,
-  useStartTls,
-  useSsl,
+  verifyCertificates,
 }: WizardFormValues) => {
-  const serverUri = `${new URI('').host(serverUriHost).port(serverUriPort).scheme('ldap')}`;
+  const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme('ldap')}`;
 
   return {
     title: 'Example Title',
     description: 'Example description',
+    default_roles: defaultRoles,
     config: {
-      type: authServiceType,
       default_roles: defaultRoles,
-      display_name_attribute: displayNameAttribute,
-      server_uri: serverUri,
-      system_username: systemUsername,
-      trust_all_certificates: trustAllCertificates,
+      server_urls: [serverUrl],
+      system_user_dn: systemUserDn,
+      system_user_password: systemUserPassword,
+      transport_security: transportSecuriy,
+      type: authServiceType,
+      user_full_name_attribute: userFullNameAttribute,
+      user_name_attribute: userNameAttribute,
       user_search_base: userSearchBase,
       user_search_pattern: userSearchPattern,
-      use_start_tls: useStartTls,
-      use_ssl: useSsl,
+      verify_certificates: verifyCertificates,
     },
   };
 };
@@ -63,16 +66,17 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
   });
 
   const {
-    serverUriHost,
-    serverUriPort,
-    systemUsername,
+    serverUrlHost,
+    serverUrlPort,
+    systemUserDn,
     userSearchBase,
     userSearchPattern,
-    displayNameAttribute,
+    userNameAttribute,
+    userFullNameAttribute,
   } = stepsState.formValues;
 
-  const isServerConfigValid = !!(serverUriHost && !!serverUriPort && systemUsername);
-  const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && displayNameAttribute);
+  const isServerConfigValid = !!(serverUrlHost && !!serverUrlPort && systemUserDn);
+  const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && userNameAttribute && userFullNameAttribute);
   const disableSubmitAll = !isServerConfigValid || !isUserSyncSettingValid;
 
   const _handleSubmitAll = () => {
@@ -157,10 +161,12 @@ BackendWizard.defaultProps = {
   editing: false,
   initialStep: 'serverConfig',
   initialValues: {
-    serverUriHost: 'localhost',
-    serverUriPort: 389,
-    useStartTls: true,
-    trustAllCertificates: false,
+    serverUrlHost: 'localhost',
+    serverUrlPort: 389,
+    transportSecuriy: 'tls',
+    verifyCertificates: true,
+    userNameAttribute: 'uid',
+    userFullNameAttribute: 'cn',
   },
 };
 

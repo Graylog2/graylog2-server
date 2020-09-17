@@ -8,6 +8,7 @@ type InternalState = {|
   id: string,
   title: string,
   description: string,
+  defaultRoles: Immutable.List<string>,
   config: {
     type: string,
     ...
@@ -18,6 +19,7 @@ export type AuthenticationBackendJson = {|
   id: string,
   title: string,
   description: string,
+  default_roles: Array<string>,
   config: {
     type: string,
     ...
@@ -51,12 +53,14 @@ export default class AuthenticationBackend {
     id: $PropertyType<InternalState, 'id'>,
     title: $PropertyType<InternalState, 'title'>,
     description: $PropertyType<InternalState, 'description'>,
+    defaultRoles: $PropertyType<InternalState, 'defaultRoles'>,
     config: $PropertyType<InternalState, 'config'>,
   ) {
     this._value = {
       id,
       title,
       description,
+      defaultRoles,
       config,
     };
   }
@@ -73,6 +77,10 @@ export default class AuthenticationBackend {
     return this._value.description;
   }
 
+  get defaultRoles(): $PropertyType<InternalState, 'defaultRoles'> {
+    return this._value.defaultRoles;
+  }
+
   get config(): $PropertyType<InternalState, 'config'> {
     return this._value.config;
   }
@@ -83,6 +91,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
+      defaultRoles,
       config,
     } = this._value;
 
@@ -91,6 +100,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
+      defaultRoles,
       config,
     }));
   }
@@ -100,6 +110,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
+      defaultRoles = Immutable.List(),
       config,
     } = this._value;
 
@@ -109,6 +120,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
+      default_roles: defaultRoles.toArray(),
       config: formattedConfig,
     };
   }
@@ -119,6 +131,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
+      default_roles: defaultRoles = [],
       config,
     } = value;
 
@@ -129,6 +142,7 @@ export default class AuthenticationBackend {
       id,
       title,
       description,
+      defaultRoles,
       formattedConfig,
     );
   }
@@ -161,6 +175,10 @@ class Builder {
     return new Builder(this.value.set('description', value));
   }
 
+  defaultRoles(value: $PropertyType<InternalState, 'defaultRoles'>): Builder {
+    return new Builder(this.value.set('defaultRoles', value));
+  }
+
   config(value: $PropertyType<InternalState, 'config'>): Builder {
     return new Builder(this.value.set('config', value));
   }
@@ -170,6 +188,7 @@ class Builder {
       id,
       title,
       description,
+      defaultRoles,
       config,
     } = this.value.toObject();
 
@@ -177,6 +196,7 @@ class Builder {
       id,
       title,
       description,
+      defaultRoles,
       config,
     );
   }

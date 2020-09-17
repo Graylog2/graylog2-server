@@ -15,8 +15,8 @@ import BackendWizardContext from './contexts/BackendWizardContext';
 type Props = {
   disableSubmitAll: boolean,
   help?: {
-    systemUsername?: React.Node,
-    systemPassword?: React.Node,
+    systemUserDn?: React.Node,
+    systemPasswordDn?: React.Node,
   },
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
@@ -33,13 +33,13 @@ const ProtocolOptions = styled.div`
 `;
 
 const defaultHelp = {
-  systemUsername: (
+  systemUserDn: (
     <span>
       The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.
       This needs to match the <code>userPrincipalName</code> of that user.
     </span>
   ),
-  systemPassword: 'The password for the initial connection to the Active Directory server.',
+  systemPasswordDn: 'The password for the initial connection to the Active Directory server.',
 };
 
 const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onSubmitAll, disableSubmitAll }: Props) => {
@@ -65,14 +65,14 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
             <>
               <div className="input-group">
                 <span className="input-group-addon">ldap://</span>
-                <FormikInput name="serverUriHost"
+                <FormikInput name="serverUrlHost"
                              placeholder="Hostname"
                              formGroupClassName=""
                              validate={FormUtils.validation.isRequired('server host')}
                              required />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikInput type="number"
-                             name="serverUriPort"
+                             name="serverUrlPort"
                              validate={FormUtils.validation.isRequired('server port')}
                              min="1"
                              max="65535"
@@ -83,37 +83,45 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
 
               {/* checked={ldapUri.scheme() === 'ldaps'} ? */}
               <ProtocolOptions>
-                <FormikInput type="checkbox"
-                             name="useSSL"
+                <FormikInput type="radio"
+                             name="transportSecurity"
                              formGroupClassName=""
-                             label="SSL" />
+                             value=""
+                             label="None" />
 
-                <FormikInput type="checkbox"
-                             name="useStartTls"
+                <FormikInput type="radio"
+                             name="transportSecurity"
                              formGroupClassName=""
+                             value="tls"
+                             label="TLS" />
+
+                <FormikInput type="radio"
+                             name="transportSecurity"
+                             formGroupClassName=""
+                             value="startTls"
                              label="StartTLS" />
 
                 <FormikInput type="checkbox"
-                             name="trustAllCertificates"
+                             name="verifyCertificates"
                              formGroupClassName=""
-                             label="Allow untrusted certificates" />
-
+                             label="Verify Certificates" />
               </ProtocolOptions>
 
             </>
           </Input>
           <FormikFormGroup label="System Username"
-                           name="systemUsername"
+                           name="systemUserDn"
                            placeholder="System User DN"
                            required
                            validate={FormUtils.validation.isRequired('System Username')}
-                           help={help.systemUsername} />
+                           help={help.systemUserDn} />
 
           <FormikFormGroup label="System Password"
-                           name="systemPassword"
+                           name="systemPasswordDn"
+                           autoComplete="autentication-service-password"
                            placeholder="System Password"
                            type="password"
-                           help={help.systemPassword} />
+                           help={help.systemPasswordDn} />
           <ButtonToolbar className="pull-right">
             {editing && (
               <Button type="button"

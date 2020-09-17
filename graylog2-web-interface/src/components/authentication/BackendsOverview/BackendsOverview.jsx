@@ -48,7 +48,6 @@ const _onPageChange = (loadBackends, setLoading) => (page, perPage) => {
 
 const BackendsOverview = () => {
   const [paginatedBackends, setPaginatedBackends] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION, globalConfig: undefined });
-  console.log(paginatedBackends);
   const { list: backends, pagination: { page, perPage, query, total }, globalConfig } = paginatedBackends;
   const [loading, setLoading] = useState();
   const _isActive = (authBackend) => authBackend.id === globalConfig?.activeBackend;

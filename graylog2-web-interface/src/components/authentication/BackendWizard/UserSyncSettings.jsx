@@ -15,7 +15,7 @@ type Props = {
   help?: {
     userSearchBase?: React.Node,
     userSearchPattern?: React.Node,
-    displayNameAttribute?: React.Node,
+    userNameAttribute?: React.Node,
     defaultRoles?: React.Node,
   },
   disableSubmitAll: boolean,
@@ -36,7 +36,7 @@ const defaultHelp = {
       The string <code>{'{0}'}</code> will be replaced by the entered username.
     </span>
   ),
-  displayNameAttribute: (
+  userNameAttribute: (
     <span>
       Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.<br />
       Try to load a test user using the form below, if you are unsure which attribute to use.
@@ -90,11 +90,18 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmi
                            help={help.userSearchPattern} />
 
           <FormikFormGroup label="Display Name Attirbute"
-                           name="displayNameAttribute"
+                           name="userNameAttribute"
                            placeholder="Display Name Attirbute"
                            validate={FormUtils.validation.isRequired('display name attribute')}
                            required
-                           help={help.displayNameAttribute} />
+                           help={help.userNameAttribute} />
+
+          <FormikFormGroup label="Full Name Attirbute"
+                           name="userFullNameAttribute"
+                           placeholder="Full Name Attirbute"
+                           validate={FormUtils.validation.isRequired('full name name attribute')}
+                           required
+                           help={help.userNameAttribute} />
 
           <Row>
             <Col sm={9} smOffset={3}>
