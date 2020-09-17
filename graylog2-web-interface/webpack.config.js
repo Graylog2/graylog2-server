@@ -178,7 +178,7 @@ if (TARGET === 'start') {
         DEVELOPMENT: true,
         GRAYLOG_HTTP_PUBLISH_URI: JSON.stringify(process.env.GRAYLOG_HTTP_PUBLISH_URI),
       }),
-      new CopyWebpackPlugin([{ from: 'config.js' }]),
+      new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
       new webpack.HotModuleReplacementPlugin(),
     ],
   });
