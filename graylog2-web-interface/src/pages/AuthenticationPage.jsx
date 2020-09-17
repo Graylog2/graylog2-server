@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import {} from 'components/authentication'; // Bind all authentication plugins
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocsHelper from 'util/DocsHelper';
@@ -40,18 +41,18 @@ const AuthenticationPage = () => {
       <>
         <PageHeader title="Authentication Management"
                     subactions={(activeBackend && (
-                    <ButtonToolbar>
-                      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(activeBackend.id)}>
-                        <Button bsStyle="success">
-                          Edit Active Service
-                        </Button>
-                      </LinkContainer>
-                      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE}>
-                        <Button bsStyle="success">
-                          Create Service
-                        </Button>
-                      </LinkContainer>
-                    </ButtonToolbar>
+                      <ButtonToolbar>
+                        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(activeBackend.id)}>
+                          <Button bsStyle="success">
+                            Edit Active Service
+                          </Button>
+                        </LinkContainer>
+                        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE}>
+                          <Button bsStyle="success">
+                            Create Service
+                          </Button>
+                        </LinkContainer>
+                      </ButtonToolbar>
                     ))}>
           <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}

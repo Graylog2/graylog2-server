@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
+import {} from 'components/authentication'; // Bind all authentication plugins
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';

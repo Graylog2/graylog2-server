@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 const ldapService = AuthenticationBackend

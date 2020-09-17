@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { withRouter } from 'react-router';
 
+import {} from 'components/authentication'; // Bind all authentication plugins
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { Spinner } from 'components/common';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
