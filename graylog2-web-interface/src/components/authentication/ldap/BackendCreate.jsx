@@ -26,7 +26,8 @@ const BackendCreate = () => {
                               finishedLoading={finishedLoading} />
       </PageHeader>
 
-      <BackendWizard onSubmit={AuthenticationDomain.create} authServiceType="ldap" />
+      <BackendWizard onSubmit={AuthenticationDomain.create}
+                     authServiceType="ldap" />
     </DocumentTitle>
   );
 };

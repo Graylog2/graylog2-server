@@ -17,7 +17,7 @@ import GroupSyncSettings from './GroupSyncSettings';
 
 type Props = {
   initialValues: WizardFormValues,
-  initialStep: $PropertyType<Step, 'key'>,
+  initialStepKey: $PropertyType<Step, 'key'>,
   onSubmit: (LdapCreate) => Promise<void>,
   editing: boolean,
   authServiceType: string,
@@ -58,9 +58,9 @@ const _prepareSubmitPayload = (authServiceType) => ({
   };
 };
 
-const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, editing }: Props) => {
+const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmit, editing }: Props) => {
   const [stepsState, setStepsState] = useState<WizardStepsState>({
-    activeStepKey: initialStep,
+    activeStepKey: initialStepKey,
     formValues: initialValues,
     prepareSubmitPayload: _prepareSubmitPayload(authServiceType),
   });
@@ -159,7 +159,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
 
 BackendWizard.defaultProps = {
   editing: false,
-  initialStep: 'serverConfig',
+  initialStepKey: 'serverConfig',
   initialValues: {
     serverUrlHost: 'localhost',
     serverUrlPort: 389,
@@ -171,7 +171,7 @@ BackendWizard.defaultProps = {
 };
 
 BackendWizard.propTypes = {
-  initialStep: PropTypes.string,
+  initialStepKey: PropTypes.string,
   initialValues: PropTypes.object,
   editing: PropTypes.bool,
 };

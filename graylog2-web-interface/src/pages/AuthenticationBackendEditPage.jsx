@@ -14,13 +14,13 @@ type Props = {
   },
   location: {
     query: {
-      step?: string,
+      initialStepKey?: string,
     },
   },
 
 };
 
-const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { step } } }: Props) => {
+const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { initialStepKey } } }: Props) => {
   const [authBackend, setAuthBackend] = useState();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { st
 
   const { editComponent: BackendEdit } = authService;
 
-  return <BackendEdit authenticationBackend={authBackend} initialStep={step} />;
+  return <BackendEdit authenticationBackend={authBackend} initialStepKey={initialStepKey} />;
 };
 
 export default withRouter(AuthenticationBackendEditPage);

@@ -15,7 +15,7 @@ import BackendWizard from '../BackendWizard';
 
 type Props = {
   authenticationBackend: LdapBackend,
-  initialStep: ?string,
+  initialStepKey: ?string,
 };
 
 export const prepareInitialValues = ({
@@ -49,20 +49,20 @@ export const prepareInitialValues = ({
   };
 };
 
-const _optionalWizardProps = (initialStep: ?string) => {
+const _optionalWizardProps = (initialStepKey: ?string) => {
   const props = {};
 
-  if (initialStep) {
-    props.initialStep = initialStep;
+  if (initialStepKey) {
+    props.initialStepKey = initialStepKey;
   }
 
   return props;
 };
 
-const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
+const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const { finishedLoading, activeBackend } = useActiveBackend();
   const initialValues = prepareInitialValues(authenticationBackend);
-  const optionalProps = _optionalWizardProps(initialStep);
+  const optionalProps = _optionalWizardProps(initialStepKey);
   const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
     {
       ...payload,
@@ -85,7 +85,7 @@ const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
       <BackendWizard {...optionalProps}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit}
-                     authServiceType="ldap"
+                     authServiceType={authenticationBackend.config.type}
                      editing />
     </DocumentTitle>
   );

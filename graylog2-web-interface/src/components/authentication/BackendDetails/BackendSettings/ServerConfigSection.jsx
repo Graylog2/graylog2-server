@@ -16,7 +16,7 @@ const ServerConfigSection = ({ authenticationBackend }: Props) => {
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
-      step: 'serverConfig',
+      initialStepKey: 'serverConfig',
     },
   };
 

@@ -16,7 +16,7 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
-      step: 'userSync',
+      initialStepKey: 'userSync',
     },
   };
 

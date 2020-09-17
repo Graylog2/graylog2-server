@@ -28,7 +28,7 @@ const GroupSyncSection = ({ authenticationBackend }: Props) => {
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
-      step: 'groupSync',
+      initialStepKey: 'groupSync',
     },
   };
 
