@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
@@ -34,6 +35,10 @@ const validate = (values) => {
   return errors;
 };
 
+const StyledForm = styled(Form)`
+  height: 100%;
+`;
+
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     const newTimerange = onSubmittingTimerange(timerange);
@@ -57,9 +62,9 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
             onSubmit={_onSubmit}
             validate={validate}>
       {(...args) => (
-        <Form>
+        <StyledForm>
           {isFunction(children) ? children(...args) : children}
-        </Form>
+        </StyledForm>
       )}
     </Formik>
   );

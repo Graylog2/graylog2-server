@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -9,8 +8,7 @@ import SearchActions from 'views/actions/SearchActions';
 import Widget from 'views/logic/widgets/Widget';
 
 import WidgetQueryControls from './WidgetQueryControls';
-
-import { WidgetActions } from '../stores/WidgetStore';
+import SearchBarForm from './searchbar/SearchBarForm';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -58,11 +56,19 @@ describe('WidgetQueryControls', () => {
   const emptyGlobalOverride = {};
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
-  const renderSUT = (props = {}) => render(
+  const Wrapper = ({ children }: { children: React.Node }) => (
     <WrappingContainer>
+      <SearchBarForm initialValues={{ timerange: { type: 'relative', range: 300 }, queryString: '', streams: [] }} onSubmit={() => {}}>
+        {children}
+      </SearchBarForm>
+    </WrappingContainer>
+  );
+
+  const renderSUT = (props = {}) => render(
+    <Wrapper>
       <WidgetQueryControls {...defaultProps}
                            {...props} />
-    </WrappingContainer>,
+    </Wrapper>,
   );
 
   it('should do something', () => {
@@ -108,9 +114,9 @@ describe('WidgetQueryControls', () => {
       await findByText(indicatorText);
 
       rerender(
-        <WrappingContainer>
+        <Wrapper>
           <WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />
-        </WrappingContainer>,
+        </Wrapper>,
       );
 
       expect(queryByText(indicatorText)).toBeNull();
@@ -122,71 +128,5 @@ describe('WidgetQueryControls', () => {
 
       expect(timeRangeSelect).toBeDisabled();
     });
-  });
-
-  it('changes the widget\'s timerange when time range input is used', async () => {
-    const { getByDisplayValue, getByText, getByTitle } = renderSUT();
-    const timeRangeSelect = getByDisplayValue('Search in last day');
-
-    expect(timeRangeSelect).not.toBeNull();
-
-    const optionForAllMessages = asElement(getByText('Search in all messages'), HTMLOptionElement);
-
-    fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
-
-    const searchButton = getByTitle(/Perform search/);
-
-    fireEvent.click(searchButton);
-
-    await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
-      timerange: { type: 'relative', range: 0 },
-    })));
-  });
-
-  it('changes the widget\'s timerange type when switching to absolute time range', async () => {
-    const { getByText, getByTitle } = renderSUT();
-    const absoluteTimeRangeSelect = getByText('Absolute');
-
-    expect(absoluteTimeRangeSelect).not.toBeNull();
-
-    fireEvent.click(absoluteTimeRangeSelect);
-
-    const searchButton = getByTitle(/Perform search/);
-
-    fireEvent.click(searchButton);
-
-    await waitFor(() => expect(WidgetActions.update)
-      .toHaveBeenLastCalledWith('deadbeef', expect.objectContaining({
-        timerange: {
-          type: 'absolute',
-          from: '2019-10-10T12:21:31.146Z',
-          to: '2019-10-10T12:26:31.146Z',
-        },
-      })));
-  });
-
-  it('changes the widget\'s streams when using stream filter', async () => {
-    const { container, getByTitle } = renderSUT({
-      availableStreams: [
-        { key: 'PFLog', value: '5c2e27d6ba33a9681ad62775' },
-        { key: 'DNS Logs', value: '5d2d9649e117dc4df84cf83c' },
-      ],
-    });
-    const streamFilter = container.querySelector('div[data-testid="streams-filter"] > div');
-
-    expect(streamFilter).not.toBeNull();
-
-    // Flow is not parsing the jest assertion before
-    if (streamFilter) {
-      await selectEvent.select(streamFilter, 'PFLog');
-    }
-
-    const searchButton = getByTitle(/Perform search/);
-
-    fireEvent.click(searchButton);
-
-    await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
-      streams: ['5c2e27d6ba33a9681ad62775'],
-    })));
   });
 });

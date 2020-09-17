@@ -1,5 +1,7 @@
 // @flow strict
 import * as React from 'react';
+import { useCallback } from 'react';
+import { useFormikContext } from 'formik';
 
 import { Button } from 'components/graylog';
 
@@ -8,11 +10,22 @@ type Props = {
   onFinish: () => void,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <>
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </>
-);
+const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => {
+  const { handleSubmit } = useFormikContext();
+  const _onFinish = useCallback((...args) => {
+    if (handleSubmit) {
+      handleSubmit();
+    }
+
+    return onFinish(...args);
+  }, [onFinish, handleSubmit]);
+
+  return (
+    <>
+      <Button onClick={_onFinish} bsStyle="primary">Save</Button>
+      <Button onClick={onCancel}>Cancel</Button>
+    </>
+  );
+};
 
 export default SaveOrCancelButtons;
