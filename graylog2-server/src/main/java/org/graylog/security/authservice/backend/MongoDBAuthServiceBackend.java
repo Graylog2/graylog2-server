@@ -71,15 +71,13 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
 
         LOG.info("Successfully validated password for user <{}>", username);
 
-        final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails()
+        final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                 .databaseId(user.getId())
                 .username(user.getName())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 // No need to set default roles because MongoDB users will not be provisioned by the provisioner
                 .defaultRoles(Collections.emptySet())
-                .authServiceType(backendType())
-                .authServiceId(backendId())
                 .authServiceUid(user.getId())
                 .build());
 
