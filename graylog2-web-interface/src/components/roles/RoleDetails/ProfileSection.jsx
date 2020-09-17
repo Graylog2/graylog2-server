@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import Role from 'logic/roles/Role';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import ReadOnlyFormGroup from 'components/common/ReadOnlyFormGroup';
+import { ReadOnlyFormGroup } from 'components/common';
 
 type Props = {
   role: Role,

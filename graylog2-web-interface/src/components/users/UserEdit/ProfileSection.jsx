@@ -3,9 +3,9 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 
 import { Button, Col, Row } from 'components/graylog';
+import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import ReadOnlyFormGroup from 'components/common/ReadOnlyFormGroup';
 
 import FullNameFormGroup from '../UserCreate/FullNameFormGroup';
 import EmailFormGroup from '../UserCreate/EmailFormGroup';

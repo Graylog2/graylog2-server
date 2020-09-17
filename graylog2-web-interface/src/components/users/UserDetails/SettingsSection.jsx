@@ -1,10 +1,9 @@
 // @flow strict
 import * as React from 'react';
 
+import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
-
-import ReadOnlyFormGroup from '../../common/ReadOnlyFormGroup';
 
 type Props = {
   user: User,
