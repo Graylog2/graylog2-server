@@ -84,8 +84,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "counter")
                 .extracting("metric")
                 .extracting("count")
-                .asList()
-                .containsExactly(23L);
+                .isEqualTo(23L);
     }
 
     @Test
@@ -102,8 +101,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "gauge")
                 .extracting("metric")
                 .extracting("value")
-                .asList()
-                .containsExactly(23);
+                .isEqualTo(23);
     }
 
     @Test
@@ -115,8 +113,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "gauge")
                 .extracting("metric")
                 .extracting("value")
-                .asList()
-                .containsExactly(23);
+                .isEqualTo(23);
     }
 
     @Test
@@ -129,8 +126,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "histogram")
                 .extracting("metric")
                 .extracting("count")
-                .asList()
-                .containsExactly(1L);
+                .isEqualTo(1L);
     }
 
     @Test
@@ -143,8 +139,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "histogram")
                 .extracting("metric")
                 .extracting("count")
-                .asList()
-                .containsExactly(1L);
+                .isEqualTo(1L);
     }
 
     @Test
@@ -158,8 +153,7 @@ public class MetricUtilsTest {
                 .extracting("metric")
                 .extracting("rate")
                 .extracting("total")
-                .asList()
-                .containsExactly(1L);
+                .isEqualTo(1L);
     }
 
     @Test
@@ -176,13 +170,13 @@ public class MetricUtilsTest {
                 .extracting("metric")
                 .extracting("rate")
                 .extracting("total")
-                .asList()
-                .containsExactly(1.0D);
+                .isEqualTo(1.0D);
     }
 
     @Test
     public void mapThrowsIllegalArgumentExceptionForUnknownMetricType() {
-        final Metric metric = new Metric() {};
+        final Metric metric = new Metric() {
+        };
 
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> MetricUtils.map("metric", metric))

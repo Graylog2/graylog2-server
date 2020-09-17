@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import org.assertj.core.data.Index;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +34,7 @@ class SimpleMessageChunkTest {
                 msg2Values
         );
 
-        assertThat(sut.getAllValuesInOrder()).asList().containsExactly(msg1Values, msg2Values);
+        assertThat(sut.getAllValuesInOrder()).contains(msg1Values, Index.atIndex(0)).contains(msg2Values, Index.atIndex(1));
     }
 
     @Test
@@ -45,8 +46,8 @@ class SimpleMessageChunkTest {
                 linkedHashSetOf("timestamp", "source"),
                 msg1, msg2);
 
-        assertThat(sut.getAllValuesInOrder()).asList().containsExactly(
-                new Object[]{"2015-01-01 01:00:00.000", "source-1"},
-                new Object[]{"2015-01-02 01:00:00.000", null});
+        assertThat(sut.getAllValuesInOrder())
+                .contains(new Object[]{"2015-01-01 01:00:00.000", "source-1"}, Index.atIndex(0))
+                .contains(new Object[]{"2015-01-02 01:00:00.000", null}, Index.atIndex(1));
     }
 }
