@@ -46,6 +46,10 @@ import org.graylog2.jackson.SemverSerializer;
 import org.graylog2.jackson.VersionDeserializer;
 import org.graylog2.jackson.VersionSerializer;
 import org.graylog2.plugin.inject.JacksonSubTypes;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueDeserializer;
+import org.graylog2.security.encryption.EncryptedValueSerializer;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
@@ -56,23 +60,27 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
     protected final ObjectMapper objectMapper;
 
+    // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider() {
-        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet(), GRNRegistry.createWithBuiltinTypes());
+        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet(), new EncryptedValueService(UUID.randomUUID().toString()), GRNRegistry.createWithBuiltinTypes());
     }
 
+    // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider(ClassLoader classLoader, Set<NamedType> subtypes) {
-        this(classLoader, subtypes, GRNRegistry.createWithBuiltinTypes());
+        this(classLoader, subtypes, new EncryptedValueService(UUID.randomUUID().toString()), GRNRegistry.createWithBuiltinTypes());
     }
 
     @Inject
     public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
                                 @JacksonSubTypes Set<NamedType> subtypes,
+                                EncryptedValueService encryptedValueService,
                                 GRNRegistry grnRegistry) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
@@ -100,10 +108,12 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addSerializer(new SemverSerializer())
                         .addSerializer(new SemverRequirementSerializer())
                         .addSerializer(GRN.class, new ToStringSerializer())
+                        .addSerializer(EncryptedValue.class, new EncryptedValueSerializer())
                         .addDeserializer(Version.class, new VersionDeserializer())
                         .addDeserializer(Semver.class, new SemverDeserializer())
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
                         .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
+                        .addDeserializer(EncryptedValue.class, new EncryptedValueDeserializer(encryptedValueService))
                 );
 
         if (subtypes != null) {
