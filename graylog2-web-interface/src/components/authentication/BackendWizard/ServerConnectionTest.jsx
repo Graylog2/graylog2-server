@@ -5,19 +5,24 @@ import { useState, useContext } from 'react';
 import { Button, Alert } from 'components/graylog';
 import { Spinner } from 'components/common';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
-const ServerConnectionTest = () => {
+type Props = {
+  prepareSubmitPayload: () => LdapCreate,
+};
+
+const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
+  const { authBackendMeta } = useContext(BackendWizardContext);
   const [{ loading, success, message, errors }, setConnectionStatus] = useState({ loading: false, success: false, message: undefined, errors: undefined });
-  const { formValues, prepareSubmitPayload } = useContext(BackendWizardContext);
 
   const _handleConnectionCheck = () => {
-    const payload = prepareSubmitPayload(formValues);
+    const { config: backendConfig } = prepareSubmitPayload();
 
     setConnectionStatus({ loading: true, message: undefined, errors: undefined, success: false });
 
-    AuthenticationDomain.testConnection({ backend_configuration: payload }).then((response) => {
+    AuthenticationDomain.testConnection({ backend_configuration: backendConfig, backendId: authBackendMeta.backendId }).then((response) => {
       if (response?.success) {
         setConnectionStatus({ loading: false, message: response.message, success: true, errors: undefined });
       } else {

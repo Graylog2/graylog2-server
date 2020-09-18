@@ -50,9 +50,8 @@ type Props = {
     systemPasswordDn?: React.Node,
   },
   formRef: React.ElementRef<typeof Formik | null>,
-  onSubmit: (nextStepKey: string) => void,
+  onSubmit: () => void,
   onSubmitAll: () => void,
-  editing: boolean,
   validateOnMount: boolean,
 };
 
@@ -74,7 +73,7 @@ const defaultHelp = {
   systemPasswordDn: 'The password for the initial connection to the Active Directory server.',
 };
 
-const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, formRef, validateOnMount }: Props) => {
+const ServerConfiguration = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const help = { ...defaultHelp, ...propsHelp };
 
@@ -87,7 +86,13 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
   };
 
   return (
-    <Formik initialValues={stepsState?.formValues} onSubmit={onSubmit} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
+    // $FlowFixMe innerRef works as expected
+    <Formik initialValues={stepsState?.formValues}
+            onSubmit={onSubmit}
+            innerRef={formRef}
+            validateOnMount={validateOnMount}
+            validateOnBlur={false}
+            validateOnChange={false}>
       {({ isSubmitting, validateForm }) => (
         <Form className="form form-horizontal">
           <Input id="uri-host"
@@ -96,7 +101,9 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
                  label="Server Address">
             <>
               <ServerUrl className="input-group">
-                <span className="input-group-addon">ldap://</span>
+                <span className="input-group-addon">
+                  {stepsState.authBackendMeta.urlScheme}://
+                </span>
                 <FormikInput name="serverUrlHost"
                              placeholder="Hostname"
                              formGroupClassName=""
@@ -161,7 +168,7 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
                            type="password"
                            help={help.systemPasswordDn} />
           <ButtonToolbar className="pull-right">
-            {editing && (
+            {stepsState.authBackendMeta.backendId && (
               <Button type="button"
                       onClick={() => _onSubmitAll(validateForm)}
                       disabled={isSubmitting}>

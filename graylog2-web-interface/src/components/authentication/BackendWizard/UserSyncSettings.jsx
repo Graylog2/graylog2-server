@@ -27,7 +27,7 @@ type Props = {
     defaultRoles?: React.Node,
   },
   formRef: React.ElementRef<typeof Formik | null>,
-  onSubmit: (nextStepKey: string) => void,
+  onSubmit: () => void,
   onSubmitAll: () => void,
   validateOnMount: boolean,
 };
@@ -80,7 +80,13 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
   }, []);
 
   return (
-    <Formik initialValues={stepsState.formValues} onSubmit={onSubmit} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
+    // $FlowFixMe innerRef works as expected
+    <Formik initialValues={stepsState.formValues}
+            onSubmit={onSubmit}
+            innerRef={formRef}
+            validateOnMount={validateOnMount}
+            validateOnBlur={false}
+            validateOnChange={false}>
       {({ isSubmitting, validateForm }) => {
         return (
           <Form className="form form-horizontal">

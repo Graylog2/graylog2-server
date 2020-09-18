@@ -8,11 +8,17 @@ import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
 
+export const AUTH_BACKEND_META = {
+  serviceType: 'ldap',
+  serviceTitle: 'LDAP',
+  urlScheme: 'ldap',
+};
+
 const BackendCreate = () => (
   <DocumentTitle title="Create LDAP Authentication Service">
     <WizardPageHeader />
     <BackendWizard onSubmit={AuthenticationDomain.create}
-                   authServiceType="ldap" />
+                   authBackendMeta={AUTH_BACKEND_META} />
   </DocumentTitle>
 );
 

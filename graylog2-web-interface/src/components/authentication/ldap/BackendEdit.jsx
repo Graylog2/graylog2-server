@@ -7,6 +7,7 @@ import AuthenticationDomain from 'domainActions/authentication/AuthenticationDom
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 import { DocumentTitle } from 'components/common';
 
+import { AUTH_BACKEND_META } from './BackendCreate';
 import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
@@ -70,8 +71,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
       <BackendWizard {...optionalProps}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit}
-                     authServiceType={authenticationBackend.config.type}
-                     editing />
+                     authBackendMeta={{ ...AUTH_BACKEND_META, backendId: authenticationBackend.id }} />
     </DocumentTitle>
   );
 };

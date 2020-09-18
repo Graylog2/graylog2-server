@@ -6,19 +6,24 @@ import { Formik, Form } from 'formik';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col, Panel } from 'components/graylog';
+import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
-const UserLoginTest = () => {
-  const { formValues, prepareSubmitPayload } = useContext(BackendWizardContext);
+type Props = {
+  prepareSubmitPayload: () => LdapCreate,
+};
+
+const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
+  const { authBackendMeta } = useContext(BackendWizardContext);
   const [{ loading, success, result }, setLoginStatus] = useState({ loading: false, success: false, result: undefined });
 
   const _handleLoginTest = ({ username, password }) => {
     setLoginStatus({ loading: true, error: undefined, success: false, result: undefined });
 
-    const payload = prepareSubmitPayload(formValues);
+    const { config: backendConfig } = prepareSubmitPayload();
 
-    AuthenticationDomain.testLogin({ backend_configuration: payload, backend_id: null, username, password }).then((response) => {
+    AuthenticationDomain.testLogin({ backend_configuration: backendConfig, backend_id: authBackendMeta.backendId, username, password }).then((response) => {
       setLoginStatus({ loading: false, success: response?.success, result: response?.result });
     });
   };

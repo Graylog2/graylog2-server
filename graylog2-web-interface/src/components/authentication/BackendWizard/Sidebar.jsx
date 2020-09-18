@@ -5,10 +5,11 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { PanelGroup, Panel } from 'components/graylog';
 import type { ThemeInterface } from 'theme';
+import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
-import BackendWizardContext from './contexts/BackendWizardContext';
+import BackendWizardContext, { type WizardFormValues, type AuthBackendMeta } from './contexts/BackendWizardContext';
 
 const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled(PanelGroup)`
   &.panel-group .panel {
@@ -32,8 +33,11 @@ const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled
     }
   }
 `;
+type Props = {
+  prepareSubmitPayload: () => LdapCreate,
+};
 
-const Sidebar = () => {
+const Sidebar = ({ prepareSubmitPayload }: Props) => {
   const [activeKey, setActiveKey] = useState('serverConfig');
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 
@@ -51,7 +55,7 @@ const Sidebar = () => {
           <Panel.Title toggle>Connection Check</Panel.Title>
         </Panel.Heading>
         <Panel.Body collapsible>
-          <ServerConnectionTest />
+          <ServerConnectionTest prepareSubmitPayload={prepareSubmitPayload} />
         </Panel.Body>
       </Panel>
       <Panel eventKey="userSync">
@@ -59,7 +63,7 @@ const Sidebar = () => {
           <Panel.Title toggle>User Login Test</Panel.Title>
         </Panel.Heading>
         <Panel.Body collapsible>
-          <UserLoginTest />
+          <UserLoginTest prepareSubmitPayload={prepareSubmitPayload} />
         </Panel.Body>
       </Panel>
       <Panel eventKey="groupSync">

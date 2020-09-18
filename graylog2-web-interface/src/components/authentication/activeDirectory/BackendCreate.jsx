@@ -49,11 +49,17 @@ export const HELP = {
   ),
 };
 
+export const AUTH_BACKEND_META = {
+  serviceType: 'active-directory',
+  serviceTitle: 'Active Directory',
+  urlScheme: 'ldap',
+};
+
 const BackendCreate = () => (
   <DocumentTitle title="Create Active Directory Authentication Services">
     <WizardPageHeader />
     <BackendWizard onSubmit={AuthenticationDomain.create}
-                   authServiceType="active-directory" />
+                   authBackendMeta={AUTH_BACKEND_META} />
   </DocumentTitle>
 );
 
