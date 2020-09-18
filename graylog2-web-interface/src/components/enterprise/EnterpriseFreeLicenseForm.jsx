@@ -1,21 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { isEmpty, trim } from 'lodash';
 
 import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 const FORM_FIELDS = ['firstName', 'lastName', 'email', 'phone', 'company'];
 
-const PHONE_PATTERN = /^[0-9+]+[0-9\-.\s]+$/;
-
-const PHONE_VALIDATOR = (key, value) => {
-  if (lodash.isEmpty(lodash.trim(value))) {
-    return 'Phone number required';
-  }
-
-  return PHONE_PATTERN.test(value) ? null : 'Invalid phone number';
-};
+const PHONE_PATTERN = /^[0-9\-.()+ ]{5,}$/;
 
 export default class EnterpriseFreeLicenseForm extends React.Component {
   static propTypes = {
@@ -44,10 +36,19 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
     this.setState({ formFields: clearedFields }, callback);
   };
 
+  validatePhone = (key, value) => {
+    if (isEmpty(value.replace(' ', ''))) {
+      return 'Valid phone number  w/ country code is required.';
+    }
+
+    return PHONE_PATTERN.test(value) ? null : 'Invalid phone number';
+  };
+
   handleInput = (key, validator) => {
     return (event) => {
       const { formFields, errors } = this.state;
-      const newFormFields = Object.assign(formFields, { [key]: event.target.value });
+      const value = event.target.value.replace(/[\s]{2,}/, ' '); // strip extraneous spaces
+      const newFormFields = Object.assign(formFields, { [key]: value });
       const newErrors = { ...errors };
 
       if (validator && (typeof validator === 'function')) {
@@ -79,7 +80,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
   formIsInvalid = () => {
     const { isSubmitting, formFields, errors } = this.state;
 
-    return isSubmitting || !lodash.isEmpty(errors) || !lodash.isEmpty(FORM_FIELDS.filter((key) => lodash.isEmpty(lodash.trim(formFields[key]))));
+    return isSubmitting || !isEmpty(errors) || !isEmpty(FORM_FIELDS.filter((key) => isEmpty(trim(formFields[key]))));
   };
 
   submitForm = (event) => {
@@ -137,17 +138,19 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
                    label="Email Address"
                    value={email}
                    placeholder="Please provide a valid email address to send the license key to"
+                   title="Please provide a valid email address to send the license key to"
                    required
                    onChange={this.handleInput('email')} />
-            <Input type="text"
+            <Input type="tel"
                    id="phone"
                    label="Phone Number"
                    value={phone}
-                   placeholder="Please provide a valid phone number"
+                   placeholder="Please provide your phone number w/ country code"
+                   title="Please provide your phone number w/ country code"
                    help={this.validationMessage('phone')}
                    bsStyle={this.validationState('phone')}
                    required
-                   onChange={this.handleInput('phone', PHONE_VALIDATOR)} />
+                   onChange={this.handleInput('phone', this.validatePhone)} />
           </Col>
         </Row>
         <Row>
