@@ -186,8 +186,8 @@ public class LdapConnector {
                     if (attribute.isHumanReadable()) {
                         ldapEntry.put(attribute.getId(), Joiner.on(", ").join(attribute.iterator()));
                     }
-                    // ActiveDirectory (memberOf) and Sun Directory Server (isMemberOf)
-                    if ("memberOf".equalsIgnoreCase(attribute.getId()) || "isMemberOf".equalsIgnoreCase(attribute.getId())) {
+                    // ActiveDirectory (memberOf), Sun Directory Server (isMemberOf) and LDAP (groupmembership)
+                    if ("memberOf".equalsIgnoreCase(attribute.getId()) || "isMemberOf".equalsIgnoreCase(attribute.getId()) || "groupmembership".equalsIgnoreCase(attribute.getId())) {
                         for (Value<?> group : attribute) {
                             groupDns.add(group.getString());
                         }
