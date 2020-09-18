@@ -203,6 +203,20 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    public List<User> loadAllForAuthServiceBackend(String authServiceBackendId) {
+        final DBObject query = BasicDBObjectBuilder.start(UserImpl.AUTH_SERVICE_ID, authServiceBackendId).get();
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        final List<User> users = Lists.newArrayList();
+        for (DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+
+        return users;
+    }
+
+    @Override
     public Collection<User> loadAllForRole(Role role) {
         final String roleId = role.getId();
         final DBObject query = BasicDBObjectBuilder.start(UserImpl.ROLES, new ObjectId(roleId)).get();

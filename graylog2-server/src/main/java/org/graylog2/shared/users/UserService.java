@@ -47,11 +47,14 @@ public interface UserService extends PersistedService {
     /**
      * Get the root user. The root user might not be present in all environments and there shouldn't really be
      * a need to explicitly refer to the root user. But if you really need it, here you go.
+     *
      * @return The root user, if present. An empty optional otherwise.
      */
     Optional<User> getRootUser();
 
     long count();
+
+    List<User> loadAllForAuthServiceBackend(String authServiceBackendId);
 
     Collection<User> loadAllForRole(Role role);
 
