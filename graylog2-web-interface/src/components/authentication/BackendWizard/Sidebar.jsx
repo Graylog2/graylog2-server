@@ -9,7 +9,7 @@ import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
-import BackendWizardContext, { type WizardFormValues, type AuthBackendMeta } from './contexts/BackendWizardContext';
+import BackendWizardContext from './contexts/BackendWizardContext';
 
 const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled(PanelGroup)`
   &.panel-group .panel {
@@ -76,10 +76,6 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
       </Panel>
     </StyledPanelGroup>
   );
-};
-
-Sidebar.defaultProps = {
-  children: 'Hello World!',
 };
 
 export default Sidebar;

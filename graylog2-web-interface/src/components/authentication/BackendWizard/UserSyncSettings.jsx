@@ -3,10 +3,10 @@ import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
+import { Alert, Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
+import { Icon, FormikFormGroup, Select } from 'components/common';
 import { validateField, validation } from 'util/FormsUtils';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import { FormikFormGroup, Select } from 'components/common';
-import { Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
@@ -141,6 +141,15 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                 </Input>
               )}
             </Field>
+
+            <Row>
+              <Col sm={9} smOffset={3}>
+                <Alert bsStyle="info">
+                  <Icon name="info-circle" />{' '}
+                  We recommend you test your user login in the sidebar panel to verify your settings.
+                </Alert>
+              </Col>
+            </Row>
 
             <ButtonToolbar className="pull-right">
               <Button type="button"
