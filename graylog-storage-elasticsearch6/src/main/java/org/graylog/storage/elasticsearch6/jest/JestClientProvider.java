@@ -64,6 +64,8 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
                               @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
+                              @Named("elasticsearch_discovery_default_user") String defaultUserForDiscoveredNodes,
+                              @Named("elasticsearch_discovery_default_password") String defaultPasswordForDiscoveredNodes,
                               ObjectMapper objectMapper) {
         this.factory = new JestClientFactory() {
             @Override
@@ -97,6 +99,13 @@ public class JestClientProvider implements Provider<JestClient> {
                 return hostUri.toString();
             })
             .collect(Collectors.toList());
+
+        if (discoveryEnabled && !Strings.isNullOrEmpty(defaultUserForDiscoveredNodes) && !Strings.isNullOrEmpty(defaultPasswordForDiscoveredNodes)) {
+            credentialsProvider.setCredentials(
+                    new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, defaultSchemeForDiscoveredNodes),
+                    new UsernamePasswordCredentials(defaultUserForDiscoveredNodes, defaultPasswordForDiscoveredNodes)
+            );
+        }
 
         final HttpClientConfig.Builder httpClientConfigBuilder = new HttpClientConfig
                 .Builder(hosts)

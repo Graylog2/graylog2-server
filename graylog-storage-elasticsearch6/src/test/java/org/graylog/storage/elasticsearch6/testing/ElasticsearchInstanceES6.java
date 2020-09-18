@@ -82,6 +82,8 @@ public class ElasticsearchInstanceES6 extends ElasticsearchInstance {
                 Duration.seconds(60),
                 "http",
                 false,
+                null,
+                null,
                 new ObjectMapperProvider().get()
         ).get();
     }
