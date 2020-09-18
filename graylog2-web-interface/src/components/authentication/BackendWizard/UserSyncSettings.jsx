@@ -80,40 +80,32 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
   }, []);
 
   return (
-    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
+    <Formik initialValues={stepsState.formValues} onSubmit={onSubmit} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
       {({ isSubmitting, validateForm }) => {
         return (
           <Form className="form form-horizontal">
-            <FormikFormGroup {...FormValidation.userSearchBase}
-                             label="Search Base DN"
+            <FormikFormGroup label="Search Base DN"
                              name="userSearchBase"
                              placeholder="Search Base DN"
-                             required
                              validate={validateField(FormValidation.userSearchBase)}
                              help={help.userSearchBase} />
 
-            <FormikFormGroup {...FormValidation.userSearchPattern}
-                             label="Search Pattern"
+            <FormikFormGroup label="Search Pattern"
                              name="userSearchPattern"
                              placeholder="Search Pattern"
-                             required
                              validate={validateField(FormValidation.userSearchPattern)}
                              help={help.userSearchPattern} />
 
-            <FormikFormGroup {...FormValidation.userNameAttribute}
-                             label="User Name Attirbute"
+            <FormikFormGroup label="User Name Attirbute"
                              name="userNameAttribute"
                              placeholder="User Name Attirbute"
                              validate={validateField(FormValidation.userNameAttribute)}
-                             required
                              help={help.userNameAttribute} />
 
-            <FormikFormGroup {...FormValidation.userFullNameAttribute}
-                             label="Full Name Attirbute"
+            <FormikFormGroup label="Full Name Attirbute"
                              name="userFullNameAttribute"
                              placeholder="Full Name Attirbute"
                              validate={validateField(FormValidation.userFullNameAttribute)}
-                             required
                              help={help.userNameAttribute} />
 
             <Row>
@@ -126,24 +118,22 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
             </Row>
 
             <Field name="defaultRoles" validate={validateField(FormValidation.defaultRoles)}>
-              {({ field: { name, value, onChange, onBlur }, meta: { error, touched: isTouched } }) => {
-                return (
-                  <Input id="default-roles-select"
-                         label="Default Roles"
-                         help={(isTouched && error) ? error : help.defaultRoles}
-                         bsStyle={(isTouched && error) ? 'error' : undefined}
-                         labelClassName="col-sm-3"
-                         wrapperClassName="col-sm-9">
-                    <Select inputProps={{ 'aria-label': 'Search for roles' }}
-                            onChange={(selectedRoles) => onChange({ target: { value: selectedRoles, name } })}
-                            onBlur={onBlur}
-                            options={rolesOptions}
-                            placeholder="Search for roles"
-                            multi
-                            value={value} />
-                  </Input>
-                );
-              }}
+              {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
+                <Input id="default-roles-select"
+                       label="Default Roles"
+                       help={error ?? help.defaultRoles}
+                       bsStyle={error ? 'error' : undefined}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9">
+                  <Select inputProps={{ 'aria-label': 'Search for roles' }}
+                          onChange={(selectedRoles) => onChange({ target: { value: selectedRoles, name } })}
+                          onBlur={onBlur}
+                          options={rolesOptions}
+                          placeholder="Search for roles"
+                          multi
+                          value={value} />
+                </Input>
+              )}
             </Field>
 
             <ButtonToolbar className="pull-right">

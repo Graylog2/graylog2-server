@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
@@ -38,7 +39,7 @@ export const prepareSubmitPayload = ({
   serverUrlPort,
   systemUserDn,
   systemUserPassword,
-  transportSecuriy,
+  transportSecurity,
   userFullNameAttribute,
   userNameAttribute,
   userSearchBase,
@@ -55,7 +56,7 @@ export const prepareSubmitPayload = ({
       server_urls: [serverUrl],
       system_user_dn: systemUserDn,
       system_password: systemUserPassword,
-      transport_security: transportSecuriy,
+      transport_security: transportSecurity,
       type: authServiceType,
       user_full_name_attribute: userFullNameAttribute,
       user_name_attribute: userNameAttribute,
@@ -139,7 +140,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
     });
   };
 
-  const wizardSteps = [
+  const wizardSteps = Immutable.OrderedSet([
     {
       key: 'serverConfig',
       title: (
@@ -148,7 +149,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
           Server Configuration
         </>),
       component: (
-        <ServerConfiguration onSubmit={_handleStepChange}
+        <ServerConfiguration onSubmit={() => _handleStepChange('userSync')}
                              onSubmitAll={_handleSubmitAll}
                              validateOnMount={stepsState.invalidStepKeys.includes('serverConfig')}
                              formRef={formRefs.serverConfig}
@@ -164,7 +165,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
         </>
       ),
       component: (
-        <UserSyncSettings onSubmit={_handleStepChange}
+        <UserSyncSettings onSubmit={() => _handleStepChange('groupSync')}
                           validateOnMount={stepsState.invalidStepKeys.includes('userSync')}
                           formRef={formRefs.userSync}
                           onSubmitAll={_handleSubmitAll} />
@@ -179,12 +180,11 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
         </>
       ),
       component: (
-        <GroupSyncSettings onSubmit={_handleStepChange}
-                           validateOnMount={stepsState.invalidStepKeys.includes('groupSync')}
+        <GroupSyncSettings validateOnMount={stepsState.invalidStepKeys.includes('groupSync')}
                            onSubmitAll={_handleSubmitAll} />
       ),
     },
-  ];
+  ]);
 
   return (
     <BackendWizardContext.Provider value={{ ...stepsState, setStepsState }}>
@@ -195,7 +195,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
                   activeStep={activeStep}
                   onStepChange={_handleStepChange}
                   hidePreviousNextButtons
-                  steps={wizardSteps}>
+                  steps={wizardSteps.toJS()}>
             <Sidebar />
           </Wizard>
         )}
@@ -210,7 +210,7 @@ BackendWizard.defaultProps = {
   initialValues: {
     serverUrlHost: 'localhost',
     serverUrlPort: 389,
-    transportSecuriy: 'tls',
+    transportSecurity: 'tls',
     verifyCertificates: true,
     userNameAttribute: 'uid',
     userFullNameAttribute: 'cn',

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useContext } from 'react';
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
 
 import { validation, validateField } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput } from 'components/common';
@@ -18,10 +18,31 @@ export const FormValidation = {
   },
   serverUrlPort: {
     required: true,
-    min: 2,
+    min: 1,
     max: 65535,
   },
 };
+
+const ServerUrl = styled.div`
+  display: flex;
+  > * {
+    align-self: flex-start;
+    min-height: 34px;
+    flex-grow: 1;
+
+    :last-child {
+      flex: 0.8;
+      min-width: 130px;
+    }
+  }
+
+  .input-group-addon {
+    display: flex;
+    align-items: center;
+    max-width: fit-content;
+    min-width: fit-content;
+  }
+`;
 
 type Props = {
   help?: {
@@ -65,10 +86,10 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
     });
   };
 
-  console.log('validateOnMount', validateOnMount);
+  console.log('stepsState?.formValues', stepsState?.formValues);
 
   return (
-    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
+    <Formik initialValues={stepsState?.formValues} onSubmit={onSubmit} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
       {({ isSubmitting, validateForm }) => (
         <Form className="form form-horizontal">
           <Input id="uri-host"
@@ -76,10 +97,9 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
                  wrapperClassName="col-sm-9"
                  label="Server Address">
             <>
-              <div className="input-group">
+              <ServerUrl className="input-group">
                 <span className="input-group-addon">ldap://</span>
-                <FormikInput {...FormValidation.serverUrlHost}
-                             name="serverUrlHost"
+                <FormikInput name="serverUrlHost"
                              placeholder="Hostname"
                              formGroupClassName=""
                              validate={validateField(FormValidation.serverUrlPort)} />
@@ -89,26 +109,39 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
                              name="serverUrlPort"
                              placeholder="Port"
                              formGroupClassName="" />
-              </div>
+              </ServerUrl>
 
               <ProtocolOptions>
-                <FormikInput type="radio"
-                             name="transportSecurity"
-                             formGroupClassName=""
+                <Field name="transportSecurity">
+                  {({ field: { value, name, onChange, onBlur } }) => (
+                    <>
+                      <Input onBlur={onBlur}
+                             id={name}
                              value=""
-                             label="None" />
-
-                <FormikInput type="radio"
-                             name="transportSecurity"
+                             defaultChecked={value === 'tls'}
+                             onChange={onChange}
                              formGroupClassName=""
+                             label="None"
+                             type="radio" />
+                      <Input onBlur={onBlur}
+                             id={name}
                              value="tls"
-                             label="TLS" />
-
-                <FormikInput type="radio"
-                             name="transportSecurity"
+                             defaultChecked={value === 'tls'}
+                             onChange={onChange}
                              formGroupClassName=""
+                             label="TLS"
+                             type="radio" />
+                      <Input onBlur={onBlur}
+                             id={name}
                              value="startTls"
-                             label="StartTLS" />
+                             label="StartTLS"
+                             defaultChecked={value === 'startTls'}
+                             onChange={onChange}
+                             formGroupClassName=""
+                             type="radio" />
+                    </>
+                  )}
+                </Field>
 
                 <FormikInput type="checkbox"
                              name="verifyCertificates"
