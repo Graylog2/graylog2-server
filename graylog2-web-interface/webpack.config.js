@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
@@ -158,6 +159,7 @@ const webpackConfig = {
     new webpack.DefinePlugin({
       FEATURES: JSON.stringify(process.env.FEATURES),
     }),
+    new LodashModuleReplacementPlugin(),
   ],
 };
 
