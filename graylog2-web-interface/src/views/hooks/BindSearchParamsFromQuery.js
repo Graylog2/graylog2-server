@@ -41,16 +41,12 @@ const _getStreams = (query = {}): Array<string> => {
 
 const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   if (view.type !== View.Type.Search) {
-    console.log('no search');
-
     return Promise.resolve(true);
   }
 
   const { q: queryString } = query;
   const timerange = _getTimerange(query);
   const streams = filtersForQuery(_getStreams(query));
-
-  console.log('queryString: ', queryString);
 
   if (!queryString && !timerange && !streams) {
     return Promise.resolve(true);
@@ -66,7 +62,6 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   let queryBuilder = firstQuery.toBuilder();
 
   if (queryString !== undefined) {
-    console.log('setting new query: ', queryString);
     queryBuilder = queryBuilder.query(createElasticsearchQueryString(queryString));
   }
 
