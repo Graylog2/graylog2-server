@@ -3,13 +3,21 @@ import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
-import FormUtils from 'util/FormsUtils';
+import { validateField, validation } from 'util/FormsUtils';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { FormikFormGroup, Select } from 'components/common';
 import { Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
+
+export const FormValidation = {
+  userSearchBase: { required: true },
+  userSearchPattern: { required: true },
+  userNameAttribute: { required: true },
+  userFullNameAttribute: { required: true },
+  defaultRoles: { required: true },
+};
 
 type Props = {
   help?: {
@@ -18,10 +26,10 @@ type Props = {
     userNameAttribute?: React.Node,
     defaultRoles?: React.Node,
   },
-  disableSubmitAll: boolean,
-  onChange: (SyntheticInputEvent<HTMLInputElement> | { target: { value: string, name: string, checked?: boolean } }) => void,
+  formRef: any,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
+  validateOnMount: boolean,
 };
 
 const defaultHelp = {
@@ -47,14 +55,14 @@ const defaultHelp = {
   ),
 };
 
-const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmitAll, onChange }: Props) => {
+const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const [rolesOptions, setRolesOptions] = useState([]);
 
   const _onSubmitAll = (validateForm) => {
     validateForm().then((errors) => {
-      if (!FormUtils.validate.hasErrors(errors)) {
+      if (!validation.hasErrors(errors)) {
         onSubmitAll();
       }
     });
@@ -72,83 +80,87 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmi
   }, []);
 
   return (
-    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')}>
-      {({ isSubmitting, isValid, validateForm }) => (
-        <Form onChange={(event) => onChange(event)} className="form form-horizontal" onBlur={(werwer) => console.log('handleBlur', werwer)}>
-          <FormikFormGroup label="Search Base DN"
-                           name="userSearchBase"
-                           placeholder="System User DN"
-                           required
-                           validate={FormUtils.validation.isRequired('system username')}
-                           help={help.userSearchBase} />
+    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
+      {({ isSubmitting, validateForm }) => {
+        return (
+          <Form className="form form-horizontal">
+            <FormikFormGroup {...FormValidation.userSearchBase}
+                             label="Search Base DN"
+                             name="userSearchBase"
+                             placeholder="Search Base DN"
+                             required
+                             validate={validateField(FormValidation.userSearchBase)}
+                             help={help.userSearchBase} />
 
-          <FormikFormGroup label="Search Pattern"
-                           name="userSearchPattern"
-                           placeholder="Search Pattern"
-                           required
-                           validate={FormUtils.validation.isRequired('search pattern')}
-                           help={help.userSearchPattern} />
+            <FormikFormGroup {...FormValidation.userSearchPattern}
+                             label="Search Pattern"
+                             name="userSearchPattern"
+                             placeholder="Search Pattern"
+                             required
+                             validate={validateField(FormValidation.userSearchPattern)}
+                             help={help.userSearchPattern} />
 
-          <FormikFormGroup label="Display Name Attirbute"
-                           name="userNameAttribute"
-                           placeholder="Display Name Attirbute"
-                           validate={FormUtils.validation.isRequired('display name attribute')}
-                           required
-                           help={help.userNameAttribute} />
+            <FormikFormGroup {...FormValidation.userNameAttribute}
+                             label="User Name Attirbute"
+                             name="userNameAttribute"
+                             placeholder="User Name Attirbute"
+                             validate={validateField(FormValidation.userNameAttribute)}
+                             required
+                             help={help.userNameAttribute} />
 
-          <FormikFormGroup label="Full Name Attirbute"
-                           name="userFullNameAttribute"
-                           placeholder="Full Name Attirbute"
-                           validate={FormUtils.validation.isRequired('full name name attribute')}
-                           required
-                           help={help.userNameAttribute} />
+            <FormikFormGroup {...FormValidation.userFullNameAttribute}
+                             label="Full Name Attirbute"
+                             name="userFullNameAttribute"
+                             placeholder="Full Name Attirbute"
+                             validate={validateField(FormValidation.userFullNameAttribute)}
+                             required
+                             help={help.userNameAttribute} />
 
-          <Row>
-            <Col sm={9} smOffset={3}>
-              <Panel bsStyle="info">
-                Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br />
-                Existing user accounts will be updated on their next login, or if you edit their roles manually.
-              </Panel>
-            </Col>
-          </Row>
+            <Row>
+              <Col sm={9} smOffset={3}>
+                <Panel bsStyle="info">
+                  Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br />
+                  Existing user accounts will be updated on their next login, or if you edit their roles manually.
+                </Panel>
+              </Col>
+            </Row>
 
-          <Field name="defaultRoles" validate={FormUtils.validation.isRequired('default role')}>
-            {({ field: { name, value, onChange: onFieldChange }, meta: { error } }) => {
-              return (
-                <Input id="default-roles-select"
-                       label="Default Roles"
-                       help={error ?? help.defaultRoles}
-                       bsStyle={error ? 'error' : undefined}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9">
-                  <Select inputProps={{ 'aria-label': 'Search for roles' }}
-                          onChange={(roleName) => {
-                            onFieldChange({ target: { value: roleName, name } });
-                            onChange({ target: { value: roleName, name } });
-                          }}
-                          options={rolesOptions}
-                          placeholder="Search for roles"
-                          multi
-                          value={value} />
-                </Input>
-              );
-            }}
-          </Field>
+            <Field name="defaultRoles" validate={validateField(FormValidation.defaultRoles)}>
+              {({ field: { name, value, onChange, onBlur }, meta: { error, touched: isTouched } }) => {
+                return (
+                  <Input id="default-roles-select"
+                         label="Default Roles"
+                         help={(isTouched && error) ? error : help.defaultRoles}
+                         bsStyle={(isTouched && error) ? 'error' : undefined}
+                         labelClassName="col-sm-3"
+                         wrapperClassName="col-sm-9">
+                    <Select inputProps={{ 'aria-label': 'Search for roles' }}
+                            onChange={(selectedRoles) => onChange({ target: { value: selectedRoles, name } })}
+                            onBlur={onBlur}
+                            options={rolesOptions}
+                            placeholder="Search for roles"
+                            multi
+                            value={value} />
+                  </Input>
+                );
+              }}
+            </Field>
 
-          <ButtonToolbar className="pull-right">
-            <Button type="button"
-                    onClick={() => _onSubmitAll(validateForm)}
-                    disabled={!isValid || isSubmitting || disableSubmitAll}>
-              Finish & Save Identity Provider
-            </Button>
-            <Button bsStyle="primary"
-                    type="submit"
-                    disabled={!isValid || isSubmitting}>
-              Next: Group Synchronisation
-            </Button>
-          </ButtonToolbar>
-        </Form>
-      )}
+            <ButtonToolbar className="pull-right">
+              <Button type="button"
+                      onClick={() => _onSubmitAll(validateForm)}
+                      disabled={isSubmitting}>
+                Finish & Save Identity Provider
+              </Button>
+              <Button bsStyle="primary"
+                      type="submit"
+                      disabled={isSubmitting}>
+                Next: Group Synchronisation
+              </Button>
+            </ButtonToolbar>
+          </Form>
+        );
+      }}
     </Formik>
   );
 };

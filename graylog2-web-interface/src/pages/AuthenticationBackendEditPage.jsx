@@ -17,7 +17,6 @@ type Props = {
       initialStepKey?: string,
     },
   },
-
 };
 
 const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { initialStepKey } } }: Props) => {

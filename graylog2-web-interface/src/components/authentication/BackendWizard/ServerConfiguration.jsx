@@ -5,23 +5,34 @@ import styled from 'styled-components';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import FormUtils from 'util/FormsUtils';
+import { validation, validateField } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { Button, ButtonToolbar } from 'components/graylog';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
+export const FormValidation = {
+  serverUrlHost: {
+    required: true,
+  },
+  serverUrlPort: {
+    required: true,
+    min: 2,
+    max: 65535,
+  },
+};
+
 type Props = {
-  disableSubmitAll: boolean,
   help?: {
     systemUserDn?: React.Node,
     systemPasswordDn?: React.Node,
   },
+  formRef: any,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => void,
   editing: boolean,
+  validateOnMount: boolean,
 };
 
 const ProtocolOptions = styled.div`
@@ -42,22 +53,24 @@ const defaultHelp = {
   systemPasswordDn: 'The password for the initial connection to the Active Directory server.',
 };
 
-const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onSubmitAll, disableSubmitAll }: Props) => {
+const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, formRef, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const help = { ...defaultHelp, ...propsHelp };
 
   const _onSubmitAll = (validateForm) => {
     validateForm().then((errors) => {
-      if (!FormUtils.validate.hasErrors(errors)) {
+      if (!validation.hasErrors(errors)) {
         onSubmitAll();
       }
     });
   };
 
+  console.log('validateOnMount', validateOnMount);
+
   return (
-    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')}>
-      {({ isSubmitting, isValid, validateForm }) => (
-        <Form onChange={(event) => onChange(event)} className="form form-horizontal">
+    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
+      {({ isSubmitting, validateForm }) => (
+        <Form className="form form-horizontal">
           <Input id="uri-host"
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9"
@@ -65,23 +78,19 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
             <>
               <div className="input-group">
                 <span className="input-group-addon">ldap://</span>
-                <FormikInput name="serverUrlHost"
+                <FormikInput {...FormValidation.serverUrlHost}
+                             name="serverUrlHost"
                              placeholder="Hostname"
                              formGroupClassName=""
-                             validate={FormUtils.validation.isRequired('server host')}
-                             required />
+                             validate={validateField(FormValidation.serverUrlPort)} />
                 <span className="input-group-addon input-group-separator">:</span>
-                <FormikInput type="number"
+                <FormikInput validate={validateField(FormValidation.serverUrlPort)}
+                             type="number"
                              name="serverUrlPort"
-                             validate={FormUtils.validation.isRequired('server port')}
-                             min="1"
-                             max="65535"
                              placeholder="Port"
-                             formGroupClassName=""
-                             required />
+                             formGroupClassName="" />
               </div>
 
-              {/* checked={ldapUri.scheme() === 'ldaps'} ? */}
               <ProtocolOptions>
                 <FormikInput type="radio"
                              name="transportSecurity"
@@ -109,11 +118,9 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
 
             </>
           </Input>
-          <FormikFormGroup label="System Username"
+          <FormikFormGroup label="System User DN"
                            name="systemUserDn"
                            placeholder="System User DN"
-                           required
-                           validate={FormUtils.validation.isRequired('System Username')}
                            help={help.systemUserDn} />
 
           <FormikFormGroup label="System Password"
@@ -126,13 +133,13 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
             {editing && (
               <Button type="button"
                       onClick={() => _onSubmitAll(validateForm)}
-                      disabled={!isValid || isSubmitting || disableSubmitAll}>
+                      disabled={isSubmitting}>
                 Finish & Save Identity Provider
               </Button>
             )}
             <Button bsStyle="primary"
                     type="submit"
-                    disabled={!isValid || isSubmitting}>
+                    disabled={isSubmitting}>
               Next: User Synchronisation
             </Button>
           </ButtonToolbar>

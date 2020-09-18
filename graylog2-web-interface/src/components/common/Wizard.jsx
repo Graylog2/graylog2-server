@@ -86,7 +86,7 @@ type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: string,
+  title: React.Node,
   component: React.Node,
   disabled?: boolean,
 };

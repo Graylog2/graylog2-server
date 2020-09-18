@@ -7,6 +7,7 @@ type Props = {
   onChange: (event: SyntheticInputEvent<HTMLInputElement>, values: any) => void,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
+  validateOnMount: boolean,
 };
 
 const Header = styled.h4`
@@ -20,7 +21,7 @@ const NoEnterpriseComponent = () => (
   </>
 );
 
-const GroupSyncSettings = ({ onSubmit, onSubmitAll, onChange }: Props) => {
+const GroupSyncSettings = ({ onSubmit, onSubmitAll, onChange, validateOnMount }: Props) => {
   const authenticationPlugin = PluginStore.exports('authentication.groupSync');
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
@@ -31,6 +32,7 @@ const GroupSyncSettings = ({ onSubmit, onSubmitAll, onChange }: Props) => {
 
   return (
     <GroupSyncForm onSubmit={onSubmit}
+                   validateOnMount={validateOnMount}
                    onSubmitAll={onSubmitAll}
                    onChange={onChange} />
   );

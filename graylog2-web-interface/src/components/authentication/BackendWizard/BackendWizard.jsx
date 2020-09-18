@@ -1,19 +1,27 @@
 // @flow strict
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
+import { compact } from 'lodash';
 
+import { validateField } from 'util/FormsUtils';
 import Wizard, { type Step } from 'components/common/Wizard';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues } from './contexts/BackendWizardContext';
-import ServerConfiguration from './ServerConfiguration';
-import UserSyncSettings from './UserSyncSettings';
+import ServerConfiguration, { FormValidation as ServerConfigValidation } from './ServerConfiguration';
+import UserSyncSettings, { FormValidation as UserSyncValidation } from './UserSyncSettings';
 import Sidebar from './Sidebar';
 import GroupSyncSettings from './GroupSyncSettings';
+import StepTitleWarning from './StepTitleWarning';
+
+const FORMS_VALIDATION = {
+  serverConfig: ServerConfigValidation,
+  userSync: UserSyncValidation,
+};
 
 type Props = {
   initialValues: WizardFormValues,
@@ -23,7 +31,8 @@ type Props = {
   authServiceType: string,
 };
 
-const _prepareSubmitPayload = (authServiceType) => ({
+export const prepareSubmitPayload = ({
+  authServiceType,
   defaultRoles,
   serverUrlHost,
   serverUrlPort,
@@ -57,84 +66,123 @@ const _prepareSubmitPayload = (authServiceType) => ({
   };
 };
 
+const _invalidStepKeys = (formValues) => {
+  const invalidStepKeys = Object.entries(FORMS_VALIDATION).map(([stepKey, formValidation]) => {
+    const stepHasError = Object.entries(formValidation).some(([fieldName, fieldValidation]) => {
+      return !!validateField(fieldValidation)(formValues?.[fieldName]);
+    });
+
+    return stepHasError ? stepKey : undefined;
+  });
+
+  // Remove undefined values
+  return compact(invalidStepKeys);
+};
+
+const _onSubmitAll = (stepsState, setStepsState, onSubmit, getCurrentFormValues) => {
+  const formValues = getCurrentFormValues();
+  const invalidStepKeys = _invalidStepKeys(formValues);
+
+  if (invalidStepKeys.length >= 1) {
+    setStepsState({
+      ...stepsState,
+      formValues,
+      invalidStepKeys,
+      activeStepKey: invalidStepKeys[0],
+    });
+
+    return;
+  }
+
+  setStepsState({ ...stepsState, formValues, invalidStepKeys: [] });
+
+  const payload = prepareSubmitPayload(formValues);
+
+  onSubmit(payload).then(() => {
+    history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
+  });
+};
+
 const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmit, editing }: Props) => {
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
-    formValues: initialValues,
-    prepareSubmitPayload: _prepareSubmitPayload(authServiceType),
+    formValues: { ...initialValues, authServiceType },
+    invalidStepKeys: [],
   });
-
-  const {
-    serverUrlHost,
-    serverUrlPort,
-    systemUserDn,
-    userSearchBase,
-    userSearchPattern,
-    userNameAttribute,
-    userFullNameAttribute,
-  } = stepsState.formValues;
-
-  const isServerConfigValid = !!(serverUrlHost && !!serverUrlPort && systemUserDn);
-  const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && userNameAttribute && userFullNameAttribute);
-  const disableSubmitAll = !isServerConfigValid || !isUserSyncSettingValid;
-
-  const _handleSubmitAll = () => {
-    if (!disableSubmitAll) {
-      const payload = stepsState.prepareSubmitPayload(stepsState.formValues);
-
-      onSubmit(payload).then(() => {
-        history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
-      });
-    }
+  const formRefs = {
+    serverConfig: useRef(),
+    userSync: useRef(),
   };
 
-  const _handleStepChange = (stepKey: $PropertyType<Step, 'key'>) => setStepsState({ ...stepsState, activeStepKey: stepKey });
+  const _getCurrentFormValues = () => {
+    const activeForm = formRefs[stepsState.activeStepKey]?.current;
 
-  const _handleFieldUpdate = (event: SyntheticInputEvent<HTMLInputElement> | { target: { value: string, name: string, checked?: boolean } }) => {
-    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    return { ...stepsState.formValues, ...activeForm?.values };
+  };
+
+  const _handleSubmitAll = () => _onSubmitAll(stepsState, setStepsState, onSubmit, _getCurrentFormValues);
+
+  const _handleStepChange = (stepKey: $PropertyType<Step, 'key'>) => {
+    const formValues = _getCurrentFormValues();
+    let invalidStepKeys = [...stepsState.invalidStepKeys];
+
+    // Only update invalid steps keys, we create them on submit all only
+    if (invalidStepKeys.length >= 1) {
+      invalidStepKeys = _invalidStepKeys(formValues);
+    }
 
     setStepsState({
       ...stepsState,
-      formValues: {
-        ...stepsState.formValues,
-        [event.target.name]: value,
-      },
+      invalidStepKeys,
+      formValues,
+      activeStepKey: stepKey,
     });
   };
 
   const wizardSteps = [
     {
       key: 'serverConfig',
-      title: 'Server Configuration',
+      title: (
+        <>
+          <StepTitleWarning invalidStepKeys={stepsState.invalidStepKeys} stepKey="serverConfig" />
+          Server Configuration
+        </>),
       component: (
         <ServerConfiguration onSubmit={_handleStepChange}
                              onSubmitAll={_handleSubmitAll}
-                             onChange={_handleFieldUpdate}
-                             disableSubmitAll={disableSubmitAll}
+                             validateOnMount={stepsState.invalidStepKeys.includes('serverConfig')}
+                             formRef={formRefs.serverConfig}
                              editing={editing} />
       ),
     },
     {
       key: 'userSync',
-      title: 'User Synchronisation',
+      title: (
+        <>
+          <StepTitleWarning invalidStepKeys={stepsState.invalidStepKeys} stepKey="userSync" />
+          User Synchronisation
+        </>
+      ),
       component: (
         <UserSyncSettings onSubmit={_handleStepChange}
-                          onSubmitAll={_handleSubmitAll}
-                          disableSubmitAll={disableSubmitAll}
-                          onChange={_handleFieldUpdate} />
+                          validateOnMount={stepsState.invalidStepKeys.includes('userSync')}
+                          formRef={formRefs.userSync}
+                          onSubmitAll={_handleSubmitAll} />
       ),
-      disabled: !isServerConfigValid,
     },
     {
       key: 'groupSync',
-      title: 'Group Synchronisation',
+      title: (
+        <>
+          <StepTitleWarning invalidStepKeys={stepsState.invalidStepKeys} stepKey="groupSync" />
+          Group Synchronisation
+        </>
+      ),
       component: (
         <GroupSyncSettings onSubmit={_handleStepChange}
-                           onSubmitAll={_handleSubmitAll}
-                           disableSubmitAll={disableSubmitAll}
-                           onChange={_handleFieldUpdate} />
+                           validateOnMount={stepsState.invalidStepKeys.includes('groupSync')}
+                           onSubmitAll={_handleSubmitAll} />
       ),
-      disabled: !isUserSyncSettingValid,
     },
   ];
 
