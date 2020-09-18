@@ -52,6 +52,7 @@ import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.ElasticsearchExceptionMapper;
@@ -194,6 +195,7 @@ public class ServerBindings extends Graylog2Module {
         final Multibinder<Class<? extends ExceptionMapper>> exceptionMappers = jerseyExceptionMapperBinder();
         exceptionMappers.addBinding().toInstance(NotFoundExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ValidationExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(ValidationFailureExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ElasticsearchExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(QueryParsingExceptionMapper.class);
     }
