@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
 import { validation, validateField } from 'util/FormsUtils';
-import { FormikFormGroup, FormikInput } from 'components/common';
+import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { Button, ButtonToolbar } from 'components/graylog';
 
@@ -86,8 +86,6 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
     });
   };
 
-  console.log('stepsState?.formValues', stepsState?.formValues);
-
   return (
     <Formik initialValues={stepsState?.formValues} onSubmit={onSubmit} innerRef={formRef} validateOnMount={validateOnMount} validateOnBlur={false} validateOnChange={false}>
       {({ isSubmitting, validateForm }) => (
@@ -151,12 +149,12 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, editing, onSubmitAll, 
 
             </>
           </Input>
-          <FormikFormGroup label="System User DN"
+          <FormikFormGroup label={<>System User DN <Opt /></>}
                            name="systemUserDn"
                            placeholder="System User DN"
                            help={help.systemUserDn} />
 
-          <FormikFormGroup label="System Password"
+          <FormikFormGroup label={<>System Password <Opt /></>}
                            name="systemPasswordDn"
                            autoComplete="autentication-service-password"
                            placeholder="System Password"

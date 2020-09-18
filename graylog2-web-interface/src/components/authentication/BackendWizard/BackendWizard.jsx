@@ -177,7 +177,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
       title: (
         <>
           <StepTitleWarning invalidStepKeys={stepsState.invalidStepKeys} stepKey="groupSync" />
-          Group Synchronisation
+          Group Synchronisation (Opt.)
         </>
       ),
       component: (
