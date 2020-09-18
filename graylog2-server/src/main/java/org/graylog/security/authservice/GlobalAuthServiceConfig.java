@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Optional;
 
@@ -49,14 +50,23 @@ public class GlobalAuthServiceConfig {
         return Optional.empty(); // TODO: Load and return the actual backend
     }
 
+    public Data getConfiguration() {
+        return clusterConfigService.getOrDefault(Data.class, Data.create(null));
+    }
+
+    public Data updateConfiguration(Data updatedData) {
+        clusterConfigService.write(updatedData);
+        return requireNonNull(clusterConfigService.get(Data.class), "updated configuration cannot be null");
+    }
+
     @AutoValue
     public static abstract class Data {
         @JsonProperty("active_backend")
-        public abstract String activeBackend();
+        public abstract Optional<String> activeBackend();
 
         @JsonCreator
-        public static GlobalAuthServiceConfig.Data create(@JsonProperty("active_backend") String activeBackend) {
-            return new AutoValue_GlobalAuthServiceConfig_Data(activeBackend);
+        public static GlobalAuthServiceConfig.Data create(@JsonProperty("active_backend") @Nullable String activeBackend) {
+            return new AutoValue_GlobalAuthServiceConfig_Data(Optional.ofNullable(activeBackend));
         }
     }
 }
