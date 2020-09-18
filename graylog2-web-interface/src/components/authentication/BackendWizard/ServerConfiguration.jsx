@@ -49,7 +49,7 @@ type Props = {
     systemUserDn?: React.Node,
     systemPasswordDn?: React.Node,
   },
-  formRef: any,
+  formRef: React.ElementRef<typeof Formik | null>,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
   editing: boolean,

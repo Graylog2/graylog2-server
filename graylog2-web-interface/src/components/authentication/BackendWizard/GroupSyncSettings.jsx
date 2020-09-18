@@ -2,10 +2,10 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
+import { Formik } from 'formik';
 
 type Props = {
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>, values: any) => void,
-  onSubmit: (nextStepKey: string) => void,
+  formRef: React.ElementRef<typeof Formik | null>,
   onSubmitAll: () => void,
   validateOnMount: boolean,
 };
@@ -21,7 +21,7 @@ const NoEnterpriseComponent = () => (
   </>
 );
 
-const GroupSyncSettings = ({ onSubmit, onSubmitAll, onChange, validateOnMount }: Props) => {
+const GroupSyncSettings = ({ onSubmitAll, formRef, validateOnMount }: Props) => {
   const authenticationPlugin = PluginStore.exports('authentication.groupSync');
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
@@ -31,10 +31,9 @@ const GroupSyncSettings = ({ onSubmit, onSubmitAll, onChange, validateOnMount }:
   const { GroupSyncForm } = authenticationPlugin[0];
 
   return (
-    <GroupSyncForm onSubmit={onSubmit}
-                   validateOnMount={validateOnMount}
-                   onSubmitAll={onSubmitAll}
-                   onChange={onChange} />
+    <GroupSyncForm validateOnMount={validateOnMount}
+                   formRef={formRef}
+                   onSubmitAll={onSubmitAll} />
   );
 };
 

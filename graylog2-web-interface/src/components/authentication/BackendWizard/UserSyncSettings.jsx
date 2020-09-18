@@ -26,7 +26,7 @@ type Props = {
     userNameAttribute?: React.Node,
     defaultRoles?: React.Node,
   },
-  formRef: any,
+  formRef: React.ElementRef<typeof Formik | null>,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
   validateOnMount: boolean,

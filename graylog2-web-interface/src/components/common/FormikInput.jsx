@@ -27,7 +27,7 @@ const inputProps = (value) => {
 /** Wraps the common Input component with a formik Field */
 const FormikInput = ({ component: Component, name, type, help, validate, ...rest }: Props) => (
   <Component name={name} validate={validate}>
-    {({ field: { value, onChange, onBlur }, meta: { error, touched } }) => {
+    {({ field: { value, onChange, onBlur }, meta: { error } }) => {
       const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
 
       return (

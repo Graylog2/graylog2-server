@@ -113,6 +113,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
   const formRefs = {
     serverConfig: useRef(),
     userSync: useRef(),
+    groupSync: useRef(),
   };
 
   const _getCurrentFormValues = () => {
@@ -181,6 +182,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
       ),
       component: (
         <GroupSyncSettings validateOnMount={stepsState.invalidStepKeys.includes('groupSync')}
+                           formRef={formRefs.groupSync}
                            onSubmitAll={_handleSubmitAll} />
       ),
     },
