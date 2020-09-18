@@ -31,6 +31,8 @@ public abstract class AuthServiceResult {
 
     public abstract String backendId();
 
+    public abstract String backendType();
+
     public abstract String backendTitle();
 
     public boolean isSuccess() {
@@ -41,11 +43,12 @@ public abstract class AuthServiceResult {
         return new AutoValue_AuthServiceResult.Builder();
     }
 
-    public static AuthServiceResult failed(String username, String backendId, String backendTitle) {
+    public static AuthServiceResult failed(String username, AuthServiceBackend backend) {
         return builder()
                 .username(username)
-                .backendId(backendId)
-                .backendTitle(backendTitle)
+                .backendId(backend.backendId())
+                .backendType(backend.backendType())
+                .backendTitle(backend.backendTitle())
                 .build();
     }
 
@@ -56,6 +59,8 @@ public abstract class AuthServiceResult {
         public abstract Builder userProfileId(String userProfileId);
 
         public abstract Builder backendId(String backendId);
+
+        public abstract Builder backendType(String backendType);
 
         public abstract Builder backendTitle(String backendTitle);
 

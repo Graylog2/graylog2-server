@@ -110,12 +110,8 @@ public class ProvisionerService {
         user.setFullName(userDetails.fullName());
         user.setEmail(userDetails.email());
 
-        if (user instanceof UserImpl) {
-            // Set a placeholder password that doesn't work for authentication
-            ((UserImpl) user).setHashedPassword(userDetails.authServiceType() + " user");
-        } else {
-            LOG.warn("Received unexpected User implementation, not setting hashed password");
-        }
+        // We don't overwrite the user's password here because we might want to fall back to the internal MongoDB
+        // provider and then we need the password hash.
 
         return user;
     }

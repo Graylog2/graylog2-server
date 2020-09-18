@@ -68,6 +68,6 @@ public class AuthServiceAuthenticator {
     }
 
     private AuthServiceResult failResult(AuthServiceCredentials authCredentials, AuthServiceBackend backend) {
-        return AuthServiceResult.failed(authCredentials.username(), backend.backendId(), backend.backendTitle());
+        return AuthServiceResult.failed(authCredentials.username(), backend);
     }
 }

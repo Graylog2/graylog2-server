@@ -72,12 +72,12 @@ public class AuthServiceRealm extends AuthenticatingRealm {
             final AuthServiceResult result = authenticator.authenticate(AuthServiceCredentials.create(username, password));
 
             if (result.isSuccess()) {
-                LOG.info("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}>",
-                        result.username(), result.userProfileId(), result.backendTitle(), result.backendId());
+                LOG.info("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}/{}>",
+                        result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
                 return toAuthenticationInfo(result.userProfileId());
             } else {
-                LOG.warn("Failed to authenticate username <{}> with backend <{}/{}>",
-                        result.username(), result.backendTitle(), result.backendId());
+                LOG.warn("Failed to authenticate username <{}> with backend <{}/{}/{}>",
+                        result.username(), result.backendTitle(), result.backendType(), result.backendId());
                 return null;
             }
         } catch (Exception e) {

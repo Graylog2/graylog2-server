@@ -23,18 +23,25 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
 public class GlobalAuthServiceConfig {
     private final ClusterConfigService clusterConfigService;
+    private final DBAuthServiceBackendService dbService;
+    private final Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories;
     private final AuthServiceBackend defaultBackend;
 
     @Inject
     public GlobalAuthServiceConfig(ClusterConfigService clusterConfigService,
+                                   DBAuthServiceBackendService dbService,
+                                   Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories,
                                    @InternalAuthServiceBackend AuthServiceBackend defaultBackend) {
         this.clusterConfigService = clusterConfigService;
+        this.dbService = dbService;
+        this.backendFactories = backendFactories;
         this.defaultBackend = requireNonNull(defaultBackend, "defaultBackend cannot be null");
     }
 
@@ -47,7 +54,21 @@ public class GlobalAuthServiceConfig {
         if (data == null) {
             return Optional.empty();
         }
-        return Optional.empty(); // TODO: Load and return the actual backend
+
+        return data.activeBackend()
+                .flatMap(dbService::get)
+                .flatMap(this::createBackend);
+    }
+
+    private Optional<AuthServiceBackend> createBackend(AuthServiceBackendDTO backend) {
+        return Optional.ofNullable(backendFactories.get(backend.config().type()))
+                .map(factory -> factory.create(backend));
+    }
+
+    public Optional<AuthServiceBackendDTO> getActiveBackendConfig() {
+        final Data data = clusterConfigService.getOrDefault(Data.class, Data.create(null));
+
+        return data.activeBackend().flatMap(dbService::get);
     }
 
     public Data getConfiguration() {

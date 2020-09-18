@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.security.authservice.AuthServiceBackend;
+import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
 import org.graylog.security.authservice.ProvisionerAction;
 import org.graylog.security.authservice.backend.MongoDBAuthServiceBackend;
@@ -31,12 +32,13 @@ import org.graylog2.plugin.PluginModule;
 public class SecurityModule extends PluginModule {
     @Override
     protected void configure() {
-        // Call this to ensure the presence of the multi binder and avoid startup errors when no action is registered
+        // Call the following to ensure the presence of the multi binder and avoid startup errors when no action is registered
         MapBinder.newMapBinder(
                 binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<ProvisionerAction.Factory<? extends ProvisionerAction>>() {}
         );
+        authServiceBackendBinder();
 
         bind(BuiltinCapabilities.class).asEagerSingleton();
 
@@ -56,5 +58,22 @@ public class SecurityModule extends PluginModule {
         registerRestControllerPackage(getClass().getPackage().getName());
 
         addAuditEventTypes(SecurityAuditEventTypes.class);
+    }
+
+    private MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {
+        return MapBinder.newMapBinder(
+                binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<AuthServiceBackend.Factory<? extends AuthServiceBackend>>() {}
+        );
+    }
+
+    protected void addAuthServiceBackend(String name,
+                                         Class<? extends AuthServiceBackend> backendClass,
+                                         Class<? extends AuthServiceBackend.Factory<? extends AuthServiceBackend>> factoryClass,
+                                         Class<? extends AuthServiceBackendConfig> configClass) {
+        install(new FactoryModuleBuilder().implement(AuthServiceBackend.class, backendClass).build(factoryClass));
+        authServiceBackendBinder().addBinding(name).to(factoryClass);
+        registerJacksonSubtype(configClass, name);
     }
 }
