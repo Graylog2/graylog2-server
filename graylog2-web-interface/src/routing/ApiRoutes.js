@@ -27,10 +27,10 @@ const ApiRoutes = {
   Authentication: {
     servicesPaginated: () => ({ url: '/system/authentication/backends' }),
     load: (serviceId) => ({ url: `/system/authentication/backends/${serviceId}` }),
-    loadActive: () => ({ url: '/system/authentication/backends/active-backend' }),
+    loadActive: () => ({ url: '/system/authentication/services/active-backend' }),
     update: (serviceId) => ({ url: `/system/authentication/services/${serviceId}` }),
-    create: () => ({ url: '/system/authentication/backends' }),
-    delete: (backendId) => ({ url: `/system/authentication/backends/${backendId}` }),
+    create: () => ({ url: '/system/authentication/services/backends' }),
+    delete: (backendId) => ({ url: `/system/authentication/services/backends/${backendId}` }),
     testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
     testLogin: () => ({ url: '/system/authentication/services/test/backend/login' }),
     loadUsersPaginated: () => ({ url: '/api/system/authentication/users' }),

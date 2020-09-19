@@ -35,7 +35,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   // It is possible to provide the already updated form values, so we do not need to get them twice
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
   const {
-    defaultRoles,
+    defaultRoles = '',
     serverUrlHost,
     serverUrlPort,
     systemUserDn,
@@ -57,7 +57,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   return {
     title: `${serviceTitle} - ${serverUrl}`,
     description: '',
-    default_roles: defaultRoles,
+    default_roles: defaultRoles.split(','),
     config: {
       type: serviceType,
       server_urls: [serverUrl],
