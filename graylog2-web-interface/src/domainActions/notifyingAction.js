@@ -2,21 +2,27 @@
 import UserNotification from 'util/UserNotification';
 import { createNotFoundError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
+import type { ListenableAction } from 'stores/StoreTypes';
 
 type Notification = {
   title?: string,
   message?: string,
 };
 
-type Props<Args, Result> = {
-  action: (...Args) => Promise<Result | void>,
+type Props<Args, ActionResult> = {
+  action: ListenableAction<(...Args) => ActionResult>,
   success?: (...Args) => Notification,
   error: (error: string, ...Args) => Notification,
   notFoundRedirect?: boolean,
 };
 
-const notifyingAction = <T, Args: Array<T>, Result>({ action, success: successNotification, error: errorNotification, notFoundRedirect }: Props<Args, Result>): (...Args) => Promise<Result | void> => {
-  return (...args: Args): Promise<Result | void> => action(...args).then((result) => {
+const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result | void>>({
+  action,
+  success: successNotification,
+  error: errorNotification,
+  notFoundRedirect,
+}: Props<Args, ActionResult>): (...Args) => ActionResult => {
+  return (...args: Args): ActionResult => action(...args).then((result) => {
     if (successNotification) {
       const { message, title } = successNotification(...args);
       UserNotification.success(message, title || 'Success');
