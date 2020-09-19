@@ -68,9 +68,9 @@ public interface User extends Persisted {
 
     void setPreferences(Map<String, Object> preferences);
 
-    void setAuthServiceId(@Nullable String id);
+    void setAuthServiceId(@Nullable String authServiceId);
 
-    void setAuthServiceUid(@Nullable String uid);
+    void setAuthServiceUid(@Nullable String authServiceUid);
 
     void setEmail(String email);
 

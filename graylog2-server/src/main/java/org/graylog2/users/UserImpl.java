@@ -364,13 +364,13 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public void setAuthServiceId(@Nullable String id) {
-        fields.put(AUTH_SERVICE_ID, id);
+    public void setAuthServiceId(@Nullable String authServiceId) {
+        fields.put(AUTH_SERVICE_ID, authServiceId);
     }
 
     @Override
-    public void setAuthServiceUid(@Nullable String uid) {
-        fields.put(AUTH_SERVICE_UID, id);
+    public void setAuthServiceUid(@Nullable String authServiceUid) {
+        fields.put(AUTH_SERVICE_UID, authServiceUid);
     }
 
     public static class LocalAdminUser extends UserImpl {
