@@ -69,7 +69,7 @@ public class ProvisionerService {
         try {
             userId = userService.save(provisionUser(userDetails));
         } catch (ValidationException e) {
-            LOG.error("Cannot update profile for user <{}>", userDetails.username());
+            LOG.error("Cannot update profile for user <{}> - {}", userDetails.username(), e.getErrors());
             // TODO: What to do? Throw an error and fail the login or just continue?
             return userDetails;
         }
@@ -96,7 +96,7 @@ public class ProvisionerService {
             LOG.debug("No provisioner action for authentication service <{}>", userDetails.authServiceType());
         }
 
-        return userDetails;
+        return userDetailsWithId;
     }
 
     private User provisionUser(UserDetails userDetails) {
@@ -126,6 +126,13 @@ public class ProvisionerService {
         user.setTimeZone(rootTimeZone);
         // TODO: Does the session timeout need to be configurable per auth service backend?
         user.setSessionTimeoutMs(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
+
+        if (user instanceof UserImpl) {
+            // Set a placeholder password that doesn't work for authentication
+            ((UserImpl) user).setHashedPassword("User initially synced from " + userDetails.authServiceType());
+        } else {
+            LOG.warn("Received unexpected User implementation, not setting hashed password");
+        }
 
         return user;
     }
