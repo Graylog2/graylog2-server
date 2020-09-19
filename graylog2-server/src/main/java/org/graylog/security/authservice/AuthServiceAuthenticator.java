@@ -17,11 +17,15 @@
 package org.graylog.security.authservice;
 
 import org.graylog2.shared.users.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 public class AuthServiceAuthenticator {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthServiceAuthenticator.class);
+
     private final GlobalAuthServiceConfig authServiceConfig;
     private final ProvisionerService provisionerService;
     private final UserService userService;
@@ -44,9 +48,19 @@ public class AuthServiceAuthenticator {
     public AuthServiceResult authenticate(AuthServiceCredentials authCredentials) {
         final Optional<AuthServiceBackend> activeBackend = authServiceConfig.getActiveBackend();
 
-        // TODO: Investigate fallback to default backend?
         if (activeBackend.isPresent()) {
-            return authenticate(authCredentials, activeBackend.get());
+            final AuthServiceResult result = authenticate(authCredentials, activeBackend.get());
+            if (result.isSuccess()) {
+                return result;
+            }
+            // TODO: Do we want the fallback to the default backend here? Maybe it should be configurable?
+            if (LOG.isDebugEnabled()) {
+                final AuthServiceBackend defaultBackend = authServiceConfig.getDefaultBackend();
+                LOG.debug("Couldn't authenticate <{}> against active authentication service <{}/{}/{}>. Trying default backend <{}/{}/{}>.",
+                        authCredentials.username(),
+                        activeBackend.get().backendId(), activeBackend.get().backendType(), activeBackend.get().backendTitle(),
+                        defaultBackend.backendId(), defaultBackend.backendType(), defaultBackend.backendTitle());
+            }
         }
         return authenticate(authCredentials, authServiceConfig.getDefaultBackend());
     }
