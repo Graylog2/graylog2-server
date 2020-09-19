@@ -2,11 +2,11 @@
 import * as React from 'react';
 
 import {} from 'components/authentication'; // Bind all authentication plugins
+import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { useActiveBackend } from 'components/authentication/hooks';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
-import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 
 const AuthenticationCreatePage = () => {
@@ -22,7 +22,7 @@ const AuthenticationCreatePage = () => {
         <BackendOverviewLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />
       </PageHeader>
 
-      <BackendCreateGettingStarted title="Create A New Authentication Service" />
+      <GettingStarted title="Create New Authentication Service" />
     </DocumentTitle>
   );
 };

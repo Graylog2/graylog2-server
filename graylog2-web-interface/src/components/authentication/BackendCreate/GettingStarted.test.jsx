@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
-import BackendCreateGettingStarted from './BackendCreateGettingStarted';
+import GettingStarted from './GettingStarted';
 
-describe('BackendCreateGettingStarted', () => {
+describe('GettingStarted', () => {
   it('should display description and select', () => {
-    const { queryByText, queryByLabelText } = render(<BackendCreateGettingStarted />);
+    const { queryByText, queryByLabelText } = render(<GettingStarted />);
 
     expect(queryByText(/Select an authentication services to setup a new one./)).not.toBeNull();
     expect(queryByLabelText('Select a provider')).not.toBeNull();

@@ -6,13 +6,13 @@ import selectEvent from 'react-select-event';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
-import BackendCreateSelect from './BackendCreateSelect';
+import ServiceSelect from './ServiceSelect';
 
 jest.mock('util/History');
 
-describe('BackendCreateSelect', () => {
+describe('ServiceSelect', () => {
   it('should redirect correctly after selecting LDAP ', async () => {
-    const { getByLabelText, getByRole } = render(<BackendCreateSelect />);
+    const { getByLabelText, getByRole } = render(<ServiceSelect />);
 
     const serviceSelect = getByLabelText('Select a service');
     const submitButton = getByRole('button', { name: 'Get started' });
@@ -26,7 +26,7 @@ describe('BackendCreateSelect', () => {
   });
 
   it('should redirect correctly after selecting active directory ', async () => {
-    const { getByLabelText, getByRole } = render(<BackendCreateSelect />);
+    const { getByLabelText, getByRole } = render(<ServiceSelect />);
 
     const serviceSelect = getByLabelText('Select a service');
     const submitButton = getByRole('button', { name: 'Get started' });

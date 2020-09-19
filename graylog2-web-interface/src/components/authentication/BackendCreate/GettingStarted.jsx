@@ -4,13 +4,13 @@ import * as React from 'react';
 import { Row, Col } from 'components/graylog';
 import { EmptyEntity } from 'components/common';
 
-import BackendCreateSelect from './BackendCreateSelect';
+import ServiceSelect from './ServiceSelect';
 
 type Props = {
   title?: string,
 };
 
-const BackendCreateGettingStarted = ({ title }: Props) => (
+const GettingStarted = ({ title }: Props) => (
   <Row className="content">
     <Col md={6} mdOffset={3}>
       <EmptyEntity title={title}>
@@ -19,14 +19,14 @@ const BackendCreateGettingStarted = ({ title }: Props) => (
           authentication services can also be extended by plugins to support other authentication mechanisms.
           Select an authentication services to setup a new one.
         </p>
-        <BackendCreateSelect />
+        <ServiceSelect />
       </EmptyEntity>
     </Col>
   </Row>
 );
 
-BackendCreateGettingStarted.defaultProps = {
+GettingStarted.defaultProps = {
   title: undefined,
 };
 
-export default BackendCreateGettingStarted;
+export default GettingStarted;

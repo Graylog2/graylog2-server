@@ -2,12 +2,12 @@
 import * as React from 'react';
 
 import {} from 'components/authentication'; // Bind all authentication plugins
+import BackendCreateGettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocsHelper from 'util/DocsHelper';
 import { useActiveBackend } from 'components/authentication/hooks';
 import DocumentationLink from 'components/support/DocumentationLink';
-import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import StringUtils from 'util/StringUtils';
