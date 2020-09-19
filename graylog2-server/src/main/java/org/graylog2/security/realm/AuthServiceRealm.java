@@ -74,7 +74,7 @@ public class AuthServiceRealm extends AuthenticatingRealm {
             if (result.isSuccess()) {
                 LOG.info("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}/{}>",
                         result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
-                return toAuthenticationInfo(result.userProfileId());
+                return toAuthenticationInfo(result);
             } else {
                 LOG.warn("Failed to authenticate username <{}> with backend <{}/{}/{}>",
                         result.username(), result.backendTitle(), result.backendType(), result.backendId());
@@ -86,7 +86,7 @@ public class AuthServiceRealm extends AuthenticatingRealm {
         }
     }
 
-    private AuthenticationInfo toAuthenticationInfo(String principal) {
-        return new SimpleAccount(principal, null, NAME);
+    private AuthenticationInfo toAuthenticationInfo(AuthServiceResult result) {
+        return new SimpleAccount(result.userProfileId(), null, NAME + "/" + result.backendType());
     }
 }
