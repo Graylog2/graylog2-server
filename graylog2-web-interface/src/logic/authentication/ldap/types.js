@@ -9,7 +9,7 @@ export type LdapConfig = {
   transportSecurity: TransportSecurity,
   type: string,
   userFullNameAttribute: string,
-  userNameAribute: string,
+  userNameAttribute: string,
   userSearchBase: string,
   userSearchPattern: string,
   verifyCertificates: boolean,

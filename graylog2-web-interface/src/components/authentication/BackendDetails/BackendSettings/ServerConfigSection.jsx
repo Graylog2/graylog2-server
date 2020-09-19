@@ -12,7 +12,7 @@ type Props = {
 };
 
 const ServerConfigSection = ({ authenticationBackend }: Props) => {
-  const { serverUrls = [], systemUserDn } = authenticationBackend.config;
+  const { serverUrls = [], systemUserDn, transportSecurity, verifyCertificates } = authenticationBackend.config;
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
@@ -22,9 +22,11 @@ const ServerConfigSection = ({ authenticationBackend }: Props) => {
 
   return (
     <SectionComponent title="Server Configuration" headerActions={<Link to={editLink}>Edit</Link>}>
-      <ReadOnlyFormGroup label="Server Address" value={serverUrls[0]} />
+      <ReadOnlyFormGroup label="Server Address" value={serverUrls.join(', ')} />
       <ReadOnlyFormGroup label="System Username" value={systemUserDn} />
       <ReadOnlyFormGroup label="System Password" value="******" />
+      <ReadOnlyFormGroup label="Transport Security" value={transportSecurity} />
+      <ReadOnlyFormGroup label="Verify Certificates" value={verifyCertificates} />
     </SectionComponent>
   );
 };

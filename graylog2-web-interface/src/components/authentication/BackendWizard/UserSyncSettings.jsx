@@ -102,9 +102,9 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                              validate={validateField(FormValidation.userSearchPattern)}
                              help={help.userSearchPattern} />
 
-            <FormikFormGroup label="User Name Attirbute"
+            <FormikFormGroup label="Name Attirbute"
                              name="userNameAttribute"
-                             placeholder="User Name Attirbute"
+                             placeholder="Name Attirbute"
                              validate={validateField(FormValidation.userNameAttribute)}
                              help={help.userNameAttribute} />
 
