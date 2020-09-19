@@ -73,7 +73,7 @@ const defaultHelp = {
   systemPasswordDn: 'The password for the initial connection to the Active Directory server.',
 };
 
-const ServerConfiguration = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
+const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const help = { ...defaultHelp, ...propsHelp };
 
@@ -188,8 +188,8 @@ const ServerConfiguration = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, 
   );
 };
 
-ServerConfiguration.defaultProps = {
+ServerConfigStep.defaultProps = {
   help: {},
 };
 
-export default ServerConfiguration;
+export default ServerConfigStep;

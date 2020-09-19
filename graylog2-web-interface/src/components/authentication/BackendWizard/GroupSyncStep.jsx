@@ -21,7 +21,7 @@ const NoEnterpriseComponent = () => (
   </>
 );
 
-const GroupSyncSettings = ({ onSubmitAll, formRef, validateOnMount }: Props) => {
+const GroupSyncStep = ({ onSubmitAll, formRef, validateOnMount }: Props) => {
   const authenticationPlugin = PluginStore.exports('authentication.groupSync');
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
@@ -37,4 +37,4 @@ const GroupSyncSettings = ({ onSubmitAll, formRef, validateOnMount }: Props) => 
   );
 };
 
-export default GroupSyncSettings;
+export default GroupSyncStep;

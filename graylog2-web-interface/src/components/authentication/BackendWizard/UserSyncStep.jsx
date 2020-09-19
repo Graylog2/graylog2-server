@@ -55,7 +55,7 @@ const defaultHelp = {
   ),
 };
 
-const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
+const UserSyncStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const [rolesOptions, setRolesOptions] = useState([]);
@@ -170,8 +170,8 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
   );
 };
 
-UserSyncSettings.defaultProps = {
+UserSyncStep.defaultProps = {
   help: {},
 };
 
-export default UserSyncSettings;
+export default UserSyncStep;

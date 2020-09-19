@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 
-import ServerConfiguration from './ServerConfiguration';
-import UserSyncSettings from './UserSyncSettings';
-import GroupSyncSettings from './GroupSyncSettings';
+import ServerConfigStep from './ServerConfigStep';
+import UserSyncStep from './UserSyncStep';
+import GroupSyncStep from './GroupSyncStep';
 import StepTitleWarning from './StepTitleWarning';
 
 type Props = {
@@ -28,10 +28,10 @@ const wizardSteps = ({ invalidStepKeys, formRefs, handleSubmitAll, setActiveStep
       </>
     ),
     component: (
-      <ServerConfiguration onSubmit={() => setActiveStepKey('userSync')}
-                           onSubmitAll={handleSubmitAll}
-                           validateOnMount={invalidStepKeys.includes('serverConfig')}
-                           formRef={formRefs.serverConfig} />
+      <ServerConfigStep onSubmit={() => setActiveStepKey('userSync')}
+                        onSubmitAll={handleSubmitAll}
+                        validateOnMount={invalidStepKeys.includes('serverConfig')}
+                        formRef={formRefs.serverConfig} />
     ),
   },
   {
@@ -43,10 +43,10 @@ const wizardSteps = ({ invalidStepKeys, formRefs, handleSubmitAll, setActiveStep
       </>
     ),
     component: (
-      <UserSyncSettings onSubmit={() => setActiveStepKey('groupSync')}
-                        validateOnMount={invalidStepKeys.includes('userSync')}
-                        formRef={formRefs.userSync}
-                        onSubmitAll={handleSubmitAll} />
+      <UserSyncStep onSubmit={() => setActiveStepKey('groupSync')}
+                    validateOnMount={invalidStepKeys.includes('userSync')}
+                    formRef={formRefs.userSync}
+                    onSubmitAll={handleSubmitAll} />
     ),
   },
   {
@@ -58,9 +58,9 @@ const wizardSteps = ({ invalidStepKeys, formRefs, handleSubmitAll, setActiveStep
       </>
     ),
     component: (
-      <GroupSyncSettings validateOnMount={invalidStepKeys.includes('groupSync')}
-                         formRef={formRefs.groupSync}
-                         onSubmitAll={handleSubmitAll} />
+      <GroupSyncStep validateOnMount={invalidStepKeys.includes('groupSync')}
+                     formRef={formRefs.groupSync}
+                     onSubmitAll={handleSubmitAll} />
     ),
   },
 ];

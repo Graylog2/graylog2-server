@@ -13,8 +13,8 @@ import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import wizardSteps from './wizardSteps';
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './contexts/BackendWizardContext';
-import { FormValidation as ServerConfigValidation } from './ServerConfiguration';
-import { FormValidation as UserSyncValidation } from './UserSyncSettings';
+import { FormValidation as ServerConfigValidation } from './ServerConfigStep';
+import { FormValidation as UserSyncValidation } from './UserSyncStep';
 import Sidebar from './Sidebar';
 
 const FORMS_VALIDATION = {
