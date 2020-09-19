@@ -7,6 +7,8 @@ import Routes from 'routing/Routes';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 
+import { STEP_KEY as SERVER_CONFIG_KEY } from '../../BackendWizard/ServerConfigStep';
+
 type Props = {
   authenticationBackend: LdapBackend,
 };
@@ -16,7 +18,7 @@ const ServerConfigSection = ({ authenticationBackend }: Props) => {
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
-      initialStepKey: 'serverConfig',
+      initialStepKey: SERVER_CONFIG_KEY,
     },
   };
 

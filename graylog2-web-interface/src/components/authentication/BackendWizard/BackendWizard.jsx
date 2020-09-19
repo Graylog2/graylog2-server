@@ -13,13 +13,14 @@ import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import wizardSteps from './wizardSteps';
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './contexts/BackendWizardContext';
-import { FormValidation as ServerConfigValidation } from './ServerConfigStep';
-import { FormValidation as UserSyncValidation } from './UserSyncStep';
+import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
+import { FORM_VALIDATION as USER_SYNC_VALIDATION, STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
+import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import Sidebar from './Sidebar';
 
 const FORMS_VALIDATION = {
-  serverConfig: ServerConfigValidation,
-  userSync: UserSyncValidation,
+  [SERVER_CONFIG_KEY]: SERVER_CONFIG_VALIDATION,
+  [USER_SYNC_KEY]: USER_SYNC_VALIDATION,
 };
 
 type Props = {
@@ -117,9 +118,9 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     invalidStepKeys: [],
   });
   const formRefs = {
-    serverConfig: useRef(),
-    userSync: useRef(),
-    groupSync: useRef(),
+    [SERVER_CONFIG_KEY]: useRef(),
+    [USER_SYNC_KEY]: useRef(),
+    [GROUP_SYNC_KEY]: useRef(),
   };
 
   const _getUpdatedFormsValues = () => {
@@ -175,7 +176,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 };
 
 BackendWizard.defaultProps = {
-  initialStepKey: 'serverConfig',
+  initialStepKey: SERVER_CONFIG_KEY,
   initialValues: {
     serverUrlHost: 'localhost',
     serverUrlPort: 389,

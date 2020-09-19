@@ -8,6 +8,8 @@ import Routes from 'routing/Routes';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 
+import { STEP_KEY as GROUP_SYNC_KEY } from '../../BackendWizard/GroupSyncStep';
+
 type Props = {
   authenticationBackend: LdapBackend,
 };
@@ -28,7 +30,7 @@ const GroupSyncSection = ({ authenticationBackend }: Props) => {
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
-      initialStepKey: 'groupSync',
+      initialStepKey: GROUP_SYNC_KEY,
     },
   };
 

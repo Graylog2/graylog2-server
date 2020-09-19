@@ -4,11 +4,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 
-type Props = {
-  formRef: React.ElementRef<typeof Formik | null>,
-  onSubmitAll: () => void,
-  validateOnMount: boolean,
-};
+export type StepKeyType = 'group-synchronisation';
+export const STEP_KEY: StepKeyType = 'group-synchronisation';
 
 const Header = styled.h4`
   margin-bottom: 5px;
@@ -20,6 +17,12 @@ const NoEnterpriseComponent = () => (
     <p>To use the <b>Teams</b> functionality you need to install the Graylog <b>Enterprise</b> plugin.</p>
   </>
 );
+
+type Props = {
+  formRef: React.ElementRef<typeof Formik | null>,
+  onSubmitAll: () => void,
+  validateOnMount: boolean,
+};
 
 const GroupSyncStep = ({ onSubmitAll, formRef, validateOnMount }: Props) => {
   const authenticationPlugin = PluginStore.exports('authentication.groupSync');

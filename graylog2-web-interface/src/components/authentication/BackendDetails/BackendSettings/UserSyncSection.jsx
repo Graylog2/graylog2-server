@@ -7,6 +7,8 @@ import { ReadOnlyFormGroup } from 'components/common';
 import Routes from 'routing/Routes';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 
+import { STEP_KEY as USER_SYNC_KEY } from '../../BackendWizard/UserSyncStep';
+
 type Props = {
   authenticationBackend: LdapBackend,
 };
@@ -24,7 +26,7 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
-      initialStepKey: 'userSync',
+      initialStepKey: USER_SYNC_KEY,
     },
   };
 

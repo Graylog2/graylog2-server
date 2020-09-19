@@ -2,16 +2,14 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 
-import ServerConfigStep from './ServerConfigStep';
-import UserSyncStep from './UserSyncStep';
-import GroupSyncStep from './GroupSyncStep';
+import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
+import UserSyncStep, { STEP_KEY as USER_SYNC_KEY, type StepKeyType as UserSyncKey } from './UserSyncStep';
+import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY, type StepKeyType as GroupSyncKey } from './GroupSyncStep';
 import StepTitleWarning from './StepTitleWarning';
 
 type Props = {
   formRefs: {
-    serverConfig: React.ElementRef<typeof Formik | null>,
-    userSync: React.ElementRef<typeof Formik | null>,
-    groupSync: React.ElementRef<typeof Formik | null>,
+    [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.ElementRef<typeof Formik | null>,
   },
   invalidStepKeys: Array<string>,
   handleSubmitAll: () => void,
@@ -20,46 +18,46 @@ type Props = {
 
 const wizardSteps = ({ invalidStepKeys, formRefs, handleSubmitAll, setActiveStepKey }: Props) => [
   {
-    key: 'serverConfig',
+    key: SERVER_CONFIG_KEY,
     title: (
       <>
-        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey="serverConfig" />
+        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey={SERVER_CONFIG_KEY} />
         Server Configuration
       </>
     ),
     component: (
-      <ServerConfigStep onSubmit={() => setActiveStepKey('userSync')}
+      <ServerConfigStep onSubmit={() => setActiveStepKey(USER_SYNC_KEY)}
                         onSubmitAll={handleSubmitAll}
-                        validateOnMount={invalidStepKeys.includes('serverConfig')}
-                        formRef={formRefs.serverConfig} />
+                        validateOnMount={invalidStepKeys.includes(SERVER_CONFIG_KEY)}
+                        formRef={formRefs[SERVER_CONFIG_KEY]} />
     ),
   },
   {
-    key: 'userSync',
+    key: USER_SYNC_KEY,
     title: (
       <>
-        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey="userSync" />
+        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey={USER_SYNC_KEY} />
         User Synchronisation
       </>
     ),
     component: (
-      <UserSyncStep onSubmit={() => setActiveStepKey('groupSync')}
-                    validateOnMount={invalidStepKeys.includes('userSync')}
-                    formRef={formRefs.userSync}
+      <UserSyncStep onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
+                    validateOnMount={invalidStepKeys.includes(USER_SYNC_KEY)}
+                    formRef={formRefs[USER_SYNC_KEY]}
                     onSubmitAll={handleSubmitAll} />
     ),
   },
   {
-    key: 'groupSync',
+    key: GROUP_SYNC_KEY,
     title: (
       <>
-        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey="groupSync" />
+        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey={GROUP_SYNC_KEY} />
         Group Synchronisation (Opt.)
       </>
     ),
     component: (
-      <GroupSyncStep validateOnMount={invalidStepKeys.includes('groupSync')}
-                     formRef={formRefs.groupSync}
+      <GroupSyncStep validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)}
+                     formRef={formRefs[GROUP_SYNC_KEY]}
                      onSubmitAll={handleSubmitAll} />
     ),
   },

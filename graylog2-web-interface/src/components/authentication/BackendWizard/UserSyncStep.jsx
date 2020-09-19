@@ -11,7 +11,9 @@ import { Input } from 'components/bootstrap';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
-export const FormValidation = {
+export type StepKeyType = 'user-synchronization';
+export const STEP_KEY: StepKeyType = 'user-synchronization';
+export const FORM_VALIDATION = {
   userSearchBase: { required: true },
   userSearchPattern: { required: true },
   userNameAttribute: { required: true },
@@ -46,8 +48,13 @@ const defaultHelp = {
   ),
   userNameAttribute: (
     <span>
+      Which Active Directory attribute to use for the username of the user in Graylog.<br />
+      Try to load a test user using the sidebar form, if you are unsure which attribute to use.
+    </span>
+  ),
+  userFullNameAttribute: (
+    <span>
       Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.<br />
-      Try to load a test user using the form below, if you are unsure which attribute to use.
     </span>
   ),
   defaultRoles: (
@@ -93,26 +100,26 @@ const UserSyncStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validat
             <FormikFormGroup label="Search Base DN"
                              name="userSearchBase"
                              placeholder="Search Base DN"
-                             validate={validateField(FormValidation.userSearchBase)}
+                             validate={validateField(FORM_VALIDATION.userSearchBase)}
                              help={help.userSearchBase} />
 
             <FormikFormGroup label="Search Pattern"
                              name="userSearchPattern"
                              placeholder="Search Pattern"
-                             validate={validateField(FormValidation.userSearchPattern)}
+                             validate={validateField(FORM_VALIDATION.userSearchPattern)}
                              help={help.userSearchPattern} />
 
             <FormikFormGroup label="Name Attirbute"
                              name="userNameAttribute"
                              placeholder="Name Attirbute"
-                             validate={validateField(FormValidation.userNameAttribute)}
+                             validate={validateField(FORM_VALIDATION.userNameAttribute)}
                              help={help.userNameAttribute} />
 
             <FormikFormGroup label="Full Name Attirbute"
                              name="userFullNameAttribute"
                              placeholder="Full Name Attirbute"
-                             validate={validateField(FormValidation.userFullNameAttribute)}
-                             help={help.userNameAttribute} />
+                             validate={validateField(FORM_VALIDATION.userFullNameAttribute)}
+                             help={help.userFullNameAttribute} />
 
             <Row>
               <Col sm={9} smOffset={3}>
@@ -123,7 +130,7 @@ const UserSyncStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validat
               </Col>
             </Row>
 
-            <Field name="defaultRoles" validate={validateField(FormValidation.defaultRoles)}>
+            <Field name="defaultRoles" validate={validateField(FORM_VALIDATION.defaultRoles)}>
               {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
                 <Input id="default-roles-select"
                        label="Default Roles"

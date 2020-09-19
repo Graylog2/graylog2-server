@@ -12,7 +12,9 @@ import { Button, ButtonToolbar } from 'components/graylog';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
-export const FormValidation = {
+export type StepKeyType = 'server-configuration';
+export const STEP_KEY: StepKeyType = 'server-configuration';
+export const FORM_VALIDATION = {
   serverUrlHost: {
     required: true,
   },
@@ -44,17 +46,6 @@ const ServerUrl = styled.div`
   }
 `;
 
-type Props = {
-  help?: {
-    systemUserDn?: React.Node,
-    systemPasswordDn?: React.Node,
-  },
-  formRef: React.ElementRef<typeof Formik | null>,
-  onSubmit: () => void,
-  onSubmitAll: () => void,
-  validateOnMount: boolean,
-};
-
 const ProtocolOptions = styled.div`
   display: flex;
 
@@ -71,6 +62,17 @@ const defaultHelp = {
     </span>
   ),
   systemPasswordDn: 'The password for the initial connection to the Active Directory server.',
+};
+
+type Props = {
+  help?: {
+    systemUserDn?: React.Node,
+    systemPasswordDn?: React.Node,
+  },
+  formRef: React.ElementRef<typeof Formik | null>,
+  onSubmit: () => void,
+  onSubmitAll: () => void,
+  validateOnMount: boolean,
 };
 
 const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
@@ -107,9 +109,9 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                 <FormikInput name="serverUrlHost"
                              placeholder="Hostname"
                              formGroupClassName=""
-                             validate={validateField(FormValidation.serverUrlPort)} />
+                             validate={validateField(FORM_VALIDATION.serverUrlPort)} />
                 <span className="input-group-addon input-group-separator">:</span>
-                <FormikInput validate={validateField(FormValidation.serverUrlPort)}
+                <FormikInput validate={validateField(FORM_VALIDATION.serverUrlPort)}
                              type="number"
                              name="serverUrlPort"
                              placeholder="Port"

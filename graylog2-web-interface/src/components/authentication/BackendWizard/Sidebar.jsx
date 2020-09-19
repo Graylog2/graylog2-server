@@ -10,6 +10,9 @@ import type { LdapCreate } from 'logic/authentication/ldap/types';
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
 import BackendWizardContext from './contexts/BackendWizardContext';
+import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
+import { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
+import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 
 const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled(PanelGroup)`
   &.panel-group .panel {
@@ -38,7 +41,7 @@ type Props = {
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
-  const [activeKey, setActiveKey] = useState('serverConfig');
+  const [activeKey, setActiveKey] = useState(SERVER_CONFIG_KEY);
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 
   useEffect(() => {
@@ -50,7 +53,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
                       activeKey={activeKey}
                       id="sidebar-server-response"
                       onSelect={setActiveKey}>
-      <Panel eventKey="serverConfig">
+      <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>Connection Check</Panel.Title>
         </Panel.Heading>
@@ -58,7 +61,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
           <ServerConnectionTest prepareSubmitPayload={prepareSubmitPayload} />
         </Panel.Body>
       </Panel>
-      <Panel eventKey="userSync">
+      <Panel eventKey={USER_SYNC_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>User Login Test</Panel.Title>
         </Panel.Heading>
@@ -66,7 +69,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
           <UserLoginTest prepareSubmitPayload={prepareSubmitPayload} />
         </Panel.Body>
       </Panel>
-      <Panel eventKey="groupSync">
+      <Panel eventKey={GROUP_SYNC_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>Grouping Review</Panel.Title>
         </Panel.Heading>
