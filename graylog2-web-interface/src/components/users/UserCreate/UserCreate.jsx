@@ -99,7 +99,7 @@ const UserCreate = () => {
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Assign Roles">
-                  <RolesSelector onSubmit={_onAssignRole} user={user} />
+                  <RolesSelector onSubmit={_onAssignRole} assignedRolesNames={user.roles} />
                 </Input>
 
                 <Input id="selected-roles-overview"
