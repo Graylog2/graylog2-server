@@ -71,7 +71,11 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
       <BackendWizard {...optionalProps}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit}
-                     authBackendMeta={{ ...AUTH_BACKEND_META, backendId: authenticationBackend.id }} />
+                     authBackendMeta={{
+                       ...AUTH_BACKEND_META,
+                       backendId: authenticationBackend.id,
+                       backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
+                     }} />
     </DocumentTitle>
   );
 };

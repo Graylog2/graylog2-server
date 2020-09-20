@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
 import { validation, validateField } from 'util/FormsUtils';
-import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
+import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt, ReadOnlyFormGroup } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { Button, ButtonToolbar } from 'components/graylog';
 
@@ -61,13 +61,13 @@ const defaultHelp = {
       This needs to match the <code>userPrincipalName</code> of that user.
     </span>
   ),
-  systemPasswordDn: 'The password for the initial connection to the Active Directory server.',
+  systemUserPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
 type Props = {
   help?: {
     systemUserDn?: React.Node,
-    systemPasswordDn?: React.Node,
+    systemUserPassword?: React.Node,
   },
   formRef: React.ElementRef<typeof Formik | null>,
   onSubmit: () => void,
@@ -77,6 +77,7 @@ type Props = {
 
 const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
+  const { backendHasPassword } = stepsState.authBackendMeta;
   const help = { ...defaultHelp, ...propsHelp };
 
   const _onSubmitAll = (validateForm) => {
@@ -89,13 +90,13 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
 
   return (
     // $FlowFixMe innerRef works as expected
-    <Formik initialValues={stepsState?.formValues}
+    <Formik initialValues={stepsState.formValues}
             onSubmit={onSubmit}
             innerRef={formRef}
             validateOnMount={validateOnMount}
             validateOnBlur={false}
             validateOnChange={false}>
-      {({ isSubmitting, validateForm }) => (
+      {({ isSubmitting, validateForm, setFieldValue, values }) => (
         <Form className="form form-horizontal">
           <Input id="uri-host"
                  labelClassName="col-sm-3"
@@ -163,12 +164,30 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                            placeholder="System User DN"
                            help={help.systemUserDn} />
 
-          <FormikFormGroup label={<>System Password <Opt /></>}
-                           name="systemPasswordDn"
-                           autoComplete="autentication-service-password"
-                           placeholder="System Password"
-                           type="password"
-                           help={help.systemPasswordDn} />
+          {(backendHasPassword && values.systemUserPassword === undefined)
+            ? (
+              <Input label={<>System Password <Opt /></>}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9"
+                     id="systemPassword">
+                <Button type="button" onClick={() => setFieldValue('systemUserPassword', null)}>
+                  Reset Password
+                </Button>
+              </Input>
+            )
+            : (
+              <FormikFormGroup label={<>System Password <Opt /></>}
+                               name="systemUserPassword"
+                               autoComplete="autentication-service-password"
+                               placeholder="System Password"
+                               type="password"
+                               buttonAfter={(backendHasPassword && values.systemUserPassword !== undefined) && (
+                               <Button type="button" onClick={() => setFieldValue('systemUserPassword', undefined)}>
+                                 Revert Reset
+                               </Button>
+                               )}
+                               help={help.systemUserPassword} />
+            )}
           <ButtonToolbar className="pull-right">
             {stepsState.authBackendMeta.backendId && (
               <Button type="button"

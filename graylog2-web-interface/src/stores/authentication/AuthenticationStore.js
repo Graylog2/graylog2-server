@@ -26,8 +26,8 @@ import type { AuthenticationBackendJson } from 'logic/authentication/Authenticat
 import ApiRoutes from 'routing/ApiRoutes';
 import AuthenticationUser from 'logic/authentication/AuthenticationUser';
 
-// import { services } from '../../../test/fixtures/authentication';
-// import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
+import { services } from '../../../test/fixtures/authentication';
+import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
 
 type PaginatedResponse = PaginatedResponseType & {
   global_config: {
@@ -57,8 +57,8 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     load(backendId: string): Promise<?AuthenticationBackend> {
       const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(backendId)).url);
-      const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
-      // const promise = Promise.resolve(services.first());
+      // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
+      const promise = Promise.resolve(services.first());
 
       AuthenticationActions.load.promise(promise);
 

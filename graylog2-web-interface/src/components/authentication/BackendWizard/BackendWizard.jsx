@@ -51,8 +51,15 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     serviceType,
     serviceTitle,
     urlScheme,
+    backendId,
   } = stepsState.authBackendMeta;
+  let password = { system_user_password: systemUserPassword };
   const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme(urlScheme)}`;
+
+  // Only update password on edit if necessary
+  if (backendId && systemUserPassword === undefined) {
+    password = {};
+  }
 
   return {
     title: `${serviceTitle} - ${serverUrl}`,
@@ -62,13 +69,13 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
       type: serviceType,
       server_urls: [serverUrl],
       system_user_dn: systemUserDn,
-      system_password: systemUserPassword,
       transport_security: transportSecurity,
       user_full_name_attribute: userFullNameAttribute,
       user_name_attribute: userNameAttribute,
       user_search_base: userSearchBase,
       user_search_pattern: userSearchPattern,
       verify_certificates: verifyCertificates,
+      ...password,
     },
   };
 };
@@ -112,7 +119,7 @@ const _onSubmitAll = (stepsState, setStepsState, onSubmit, getUpdatedFormsValues
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
   const [stepsState, setStepsState] = useState<WizardStepsState>({
-    authBackendMeta: authBackendMeta,
+    authBackendMeta,
     activeStepKey: initialStepKey,
     formValues: initialValues,
     invalidStepKeys: [],
@@ -192,6 +199,7 @@ BackendWizard.propTypes = {
   initialValues: PropTypes.object,
   authBackendMeta: PropTypes.objectOf({
     backendId: PropTypes.string,
+    backendHasPassword: PropTypes.boolean,
     serviceType: PropTypes.string.isRequired,
     serviceTitle: PropTypes.string.isRequired,
     urlScheme: PropTypes.string.isRequired,

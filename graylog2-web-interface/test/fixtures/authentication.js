@@ -12,6 +12,7 @@ const ldapService = AuthenticationBackend
   .config({
     serverUrls: ['ldap://localhost:389'],
     systemUserDn: 'uid=admin,out=system',
+    systemUserPassword: { isSet: false },
     transportSecurity: 'tls',
     type: 'ldap',
     userFullNameAttribute: 'uid',
@@ -34,6 +35,7 @@ const activeDirectoryService = AuthenticationBackend
     transportSecurity: 'tls',
     type: 'active-directory',
     userFullNameAttribute: 'uid',
+    systemUserPassword: { isSet: true },
     userNameAttribute: 'cn',
     userSearchBase: 'dc=example,dc=com',
     userSearchPattern: '(&(|(objectClass=inetOrgPerson))(uid={0}))',
