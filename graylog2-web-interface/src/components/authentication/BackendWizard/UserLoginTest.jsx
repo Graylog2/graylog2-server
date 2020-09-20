@@ -21,7 +21,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
   const _handleLoginTest = ({ username, password }) => {
     setLoginStatus({ loading: true, error: undefined, success: false, result: undefined });
 
-    const payload = prepareSubmitPayload();
+    const payload = { ...prepareSubmitPayload(), user_login: { username, password } };
 
     AuthenticationDomain.testLogin({ backend_configuration: payload, backend_id: authBackendMeta.backendId, username, password }).then((response) => {
       setLoginStatus({ loading: false, success: response?.success, result: response?.result });

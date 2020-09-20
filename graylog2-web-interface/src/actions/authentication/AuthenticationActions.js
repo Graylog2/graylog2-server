@@ -52,9 +52,12 @@ export type ConnectionTestResult = {
 
 export type LoginTestPayload = {
   backend_id: ?string,
-  backend_configuration: AuthenticationBackendCreate,
-  username: string,
-  password: string,
+  backend_configuration: AuthenticationBackendCreate & {
+    user_login: {
+      username: string,
+      password: string,
+    },
+  },
 };
 
 export type LoginTestResult = {
