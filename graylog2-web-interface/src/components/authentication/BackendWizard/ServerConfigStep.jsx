@@ -127,7 +127,7 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                       <Input onBlur={onBlur}
                              id={name}
                              value=""
-                             defaultChecked={value === 'tls'}
+                             defaultChecked={value === ''}
                              onChange={onChange}
                              formGroupClassName=""
                              label="None"
@@ -171,7 +171,7 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9"
                      id="systemPassword">
-                <Button type="button" onClick={() => setFieldValue('systemUserPassword', null)}>
+                <Button type="button" onClick={() => setFieldValue('systemUserPassword', '')}>
                   Reset Password
                 </Button>
               </Input>

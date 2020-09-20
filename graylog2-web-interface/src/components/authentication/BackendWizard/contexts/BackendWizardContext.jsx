@@ -4,7 +4,22 @@ import * as React from 'react';
 import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
-export type WizardFormValues = any;
+export type WizardFormValues = {
+  defaultRoles?: string,
+  groupNameAttribute?: string,
+  groupSearchBase?: string,
+  groupSearchPattern?: string,
+  serverUrlHost?: string,
+  serverUrlPort?: string | number,
+  systemUserDn?: string,
+  systemUserPassword?: string,
+  transportSecurity?: ('tls' | 'start_tls' | ''),
+  userFullNameAttribute?: string,
+  userNameAttribute?: string,
+  userSearchBase?: string,
+  userSearchPattern?: string,
+  verifyCertificates?: boolean,
+};
 export type AuthBackendMeta = {
   backendId?: string, // only needed when editing an auth service
   backendHasPassword?: boolean, // only needed when editing an auth service

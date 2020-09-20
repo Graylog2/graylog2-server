@@ -5,7 +5,7 @@ type TransportSecurity = ?('tls' | 'start_tls');
 
 export type LdapConfig = {
   serverUrls: Array<string>,
-  systemUserDn: ?string,
+  systemUserDn: string,
   systemUserPassword: { isSet: boolean },
   transportSecurity: TransportSecurity,
   type: string,
@@ -18,7 +18,7 @@ export type LdapConfig = {
 
 export type LdapConfigJson = {
   server_urls: Array<string>,
-  system_user_dn: ?string,
+  system_user_dn: string,
   system_user_password: { is_set: boolean },
   transport_security: TransportSecurity,
   type: string,
