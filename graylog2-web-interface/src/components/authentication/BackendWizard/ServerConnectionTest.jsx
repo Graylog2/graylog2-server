@@ -18,11 +18,11 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
   const [{ loading, success, message, errors }, setConnectionStatus] = useState({ loading: false, success: false, message: undefined, errors: undefined });
 
   const _handleConnectionCheck = () => {
-    const { config: backendConfig } = prepareSubmitPayload();
+    const payload = prepareSubmitPayload();
 
     setConnectionStatus({ loading: true, message: undefined, errors: undefined, success: false });
 
-    AuthenticationDomain.testConnection({ backend_configuration: backendConfig, backendId: authBackendMeta.backendId }).then((response) => {
+    AuthenticationDomain.testConnection({ backend_configuration: payload, backend_id: authBackendMeta.backendId }).then((response) => {
       if (response?.success) {
         setConnectionStatus({ loading: false, message: response.message, success: true, errors: undefined });
       } else {

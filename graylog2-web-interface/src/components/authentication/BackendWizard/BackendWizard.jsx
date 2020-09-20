@@ -82,6 +82,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
 
 const _invalidStepKeys = (formValues) => {
   const invalidStepKeys = Object.entries(FORMS_VALIDATION).map(([stepKey, formValidation]) => {
+    // $FlowFixMe formValidation is valid input for Object.entries
     const stepHasError = Object.entries(formValidation).some(([fieldName, fieldValidation]) => {
       return !!validateField(fieldValidation)(formValues?.[fieldName]);
     });

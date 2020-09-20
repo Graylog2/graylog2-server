@@ -9,7 +9,7 @@ import StepTitleWarning from './StepTitleWarning';
 
 type Props = {
   formRefs: {
-    [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.ElementRef<typeof Formik | null>,
+    [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
   invalidStepKeys: Array<string>,
   handleSubmitAll: () => void,

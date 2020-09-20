@@ -19,7 +19,7 @@ const NoEnterpriseComponent = () => (
 );
 
 type Props = {
-  formRef: React.ElementRef<typeof Formik | null>,
+  formRef: React.Ref<typeof Formik>,
   onSubmitAll: () => void,
   validateOnMount: boolean,
 };

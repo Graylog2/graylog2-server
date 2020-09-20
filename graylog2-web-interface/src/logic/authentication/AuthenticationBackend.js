@@ -15,7 +15,7 @@ type InternalState = {|
   },
 |};
 
-export type AuthenticationBackendJson = {|
+export type AuthenticationBackendJSON = {|
   id: string,
   title: string,
   description: string,
@@ -26,7 +26,7 @@ export type AuthenticationBackendJson = {|
   },
 |};
 
-const configFromJson = (config: $PropertyType<AuthenticationBackendJson, 'config'>) => {
+const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
   const authService = getAuthServicePlugin(config.type, true);
 
   if (authService && typeof authService.configFromJson === 'function') {
@@ -36,7 +36,7 @@ const configFromJson = (config: $PropertyType<AuthenticationBackendJson, 'config
   return config;
 };
 
-const configToJson = (config: $PropertyType<AuthenticationBackendJson, 'config'>) => {
+const configToJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
   const authService = getAuthServicePlugin(config.type, true);
 
   if (authService && typeof authService.configToJson === 'function') {
@@ -125,7 +125,7 @@ export default class AuthenticationBackend {
     };
   }
 
-  static fromJSON(value: AuthenticationBackendJson) {
+  static fromJSON(value: AuthenticationBackendJSON) {
     /* eslint-disable camelcase */
     const {
       id,

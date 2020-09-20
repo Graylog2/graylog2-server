@@ -4,6 +4,7 @@ import * as Immutable from 'immutable'
 ;
 
 // import * as Immutable from 'immutable';
+
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
@@ -22,18 +23,22 @@ import type {
   AuthenticationBackendUpdate,
 } from 'actions/authentication/AuthenticationActions';
 import type { PaginatedResponseType } from 'stores/PaginationTypes';
-import type { AuthenticationBackendJson } from 'logic/authentication/AuthenticationBackend';
+import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
-import AuthenticationUser from 'logic/authentication/AuthenticationUser';
+import AuthenticationUser, { type AuthenticationUserJSON } from 'logic/authentication/AuthenticationUser';
 
 import { services } from '../../../test/fixtures/authentication';
-import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
+// import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
 
-type PaginatedResponse = PaginatedResponseType & {
+type PaginatedBackendsResponse = PaginatedResponseType & {
   global_config: {
     active_backend: string,
   },
-  backends: Array<AuthenticationBackendJson>,
+  backends: Array<AuthenticationBackendJSON>,
+};
+
+type PaginatedUsersResponse = PaginatedResponseType & {
+  users: Array<AuthenticationUserJSON>,
 };
 
 const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
@@ -134,7 +139,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     loadBackendsPaginated(page: number, perPage: number, query: string): Promise<?PaginatedBackends> {
       const url = PaginationURL(ApiRoutes.Authentication.servicesPaginated().url, page, perPage, query);
       const promise = fetch('GET', qualifyUrl(url))
-        .then((response: PaginatedResponse) => ({
+        .then((response: PaginatedBackendsResponse) => ({
           globalConfig: {
             activeBackend: response.global_config.active_backend,
           },
@@ -171,8 +176,8 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       const url = PaginationURL(ApiRoutes.Authentication.loadUsersPaginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
-        .then((response: PaginatedResponse) => ({
-          list: Immutable.List(response.backends.map((user) => AuthenticationUser.fromJSON(user))),
+        .then((response: PaginatedUsersResponse) => ({
+          list: Immutable.List(response.users.map((user) => AuthenticationUser.fromJSON(user))),
           pagination: {
             count: response.count,
             total: response.total,

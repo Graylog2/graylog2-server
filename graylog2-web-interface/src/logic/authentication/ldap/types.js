@@ -1,5 +1,5 @@
 // @flow strict
-import AuthenticationBackend, { type AuthenticationBackendJson } from 'logic/authentication/AuthenticationBackend';
+import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 
 type TransportSecurity = ?('tls' | 'start_tls');
 
@@ -38,9 +38,9 @@ export type LdapBackend = {
 };
 
 export type LdapCreate = {
-  title: $PropertyType<AuthenticationBackendJson, 'title'>,
-  description: $PropertyType<AuthenticationBackendJson, 'description'>,
-  default_roles: $PropertyType<AuthenticationBackendJson, 'default_roles'>,
+  title: $PropertyType<AuthenticationBackendJSON, 'title'>,
+  description: $PropertyType<AuthenticationBackendJSON, 'description'>,
+  default_roles: $PropertyType<AuthenticationBackendJSON, 'default_roles'>,
   config: {
     ...LdapConfigJson,
     system_user_password: ?string,
@@ -49,5 +49,5 @@ export type LdapCreate = {
 
 export type LdapUpdate = {
   ...LdapCreate,
-  id: $PropertyType<AuthenticationBackendJson, 'id'>,
+  id: $PropertyType<AuthenticationBackendJSON, 'id'>,
 };

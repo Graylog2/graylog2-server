@@ -2,23 +2,29 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import AuthenticationUser from 'logic/authentication/AuthenticationUser';
 import type { PaginationType } from 'stores/PaginationTypes';
 
 export type AuthenticationBackendCreate = {
-  title: $PropertyType<AuthenticationBackend, 'title'>,
-  description: $PropertyType<AuthenticationBackend, 'description'>,
-  config: any,
+  title: $PropertyType<AuthenticationBackendJSON, 'title'>,
+  description: $PropertyType<AuthenticationBackendJSON, 'description'>,
+  config: {
+    type: string,
+    ...any,
+  },
 };
 
 export type AuthenticationBackendUpdate = {
-  id: $PropertyType<AuthenticationBackend, 'id'>,
-  title: $PropertyType<AuthenticationBackend, 'title'>,
-  description: $PropertyType<AuthenticationBackend, 'description'>,
-  config: any,
+  id: $PropertyType<AuthenticationBackendJSON, 'id'>,
+  title: $PropertyType<AuthenticationBackendJSON, 'title'>,
+  description: $PropertyType<AuthenticationBackendJSON, 'description'>,
+  config: {
+    type: string,
+    ...any,
+  },
 };
 
 export type PaginatedBackends = {
@@ -36,8 +42,7 @@ export type PaginatedAuthUsers = {
 
 export type ConnectionTestPayload = {
   backend_configuration: AuthenticationBackendCreate,
-} | {
-  backend_id: string,
+  backend_id: ?string,
 };
 export type ConnectionTestResult = {
   success: boolean,

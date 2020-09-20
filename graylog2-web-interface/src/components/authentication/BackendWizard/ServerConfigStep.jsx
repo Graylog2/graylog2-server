@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
 import { validation, validateField } from 'util/FormsUtils';
-import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt, ReadOnlyFormGroup } from 'components/common';
+import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { Button, ButtonToolbar } from 'components/graylog';
 
@@ -27,6 +27,7 @@ export const FORM_VALIDATION = {
 
 const ServerUrl = styled.div`
   display: flex;
+
   > * {
     align-self: flex-start;
     min-height: 34px;
@@ -69,7 +70,7 @@ type Props = {
     systemUserDn?: React.Node,
     systemUserPassword?: React.Node,
   },
-  formRef: React.ElementRef<typeof Formik | null>,
+  formRef: React.Ref<typeof Formik>,
   onSubmit: () => void,
   onSubmitAll: () => void,
   validateOnMount: boolean,

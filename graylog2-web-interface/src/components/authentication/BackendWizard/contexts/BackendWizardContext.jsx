@@ -7,7 +7,7 @@ import { singleton } from 'views/logic/singleton';
 export type WizardFormValues = any;
 export type AuthBackendMeta = {
   backendId?: string, // only needed when editing an auth service
-  backendHasPassword: boolean, // only needed when editing an auth service
+  backendHasPassword?: boolean, // only needed when editing an auth service
   serviceType: string,
   serviceTitle: string,
   urlScheme: string,
