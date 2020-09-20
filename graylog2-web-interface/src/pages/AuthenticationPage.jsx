@@ -11,6 +11,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import StringUtils from 'util/StringUtils';
+import BackendActionLinks from 'components/authentication/BackendActionLinks';
 
 const _pageTilte = (activeBackend: ?AuthenticationBackend) => {
   const title = 'Authentication Services';
@@ -35,13 +36,16 @@ const AuthenticationPage = () => {
   return (
     <DocumentTitle title={pageTitle}>
       <>
-        <PageHeader title={pageTitle}>
+        <PageHeader title={pageTitle}
+                    subactions={(
+                      <BackendActionLinks activeBackend={activeBackend}
+                                          finishedLoading={finishedLoading} />
+                    )}>
           <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
-          <BackendOverviewLinks activeBackend={activeBackend}
-                                finishedLoading={finishedLoading} />
+          <BackendOverviewLinks />
         </PageHeader>
 
         {!finishedLoading && (

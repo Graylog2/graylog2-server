@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 
-import { PageHeader as CommonPageHeader } from 'components/common';
+import { PageHeader } from 'components/common';
 import { useActiveBackend } from 'components/authentication/hooks';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
+import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
@@ -28,16 +29,19 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
   const pageTitle = _pageTitle(authBackend);
 
   return (
-    <CommonPageHeader title={pageTitle}>
+    <PageHeader title={pageTitle}
+                subactions={(
+                  <BackendActionLinks activeBackend={activeBackend}
+                                      finishedLoading={finishedLoading} />
+    )}>
       <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
       <span>
         Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                            text="documentation" />.
       </span>
 
-      <BackendOverviewLinks activeBackend={activeBackend}
-                            finishedLoading={finishedLoading} />
-    </CommonPageHeader>
+      <BackendOverviewLinks />
+    </PageHeader>
   );
 };
 

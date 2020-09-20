@@ -7,6 +7,7 @@ import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendsOverview from 'components/authentication/BackendsOverview';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
+import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import { useActiveBackend } from 'components/authentication/hooks';
 
 const AuthenticationCreatePage = () => {
@@ -14,13 +15,16 @@ const AuthenticationCreatePage = () => {
 
   return (
     <DocumentTitle title="Authentication Services">
-      <PageHeader title="Authentication Services">
+      <PageHeader title="Authentication Services"
+                  subactions={(
+                    <BackendActionLinks activeBackend={activeBackend}
+                                        finishedLoading={finishedLoading} />
+                  )}>
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
         <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                  text="documentation" />.
         </span>
-        <BackendOverviewLinks activeBackend={activeBackend}
-                              finishedLoading={finishedLoading} />
+        <BackendOverviewLinks />
       </PageHeader>
 
       <BackendsOverview />
