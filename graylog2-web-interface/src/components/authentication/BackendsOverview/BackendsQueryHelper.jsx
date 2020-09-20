@@ -34,8 +34,13 @@ const backendQueryHelperPopover = (
 );
 
 const BackendQueryHelper = () => (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={backendQueryHelperPopover}>
-    <Button bsStyle="link"><Icon name="question-circle" /></Button>
+  <OverlayTrigger overlay={backendQueryHelperPopover}
+                  placement="right"
+                  rootClose
+                  trigger="click">
+    <Button bsStyle="link">
+      <Icon name="question-circle" />
+    </Button>
   </OverlayTrigger>
 );
 

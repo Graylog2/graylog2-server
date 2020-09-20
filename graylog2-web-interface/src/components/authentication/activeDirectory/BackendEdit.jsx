@@ -39,9 +39,9 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     <DocumentTitle title="Edit Active Directory Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {...optionalProps}
-                     initialValues={initialValues}
-                     help={HELP}
                      authBackendMeta={{ ...AUTH_BACKEND_META, backendId: authenticationBackend.id }}
+                     help={HELP}
+                     initialValues={initialValues}
                      onSubmit={_handleSubmit} />
     </DocumentTitle>
   );

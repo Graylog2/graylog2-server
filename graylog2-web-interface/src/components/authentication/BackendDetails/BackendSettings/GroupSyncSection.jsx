@@ -1,12 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Link } from 'react-router';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
-import SectionComponent from 'components/common/Section/SectionComponent';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 import { STEP_KEY as GROUP_SYNC_KEY } from '../../BackendWizard/GroupSyncStep';
 

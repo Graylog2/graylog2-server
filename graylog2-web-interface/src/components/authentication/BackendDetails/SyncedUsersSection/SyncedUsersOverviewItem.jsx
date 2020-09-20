@@ -4,11 +4,11 @@ import { Link } from 'react-router';
 import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import RolesCell from 'components/users/UsersOverview/UserOverviewItem/RolesCell';
-import { Button, ButtonToolbar } from 'components/graylog';
 import Routes from 'routing/Routes';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationUser from 'logic/authentication/AuthenticationUser';
+import { Button, ButtonToolbar } from 'components/graylog';
+import RolesCell from 'components/users/UsersOverview/UserOverviewItem/RolesCell';
 
 type Props = {
   user: AuthenticationUser,
@@ -21,11 +21,11 @@ const ActtionsWrapper = styled(ButtonToolbar)`
 
 const SyncedUsersOverviewItem = ({
   user: {
-    id,
-    fullName,
-    username,
-    roles,
     enabled,
+    fullName,
+    id,
+    roles,
+    username,
   },
 }: Props) => {
   return (

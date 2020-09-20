@@ -15,23 +15,20 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
   const authService = getAuthServicePlugin(authenticationBackend.config.type);
 
   if (!authService) {
-    return `No authentication service plugin configrued for active type "${authenticationBackend.config.type}"`;
+    return `No authentication service plugin configured for type "${authenticationBackend.config.type}"`;
   }
 
   const { detailsComponent: BackendSettings } = authService;
 
   return (
-    <>
-      <SectionGrid>
-        <div>
-          <BackendSettings authenticationBackend={authenticationBackend} />
-        </div>
-        <div>
-          <SyncedUsersSection authenticationBackend={authenticationBackend} />
-        </div>
-      </SectionGrid>
-
-    </>
+    <SectionGrid>
+      <div>
+        <BackendSettings authenticationBackend={authenticationBackend} />
+      </div>
+      <div>
+        <SyncedUsersSection authenticationBackend={authenticationBackend} />
+      </div>
+    </SectionGrid>
   );
 };
 

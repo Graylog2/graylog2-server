@@ -4,18 +4,18 @@ import { useState, useEffect } from 'react';
 
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
-import SectionComponent from 'components/common/Section/SectionComponent';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import ServiceUsersFilter from './SyncedUsersFilter';
 
 const DEFAULT_PAGINATION = {
   count: undefined,
-  total: undefined,
   page: 1,
   perPage: 10,
   query: '',
+  total: undefined,
 };
 
 const TABLE_HEADERS = ['Username', 'Full Name', 'Roles', 'Actions'];
@@ -36,9 +36,10 @@ const _headerCellFormatter = (header) => {
 };
 
 const SyncedUsersSection = () => {
+  const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION });
   const { list: users, pagination: { page, perPage, query, total } } = paginatedUsers;
-  const [loading, setLoading] = useState(false);
+
   const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
@@ -74,18 +75,18 @@ const SyncedUsersSection = () => {
       <p className="description">
         Found {total} synchronized users.
       </p>
-      <PaginatedList onChange={_onPageChange(_loadUsers, setLoading)} totalItems={total} activePage={page}>
-        <DataTable id="synced-users-overview"
-                   className="table-hover"
-                   rowClassName="no-bm"
-                   headers={TABLE_HEADERS}
-                   headerCellFormatter={_headerCellFormatter}
-                   sortByKey="username"
-                   rows={users.toJS()}
+      <PaginatedList activePage={page} totalItems={total} onChange={_onPageChange(_loadUsers, setLoading)}>
+        <DataTable className="table-hover"
                    customFilter={<ServiceUsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                    dataRowFormatter={_userOverviewItem}
                    filterKeys={[]}
-                   filterLabel="Filter Users" />
+                   filterLabel="Filter Users"
+                   headerCellFormatter={_headerCellFormatter}
+                   headers={TABLE_HEADERS}
+                   id="synced-users-overview"
+                   rowClassName="no-bm"
+                   rows={users.toJS()}
+                   sortByKey="username" />
       </PaginatedList>
     </SectionComponent>
   );

@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 
-import FormsUtils from 'util/FormsUtils';
 import { FormikFormGroup } from 'components/common';
 
 function validateEmail(value) {

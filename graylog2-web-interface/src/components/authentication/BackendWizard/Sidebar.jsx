@@ -3,16 +3,16 @@ import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { PanelGroup, Panel } from 'components/graylog';
 import type { ThemeInterface } from 'theme';
 import type { LdapCreate } from 'logic/authentication/ldap/types';
+import { PanelGroup, Panel } from 'components/graylog';
 
-import ServerConnectionTest from './ServerConnectionTest';
-import UserLoginTest from './UserLoginTest';
-import BackendWizardContext from './contexts/BackendWizardContext';
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
 import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
+import BackendWizardContext from './contexts/BackendWizardContext';
+import ServerConnectionTest from './ServerConnectionTest';
+import UserLoginTest from './UserLoginTest';
 
 const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled(PanelGroup)`
   &.panel-group .panel {

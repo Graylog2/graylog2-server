@@ -1,12 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
-import { Col, Row } from 'components/graylog';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
+import { Col, Row } from 'components/graylog';
 
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
@@ -15,10 +15,10 @@ const TABLE_HEADERS = ['Title', 'Description', 'Actions'];
 
 const DEFAULT_PAGINATION = {
   count: undefined,
-  total: undefined,
   page: 1,
   perPage: 10,
   query: '',
+  total: undefined,
 };
 
 const Header = styled.div`
@@ -26,7 +26,7 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => `
+const LoadingSpinner = styled(Spinner)(({ theme }) => css`
   margin-left: 10px;
   font-size: ${theme.fonts.size.h3};
 `);
@@ -56,6 +56,8 @@ const BackendsOverview = () => {
     return AuthenticationDomain.loadBackendsPaginated(newPage, newPerPage, newQuery)
       .then((newPaginatedBackends) => newPaginatedBackends && setPaginatedBackends(newPaginatedBackends));
   };
+
+  const _handleSearch = (newQuery) => _loadBackends(DEFAULT_PAGINATION.page, undefined, newQuery);
 
   useEffect(() => {
     _loadBackends(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
@@ -94,19 +96,19 @@ const BackendsOverview = () => {
           Found {backends.size} configured authentication services on the system.
         </p>
         <PaginatedList onChange={_onPageChange(_loadBackends, setLoading)} totalItems={total} activePage={1}>
-          <DataTable id="auth-backends-overview"
-                     className="table-hover"
-                     rowClassName="no-bm"
-                     headers={TABLE_HEADERS}
-                     headerCellFormatter={_headerCellFormatter}
-                     sortByKey="title"
-                     rows={backends.toJS()}
+          <DataTable className="table-hover"
+                     customFilter={<BackendsFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                      dataRowFormatter={(authBackend) => (
                        <BackendsOverviewItem authenticationBackend={authBackend} isActive={_isActive(authBackend)} />
                      )}
-                     customFilter={<BackendsFilter onSearch={() => Promise.resolve()} onReset={() => Promise.resolve()} />}
                      filterKeys={[]}
-                     filterLabel="Filter services" />
+                     filterLabel="Filter services"
+                     headerCellFormatter={_headerCellFormatter}
+                     headers={TABLE_HEADERS}
+                     id="auth-backends-overview"
+                     rowClassName="no-bm"
+                     rows={backends.toJS()}
+                     sortByKey="title" />
         </PaginatedList>
       </Col>
     </Row>

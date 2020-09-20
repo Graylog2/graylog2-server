@@ -2,10 +2,10 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import { ReadOnlyFormGroup } from 'components/common';
 import Routes from 'routing/Routes';
-import SectionComponent from 'components/common/Section/SectionComponent';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
+import { ReadOnlyFormGroup } from 'components/common';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from '../../BackendWizard/ServerConfigStep';
 

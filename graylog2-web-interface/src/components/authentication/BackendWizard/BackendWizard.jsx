@@ -1,21 +1,21 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useRef } from 'react';
+import { compact } from 'lodash';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
-import { compact } from 'lodash';
 
-import { validateField } from 'util/FormsUtils';
-import Wizard, { type Step } from 'components/common/Wizard';
 import Routes from 'routing/Routes';
+import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
 import type { LdapCreate } from 'logic/authentication/ldap/types';
+import Wizard, { type Step } from 'components/common/Wizard';
 
-import wizardSteps from './wizardSteps';
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './contexts/BackendWizardContext';
 import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { FORM_VALIDATION as USER_SYNC_VALIDATION, STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
 import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
+import wizardSteps from './wizardSteps';
 import Sidebar from './Sidebar';
 
 const FORMS_VALIDATION = {
@@ -24,10 +24,10 @@ const FORMS_VALIDATION = {
 };
 
 type Props = {
-  initialValues: WizardFormValues,
-  initialStepKey: $PropertyType<Step, 'key'>,
-  onSubmit: (LdapCreate) => Promise<void>,
   authBackendMeta: AuthBackendMeta,
+  initialStepKey: $PropertyType<Step, 'key'>,
+  initialValues: WizardFormValues,
+  onSubmit: (LdapCreate) => Promise<void>,
 };
 
 const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues) => {
@@ -48,10 +48,10 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     verifyCertificates,
   } = formValues;
   const {
-    serviceType,
-    serviceTitle,
-    urlScheme,
     backendId,
+    serviceTitle,
+    serviceType,
+    urlScheme,
   } = stepsState.authBackendMeta;
   let password = { system_user_password: systemUserPassword };
   const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme(urlScheme)}`;
@@ -62,14 +62,14 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   }
 
   return {
-    title: `${serviceTitle} - ${serverUrl}`,
-    description: '',
     default_roles: defaultRoles.split(','),
+    description: '',
+    title: `${serviceTitle} - ${serverUrl}`,
     config: {
-      type: serviceType,
       server_urls: [serverUrl],
       system_user_dn: systemUserDn,
       transport_security: transportSecurity,
+      type: serviceType,
       user_full_name_attribute: userFullNameAttribute,
       user_name_attribute: userNameAttribute,
       user_search_base: userSearchBase,
@@ -101,9 +101,9 @@ const _onSubmitAll = (stepsState, setStepsState, onSubmit, getUpdatedFormsValues
   if (invalidStepKeys.length >= 1) {
     setStepsState({
       ...stepsState,
+      activeStepKey: invalidStepKeys[0],
       formValues,
       invalidStepKeys,
-      activeStepKey: invalidStepKeys[0],
     });
 
     return;
@@ -120,8 +120,8 @@ const _onSubmitAll = (stepsState, setStepsState, onSubmit, getUpdatedFormsValues
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
   const [stepsState, setStepsState] = useState<WizardStepsState>({
-    authBackendMeta,
     activeStepKey: initialStepKey,
+    authBackendMeta,
     formValues: initialValues,
     invalidStepKeys: [],
   });
@@ -156,12 +156,18 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     });
   };
 
-  const _handleSubmitAll = () => _onSubmitAll(stepsState, setStepsState, onSubmit, _getUpdatedFormsValues, _getSubmitPayload);
+  const _handleSubmitAll = () => _onSubmitAll(
+    stepsState,
+    setStepsState,
+    onSubmit,
+    _getUpdatedFormsValues,
+    _getSubmitPayload,
+  );
 
   const steps = wizardSteps({
     formRefs,
-    invalidStepKeys: stepsState.invalidStepKeys,
     handleSubmitAll: _handleSubmitAll,
+    invalidStepKeys: stepsState.invalidStepKeys,
     setActiveStepKey: _setActiveStepKey,
   });
 
@@ -169,11 +175,11 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     <BackendWizardContext.Provider value={{ ...stepsState, setStepsState }}>
       <BackendWizardContext.Consumer>
         {({ activeStepKey: activeStep }) => (
-          <Wizard horizontal
-                  justified
-                  activeStep={activeStep}
-                  onStepChange={_setActiveStepKey}
+          <Wizard activeStep={activeStep}
                   hidePreviousNextButtons
+                  horizontal
+                  justified
+                  onStepChange={_setActiveStepKey}
                   steps={steps}>
             <Sidebar prepareSubmitPayload={_getSubmitPayload} />
           </Wizard>
@@ -189,22 +195,22 @@ BackendWizard.defaultProps = {
     serverUrlHost: 'localhost',
     serverUrlPort: 389,
     transportSecurity: 'tls',
-    verifyCertificates: true,
-    userNameAttribute: 'uid',
     userFullNameAttribute: 'cn',
+    userNameAttribute: 'uid',
+    verifyCertificates: true,
   },
 };
 
 BackendWizard.propTypes = {
-  initialStepKey: PropTypes.string,
-  initialValues: PropTypes.object,
   authBackendMeta: PropTypes.objectOf({
-    backendId: PropTypes.string,
     backendHasPassword: PropTypes.boolean,
-    serviceType: PropTypes.string.isRequired,
+    backendId: PropTypes.string,
     serviceTitle: PropTypes.string.isRequired,
+    serviceType: PropTypes.string.isRequired,
     urlScheme: PropTypes.string.isRequired,
   }).isRequired,
+  initialStepKey: PropTypes.string,
+  initialValues: PropTypes.object,
 };
 
 export default BackendWizard;

@@ -3,8 +3,8 @@ import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
-import { SearchForm } from 'components/common';
 import type { PaginatedUsers } from 'actions/users/UsersActions';
+import { SearchForm } from 'components/common';
 import UserQueryHelper from 'components/users/UsersQueryHelper';
 
 type Props = {
@@ -22,11 +22,11 @@ const SyncedUsersFilter = ({ onSearch, onReset }: Props) => {
 
   return (
     <Container>
-      <SearchForm onSearch={_handleSearch}
-                  onReset={onReset}
-                  useLoadingState
+      <SearchForm onReset={onReset}
+                  onSearch={_handleSearch}
                   queryHelpComponent={queryHelper}
-                  topMargin={0} />
+                  topMargin={0}
+                  useLoadingState />
     </Container>
   );
 };

@@ -8,17 +8,18 @@ import { ButtonToolbar, Button } from 'components/graylog';
 const BackendOverviewLinks = () => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.ACTIVE}>
-      <Button pullRight
-              bsStyle="info">
+      <Button bsStyle="info"
+              pullRight>
         Active Service
       </Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.OVERVIEW}>
-      <Button pullRight
-              bsStyle="info">
+      <Button bsStyle="info"
+              pullRight>
         All Services
       </Button>
     </LinkContainer>
   </ButtonToolbar>
 );
+
 export default BackendOverviewLinks;

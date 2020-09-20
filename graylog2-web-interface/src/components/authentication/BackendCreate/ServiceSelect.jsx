@@ -1,15 +1,15 @@
 // @flow strict
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
-import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import styled from 'styled-components';
 
-import FormsUtils from 'util/FormsUtils';
-import { defaultCompare } from 'views/logic/DefaultCompare';
+import Routes from 'routing/Routes';
+import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 import { Select, FieldError } from 'components/common';
 import { Button } from 'components/graylog';
-import Routes from 'routing/Routes';
 
 const ElementsContainer = styled.div`
   display: flex;
@@ -42,15 +42,15 @@ const BackendCreateSelect = () => {
         <StyledForm>
           <ElementsContainer>
             <FormGroup className="form-group">
-              <Field name="authenticationService" validate={FormsUtils.validation.isRequired('provider')}>
+              <Field name="authenticationService" validate={validateField({ required: true })}>
                 {({ field: { name, value, onChange }, meta: { error } }) => (
                   <>
-                    <Select placeholder="Select a provider"
+                    <Select clearable={false}
                             inputProps={{ 'aria-label': 'Select a provider' }}
-                            options={authServicesOptions}
                             onChange={(authService) => onChange({ target: { value: authService, name } })}
-                            value={value}
-                            clearable={false} />
+                            options={authServicesOptions}
+                            placeholder="Select a provider"
+                            value={value} />
                     {error && <FieldError>{error}</FieldError>}
                   </>
                 )}
@@ -58,8 +58,8 @@ const BackendCreateSelect = () => {
             </FormGroup>
             &nbsp;
             <Button bsStyle="success"
-                    type="submit"
-                    disabled={isSubmitting || !isValid}>
+                    disabled={isSubmitting || !isValid}
+                    type="submit">
               Get started
             </Button>
           </ElementsContainer>

@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 
-import { DocumentTitle } from 'components/common';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import { DocumentTitle } from 'components/common';
 
 import WizardPageHeader from './WizardPageHeader';
 

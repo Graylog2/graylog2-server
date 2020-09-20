@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Formik } from 'formik';
 
 export type StepKeyType = 'group-synchronisation';
@@ -34,9 +34,9 @@ const GroupSyncStep = ({ onSubmitAll, formRef, validateOnMount }: Props) => {
   const { GroupSyncForm } = authenticationPlugin[0];
 
   return (
-    <GroupSyncForm validateOnMount={validateOnMount}
-                   formRef={formRef}
-                   onSubmitAll={onSubmitAll} />
+    <GroupSyncForm formRef={formRef}
+                   onSubmitAll={onSubmitAll}
+                   validateOnMount={validateOnMount} />
   );
 };
 

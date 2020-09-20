@@ -3,10 +3,10 @@ import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
 
+import type { LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col, Panel } from 'components/graylog';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 

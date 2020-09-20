@@ -2,10 +2,10 @@
 import * as React from 'react';
 import { useState, useContext } from 'react';
 
+import type { LdapCreate } from 'logic/authentication/ldap/types';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { Button, Alert } from 'components/graylog';
 import { Spinner } from 'components/common';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
@@ -36,19 +36,19 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
       <p>
         Performs a background connection check with the address and credentials above.
       </p>
-      <Button type="button" onClick={() => _handleConnectionCheck()}>
+      <Button onClick={_handleConnectionCheck} type="button">
         {loading ? <Spinner delay={0} /> : 'Start Check'}
       </Button>
       {success && <Alert bsStyle="success">{message}</Alert>}
       {errors && (
-      <Alert bsStyle="danger">
-        {message}
-        <ul>
-          {errors.map((error) => {
-            return <li key={error}>{error}</li>;
-          })}
-        </ul>
-      </Alert>
+        <Alert bsStyle="danger">
+          {message}
+          <ul>
+            {errors.map((error) => {
+              return <li key={error}>{error}</li>;
+            })}
+          </ul>
+        </Alert>
       )}
     </>
   );

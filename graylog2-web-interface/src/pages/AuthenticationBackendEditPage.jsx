@@ -33,7 +33,7 @@ const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { in
   const authService = getAuthServicePlugin(authBackend.config.type);
 
   if (!authService) {
-    return `No authentication service plugin configrued for "${authBackend.config.type}"`;
+    return `No authentication service plugin configured for "${authBackend.config.type}"`;
   }
 
   const { editComponent: BackendEdit } = authService;

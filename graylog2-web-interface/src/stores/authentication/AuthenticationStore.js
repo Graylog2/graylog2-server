@@ -1,7 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
-import * as Immutable from 'immutable'
-;
+import * as Immutable from 'immutable';
 
 // import * as Immutable from 'immutable';
 
@@ -61,7 +60,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     },
 
     load(backendId: string): Promise<?AuthenticationBackend> {
-      const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(backendId)).url);
+      // const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(backendId)).url);
       // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
       const promise = Promise.resolve(services.first());
 

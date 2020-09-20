@@ -1,14 +1,14 @@
 // @flow strict
 import * as React from 'react';
 
-import { PageHeader } from 'components/common';
-import { useActiveBackend } from 'components/authentication/hooks';
-import DocumentationLink from 'components/support/DocumentationLink';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
-import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
+import { PageHeader } from 'components/common';
+import { useActiveBackend } from 'components/authentication/hooks';
+import BackendActionLinks from 'components/authentication/BackendActionLinks';
+import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
   authenticationBackend?: LdapBackend,

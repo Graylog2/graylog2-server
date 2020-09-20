@@ -5,10 +5,10 @@ import styled from 'styled-components';
 import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
-import { validation, validateField } from 'util/FormsUtils';
+import { formHasErrors, validateField } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
-import { Input } from 'components/bootstrap';
 import { Button, ButtonToolbar } from 'components/graylog';
+import { Input } from 'components/bootstrap';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
@@ -66,11 +66,11 @@ const defaultHelp = {
 };
 
 type Props = {
+  formRef: React.Ref<typeof Formik>,
   help?: {
     systemUserDn?: React.Node,
     systemUserPassword?: React.Node,
   },
-  formRef: React.Ref<typeof Formik>,
   onSubmit: () => void,
   onSubmitAll: () => void,
   validateOnMount: boolean,
@@ -83,7 +83,7 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
 
   const _onSubmitAll = (validateForm) => {
     validateForm().then((errors) => {
-      if (!validation.hasErrors(errors)) {
+      if (!formHasErrors(errors)) {
         onSubmitAll();
       }
     });
@@ -92,118 +92,117 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
   return (
     // $FlowFixMe innerRef works as expected
     <Formik initialValues={stepsState.formValues}
-            onSubmit={onSubmit}
             innerRef={formRef}
-            validateOnMount={validateOnMount}
+            onSubmit={onSubmit}
             validateOnBlur={false}
-            validateOnChange={false}>
-      {({ isSubmitting, validateForm, setFieldValue, values }) => (
+            validateOnChange={false}
+            validateOnMount={validateOnMount}>
+      {({ isSubmitting, setFieldValue, values, validateForm }) => (
         <Form className="form form-horizontal">
           <Input id="uri-host"
+                 label="Server Address"
                  labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9"
-                 label="Server Address">
+                 wrapperClassName="col-sm-9">
             <>
               <ServerUrl className="input-group">
                 <span className="input-group-addon">
                   {stepsState.authBackendMeta.urlScheme}://
                 </span>
-                <FormikInput name="serverUrlHost"
+                <FormikInput formGroupClassName=""
+                             name="serverUrlHost"
                              placeholder="Hostname"
-                             formGroupClassName=""
                              validate={validateField(FORM_VALIDATION.serverUrlPort)} />
                 <span className="input-group-addon input-group-separator">:</span>
-                <FormikInput validate={validateField(FORM_VALIDATION.serverUrlPort)}
-                             type="number"
+                <FormikInput formGroupClassName=""
                              name="serverUrlPort"
                              placeholder="Port"
-                             formGroupClassName="" />
+                             type="number"
+                             validate={validateField(FORM_VALIDATION.serverUrlPort)} />
               </ServerUrl>
 
               <ProtocolOptions>
                 <Field name="transportSecurity">
-                  {({ field: { value, name, onChange, onBlur } }) => (
+                  {({ field: { name, onChange, onBlur, value } }) => (
                     <>
-                      <Input onBlur={onBlur}
-                             id={name}
-                             value=""
-                             defaultChecked={value === ''}
-                             onChange={onChange}
+                      <Input defaultChecked={value === ''}
                              formGroupClassName=""
+                             id={name}
                              label="None"
-                             type="radio" />
-                      <Input onBlur={onBlur}
-                             id={name}
-                             value="tls"
-                             defaultChecked={value === 'tls'}
+                             onBlur={onBlur}
                              onChange={onChange}
+                             type="radio"
+                             value="" />
+                      <Input defaultChecked={value === 'tls'}
                              formGroupClassName=""
+                             id={name}
                              label="TLS"
-                             type="radio" />
-                      <Input onBlur={onBlur}
-                             id={name}
-                             value="startTls"
-                             label="StartTLS"
-                             defaultChecked={value === 'startTls'}
+                             onBlur={onBlur}
                              onChange={onChange}
+                             type="radio"
+                             value="tls" />
+                      <Input defaultChecked={value === 'start_tls'}
                              formGroupClassName=""
-                             type="radio" />
+                             id={name}
+                             label="StartTLS"
+                             onBlur={onBlur}
+                             onChange={onChange}
+                             type="radio"
+                             value="start_tls" />
                     </>
                   )}
                 </Field>
 
-                <FormikInput type="checkbox"
+                <FormikInput formGroupClassName=""
+                             label="Verify Certificates"
                              name="verifyCertificates"
-                             formGroupClassName=""
-                             label="Verify Certificates" />
+                             type="checkbox" />
               </ProtocolOptions>
 
             </>
           </Input>
-          <FormikFormGroup label={<>System User DN <Opt /></>}
+          <FormikFormGroup help={help.systemUserDn}
+                           label={<>System User DN <Opt /></>}
                            name="systemUserDn"
-                           placeholder="System User DN"
-                           help={help.systemUserDn} />
+                           placeholder="System User DN" />
 
           {(backendHasPassword && values.systemUserPassword === undefined)
             ? (
-              <Input label={<>System Password <Opt /></>}
+              <Input id="systemPassword"
+                     label={<>System Password <Opt /></>}
                      labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9"
-                     id="systemPassword">
+                     wrapperClassName="col-sm-9">
                 <Button type="button" onClick={() => setFieldValue('systemUserPassword', '')}>
                   Reset Password
                 </Button>
               </Input>
             )
             : (
-              <FormikFormGroup label={<>System Password <Opt /></>}
-                               name="systemUserPassword"
-                               autoComplete="autentication-service-password"
-                               placeholder="System Password"
-                               type="password"
+              <FormikFormGroup autoComplete="autentication-service-password"
                                buttonAfter={(backendHasPassword && values.systemUserPassword !== undefined) && (
                                <Button type="button" onClick={() => setFieldValue('systemUserPassword', undefined)}>
                                  Revert Reset
                                </Button>
                                )}
-                               help={help.systemUserPassword} />
+                               help={help.systemUserPassword}
+                               label={<>System Password <Opt /></>}
+                               name="systemUserPassword"
+                               placeholder="System Password"
+                               type="password" />
             )}
           <ButtonToolbar className="pull-right">
             {stepsState.authBackendMeta.backendId && (
-              <Button type="button"
+              <Button disabled={isSubmitting}
                       onClick={() => _onSubmitAll(validateForm)}
-                      disabled={isSubmitting}>
+                      type="button">
                 Finish & Save Identity Provider
               </Button>
             )}
             <Button bsStyle="primary"
-                    type="submit"
-                    disabled={isSubmitting}>
+                    disabled={isSubmitting}
+                    type="submit">
               Next: User Synchronisation
             </Button>
           </ButtonToolbar>
-
         </Form>
       )}
     </Formik>

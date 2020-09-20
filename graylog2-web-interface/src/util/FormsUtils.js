@@ -2,24 +2,6 @@ import NumberUtils from 'util/NumberUtils';
 
 import createEvent from './CreateEvent';
 
-export const validateValue = (fieldValue, validationType, validationValue) => {
-  switch (validationType) {
-    case 'required':
-      if (!fieldValue) return 'Field is required';
-      break;
-    case 'min':
-      if (fieldValue < Number(validationValue)) return `Must be greater than ${validationValue}`;
-      break;
-    case 'max':
-      if (fieldValue > Number(validationValue)) return `Must be smaller than ${validationValue}`;
-      break;
-    default:
-      return undefined;
-  }
-
-  return undefined;
-};
-
 export const getValueFromInput = (input) => {
   switch (input.type) {
     case 'radio':
@@ -47,9 +29,24 @@ export const triggerInput = (urlInput) => {
   input.dispatchEvent(event);
 };
 
-export const validation = {
-  isRequired: (field) => (value) => (!value ? `The ${field} is required` : undefined),
-  hasErrors: (errorMap = {}) => Object.keys(errorMap).length > 0,
+export const formHasErrors = (errorMap = {}) => Object.keys(errorMap).length > 0;
+
+export const validateValue = (fieldValue, conditionType, conditionValue) => {
+  switch (conditionType) {
+    case 'required':
+      if (!fieldValue) return 'Field is required';
+      break;
+    case 'min':
+      if (fieldValue < Number(conditionValue)) return `Must be greater than ${conditionValue}`;
+      break;
+    case 'max':
+      if (fieldValue > Number(conditionValue)) return `Must be smaller than ${conditionValue}`;
+      break;
+    default:
+      return undefined;
+  }
+
+  return undefined;
 };
 
 export const validateField = (validationRules) => (fieldValue) => {
@@ -73,6 +70,6 @@ export const validateField = (validationRules) => (fieldValue) => {
 export default {
   getValueFromInput,
   triggerInput,
-  validation,
+  formHasErrors,
   validateField,
 };

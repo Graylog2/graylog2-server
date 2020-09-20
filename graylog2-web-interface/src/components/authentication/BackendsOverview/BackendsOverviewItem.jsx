@@ -3,8 +3,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { Button, ButtonToolbar } from 'components/graylog';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { Button, ButtonToolbar } from 'components/graylog';
 
 type Props = {
   authenticationBackend: AuthenticationBackend,
@@ -50,7 +50,7 @@ const BackendsOverviewItem = ({ authenticationBackend, isActive }: Props) => {
     <tr key={id} className={isActive ? 'active' : ''}>
       <td className="limited">{title}</td>
       <td className="limited">{description}</td>
-      <ActionsCell isActive={isActive} authenticationBackend={authenticationBackend} />
+      <ActionsCell authenticationBackend={authenticationBackend} isActive={isActive} />
     </tr>
   );
 };

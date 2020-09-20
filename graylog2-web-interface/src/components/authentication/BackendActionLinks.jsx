@@ -14,14 +14,14 @@ type Props = {
 const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(activeBackend?.id)}>
-      <Button disabled={!activeBackend || !finishedLoading}
-              type="button"
-              bsStyle="success">
+      <Button bsStyle="success"
+              disabled={!activeBackend || !finishedLoading}
+              type="button">
         Edit Active Service
       </Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE}>
-      <Button typetype="button" bsStyle="success">
+      <Button bsStyle="success" type="button">
         Create Service
       </Button>
     </LinkContainer>

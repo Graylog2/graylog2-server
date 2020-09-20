@@ -3,8 +3,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import URI from 'urijs';
 
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle } from 'components/common';
 
 import { AUTH_BACKEND_META } from './BackendCreate';
@@ -69,13 +69,13 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     <DocumentTitle title="Edit LDAP Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {...optionalProps}
-                     initialValues={initialValues}
-                     onSubmit={_handleSubmit}
                      authBackendMeta={{
                        ...AUTH_BACKEND_META,
                        backendId: authenticationBackend.id,
                        backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
-                     }} />
+                     }}
+                     initialValues={initialValues}
+                     onSubmit={_handleSubmit} />
     </DocumentTitle>
   );
 };

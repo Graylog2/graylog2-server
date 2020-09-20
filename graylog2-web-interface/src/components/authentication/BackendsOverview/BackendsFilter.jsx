@@ -2,9 +2,9 @@
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { SearchForm } from 'components/common';
 import type { ThemeInterface } from 'theme';
 import type { PaginatedBackends } from 'actions/authentication/AuthenticationActions';
+import { SearchForm } from 'components/common';
 
 import BackendsQueryHelper from './BackendsQueryHelper.jsx';
 
@@ -23,11 +23,11 @@ const BackendsFilter = ({ onSearch, onReset }: Props) => {
 
   return (
     <Container>
-      <SearchForm onSearch={_handleSearch}
-                  onReset={onReset}
-                  useLoadingState
+      <SearchForm onReset={onReset}
+                  onSearch={_handleSearch}
                   queryHelpComponent={queryHelper}
-                  topMargin={0} />
+                  topMargin={0}
+                  useLoadingState />
     </Container>
   );
 };

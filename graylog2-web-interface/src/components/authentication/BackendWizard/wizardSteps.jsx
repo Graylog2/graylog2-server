@@ -11,12 +11,12 @@ type Props = {
   formRefs: {
     [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
-  invalidStepKeys: Array<string>,
   handleSubmitAll: () => void,
+  invalidStepKeys: Array<string>,
   setActiveStepKey: (stepKey: string)=> void,
 };
 
-const wizardSteps = ({ invalidStepKeys, formRefs, handleSubmitAll, setActiveStepKey }: Props) => [
+const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStepKey }: Props) => [
   {
     key: SERVER_CONFIG_KEY,
     title: (
