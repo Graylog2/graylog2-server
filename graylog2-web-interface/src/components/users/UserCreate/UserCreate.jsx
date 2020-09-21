@@ -11,6 +11,7 @@ import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem
 import RolesSelector from 'components/permissions/RolesSelector';
 import { Alert, Col, Row, Button, ButtonToolbar } from 'components/graylog';
 import { Input } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
@@ -68,6 +69,10 @@ const UserCreate = () => {
 
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
+
+  if (!users) {
+    return <Spinner />;
+  }
 
   return (
     <Row className="content">

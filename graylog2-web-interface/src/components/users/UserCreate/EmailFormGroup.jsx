@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import FormikFormGroup from '../form/FormikFormGroup';
+import { FormikFormGroup } from 'components/common';
 
 const EmailFormGroup = () => (
   <FormikFormGroup label="E-Mail Address"

@@ -4,8 +4,7 @@ import { Field } from 'formik';
 
 import { Row, Col, FormGroup } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-
-import FieldError from '../form/FieldError';
+import { FieldError } from 'components/common';
 
 export const validatePasswords = (errors: { [name: string]: string }, password: string, passwordRepeat: string) => {
   const newErrors = { ...errors };

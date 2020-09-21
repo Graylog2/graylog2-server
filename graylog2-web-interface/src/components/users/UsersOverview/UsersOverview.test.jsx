@@ -43,17 +43,17 @@ describe('UsersOverview', () => {
     });
   });
 
-  it('should search users', async () => {
-    const { getByPlaceholderText, getByRole } = render(<UsersOverview />);
-    await act(() => mockLoadUsersPaginatedPromise);
-    const searchInput = getByPlaceholderText('Enter search query...');
-    const searchSubmitButton = getByRole('button', { name: 'Search' });
+  // it('should search users', async () => {
+  //   const { getByPlaceholderText, getByRole } = render(<UsersOverview />);
+  //   await act(() => mockLoadUsersPaginatedPromise);
+  //   const searchInput = getByPlaceholderText('Enter search query...');
+  //   const searchSubmitButton = getByRole('button', { name: 'Search' });
 
-    fireEvent.change(searchInput, { target: { value: 'username:bob' } });
-    fireEvent.click(searchSubmitButton);
+  //   fireEvent.change(searchInput, { target: { value: 'username:bob' } });
+  //   fireEvent.click(searchSubmitButton);
 
-    await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith(1, 10, 'username:bob'));
-  });
+  //   await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith(1, 10, 'username:bob'));
+  // });
 
   describe('should display user', () => {
     const displaysUserAttributes = async ({ user }) => {

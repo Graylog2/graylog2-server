@@ -53,6 +53,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -181,8 +182,11 @@ public class AuthzRolesResource extends RestResource {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
 
-        final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedForUser(
-                searchQuery, page, perPage,sort, order, username);
+        final User user = Optional.ofNullable(userService.load(username))
+                .orElseThrow(() -> new NotFoundException("Couldn't find user: " + username));
+
+        final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(
+                searchQuery, page, perPage,sort, order, user.getRoleIds());
         return PaginatedResponse.create("roles", result, query);
     }
 
