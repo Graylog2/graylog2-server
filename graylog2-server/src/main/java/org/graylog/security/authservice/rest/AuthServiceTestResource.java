@@ -24,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.test.AuthServiceBackendTestRequest;
 import org.graylog.security.authservice.test.AuthServiceBackendTestService;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -55,6 +56,7 @@ public class AuthServiceTestResource extends RestResource {
     @Path("backend/connection")
     @ApiOperation("Test authentication service backend connection")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_TEST_BACKEND_EXECUTE)
+    @NoAuditEvent("Test resource - doesn't change any data")
     public Response backendConnection(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendTestRequest request) {
         validateConfig(request.backendConfiguration());
 
@@ -65,6 +67,7 @@ public class AuthServiceTestResource extends RestResource {
     @Path("backend/login")
     @ApiOperation("Test authentication service backend login")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_TEST_BACKEND_EXECUTE)
+    @NoAuditEvent("Test resource - doesn't change any data")
     public Response backendLogin(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendTestRequest request) {
         validateConfig(request.backendConfiguration());
 

@@ -21,7 +21,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.security.SecurityAuditEventTypes;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -59,6 +61,7 @@ public class GlobalAuthServiceConfigResource extends RestResource {
     @POST
     @ApiOperation("Update global authentication services configuration")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_EDIT)
+    @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_GLOBAL_CONFIG_UPDATE)
     public Response update(@ApiParam(name = "JSON body", required = true) @NotNull GlobalAuthServiceConfig.Data body) {
         return toResponse(authServiceConfig.updateConfiguration(body));
     }
