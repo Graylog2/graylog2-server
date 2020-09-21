@@ -71,14 +71,14 @@ public class AuthServiceRealm extends AuthenticatingRealm {
             return null;
         }
 
-        LOG.info("Attempting authentication for username <{}>", username);
+        LOG.debug("Attempting authentication for username <{}>", username);
         try {
             // We encrypt the password before passing it on to reduce the chance of exposing it somewhere by accident.
             final EncryptedValue encryptedPassword = encryptedValueService.encrypt(plainPassword);
             final AuthServiceResult result = authenticator.authenticate(AuthServiceCredentials.create(username, encryptedPassword));
 
             if (result.isSuccess()) {
-                LOG.info("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}/{}>",
+                LOG.debug("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}/{}>",
                         result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
                 return toAuthenticationInfo(result);
             } else {
