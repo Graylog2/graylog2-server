@@ -56,7 +56,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   let password = { system_user_password: systemUserPassword };
   const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme(urlScheme)}`;
 
-  // Only update password on edit if necessary
+  // Only update password on edit if necessary, if a users resets the password it is null
   if (backendId && systemUserPassword === undefined) {
     password = {};
   }
