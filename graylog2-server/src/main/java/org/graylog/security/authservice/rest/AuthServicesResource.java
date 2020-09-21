@@ -28,12 +28,12 @@ import org.graylog2.shared.security.RestPermissions;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.Optional;
 
 @Path("/system/authentication/services")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -53,11 +53,10 @@ public class AuthServicesResource extends RestResource {
     @ApiOperation("Get active authentication service backend")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_READ)
     public Response get() {
-        final AuthServiceBackendDTO activeConfig = authServiceConfig.getActiveBackendConfig()
-                .orElseThrow(() -> new NotFoundException("No active authentication backend service"));
+        final Optional<AuthServiceBackendDTO> activeConfig = authServiceConfig.getActiveBackendConfig();
 
-        checkPermission(RestPermissions.AUTH_SERVICE_BACKEND_READ, activeConfig.id());
+        activeConfig.ifPresent(backend -> checkPermission(RestPermissions.AUTH_SERVICE_BACKEND_READ, backend.id()));
 
-        return Response.ok(Collections.singletonMap("backend", activeConfig)).build();
+        return Response.ok(Collections.singletonMap("backend", activeConfig.orElse(null))).build();
     }
 }
