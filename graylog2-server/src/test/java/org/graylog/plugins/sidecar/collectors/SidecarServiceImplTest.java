@@ -23,6 +23,7 @@ import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.SidecarService;
+import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -46,7 +47,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(JukitoRunner.class)
-@UseModules({ObjectMapperModule.class, ValidatorModule.class})
+@UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
 public class SidecarServiceImplTest {
     private static final String collectionName = "sidecars";
     @Mock
