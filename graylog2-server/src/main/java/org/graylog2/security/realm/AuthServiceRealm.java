@@ -26,6 +26,7 @@ import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog.security.authservice.AuthServiceAuthenticator;
 import org.graylog.security.authservice.AuthServiceCredentials;
+import org.graylog.security.authservice.AuthServiceException;
 import org.graylog.security.authservice.AuthServiceResult;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -99,6 +100,9 @@ public class AuthServiceRealm extends AuthenticatingRealm {
                         result.username(), result.backendTitle(), result.backendType(), result.backendId());
                 return null;
             }
+        } catch (AuthServiceException e) {
+            LOG.error("Authentication service error", e);
+            return null;
         } catch (Exception e) {
             LOG.error("Unhandled authentication error", e);
             return null;

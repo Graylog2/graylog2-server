@@ -16,12 +16,12 @@
  */
 package org.graylog.security.authservice;
 
-public class ProvisionException extends Exception {
-    public ProvisionException(String message, Throwable cause) {
-        super(message, cause);
+public class ProvisionerServiceException extends AuthServiceException {
+    public ProvisionerServiceException(UserDetails userDetails) {
+        super("Couldn't provision user: " + userDetails.username(), userDetails.authServiceType(), userDetails.authServiceId());
     }
 
-    public ProvisionException(String message) {
-        super(message);
+    public ProvisionerServiceException(UserDetails userDetails, Throwable cause) {
+        super("Couldn't provision user: " + userDetails.username(), userDetails.authServiceType(), userDetails.authServiceId(), cause);
     }
 }
