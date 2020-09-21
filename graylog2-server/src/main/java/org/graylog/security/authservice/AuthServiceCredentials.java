@@ -17,14 +17,15 @@
 package org.graylog.security.authservice;
 
 import com.google.auto.value.AutoValue;
+import org.graylog2.security.encryption.EncryptedValue;
 
 @AutoValue
 public abstract class AuthServiceCredentials {
     public abstract String username();
 
-    public abstract String password();
+    public abstract EncryptedValue password();
 
-    public static AuthServiceCredentials create(String username, String password) {
+    public static AuthServiceCredentials create(String username, EncryptedValue password) {
         return new AutoValue_AuthServiceCredentials(username, password);
     }
 }
