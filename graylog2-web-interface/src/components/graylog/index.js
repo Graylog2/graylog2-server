@@ -3,6 +3,7 @@ import Badge from './Badge';
 import Button from './Button';
 import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
+import DropdownMenu from './DropdownMenu';
 import DropdownSubmenu from './DropdownSubmenu';
 import FormControl from './FormControl';
 import FormGroup from './FormGroup';
@@ -34,6 +35,7 @@ export {
   Button,
   ControlLabel,
   DropdownButton,
+  DropdownMenu,
   DropdownSubmenu,
   FormControl,
   FormGroup,
