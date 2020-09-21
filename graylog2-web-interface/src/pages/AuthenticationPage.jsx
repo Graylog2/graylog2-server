@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import {} from 'components/authentication'; // Bind all authentication plugins
+import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';

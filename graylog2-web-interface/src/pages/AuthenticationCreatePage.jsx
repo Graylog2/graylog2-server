@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import {} from 'components/authentication'; // Bind all authentication plugins
+import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { useActiveBackend } from 'components/authentication/hooks';
