@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Redirect, Router, Route, Switch } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
