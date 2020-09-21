@@ -190,13 +190,11 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                                type="password" />
             )}
           <ButtonToolbar className="pull-right">
-            {stepsState.authBackendMeta.backendId && (
-              <Button disabled={isSubmitting}
-                      onClick={() => _onSubmitAll(validateForm)}
-                      type="button">
-                Finish & Save Identity Provider
-              </Button>
-            )}
+            <Button disabled={isSubmitting}
+                    onClick={() => _onSubmitAll(validateForm)}
+                    type="button">
+              Finish & Save Service
+            </Button>
             <Button bsStyle="primary"
                     disabled={isSubmitting}
                     type="submit">

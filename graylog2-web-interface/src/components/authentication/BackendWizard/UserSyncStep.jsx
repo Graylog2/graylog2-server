@@ -162,7 +162,7 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, validat
             <Button disabled={isSubmitting}
                     onClick={() => _onSubmitAll(validateForm)}
                     type="button">
-              Finish & Save Identity Provider
+              Finish & Save Identity Service
             </Button>
             <Button bsStyle="primary"
                     disabled={isSubmitting}
