@@ -1,7 +1,9 @@
 // @flow strict
 import React from 'react';
+import { useEffect, useRef } from 'react';
 import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
+import type { FormikProps } from 'formik';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -11,15 +13,27 @@ import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
-const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => (
-  <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }}
-          onSubmit={() => {}}
-          validateOnMount>
-    <Form>
-      <OriginalKeywordTimeRangeSelector {...props} />
-    </Form>
-  </Formik>
-);
+const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => {
+  const formRef = useRef<FormikProps<*> | null>(null);
+
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current.validateForm();
+    }
+  }, []);
+
+  return (
+    // $FlowFixMe: innerRef is valid prop.
+    <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }}
+            innerRef={formRef}
+            onSubmit={() => {}}
+            validateOnMount>
+      <Form>
+        <OriginalKeywordTimeRangeSelector {...props} />
+      </Form>
+    </Formik>
+  );
+};
 
 jest.mock('logic/datetimes/DateTime', () => ({ fromUTCDateTime: (date) => date }));
 
@@ -48,7 +62,9 @@ describe('KeywordTimeRangeSelector', () => {
   const asyncRender = async (element) => {
     let wrapper;
 
-    await act(async () => { wrapper = render(element); });
+    await act(async () => {
+      wrapper = render(element);
+    });
 
     if (!wrapper) {
       throw new Error('Render returned `null`.');
