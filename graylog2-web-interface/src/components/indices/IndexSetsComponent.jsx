@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 import { Link } from 'react-router';
 
 import { Col, Label, DropdownButton, MenuItem, Button } from 'components/graylog';

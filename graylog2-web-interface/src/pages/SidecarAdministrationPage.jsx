@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';

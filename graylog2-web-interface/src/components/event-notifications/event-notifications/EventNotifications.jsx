@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, DropdownButton, MenuItem, Row, Button } from 'components/graylog';

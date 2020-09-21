@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 
 import { MenuItem, NavDropdown } from 'components/graylog';
 import { ExternalLink, Icon } from 'components/common';

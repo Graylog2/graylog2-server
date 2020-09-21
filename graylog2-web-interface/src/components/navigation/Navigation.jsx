@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 

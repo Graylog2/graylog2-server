@@ -1,7 +1,7 @@
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 import Reflux from 'reflux';
 
 import { DocumentTitle, Spinner } from 'components/common';

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 // $FlowFixMe: imports from core need to be fixed in flow
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import { Col, Row, Button } from 'components/graylog';

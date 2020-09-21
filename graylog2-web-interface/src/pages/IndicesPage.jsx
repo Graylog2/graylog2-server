@@ -1,5 +1,5 @@
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/graylog';

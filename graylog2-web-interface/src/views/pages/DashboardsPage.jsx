@@ -1,7 +1,7 @@
 // @flow strict
 import React, { useEffect } from 'react';
 // $FlowFixMe: imports from core need to be fixed in flow
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 
 import { Col, Row, Button } from 'components/graylog';
 import connect from 'stores/connect';
