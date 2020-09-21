@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 public final class LdapEntry {
 
     private Map<String, String> attributes = Maps.newHashMap();
@@ -51,6 +54,23 @@ public final class LdapEntry {
 
     public String get(String key) {
         return attributes.get(key.toLowerCase(Locale.ENGLISH));
+    }
+
+    /**
+     * Returns the given attribute or throws an exception if the value for the given key is null or blank.
+     * @param key the attribute key
+     * @return the value
+     * @throws IllegalStateException when attribute value is null or blank
+     */
+    public String getNonBlank(String key) {
+        checkArgument(!isBlank(key), "LDAP attribute name cannot be null or empty");
+
+        final String value = get(key.trim());
+        if (isBlank(value)) {
+            throw new IllegalStateException("LDAP attribute <" + key + "> cannot be null or empty");
+        }
+
+        return value;
     }
 
     public String put(String key, String value) {
