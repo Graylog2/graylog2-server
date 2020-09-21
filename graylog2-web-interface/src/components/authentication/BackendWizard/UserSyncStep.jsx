@@ -81,7 +81,7 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, validat
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((roles) => {
       if (roles) {
-        const options = roles.list.map((role) => ({ label: role.name, value: role.name })).toArray();
+        const options = roles.list.map((role) => ({ label: role.name, value: role.id })).toArray();
         setRolesOptions(options);
       }
     });

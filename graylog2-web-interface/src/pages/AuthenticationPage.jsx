@@ -35,28 +35,30 @@ const AuthenticationPage = () => {
 
   return (
     <DocumentTitle title={pageTitle}>
-      <PageHeader title={pageTitle}
-                  subactions={(
-                    <BackendActionLinks activeBackend={activeBackend}
-                                        finishedLoading={finishedLoading} />
+      <>
+        <PageHeader title={pageTitle}
+                    subactions={(
+                      <BackendActionLinks activeBackend={activeBackend}
+                                          finishedLoading={finishedLoading} />
                     )}>
-        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                 text="documentation" />.
-        </span>
-        <BackendOverviewLinks />
-      </PageHeader>
+          <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+          <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                                   text="documentation" />.
+          </span>
+          <BackendOverviewLinks />
+        </PageHeader>
 
-      {!finishedLoading && (
-        <Spinner />
-      )}
+        {!finishedLoading && (
+          <Spinner />
+        )}
 
-      {finishedLoading && (
-        <>
-          {!activeBackend && <GettingStarted />}
-          {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
-        </>
-      )}
+        {finishedLoading && (
+          <>
+            {!activeBackend && <GettingStarted />}
+            {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
+          </>
+        )}
+      </>
     </DocumentTitle>
   );
 };

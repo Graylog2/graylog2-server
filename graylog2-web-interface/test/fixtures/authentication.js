@@ -8,7 +8,7 @@ const ldapService = AuthenticationBackend
   .id('ldap-service-id')
   .title('LDAP: ldap://localhost:389')
   .description('LDAP service description')
-  .defaultRoles(Immutable.List(['Reader']))
+  .defaultRoles(Immutable.List(['5ea8124e37c69637c96d4619']))
   .config({
     serverUrls: ['ldap://localhost:389'],
     systemUserDn: 'uid=admin,out=system',
@@ -28,7 +28,7 @@ const activeDirectoryService = AuthenticationBackend
   .id('ad-service-id')
   .title('Active Directory: ldap://localhost:389')
   .description('Active directory service description')
-  .defaultRoles(Immutable.List(['Reader']))
+  .defaultRoles(Immutable.List(['5ea8124e37c69637c96d4619']))
   .config({
     serverUrls: ['ldap://localhost:389'],
     systemUserDn: 'uid=admin,out=system',

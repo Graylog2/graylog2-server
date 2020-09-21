@@ -202,8 +202,8 @@ BackendWizard.defaultProps = {
 };
 
 BackendWizard.propTypes = {
-  authBackendMeta: PropTypes.objectOf({
-    backendHasPassword: PropTypes.boolean,
+  authBackendMeta: PropTypes.shape({
+    backendHasPassword: PropTypes.bool,
     backendId: PropTypes.string,
     serviceTitle: PropTypes.string.isRequired,
     serviceType: PropTypes.string.isRequired,

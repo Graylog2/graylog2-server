@@ -1,19 +1,29 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import Role from 'logic/roles/Role';
 import { ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import { STEP_KEY as USER_SYNC_KEY } from '../../BackendWizard/UserSyncStep';
 
+const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
+  const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name);
+
+  return defaultRolesNames.join(', ');
+};
 type Props = {
   authenticationBackend: LdapBackend,
 };
 
 const UserSyncSection = ({ authenticationBackend }: Props) => {
+  const [{ list: roles }, setPaginatedRoles] = useState({ list: Immutable.List() });
   const {
     userSearchBase,
     userSearchPattern,
@@ -30,13 +40,19 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
     },
   };
 
+  useEffect(() => {
+    const getUnlimited = [1, 0, ''];
+
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
+  }, []);
+
   return (
     <SectionComponent title="User Synchronisation" headerActions={<Link to={editLink}>Edit</Link>}>
       <ReadOnlyFormGroup label="Search Base DN" value={userSearchBase} />
       <ReadOnlyFormGroup label="Search Pattern" value={userSearchPattern} />
       <ReadOnlyFormGroup label="Name Attribute" value={userNameAttribute} />
       <ReadOnlyFormGroup label="Full Name Attribute" value={userFullNameAttribute} />
-      <ReadOnlyFormGroup label="Default Roles" value={defaultRoles.join(', ')} />
+      <ReadOnlyFormGroup label="Default Roles" value={<RolesList roles={roles} defaultRolesIds={defaultRoles} />} />
     </SectionComponent>
   );
 };
