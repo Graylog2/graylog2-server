@@ -1,4 +1,5 @@
 // @flow strict
+import * as React from 'react';
 import { LinkContainer as BootstrapLinkContainer } from 'react-router-bootstrap';
 
 type LinkContainerProps = {
