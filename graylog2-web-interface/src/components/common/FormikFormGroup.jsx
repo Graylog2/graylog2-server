@@ -12,7 +12,7 @@ type Props = {
 };
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ label, name, type, help, validate, ...rest }: Props) => (
+const FormikFormGroup = ({ label, name, type, help, ...rest }: Props) => (
   <FormikInput {...rest}
                help={help}
                label={label}
