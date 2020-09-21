@@ -8,6 +8,7 @@ import { Input } from 'components/bootstrap';
 type Props = {
   component: typeof Field,
   name: string,
+  type?: string,
   help?: React.Node,
   labelClassName?: string,
   wrapperClassName?: string,

@@ -31,7 +31,7 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
     userFullNameAttribute,
   } = authenticationBackend.config;
   const {
-    defaultRoles = [],
+    defaultRoles = Immutable.List(),
   } = authenticationBackend;
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
