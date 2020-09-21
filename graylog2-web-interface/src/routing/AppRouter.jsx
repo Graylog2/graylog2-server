@@ -1,5 +1,5 @@
 import React from 'react';
-import { IndexRoute, Redirect, Router, Route } from 'react-router';
+import { Redirect, BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
@@ -96,41 +96,57 @@ import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((pluginRoute) => {
+    const PluginRouteComponent = pluginRoute.component;
+
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={appPrefixed(pluginRoute.path)}
-             component={pluginRoute.component} />
+             path={appPrefixed(pluginRoute.path)}>
+        <PluginRouteComponent />
+      </Route>
     );
   });
-  const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map((pluginRoute) => (
-    <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-           component={pluginRoute.parentComponent}>
-      <Route path={appPrefixed(pluginRoute.path)}
-             component={pluginRoute.component} />
-    </Route>
-  ));
+  const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map((pluginRoute) => {
+    const PluginRouteComponent = pluginRoute.component;
+    const PluginParentComponent = pluginRoute.parentComponent;
+
+    return (
+      <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}>
+        <PluginParentComponent>
+          <Route path={appPrefixed(pluginRoute.path)}>
+            <PluginRouteComponent />
+          </Route>
+        </PluginParentComponent>
+      </Route>
+    );
+  });
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map((pluginRoute) => {
+    const PluginRouteComponent = pluginRoute.component;
+
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={appPrefixed(pluginRoute.path)}
-             component={pluginRoute.component} />
+             path={appPrefixed(pluginRoute.path)}>
+        <PluginRouteComponent />
+      </Route>
     );
   });
 
   return (
     <Router history={history}>
-      <Route component={RouterErrorBoundary}>
+      <RouterErrorBoundary>
         {pluginRoutesWithNullParent}
-        <Route path={Routes.STARTPAGE} component={App}>
-          <Route component={AppWithGlobalNotifications}>
-            <IndexRoute component={StartPage} />
+
+        <App>
+          <AppWithGlobalNotifications>
+            <Route exact path={Routes.STARTPAGE} component={StartPage} />
             {pluginRoutesWithParent}
-            <Route component={AppWithExtendedSearchBar}>
+            <AppWithExtendedSearchBar>
               <Route path={Routes.SEARCH} component={DelegatedSearchPage} />
-            </Route>
+            </AppWithExtendedSearchBar>
             <Route component={AppWithoutSearchBar}>
               <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
-              <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
+              <Route path={Routes.legacy_stream_search(':streamId')}>
+                <Redirect to={Routes.stream_search(':streamId')} />
+              </Route>
               <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
               <Route path={Routes.STREAMS} component={StreamsPage} />
               <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
@@ -244,13 +260,13 @@ const AppRouter = () => {
                      component={SidecarEditCollectorPage} />
               {standardPluginRoutes}
             </Route>
-          </Route>
-          <Route component={AppWithoutSearchBar}>
+          </AppWithGlobalNotifications>
+          <AppWithoutSearchBar>
             <Route path={Routes.NOTFOUND} component={NotFoundPage} />
             <Route path="*" component={NotFoundPage} />
-          </Route>
-        </Route>
-      </Route>
+          </AppWithoutSearchBar>
+        </App>
+      </RouterErrorBoundary>
     </Router>
   );
 };
