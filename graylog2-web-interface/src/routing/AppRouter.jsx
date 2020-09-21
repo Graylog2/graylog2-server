@@ -139,9 +139,11 @@ const AppRouter = () => {
           <AppWithGlobalNotifications>
             <Route exact path={Routes.STARTPAGE} component={StartPage} />
             {pluginRoutesWithParent}
-            <AppWithExtendedSearchBar>
-              <Route path={Routes.SEARCH} component={DelegatedSearchPage} />
-            </AppWithExtendedSearchBar>
+            <Route path={Routes.SEARCH}>
+              <AppWithExtendedSearchBar>
+                <DelegatedSearchPage />
+              </AppWithExtendedSearchBar>
+            </Route>
             <Route component={AppWithoutSearchBar}>
               <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
               <Route path={Routes.legacy_stream_search(':streamId')}>
@@ -261,10 +263,16 @@ const AppRouter = () => {
               {standardPluginRoutes}
             </Route>
           </AppWithGlobalNotifications>
-          <AppWithoutSearchBar>
-            <Route path={Routes.NOTFOUND} component={NotFoundPage} />
-            <Route path="*" component={NotFoundPage} />
-          </AppWithoutSearchBar>
+          <Route exact path="*">
+            <AppWithoutSearchBar>
+              <NotFoundPage />
+            </AppWithoutSearchBar>
+          </Route>
+          <Route exact path={Routes.NOTFOUND}>
+            <AppWithoutSearchBar>
+              <NotFoundPage />
+            </AppWithoutSearchBar>
+          </Route>
         </App>
       </RouterErrorBoundary>
     </Router>
