@@ -54,7 +54,7 @@ const DropdownMenu = ({ show, children, ...restProps }: Props) => {
 
 DropdownMenu.propTypes = {
   children: PropTypes.node.isRequired,
-  show: PropTypes.boolean,
+  show: PropTypes.bool,
 };
 
 DropdownMenu.defaultProps = {
