@@ -16,6 +16,7 @@
  */
 package org.graylog.security;
 
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
@@ -24,7 +25,10 @@ import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
 import org.graylog.security.authservice.ProvisionerAction;
+import org.graylog.security.authservice.backend.LDAPAuthServiceBackend;
+import org.graylog.security.authservice.backend.LDAPAuthServiceBackendConfig;
 import org.graylog.security.authservice.backend.MongoDBAuthServiceBackend;
+import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
@@ -41,6 +45,7 @@ public class SecurityModule extends PluginModule {
         authServiceBackendBinder();
 
         bind(BuiltinCapabilities.class).asEagerSingleton();
+        bind(UnboundLDAPConnector.class).in(Scopes.SINGLETON);
 
         install(new FactoryModuleBuilder().implement(GranteeAuthorizer.class, GranteeAuthorizer.class).build(GranteeAuthorizer.Factory.class));
 
@@ -58,6 +63,11 @@ public class SecurityModule extends PluginModule {
         registerRestControllerPackage(getClass().getPackage().getName());
 
         addAuditEventTypes(SecurityAuditEventTypes.class);
+
+        addAuthServiceBackend(LDAPAuthServiceBackend.TYPE_NAME,
+                LDAPAuthServiceBackend.class,
+                LDAPAuthServiceBackend.Factory.class,
+                LDAPAuthServiceBackendConfig.class);
     }
 
     private MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {
