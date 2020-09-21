@@ -16,12 +16,16 @@
  */
 package org.graylog.security.authservice.rest;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.security.authservice.AuthServiceBackendDTO;
+import org.graylog.security.authservice.test.AuthServiceBackendTestRequest;
+import org.graylog.security.authservice.test.AuthServiceBackendTestService;
+import org.graylog2.plugin.rest.ValidationFailureException;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -40,23 +44,39 @@ import javax.ws.rs.core.Response;
 @Api(value = "System/Authentication/Services/Test", description = "Test authentication services")
 @RequiresAuthentication
 public class AuthServiceTestResource extends RestResource {
+    private final AuthServiceBackendTestService testService;
+
     @Inject
-    public AuthServiceTestResource() {
+    public AuthServiceTestResource(AuthServiceBackendTestService testService) {
+        this.testService = testService;
     }
 
     @POST
     @Path("backend/connection")
     @ApiOperation("Test authentication service backend connection")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_TEST_BACKEND_EXECUTE)
-    public Response backendConnection(@ApiParam(name = "JSON body", required = true) @NotNull JsonNode body) {
-        return Response.ok().build();
+    public Response backendConnection(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendTestRequest request) {
+        validateConfig(request.backendConfiguration());
+
+        return Response.ok(testService.testConnection(request)).build();
     }
 
     @POST
     @Path("backend/login")
     @ApiOperation("Test authentication service backend login")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_TEST_BACKEND_EXECUTE)
-    public Response backendLogin(@ApiParam(name = "JSON body", required = true) @NotNull JsonNode body) {
-        return Response.ok().build();
+    public Response backendLogin(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendTestRequest request) {
+        validateConfig(request.backendConfiguration());
+
+        return Response.ok(testService.testLogin(request)).build();
     }
+
+    private void validateConfig(AuthServiceBackendDTO config) {
+        final ValidationResult result = config.validate();
+
+        if (result.failed()) {
+            throw new ValidationFailureException(result);
+        }
+    }
+
 }

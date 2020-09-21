@@ -17,9 +17,11 @@
 package org.graylog.security.authservice.backend;
 
 import org.graylog.security.authservice.AuthServiceBackend;
+import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.ProvisionerService;
 import org.graylog.security.authservice.UserDetails;
+import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -29,6 +31,7 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Optional;
@@ -55,7 +58,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
                                                           ProvisionerService provisionerService) {
         final String username = authCredentials.username();
 
-        LOG.info("Trying to load user <{}> from database", username);
+        LOG.debug("Trying to load user <{}> from database", username);
         final User user = userService.load(username);
         if (user == null) {
             LOG.warn("User <{}> not found in database", username);
@@ -75,7 +78,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
             return Optional.empty();
         }
 
-        LOG.info("Successfully validated password for user <{}>", username);
+        LOG.debug("Successfully validated password for user <{}>", username);
 
         final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                 .databaseId(user.getId())
@@ -111,5 +114,15 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
     @Override
     public String backendTitle() {
         return "Internal MongoDB";
+    }
+
+    @Override
+    public AuthServiceBackendTestResult testConnection(@Nullable AuthServiceBackendDTO existingBackendConfig) {
+        return AuthServiceBackendTestResult.createFailure("Not implemented");
+    }
+
+    @Override
+    public AuthServiceBackendTestResult testLogin(AuthServiceCredentials credentials, @Nullable AuthServiceBackendDTO existingConfig) {
+        return AuthServiceBackendTestResult.createFailure("Not implemented");
     }
 }

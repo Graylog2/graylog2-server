@@ -16,6 +16,9 @@
  */
 package org.graylog.security.authservice;
 
+import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
+
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface AuthServiceBackend {
@@ -33,4 +36,8 @@ public interface AuthServiceBackend {
     String backendId();
 
     String backendTitle();
+
+    AuthServiceBackendTestResult testConnection(@Nullable AuthServiceBackendDTO existingConfig);
+
+    AuthServiceBackendTestResult testLogin(AuthServiceCredentials credentials, @Nullable AuthServiceBackendDTO existingConfig);
 }
