@@ -28,17 +28,17 @@ const StyledDropdownMenu: StyledComponent<{show: boolean}, ThemeInterface, HTMLU
   
   > li {
     > a {
-      color: ${theme.colors.variant.light.info};
+      color: ${theme.colors.variant.darker.default};
       
       &:hover {
-        color: ${theme.colors.variant.dark.info};
+        color: ${theme.colors.variant.darkest.default};
         background-color: ${theme.colors.variant.lighter.default};
       }
     }
     
     &.disabled {
       > a {
-        color: ${theme.colors.variant.lighter.info};
+        color: ${theme.colors.variant.light.default};
       }
     }
   }
