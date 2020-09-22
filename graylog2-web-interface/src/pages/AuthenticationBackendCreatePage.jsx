@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { withRouter } from 'react-router';
 
+import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 
 type Props = {

@@ -73,10 +73,11 @@ type Props = {
   },
   onSubmit: () => void,
   onSubmitAll: () => void,
+  submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, validateOnMount }: Props) => {
+const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendHasPassword } = stepsState.authBackendMeta;
   const help = { ...defaultHelp, ...propsHelp };
@@ -189,6 +190,7 @@ const ServerConfigStep = ({ help: propsHelp, onSubmit, onSubmitAll, formRef, val
                                placeholder="System Password"
                                type="password" />
             )}
+          {submitAllError}
           <ButtonToolbar className="pull-right">
             <Button disabled={isSubmitting}
                     onClick={() => _onSubmitAll(validateForm)}

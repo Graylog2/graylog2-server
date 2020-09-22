@@ -14,9 +14,10 @@ type Props = {
   handleSubmitAll: () => void,
   invalidStepKeys: Array<string>,
   setActiveStepKey: (stepKey: string)=> void,
+  submitAllError: string,
 };
 
-const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStepKey }: Props) => [
+const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStepKey, submitAllError }: Props) => [
   {
     key: SERVER_CONFIG_KEY,
     title: (
@@ -26,10 +27,11 @@ const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStep
       </>
     ),
     component: (
-      <ServerConfigStep onSubmit={() => setActiveStepKey(USER_SYNC_KEY)}
+      <ServerConfigStep formRef={formRefs[SERVER_CONFIG_KEY]}
+                        onSubmit={() => setActiveStepKey(USER_SYNC_KEY)}
                         onSubmitAll={handleSubmitAll}
-                        validateOnMount={invalidStepKeys.includes(SERVER_CONFIG_KEY)}
-                        formRef={formRefs[SERVER_CONFIG_KEY]} />
+                        submitAllError={submitAllError}
+                        validateOnMount={invalidStepKeys.includes(SERVER_CONFIG_KEY)} />
     ),
   },
   {
@@ -41,10 +43,11 @@ const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStep
       </>
     ),
     component: (
-      <UserSyncStep onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
-                    validateOnMount={invalidStepKeys.includes(USER_SYNC_KEY)}
-                    formRef={formRefs[USER_SYNC_KEY]}
-                    onSubmitAll={handleSubmitAll} />
+      <UserSyncStep formRef={formRefs[USER_SYNC_KEY]}
+                    onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
+                    onSubmitAll={handleSubmitAll}
+                    submitAllError={submitAllError}
+                    validateOnMount={invalidStepKeys.includes(USER_SYNC_KEY)} />
     ),
   },
   {
@@ -56,9 +59,10 @@ const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStep
       </>
     ),
     component: (
-      <GroupSyncStep validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)}
-                     formRef={formRefs[GROUP_SYNC_KEY]}
-                     onSubmitAll={handleSubmitAll} />
+      <GroupSyncStep formRef={formRefs[GROUP_SYNC_KEY]}
+                     onSubmitAll={handleSubmitAll}
+                     submitAllError={submitAllError}
+                     validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)} />
     ),
   },
 ];

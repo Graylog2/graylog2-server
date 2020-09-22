@@ -32,6 +32,7 @@ type Props = {
   },
   onSubmit: () => void,
   onSubmitAll: () => void,
+  submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
@@ -63,7 +64,7 @@ const defaultHelp = {
   ),
 };
 
-const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, validateOnMount }: Props) => {
+const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const [rolesOptions, setRolesOptions] = useState([]);
@@ -157,6 +158,8 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, validat
               </Alert>
             </Col>
           </Row>
+
+          {submitAllError}
 
           <ButtonToolbar className="pull-right">
             <Button disabled={isSubmitting}

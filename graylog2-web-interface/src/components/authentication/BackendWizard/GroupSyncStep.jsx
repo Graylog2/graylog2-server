@@ -21,11 +21,13 @@ const NoEnterpriseComponent = () => (
 type Props = {
   formRef: React.Ref<typeof Formik>,
   onSubmitAll: () => void,
+  submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-const GroupSyncStep = ({ onSubmitAll, formRef, validateOnMount }: Props) => {
+const GroupSyncStep = ({ onSubmitAll, formRef, submitAllError, validateOnMount }: Props) => {
   const authenticationPlugin = PluginStore.exports('authentication.groupSync');
+  console.log('submitAllError1', submitAllError);
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
     return <NoEnterpriseComponent />;
@@ -36,6 +38,7 @@ const GroupSyncStep = ({ onSubmitAll, formRef, validateOnMount }: Props) => {
   return (
     <GroupSyncForm formRef={formRef}
                    onSubmitAll={onSubmitAll}
+                   submitAllError={submitAllError}
                    validateOnMount={validateOnMount} />
   );
 };

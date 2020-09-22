@@ -9,6 +9,7 @@ import Routes from 'routing/Routes';
 import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
 import type { LdapCreate } from 'logic/authentication/ldap/types';
+import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { type Step } from 'components/common/Wizard';
 
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './contexts/BackendWizardContext';
@@ -23,12 +24,16 @@ const FORMS_VALIDATION = {
   [USER_SYNC_KEY]: USER_SYNC_VALIDATION,
 };
 
-type Props = {
-  authBackendMeta: AuthBackendMeta,
-  initialStepKey: $PropertyType<Step, 'key'>,
-  initialValues: WizardFormValues,
-  onSubmit: (LdapCreate) => Promise<void>,
-};
+const SubmitAllError = ({ error }: { error: string }) => (
+  <Row>
+    <Col xs={9} xsOffset={3}>
+      <Alert bsStyle="danger">
+        <b>Failed to create authentication service</b><br />
+        {error}
+      </Alert>
+    </Col>
+  </Row>
+);
 
 const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues) => {
   // We need to ensure that we are using the actual form values
@@ -94,9 +99,10 @@ const _invalidStepKeys = (formValues) => {
   return compact(invalidStepKeys);
 };
 
-const _onSubmitAll = (stepsState, setStepsState, onSubmit, getUpdatedFormsValues, getSubmitPayload) => {
+const _onSubmitAll = (stepsState, setStepsState, onSubmit, setSubmitAllError, getUpdatedFormsValues, getSubmitPayload) => {
   const formValues = getUpdatedFormsValues();
   const invalidStepKeys = _invalidStepKeys(formValues);
+  setSubmitAllError(null);
 
   if (invalidStepKeys.length >= 1) {
     setStepsState({
@@ -113,9 +119,19 @@ const _onSubmitAll = (stepsState, setStepsState, onSubmit, getUpdatedFormsValues
 
   const payload = getSubmitPayload(formValues);
 
-  onSubmit(payload).then(() => {
+  onSubmit(payload).then((result) => {
+    console.log('result', result);
     history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
+  }).catch((error) => {
+    setSubmitAllError(error);
   });
+};
+
+type Props = {
+  authBackendMeta: AuthBackendMeta,
+  initialStepKey: $PropertyType<Step, 'key'>,
+  initialValues: WizardFormValues,
+  onSubmit: (LdapCreate) => Promise<void>,
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
@@ -125,6 +141,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     formValues: initialValues,
     invalidStepKeys: [],
   });
+  const [submitAllError, setSubmitAllError] = useState();
   const formRefs = {
     [SERVER_CONFIG_KEY]: useRef(),
     [USER_SYNC_KEY]: useRef(),
@@ -160,6 +177,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     stepsState,
     setStepsState,
     onSubmit,
+    setSubmitAllError,
     _getUpdatedFormsValues,
     _getSubmitPayload,
   );
@@ -169,6 +187,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
     setActiveStepKey: _setActiveStepKey,
+    submitAllError: submitAllError && <SubmitAllError error={submitAllError} />,
   });
 
   return (

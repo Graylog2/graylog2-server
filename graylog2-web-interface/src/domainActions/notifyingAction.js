@@ -44,6 +44,8 @@ const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result
 
     const { message, title } = errorNotification(readableError, ...args);
     UserNotification.error(message, title || 'Error');
+
+    throw readableError;
   });
 };
 
