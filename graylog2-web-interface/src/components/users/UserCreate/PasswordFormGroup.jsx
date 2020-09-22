@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Field } from 'formik';
 
 import { Row, Col, FormGroup } from 'components/graylog';
-import { FieldError } from 'components/common';
+import { InputDescription } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 export const validatePasswords = (errors: { [name: string]: string }, password: string, passwordRepeat: string) => {
@@ -43,7 +43,7 @@ const PasswordFormGroup = () => {
                          required
                          minLength={6}
                          value={value ?? ''} />
-                  {error && <FieldError>{error}</FieldError>}
+                  <InputDescription error={error} />
                 </Col>
               </FormGroup>
             )}
@@ -64,7 +64,7 @@ const PasswordFormGroup = () => {
                          required
                          minLength={6}
                          value={value ?? ''} />
-                  {error && <FieldError>{error}</FieldError>}
+                  {error && <InputDescription>{error}</InputDescription>}
                 </Col>
               </FormGroup>
             )}

@@ -34,13 +34,13 @@ export const formHasErrors = (errorMap = {}) => Object.keys(errorMap).length > 0
 export const validateValue = (fieldValue, conditionType, conditionValue) => {
   switch (conditionType) {
     case 'required':
-      if (!fieldValue) return 'Field is required';
+      if (!fieldValue) return 'Field is required.';
       break;
     case 'min':
-      if (fieldValue < Number(conditionValue)) return `Must be greater than ${conditionValue}`;
+      if (fieldValue < Number(conditionValue)) return `Must be greater than ${conditionValue}.`;
       break;
     case 'max':
-      if (fieldValue > Number(conditionValue)) return `Must be smaller than ${conditionValue}`;
+      if (fieldValue > Number(conditionValue)) return `Must be smaller than ${conditionValue}.`;
       break;
     default:
       return undefined;

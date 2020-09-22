@@ -8,7 +8,7 @@ import Routes from 'routing/Routes';
 import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import { Select, FieldError } from 'components/common';
+import { Select, InputDescription } from 'components/common';
 import { Button } from 'components/graylog';
 
 const ElementsContainer = styled.div`
@@ -51,7 +51,7 @@ const BackendCreateSelect = () => {
                             options={authServicesOptions}
                             placeholder="Select a provider"
                             value={value} />
-                    {error && <FieldError>{error}</FieldError>}
+                    <InputDescription error={error} />
                   </>
                 )}
               </Field>

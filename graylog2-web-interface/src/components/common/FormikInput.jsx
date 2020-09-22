@@ -34,8 +34,9 @@ const FormikInput = ({ component: Component, name, type, help, validate, ...rest
                {...typeSepcificProps}
                onBlur={onBlur}
                bsStyle={error ? 'error' : undefined}
-               help={error ?? help}
+               help={help}
                id={name}
+               error={error}
                onChange={onChange}
                type={type} />
       );
