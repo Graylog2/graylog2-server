@@ -6,6 +6,8 @@ import Routes from 'aws/common/Routes';
 
 import AWSInputConfiguration from './aws/AWSInputConfiguration';
 import AWSCloudWatchApp from './aws/cloudwatch/CloudWatchApp';
+import SlackNotificationForm from './event-notifications/event-notification-types/SlackNotificationForm';
+import SlackNotificationSummary from './event-notifications/event-notification-types/SlackNotificationSummary';
 
 import packageJson from '../../package.json';
 
@@ -17,6 +19,15 @@ const manifest = new PluginManifest(packageJson, {
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',
       component: AWSInputConfiguration,
+    },
+  ],
+  eventNotificationTypes: [
+    {
+      type: 'slack-notification-v1',
+      displayName: 'Slack Notification',
+      formComponent: SlackNotificationForm,
+      summaryComponent: SlackNotificationSummary,
+      defaultConfig: SlackNotificationForm.defaultConfig,
     },
   ],
 });
