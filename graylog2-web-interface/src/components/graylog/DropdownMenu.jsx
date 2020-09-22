@@ -12,7 +12,7 @@ type Props = {
 };
 
 const StyledDropdownMenu: StyledComponent<{show: boolean}, ThemeInterface, HTMLUListElement> = styled.ul.attrs(() => ({
-  className: 'dropdown-menu',
+  className: 'dropdown-menu', /* stylelint-disable-line property-no-unknown */
 }))(({ show, theme }) => css`
   display: ${show ? 'block' : 'none'};
   min-width: max-content;
