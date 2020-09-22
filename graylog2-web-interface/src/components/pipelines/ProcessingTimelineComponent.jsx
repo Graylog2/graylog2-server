@@ -113,7 +113,8 @@ const ProcessingTimelineComponent = createReactClass({
     return (
       <tr key={pipeline.id}>
         <PipelineNameTD>
-          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>{pipeline.title}</Link><br />
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} title={pipeline.title}>{pipeline.title}</Link>
+          <br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
