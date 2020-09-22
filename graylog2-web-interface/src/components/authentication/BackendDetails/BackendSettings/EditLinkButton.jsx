@@ -12,7 +12,7 @@ type Props = {
 
 const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => {
   const editLink = {
-    pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackendId),
+    pathname: Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId),
     query: {
       initialStepKey: stepKey,
     },

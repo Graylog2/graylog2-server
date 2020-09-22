@@ -209,11 +209,11 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
               <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
               <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.ACTIVE} component={AuthenticationPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.OVERVIEW} component={AuthenticationOverviewPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(':backendId')} component={AuthenticationBackendEditPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_BACKEND(':name')} component={AuthenticationBackendCreatePage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE} component={AuthenticationCreatePage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW} component={AuthenticationOverviewPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')} component={AuthenticationBackendEditPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')} component={AuthenticationBackendCreatePage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
 
               <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
               <Route path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />

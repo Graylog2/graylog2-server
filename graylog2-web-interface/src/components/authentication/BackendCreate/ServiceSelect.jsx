@@ -26,8 +26,8 @@ const FormGroup = styled.div`
   flex: 1;
 `;
 
-const _onSubmit = ({ authenticationService }) => {
-  const createRoute = Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_BACKEND(authenticationService);
+const _onSubmit = ({ authServiceType }) => {
+  const createRoute = Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(authServiceType);
   history.push(createRoute);
 };
 
@@ -42,7 +42,7 @@ const BackendCreateSelect = () => {
         <StyledForm>
           <ElementsContainer>
             <FormGroup className="form-group">
-              <Field name="authenticationService" validate={validateField({ required: true })}>
+              <Field name="authServiceType" validate={validateField({ required: true })}>
                 {({ field: { name, value, onChange }, meta: { error } }) => (
                   <>
                     <Select clearable={false}
