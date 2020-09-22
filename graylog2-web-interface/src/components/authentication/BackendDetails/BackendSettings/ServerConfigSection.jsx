@@ -1,11 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { Link } from 'react-router';
 
-import Routes from 'routing/Routes';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 import { ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
+
+import EditLinkButton from './EditLinkButton';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from '../../BackendWizard/ServerConfigStep';
 
@@ -15,15 +15,9 @@ type Props = {
 
 const ServerConfigSection = ({ authenticationBackend }: Props) => {
   const { serverUrls = [], systemUserDn, transportSecurity, verifyCertificates } = authenticationBackend.config;
-  const editLink = {
-    pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
-    query: {
-      initialStepKey: SERVER_CONFIG_KEY,
-    },
-  };
 
   return (
-    <SectionComponent title="Server Configuration" headerActions={<Link to={editLink}>Edit</Link>}>
+    <SectionComponent title="Server Configuration" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={SERVER_CONFIG_KEY} />}>
       <ReadOnlyFormGroup label="Server Address" value={serverUrls.join(', ')} />
       <ReadOnlyFormGroup label="System Username" value={systemUserDn} />
       <ReadOnlyFormGroup label="System Password" value="******" />

@@ -16,6 +16,7 @@ type Props = {
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
 
   * + * {
    margin-left: 10px;

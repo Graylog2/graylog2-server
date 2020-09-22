@@ -2,14 +2,14 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
 
-import Routes from 'routing/Routes';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Role from 'logic/roles/Role';
 import { ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
+
+import EditLinkButton from './EditLinkButton';
 
 import { STEP_KEY as USER_SYNC_KEY } from '../../BackendWizard/UserSyncStep';
 
@@ -33,12 +33,6 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
   const {
     defaultRoles = Immutable.List(),
   } = authenticationBackend;
-  const editLink = {
-    pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
-    query: {
-      initialStepKey: USER_SYNC_KEY,
-    },
-  };
 
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
@@ -47,7 +41,7 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
   }, []);
 
   return (
-    <SectionComponent title="User Synchronisation" headerActions={<Link to={editLink}>Edit</Link>}>
+    <SectionComponent title="User Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={USER_SYNC_KEY} />}>
       <ReadOnlyFormGroup label="Search Base DN" value={userSearchBase} />
       <ReadOnlyFormGroup label="Search Pattern" value={userSearchPattern} />
       <ReadOnlyFormGroup label="Name Attribute" value={userNameAttribute} />
