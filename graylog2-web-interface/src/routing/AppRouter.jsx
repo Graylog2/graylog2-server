@@ -92,8 +92,9 @@ import {
   UsersOverviewPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
+
 import {} from 'components/authentication';
-import AuthProvidersConfig from "../components/authentication/AuthProvidersConfig";
+import AuthProvidersConfig from '../components/authentication/AuthProvidersConfig';
 
 const renderPluginRoute = ({ path, component: Component }) => (
   <Route key={`${path}-${Component.displayName}`}
@@ -136,9 +137,7 @@ const AppRouter = () => {
                     <AppWithoutSearchBar>
                       <Switch>
                         <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
-                        <Route path={Routes.legacy_stream_search(':streamId')}>
-                          <Redirect to={Routes.stream_search(':streamId')} />
-                        </Route>
+                        <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
                         <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
                         <Route path={Routes.STREAMS} component={StreamsPage} />
                         <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
