@@ -70,7 +70,7 @@ const BackendsOverview = () => {
       _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 
-    const unlistenDeleteBackend = AuthenticationActions.enableUser.completed.listen(() => {
+    const unlistenDeleteBackend = AuthenticationActions.delete.completed.listen(() => {
       _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 
