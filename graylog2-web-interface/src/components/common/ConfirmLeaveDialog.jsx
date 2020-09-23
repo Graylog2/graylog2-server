@@ -1,48 +1,23 @@
-import { useEffect } from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
+import { Prompt } from 'react-router-dom';
 
 import AppConfig from 'util/AppConfig';
 
 /**
  * This component should be conditionally rendered if you have a form that is in a "dirty" state. It will confirm with the user that they want to navigate away, refresh, or in any way unload the component.
  */
-const ConfirmLeaveDialog = ({ question, router }) => {
-  const handleLeavePage = (e) => {
-    if (AppConfig.gl2DevMode()) {
-      return null;
-    }
-
-    e.returnValue = question;
-
-    return question;
-  };
-
-  const routerWillLeave = () => {
-    return handleLeavePage({});
-  };
-
-  useEffect(() => {
-    window.addEventListener('beforeunload', handleLeavePage);
-    const { routes } = router;
-    const route = routes[routes.length - 1];
-    const unsubscribe = router.setRouteLeaveHook(route, routerWillLeave);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleLeavePage);
-      unsubscribe();
-    };
-  }, []);
-
-  return null;
+type Props = {
+  question: string,
 };
+const ConfirmLeaveDialog = ({ question }: Props) => (
+  <Prompt when={!AppConfig.gl2DevMode()} message={question} />
+);
 
 ConfirmLeaveDialog.propTypes = {
   /** Phrase used in the confirmation dialog. */
   question: PropTypes.string,
-  router: PropTypes.shape({
-    setRouteLeaveHook: PropTypes.func.isRequired,
-  }).isRequired,
 };
 
 ConfirmLeaveDialog.defaultProps = {
@@ -50,4 +25,4 @@ ConfirmLeaveDialog.defaultProps = {
 };
 
 /** @component */
-export default withRouter(ConfirmLeaveDialog);
+export default ConfirmLeaveDialog;
