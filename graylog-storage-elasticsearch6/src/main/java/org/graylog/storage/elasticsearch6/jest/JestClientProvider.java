@@ -64,8 +64,8 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
                               @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
-                              @Named("elasticsearch_discovery_default_user") String defaultUserForDiscoveredNodes,
-                              @Named("elasticsearch_discovery_default_password") String defaultPasswordForDiscoveredNodes,
+                              @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
+                              @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
                               ObjectMapper objectMapper) {
         this.factory = new JestClientFactory() {
             @Override

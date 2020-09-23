@@ -7,6 +7,7 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.auth.UsernamePasswordCr
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -22,8 +23,8 @@ public class ESCredentialsProvider implements Provider<CredentialsProvider> {
 
     @Inject
     public ESCredentialsProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
-                                 @Named("elasticsearch_discovery_default_user") String defaultUserForDiscoveredNodes,
-                                 @Named("elasticsearch_discovery_default_password") String defaultPasswordForDiscoveredNodes,
+                                 @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
+                                 @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
                                  @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {
         this.elasticsearchHosts = elasticsearchHosts;
         this.defaultUserForDiscoveredNodes = defaultUserForDiscoveredNodes;
