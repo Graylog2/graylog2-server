@@ -29,7 +29,7 @@ export type AuthenticationBackendUpdate = {
 
 export type PaginatedBackends = {
   context: {
-    activeBackend: ?string,
+    activeBackend: ?AuthenticationBackend,
   },
   list: Immutable.List<AuthenticationBackend>,
   pagination: PaginationType,
@@ -79,33 +79,34 @@ export type LoginTestResult = {
 
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<void>,
-  update: (id: string, AuthenticationBackendUpdate) => Promise<void>,
+  delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  disableUser: (userId: string, username: string) => Promise<void>,
+  enableUser: (userId: string, username: string) => Promise<void>,
   load: (id: string) => Promise<?AuthenticationBackend>,
   loadActive: () => Promise<?AuthenticationBackend>,
-  delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
-  testConnection: (payload: ConnectionTestPayload) => Promise<?ConnectionTestResult>,
-  testLogin: (payload: LoginTestPayload) => Promise<?LoginTestResult>,
-  enableUser: (userId: string, username: string) => Promise<void>,
-  disableUser: (userId: string, username: string) => Promise<void>,
-  setActiveBackend: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   loadBackendsPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedBackends>,
   loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedAuthUsers>,
+  setActiveBackend: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  testConnection: (payload: ConnectionTestPayload) => Promise<?ConnectionTestResult>,
+  testLogin: (payload: LoginTestPayload) => Promise<?LoginTestResult>,
+  update: (id: string, AuthenticationBackendUpdate) => Promise<void>,
 };
 
 const AuthenticationActions: RefluxActions<ActionsType> = singletonActions(
   'Authentication',
   () => Reflux.createActions({
     create: { asyncResult: true },
-    update: { asyncResult: true },
+    delete: { asyncResult: true },
+    disableUser: { asyncResult: true },
+    enableUser: { asyncResult: true },
     load: { asyncResult: true },
     loadActive: { asyncResult: true },
-    delete: { asyncResult: true },
-    testConnection: { asyncResult: true },
-    testLogin: { asyncResult: true },
     loadBackendsPaginated: { asyncResult: true },
     loadUsersPaginated: { asyncResult: true },
-    enableUser: { asyncResult: true },
-    disableUser: { asyncResult: true },
+    setActiveBackend: { asyncResult: true },
+    testConnection: { asyncResult: true },
+    testLogin: { asyncResult: true },
+    update: { asyncResult: true },
   }),
 );
 

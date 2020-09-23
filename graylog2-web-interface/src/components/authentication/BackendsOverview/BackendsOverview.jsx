@@ -47,10 +47,10 @@ const _onPageChange = (loadBackends, setLoading) => (page, perPage) => {
 };
 
 const BackendsOverview = () => {
-  const [paginatedBackends, setPaginatedBackends] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION, globalConfig: undefined });
-  const { list: backends, pagination: { page, perPage, query, total }, globalConfig } = paginatedBackends;
+  const [paginatedBackends, setPaginatedBackends] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION, context: undefined });
+  const { list: backends, pagination: { page, perPage, query, total }, context } = paginatedBackends;
   const [loading, setLoading] = useState();
-  const _isActive = (authBackend) => authBackend.id === globalConfig?.activeBackend;
+  const _isActive = (authBackend) => authBackend.id === context?.activeBackend?.id;
 
   const _loadBackends = (newPage = page, newPerPage = perPage, newQuery = query) => {
     return AuthenticationDomain.loadBackendsPaginated(newPage, newPerPage, newQuery)
@@ -74,9 +74,14 @@ const BackendsOverview = () => {
       _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 
+    const unlistenSetActivateBackend = AuthenticationActions.setActiveBackend.completed.listen(() => {
+      _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
+    });
+
     return () => {
       unlistenDisableBackend();
       unlistenEnableBackend();
+      unlistenSetActivateBackend();
       unlistenDeleteBackend();
     };
   }, []);
