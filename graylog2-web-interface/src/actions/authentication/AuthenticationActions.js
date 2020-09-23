@@ -28,8 +28,8 @@ export type AuthenticationBackendUpdate = {
 };
 
 export type PaginatedBackends = {
-  globalConfig: {
-    activeBackend: string,
+  context: {
+    activeBackend: ?string,
   },
   list: Immutable.List<AuthenticationBackend>,
   pagination: PaginationType,

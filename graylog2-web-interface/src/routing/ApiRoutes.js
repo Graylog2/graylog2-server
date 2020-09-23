@@ -25,8 +25,8 @@ const ApiRoutes = {
     list: () => { return { url: '/alerts/conditions' }; },
   },
   Authentication: {
-    servicesPaginated: () => ({ url: '/system/authentication/backends' }),
-    load: (serviceId) => ({ url: `/system/authentication/backends/${serviceId}` }),
+    servicesPaginated: () => ({ url: '/system/authentication/services/backends' }),
+    load: (serviceId) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
     loadActive: () => ({ url: '/system/authentication/services/active-backend' }),
     update: (serviceId) => ({ url: `/system/authentication/services/${serviceId}` }),
     create: () => ({ url: '/system/authentication/services/backends' }),
