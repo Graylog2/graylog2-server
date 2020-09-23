@@ -3,7 +3,6 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import PaginatedItemOverview, {
   type PaginationInfo,
@@ -31,11 +30,6 @@ const RolesSection = ({ user: { username } }: Props) => {
 
         // $FlowFixMe Role has DescriptiveItem implemented!!!
         return response;
-      }).catch((error) => {
-        if (error?.additional?.status === 404) {
-          UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
-            'Could not load roles for user');
-        }
       });
   };
 
