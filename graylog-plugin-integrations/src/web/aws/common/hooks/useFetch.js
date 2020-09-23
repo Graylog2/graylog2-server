@@ -4,6 +4,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import { FormDataContext } from '../../context/FormData';
+import { AWS_AUTH_TYPES } from '../constants';
 
 /* useFetch Custom Hook
 
@@ -43,6 +44,7 @@ EXAMPLES:
 
 const parseError = (error) => {
   const fullError = error.additional && error.additional.body && error.additional.body.message;
+
   return fullError || error.message;
 };
 
@@ -64,26 +66,34 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
         setLoading(true);
 
         const {
-          awsCloudWatchAssumeARN = { value: undefined },
-          awsEndpointCloudWatch = { value: undefined },
-          awsEndpointIAM = { value: undefined },
-          awsEndpointDynamoDB = { value: undefined },
-          awsEndpointKinesis = { value: undefined },
-          key = undefined,
-          secret = undefined,
+          awsAuthenticationType,
+          awsCloudWatchAssumeARN,
+          awsCloudWatchAwsKey,
+          awsCloudWatchAwsSecret,
+          awsEndpointCloudWatch,
+          awsEndpointIAM,
+          awsEndpointDynamoDB,
+          awsEndpointKinesis,
+          key,
+          secret,
         } = formData;
 
         if (method === 'GET') {
           fetcher = fetch(method, qualifiedURL);
         } else {
           fetcher = fetch(method, qualifiedURL, {
-            aws_access_key_id: key,
-            aws_secret_access_key: secret,
-            assume_role_arn: awsCloudWatchAssumeARN.value,
-            cloudwatch_endpoint: awsEndpointCloudWatch.value,
-            dynamodb_endpoint: awsEndpointDynamoDB.value,
-            iam_endpoint: awsEndpointIAM.value,
-            kinesis_endpoint: awsEndpointKinesis.value,
+            ...awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret ? {
+              aws_access_key_id: awsCloudWatchAwsKey?.value,
+              aws_secret_access_key: awsCloudWatchAwsSecret?.value,
+            } : {
+              aws_access_key_id: key,
+              aws_secret_access_key: secret,
+            },
+            assume_role_arn: awsCloudWatchAssumeARN?.value,
+            cloudwatch_endpoint: awsEndpointCloudWatch?.value,
+            dynamodb_endpoint: awsEndpointDynamoDB?.value,
+            iam_endpoint: awsEndpointIAM?.value,
+            kinesis_endpoint: awsEndpointKinesis?.value,
             ...options,
           });
         }
