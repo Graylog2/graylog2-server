@@ -32,6 +32,7 @@ import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
@@ -273,6 +274,7 @@ public class JerseyService extends AbstractIdleService {
                     }
                 })
                 .register(new UserContextBinder())
+                .register(MultiPartFeature.class)
                 .packages(true, controllerPackages)
                 .packages(true, RESOURCE_PACKAGE_WEB)
                 .registerResources(additionalResources);
