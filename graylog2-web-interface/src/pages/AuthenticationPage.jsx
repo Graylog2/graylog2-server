@@ -29,10 +29,6 @@ const AuthenticationPage = () => {
   const { finishedLoading, activeBackend } = useActiveBackend();
   const pageTitle = _pageTilte(activeBackend);
 
-  if (!finishedLoading) {
-    return <Spinner />;
-  }
-
   return (
     <DocumentTitle title={pageTitle}>
       <>

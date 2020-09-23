@@ -70,9 +70,9 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     },
 
     loadActive(): Promise<?AuthenticationBackend> {
-      // const url = qualifyUrl(ApiRoutes.Authentication.loadActive().url);
-      // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
-      const promise = Promise.resolve(services.first());
+      const url = qualifyUrl(ApiRoutes.Authentication.loadActive().url);
+      const promise = fetch('GET', url).then((result) => (result?.backend ? AuthenticationBackend.fromJSON(result.backend) : null));
+      // const promise = Promise.resolve(services.first());
 
       AuthenticationActions.loadActive.promise(promise);
 
