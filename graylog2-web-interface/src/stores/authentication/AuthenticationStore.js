@@ -75,7 +75,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     update(backendId: ?$PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.update(backendId).url);
-      const promise = fetch('DELETE', url, payload);
+      const promise = fetch('PUT', url, payload);
       AuthenticationActions.update.promise(promise);
 
       return promise;

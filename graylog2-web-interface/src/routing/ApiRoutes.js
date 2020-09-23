@@ -35,7 +35,7 @@ const ApiRoutes = {
     servicesPaginated: () => ({ url: '/system/authentication/services/backends' }),
     testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
     testLogin: () => ({ url: '/system/authentication/services/test/backend/login' }),
-    update: (serviceId) => ({ url: `/system/authentication/services/${serviceId}` }),
+    update: (serviceId) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
     updateConfiguration: () => ({ url: '/system/authentication/services/configuration' }),
   },
   AuthzRolesController: {
