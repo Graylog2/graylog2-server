@@ -86,7 +86,8 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .query(filter)
                 .from((page - 1) * perPage)
                 .size(perPage)
-                .sort(sorting.getField(), sortOrderMapper.fromSorting(sorting));
+                .sort(sorting.getField(), sortOrderMapper.fromSorting(sorting))
+                .trackTotalHits(true);
 
         final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
         final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))

@@ -21,7 +21,8 @@ public class CountsAdapterES7 implements CountsAdapter {
     public long totalCount(List<String> indices) {
         final SearchSourceBuilder query = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery())
-                .size(0);
+                .size(0)
+                .trackTotalHits(true);
         final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
                 .source(query);
 
