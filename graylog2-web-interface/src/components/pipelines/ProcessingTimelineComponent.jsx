@@ -11,7 +11,6 @@ import { Alert, Button } from 'components/graylog';
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { util } from 'theme';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -78,6 +77,7 @@ const ProcessingTimelineComponent = createReactClass({
 
   _headerCellFormatter(header) {
     let className;
+
     if (header === 'Actions') {
       className = 'actions';
     }
@@ -114,7 +114,8 @@ const ProcessingTimelineComponent = createReactClass({
     return (
       <tr key={pipeline.id}>
         <PipelineNameTD>
-          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>{pipeline.title}</Link><br />
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} title={pipeline.title}>{pipeline.title}</Link>
+          <br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
@@ -185,6 +186,7 @@ const ProcessingTimelineComponent = createReactClass({
     this.usedStages = this._calculateUsedStages(pipelines);
 
     const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
+
     return (
       <div>
         {addNewPipelineButton}
