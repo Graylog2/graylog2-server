@@ -119,8 +119,7 @@ const _onSubmitAll = (stepsState, setStepsState, onSubmit, setSubmitAllError, ge
 
   const payload = getSubmitPayload(formValues);
 
-  onSubmit(payload).then((result) => {
-    console.log('result', result);
+  onSubmit(payload).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
