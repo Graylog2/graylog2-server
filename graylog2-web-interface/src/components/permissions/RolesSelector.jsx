@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -11,8 +12,9 @@ import { Button } from 'components/graylog';
 import { Select } from 'components/common';
 
 type Props = {
+  assignedRolesIds: Immutable.List<string>,
+  identifier: (role: Role) => string,
   onSubmit: (role: Role) => Promise<void>,
-  assignedRolesNames: Immutable.List<string>,
 };
 
 const SubmitButton = styled(Button)`
@@ -36,8 +38,8 @@ const _renderRoleOption = ({ label }: { label: string }) => (
   <RoleSelectOption>{label}</RoleSelectOption>
 );
 
-const _options = (roles: Immutable.List<Role>, assignedRolesNames) => roles
-  .filter((r) => !assignedRolesNames.includes(r.name))
+const _options = (roles: Immutable.List<Role>, assignedRolesIds, identifier) => roles
+  .filter((role) => !assignedRolesIds.includes(identifier(role)))
   .toArray()
   .map((r) => ({ label: r.name, value: r.name, role: r }));
 
@@ -56,19 +58,19 @@ const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, set
   });
 };
 
-const RolesSelector = ({ assignedRolesNames, onSubmit }: Props) => {
+const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
   const [roles, setRoles] = useState(Immutable.List());
   const [selectedRoleName, setSelectedRoleName] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const _onSubmit = () => _assignRole(selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting);
-  const options = _options(roles, assignedRolesNames);
+  const options = _options(roles, assignedRolesIds, identifier);
 
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
       .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(paginatedRoles.list));
-  }, [assignedRolesNames]);
+  }, [assignedRolesIds]);
 
   return (
     <div>
@@ -89,6 +91,15 @@ const RolesSelector = ({ assignedRolesNames, onSubmit }: Props) => {
       </FormElements>
     </div>
   );
+};
+
+RolesSelector.defaultProps = {
+  identifier: (role) => role.id,
+};
+
+RolesSelector.propTypes = {
+  identifier: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default RolesSelector;
