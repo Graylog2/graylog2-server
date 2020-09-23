@@ -148,14 +148,16 @@ const AppRouter = () => {
                         <Route path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
                         <Route path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
                         <Route path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
-                        <Route path={Routes.ALERTS.LIST} component={EventsPage} />
-                        <Route path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
-                        <Route path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
-                        <Route path={Routes.ALERTS.DEFINITIONS.edit(':definitionId')}
+                        <Route exact path={Routes.ALERTS.LIST} component={EventsPage} />
+                        <Route exact path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
+                        <Route exact path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
+                        <Route exact
+                               path={Routes.ALERTS.DEFINITIONS.edit(':definitionId')}
                                component={EditEventDefinitionPage} />
-                        <Route path={Routes.ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
-                        <Route path={Routes.ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
-                        <Route path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')}
+                        <Route exact path={Routes.ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
+                        <Route exact path={Routes.ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
+                        <Route exact
+                               path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')}
                                component={EditEventNotificationPage} />
                         <Route path={Routes.show_alert_condition(':streamId', ':conditionId')}
                                component={EditAlertConditionPage} />
