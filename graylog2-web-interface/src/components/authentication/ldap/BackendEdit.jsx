@@ -34,7 +34,7 @@ export const prepareInitialValues = ({
 
   return {
     defaultRoles: defaultRoles.join(),
-    serverUrlHost: serverUrl.host(),
+    serverUrlHost: serverUrl.hostname(),
     serverUrlPort: serverUrl.port(),
     systemUserDn,
     transportSecurity,
