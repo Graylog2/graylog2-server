@@ -69,6 +69,12 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_discovery_default_scheme", validators = {HttpOrHttpsSchemeValidator.class})
     String defaultSchemeForDiscoveredNodes = "http";
 
+    @Parameter(value = "elasticsearch_discovery_default_user")
+    String defaultUserForDiscoveredNodes = null;
+
+    @Parameter(value = "elasticsearch_discovery_default_password")
+    String defaultPasswordForDiscoveredNodes = null;
+
     @Parameter(value = "elasticsearch_compression_enabled")
     boolean compressionEnabled = false;
 
