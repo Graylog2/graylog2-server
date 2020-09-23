@@ -1,8 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
-// import * as Immutable from 'immutable';
-
-// import * as Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { Store } from 'stores/StoreTypes';
@@ -10,7 +8,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'views/logic/singleton';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
-// import PaginationURL from 'util/PaginationURL';
+import PaginationURL from 'util/PaginationURL';
 import type {
   PaginatedBackends,
   PaginatedAuthUsers,
@@ -21,20 +19,18 @@ import type {
   LoginTestResult,
   AuthenticationBackendUpdate,
 } from 'actions/authentication/AuthenticationActions';
-// import type { PaginatedResponseType } from 'stores/PaginationTypes';
-// import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
+import type { PaginatedResponseType } from 'stores/PaginationTypes';
+import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
-// import AuthenticationUser, { type AuthenticationUserJSON } from 'logic/authentication/AuthenticationUser';
 
-import { services } from '../../../test/fixtures/authentication';
 import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
 
-// type PaginatedBackendsResponse = PaginatedResponseType & {
-//   global_config: {
-//     active_backend: string,
-//   },
-//   backends: Array<AuthenticationBackendJSON>,
-// };
+type PaginatedBackendsResponse = PaginatedResponseType & {
+  context: {
+    active_backend: ?AuthenticationBackendJSON,
+  },
+  backends: Array<AuthenticationBackendJSON>,
+};
 
 // type PaginatedUsersResponse = PaginatedResponseType & {
 //   users: Array<AuthenticationUserJSON>,
@@ -60,9 +56,9 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     },
 
     load(backendId: string): Promise<?AuthenticationBackend> {
-      // const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(backendId)).url);
-      // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
-      const promise = Promise.resolve(services.first());
+      const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(backendId)).url);
+      const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
+      // const promise = Promise.resolve(services.first());
 
       AuthenticationActions.load.promise(promise);
 
@@ -128,7 +124,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     },
 
     setActiveBackend(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.Authentication.updateConfiguration.url);
+      const url = qualifyUrl(ApiRoutes.Authentication.updateConfiguration().url);
       const promise = fetch('POST', url, { active_backend: backendId });
       AuthenticationActions.setActiveBackend.promise(promise);
 
@@ -136,35 +132,21 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     },
 
     loadBackendsPaginated(page: number, perPage: number, query: string): Promise<?PaginatedBackends> {
-      // const url = PaginationURL(ApiRoutes.Authentication.servicesPaginated().url, page, perPage, query);
-      // const promise = fetch('GET', qualifyUrl(url))
-      //   .then((response: PaginatedBackendsResponse) => ({
-      //     globalConfig: {
-      //       activeBackend: response.global_config.active_backend,
-      //     },
-      //     list: Immutable.List(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
-      //     pagination: {
-      //       count: response.count,
-      //       total: response.total,
-      //       page: response.page,
-      //       perPage: response.per_page,
-      //       query: response.query,
-      //     },
-      //   }));
-
-      const promise = Promise.resolve({
-        globalConfig: {
-          activeBackend: services.first().id,
-        },
-        list: services,
-        pagination: {
-          count: services.size,
-          total: services.size,
-          page: page || 1,
-          perPage: perPage || 10,
-          query: query || '',
-        },
-      });
+      const url = PaginationURL(ApiRoutes.Authentication.servicesPaginated().url, page, perPage, query);
+      const promise = fetch('GET', qualifyUrl(url))
+        .then((response: PaginatedBackendsResponse) => ({
+          context: {
+            activeBackend: response.context.active_backend,
+          },
+          list: Immutable.List(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
+          pagination: {
+            count: response.count,
+            total: response.total,
+            page: response.page,
+            perPage: response.per_page,
+            query: response.query,
+          },
+        }));
 
       AuthenticationActions.loadBackendsPaginated.promise(promise);
 
@@ -175,16 +157,16 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       // const url = PaginationURL(ApiRoutes.Authentication.loadUsersPaginated().url, page, perPage, query);
 
       // const promise = fetch('GET', qualifyUrl(url))
-      //   .then((response: PaginatedUsersResponse) => ({
-      //     list: Immutable.List(response.users.map((user) => AuthenticationUser.fromJSON(user))),
-      //     pagination: {
-      //       count: response.count,
-      //       total: response.total,
-      //       page: response.page,
-      //       perPage: response.per_page,
-      //       query: response.query,
-      //     },
-      //   }));
+      // .then((response: PaginatedUsersResponse) => ({
+      //   list: Immutable.List(response.users.map((user) => AuthenticationUser.fromJSON(user))),
+      //   pagination: {
+      //     count: response.count,
+      //     total: response.total,
+      //     page: response.page,
+      //     perPage: response.per_page,
+      //     query: response.query,
+      //   },
+      // }));
 
       const promise = Promise.resolve({
         list: authUsers,
