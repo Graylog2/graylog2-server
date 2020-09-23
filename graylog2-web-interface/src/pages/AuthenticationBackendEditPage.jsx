@@ -10,7 +10,7 @@ import AuthenticationDomain from 'domainActions/authentication/AuthenticationDom
 
 type Props = {
   params: {
-    id: string,
+    backendId: string,
   },
   location: {
     query: {
@@ -19,11 +19,11 @@ type Props = {
   },
 };
 
-const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { initialStepKey } } }: Props) => {
+const AuthenticationBackendEditPage = ({ params: { backendId }, location: { query: { initialStepKey } } }: Props) => {
   const [authBackend, setAuthBackend] = useState();
 
   useEffect(() => {
-    AuthenticationDomain.load(id).then((newAuthBackend) => newAuthBackend && setAuthBackend(newAuthBackend));
+    AuthenticationDomain.load(backendId).then((newAuthBackend) => newAuthBackend && setAuthBackend(newAuthBackend));
   }, []);
 
   if (!authBackend) {
