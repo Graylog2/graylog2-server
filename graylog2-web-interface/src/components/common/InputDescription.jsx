@@ -6,22 +6,29 @@ import styled, { type StyledComponent } from 'styled-components';
 import type { ThemeInterface } from 'theme';
 import { HelpBlock } from 'components/graylog';
 
-const StyledHelpBlock: StyledComponent<{hasError: boolean}, ThemeInterface, typeof HelpBlock> = styled(HelpBlock)(({ theme, hasError }) => `
-  ${hasError && `
+const Wrapper: StyledComponent<{hasError: boolean}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme, hasError }) => `
+  ${hasError ? `
     color: ${theme.colors.variant.danger};
-  `};
+  ` : ''};
 `);
 
-const InputDescription = ({ help, error }) => {
+type Props = {
+  help?: React.Node,
+  error?: React.Node,
+};
+
+const InputDescription = ({ help, error }: Props) => {
   if (!help && !error) {
     return null;
   }
 
   return (
-    <StyledHelpBlock hasError={!!error}>
-      {error && <>{error}<br /></>}
-      {help}
-    </StyledHelpBlock>
+    <Wrapper hasError={!!error}>
+      <HelpBlock>
+        {error && <>{error}<br /></>}
+        {help}
+      </HelpBlock>
+    </Wrapper>
   );
 };
 
