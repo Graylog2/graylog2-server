@@ -192,7 +192,7 @@ public class AuthzRolesResource extends RestResource {
 
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Add a user to a role")
+    @ApiOperation("Add user to role")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     @Path("{roleId}/assignee/{username}")
     public void addUser(
@@ -202,7 +202,7 @@ public class AuthzRolesResource extends RestResource {
     }
 
     @DELETE
-    @ApiOperation("Remove a member to a team")
+    @ApiOperation("Remove user from role")
     @Path("{roleId}/assignee/{username}")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_DELETE)
     public void removeUser(
