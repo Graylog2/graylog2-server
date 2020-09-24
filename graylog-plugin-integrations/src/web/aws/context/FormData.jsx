@@ -18,12 +18,11 @@ export const FormDataProvider = ({ initialFormData, children }) => {
   };
 
   const clearField = (id) => {
-    if (Object.keys(formData).find(field => field === id)) {
+    if (Object.keys(formData).find((field) => field === id)) {
       delete formData[id];
       updateState(formData);
     }
   };
-
 
   return (
     <FormDataContext.Provider value={{ formData, setFormData, clearField }}>

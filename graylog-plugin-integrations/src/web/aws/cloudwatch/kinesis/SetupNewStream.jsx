@@ -8,9 +8,7 @@ import FormWrap from 'aws/common/FormWrap';
 import { ApiRoutes } from 'aws/common/Routes';
 import { renderOptions } from 'aws/common/Options';
 import useFetch from 'aws/common/hooks/useFetch';
-
 import formValidation from 'aws/utils/formValidation';
-
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 
@@ -37,11 +35,13 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
       setGroupNamesUrl(null);
 
       const noGroups = /No CloudWatch log groups/g;
+
       if (groupNamesStatus.error.match(noGroups)) {
         setFormError({
           full_message: groupNamesStatus.error,
           nice_message: <span>We&apos;re unable to find any groups in your chosen region. Please try selecting a different region.</span>,
         });
+
         setDisabledGroups(true);
       } else {
         setFormError({

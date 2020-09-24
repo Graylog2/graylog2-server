@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-
 import { Link } from 'components/graylog/router';
+
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 import { Icon } from 'components/common';

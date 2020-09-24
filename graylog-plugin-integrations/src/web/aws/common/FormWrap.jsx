@@ -16,8 +16,7 @@ export const ErrorMessage = ({ fullMessage, niceMessage }) => {
           <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)} expanded={expanded}>
             More Info <i className="fa fa-chevron-right" />
           </ErrorToggleInfo>
-        )
-      }
+        )}
     </>
   );
 
@@ -60,8 +59,10 @@ const FormWrap = ({
 }) => {
   const formRef = useRef();
   const [disabledButton, setDisabledButton] = useState(disabled);
+
   const prevent = (event) => {
     event.preventDefault();
+
     return false;
   };
 
@@ -165,7 +166,7 @@ const ErrorToggleInfo = styled.button`
   padding: 0;
 
   .fa {
-    transform: rotate(${props => (props.expanded ? '90deg' : '0deg')});
+    transform: rotate(${(props) => (props.expanded ? '90deg' : '0deg')});
     transition: 150ms transform ease-in-out;
   }
 `;

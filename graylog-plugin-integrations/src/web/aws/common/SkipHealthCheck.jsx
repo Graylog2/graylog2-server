@@ -7,7 +7,6 @@ import AdditionalFields from 'aws/common/AdditionalFields';
 import { renderOptions } from 'aws/common/Options';
 import ValidatedInput from 'aws/common/ValidatedInput';
 import { KINESIS_LOG_TYPES } from 'aws/common/constants';
-
 import { FormDataContext } from 'aws/context/FormData';
 
 const SkipHealthCheck = ({ onChange, onSubmit }) => {

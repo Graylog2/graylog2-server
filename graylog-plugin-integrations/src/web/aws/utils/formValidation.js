@@ -24,13 +24,13 @@ const formValidation = {
       { invalid: isInvalidStep, message: providedMessage || 'Unexpected value.' },
     ];
 
-    const errorOutput = possibleErrors.find(error => error.invalid);
+    const errorOutput = possibleErrors.find((error) => error.invalid);
 
     return customErrorMessage || errorOutput.message;
   },
 
   isFormValid: (requiredFields, context) => {
-    return !!requiredFields.find(field => (!context[field] || !context[field].value || context[field].error));
+    return !!requiredFields.find((field) => (!context[field] || !context[field].value || context[field].error));
   },
 };
 
