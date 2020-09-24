@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'components/graylog/router';
 import numeral from 'numeral';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Button, Row, Col, Well } from 'components/graylog';
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';

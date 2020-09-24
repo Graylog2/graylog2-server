@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Link } from 'components/graylog/router';
 import naturalSort from 'javascript-natural-sort';
 
+import { Link } from 'components/graylog/router';
 import { ControlLabel, FormGroup, HelpBlock, Button } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';

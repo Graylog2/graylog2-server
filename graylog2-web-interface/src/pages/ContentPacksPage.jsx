@@ -2,9 +2,9 @@ import React from 'react';
 import Reflux from 'reflux';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import { LinkContainer } from 'components/graylog/router';
 import styled, { css } from 'styled-components';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import Spinner from 'components/common/Spinner';

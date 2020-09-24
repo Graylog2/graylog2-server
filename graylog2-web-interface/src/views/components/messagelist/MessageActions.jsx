@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { ClipboardButton } from 'components/common';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';

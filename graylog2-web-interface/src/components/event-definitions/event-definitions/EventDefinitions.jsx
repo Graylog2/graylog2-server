@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'components/graylog/router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Button, Col, DropdownButton, Label, MenuItem, Row } from 'components/graylog';
 import Routes from 'routing/Routes';
 import {

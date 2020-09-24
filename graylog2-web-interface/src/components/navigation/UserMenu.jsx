@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { NavDropdown, MenuItem } from 'components/graylog';

@@ -1,8 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
 import history from 'util/History';

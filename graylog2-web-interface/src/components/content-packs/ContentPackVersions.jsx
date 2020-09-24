@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { DataTable } from 'components/common';
 import { Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/graylog';

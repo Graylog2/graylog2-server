@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'components/graylog/router';
-import { Link } from 'components/graylog/router';
 
+import { LinkContainer, Link } from 'components/graylog/router';
 import { ButtonToolbar, Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';

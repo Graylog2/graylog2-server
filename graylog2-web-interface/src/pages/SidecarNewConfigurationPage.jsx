@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';

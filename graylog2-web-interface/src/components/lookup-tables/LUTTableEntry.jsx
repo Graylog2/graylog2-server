@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'components/graylog/router';
-import { Link } from 'components/graylog/router';
 
+import { LinkContainer, Link } from 'components/graylog/router';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';

@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Link } from 'components/graylog/router';
 
+import { Link } from 'components/graylog/router';
 import { Col, Button } from 'components/graylog';
 import { DataTable, EntityListItem, Spinner, Icon } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';

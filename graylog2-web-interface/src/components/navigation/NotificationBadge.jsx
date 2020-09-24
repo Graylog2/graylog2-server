@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'components/graylog/router';
 import styled from 'styled-components';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Badge, Nav } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';

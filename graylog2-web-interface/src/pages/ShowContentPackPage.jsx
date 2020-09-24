@@ -2,8 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import { BootstrapModalConfirm } from 'components/bootstrap';

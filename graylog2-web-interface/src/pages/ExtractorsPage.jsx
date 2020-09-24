@@ -1,9 +1,9 @@
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'components/graylog/router';
 import Reflux from 'reflux';
 
+import { LinkContainer } from 'components/graylog/router';
 import { DocumentTitle, Spinner } from 'components/common';
 import PageHeader from 'components/common/PageHeader';
 import ExtractorsList from 'components/extractors/ExtractorsList';

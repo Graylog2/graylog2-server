@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Link } from 'components/graylog/router';
-import { LinkContainer } from 'components/graylog/router';
 import styled, { css } from 'styled-components';
 
+import { Link, LinkContainer } from 'components/graylog/router';
 import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
 import { EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import Routes from 'routing/Routes';

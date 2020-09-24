@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import { Link } from 'components/graylog/router';
 
+import { Link } from 'components/graylog/router';
 import { Button, ButtonGroup, Col, Label, MessageDetailsDefinitionList, Row } from 'components/graylog';
 import { ClipboardButton, Icon, Timestamp } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';

@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link } from 'components/graylog/router';
-import { LinkContainer } from 'components/graylog/router';
 import styled, { css } from 'styled-components';
 
+import { Link, LinkContainer } from 'components/graylog/router';
 import { Button, Tooltip } from 'components/graylog';
 import { OverlayElement, Icon } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
