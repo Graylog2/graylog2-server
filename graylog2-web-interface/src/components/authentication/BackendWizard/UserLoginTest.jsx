@@ -2,13 +2,18 @@
 import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
+import styled from 'styled-components';
 
 import type { LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
-import { Button, Row, Col, Panel } from 'components/graylog';
+import { Button, Row, Col, Alert } from 'components/graylog';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
+
+const ResponseAlert = styled(Alert)`
+  margin-top: 10px;
+`;
 
 type Props = {
   prepareSubmitPayload: () => LdapCreate,
@@ -31,7 +36,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
       if (response?.success) {
         setLoginStatus({ loading: false, message: response.message, result: response?.result, success: true });
       } else {
-        setLoginStatus({ loading: false, message: response?.message, result: response.result, success: false });
+        setLoginStatus({ loading: false, message: response?.message, result: response?.result, success: false });
       }
     });
   };
@@ -60,11 +65,17 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
               {loading ? <Spinner delay={0} /> : 'Test Login'}
             </Button>
             {result && (
-              <Panel bsStyle={success ? 'success' : 'error'}>
-                {!result.user_exists && <p>User does not exist</p>}
+              <ResponseAlert bsStyle={success ? 'success' : 'error'}>
+                <b>
+                  {!result.user_exists && 'User does not exist'}
+                  {result.user_exists && (
+                    <>
+                      {result.login_success ? 'Login was successful' : 'Login failed'}
+                    </>
+                  )}
+                </b>
                 {result.user_exists && (
                   <p>
-                    {result.login_success ? 'Login was successful' : 'Login failed'}
                     {result.user_details && (
                       <>
                         <b>User attributes:</b><br />
@@ -73,7 +84,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
                     )}
                   </p>
                 )}
-              </Panel>
+              </ResponseAlert>
             )}
           </Form>
         )}

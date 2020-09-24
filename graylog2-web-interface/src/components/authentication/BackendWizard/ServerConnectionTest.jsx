@@ -10,7 +10,7 @@ import { Spinner } from 'components/common';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
-const ErrorsSection = styled(Alert)`
+const StyledAlert = styled(Alert)`
   margin-top: 10px;
 `;
 
@@ -54,16 +54,20 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
       <Button onClick={_handleConnectionCheck} type="button">
         {loading ? <Spinner delay={0} /> : 'Start Check'}
       </Button>
-      {success && <Alert bsStyle="success">{message}</Alert>}
+      {success && (
+        <StyledAlert bsStyle="success">
+          <b>{message}</b>
+        </StyledAlert>
+      )}
       {errors && (
-        <ErrorsSection bsStyle="danger">
+        <StyledAlert bsStyle="danger">
           <ErrorsTitle>{message}</ErrorsTitle>
           <ErrorsList>
             {errors.map((error) => {
               return <li key={error}>{error}</li>;
             })}
           </ErrorsList>
-        </ErrorsSection>
+        </StyledAlert>
       )}
     </>
   );
