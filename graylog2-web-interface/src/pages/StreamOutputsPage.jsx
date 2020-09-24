@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 

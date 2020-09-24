@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 import { cloneDeep } from 'lodash';
 
 import { Button, FormGroup, ControlLabel } from 'components/graylog';

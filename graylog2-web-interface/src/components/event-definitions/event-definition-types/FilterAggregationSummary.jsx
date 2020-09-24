@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 
 import { Alert } from 'components/graylog';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';

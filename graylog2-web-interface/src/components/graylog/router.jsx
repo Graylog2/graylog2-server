@@ -1,9 +1,8 @@
 // @flow strict
-import * as React from 'react';
-import { LinkContainer as BootstrapLinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
-type LinkContainerProps = {
-  to: string,
-  children: React.Node,
+export {
+  Link,
+  LinkContainer,
 };
-export const LinkContainer = ({ children, to }: LinkContainerProps) => <BootstrapLinkContainer to={to}>{children}</BootstrapLinkContainer>;

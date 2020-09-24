@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 
 import Routes from 'routing/Routes';
 import { PipelineRulesContext } from 'components/rules/RuleContext';

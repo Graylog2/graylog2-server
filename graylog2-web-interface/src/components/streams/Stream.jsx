@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 import { LinkContainer } from 'components/graylog/router';
 import styled, { css } from 'styled-components';
 

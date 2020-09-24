@@ -1,6 +1,6 @@
 import React from 'react';
 import { LinkContainer } from 'components/graylog/router';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';

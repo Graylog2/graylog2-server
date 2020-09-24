@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 
 import { Col, Label, Row } from 'components/graylog';
 import StreamLink from 'components/streams/StreamLink';

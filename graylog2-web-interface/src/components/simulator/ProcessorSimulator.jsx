@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/graylog';
 import { Select } from 'components/common';

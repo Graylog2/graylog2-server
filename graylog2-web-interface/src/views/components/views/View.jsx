@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 // $FlowFixMe: imports from core need to be fixed in flow
-import { Link } from 'react-router';
+import { Link } from 'components/graylog/router';
 
 import Routes from 'routing/Routes';
 import { EntityListItem } from 'components/common';
