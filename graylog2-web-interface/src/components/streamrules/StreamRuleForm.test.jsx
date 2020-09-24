@@ -59,7 +59,7 @@ describe('StreamRuleForm', () => {
     const inputs = [
       { id: 'my-id', title: 'title', name: 'name' },
     ];
-    const { getByTestId, getByText, debug } = render(
+    const { getByTestId, getByText } = render(
       <StreamRuleForm onSubmit={submit}
                       streamRule={getStreamRule()}
                       inputs={inputs}
