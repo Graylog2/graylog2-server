@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useContext } from 'react';
+import styled from 'styled-components';
 
 import type { LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
@@ -8,6 +9,20 @@ import { Button, Alert } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
+
+const ErrorsSection = styled(Alert)`
+  margin-top: 10px;
+`;
+
+const ErrorsTitle = styled.div`
+  font-weight: bold;
+  margin-bottom: 5px;
+`;
+
+const ErrorsList = styled.ul`
+  list-style: initial;
+  padding-left: 20px;
+`;
 
 type Props = {
   prepareSubmitPayload: () => LdapCreate,
@@ -26,7 +41,7 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
       if (response?.success) {
         setConnectionStatus({ loading: false, message: response.message, success: true, errors: undefined });
       } else {
-        setConnectionStatus({ loading: false, message: undefined, success: undefined, errors: response?.errors });
+        setConnectionStatus({ loading: false, message: response?.message, success: undefined, errors: response?.errors });
       }
     });
   };
@@ -41,14 +56,14 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
       </Button>
       {success && <Alert bsStyle="success">{message}</Alert>}
       {errors && (
-        <Alert bsStyle="danger">
-          {message}
-          <ul>
+        <ErrorsSection bsStyle="danger">
+          <ErrorsTitle>{message}</ErrorsTitle>
+          <ErrorsList>
             {errors.map((error) => {
               return <li key={error}>{error}</li>;
             })}
-          </ul>
-        </Alert>
+          </ErrorsList>
+        </ErrorsSection>
       )}
     </>
   );

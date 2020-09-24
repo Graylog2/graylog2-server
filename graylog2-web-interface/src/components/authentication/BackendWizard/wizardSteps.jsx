@@ -14,7 +14,7 @@ type Props = {
   handleSubmitAll: () => void,
   invalidStepKeys: Array<string>,
   setActiveStepKey: (stepKey: string)=> void,
-  submitAllError: string,
+  submitAllError: ?React.Node,
 };
 
 const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStepKey, submitAllError }: Props) => [

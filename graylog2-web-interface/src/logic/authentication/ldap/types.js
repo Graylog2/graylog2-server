@@ -1,7 +1,7 @@
 // @flow strict
 import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 
-type TransportSecurity = ('tls' | 'start_tls' | '');
+type TransportSecurity = ('tls' | 'start_tls' | 'none');
 
 export type LdapConfig = {
   serverUrls: Array<string>,

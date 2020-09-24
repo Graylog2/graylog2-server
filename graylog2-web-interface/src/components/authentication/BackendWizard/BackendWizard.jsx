@@ -85,7 +85,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   };
 };
 
-const _invalidStepKeys = (formValues) => {
+const _getInvalidStepKeys = (formValues) => {
   const invalidStepKeys = Object.entries(FORMS_VALIDATION).map(([stepKey, formValidation]) => {
     // $FlowFixMe formValidation is valid input for Object.entries
     const stepHasError = Object.entries(formValidation).some(([fieldName, fieldValidation]) => {
@@ -99,23 +99,14 @@ const _invalidStepKeys = (formValues) => {
   return compact(invalidStepKeys);
 };
 
-const _onSubmitAll = (stepsState, setStepsState, onSubmit, setSubmitAllError, getUpdatedFormsValues, getSubmitPayload) => {
+const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps) => {
   const formValues = getUpdatedFormsValues();
-  const invalidStepKeys = _invalidStepKeys(formValues);
-  setSubmitAllError(null);
+  const invalidStepKeys = validateSteps(formValues);
+  setSubmitAllError();
 
   if (invalidStepKeys.length >= 1) {
-    setStepsState({
-      ...stepsState,
-      activeStepKey: invalidStepKeys[0],
-      formValues,
-      invalidStepKeys,
-    });
-
     return;
   }
-
-  setStepsState({ ...stepsState, formValues, invalidStepKeys: [] });
 
   const payload = getSubmitPayload(formValues);
 
@@ -140,7 +131,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     formValues: initialValues,
     invalidStepKeys: [],
   });
-  const [submitAllError, setSubmitAllError] = useState();
+  const [submitAllError, setSubmitAllError] = useState<?string>();
   const formRefs = {
     [SERVER_CONFIG_KEY]: useRef(),
     [USER_SYNC_KEY]: useRef(),
@@ -153,6 +144,19 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     return { ...stepsState.formValues, ...activeForm?.values };
   };
 
+  const _validateSteps = (formValues: WizardFormValues): Array<string> => {
+    const invalidStepKeys = _getInvalidStepKeys(formValues);
+
+    setStepsState({
+      ...stepsState,
+      activeStepKey: invalidStepKeys[0],
+      formValues,
+      invalidStepKeys,
+    });
+
+    return invalidStepKeys;
+  };
+
   const _getSubmitPayload = _prepareSubmitPayload(stepsState, _getUpdatedFormsValues);
 
   const _setActiveStepKey = (stepKey: $PropertyType<Step, 'key'>) => {
@@ -161,7 +165,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
     // Only update invalid steps keys, we create them on submit all only
     if (invalidStepKeys.length >= 1) {
-      invalidStepKeys = _invalidStepKeys(formValues);
+      invalidStepKeys = _getInvalidStepKeys(formValues);
     }
 
     setStepsState({
@@ -174,11 +178,11 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
   const _handleSubmitAll = () => _onSubmitAll(
     stepsState,
-    setStepsState,
-    onSubmit,
     setSubmitAllError,
+    onSubmit,
     _getUpdatedFormsValues,
     _getSubmitPayload,
+    _validateSteps,
   );
 
   const steps = wizardSteps({

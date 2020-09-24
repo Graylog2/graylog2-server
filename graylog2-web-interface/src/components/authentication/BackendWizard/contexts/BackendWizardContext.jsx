@@ -13,7 +13,7 @@ export type WizardFormValues = {
   serverUrlPort?: string | number,
   systemUserDn?: string,
   systemUserPassword?: string,
-  transportSecurity?: ('tls' | 'start_tls' | ''),
+  transportSecurity?: ('tls' | 'start_tls' | 'none'),
   userFullNameAttribute?: string,
   userNameAttribute?: string,
   userSearchBase?: string,

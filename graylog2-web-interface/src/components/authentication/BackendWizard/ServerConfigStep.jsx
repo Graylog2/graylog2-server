@@ -125,14 +125,14 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                 <Field name="transportSecurity">
                   {({ field: { name, onChange, onBlur, value } }) => (
                     <>
-                      <Input defaultChecked={value === ''}
+                      <Input defaultChecked={value === 'none'}
                              formGroupClassName=""
                              id={name}
                              label="None"
                              onBlur={onBlur}
                              onChange={onChange}
                              type="radio"
-                             value="" />
+                             value="none" />
                       <Input defaultChecked={value === 'tls'}
                              formGroupClassName=""
                              id={name}
