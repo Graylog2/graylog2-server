@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
 
@@ -24,25 +24,30 @@ const inputProps = (value) => {
 };
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ component: Component, name, type, help, validate, ...rest }: Props) => (
-  <Component name={name} validate={validate}>
-    {({ field: { value, onChange, onBlur }, meta: { error } }) => {
-      const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
+const FormikInput = ({ component: Component, name, type, help, validate, ...rest }: Props) => {
+  const { validateOnChange } = useFormikContext();
 
-      return (
-        <Input {...rest}
-               {...typeSepcificProps}
-               onBlur={onBlur}
-               bsStyle={error ? 'error' : undefined}
-               help={help}
-               id={name}
-               error={error}
-               onChange={onChange}
-               type={type} />
-      );
-    }}
-  </Component>
-);
+  return (
+    <Component name={name} validate={validate}>
+      {({ field: { value, onChange, onBlur }, meta: { error, touched } }) => {
+        const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
+        const displayError = validateOnChange ? !!(error && touched) : !!error;
+
+        return (
+          <Input {...rest}
+                 {...typeSepcificProps}
+                 onBlur={onBlur}
+                 bsStyle={displayError ? 'error' : undefined}
+                 help={help}
+                 id={name}
+                 error={displayError ? error : undefined}
+                 onChange={onChange}
+                 type={type} />
+        );
+      }}
+    </Component>
+  );
+};
 
 FormikInput.propTypes = {
   component: PropTypes.func,
