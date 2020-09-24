@@ -1,9 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import { Field } from 'formik';
 
-import { Row, Col, FormGroup } from 'components/graylog';
-import { InputDescription } from 'components/common';
+import { Row, Col } from 'components/graylog';
+import { FormikInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 export const validatePasswords = (errors: { [name: string]: string }, password: string, passwordRepeat: string) => {
@@ -29,46 +28,24 @@ const PasswordFormGroup = () => {
            wrapperClassName="col-sm-9">
       <Row className="no-bm">
         <Col sm={6}>
-          <Field name="password">
-            {({ field: { name, value, onChange }, meta: { error } }) => (
-              <FormGroup validationState={error ? 'error' : null} className="no-bm">
-                <Col xs={12}>
-                  <input className="form-control"
-                         id={name}
-                         name={name}
-                         onChange={onChange}
-                         maxLength={100}
-                         type="password"
-                         placeholder="Password"
-                         required
-                         minLength={6}
-                         value={value ?? ''} />
-                  <InputDescription error={error} />
-                </Col>
-              </FormGroup>
-            )}
-          </Field>
+          <FormikInput name="password"
+                       maxLength={100}
+                       type="password"
+                       placeholder="Password"
+                       required
+                       formGroupClassName="form-group no-bm"
+                       wrapperClassName="col-xs-12"
+                       minLength={6} />
         </Col>
         <Col sm={6}>
-          <Field name="password_repeat">
-            {({ field: { name, value, onChange }, meta: { error } }) => (
-              <FormGroup validationState={error ? 'error' : null} className="no-bm">
-                <Col xs={12}>
-                  <input className="form-control"
-                         id={name}
-                         name={name}
-                         onChange={onChange}
-                         maxLength={100}
-                         type="password"
-                         placeholder="Repeat password"
-                         required
-                         minLength={6}
-                         value={value ?? ''} />
-                  {error && <InputDescription>{error}</InputDescription>}
-                </Col>
-              </FormGroup>
-            )}
-          </Field>
+          <FormikInput name="password_repeat"
+                       maxLength={100}
+                       type="password"
+                       placeholder="Password repeat"
+                       formGroupClassName="form-group no-bm"
+                       required
+                       wrapperClassName="col-xs-12"
+                       minLength={6} />
         </Col>
       </Row>
     </Input>
