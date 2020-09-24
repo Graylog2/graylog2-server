@@ -47,7 +47,6 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
-            @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             CredentialsProvider credentialsProvider) {
         client = buildClient(
