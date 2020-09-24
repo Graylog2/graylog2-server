@@ -3,6 +3,7 @@ import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
+import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
@@ -22,7 +23,7 @@ describe('ServiceSelect', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE_LDAP));
+    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')));
   });
 
   it('should redirect correctly after selecting active directory ', async () => {
@@ -36,6 +37,6 @@ describe('ServiceSelect', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE_AD));
+    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('active-directory')));
   });
 });
