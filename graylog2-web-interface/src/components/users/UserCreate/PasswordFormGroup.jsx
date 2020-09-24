@@ -41,7 +41,7 @@ const PasswordFormGroup = () => {
           <FormikInput name="password_repeat"
                        maxLength={100}
                        type="password"
-                       placeholder="Password repeat"
+                       placeholder="Repeat password"
                        formGroupClassName="form-group no-bm"
                        required
                        wrapperClassName="col-xs-12"
