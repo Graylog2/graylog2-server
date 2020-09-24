@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations;
 
+import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.codecs.AWSCodec;
@@ -33,6 +34,7 @@ import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
+import org.graylog.integrations.notifications.types.SlackClient;
 import org.graylog.integrations.notifications.types.SlackEventNotification;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfig;
 import org.graylog2.plugin.PluginConfigBean;
@@ -89,6 +91,8 @@ public class IntegrationsModule extends PluginModule {
 
         addAuditEventTypes(IntegrationsAuditEventTypes.class);
 
+
+       // bind(SlackEventNotificationConfig.class).toProvider(EventNotificationConfig.class);
         addNotificationType(SlackEventNotificationConfig.TYPE_NAME,
                 SlackEventNotificationConfig.class,
                 SlackEventNotification.class,

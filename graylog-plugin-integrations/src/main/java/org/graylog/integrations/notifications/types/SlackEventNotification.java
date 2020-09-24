@@ -23,11 +23,11 @@ import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
-import org.graylog.events.notifications.modeldata.BacklogItemModelData;
-import org.graylog.events.notifications.modeldata.CustomMessageModelData;
-import org.graylog.events.notifications.modeldata.StreamModelData;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
+import org.graylog.integrations.notifications.modeldata.BacklogItemModelData;
+import org.graylog.integrations.notifications.modeldata.CustomMessageModelData;
+import org.graylog.integrations.notifications.modeldata.StreamModelData;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
@@ -62,11 +62,9 @@ public class SlackEventNotification implements EventNotification {
 	private final NotificationService notificationService;
 	private final ObjectMapper objectMapper;
 	private final NodeId nodeId;
-	private final SlackClient slackClient;
 
 	@Inject
 	public SlackEventNotification(EventNotificationService notificationCallbackService,
-                                  SlackClient slackClient,
                                   StreamService streamService,
                                   Engine templateEngine,
                                   NotificationService notificationService,
@@ -78,7 +76,7 @@ public class SlackEventNotification implements EventNotification {
 		this.notificationService = notificationService;
 		this.objectMapper = objectMapper;
 		this.nodeId = nodeId;
-		this.slackClient = slackClient;
+
 
 	}
 
