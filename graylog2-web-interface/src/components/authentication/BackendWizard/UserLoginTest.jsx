@@ -16,15 +16,23 @@ type Props = {
 
 const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
   const { authBackendMeta } = useContext(BackendWizardContext);
-  const [{ loading, success, result }, setLoginStatus] = useState({ loading: false, success: false, result: undefined });
+  const [{ loading, success, result }, setLoginStatus] = useState({ loading: false, success: false, result: undefined, message: undefined });
 
   const _handleLoginTest = ({ username, password }) => {
     setLoginStatus({ loading: true, error: undefined, success: false, result: undefined });
 
-    const payload = { ...prepareSubmitPayload(), user_login: { username, password } };
+    const payload = { ...prepareSubmitPayload() };
 
-    AuthenticationDomain.testLogin({ backend_configuration: payload, backend_id: authBackendMeta.backendId, username, password }).then((response) => {
-      setLoginStatus({ loading: false, success: response?.success, result: response?.result });
+    AuthenticationDomain.testLogin({
+      backend_configuration: payload,
+      user_login: { username, password },
+      backend_id: authBackendMeta.backendId,
+    }).then((response) => {
+      if (response?.success) {
+        setLoginStatus({ loading: false, message: response.message, result: response?.result, success: true });
+      } else {
+        setLoginStatus({ loading: false, message: response?.message, result: response.result, success: false });
+      }
     });
   };
 
@@ -39,11 +47,13 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
             <Row>
               <Col sm={6}>
                 <FormikInput label="Username"
-                             name="username" />
+                             name="username"
+                             required />
               </Col>
               <Col sm={6}>
                 <FormikInput label="Password"
-                             name="password" />
+                             name="password"
+                             required />
               </Col>
             </Row>
             <Button type="submit" disabled={isSubmitting || !isValid}>
