@@ -27,7 +27,6 @@ type Props = {
 
 const GroupSyncStep = ({ onSubmitAll, formRef, submitAllError, validateOnMount }: Props) => {
   const authenticationPlugin = PluginStore.exports('authentication.groupSync');
-  console.log('submitAllError1', submitAllError);
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
     return <NoEnterpriseComponent />;
