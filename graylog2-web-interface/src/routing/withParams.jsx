@@ -1,5 +1,5 @@
 // @flow strict
 
-const withParams = (Component) => Component;
+const withParams = <T>(Component: T): T => Component;
 
 export default withParams;
