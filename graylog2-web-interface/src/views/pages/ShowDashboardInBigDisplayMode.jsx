@@ -12,6 +12,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
+import withParams from 'routing/withParams';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -68,4 +69,4 @@ const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, 
   );
 };
 
-export default withRouter(connect(ShowDashboardInBigDisplayMode, { view: ViewStore }));
+export default withRouter(connect(withParams(ShowDashboardInBigDisplayMode), { view: ViewStore }));

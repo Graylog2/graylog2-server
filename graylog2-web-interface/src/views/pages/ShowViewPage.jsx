@@ -15,6 +15,7 @@ import ViewLoader from 'views/logic/views/ViewLoader';
 import { SearchActions } from 'views/stores/SearchStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import { ExtendedSearchPage } from 'views/pages';
+import withParams from 'routing/withParams';
 
 type Props = {
   executingViewHooks: Array<ViewHook>,
@@ -142,4 +143,4 @@ const mapping = {
   loadingViewHooks: 'views.hooks.loadingView',
   executingViewHooks: 'views.hooks.executingView',
 };
-export default withPluginEntities(ShowViewPageWithStores, mapping);
+export default withPluginEntities(withParams(ShowViewPageWithStores), mapping);

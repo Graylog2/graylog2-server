@@ -13,6 +13,7 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
 import history from 'util/History';
+import withParams from 'routing/withParams';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
@@ -116,7 +117,7 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default connect(EditEventDefinitionPage, {
+export default connect(withParams(EditEventDefinitionPage), {
   currentUser: CurrentUserStore,
 },
 ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

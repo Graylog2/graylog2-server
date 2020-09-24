@@ -7,6 +7,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ImportExtractors from 'components/extractors/ImportExtractors';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
+import withParams from 'routing/withParams';
 
 const InputsActions = ActionsProvider.getActions('Inputs');
 const InputsStore = StoreProvider.getStore('Inputs');
@@ -57,4 +58,4 @@ const ImportExtractorsPage = createReactClass({
   },
 });
 
-export default ImportExtractorsPage;
+export default withParams(ImportExtractorsPage);

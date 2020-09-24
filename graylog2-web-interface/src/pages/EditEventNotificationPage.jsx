@@ -12,6 +12,7 @@ import connect from 'stores/connect';
 import PermissionsMixin from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+import withParams from 'routing/withParams';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
@@ -108,7 +109,7 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default connect(EditEventDefinitionPage, {
+export default connect(withParams(EditEventDefinitionPage), {
   currentUser: CurrentUserStore,
 },
 ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

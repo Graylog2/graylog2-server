@@ -11,6 +11,7 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
+import withParams from 'routing/withParams';
 
 const InputsActions = ActionsProvider.getActions('Inputs');
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
@@ -104,4 +105,4 @@ const EditExtractorsPage = createReactClass({
   },
 });
 
-export default EditExtractorsPage;
+export default withParams(EditExtractorsPage);
