@@ -7,6 +7,7 @@ import { Alert } from 'components/graylog';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
+import withParams from 'routing/withParams';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const StreamsStore = StoreProvider.getStore('Streams');
@@ -72,4 +73,4 @@ const StreamEditPage = createReactClass({
   },
 });
 
-export default StreamEditPage;
+export default withParams(StreamEditPage);

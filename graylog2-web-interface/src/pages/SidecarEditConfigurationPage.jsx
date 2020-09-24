@@ -10,6 +10,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import history from 'util/History';
+import withParams from 'routing/withParams';
 
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
@@ -102,4 +103,4 @@ const SidecarEditConfigurationPage = createReactClass({
   },
 });
 
-export default SidecarEditConfigurationPage;
+export default withParams(SidecarEditConfigurationPage);

@@ -12,6 +12,7 @@ import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 const { RulesStore } = CombinedProvider.get('Rules');
@@ -188,4 +189,4 @@ const PipelineDetailsPage = createReactClass({
   },
 });
 
-export default PipelineDetailsPage;
+export default withParams(PipelineDetailsPage);

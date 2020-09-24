@@ -7,6 +7,7 @@ import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
+import withParams from 'routing/withParams';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -65,4 +66,4 @@ const ShowMetricsPage = createReactClass({
   },
 });
 
-export default ShowMetricsPage;
+export default withParams(ShowMetricsPage);
