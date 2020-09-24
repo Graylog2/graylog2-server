@@ -46,10 +46,10 @@ const BackendCreateSelect = () => {
                 {({ field: { name, value, onChange }, meta: { error } }) => (
                   <>
                     <Select clearable={false}
-                            inputProps={{ 'aria-label': 'Select a provider' }}
+                            inputProps={{ 'aria-label': 'Select a service' }}
                             onChange={(authService) => onChange({ target: { value: authService, name } })}
                             options={authServicesOptions}
-                            placeholder="Select a provider"
+                            placeholder="Select a service"
                             value={value} />
                     <InputDescription error={error} />
                   </>

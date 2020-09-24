@@ -9,6 +9,6 @@ describe('GettingStarted', () => {
     const { queryByText, queryByLabelText } = render(<GettingStarted />);
 
     expect(queryByText(/Select an authentication services to setup a new one./)).not.toBeNull();
-    expect(queryByLabelText('Select a provider')).not.toBeNull();
+    expect(queryByLabelText('Select a service')).not.toBeNull();
   });
 });
