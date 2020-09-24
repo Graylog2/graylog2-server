@@ -33,6 +33,13 @@ public class RestPermissions implements PluginPermissions {
      */
     public static final String AUTHENTICATION_READ = "authentication:read";
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
+    public static final String AUTH_SERVICE_BACKEND_CREATE = "authservicebackend:create";
+    public static final String AUTH_SERVICE_BACKEND_DELETE = "authservicebackend:delete";
+    public static final String AUTH_SERVICE_BACKEND_EDIT = "authservicebackend:edit";
+    public static final String AUTH_SERVICE_BACKEND_READ = "authservicebackend:read";
+    public static final String AUTH_SERVICE_GLOBAL_CONFIG_READ = "authserviceglobalconfig:read";
+    public static final String AUTH_SERVICE_GLOBAL_CONFIG_EDIT = "authserviceglobalconfig:edit";
+    public static final String AUTH_SERVICE_TEST_BACKEND_EXECUTE = "authservicetestbackend:execute";
     public static final String BUFFERS_READ = "buffers:read";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
@@ -154,6 +161,13 @@ public class RestPermissions implements PluginPermissions {
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(AUTHENTICATION_EDIT, ""))
             .add(create(AUTHENTICATION_READ, ""))
+            .add(create(AUTH_SERVICE_BACKEND_CREATE, ""))
+            .add(create(AUTH_SERVICE_BACKEND_DELETE, ""))
+            .add(create(AUTH_SERVICE_BACKEND_EDIT, ""))
+            .add(create(AUTH_SERVICE_BACKEND_READ, ""))
+            .add(create(AUTH_SERVICE_GLOBAL_CONFIG_READ, ""))
+            .add(create(AUTH_SERVICE_GLOBAL_CONFIG_EDIT, ""))
+            .add(create(AUTH_SERVICE_TEST_BACKEND_EXECUTE, ""))
             .add(create(BUFFERS_READ, ""))
             .add(create(CONTENT_PACK_CREATE, ""))
             .add(create(CONTENT_PACK_DELETE, ""))

@@ -25,7 +25,11 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.http.util.TextUtils.isBlank;
 
 public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
     private static final String COLLECTION_NAME = "users";
@@ -63,5 +67,20 @@ public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
                 .all(UserImpl.ROLES, roleId);
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+    }
+
+    public PaginatedList<UserOverviewDTO> findPaginatedByAuthServiceBackend(SearchQuery searchQuery,
+                                                                            int page,
+                                                                            int perPage,
+                                                                            String sortField,
+                                                                            String order,
+                                                                            String authServiceBackendId) {
+        checkArgument(!isBlank(authServiceBackendId), "authServiceBackendId cannot be blank");
+
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.is(UserImpl.AUTH_SERVICE_ID, Optional.of(authServiceBackendId)),
+                searchQuery.toDBQuery()
+        );
+        return findPaginatedWithQueryAndSort(query, getSortBuilder(order, sortField), page, perPage);
     }
 }

@@ -92,8 +92,8 @@ class RolesToGrantsMigrationTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-                      MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                      GRNRegistry grnRegistry) {
+               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+               GRNRegistry grnRegistry) {
         when(permissions.readerBasePermissions()).thenReturn(ImmutableSet.of());
         when(validator.validate(any())).thenReturn(ImmutableSet.of());
 
@@ -184,6 +184,7 @@ class RolesToGrantsMigrationTest {
     // An incomplete UserService implementation, that needs fewer dependencies
     public static class TestUserService extends PersistedServiceImpl implements UserService {
         final UserImpl.Factory userFactory;
+
         protected TestUserService(MongoConnection mongoConnection) {
             super(mongoConnection);
             final Permissions permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
@@ -240,6 +241,11 @@ class RolesToGrantsMigrationTest {
         @Override
         public long count() {
             return 0;
+        }
+
+        @Override
+        public List<User> loadAllForAuthServiceBackend(String authServiceBackendId) {
+            return Collections.emptyList();
         }
 
         @Override

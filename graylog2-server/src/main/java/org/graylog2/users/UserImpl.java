@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,6 +81,8 @@ public class UserImpl extends PersistedImpl implements User {
             .build();
 
     public static final String COLLECTION_NAME = "users";
+    public static final String AUTH_SERVICE_ID = "auth_service_id";
+    public static final String AUTH_SERVICE_UID = "auth_service_uid";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
@@ -95,6 +98,8 @@ public class UserImpl extends PersistedImpl implements User {
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
     public static final int MAX_FULL_NAME_LENGTH = 200;
+
+    public static final long DEFAULT_SESSION_TIMEOUT_MS = TimeUnit.HOURS.toMillis(8);
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
@@ -233,7 +238,7 @@ public class UserImpl extends PersistedImpl implements User {
         if (o != null && o instanceof Long) {
             return (Long) o;
         }
-        return TimeUnit.HOURS.toMillis(8);
+        return DEFAULT_SESSION_TIMEOUT_MS;
     }
 
     @Override
@@ -346,6 +351,28 @@ public class UserImpl extends PersistedImpl implements User {
         this.fields.put(STARTPAGE, startpageMap);
     }
 
+    @Nullable
+    @Override
+    public String getAuthServiceId() {
+        return (String) fields.get(AUTH_SERVICE_ID);
+    }
+
+    @Nullable
+    @Override
+    public String getAuthServiceUid() {
+        return (String) fields.get(AUTH_SERVICE_UID);
+    }
+
+    @Override
+    public void setAuthServiceId(@Nullable String authServiceId) {
+        fields.put(AUTH_SERVICE_ID, authServiceId);
+    }
+
+    @Override
+    public void setAuthServiceUid(@Nullable String authServiceUid) {
+        fields.put(AUTH_SERVICE_UID, authServiceUid);
+    }
+
     public static class LocalAdminUser extends UserImpl {
         private final Configuration configuration;
         private final Set<String> roles;
@@ -406,7 +433,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public long getSessionTimeoutMs() {
-            return TimeUnit.HOURS.toMillis(8);
+            return DEFAULT_SESSION_TIMEOUT_MS;
         }
 
         @Override
