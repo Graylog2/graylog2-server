@@ -5,7 +5,7 @@ import WrappingContainer from 'WrappingContainer';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
-import Widget from 'views/logic/widgets/Widget';
+import { DEFAULT_TIMERANGE } from 'views/Constants';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import SearchBarForm from './searchbar/SearchBarForm';
@@ -54,7 +54,7 @@ describe('WidgetQueryControls', () => {
 
   const Wrapper = ({ children }: { children: React.Node }) => (
     <WrappingContainer>
-      <SearchBarForm initialValues={{ timerange: { type: 'relative', range: 300 }, queryString: '', streams: [] }} onSubmit={() => {}}>
+      <SearchBarForm initialValues={{ timerange: DEFAULT_TIMERANGE, queryString: '', streams: [] }} onSubmit={() => {}}>
         {children}
       </SearchBarForm>
     </WrappingContainer>
