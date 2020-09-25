@@ -98,14 +98,14 @@ public class DocumentationBrowserResource extends RestResource {
     @GET
     @Path("/{route: .*}")
     public Response asset(@PathParam("route") String route) throws IOException {
-        // Directory traversal should not be possible but just to make sure..
-        if (route.contains("..")) {
-            throw new BadRequestException("Not allowed to access parent directory");
-        }
-
         // Remove path globalModePath before we serve swagger resources
         if (route.startsWith("global/")) {
-            route = route.replace("global/", "");
+            route = route.replaceFirst("global/", "");
+        }
+
+        // Trying to prevent directory traversal
+        if (route.contains("..")) {
+            throw new BadRequestException("Not allowed to access parent directory");
         }
         final URL resource = classLoader.getResource("swagger/" + route);
         if (null != resource) {

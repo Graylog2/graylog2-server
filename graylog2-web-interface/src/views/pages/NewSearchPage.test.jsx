@@ -15,6 +15,8 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import NewSearchPage from './NewSearchPage';
 
+import StreamsContext from '../../contexts/StreamsContext';
+
 const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
 const mockView = View.create()
   .toBuilder()
@@ -62,7 +64,11 @@ describe('NewSearchPage', () => {
       relative: '300',
     },
   };
-  const SimpleNewSearchPage = (props) => <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />;
+  const SimpleNewSearchPage = (props) => (
+    <StreamsContext.Provider value={[{}]}>
+      <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />
+    </StreamsContext.Provider>
+  );
 
   beforeAll(() => {
     jest.useFakeTimers();

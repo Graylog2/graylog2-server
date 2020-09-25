@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
+import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -48,6 +49,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,15 +70,18 @@ public class AuthServicesResource extends RestResource {
 
     private final GlobalAuthServiceConfig authServiceConfig;
     private final PaginatedUserService userService;
+    private final DBAuthServiceBackendService backendService;
     private final RoleService roleService;
     private final SearchQueryParser userSearchQueryParser;
 
     @Inject
     public AuthServicesResource(GlobalAuthServiceConfig authServiceConfig,
                                 PaginatedUserService userService,
+                                DBAuthServiceBackendService backendService,
                                 RoleService roleService) {
         this.authServiceConfig = authServiceConfig;
         this.userService = userService;
+        this.backendService = backendService;
         this.roleService = roleService;
         this.userSearchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
     }
@@ -88,7 +93,12 @@ public class AuthServicesResource extends RestResource {
     public Response get() {
         final Optional<AuthServiceBackendDTO> activeConfig = getActiveBackendConfig();
 
-        return Response.ok(Collections.singletonMap("backend", activeConfig.orElse(null))).build();
+        // We cannot use an ImmutableMap because the backend value can be null
+        final Map<String, Object> response = new HashMap<>();
+        response.put("backend", activeConfig.orElse(null));
+        response.put("context", Collections.singletonMap("backends_total", backendService.countBackends()));
+
+        return Response.ok(response).build();
     }
 
     @GET
