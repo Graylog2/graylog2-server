@@ -4,6 +4,7 @@ exports[`WidgetQueryControls should do something 1`] = `
 <div>
   <form
     action="#"
+    class="SearchBarForm__StyledForm-sc-8xamkl-0 eUsJRX"
   >
     <div
       class="TopRow-sc-1ysyhyx-0 dDogjc row"
