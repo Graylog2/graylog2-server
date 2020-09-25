@@ -18,7 +18,7 @@ const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => {
     }
 
     return onFinish(...args);
-  }, [onFinish, handleSubmit]);
+  }, [onFinish, handleSubmit, dirty]);
 
   return (
     <>
