@@ -9,7 +9,7 @@ const StyledLabel = styled(BootstrapLabel)(({ bsStyle, theme }) => {
   }
 
   const backgroundColor = theme.colors.variant[bsStyle];
-  const textColor = theme.utils.contrastingColor(backgroundColor);
+  const textColor = theme.utils.readableColor(backgroundColor);
 
   return css`
     background-color: ${backgroundColor};
