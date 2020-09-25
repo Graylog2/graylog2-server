@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 
-import styles from './OverlayDropdown.css';
+import { DropdownMenu } from 'components/graylog';
 
-const StyledList = styled.ul(({ show, theme }) => css`
-  padding-left: 5px;
-  padding-right: 5px;
-  color: ${theme.colors.gray[40]};
-  z-index: 1050;
-  min-width: 'max-content';
-  display: ${show ? 'block' : 'none'};
-`);
+const ToggleDropdown = styled.span`
+  cursor: pointer;
+
+  .caret {
+    visibility: hidden;
+  }
+
+  &:hover .caret {
+    visibility: visible;
+  }
+`;
 
 const oppositePlacement = {
   left: 'right',
@@ -40,12 +43,11 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
 
   return (
     <>
-      <span onClick={onToggle}
-            ref={toggleTarget}
-            role="presentation"
-            className={styles.dropdowntoggle}>
+      <ToggleDropdown onClick={onToggle}
+                      ref={toggleTarget}
+                      role="presentation">
         {toggle}<span className="caret" />
-      </span>
+      </ToggleDropdown>
       {show && (
         <Overlay show={show}
                  container={menuContainer}
@@ -58,14 +60,12 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
                  transition={Transition}
                  onEntering={handleOverlayEntering}>
           <FilterProps>
-            <StyledList className="dropdown-menu"
-                        show={show}>
+            <DropdownMenu show={show}>
               {children}
-            </StyledList>
+            </DropdownMenu>
           </FilterProps>
         </Overlay>
       )}
-
     </>
   );
 };

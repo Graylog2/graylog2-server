@@ -7,6 +7,7 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.auth.UsernamePasswordCr
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -16,10 +17,19 @@ import java.util.List;
 
 public class ESCredentialsProvider implements Provider<CredentialsProvider> {
     private final List<URI> elasticsearchHosts;
+    private final String defaultUserForDiscoveredNodes;
+    private final String defaultPasswordForDiscoveredNodes;
+    private final boolean discoveryEnabled;
 
     @Inject
-    public ESCredentialsProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts) {
+    public ESCredentialsProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
+                                 @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
+                                 @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
+                                 @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {
         this.elasticsearchHosts = elasticsearchHosts;
+        this.defaultUserForDiscoveredNodes = defaultUserForDiscoveredNodes;
+        this.defaultPasswordForDiscoveredNodes = defaultPasswordForDiscoveredNodes;
+        this.discoveryEnabled = discoveryEnabled;
     }
 
     @Override
@@ -41,6 +51,13 @@ public class ESCredentialsProvider implements Provider<CredentialsProvider> {
                         }
                     }
                 });
+
+        if (discoveryEnabled && !Strings.isNullOrEmpty(defaultUserForDiscoveredNodes) && !Strings.isNullOrEmpty(defaultPasswordForDiscoveredNodes)) {
+            credentialsProvider.setCredentials(
+                    new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME),
+                    new UsernamePasswordCredentials(defaultUserForDiscoveredNodes, defaultPasswordForDiscoveredNodes)
+            );
+        }
 
         return credentialsProvider;
     }
