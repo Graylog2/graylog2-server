@@ -26,6 +26,8 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 
 import Widget from './Widget';
 
+import WidgetContext from '../contexts/WidgetContext';
+
 jest.mock('views/actions/SearchActions', () => ({
   create: mockAction(jest.fn()),
   get: mockAction(jest.fn()),
@@ -80,7 +82,10 @@ describe('<Widget />', () => {
     jest.resetModules();
   });
 
-  const widget = { config: {}, id: 'widgetId', type: 'dummy' };
+  const widget = WidgetModel.builder().newId()
+    .type('dummy')
+    .config({})
+    .build();
 
   const viewState = ViewState.builder().build();
   const query = Query.builder().id('query-id').build();
@@ -117,15 +122,16 @@ describe('<Widget />', () => {
   };
 
   const DummyWidget = (props) => (
-    <Widget widget={widget}
-            id="widgetId"
-            fields={[]}
-            onPositionsChange={() => {}}
-            onSizeChange={() => {}}
-            title="Widget Title"
-            position={new WidgetPosition(1, 1, 1, 1)}
-            {...props} />
-
+    <WidgetContext.Provider value={widget}>
+      <Widget widget={widget}
+              id="widgetId"
+              fields={[]}
+              onPositionsChange={() => {}}
+              onSizeChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props} />
+    </WidgetContext.Provider>
   );
   it('should render with empty props', () => {
     const { baseElement } = render(<DummyWidget />);
@@ -176,18 +182,23 @@ describe('<Widget />', () => {
     await waitForElement(() => getByText('Unknown widget'));
   });
   it('renders placeholder in edit mode if widget type is unknown', async () => {
-    const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
+    const unknownWidget = WidgetModel.builder()
+      .newId()
+      .type('i-dont-know-this-widget-type')
+      .config({})
+      .build();
     const UnknownWidget = (props) => (
-      <Widget widget={unknownWidget}
-              editing
-              id="widgetId"
-              fields={[]}
-              onPositionsChange={() => {}}
-              onSizeChange={() => {}}
-              title="Widget Title"
-              position={new WidgetPosition(1, 1, 1, 1)}
-              {...props} />
-
+      <WidgetContext.Provider value={unknownWidget}>
+        <Widget widget={unknownWidget}
+                editing
+                id="widgetId"
+                fields={[]}
+                onPositionsChange={() => {}}
+                onSizeChange={() => {}}
+                title="Widget Title"
+                position={new WidgetPosition(1, 1, 1, 1)}
+                {...props} />
+      </WidgetContext.Provider>
     );
     const { getByText } = render(<UnknownWidget data={[]} />);
     await waitForElement(() => getByText('Unknown widget in edit mode'));

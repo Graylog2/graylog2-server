@@ -2,23 +2,23 @@
 
 exports[`EventListConfiguration should render minimal 1`] = `
 <div>
+<<<<<<< HEAD
   <form>
     <div
       class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+=======
+  <div
+    class="checkbox"
+  >
+    <label
+      title=""
+>>>>>>> 7b7925c750... Submit widget query form before saving edit widget modal. (#8985)
     >
-      <div
-        class="checkbox"
-      >
-        <label
-          title=""
-        >
-          <input
-            type="checkbox"
-          />
-          Enable Event Annotation
-        </label>
-      </div>
-    </div>
-  </form>
+      <input
+        type="checkbox"
+      />
+      Enable Event Annotation
+    </label>
+  </div>
 </div>
 `;

@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
@@ -21,9 +22,26 @@ type Props = {
   children: ((props: FormikProps<Values>) => React$Node) | React$Node,
 };
 
+const validate = (values) => {
+  const errors = {};
+
+  if (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to) {
+    errors.timerange = {
+      from: 'Start date must be before end date',
+    };
+  }
+
+  return errors;
+};
+
+const StyledForm = styled(Form)`
+  height: 100%;
+`;
+
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     const newTimerange = onSubmittingTimerange(timerange);
+
     return onSubmit({
       timerange: newTimerange,
       streams,
@@ -36,14 +54,16 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
     streams,
     timerange: onInitializingTimerange(timerange),
   };
+
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}>
+            onSubmit={_onSubmit}
+            validate={validate}>
       {(...args) => (
-        <Form>
+        <StyledForm>
           {isFunction(children) ? children(...args) : children}
-        </Form>
+        </StyledForm>
       )}
     </Formik>
   );
