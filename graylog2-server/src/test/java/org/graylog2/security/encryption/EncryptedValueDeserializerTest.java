@@ -49,6 +49,8 @@ class EncryptedValueDeserializerTest {
         assertThat(value).isNotNull();
         assertThat(value.value()).isNotBlank();
         assertThat(value.salt()).isNotBlank();
+        assertThat(value.isKeepValue()).isFalse();
+        assertThat(value.isDeleteValue()).isFalse();
     }
 
     @Test
@@ -59,6 +61,8 @@ class EncryptedValueDeserializerTest {
         assertThat(value).isNotNull();
         assertThat(value.value()).isNotBlank();
         assertThat(value.salt()).isNotBlank();
+        assertThat(value.isKeepValue()).isFalse();
+        assertThat(value.isDeleteValue()).isFalse();
     }
 
     @Test
@@ -68,6 +72,7 @@ class EncryptedValueDeserializerTest {
         assertThat(value).isNotNull();
         assertThat(value.value()).isEmpty();
         assertThat(value.salt()).isEmpty();
+        assertThat(value.isSet()).isFalse();
     }
 
     @Test
@@ -111,6 +116,56 @@ class EncryptedValueDeserializerTest {
         assertThat(value.value()).isEqualTo("2d043f9a7d5a5a7537d3e93c93c5dc40");
         assertThat(value.salt()).isEqualTo("c93c0263bfc3713d");
         assertThat(encryptedValueService.decrypt(value)).isEqualTo("password");
+        assertThat(value.isKeepValue()).isFalse();
+        assertThat(value.isDeleteValue()).isFalse();
+    }
+
+    @Test
+    void deserializeKeepValue() throws Exception {
+        final EncryptedValue value = objectMapper.readValue("{\"keep_value\":true}", EncryptedValue.class);
+
+        assertThat(value).isNotNull();
+        assertThat(value.value()).isBlank();
+        assertThat(value.salt()).isBlank();
+        assertThat(value.isKeepValue()).isTrue();
+        assertThat(value.isDeleteValue()).isFalse();
+
+        // keep_value=false is not allowed
+        assertThatThrownBy(() -> objectMapper.readValue("{\"keep_value\":false}", EncryptedValue.class))
+                .isInstanceOf(JsonMappingException.class)
+                .hasMessageContaining("keep_value");
+    }
+
+    @Test
+    void deserializeDeleteValue() throws Exception {
+        final EncryptedValue value = objectMapper.readValue("{\"delete_value\":true}", EncryptedValue.class);
+
+        assertThat(value).isNotNull();
+        assertThat(value.value()).isBlank();
+        assertThat(value.salt()).isBlank();
+        assertThat(value.isKeepValue()).isFalse();
+        assertThat(value.isDeleteValue()).isTrue();
+
+        // delete_value=false is not allowed
+        assertThatThrownBy(() -> objectMapper.readValue("{\"delete_value\":false}", EncryptedValue.class))
+                .isInstanceOf(JsonMappingException.class)
+                .hasMessageContaining("delete_value");
+    }
+
+    @Test
+    void validateKeys() {
+        assertThatThrownBy(() -> objectMapper.readValue("{\"delete_value\":true, \"keep_value\":true}", EncryptedValue.class))
+                .isInstanceOf(JsonMappingException.class)
+                .hasMessageContaining("mutually exclusive");
+        assertThatThrownBy(() -> objectMapper.readValue("{\"delete_value\":true, \"set_value\":true}", EncryptedValue.class))
+                .isInstanceOf(JsonMappingException.class)
+                .hasMessageContaining("mutually exclusive");
+        assertThatThrownBy(() -> objectMapper.readValue("{\"keep_value\":true, \"set_value\":true}", EncryptedValue.class))
+                .isInstanceOf(JsonMappingException.class)
+                .hasMessageContaining("mutually exclusive");
+        assertThatThrownBy(() -> objectMapper.readValue("{\"keep_value\":true, \"set_value\":true, \"delete_value\":true}", EncryptedValue.class))
+                .isInstanceOf(JsonMappingException.class)
+                .hasMessageContaining("mutually exclusive");
     }
 
     @Test
