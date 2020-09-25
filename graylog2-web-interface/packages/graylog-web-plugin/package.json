@@ -40,7 +40,7 @@
     "html-webpack-plugin": "^4.2.0",
     "javascript-natural-sort": "0.7.1",
     "jquery": "3.5.1",
-    "moment": "2.28.0",
+    "moment": "2.29.0",
     "moment-timezone": "0.5.31",
     "prop-types": "15.7.2",
     "react": "16.13.1",
@@ -51,7 +51,7 @@
     "react-router-bootstrap": "0.23.3",
     "reflux": "0.2.13",
     "styled-components": "5.1.1",
-    "webpack": "4.44.1",
+    "webpack": "4.44.2",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "3.3.12",
     "webpack-merge": "4.2.2"

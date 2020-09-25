@@ -4,11 +4,15 @@ import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvi
 import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 
+import StreamsProvider from '../contexts/StreamsProvider';
+
 const LoggedInPage = () => {
   return (
     <CurrentUserProvider>
       <CurrentUserPreferencesProvider>
-        <AppRouter />
+        <StreamsProvider>
+          <AppRouter />
+        </StreamsProvider>
       </CurrentUserPreferencesProvider>
     </CurrentUserProvider>
   );

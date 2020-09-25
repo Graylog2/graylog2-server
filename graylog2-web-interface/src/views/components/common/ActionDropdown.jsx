@@ -1,12 +1,9 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { Overlay } from 'react-overlays';
 
-import type { ThemeInterface } from 'theme';
-import { MenuItem } from 'components/graylog';
+import { DropdownMenu, MenuItem } from 'components/graylog';
 
 import StopPropagation from './StopPropagation';
 
@@ -34,12 +31,6 @@ type ActionDropdownProps = {
   container?: HTMLElement,
   element: React.Node,
 };
-
-const StyledDropdownMenu: StyledComponent<ActionDropdownState, ThemeInterface, HTMLUListElement> = styled.ul(({ show, theme }) => css`
-  display: ${show ? 'block' : 'none'};
-  min-width: max-content;
-  color: ${theme.colors.gray[40]};
-`);
 
 const ActionToggle = ({ children, onClick }: ActionToggleProps) => {
   const handleClick = (e) => {
@@ -130,10 +121,10 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
                  onHide={this._onToggle}
                  target={() => this.target}>
           <FilterProps>
-            <StyledDropdownMenu show={show} className="dropdown-menu">
+            <DropdownMenu show={show}>
               <MenuItem header>Actions</MenuItem>
               {mappedChildren}
-            </StyledDropdownMenu>
+            </DropdownMenu>
           </FilterProps>
         </Overlay>
       </StopPropagation>
