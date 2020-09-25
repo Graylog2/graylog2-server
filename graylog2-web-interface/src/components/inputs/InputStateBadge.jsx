@@ -115,7 +115,7 @@ const InputStateBadge = createReactClass({
     const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
     return (
-      <Label bsStyle="danger" bsSize="xsmall">{text}</Label>
+      <Label bsStyle="primary" bsSize="xsmall">{text}</Label>
     );
   },
 });
