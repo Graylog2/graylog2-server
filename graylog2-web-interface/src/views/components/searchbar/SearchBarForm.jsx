@@ -22,18 +22,6 @@ type Props = {
   children: ((props: FormikProps<Values>) => React$Node) | React$Node,
 };
 
-const validate = (values) => {
-  const errors = {};
-
-  if (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to) {
-    errors.timerange = {
-      from: 'Start date must be before end date',
-    };
-  }
-
-  return errors;
-};
-
 const StyledForm = styled(Form)`
   height: 100%;
 `;
@@ -58,8 +46,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}
-            validate={validate}>
+            onSubmit={_onSubmit}>
       {(...args) => (
         <StyledForm>
           {isFunction(children) ? children(...args) : children}
