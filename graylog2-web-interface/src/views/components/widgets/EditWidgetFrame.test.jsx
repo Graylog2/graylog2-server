@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { asElement, render, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import MockStore from 'helpers/mocking/StoreMock';
 
@@ -74,7 +74,7 @@ describe('EditWidgetFrame', () => {
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+      await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
         timerange: { type: 'relative', range: 0 },
       })));
     });
@@ -91,7 +91,7 @@ describe('EditWidgetFrame', () => {
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(WidgetActions.update)
+      await wait(() => expect(WidgetActions.update)
         .toHaveBeenLastCalledWith('deadbeef', expect.objectContaining({
           timerange: {
             type: 'absolute',
@@ -117,7 +117,7 @@ describe('EditWidgetFrame', () => {
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+      await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
         streams: ['5c2e27d6ba33a9681ad62775'],
       })));
     });
