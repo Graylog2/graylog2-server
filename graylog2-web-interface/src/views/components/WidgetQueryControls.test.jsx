@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, fireEvent, cleanup, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, cleanup, waitForElement, wait } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -77,39 +77,34 @@ describe('WidgetQueryControls', () => {
 
   describe('displays if global override is set', () => {
     const indicatorText = 'These controls are disabled, because a filter is applied to all widgets.';
-
     it('shows an indicator if global override is set', async () => {
-      const { findByText, findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-
-      await findByText(indicatorText);
-      await findByTestId('reset-filter');
+      const { getByText, getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      await waitForElement(() => getByText(indicatorText));
+      await waitForElement(() => getByTestId('reset-filter'));
     });
 
     it('does not show an indicator if global override is not set', async () => {
       const { queryByText } = renderSUT({ globalOverride: emptyGlobalOverride });
-
       expect(queryByText(indicatorText)).toBeNull();
     });
 
     it('triggers resetting the global override store when reset filter button is clicked', async () => {
-      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const resetFilterButton = await findByTestId('reset-filter');
+      const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
       fireEvent.click(resetFilterButton);
-
       expect(GlobalOverrideActions.reset).toHaveBeenCalled();
     });
 
     it('executes search when reset filter button is clicked', async () => {
-      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const resetFilterButton = await findByTestId('reset-filter');
+      const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
       fireEvent.click(resetFilterButton);
-      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
+      await wait(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notification', async () => {
-      const { findByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
-
-      await findByText(indicatorText);
+      const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      await waitForElement(() => getByText(indicatorText));
 
       rerender(
         <Wrapper>
@@ -123,7 +118,6 @@ describe('WidgetQueryControls', () => {
     it('disables timerange controls when global override is present', () => {
       const { getByDisplayValue } = renderSUT({ globalOverride: globalOverrideWithQuery });
       const timeRangeSelect = getByDisplayValue('Search in last day');
-
       expect(timeRangeSelect).toBeDisabled();
     });
   });
