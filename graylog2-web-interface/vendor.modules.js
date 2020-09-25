@@ -3,6 +3,7 @@ module.exports = [
   'create-react-class',
   'deep-equal',
   'jquery',
+  'formik',
   'leaflet',
   'moment-timezone',
   'moment',

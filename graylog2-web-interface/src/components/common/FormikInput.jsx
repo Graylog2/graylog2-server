@@ -6,7 +6,6 @@ import { Field, useFormikContext } from 'formik';
 import { Input } from 'components/bootstrap';
 
 type Props = {
-  component: typeof Field,
   name: string,
   type?: string,
   help?: React.Node,
@@ -28,7 +27,7 @@ const FormikInput = ({ component: Component, name, type, help, validate, ...rest
   const { validateOnChange } = useFormikContext();
 
   return (
-    <Component name={name} validate={validate}>
+    <Field name={name} validate={validate}>
       {({ field: { value, onChange, onBlur }, meta: { error, touched } }) => {
         const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
         const displayError = validateOnChange ? !!(error && touched) : !!error;
@@ -45,12 +44,11 @@ const FormikInput = ({ component: Component, name, type, help, validate, ...rest
                  type={type} />
         );
       }}
-    </Component>
+    </Field>
   );
 };
 
 FormikInput.propTypes = {
-  component: PropTypes.func,
   help: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   labelClassName: PropTypes.string,
   type: PropTypes.string,
@@ -60,7 +58,6 @@ FormikInput.propTypes = {
 };
 
 FormikInput.defaultProps = {
-  component: Field,
   help: undefined,
   labelClassName: undefined,
   type: 'text',
