@@ -4,14 +4,14 @@ import * as React from 'react';
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import SectionGrid from 'components/common/Section/SectionGrid';
-import { Alert } from 'components/graylog';
-import SectionComponent from 'components/common/Section/SectionComponent';
+
+import SyncedUsersSection from './SyncedUsersSection';
 
 type Props = {
   authenticationBackend: AuthenticationBackend,
 };
 
-const BackendDetails = ({ authenticationBackend }: Props) => {
+const BackendDetailsActive = ({ authenticationBackend }: Props) => {
   const authService = getAuthServicePlugin(authenticationBackend.config.type);
 
   if (!authService) {
@@ -26,14 +26,10 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
         <BackendConfigDetails authenticationBackend={authenticationBackend} />
       </div>
       <div>
-        <SectionComponent title="Synchronized Users">
-          <Alert>
-            Managing synchronized users is only possible for the active authentication service.
-          </Alert>
-        </SectionComponent>
+        <SyncedUsersSection authenticationBackend={authenticationBackend} />
       </div>
     </SectionGrid>
   );
 };
 
-export default BackendDetails;
+export default BackendDetailsActive;

@@ -4,7 +4,7 @@ import LdapConfigParser from 'logic/authentication/ldap/LdapConfigParser';
 
 import BackendCreateLDAP from './ldap/BackendCreate';
 import BackendEditLDAP from './ldap/BackendEdit';
-import BackendSettings from './BackendDetails/BackendSettings';
+import BackendConfigDetails from './ldap/BackendConfigDetails';
 import BackendCreateAD from './activeDirectory/BackendCreate';
 import BackendEditAD from './activeDirectory/BackendEdit';
 
@@ -15,7 +15,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'LDAP',
       createComponent: BackendCreateLDAP,
       editComponent: BackendEditLDAP,
-      detailsComponent: BackendSettings,
+      configDetailsComponent: BackendConfigDetails,
       configToJson: LdapConfigParser.toJson,
       configFromJson: LdapConfigParser.fromJson,
     },
@@ -24,7 +24,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Active Directory',
       createComponent: BackendCreateAD,
       editComponent: BackendEditAD,
-      detailsComponent: BackendSettings,
+      configDetailsComponent: BackendConfigDetails,
       configToJson: LdapConfigParser.toJson,
       configFromJson: LdapConfigParser.fromJson,
     },

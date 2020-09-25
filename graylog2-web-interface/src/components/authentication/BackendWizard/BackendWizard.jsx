@@ -69,7 +69,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   return {
     default_roles: defaultRoles.split(','),
     description: '',
-    title: `${serviceTitle} - ${serverUrl}`,
+    title: `${serviceTitle} ${serverUrl}`,
     config: {
       server_urls: [serverUrl],
       system_user_dn: systemUserDn,

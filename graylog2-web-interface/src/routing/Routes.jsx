@@ -70,11 +70,12 @@ const Routes = {
     PROCESSBUFFERDUMP: (nodeId) => `/system/processbufferdump/${nodeId}`,
     AUTHENTICATION: {
       BACKENDS: {
-        ACTIVE: '/system/authentication',
         OVERVIEW: '/system/authentication/services',
-        CREATE: '/system/authentication/create',
-        createBackend: (name) => `/system/authentication/create/${name}`,
-        edit: (id) => `/system/authentication/edit/${id}`,
+        ACTIVE: '/system/authentication/services/active',
+        CREATE: '/system/authentication/services/create',
+        createBackend: (name) => `/system/authentication/services/create/${name}`,
+        show: (id) => `/system/authentication/services/${id}`,
+        edit: (id) => `/system/authentication/services/edit/${id}`,
       },
     },
     USERS: {

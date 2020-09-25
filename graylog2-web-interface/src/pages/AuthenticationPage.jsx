@@ -9,7 +9,7 @@ import { useActiveBackend } from 'components/authentication/hooks';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
-import BackendDetails from 'components/authentication/BackendDetails';
+import BackendDetailsActive from 'components/authentication/BackendDetailsActive';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
@@ -51,7 +51,7 @@ const AuthenticationPage = () => {
         {finishedLoading && (
           <>
             {!activeBackend && <GettingStarted />}
-            {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
+            {activeBackend && <BackendDetailsActive authenticationBackend={activeBackend} />}
           </>
         )}
       </>
