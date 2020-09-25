@@ -45,10 +45,6 @@ describe('WidgetQueryControls', () => {
   };
 
   const defaultProps = {
-    widget: Widget.builder()
-      .id('deadbeef')
-      .type('foo')
-      .build(),
     availableStreams: [],
     config,
   };

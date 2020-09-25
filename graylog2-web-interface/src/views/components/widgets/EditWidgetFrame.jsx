@@ -85,7 +85,7 @@ const EditWidgetFrame = ({ children }: Props) => {
             <Modal.Header className={styles.QueryControls}>
               <QueryEditModeContext.Provider value="widget">
                 <HeaderElements />
-                <WidgetQueryControls widget={widget} />
+                <WidgetQueryControls />
               </QueryEditModeContext.Provider>
             </Modal.Header>
           </IfDashboard>
