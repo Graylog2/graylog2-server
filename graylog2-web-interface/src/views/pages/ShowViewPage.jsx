@@ -12,7 +12,6 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
-import { SearchActions } from 'views/stores/SearchStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import { ExtendedSearchPage } from 'views/pages';
 
@@ -58,10 +57,14 @@ class ShowViewPage extends React.Component<Props, State> {
     viewLoader: ViewLoader,
   };
 
-  state = {
-    hookComponent: undefined,
-    loaded: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      hookComponent: undefined,
+      loaded: false,
+    };
+  }
 
   componentDidMount = () => {
     const { params } = this.props;
