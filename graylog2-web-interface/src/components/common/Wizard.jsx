@@ -84,7 +84,7 @@ const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme
         border-right: 0;
         border-left: 0;
 
-        &:last-child, &:first-child {
+        &:last-child a, &:first-child a {
           border-radius: 0;
         }
 
