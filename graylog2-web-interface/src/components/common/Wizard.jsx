@@ -73,6 +73,38 @@ const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme
       }
     }
   }
+
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    &.nav {
+      > li {
+        border-right: 0;
+        border-left: 0;
+
+        &:last-child, &:first-child {
+          border-radius: 0;
+        }
+
+        &:not(:last-child) {
+          border-bottom: 0;
+        }
+
+        &:not(:last-child) > a {
+          ::after {
+            bottom: 0;
+            left: 50%;
+            top: auto;
+            width: 10px;
+            height: 10px;
+            transform: translateY(50%) translateX(-50%) rotate(45deg);
+          }
+        }
+      }
+
+      &.nav-justified > li > a {
+        margin-bottom: 0;
+      }
+    }
+  }
 `);
 
 const HorizontalCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)`
