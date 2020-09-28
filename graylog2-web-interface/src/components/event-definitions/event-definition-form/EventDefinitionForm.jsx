@@ -13,68 +13,6 @@ import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
-const StyledNav = styled(Nav)(({ theme }) => css`
-  &.nav {
-    > li {
-      border: 1px solid ${theme.colors.variant.lighter.default};
-      border-left: 0;
-
-      &:first-child {
-        border-left: 1px solid ${theme.colors.variant.lighter.default};
-        border-radius: 4px 0 0 4px;
-
-        > a {
-          border-radius: 4px 0 0 4px;
-        }
-      }
-
-      &:last-child {
-        border-radius: 0 4px 4px 0;
-
-        > a {
-          border-radius: 0 4px 4px 0;
-        }
-      }
-
-      &:not(:last-child) > a {
-        ::after {
-          transition: background-color 150ms ease-in-out;
-          background-color: ${theme.colors.global.contentBackground};
-          border-color: ${theme.colors.variant.lighter.default};
-          border-style: solid;
-          border-width: 0 1px 1px 0;
-          content: '';
-          display: block;
-          height: 15px;
-          position: absolute;
-          right: -1px;
-          top: 50%;
-          transform: translateY(-50%) translateX(50%) rotate(-45deg);
-          width: 15px;
-          z-index: 2;
-        }
-
-        :hover::after {
-          background-color: ${theme.colors.variant.lightest.default};
-        }
-      }
-
-      &.active a {
-        &,
-        &:hover,
-        &::after,
-        &:hover::after {
-          background-color: ${theme.colors.global.link};
-        }
-      }
-
-      > a {
-        border-radius: 0;
-      }
-    }
-  }
-`);
-
 const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 
 class EventDefinitionForm extends React.Component {
@@ -232,7 +170,6 @@ class EventDefinitionForm extends React.Component {
                   onStepChange={this.handleStepChange}
                   horizontal
                   justified
-                  NavigationComponent={StyledNav}
                   containerClassName=""
                   hidePreviousNextButtons />
           {this.renderButtons(activeStep)}
