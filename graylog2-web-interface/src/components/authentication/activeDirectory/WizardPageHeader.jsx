@@ -39,7 +39,8 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
         Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                            text="documentation" />.
       </span>
-      <BackendOverviewLinks />
+      <BackendOverviewLinks activeBackend={activeBackend}
+                            finishedLoading={finishedLoading} />
     </PageHeader>
   );
 };

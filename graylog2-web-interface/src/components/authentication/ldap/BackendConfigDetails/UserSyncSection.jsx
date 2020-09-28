@@ -18,6 +18,7 @@ const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<
 
   return defaultRolesNames.join(', ');
 };
+
 type Props = {
   authenticationBackend: LdapBackend,
 };

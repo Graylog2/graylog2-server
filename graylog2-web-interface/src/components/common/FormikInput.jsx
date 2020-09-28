@@ -23,7 +23,7 @@ const inputProps = (value) => {
 };
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ component: Component, name, type, help, validate, ...rest }: Props) => {
+const FormikInput = ({ name, type, help, validate, ...rest }: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (

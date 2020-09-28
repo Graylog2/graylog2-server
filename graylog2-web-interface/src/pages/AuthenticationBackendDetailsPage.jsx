@@ -8,6 +8,7 @@ import {} from 'components/authentication/bindings'; // Bind all authentication 
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import { useActiveBackend } from 'components/authentication/hooks';
 import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
@@ -29,9 +30,10 @@ const _pageTilte = (authBackendTitle) => {
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   const [authBackend, setAuthBackend] = useState();
+  const { finishedLoading, activeBackend } = useActiveBackend();
 
   useEffect(() => {
-    AuthenticationDomain.load(backendId).then((newAuthBackend) => newAuthBackend && setAuthBackend(newAuthBackend));
+    AuthenticationDomain.load(backendId).then((response) => response && setAuthBackend(response.backend));
   }, []);
 
   if (!authBackend) {
@@ -56,7 +58,8 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
-          <BackendOverviewLinks />
+          <BackendOverviewLinks activeBackend={activeBackend}
+                                finishedLoading={finishedLoading} />
         </PageHeader>
         <BackendDetails authenticationBackend={authBackend} />
       </>

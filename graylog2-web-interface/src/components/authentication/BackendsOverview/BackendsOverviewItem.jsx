@@ -1,12 +1,14 @@
 // @flow strict
 /* eslint-disable no-alert */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
 import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
+import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { Button, ButtonToolbar } from 'components/graylog';
@@ -14,6 +16,7 @@ import { Button, ButtonToolbar } from 'components/graylog';
 type Props = {
   authenticationBackend: AuthenticationBackend,
   isActive: boolean,
+  roles: Immutable.List<Role>,
 };
 
 const StyledButtonToolbar = styled(ButtonToolbar)`
@@ -21,7 +24,13 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
-const EditButton = ({ isActive, authenticationBackend }: Props) => {
+const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
+  const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name);
+
+  return defaultRolesNames.join(', ');
+};
+
+const EditButton = ({ isActive, authenticationBackend }: { authenticationBackend: AuthenticationBackend, isActive: boolean }) => {
   const link = isActive
     ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE : Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackend.id);
 
@@ -38,7 +47,7 @@ const confirmMessage = (authBackendTitle: string, actionName: string) => {
   return `Do you really want to ${actionName} the authentication service "${StringUtils.truncateWithEllipses(authBackendTitle, 30)}"`;
 };
 
-const ActionsCell = ({ isActive, authenticationBackend }: Props) => {
+const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBackend: AuthenticationBackend, isActive: boolean }) => {
   const { title, id } = authenticationBackend;
   const _setActiveBackend = (backendId) => AuthenticationDomain.setActiveBackend(backendId, title);
 
@@ -86,17 +95,20 @@ const ActionsCell = ({ isActive, authenticationBackend }: Props) => {
   );
 };
 
-const BackendsOverviewItem = ({ authenticationBackend, isActive }: Props) => {
-  const { title, description, id } = authenticationBackend;
+const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props) => {
+  const { title, defaultRoles, id } = authenticationBackend;
+  const detailsLink = isActive ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE : Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id);
 
   return (
     <tr key={id} className={isActive ? 'active' : ''}>
       <td className="limited">
-        <Link to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id)}>
+        <Link to={detailsLink}>
           {title}
         </Link>
       </td>
-      <td className="limited">{description}</td>
+      <td className="limited">
+        <RolesList defaultRolesIds={defaultRoles} roles={roles} />
+      </td>
       <ActionsCell authenticationBackend={authenticationBackend} isActive={isActive} />
     </tr>
   );

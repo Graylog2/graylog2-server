@@ -1,9 +1,11 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 import { Col, Row } from 'components/graylog';
@@ -11,7 +13,7 @@ import { Col, Row } from 'components/graylog';
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
 
-const TABLE_HEADERS = ['Title', 'Description', 'Actions'];
+const TABLE_HEADERS = ['Title', 'Default Roles'];
 
 const DEFAULT_PAGINATION = {
   count: undefined,
@@ -49,6 +51,7 @@ const _onPageChange = (loadBackends, setLoading) => (page, perPage) => {
 const BackendsOverview = () => {
   const [paginatedBackends, setPaginatedBackends] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION, context: undefined });
   const { list: backends, pagination: { page, perPage, query, total }, context } = paginatedBackends;
+  const [{ list: roles }, setPaginatedRoles] = useState({ list: Immutable.List() });
   const [loading, setLoading] = useState();
   const _isActive = (authBackend) => authBackend.id === context?.activeBackend?.id;
 
@@ -58,25 +61,17 @@ const BackendsOverview = () => {
   };
 
   const _handleSearch = (newQuery) => _loadBackends(DEFAULT_PAGINATION.page, undefined, newQuery);
+  const _refreshOverview = () => _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
 
   useEffect(() => {
+    const getUnlimited = [1, 0, ''];
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
     _loadBackends(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
-    const unlistenDisableBackend = AuthenticationActions.disableUser.completed.listen(() => {
-      _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
-
-    const unlistenEnableBackend = AuthenticationActions.enableUser.completed.listen(() => {
-      _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
-
-    const unlistenDeleteBackend = AuthenticationActions.delete.completed.listen(() => {
-      _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
-
-    const unlistenSetActivateBackend = AuthenticationActions.setActiveBackend.completed.listen(() => {
-      _loadBackends(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
+    const unlistenDisableBackend = AuthenticationActions.disableUser.completed.listen(_refreshOverview);
+    const unlistenEnableBackend = AuthenticationActions.enableUser.completed.listen(_refreshOverview);
+    const unlistenDeleteBackend = AuthenticationActions.delete.completed.listen(_refreshOverview);
+    const unlistenSetActivateBackend = AuthenticationActions.setActiveBackend.completed.listen(_refreshOverview);
 
     return () => {
       unlistenDisableBackend();
@@ -86,7 +81,7 @@ const BackendsOverview = () => {
     };
   }, []);
 
-  if (!backends) {
+  if (!backends || !roles) {
     return <Spinner />;
   }
 
@@ -104,7 +99,7 @@ const BackendsOverview = () => {
           <DataTable className="table-hover"
                      customFilter={<BackendsFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                      dataRowFormatter={(authBackend) => (
-                       <BackendsOverviewItem authenticationBackend={authBackend} isActive={_isActive(authBackend)} />
+                       <BackendsOverviewItem authenticationBackend={authBackend} isActive={_isActive(authBackend)} roles={roles} />
                      )}
                      filterKeys={[]}
                      filterLabel="Filter services"

@@ -7,8 +7,8 @@ import { AuthenticationActions } from 'stores/authentication/AuthenticationStore
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-import SyncedUsersOverviewItem from '../BackendDetails/SyncedUsersSection/SyncedUsersOverviewItem';
-import ServiceUsersFilter from '../BackendDetails/SyncedUsersSection/SyncedUsersFilter';
+import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
+import ServiceUsersFilter from './SyncedUsersFilter';
 
 const DEFAULT_PAGINATION = {
   count: undefined,

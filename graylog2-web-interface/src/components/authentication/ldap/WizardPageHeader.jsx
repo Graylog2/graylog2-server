@@ -40,7 +40,8 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
                                                            text="documentation" />.
       </span>
 
-      <BackendOverviewLinks />
+      <BackendOverviewLinks activeBackend={activeBackend}
+                            finishedLoading={finishedLoading} />
     </PageHeader>
   );
 };

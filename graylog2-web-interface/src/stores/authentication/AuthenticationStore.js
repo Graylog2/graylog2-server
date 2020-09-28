@@ -10,14 +10,16 @@ import { singletonStore } from 'views/logic/singleton';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 import PaginationURL from 'util/PaginationURL';
 import type {
-  PaginatedBackends,
-  PaginatedAuthUsers,
   AuthenticationBackendCreate,
+  AuthenticationBackendUpdate,
   ConnectionTestPayload,
   ConnectionTestResult,
+  LoadActiveResponse,
+  LoadResponse,
   LoginTestPayload,
   LoginTestResult,
-  AuthenticationBackendUpdate,
+  PaginatedAuthUsers,
+  PaginatedBackends,
 } from 'actions/authentication/AuthenticationActions';
 import type { PaginatedResponseType } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
@@ -55,18 +57,23 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    load(backendId: string): Promise<?AuthenticationBackend> {
+    load(backendId: string): Promise<?LoadResponse> {
       const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(backendId)).url);
-      const promise = fetch('GET', url).then((result) => (result?.backend ? AuthenticationBackend.fromJSON(result.backend) : null));
+      const promise = fetch('GET', url).then((result) => (result ? {
+        backend: AuthenticationBackend.fromJSON(result.backend),
+      } : null));
 
       AuthenticationActions.load.promise(promise);
 
       return promise;
     },
 
-    loadActive(): Promise<?AuthenticationBackend> {
+    loadActive(): Promise<?LoadActiveResponse> {
       const url = qualifyUrl(ApiRoutes.Authentication.loadActive().url);
-      const promise = fetch('GET', url).then((result) => (result?.backend ? AuthenticationBackend.fromJSON(result.backend) : null));
+      const promise = fetch('GET', url).then((result) => (result ? {
+        backend: result.backend ? AuthenticationBackend.fromJSON(result.backend) : null,
+        context: { backendsTotal: result.context.backends_total },
+      } : null));
 
       AuthenticationActions.loadActive.promise(promise);
 

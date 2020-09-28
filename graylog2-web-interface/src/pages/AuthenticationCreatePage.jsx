@@ -24,7 +24,8 @@ const AuthenticationCreatePage = () => {
         <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                  text="documentation" />.
         </span>
-        <BackendOverviewLinks />
+        <BackendOverviewLinks activeBackend={activeBackend}
+                              finishedLoading={finishedLoading} />
       </PageHeader>
 
       <GettingStarted title="Create New Authentication Service" />

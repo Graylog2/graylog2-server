@@ -76,13 +76,23 @@ export type LoginTestResult = {
   },
 };
 
+export type LoadResponse = {
+  backend: ?AuthenticationBackend,
+};
+
+export type LoadActiveResponse = LoadActiveResponse & {
+  context: {
+    backendTotal: number,
+  },
+};
+
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<void>,
   delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   disableUser: (userId: string, username: string) => Promise<void>,
   enableUser: (userId: string, username: string) => Promise<void>,
-  load: (id: string) => Promise<?AuthenticationBackend>,
-  loadActive: () => Promise<?AuthenticationBackend>,
+  load: (id: string) => Promise<?LoadResponse>,
+  loadActive: () => Promise<?LoadActiveResponse>,
   loadBackendsPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedBackends>,
   loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedAuthUsers>,
   setActiveBackend: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
