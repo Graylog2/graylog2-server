@@ -216,15 +216,4 @@ describe('<Wizard />', () => {
     expect(wrapperH.find('button > svg.fa-caret-left').exists()).toBe(false);
     expect(wrapperH.find('button > svg.fa-caret-right').exists()).toBe(false);
   });
-
-  it('should render a new component if NavigationComponent is passed', () => {
-    const TestNavComponentFaux = styled(Nav)``;
-    const TestNavComponent = styled(Nav)`
-      background: #000;
-    `;
-    const wrapper = mount(<Wizard steps={steps} NavigationComponent={TestNavComponent} />);
-
-    expect(enzymeFind(wrapper, TestNavComponent).exists()).toBe(true);
-    expect(enzymeFind(wrapper, TestNavComponentFaux).exists()).toBe(false);
-  });
 });

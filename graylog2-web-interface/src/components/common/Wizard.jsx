@@ -13,6 +13,10 @@ const SubnavigationCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)((
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
+const HorizontalCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)`
+  margin-bottom: 15px;
+`;
+
 const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme }) => css`
   &.nav {
     > li {
@@ -107,10 +111,6 @@ const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme
   }
 `);
 
-const HorizontalCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)`
-  margin-bottom: 15px;
-`;
-
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
@@ -134,7 +134,6 @@ type Props = {
   horizontal: boolean,
   justified: boolean,
   containerClassName: string,
-  NavigationComponent: Nav,
   hidePreviousNextButtons: boolean,
 };
 
@@ -175,8 +174,6 @@ class Wizard extends React.Component<Props, State> {
     justified: PropTypes.bool,
     /** Customize the container CSS class used by this component */
     containerClassName: PropTypes.string,
-    /** Customize the navigation componment used by Wizard */
-    NavigationComponent: PropTypes.elementType,
     /** Indicates if wizard should render next/previous buttons or not */
     hidePreviousNextButtons: PropTypes.bool,
   };
@@ -188,7 +185,6 @@ class Wizard extends React.Component<Props, State> {
     horizontal: false,
     justified: false,
     containerClassName: 'content',
-    NavigationComponent: StyledNav,
     hidePreviousNextButtons: false,
   };
 
@@ -320,7 +316,7 @@ class Wizard extends React.Component<Props, State> {
 
   _renderHorizontalStepNav = () => {
     const selectedStep = this._getSelectedStep();
-    const { justified, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
+    const { justified, steps, hidePreviousNextButtons } = this.props;
 
     return (
       <HorizontalCol sm={12}>
@@ -342,15 +338,15 @@ class Wizard extends React.Component<Props, State> {
             </HorizontalButtonToolbar>
           </div>
         )}
-        <NavigationComponent bsStyle="pills"
-                             activeKey={selectedStep}
-                             onSelect={this._wizardChanged}
-                             justified={justified}>
+        <StyledNav bsStyle="pills"
+                   activeKey={selectedStep}
+                   onSelect={this._wizardChanged}
+                   justified={justified}>
           {steps.map((navItem) => {
             return (
               <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
-        </NavigationComponent>
+        </StyledNav>
       </HorizontalCol>
     );
   };
