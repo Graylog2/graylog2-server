@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Button, ButtonToolbar, Col, Nav, Row } from 'components/graylog';
+import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { Wizard } from 'components/common';
 
 import EventDetailsForm from './EventDetailsForm';
