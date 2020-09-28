@@ -116,8 +116,6 @@ class NewSearchPage extends React.Component<Props, State> {
       this.setState({ loaded: true });
 
       return view;
-    }).then(() => {
-      SearchActions.executeWithCurrentState();
     }).catch((e) => e);
   };
 
