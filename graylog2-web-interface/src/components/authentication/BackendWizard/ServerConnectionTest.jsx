@@ -10,6 +10,20 @@ import { Spinner } from 'components/common';
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
 import BackendWizardContext from './contexts/BackendWizardContext';
 
+const _addRequiredRequestPayload = (formValues) => {
+  const neccessaryAttributes = { ...formValues };
+
+  if (!neccessaryAttributes.config.user_search_base) {
+    neccessaryAttributes.config.user_search_base = '';
+  }
+
+  if (!neccessaryAttributes.config.user_search_pattern) {
+    neccessaryAttributes.config.user_search_pattern = '';
+  }
+
+  return neccessaryAttributes;
+};
+
 type Props = {
   prepareSubmitPayload: () => LdapCreate,
 };
@@ -19,7 +33,7 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
   const [{ loading, success, message, errors }, setConnectionStatus] = useState({ loading: false, success: false, message: undefined, errors: undefined });
 
   const _handleConnectionCheck = () => {
-    const payload = prepareSubmitPayload();
+    const payload = _addRequiredRequestPayload(prepareSubmitPayload());
 
     setConnectionStatus({ loading: true, message: undefined, errors: undefined, success: false });
 
