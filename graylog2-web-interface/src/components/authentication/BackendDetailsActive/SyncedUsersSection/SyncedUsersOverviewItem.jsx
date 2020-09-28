@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { Link } from 'react-router';
 import styled from 'styled-components';
+import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';

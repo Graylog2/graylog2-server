@@ -48,17 +48,13 @@ const SyncedUsersSection = () => {
   };
 
   const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);
+  const _refreshList = () => _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
 
   useEffect(() => {
     _loadUsers(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
-    const unlistenDisableUser = AuthenticationActions.disableUser.completed.listen(() => {
-      _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
-
-    const unlistenEnableUser = AuthenticationActions.enableUser.completed.listen(() => {
-      _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
+    const unlistenDisableUser = AuthenticationActions.disableUser.completed.listen(_refreshList);
+    const unlistenEnableUser = AuthenticationActions.enableUser.completed.listen(_refreshList);
 
     return () => {
       unlistenDisableUser();
