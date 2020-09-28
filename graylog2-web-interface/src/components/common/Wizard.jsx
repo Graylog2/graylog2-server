@@ -273,22 +273,22 @@ class Wizard extends React.Component<Props, State> {
   };
 
   _renderVerticalStepNav = () => {
-    const { justified, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
+    const { justified, steps, hidePreviousNextButtons } = this.props;
     const selectedStep = this._getSelectedStep();
 
     return (
       <SubnavigationCol md={2}>
-        <NavigationComponent stacked
-                             bsStyle="pills"
-                             activeKey={selectedStep}
-                             onSelect={this._wizardChanged}
-                             justified={justified}>
+        <Nav stacked
+             bsStyle="pills"
+             activeKey={selectedStep}
+             onSelect={this._wizardChanged}
+             justified={justified}>
           {steps.map((navItem) => {
             return (
               <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
             );
           })}
-        </NavigationComponent>
+        </Nav>
         {!hidePreviousNextButtons && (
           <>
             <br />
