@@ -37,6 +37,7 @@
     "@babel/preset-env": "7.11.5",
     "babel-eslint": "9.0.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
+    "formik": "^2.1.4",
     "html-webpack-plugin": "^4.2.0",
     "javascript-natural-sort": "0.7.1",
     "jquery": "3.5.1",
