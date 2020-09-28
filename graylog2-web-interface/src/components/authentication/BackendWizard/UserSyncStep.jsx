@@ -60,7 +60,7 @@ const defaultHelp = {
     </span>
   ),
   defaultRoles: (
-    'The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.'
+    'The default Graylog roles determine whether a user created via LDAP can access the entire system, or has limited access.'
   ),
 };
 

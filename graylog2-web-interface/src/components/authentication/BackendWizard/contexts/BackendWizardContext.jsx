@@ -6,13 +6,15 @@ import { singleton } from 'views/logic/singleton';
 
 export type WizardFormValues = {
   defaultRoles?: string,
-  groupNameAttribute?: string,
   groupSearchBase?: string,
   groupSearchPattern?: string,
   serverUrlHost?: string,
   serverUrlPort?: string | number,
   systemUserDn?: string,
   systemUserPassword?: string,
+  teamDefaultRoles: string,
+  teamNameAttribute?: string,
+  teamUniqueIdAttribute?: string,
   transportSecurity?: ('tls' | 'start_tls' | 'none'),
   userFullNameAttribute?: string,
   userNameAttribute?: string,
