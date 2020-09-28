@@ -1,15 +1,13 @@
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-
 import history from 'util/History';
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -47,10 +45,13 @@ const StartPage = createReactClass({
 
   _redirectToStartpage() {
     const { currentUser: { startpage, permissions }, gettingStarted } = this.state;
+
     // Show getting started page if user is an admin and getting started wasn't dismissed
+    // eslint-disable-next-line import/no-named-as-default-member
     if (PermissionsMixin.isPermitted(permissions, ['inputs:create'])) {
       if (gettingStarted.show) {
         this._redirect(Routes.GETTING_STARTED);
+
         return;
       }
     }
@@ -62,19 +63,16 @@ const StartPage = createReactClass({
       } else {
         this._redirect(Routes.dashboard_show(startpage.id));
       }
+
       return;
     }
 
-    // Show search page if permitted, or streams page in other case
-    if (PermissionsMixin.isAnyPermitted(permissions, ['searches:absolute', 'searches:keyword', 'searches:relative'])) {
-      this._redirect(Routes.SEARCH);
-    } else {
-      this._redirect(Routes.STREAMS);
-    }
+    this._redirect(Routes.SEARCH);
   },
 
   _isLoading() {
     const { currentUser, gettingStarted } = this.state;
+
     return !currentUser || !gettingStarted;
   },
 
