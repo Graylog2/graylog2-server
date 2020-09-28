@@ -12,7 +12,7 @@ export type WizardFormValues = {
   serverUrlPort?: string | number,
   systemUserDn?: string,
   systemUserPassword?: string,
-  teamDefaultRoles: string,
+  teamDefaultRoles?: string,
   teamNameAttribute?: string,
   teamUniqueIdAttribute?: string,
   transportSecurity?: ('tls' | 'start_tls' | 'none'),
