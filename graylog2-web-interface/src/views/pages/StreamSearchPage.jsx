@@ -56,8 +56,6 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
       setLoaded(true);
 
       return view;
-    }).then(() => {
-      SearchActions.executeWithCurrentState();
     }).catch((e) => e);
   };
 
