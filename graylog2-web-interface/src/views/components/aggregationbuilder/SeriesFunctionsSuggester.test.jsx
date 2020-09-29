@@ -10,7 +10,7 @@ describe('SeriesFunctionsSuggester', () => {
     jest.doMock('views/stores/AggregationFunctionsStore', () => AggregationFunctionsStore);
 
     // eslint-disable-next-line global-require
-    SeriesFunctionsSuggester = require('./SeriesFunctionsSuggester');
+    SeriesFunctionsSuggester = require('./SeriesFunctionsSuggester').default;
   });
 
   afterEach(() => {

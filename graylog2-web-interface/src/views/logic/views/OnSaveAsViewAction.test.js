@@ -1,7 +1,7 @@
 import View from './View';
 
 // eslint-disable-next-line global-require
-const loadSUT = () => require('./OnSaveAsViewAction');
+const loadSUT = () => require('./OnSaveAsViewAction').default;
 
 const mockActions = () => {
   const ViewActions = { load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load') };
