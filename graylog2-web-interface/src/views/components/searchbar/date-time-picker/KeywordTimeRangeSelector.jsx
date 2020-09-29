@@ -11,7 +11,7 @@ import { Field, useField } from 'formik';
 import { Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
-import type { ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme/index';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
