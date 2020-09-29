@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
 import { ViewActions } from 'views/stores/ViewStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import View from 'views/logic/views/View';
