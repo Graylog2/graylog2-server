@@ -1,20 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { withRouter } from 'react-router';
-
-import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
-
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import { IfPermitted } from 'components/common';
 
@@ -31,10 +28,12 @@ import StyledNavbar from './Navigation.styles';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const _isActive = (requestPath, prefix) => {
+  // eslint-disable-next-line import/no-named-as-default-member
   return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
+  // eslint-disable-next-line import/no-named-as-default-member
   const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {
@@ -49,6 +48,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+
     if (isEmpty) {
       return null;
     }
@@ -65,6 +65,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginExports = PluginStore.exports('navigation');
+
   if (!pluginExports.find((value) => value.description.toLowerCase() === 'enterprise')) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
@@ -72,6 +73,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
       description: 'Enterprise',
     });
   }
+
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, location));
@@ -94,11 +96,9 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
       <Navbar.Collapse>
         <Nav navbar>
-          <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
-            <LinkContainer to={Routes.SEARCH}>
-              <NavItem to="search">Search</NavItem>
-            </LinkContainer>
-          </IfPermitted>
+          <LinkContainer to={Routes.SEARCH}>
+            <NavItem to="search">Search</NavItem>
+          </LinkContainer>
 
           <LinkContainer to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>

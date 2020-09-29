@@ -2,9 +2,13 @@ import React from 'react';
 import AppRouter from 'routing/AppRouter';
 import CurrentUserPreferencesProvider from '../contexts/CurrentUserPreferencesProvider';
 
+import StreamsProvider from '../contexts/StreamsProvider';
+
 const LoggedInPage = () => (
   <CurrentUserPreferencesProvider>
-    <AppRouter />
+    <StreamsProvider>
+      <AppRouter />
+    </StreamsProvider>
   </CurrentUserPreferencesProvider>
 );
 
