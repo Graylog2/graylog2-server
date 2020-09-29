@@ -29,7 +29,8 @@ const InputDescription = ({ help, error }: Props) => {
   return (
     <Wrapper hasError={!!error}>
       <HelpBlock>
-        {error && <>{error}<br /></>}
+        {error}
+        {(error && help) && <br />}
         {help}
       </HelpBlock>
     </Wrapper>
