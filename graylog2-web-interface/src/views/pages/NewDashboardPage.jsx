@@ -41,7 +41,7 @@ const NewDashboardPage = ({ route, location }: Props) => {
   const [loaded, HookComponent] = useLoadView(loadedView, location.query);
 
   if (HookComponent) {
-    return <HookComponent />;
+    return HookComponent;
   }
 
   return loaded

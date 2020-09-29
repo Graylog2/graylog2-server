@@ -32,7 +32,7 @@ const ShowViewPage = ({ params: { viewId }, route, location: { query }, viewLoad
   const [loaded, HookComponent] = useViewLoader(viewId, query, viewLoader);
 
   if (HookComponent) {
-    return <HookComponent />;
+    return HookComponent;
   }
 
   if (!loaded) {

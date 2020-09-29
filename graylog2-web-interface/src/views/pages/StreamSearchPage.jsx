@@ -27,7 +27,7 @@ const StreamSearchPage = ({ params: { streamId }, route, location }: Props) => {
   const [loaded, HookComponent] = useLoadView(newView, query);
 
   if (HookComponent) {
-    return <HookComponent />;
+    return HookComponent;
   }
 
   if (loaded) {

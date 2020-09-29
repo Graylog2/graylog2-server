@@ -27,7 +27,7 @@ const NewSearchPage = ({ location: { query }, location, route }: Props) => {
   const [loaded, HookComponent] = useLoadView(view, query);
 
   if (HookComponent) {
-    return <HookComponent />;
+    return HookComponent;
   }
 
   if (loaded) {
