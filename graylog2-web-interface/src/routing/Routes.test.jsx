@@ -8,7 +8,7 @@ describe('Routes', () => {
     beforeAll(() => {
       jest.resetModules();
       window.appConfig = {}; // Ensure no prefix is set
-      Routes = require.requireActual('./Routes');
+      Routes = require.requireActual('./Routes').default;
     });
 
     it('returns a route from constant', () => {
@@ -38,7 +38,7 @@ describe('Routes', () => {
         gl2AppPathPrefix: prefix,
       };
 
-      Routes = require.requireActual('./Routes');
+      Routes = require.requireActual('./Routes').default;
     });
 
     it('returns a route from constant', () => {

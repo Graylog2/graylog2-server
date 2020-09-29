@@ -2,8 +2,9 @@
 import Reflux from 'reflux';
 
 import fetch, { fetchPlainText } from 'logic/rest/FetchProvider';
+import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 type GrokPattern = {
@@ -13,6 +14,14 @@ type GrokPattern = {
   content_pack: string,
 };
 
+type PaginatedResponse = {
+  count: number,
+  total: number,
+  page: number,
+  per_page: number,
+  patterns: Array<GrokPattern>,
+};
+
 type GrokPatternTest = {
   name: string,
   pattern: string,
@@ -20,7 +29,7 @@ type GrokPatternTest = {
 };
 
 const GrokPatternsStore = Reflux.createStore({
-  URL: URLUtils.qualifyUrl('/system/grok'),
+  URL: qualifyUrl('/system/grok'),
 
   loadPatterns(callback: (patterns: Array<GrokPattern>) => void) {
     const failCallback = (error) => {
@@ -47,6 +56,30 @@ const GrokPatternsStore = Reflux.createStore({
       );
   },
 
+  searchPaginated(page, perPage, query) {
+    const url = PaginationURL(ApiRoutes.GrokPatternsController.paginated().url, page, perPage, query);
+
+    return fetch('GET', qualifyUrl(url))
+      .then((response: PaginatedResponse) => {
+        const pagination = {
+          count: response.count,
+          total: response.total,
+          page: response.page,
+          perPage: response.per_page,
+          query: query,
+        };
+
+        return {
+          patterns: response.patterns,
+          pagination: pagination,
+        };
+      })
+      .catch((errorThrown) => {
+        UserNotification.error(`Loading patterns failed with status: ${errorThrown}`,
+          'Could not load streams');
+      });
+  },
+
   testPattern(pattern: GrokPatternTest, callback: (request: any) => void, errCallback: (errorMessage: string) => void) {
     const failCallback = (error) => {
       let errorMessage = error.message;
@@ -67,7 +100,7 @@ const GrokPatternsStore = Reflux.createStore({
       sampleData: pattern.sampleData,
     };
 
-    fetch('POST', URLUtils.qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)
+    fetch('POST', qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)
       .then(
         (response) => {
           callback(response);

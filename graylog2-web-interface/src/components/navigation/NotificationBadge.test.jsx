@@ -21,7 +21,7 @@ describe('NotificationBadge', () => {
     jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
 
     // eslint-disable-next-line global-require
-    NotificationBadge = require('./NotificationBadge');
+    NotificationBadge = require('./NotificationBadge').default;
   });
 
   it('triggers update of notifications', () => {

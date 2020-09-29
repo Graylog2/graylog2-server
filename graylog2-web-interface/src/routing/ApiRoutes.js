@@ -81,6 +81,7 @@ const ApiRoutes = {
   },
   GrokPatternsController: {
     test: () => { return { url: '/system/grok/test' }; },
+    paginated: () => { return { url: '/system/grok/paginated' }; },
   },
   DashboardsApiController: {
     create: () => { return { url: '/dashboards' }; },

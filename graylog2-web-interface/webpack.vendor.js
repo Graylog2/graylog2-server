@@ -12,7 +12,7 @@ const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
 
-const TARGET = process.env.npm_lifecycle_event;
+const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
 // eslint-disable-next-line no-console
@@ -41,19 +41,23 @@ const webpackConfig = {
         const jsfiles = [];
         const cssfiles = [];
         const chunks = {};
+
         Object.keys(assets).forEach((chunk) => {
           if (assets[chunk].js) {
             jsfiles.push(assets[chunk].js);
           }
+
           if (assets[chunk].css) {
             jsfiles.push(assets[chunk].css);
           }
+
           chunks[chunk] = {
             size: 0,
             entry: assets[chunk].js,
             css: assets[chunk].css || [],
           };
         });
+
         return JSON.stringify({
           files: {
             js: jsfiles,
@@ -67,7 +71,7 @@ const webpackConfig = {
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
 
-if (TARGET === 'build') {
+if (TARGET.startsWith('build')) {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
