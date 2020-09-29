@@ -270,7 +270,8 @@ class ContentPackSelection extends React.Component {
                        value={contentPack.name}
                        onChange={this._bindValue}
                        label="Name"
-                       help={errors.name ? errors.name : 'Required. Give a descriptive name for this content pack.'}
+                       help="Required. Give a descriptive name for this content pack."
+                       error={errors.name}
                        required />
                 <Input name="summary"
                        id="summary"
@@ -280,7 +281,8 @@ class ContentPackSelection extends React.Component {
                        value={contentPack.summary}
                        onChange={this._bindValue}
                        label="Summary"
-                       help={errors.summary ? errors.summary : 'Required. Give a short summary of the content pack.'}
+                       help="Required. Give a short summary of the content pack."
+                       error={errors.summary}
                        required />
                 <Input name="description"
                        id="description"
@@ -298,7 +300,8 @@ class ContentPackSelection extends React.Component {
                        value={contentPack.vendor}
                        onChange={this._bindValue}
                        label="Vendor"
-                       help={errors.vendor ? errors.vendor : 'Required. Who did this content pack and how can they be reached, e.g. Name and email.'}
+                       help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
+                       error={errors.vendor}
                        required />
                 <Input name="url"
                        id="url"
@@ -308,7 +311,8 @@ class ContentPackSelection extends React.Component {
                        value={contentPack.url}
                        onChange={this._bindValue}
                        label="URL"
-                       help={errors.url ? errors.url : 'Where can I find the content pack. e.g. github url'} />
+                       help="Where can I find the content pack. e.g. github url"
+                       error={errors.url} />
               </fieldset>
             </form>
           </Col>
