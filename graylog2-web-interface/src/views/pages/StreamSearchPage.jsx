@@ -1,16 +1,14 @@
 // @flow strict
 import * as React from 'react';
-import { useMemo } from 'react';
 
-import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Spinner from 'components/common/Spinner';
 import { ExtendedSearchPage } from 'views/pages';
 import withParams from 'routing/withParams';
 import useLoadView from 'views/logic/views/UseLoadView';
 import { loadNewView, loadView } from 'views/logic/views/Actions';
+import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
 type Props = {
   location: {
@@ -24,7 +22,7 @@ type Props = {
 
 const StreamSearchPage = ({ params: { streamId }, route, location }: Props) => {
   const { query } = location;
-  const newView = useMemo(() => ViewActions.create(View.Type.Search, streamId).then(({ view }) => view), []);
+  const newView = useCreateSavedSearch(streamId);
 
   const [loaded, HookComponent] = useLoadView(newView, query);
 

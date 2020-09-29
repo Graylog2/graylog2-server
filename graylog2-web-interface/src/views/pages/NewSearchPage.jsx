@@ -1,18 +1,16 @@
 // @flow strict
 import * as React from 'react';
-import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
 import { Spinner } from 'components/common';
-import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import View from 'views/logic/views/View';
 import { ExtendedSearchPage } from 'views/pages';
 import { loadNewView, loadView } from 'views/logic/views/Actions';
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 import useLoadView from 'views/logic/views/UseLoadView';
+import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
 type URLQuery = { [string]: any };
 
@@ -25,7 +23,7 @@ type Props = {
 };
 
 const NewSearchPage = ({ location: { query }, location, route }: Props) => {
-  const view = useMemo(() => ViewActions.create(View.Type.Search).then(({ view: v }) => v), []);
+  const view = useCreateSavedSearch();
   const [loaded, HookComponent] = useLoadView(view, query);
 
   if (HookComponent) {
