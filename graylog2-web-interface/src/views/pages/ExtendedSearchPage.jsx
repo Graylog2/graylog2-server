@@ -125,7 +125,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
     const { view } = ViewStore.getInitialState();
 
     bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
-  }, [query]);
+  }, [location.query]);
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -140,8 +140,6 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       storeListenersUnsubscribes = storeListenersUnsubscribes
         .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
-
-      return null;
     });
 
     // Returning cleanup function used when unmounting

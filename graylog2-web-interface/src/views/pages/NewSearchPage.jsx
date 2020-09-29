@@ -1,152 +1,58 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
-import UserNotification from 'util/UserNotification';
-import withPluginEntities from 'views/logic/withPluginEntities';
 import { Spinner } from 'components/common';
 import { ViewActions } from 'views/stores/ViewStore';
-import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import View from 'views/logic/views/View';
-import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
 import { ExtendedSearchPage } from 'views/pages';
-import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-
-import IfUserHasAccessToAnyStream from '../components/IfUserHasAccessToAnyStream';
+import { loadNewView, loadView } from 'views/logic/views/Actions';
+import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
+import useLoadView from 'views/logic/views/UseLoadView';
 
 type URLQuery = { [string]: any };
 
 type Props = {
   route: {},
-  router: {
-    getCurrentLocation: () => ({ pathname: string, search: string }),
-  },
   location: {
     query: URLQuery,
     pathname: string,
   },
-  executingViewHooks: Array<ViewHook>,
-  loadingViewHooks: Array<ViewHook>,
 };
 
-type State = {
-  loaded: boolean,
-  hookComponent: ?any,
-};
+const NewSearchPage = ({ location: { query }, location, route }: Props) => {
+  const view = useMemo(() => ViewActions.create(View.Type.Search).then(({ view: v }) => v), []);
+  const [loaded, HookComponent] = useLoadView(view, query);
 
-class NewSearchPage extends React.Component<Props, State> {
-  static propTypes = {
-    route: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-    location: PropTypes.shape({
-      query: PropTypes.object,
-      pathname: PropTypes.string,
-    }).isRequired,
-  };
-
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      hookComponent: undefined,
-      loaded: false,
-    };
+  if (HookComponent) {
+    return <HookComponent />;
   }
 
-  componentDidMount() {
-    this.loadViewFromParams();
-  }
-
-  loadViewFromParams = (): Promise<?View> => {
-    const { location: { query } } = this.props;
-
-    return this.loadNewView({ ...query });
-  }
-
-  loadEmptyView = (): Promise<?View> => {
-    const { router } = this.props;
-
-    return this.loadNewView({}).then(() => {
-      const { pathname, search } = router.getCurrentLocation();
-      const query = `${pathname}${search}`;
-
-      // running syncWithQueryParameters with the "old" query, will replace the url query with the new view settings
-      syncWithQueryParameters(query);
-    });
-  }
-
-  loadNewView = (currentURLQuery: URLQuery): Promise<?View> => {
-    const { loadingViewHooks, executingViewHooks } = this.props;
-
-    return processHooks(
-      ViewActions.create(View.Type.Search).then(({ view }) => view),
-      loadingViewHooks,
-      executingViewHooks,
-      currentURLQuery,
-      () => this.setState({ loaded: true }),
-    ).catch(
-      (error) => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
+  if (loaded) {
+    return (
+      <ViewLoaderContext.Provider value={loadView}>
+        <NewViewLoaderContext.Provider value={loadNewView}>
+          <IfUserHasAccessToAnyStream>
+            <ExtendedSearchPage route={route} location={location} />
+          </IfUserHasAccessToAnyStream>
+        </NewViewLoaderContext.Provider>
+      </ViewLoaderContext.Provider>
     );
-  };
-
-  loadView = (viewId: string): Promise<?View> => {
-    const { location, loadingViewHooks, executingViewHooks } = this.props;
-    const { query } = location;
-
-    return ViewLoader(
-      viewId,
-      loadingViewHooks,
-      executingViewHooks,
-      query,
-      () => {
-        this.setState({ hookComponent: undefined });
-      },
-      (e) => {
-        if (e instanceof Error) {
-          throw e;
-        }
-
-        this.setState({ hookComponent: e });
-      },
-    ).then((view) => {
-      this.setState({ loaded: true });
-
-      return view;
-    }).catch((e) => e);
-  };
-
-  render() {
-    const { hookComponent, loaded } = this.state;
-
-    if (hookComponent) {
-      const HookComponent = hookComponent;
-
-      return <HookComponent />;
-    }
-
-    if (loaded) {
-      const { location, route } = this.props;
-
-      return (
-        <ViewLoaderContext.Provider value={this.loadView}>
-          <NewViewLoaderContext.Provider value={this.loadEmptyView}>
-            <IfUserHasAccessToAnyStream>
-              <ExtendedSearchPage route={route} location={location} />
-            </IfUserHasAccessToAnyStream>
-          </NewViewLoaderContext.Provider>
-        </ViewLoaderContext.Provider>
-      );
-    }
-
-    return <Spinner />;
   }
-}
 
-const mapping = {
-  loadingViewHooks: 'views.hooks.loadingView',
-  executingViewHooks: 'views.hooks.executingView',
+  return <Spinner />;
 };
-export default withPluginEntities(withRouter(NewSearchPage), mapping);
+
+NewSearchPage.propTypes = {
+  route: PropTypes.object.isRequired,
+  location: PropTypes.shape({
+    query: PropTypes.object,
+    pathname: PropTypes.string,
+  }).isRequired,
+};
+
+export default withRouter(NewSearchPage);

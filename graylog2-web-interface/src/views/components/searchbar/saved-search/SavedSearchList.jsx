@@ -97,9 +97,7 @@ class SavedSearchList extends React.Component<Props, State> {
       return;
     }
 
-    loadFunc(selectedSavedSearch).then(() => {
-      browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedSavedSearch));
-    });
+    browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedSavedSearch));
 
     toggleModal();
   };
