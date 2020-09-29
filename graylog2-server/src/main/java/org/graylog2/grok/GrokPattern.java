@@ -31,7 +31,12 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 public abstract class GrokPattern {
 
-    @JsonProperty("id")
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_PATTERN = "pattern";
+    public static final String FIELD_CONTENT_PACK = "content_pack";
+
+    @JsonProperty(FIELD_ID)
     @Nullable
     @Id
     @ObjectId
@@ -49,9 +54,9 @@ public abstract class GrokPattern {
 
     @JsonCreator
     public static GrokPattern create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                     @JsonProperty("name") String name,
-                                     @JsonProperty("pattern") String pattern,
-                                     @JsonProperty("content_pack") @Nullable String contentPack) {
+                                     @JsonProperty(FIELD_NAME) String name,
+                                     @JsonProperty(FIELD_PATTERN) String pattern,
+                                     @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack) {
         return builder()
                 .id(id)
                 .name(name)

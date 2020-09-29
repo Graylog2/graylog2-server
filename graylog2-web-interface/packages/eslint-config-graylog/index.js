@@ -52,6 +52,9 @@ module.exports = {
     'react/prefer-stateless-function': 'warn',
     'react/static-property-placement': 'off',
 
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'error',
+
     'padding-line-between-statements': [
       'error',
       {

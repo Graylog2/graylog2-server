@@ -45,7 +45,7 @@ describe('SystemMenu', () => {
 
     beforeEach(() => {
       // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu');
+      SystemMenu = require('./SystemMenu').default;
     });
 
     const verifyPermissions = ({ permissions, count, links }) => {
@@ -84,7 +84,7 @@ describe('SystemMenu', () => {
       ];
 
       // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu');
+      SystemMenu = require('./SystemMenu').default;
     });
 
     afterEach(() => {
@@ -130,7 +130,7 @@ describe('SystemMenu', () => {
       ];
 
       // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu');
+      SystemMenu = require('./SystemMenu').default;
     });
 
     afterEach(() => {
