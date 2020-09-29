@@ -39,4 +39,22 @@ describe('Input', () => {
 
     expect(wrapper.find('input[name="inputWithNameProp"]')).toExist();
   });
+
+  it('renders input w/ provided error', () => {
+    const wrapper = mount(<Input id="inputWithError" type="text" error="The error message" />);
+
+    expect(wrapper.find({ error: 'The error message' }).find('InputDescription').length).toEqual(1);
+  });
+
+  it('renders input w/ provided help', () => {
+    const wrapper = mount(<Input id="inputWithHelp" type="text" help="The help text" />);
+
+    expect(wrapper.find({ help: 'The help text' }).find('InputDescription').length).toEqual(1);
+  });
+
+  it('renders input w/ provided help and error', () => {
+    const wrapper = mount(<Input id="inputWithHelp" type="text" help="The help text" error="The error message" />);
+
+    expect(wrapper.find({ help: 'The help text', error: 'The error message' }).find('InputDescription').length).toEqual(1);
+  });
 });
