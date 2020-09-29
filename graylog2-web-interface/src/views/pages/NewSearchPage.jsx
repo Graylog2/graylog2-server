@@ -12,7 +12,6 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import View from 'views/logic/views/View';
 import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
-import { SearchActions } from 'views/stores/SearchStore';
 import { ExtendedSearchPage } from 'views/pages';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
