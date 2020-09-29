@@ -3,9 +3,9 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
 import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
+import UserOverview from 'logic/users/UserOverview';
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
-import AuthenticationUser from 'logic/authentication/AuthenticationUser';
 import type { PaginationType } from 'stores/PaginationTypes';
 
 export type AuthenticationBackendCreate = {
@@ -36,7 +36,7 @@ export type PaginatedBackends = {
 };
 
 export type PaginatedAuthUsers = {
-  list: Immutable.List<AuthenticationUser>,
+  list: Immutable.List<UserOverview>,
   pagination: PaginationType,
 };
 

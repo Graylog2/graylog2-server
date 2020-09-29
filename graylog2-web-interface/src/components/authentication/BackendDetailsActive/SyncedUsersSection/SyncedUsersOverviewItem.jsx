@@ -6,12 +6,12 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import AuthenticationUser from 'logic/authentication/AuthenticationUser';
+import UserOverview from 'logic/users/UserOverview';
 import { Button, ButtonToolbar } from 'components/graylog';
 import RolesCell from 'components/users/UsersOverview/UserOverviewItem/RolesCell';
 
 type Props = {
-  user: AuthenticationUser,
+  user: UserOverview,
 };
 
 const ActtionsWrapper = styled(ButtonToolbar)`

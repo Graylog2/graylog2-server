@@ -25,7 +25,7 @@ import type { PaginatedResponseType } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
 
-import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
+import { userList as authUsers } from '../../../test/fixtures/userOverviews';
 
 type PaginatedBackendsResponse = PaginatedResponseType & {
   context: {
@@ -35,7 +35,7 @@ type PaginatedBackendsResponse = PaginatedResponseType & {
 };
 
 // type PaginatedUsersResponse = PaginatedResponseType & {
-//   users: Array<AuthenticationUserJSON>,
+//   users: Array<UserOverviewJSON>,
 // };
 
 const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
@@ -163,7 +163,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
       // const promise = fetch('GET', qualifyUrl(url))
       // .then((response: PaginatedUsersResponse) => ({
-      //   list: Immutable.List(response.users.map((user) => AuthenticationUser.fromJSON(user))),
+      //   list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
       //   pagination: {
       //     count: response.count,
       //     total: response.total,
