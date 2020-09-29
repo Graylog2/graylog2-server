@@ -4,13 +4,10 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
 import { Spinner } from 'components/common';
-import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import { ExtendedSearchPage } from 'views/pages';
-import { loadNewView, loadView } from 'views/logic/views/Actions';
-import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
+
+import SavedSearchPage from './SavedSearchPage';
 
 type URLQuery = { [string]: any };
 
@@ -22,7 +19,7 @@ type Props = {
   },
 };
 
-const NewSearchPage = ({ location: { query }, location, route }: Props) => {
+const NewSearchPage = ({ location: { query }, route }: Props) => {
   const view = useCreateSavedSearch();
   const [loaded, HookComponent] = useLoadView(view, query);
 
@@ -30,19 +27,11 @@ const NewSearchPage = ({ location: { query }, location, route }: Props) => {
     return HookComponent;
   }
 
-  if (loaded) {
-    return (
-      <ViewLoaderContext.Provider value={loadView}>
-        <NewViewLoaderContext.Provider value={loadNewView}>
-          <IfUserHasAccessToAnyStream>
-            <ExtendedSearchPage route={route} location={location} />
-          </IfUserHasAccessToAnyStream>
-        </NewViewLoaderContext.Provider>
-      </ViewLoaderContext.Provider>
-    );
+  if (!loaded) {
+    return <Spinner />;
   }
 
-  return <Spinner />;
+  return <SavedSearchPage route={route} />;
 };
 
 NewSearchPage.propTypes = {

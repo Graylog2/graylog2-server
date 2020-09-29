@@ -5,13 +5,11 @@ import PropTypes from 'prop-types';
 import useViewLoader from 'views/logic/views/UseViewLoader';
 import Spinner from 'components/common/Spinner';
 import View from 'views/logic/views/View';
-import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
-import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import { ExtendedSearchPage } from 'views/pages';
 import withParams from 'routing/withParams';
-import { loadNewView, loadView } from 'views/logic/views/Actions';
+
+import SavedSearchPage from './SavedSearchPage';
 
 type Props = {
   location: {
@@ -39,13 +37,7 @@ const ShowViewPage = ({ params: { viewId }, route, location: { query }, viewLoad
     return <Spinner />;
   }
 
-  return (
-    <NewViewLoaderContext.Provider value={loadNewView}>
-      <ViewLoaderContext.Provider value={loadView}>
-        <ExtendedSearchPage route={route} />
-      </ViewLoaderContext.Provider>
-    </NewViewLoaderContext.Provider>
-  );
+  return <SavedSearchPage route={route} />;
 };
 
 ShowViewPage.propTypes = {
