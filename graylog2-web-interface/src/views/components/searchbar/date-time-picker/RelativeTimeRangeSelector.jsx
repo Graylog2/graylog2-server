@@ -7,7 +7,7 @@ import { Field } from 'formik';
 import Input from 'components/bootstrap/Input';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
-import TimerangeSelector from './TimerangeSelector';
+import TimerangeSelector from '../TimerangeSelector';
 
 type Props = {
   disabled: boolean,
