@@ -24,6 +24,7 @@ export { default as FormikFormGroup } from './FormikFormGroup';
 export { default as Icon } from './Icon';
 export { default as IconButton } from './IconButton';
 export { default as IfPermitted } from './IfPermitted';
+export { default as InputDescription } from './InputDescription';
 export { default as InteractableModal } from './InteractableModal';
 export { default as ISODurationInput } from './ISODurationInput';
 export { default as LinkToNode } from './LinkToNode';
