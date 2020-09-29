@@ -8,7 +8,7 @@ import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 import WizardPageHeader from './WizardPageHeader';
 import { HELP, AUTH_BACKEND_META } from './BackendCreate';
 
-import { prepareInitialValues } from '../ldap/BackendEdit';
+import { prepareInitialValues, passwordUpdatePayload } from '../ldap/BackendEdit';
 import BackendWizard from '../BackendWizard';
 
 type Props = {
@@ -33,6 +33,10 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     {
       ...payload,
       id: authenticationBackend.id,
+      config: {
+        ...payload.config,
+        system_user_password: passwordUpdatePayload(payload.config.system_user_password),
+      },
     });
 
   return (

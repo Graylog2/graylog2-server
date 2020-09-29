@@ -37,7 +37,7 @@ const SubmitAllError = ({ error }: { error: string }) => (
 
 const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues) => {
   // We need to ensure that we are using the actual form values
-  // It is possible to provide the already updated form values, so we do not need to get them twice
+  // It is possible to provide already updated form values, so we do not need to get them twice
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
   const {
     defaultRoles = '',
@@ -53,18 +53,11 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     verifyCertificates,
   } = formValues;
   const {
-    backendId,
     serviceTitle,
     serviceType,
     urlScheme,
   } = stepsState.authBackendMeta;
-  let password = { system_user_password: systemUserPassword };
   const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme(urlScheme)}`;
-
-  // Only update password on edit if necessary, if a users resets the password it is null
-  if (backendId && systemUserPassword === undefined) {
-    password = {};
-  }
 
   return {
     default_roles: defaultRoles.split(','),
@@ -73,6 +66,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     config: {
       server_urls: [serverUrl],
       system_user_dn: systemUserDn,
+      system_user_password: systemUserPassword,
       transport_security: transportSecurity,
       type: serviceType,
       user_full_name_attribute: userFullNameAttribute,
@@ -80,7 +74,6 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
       user_search_base: userSearchBase,
       user_search_pattern: userSearchPattern,
       verify_certificates: verifyCertificates,
-      ...password,
     },
   };
 };

@@ -178,10 +178,10 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
               </Input>
             )
             : (
-              <FormikFormGroup autoComplete="autentication-service-password"
+              <FormikFormGroup autoComplete="authentication-service-password"
                                buttonAfter={(backendHasPassword && values.systemUserPassword !== undefined) && (
                                <Button type="button" onClick={() => setFieldValue('systemUserPassword', undefined)}>
-                                 Revert Reset
+                                 Undo Reset
                                </Button>
                                )}
                                help={help.systemUserPassword}

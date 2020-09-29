@@ -50,4 +50,8 @@ export type LdapCreate = {
 export type LdapUpdate = {
   ...LdapCreate,
   id: $PropertyType<AuthenticationBackendJSON, 'id'>,
+  config: {
+    ...LdapConfigJson,
+    system_user_password: string | { keep_value: true } | { delete_value: true },
+  },
 };
