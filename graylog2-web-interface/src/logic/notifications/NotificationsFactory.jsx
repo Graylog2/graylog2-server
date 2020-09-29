@@ -81,7 +81,7 @@ class NotificationsFactory {
           title: 'Elasticsearch cluster unavailable',
           description: (
             <span>
-              Graylog could not successfully connect to the Elasticsearch cluster. If you're using multicast, check that
+              Graylog could not successfully connect to the Elasticsearch cluster. If you&apos;re using multicast, check that
               it is working in your network and that Elasticsearch is accessible. Also check that the cluster name setting
               is correct. Read how to fix this in {' '}
               <DocumentationLink page={DocsHelper.PAGES.ES_CLUSTER_UNAVAILABLE}
@@ -192,7 +192,7 @@ class NotificationsFactory {
           description: (
             <span>
               The most recent stable Graylog version is <em>{notification.details.current_version}</em>.
-              Get it from <a href="https://www.graylog.org/" target="_blank">https://www.graylog.org/</a>.
+              Get it from <a href="https://www.graylog.org/" rel="noopener noreferrer" target="_blank">https://www.graylog.org/</a>.
             </span>
           ),
         };
@@ -201,7 +201,7 @@ class NotificationsFactory {
           title: 'Output disabled',
           description: (
             <span>
-              The output with the id {notification.details.outputId} in stream "{notification.details.streamTitle}"
+              The output with the id {notification.details.outputId} in stream &quot;{notification.details.streamTitle}&quot;
               (id: {notification.details.streamId}) has been disabled for {notification.details.faultPenaltySeconds}
               seconds because there were {notification.details.faultCount} failures.
               (Node: <em>{notification.node_id}</em>, Fault threshold: <em>{notification.details.faultCountThreshold}</em>)
@@ -213,11 +213,11 @@ class NotificationsFactory {
           title: 'Output failing',
           description: (
             <span>
-              The output "{notification.details.outputTitle}" (id: {notification.details.outputId})
-              in stream "{notification.details.streamTitle}" (id: {notification.details.streamId})
+              The output &quot;{notification.details.outputTitle}&quot; (id: {notification.details.outputId})
+              in stream &quot;{notification.details.streamTitle}&quot; (id: {notification.details.streamId})
               is unable to send messages to the configured destination.
-              <br/>
-                The error message from the output is: <em>{notification.details.errorMessage}</em>
+              <br />
+              The error message from the output is: <em>{notification.details.errorMessage}</em>
             </span>
           ),
         };
@@ -242,7 +242,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster running out of disk space, their disk usage is above the low watermark.{' '}
               For this reason Elasticsearch will not allocate new shards to the affected nodes.{' '}
               The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" rel="noopener noreferrer" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),
@@ -255,7 +255,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster with almost no free disk, their disk usage is above the high watermark.{' '}
               For this reason Elasticsearch will attempt to relocate shards away from the affected nodes.{' '}
               The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" rel="noopener noreferrer" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),
@@ -268,7 +268,7 @@ class NotificationsFactory {
               There are Elasticsearch nodes in the cluster without free disk, their disk usage is above the flood stage watermark.{' '}
               For this reason Elasticsearch enforces a read-only index block on all indexes having any of their shards in any of the{' '}
               affected nodes. The affected nodes are: [{notification.details.nodes}]{' '}
-              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" rel="noopener noreferrer" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
               for more details.
             </span>
           ),
