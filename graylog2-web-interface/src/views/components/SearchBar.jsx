@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
@@ -44,7 +45,6 @@ import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import SearchBarForm from './searchbar/SearchBarForm';
-import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<*>,
@@ -57,7 +57,7 @@ type Props = {
 
 const FlexCol = styled(Col)`
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: space-between;
 `;
 
@@ -98,9 +98,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
               <>
                 <TopRow>
                   <FlexCol md={6}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           config={config} />
-                    <TimeRangeDisplay timerange={values?.timerange} />
+                    <TimeRangeTypeSelector disabled={disableSearch} config={config} />
                     <RefreshControls />
                   </FlexCol>
 
