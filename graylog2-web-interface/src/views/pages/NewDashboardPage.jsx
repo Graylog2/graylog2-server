@@ -1,5 +1,6 @@
 // @flow strict
-import React, { useMemo } from 'react';
+import * as React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import Spinner from 'components/common/Spinner';

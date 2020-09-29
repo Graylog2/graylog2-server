@@ -63,7 +63,6 @@ export const SearchJobStore = singletonStore(
     },
 
     run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
-      debugger;
       const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
 
       SearchJobActions.run.promise(promise);

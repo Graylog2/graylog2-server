@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useMemo } from 'react';
 
 import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -23,7 +24,7 @@ type Props = {
 
 const StreamSearchPage = ({ params: { streamId }, route, location }: Props) => {
   const { query } = location;
-  const newView = ViewActions.create(View.Type.Search, streamId).then(({ view }) => view);
+  const newView = useMemo(() => ViewActions.create(View.Type.Search, streamId).then(({ view }) => view), []);
 
   const [loaded, HookComponent] = useLoadView(newView, query);
 
