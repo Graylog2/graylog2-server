@@ -4,7 +4,12 @@ import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 
 import StreamRuleForm from './StreamRuleForm';
 
-jest.mock('components/common/TypeAheadFieldInput', () => ({ defaultValue }: { defaultValue: string }) => (<div>{defaultValue}</div>));
+jest.mock('components/common', () => ({
+  // eslint-disable-next-line react/prop-types
+  TypeAheadFieldInput: ({ defaultValue }) => (<div>{defaultValue}</div>),
+  // eslint-disable-next-line react/prop-types
+  Icon: ({ children }) => (<div>{children}</div>),
+}));
 
 describe('StreamRuleForm', () => {
   afterEach(() => {

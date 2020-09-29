@@ -63,6 +63,8 @@ const PasswordSection = ({ user: { username } }: Props) => {
                              help="Passwords must be at least 6 characters long. We recommend using a strong password."
                              maxLength={100}
                              minLength={6}
+                             labelClassName="col-sm-3"
+                             wrapperClassName="col-sm-9"
                              required />
             <FormikFormGroup label="Repeat Password"
                              name="password_repeat"
