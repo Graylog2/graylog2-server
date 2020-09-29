@@ -134,7 +134,8 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitA
           <Field name="defaultRoles" validate={validateField(FORM_VALIDATION.defaultRoles)}>
             {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
               <Input bsStyle={error ? 'error' : undefined}
-                     help={error ?? help.defaultRoles}
+                     help={help.defaultRoles}
+                     error={error}
                      id="default-roles-select"
                      label="Default Roles"
                      labelClassName="col-sm-3"

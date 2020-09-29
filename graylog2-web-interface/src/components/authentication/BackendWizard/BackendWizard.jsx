@@ -125,7 +125,7 @@ type Props = {
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
-  const [submitAllError, setSubmitAllError] = useState<?string>();
+  const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
     authBackendMeta,
