@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
+import styled from 'styled-components';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -13,7 +14,6 @@ import { Col, Row } from 'components/graylog';
 import TopRow from 'views/components/searchbar/TopRow';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
-import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
@@ -26,17 +26,24 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
 import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
   availableStreams: Array<*>,
-  config: any,
+  config: SearchesConfig,
   currentQuery: Query,
   disableSearch: boolean,
   onSubmit: ({ timerange: TimeRange, streams: Array<string>, queryString: string }, Query) => Promise<any>,
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
+
+const FlexCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
 
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   const newQuery = currentQuery.toBuilder()
@@ -74,16 +81,16 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
             {({ dirty, isSubmitting, isValid, handleSubmit }) => (
               <>
                 <TopRow>
-                  <Col md={4}>
-                    <TimeRangeTypeSelector />
-                    <TimeRangeInput config={config} />
-                  </Col>
+                  <FlexCol md={6}>
+                    <TimeRangeTypeSelector disabled={disableSearch} config={config} />
+                    <RefreshControls />
+                  </FlexCol>
 
                   <Col mdHidden lgHidden>
                     <HorizontalSpacer />
                   </Col>
 
-                  <Col md={5} xs={8}>
+                  <Col md={6}>
                     <Field name="streams">
                       {({ field: { name, value, onChange } }) => (
                         <StreamsFilter value={value}
@@ -91,10 +98,6 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                                        onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
                       )}
                     </Field>
-                  </Col>
-
-                  <Col md={3} xs={4}>
-                    <RefreshControls />
                   </Col>
                 </TopRow>
 

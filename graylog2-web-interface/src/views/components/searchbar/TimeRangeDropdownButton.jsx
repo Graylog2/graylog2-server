@@ -1,35 +1,45 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
+import { useRef, useState } from 'react';
+import { Overlay } from 'react-overlays';
 
-import { DropdownButton } from 'components/graylog';
+import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
 
-const StyledDropdownButton: StyledComponent<{}, void, DropdownButton> = styled(DropdownButton)`
-  padding: 6px 7px;
-  margin-right: 5px;
-`;
-
 type Props = {
-  onSelect: (newType: string) => void,
   children: React.Node,
   disabled?: boolean,
+  show?: boolean,
+  toggleShow: (void) => boolean,
 };
 
-const TimeRangeDropdownButton = ({ onSelect, children, disabled, ...rest }: Props) => (
-  <StyledDropdownButton {...rest}
-                        bsStyle="info"
-                        disabled={disabled}
-                        id="timerange-type"
-                        title={<Icon name="clock" />}
-                        onSelect={onSelect}>
-    {children}
-  </StyledDropdownButton>
-);
+const TimeRangeDropdownButton = ({ children, disabled, show, toggleShow }: Props) => {
+  const containerRef = useRef();
+
+  return (
+    <div ref={containerRef}>
+      <Button bsStyle="info"
+              disabled={disabled}
+              onClick={toggleShow}>
+        <Icon name="clock" />
+      </Button>
+
+      <Overlay show={show}
+               trigger="click"
+               placement="bottom"
+               onHide={toggleShow}
+               container={containerRef.current}>
+        {children}
+      </Overlay>
+    </div>
+  );
+};
 
 TimeRangeDropdownButton.defaultProps = {
   disabled: false,
+  show: false,
 };
 
 export default TimeRangeDropdownButton;
+
+// trigger={<Button bsStyle="info" disabled={disabled} ref={containerRef}><Icon name="clock" /></Button>}

@@ -3,10 +3,10 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useField } from 'formik';
 
+import AbsoluteTimeRangeSelector from 'views/components/searchbar/date-time-picker/AbsoluteTimeRangeSelector';
+import KeywordTimeRangeSelector from 'views/components/searchbar/date-time-picker/KeywordTimeRangeSelector';
+import RelativeTimeRangeSelector from 'views/components/searchbar/date-time-picker/RelativeTimeRangeSelector';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
-import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
-import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
 import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';

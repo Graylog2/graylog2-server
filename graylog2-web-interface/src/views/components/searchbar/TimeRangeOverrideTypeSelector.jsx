@@ -6,7 +6,7 @@ import { useField } from 'formik';
 import { MenuItem, ButtonToolbar } from 'components/graylog';
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 
-import timeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
+import Dropdown from './date-time-picker/Dropdown';
 
 import { migrateTimeRangeToNewType } from '../TimerangeForForm';
 
@@ -22,12 +22,12 @@ const TimeRangeOverrideTypeSelector = () => {
 
   return (
     <ButtonToolbar className="pull-left">
-      <TimeRangeDropdownButton onSelect={onSelect}>
+      <TimeRangeDropdownButton>
         <MenuItem eventKey="disabled"
                   active={type === undefined}>
           No Override
         </MenuItem>
-        {timeRangeTypeMenuItems(type)}
+        <Dropdown currentType={type} onSelect={onSelect} />
       </TimeRangeDropdownButton>
     </ButtonToolbar>
   );

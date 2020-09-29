@@ -1,22 +1,24 @@
 // @flow strict
 import * as React from 'react';
-import { useCallback } from 'react';
-import { useField } from 'formik';
+import { useCallback, useState } from 'react';
+import { useFormikContext } from 'formik';
+import PropTypes from 'prop-types';
 
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
-import { ButtonToolbar } from 'components/graylog';
-import PropTypes from 'views/components/CustomPropTypes';
 
-import timeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
+import Dropdown from './date-time-picker/Dropdown';
 
 import { migrateTimeRangeToNewType } from '../TimerangeForForm';
 
 type Props = {
+  config: any,
   disabled: boolean,
 };
 
-export default function TimeRangeTypeSelector({ disabled }: Props) {
-  const [{ value, onChange, name }] = useField('timerange');
+export default function TimeRangeTypeSelector({ config, disabled }: Props) {
+  const [show, setShow] = useState(false);
+  const formik = useFormikContext();
+  const { value, onChange, name } = formik.getFieldProps('timerange');
   const { type: currentType } = value;
   const onSelect = useCallback((newType) => onChange({
     target: {
@@ -24,13 +26,17 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
       name,
     },
   }), [onChange, value]);
+  const toggleShow = () => setShow(!show);
 
   return (
-    <ButtonToolbar className="pull-left">
-      <TimeRangeDropdownButton disabled={disabled} onSelect={onSelect}>
-        {timeRangeTypeMenuItems(currentType)}
-      </TimeRangeDropdownButton>
-    </ButtonToolbar>
+    <TimeRangeDropdownButton disabled={disabled}
+                             show={show}
+                             toggleShow={toggleShow}>
+      <Dropdown currentType={currentType}
+                onSelect={onSelect}
+                config={config}
+                toggleDropdownShow={toggleShow} />
+    </TimeRangeDropdownButton>
   );
 }
 
