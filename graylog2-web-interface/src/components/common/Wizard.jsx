@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled, { css, type StyledComponent } from 'styled-components';
 
-import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 import { type ThemeInterface } from 'theme';
+import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 
 import Icon from './Icon';
 
