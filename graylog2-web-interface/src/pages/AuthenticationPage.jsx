@@ -10,7 +10,6 @@ import Routes from 'routing/Routes';
 import { useActiveBackend } from 'components/authentication/hooks';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
-import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import BackendDetailsActive from 'components/authentication/BackendDetailsActive';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
