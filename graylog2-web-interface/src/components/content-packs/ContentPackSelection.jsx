@@ -265,7 +265,6 @@ class ContentPackSelection extends React.Component {
                 <Input name="name"
                        id="name"
                        type="text"
-                       bsStyle={errors.name ? 'error' : null}
                        maxLength={250}
                        value={contentPack.name}
                        onChange={this._bindValue}
@@ -276,7 +275,6 @@ class ContentPackSelection extends React.Component {
                 <Input name="summary"
                        id="summary"
                        type="text"
-                       bsStyle={errors.summary ? 'error' : null}
                        maxLength={250}
                        value={contentPack.summary}
                        onChange={this._bindValue}
@@ -295,7 +293,6 @@ class ContentPackSelection extends React.Component {
                 <Input name="vendor"
                        id="vendor"
                        type="text"
-                       bsStyle={errors.vendor ? 'error' : null}
                        maxLength={250}
                        value={contentPack.vendor}
                        onChange={this._bindValue}
@@ -307,7 +304,6 @@ class ContentPackSelection extends React.Component {
                        id="url"
                        type="text"
                        maxLength={250}
-                       bsStyle={errors.url ? 'error' : null}
                        value={contentPack.url}
                        onChange={this._bindValue}
                        label="URL"

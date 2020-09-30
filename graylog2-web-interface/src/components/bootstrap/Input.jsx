@@ -130,7 +130,7 @@ class Input extends React.Component {
     }
 
     return (
-      <FormGroup controlId={id} validationState={validationState} bsClass={formGroupClassName}>
+      <FormGroup controlId={id} validationState={error ? 'error' : validationState} bsClass={formGroupClassName}>
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
           {input}
@@ -142,7 +142,7 @@ class Input extends React.Component {
 
   _renderCheckboxGroup = (id, validationState, formGroupClassName, wrapperClassName, label, error, help, props) => {
     return (
-      <FormGroup controlId={id} validationState={validationState} bsClass={formGroupClassName}>
+      <FormGroup controlId={id} validationState={error ? 'error' : validationState} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
           <Checkbox inputRef={(ref) => { this.input = ref; }} {...props}>{label}</Checkbox>
           <InputDescription error={error} help={help} />
@@ -153,7 +153,7 @@ class Input extends React.Component {
 
   _renderRadioGroup = (id, validationState, formGroupClassName, wrapperClassName, label, error, help, props) => {
     return (
-      <FormGroup controlId={id} validationState={validationState} bsClass={formGroupClassName}>
+      <FormGroup controlId={id} validationState={error ? 'error' : validationState} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
           <Radio inputRef={(ref) => { this.input = ref; }} {...props}>{label}</Radio>
           <InputDescription error={error} help={help} />
