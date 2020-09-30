@@ -28,7 +28,7 @@ const useLoadView = (view: Promise<View>, query: { [string]: any }) => {
 
       setHookComponent(e);
     });
-  }, [executingViewHooks, loadingViewHooks, query, view]);
+  }, [executingViewHooks, loadingViewHooks, view]);
 
   return [loaded, hookComponent];
 };

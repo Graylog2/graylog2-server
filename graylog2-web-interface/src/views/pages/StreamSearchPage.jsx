@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useCallback } from 'react';
 
 import Spinner from 'components/common/Spinner';
 import withParams from 'routing/withParams';
@@ -7,6 +8,8 @@ import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
 import SavedSearchPage from './SavedSearchPage';
+
+import { loadNewViewForStream } from '../logic/views/Actions';
 
 type Props = {
   location: {
@@ -22,6 +25,8 @@ const StreamSearchPage = ({ params: { streamId }, route, location: { query } }: 
   const newView = useCreateSavedSearch(streamId);
   const [loaded, HookComponent] = useLoadView(newView, query);
 
+  const _loadNewView = useCallback(() => loadNewViewForStream(streamId), [streamId]);
+
   if (HookComponent) {
     return HookComponent;
   }
@@ -30,7 +35,7 @@ const StreamSearchPage = ({ params: { streamId }, route, location: { query } }: 
     return <Spinner />;
   }
 
-  return <SavedSearchPage route={route} />;
+  return <SavedSearchPage route={route} loadNewView={_loadNewView} />;
 };
 
 export default withParams(StreamSearchPage);

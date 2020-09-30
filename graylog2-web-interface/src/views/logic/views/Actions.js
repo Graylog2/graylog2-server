@@ -1,15 +1,15 @@
 // @flow strict
 import history from 'util/History';
+import Routes from 'routing/Routes';
 
-const loadNewView = () => {
-  return history.push('/search');
+export const loadNewView = () => {
+  return history.push(`${Routes.SEARCH}/new`);
 };
 
-const loadView = (viewId: string) => {
-  return history.push(`/search/${viewId}`);
+export const loadNewViewForStream = (streamId: string) => {
+  return history.push(`${Routes.stream_search(streamId)}/new`);
 };
 
-export {
-  loadNewView,
-  loadView,
+export const loadView = (viewId: string) => {
+  return history.push(`${Routes.SEARCH}/${viewId}`);
 };
