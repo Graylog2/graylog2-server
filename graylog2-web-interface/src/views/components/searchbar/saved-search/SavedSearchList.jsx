@@ -16,6 +16,8 @@ import View from 'views/logic/views/View';
 import type { ThemeInterface } from 'theme';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
+import { loadView } from '../../../logic/views/Actions';
+
 type Props = {
   toggleModal: () => void,
   deleteSavedSearch: (View) => Promise<View>,
@@ -97,7 +99,7 @@ class SavedSearchList extends React.Component<Props, State> {
       return;
     }
 
-    browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedSavedSearch));
+    loadFunc(selectedSavedSearch);
 
     toggleModal();
   };
