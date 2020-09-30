@@ -58,8 +58,9 @@ public class AuthServiceTestResource extends RestResource {
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_TEST_BACKEND_EXECUTE)
     @NoAuditEvent("Test resource - doesn't change any data")
     public Response backendConnection(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendTestRequest request) {
-        validateConfig(request.backendConfiguration());
-
+        // We do NOT validate the backend configuration in the request here to make it possible to execute the
+        // connection test with partial configuration data. This is needed in the UI when using a step-based wizard
+        // and already wants to test the connection before having the user enter the complete configuration.
         return Response.ok(testService.testConnection(request)).build();
     }
 

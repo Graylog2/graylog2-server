@@ -46,7 +46,7 @@ describe('Navigation', () => {
 
   beforeEach(() => {
     // eslint-disable-next-line global-require
-    Navigation = require('./Navigation');
+    Navigation = require('./Navigation').default;
   });
 
   describe('has common elements', () => {

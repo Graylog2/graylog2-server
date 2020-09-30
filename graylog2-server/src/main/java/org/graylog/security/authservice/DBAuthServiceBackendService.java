@@ -63,6 +63,10 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find backend implementation for type <" + existingBackend.config().type() + ">"));
     }
 
+    public long countBackends() {
+        return db.count();
+    }
+
     public PaginatedList<AuthServiceBackendDTO> findPaginated(PaginationParameters params,
                                                               Predicate<AuthServiceBackendDTO> filter) {
         final String sortBy = defaultIfBlank(params.getSortBy(), "title");

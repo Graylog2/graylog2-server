@@ -34,7 +34,6 @@ import org.apache.directory.server.ldap.LdapServer;
 import org.graylog2.ApacheDirectoryTestServiceFactory;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.security.ldap.LdapEntry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -114,18 +113,24 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
 
     @Test
     public void testUserLookup() throws Exception {
-        final LdapEntry entry = connector.search(connection,
+        final LDAPUser entry = connector.searchUser(connection,
                 "ou=users,dc=example,dc=com",
                 "(&(objectClass=posixAccount)(uid={0}))",
-                "cn",
+                "john",
                 "entryUUID",
-                "john");
+                "uid",
+                "cn")
+                .orElse(null);
 
         assertThat(entry).isNotNull();
-        assertThat(entry.getDn())
+        assertThat(entry.dn())
                 .isNotNull()
                 .isEqualTo("cn=John Doe,ou=users,dc=example,dc=com");
-        assertThat(entry.get("entryUUID")).isNotBlank().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+        assertThat(entry.uniqueId()).isNotBlank().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+        assertThat(entry.entry().firstAttributeValue("entryUUID")).get().satisfies(value -> {
+            assertThat(value).isNotBlank().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+        });
+        assertThat(entry.entry().firstAttributeValue("entryUUID")).get().isEqualTo(entry.uniqueId());
     }
 
     @Test

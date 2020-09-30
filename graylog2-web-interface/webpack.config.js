@@ -14,7 +14,7 @@ const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
-const TARGET = process.env.npm_lifecycle_event;
+const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
 const BABELRC = path.resolve(ROOT_PATH, 'babel.config.js');
@@ -184,7 +184,7 @@ if (TARGET === 'start') {
   });
 }
 
-if (TARGET === 'build') {
+if (TARGET.startsWith('build')) {
   // eslint-disable-next-line no-console
   console.error('Running in production mode');
   process.env.NODE_ENV = 'production';
