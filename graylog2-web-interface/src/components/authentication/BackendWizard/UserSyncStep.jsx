@@ -111,15 +111,15 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitA
                            validate={validateField(FORM_VALIDATION.userSearchPattern)} />
 
           <FormikFormGroup help={help.userNameAttribute}
-                           label="Name Attirbute"
+                           label="Name Attribute"
                            name="userNameAttribute"
-                           placeholder="Name Attirbute"
+                           placeholder="Name Attribute"
                            validate={validateField(FORM_VALIDATION.userNameAttribute)} />
 
           <FormikFormGroup help={help.userFullNameAttribute}
-                           label="Full Name Attirbute"
+                           label="Full Name Attribute"
                            name="userFullNameAttribute"
-                           placeholder="Full Name Attirbute"
+                           placeholder="Full Name Attribute"
                            validate={validateField(FORM_VALIDATION.userFullNameAttribute)} />
 
           <Row>

@@ -141,12 +141,14 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
   const _validateSteps = (formValues: WizardFormValues): Array<string> => {
     const invalidStepKeys = _getInvalidStepKeys(formValues);
 
-    setStepsState({
-      ...stepsState,
-      activeStepKey: invalidStepKeys[0],
-      formValues,
-      invalidStepKeys,
-    });
+    if (invalidStepKeys.length >= 1) {
+      setStepsState({
+        ...stepsState,
+        activeStepKey: invalidStepKeys[0],
+        formValues,
+        invalidStepKeys,
+      });
+    }
 
     return invalidStepKeys;
   };
