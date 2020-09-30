@@ -6,10 +6,8 @@ import styled, { type StyledComponent } from 'styled-components';
 import type { ThemeInterface } from 'theme';
 import { HelpBlock } from 'components/graylog';
 
-const Wrapper: StyledComponent<{hasError: boolean}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme, hasError }) => `
-  ${hasError ? `
-    color: ${theme.colors.variant.danger};
-  ` : ''};
+const Wrapper: StyledComponent<{hasError: boolean}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme, hasError }) => hasError && `
+  color: ${theme.colors.variant.danger};
 `);
 
 type Props = {
