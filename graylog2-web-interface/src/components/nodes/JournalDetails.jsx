@@ -3,7 +3,9 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Link } from 'react-router';
+
+import { Link } from 'components/graylog/router';
+
 import numeral from 'numeral';
 import moment from 'moment';
 import {} from 'moment-duration-format';

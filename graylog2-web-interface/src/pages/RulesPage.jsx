@@ -1,8 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { LinkContainer } from 'react-router-bootstrap';
 import Reflux from 'reflux';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';

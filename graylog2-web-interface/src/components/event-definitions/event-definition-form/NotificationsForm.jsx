@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Col, Row, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';

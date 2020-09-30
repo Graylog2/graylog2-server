@@ -1,9 +1,9 @@
 // @flow strict
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-// $FlowFixMe: imports from core need to be fixed in flow
-import { Link } from 'react-router';
 
+// $FlowFixMe: imports from core need to be fixed in flow
+import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { EntityListItem } from 'components/common';
 import CurrentUserContext from 'contexts/CurrentUserContext';

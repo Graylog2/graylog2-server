@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router';
 
+import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -216,8 +216,8 @@ class NotificationsFactory {
               The output "{notification.details.outputTitle}" (id: {notification.details.outputId})
               in stream "{notification.details.streamTitle}" (id: {notification.details.streamId})
               is unable to send messages to the configured destination.
-              <br/>
-                The error message from the output is: <em>{notification.details.errorMessage}</em>
+              <br />
+              The error message from the output is: <em>{notification.details.errorMessage}</em>
             </span>
           ),
         };

@@ -3,9 +3,9 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Button, ProgressBar } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
