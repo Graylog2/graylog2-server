@@ -6,7 +6,7 @@ import SharedEntity from 'logic/permissions/SharedEntity';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import EntityShareState, { type EntityShareStateJson } from 'logic/permissions/EntityShareState';
-import EntityShareActions, { type EntitySharePayload, type PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
+import EntityShareActions, { type EntitySharePayload, type PaginatedEntitySharesType } from 'actions/permissions/EntityShareActions';
 import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'views/logic/singleton';
 import type { Store } from 'stores/StoreTypes';
@@ -74,20 +74,11 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    loadUserSharesPaginated(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+    loadUserSharesPaginated(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEntitySharesType> {
       const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
       const promise = fetch('GET', qualifyUrl(url)).then(formatPaginatedSharesResponse);
 
       EntityShareActions.loadUserSharesPaginated.promise(promise);
-
-      return promise;
-    },
-
-    loadTeamSharesPaginated(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
-      const url = PaginationURL(ApiRoutes.EntityShareController.teamSharesPaginated(teamId).url, page, perPage, query, additionalQueries);
-      const promise = fetch('GET', qualifyUrl(url)).then(formatPaginatedSharesResponse);
-
-      EntityShareActions.loadTeamSharesPaginated.promise(promise);
 
       return promise;
     },
