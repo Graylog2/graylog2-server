@@ -84,6 +84,7 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
     });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadViewFromParams(); }, [streamId]);
 
   if (hookComponent) {
