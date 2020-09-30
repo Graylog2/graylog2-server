@@ -18,7 +18,10 @@ jest.mock('components/common', () => ({
 }));
 
 jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: { create: jest.fn(() => Promise.resolve()), load: jest.fn(() => Promise.resolve()) },
+  ViewActions: {
+    create: jest.fn(() => Promise.resolve({ view: undefined })),
+    load: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 jest.mock('views/logic/views/ViewLoader', () => ({
