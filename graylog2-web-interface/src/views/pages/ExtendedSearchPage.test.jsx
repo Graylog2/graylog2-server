@@ -22,6 +22,8 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
+import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
+
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/layout/Footer', () => <div />);
 jest.mock('util/History', () => ({ push: jest.fn() }));
@@ -90,6 +92,7 @@ jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardS
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 jest.mock('views/logic/withPluginEntities', () => (x) => x);
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
+jest.mock('views/hooks/SyncWithQueryParameters');
 
 const mockPromise = (res) => {
   const promise = Promise.resolve(res);
@@ -230,6 +233,12 @@ describe('ExtendedSearchPage', () => {
     mount(<SimpleExtendedSearchPage />);
 
     expect(StreamsActions.refresh).toHaveBeenCalled();
+  });
+
+  it('synchronizes URL upon mount', async () => {
+    mount(<SimpleExtendedSearchPage />);
+
+    expect(useSyncWithQueryParameters).toHaveBeenCalled();
   });
 
   it('updating search in view triggers search execution', () => {
