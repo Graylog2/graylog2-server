@@ -28,6 +28,8 @@ import org.graylog.security.authservice.UserDetails;
 import org.graylog.security.authservice.ldap.LDAPUser;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
 import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.shared.security.ldap.LdapEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,6 +137,31 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     @Override
     public String backendTitle() {
         return backend.title();
+    }
+
+    @Override
+    public AuthServiceBackendDTO prepareConfigUpdate(AuthServiceBackendDTO existingBackend, AuthServiceBackendDTO newBackend) {
+        final LDAPAuthServiceBackendConfig newConfig = (LDAPAuthServiceBackendConfig) newBackend.config();
+
+        if (newConfig.systemUserPassword().isDeleteValue()) {
+            // If the system user password should be deleted, use an unset value
+            return newBackend.toBuilder()
+                    .config(newConfig.toBuilder()
+                            .systemUserPassword(EncryptedValue.createUnset())
+                            .build())
+                    .build();
+        }
+        if (newConfig.systemUserPassword().isKeepValue()) {
+            // If the system user password should be kept, use the value from the existing config
+            final LDAPAuthServiceBackendConfig existingConfig = (LDAPAuthServiceBackendConfig) existingBackend.config();
+            return newBackend.toBuilder()
+                    .config(newConfig.toBuilder()
+                            .systemUserPassword(existingConfig.systemUserPassword())
+                            .build())
+                    .build();
+        }
+
+        return newBackend;
     }
 
     @Override

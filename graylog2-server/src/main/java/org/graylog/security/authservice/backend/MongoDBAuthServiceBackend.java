@@ -117,6 +117,11 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
     }
 
     @Override
+    public AuthServiceBackendDTO prepareConfigUpdate(AuthServiceBackendDTO existingBackend, AuthServiceBackendDTO newBackend) {
+        return newBackend;
+    }
+
+    @Override
     public AuthServiceBackendTestResult testConnection(@Nullable AuthServiceBackendDTO existingBackendConfig) {
         return AuthServiceBackendTestResult.createFailure("Not implemented");
     }
