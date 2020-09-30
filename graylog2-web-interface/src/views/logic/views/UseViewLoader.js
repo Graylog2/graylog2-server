@@ -13,6 +13,9 @@ const useViewLoader = (viewId: string, query: { [string]: any }, viewLoader: Vie
   const [hookComponent, setHookComponent] = useState(undefined);
 
   useEffect(() => {
+    setLoaded(false);
+    setHookComponent(undefined);
+
     viewLoader(
       viewId,
       loadingViewHooks,
@@ -33,7 +36,7 @@ const useViewLoader = (viewId: string, query: { [string]: any }, viewLoader: Vie
 
       return results;
     }).catch((e) => e);
-  }, [executingViewHooks, loadingViewHooks, query, viewId, viewLoader]);
+  }, [executingViewHooks, loadingViewHooks, viewId, viewLoader]);
 
   return [loaded, hookComponent];
 };
