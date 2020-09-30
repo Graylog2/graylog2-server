@@ -105,4 +105,18 @@ class LDAPEntryTest {
 
         assertThat(entry.allAttributeValues("test")).get().isEqualTo(ImmutableList.of("1", "2"));
     }
+
+    @Test
+    void hasAttribute() {
+        final LDAPEntry entry = LDAPEntry.builder()
+                .dn("cn=jane,ou=people,dc=example,dc=com")
+                .addAttribute("zero", "0")
+                .addAttribute("one", null)
+                .build();
+
+        assertThat(entry.hasAttribute("zero")).isTrue();
+        assertThat(entry.hasAttribute("ZERO")).isTrue();
+        assertThat(entry.hasAttribute("one")).isFalse();
+        assertThat(entry.hasAttribute("nope")).isFalse();
+    }
 }

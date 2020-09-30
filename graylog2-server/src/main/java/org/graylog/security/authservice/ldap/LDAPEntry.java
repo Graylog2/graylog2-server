@@ -39,6 +39,10 @@ public abstract class LDAPEntry {
 
     public abstract ImmutableListMultimap<String, String> attributes();
 
+    public boolean hasAttribute(String key) {
+        return attributes().containsKey(toKey(key));
+    }
+
     public Optional<ImmutableList<String>> allAttributeValues(String key) {
         return Optional.ofNullable(attributes().get(toKey(key)));
     }
