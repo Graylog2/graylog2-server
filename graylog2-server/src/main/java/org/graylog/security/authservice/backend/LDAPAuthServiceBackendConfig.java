@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.unboundid.ldap.sdk.Filter;
+import com.unboundid.ldap.sdk.LDAPException;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.authservice.ldap.LDAPConnectorConfig;
@@ -90,6 +92,12 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
         }
         if (isBlank(userSearchPattern())) {
             result.addError(FIELD_USER_SEARCH_PATTERN, "User search pattern cannot be empty.");
+        } else {
+            try {
+                Filter.create(userSearchPattern());
+            } catch (LDAPException e) {
+                result.addError(FIELD_USER_SEARCH_PATTERN, "User search pattern cannot be parsed. It must be a valid LDAP filter.");
+            }
         }
         if (isBlank(userUniqueIdAttribute())) {
             result.addError(FIELD_USER_UNIQUE_ID_ATTRIBUTE, "User unique ID attribute cannot be empty.");
