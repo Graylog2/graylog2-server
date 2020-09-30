@@ -39,6 +39,9 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
 
     AuthenticationDomain.testConnection({ backend_configuration: payload, backend_id: authBackendMeta.backendId }).then((response) => {
       setConnectionStatus({ loading: false, message: response?.message, success: response?.success, errors: response?.errors });
+    }).catch((error) => {
+      const requestErrors = [error?.message, error?.additional?.res?.text];
+      setConnectionStatus({ loading: false, message: undefined, errors: requestErrors, success: false });
     });
   };
 

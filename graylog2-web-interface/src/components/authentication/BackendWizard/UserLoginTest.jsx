@@ -24,10 +24,8 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
   const _handleLoginTest = ({ username, password }) => {
     setLoginStatus({ ...initialLoginStatus, loading: true });
 
-    const payload = { ...prepareSubmitPayload() };
-
     return AuthenticationDomain.testLogin({
-      backend_configuration: payload,
+      backend_configuration: prepareSubmitPayload(),
       user_login: { username, password },
       backend_id: authBackendMeta.backendId,
     }).then((response) => {
@@ -41,6 +39,9 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
           success: response.success,
         });
       }
+    }).catch((error) => {
+      const requestErrors = [error?.message, error?.additional?.res?.text];
+      setLoginStatus({ loading: false, success: false, testFinished: true, result: {}, message: undefined, errors: requestErrors });
     });
   };
 

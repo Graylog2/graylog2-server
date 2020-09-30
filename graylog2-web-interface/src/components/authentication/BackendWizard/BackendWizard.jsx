@@ -11,6 +11,7 @@ import history from 'util/History';
 import type { LdapCreate } from 'logic/authentication/ldap/types';
 import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { type Step } from 'components/common/Wizard';
+import { FetchError } from 'logic/rest/FetchProvider';
 
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './contexts/BackendWizardContext';
 import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -24,7 +25,7 @@ const FORMS_VALIDATION = {
   [USER_SYNC_KEY]: USER_SYNC_VALIDATION,
 };
 
-const SubmitAllError = ({ error, backendId }: { error: string, backendId: ?string }) => (
+const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?string }) => (
   <Row>
     <Col xs={9} xsOffset={3}>
       <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }}>
