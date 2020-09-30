@@ -26,7 +26,7 @@ import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/layout/Footer', () => <div />);
-jest.mock('util/History', () => ({ push: jest.fn() }));
+jest.mock('util/History');
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
@@ -84,12 +84,12 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
-jest.mock('views/stores/StreamsStore', () => ({ StreamsActions: { refresh: jest.fn() } }));
+jest.mock('views/stores/StreamsStore');
 jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
 jest.mock('views/components/WithSearchStatus', () => (x) => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
-jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
+jest.mock('views/stores/SearchMetadataStore');
 jest.mock('views/logic/withPluginEntities', () => (x) => x);
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');

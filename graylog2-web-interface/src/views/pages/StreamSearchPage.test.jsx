@@ -41,9 +41,7 @@ jest.mock('views/logic/views/ViewLoader', () => ({
   processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
-jest.mock('views/hooks/SyncWithQueryParameters', () => ({
-  syncWithQueryParameters: jest.fn(),
-}));
+jest.mock('views/hooks/SyncWithQueryParameters');
 
 jest.mock('views/logic/views/Actions');
 
