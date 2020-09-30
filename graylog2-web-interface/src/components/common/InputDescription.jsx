@@ -1,13 +1,16 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { HelpBlock } from 'components/graylog';
 
-const Wrapper: StyledComponent<{hasError: boolean}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme, hasError }) => hasError && `
+const ErrorMessage = styled.span(({ theme, hasError }) => hasError && `
   color: ${theme.colors.variant.danger};
+`);
+
+const HelpMessage = styled.span(({ theme }) => `
+  color: ${theme.colors.gray[50]};
 `);
 
 type Props = {
@@ -25,13 +28,16 @@ const InputDescription = ({ help, error }: Props) => {
   }
 
   return (
-    <Wrapper hasError={!!error}>
-      <HelpBlock>
+    <HelpBlock>
+      <ErrorMessage hasError={!!error}>
         {error}
-        {(error && help) && <br />}
+      </ErrorMessage>
+      {(error && help) && <br />}
+      <HelpMessage>
         {help}
-      </HelpBlock>
-    </Wrapper>
+
+      </HelpMessage>
+    </HelpBlock>
   );
 };
 
