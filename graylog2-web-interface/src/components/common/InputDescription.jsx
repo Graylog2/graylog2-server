@@ -32,7 +32,7 @@ const InputDescription = ({ help, error }: Props) => {
       <ErrorMessage hasError={!!error}>
         {error}
       </ErrorMessage>
-      {(error && help) && <br />}
+      {(!!error && !!help) && <br />}
       <HelpMessage>
         {help}
 
