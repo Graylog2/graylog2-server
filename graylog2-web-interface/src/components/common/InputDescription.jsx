@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { HelpBlock } from 'components/graylog';
 
-const ErrorMessage = styled.span(({ theme, hasError }) => hasError && `
+const ErrorMessage = styled.span(({ theme }) => `
   color: ${theme.colors.variant.danger};
 `);
 
@@ -29,14 +29,17 @@ const InputDescription = ({ help, error }: Props) => {
 
   return (
     <HelpBlock>
-      <ErrorMessage hasError={!!error}>
-        {error}
-      </ErrorMessage>
+      {error && (
+        <ErrorMessage>
+          {error}
+        </ErrorMessage>
+      )}
       {(!!error && !!help) && <br />}
-      <HelpMessage>
-        {help}
-
-      </HelpMessage>
+      {help && (
+        <HelpMessage>
+          {help}
+        </HelpMessage>
+      )}
     </HelpBlock>
   );
 };
