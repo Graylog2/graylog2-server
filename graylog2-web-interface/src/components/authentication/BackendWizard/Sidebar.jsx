@@ -55,7 +55,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
                       onSelect={setActiveKey}>
       <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
-          <Panel.Title toggle>Connection Check</Panel.Title>
+          <Panel.Title toggle>Server Connection Check</Panel.Title>
         </Panel.Heading>
         <Panel.Body collapsible>
           <ServerConnectionTest prepareSubmitPayload={prepareSubmitPayload} />

@@ -24,12 +24,13 @@ const FORMS_VALIDATION = {
   [USER_SYNC_KEY]: USER_SYNC_VALIDATION,
 };
 
-const SubmitAllError = ({ error }: { error: string }) => (
+const SubmitAllError = ({ error, backendId }: { error: string, backendId: ?string }) => (
   <Row>
     <Col xs={9} xsOffset={3}>
-      <Alert bsStyle="danger">
-        <b>Failed to create authentication service</b><br />
-        {error}
+      <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }}>
+        <b>Failed to {backendId ? 'edit' : 'create'} authentication service</b><br />
+        {error?.message && <>{error.message}<br /><br /></>}
+        {error?.additional?.res?.text}
       </Alert>
     </Col>
   </Row>
@@ -183,7 +184,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
     setActiveStepKey: _setActiveStepKey,
-    submitAllError: submitAllError && <SubmitAllError error={submitAllError} />,
+    submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });
 
   return (
