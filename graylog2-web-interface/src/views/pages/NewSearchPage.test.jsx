@@ -34,15 +34,9 @@ jest.mock('views/hooks/SyncWithQueryParameters');
 
 jest.mock('views/stores/ViewManagementStore');
 
-jest.mock('views/logic/views/ViewLoader', () => {
-  const originalModule = jest.requireActual('views/logic/views/ViewLoader');
-
-  return {
-    __esModule: true,
-    ...originalModule,
-    processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
-  };
-});
+jest.mock('views/logic/views/ViewLoader', () => ({
+  processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
+}));
 
 jest.mock('views/logic/views/Actions');
 

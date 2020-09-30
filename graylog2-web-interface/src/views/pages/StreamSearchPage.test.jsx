@@ -6,7 +6,6 @@ import asMock from 'helpers/mocking/AsMock';
 
 import StreamsContext from 'contexts/StreamsContext';
 import { processHooks } from 'views/logic/views/ViewLoader';
-import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -36,6 +35,10 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.resolve()),
   },
+}));
+
+jest.mock('views/logic/views/ViewLoader', () => ({
+  processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
 jest.mock('views/hooks/SyncWithQueryParameters', () => ({
@@ -144,8 +147,15 @@ describe('StreamSearchPage', () => {
 
       fireEvent.click(viewCreateButton);
 
-      await waitFor(() => expect(processHooksAction).toBeCalledTimes(2));
-      await waitFor(() => expect(processHooksAction.mock.calls[1][3]).toStrictEqual({}));
+      await waitFor(() => expect(processHooksAction).toHaveBeenCalled());
+
+      const query = {
+        q: '',
+        rangetype: 'relative',
+        relative: '300',
+      };
+
+      expect(processHooksAction).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), query, expect.anything());
     });
   });
 });
