@@ -8,7 +8,6 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-import type { ViewJson } from 'views/logic/views/View';
 import { ExtendedSearchPage } from 'views/pages';
 import { IfPermitted } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
