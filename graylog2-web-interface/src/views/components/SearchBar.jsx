@@ -45,6 +45,12 @@ const FlexCol = styled(Col)`
   justify-content: space-between;
 `;
 
+const StyledTimeRange = styled.input`
+  width: 100%;
+  padding: 3px 9px;
+  margin: 0 12px;
+`;
+
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   const newQuery = currentQuery.toBuilder()
     .timerange(timerange)
@@ -70,7 +76,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  const _onSubmit = useCallback((values) => onSubmit(values, currentQuery), [query, onSubmit]);
+  const _onSubmit = (values) => onSubmit(values, currentQuery);
 
   return (
     <ScrollToHint value={query.query_string}>
@@ -78,11 +84,15 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
         <Col md={12}>
           <SearchBarForm initialValues={{ timerange, streams, queryString }}
                          onSubmit={_onSubmit}>
-            {({ dirty, isSubmitting, isValid, handleSubmit }) => (
+            {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
               <>
                 <TopRow>
                   <FlexCol md={6}>
-                    <TimeRangeTypeSelector disabled={disableSearch} config={config} />
+                    <TimeRangeTypeSelector disabled={disableSearch}
+                                           config={config} />
+                    <StyledTimeRange type="text"
+                                     value={JSON.stringify(values?.timerange)}
+                                     disabled />
                     <RefreshControls />
                   </FlexCol>
 

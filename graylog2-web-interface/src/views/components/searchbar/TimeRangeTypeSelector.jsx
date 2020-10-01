@@ -1,49 +1,40 @@
 // @flow strict
 import * as React from 'react';
-import { useCallback, useState } from 'react';
-import { useFormikContext } from 'formik';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 
-import Dropdown from './date-time-picker/Dropdown';
-
-import { migrateTimeRangeToNewType } from '../TimerangeForForm';
+import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 
 type Props = {
   config: any,
-  disabled: boolean,
+  disabled?: boolean,
+  noOverride?: boolean,
 };
 
-export default function TimeRangeTypeSelector({ config, disabled }: Props) {
+export default function TimeRangeTypeSelector({ config, disabled, noOverride }: Props) {
   const [show, setShow] = useState(false);
-  const formik = useFormikContext();
-  const { value, onChange, name } = formik.getFieldProps('timerange');
-  const { type: currentType } = value;
-  const onSelect = useCallback((newType) => onChange({
-    target: {
-      value: migrateTimeRangeToNewType(value, newType),
-      name,
-    },
-  }), [onChange, value]);
+
   const toggleShow = () => setShow(!show);
 
   return (
     <TimeRangeDropdownButton disabled={disabled}
                              show={show}
                              toggleShow={toggleShow}>
-      <Dropdown currentType={currentType}
-                onSelect={onSelect}
-                config={config}
-                toggleDropdownShow={toggleShow} />
+      <TimeRangeDropdown config={config}
+                         toggleDropdownShow={toggleShow}
+                         noOverride={noOverride} />
     </TimeRangeDropdownButton>
   );
 }
 
 TimeRangeTypeSelector.propTypes = {
   disabled: PropTypes.bool,
+  noOverride: PropTypes.bool,
 };
 
 TimeRangeTypeSelector.defaultProps = {
   disabled: false,
+  noOverride: false,
 };

@@ -9,7 +9,8 @@ import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
 import type { ThemeInterface } from 'theme/index';
 
-import TimerangeSelector from '../TimerangeSelector';
+import TimerangeSelector from './TimerangeSelector';
+
 import DateInputWithPicker from '../DateInputWithPicker';
 
 type Props = {
@@ -45,7 +46,7 @@ const _isValidDateString = (dateString: string) => {
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
   return (
     <StyledTimerangeSelector className="absolute">
-      <Field name="timerange.from" validate={_isValidDateString}>
+      <Field name="temp.from" validate={_isValidDateString}>
         {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
           <InputWrap>
             <DateInputWithPicker disabled={disabled}
@@ -63,7 +64,7 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
         <Icon name="long-arrow-alt-right" />
       </Separator>
 
-      <Field name="timerange.to" validate={_isValidDateString}>
+      <Field name="temp.to" validate={_isValidDateString}>
         {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
           <InputWrap>
             <DateInputWithPicker disabled={disabled}

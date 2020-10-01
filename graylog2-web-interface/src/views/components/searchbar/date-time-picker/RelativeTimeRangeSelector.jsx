@@ -7,7 +7,7 @@ import { Field } from 'formik';
 import Input from 'components/bootstrap/Input';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
-import TimerangeSelector from '../TimerangeSelector';
+import TimerangeSelector from './TimerangeSelector';
 
 type Props = {
   disabled: boolean,
@@ -49,7 +49,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
   }
 
   return (
-    <Field name="timerange.range">
+    <Field name="temp.range">
       {({ field: { name, value, onChange } }) => {
         const _onChange = (e) => {
           const { target: { value: newValue } } = e;

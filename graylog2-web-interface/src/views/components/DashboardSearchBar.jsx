@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
+import styled from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 import connect from 'stores/connect';
@@ -11,7 +12,6 @@ import DocsHelper from 'util/DocsHelper';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { Icon, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
-import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeOverrideTypeSelector';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
@@ -20,7 +20,19 @@ import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import TopRow from 'views/components/searchbar/TopRow';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
-import TimeRangeInput from './searchbar/TimeRangeInput';
+import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
+
+const StyledTimeRange = styled.input`
+  width: 100%;
+  padding: 3px 9px;
+  margin: 0 12px;
+`;
+
+const FlexCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
 
 type Props = {
   config: any,
@@ -46,13 +58,17 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
       <Row className="content">
         <Col md={12}>
           <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm}>
-            {({ dirty, isSubmitting, isValid, handleSubmit }) => (
+            {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
               <>
                 <TopRow>
-                  <Col lg={4} md={6} xs={8}>
-                    <TimeRangeOverrideTypeSelector />
-                    <TimeRangeInput config={config} />
-                  </Col>
+                  <FlexCol lg={4} md={6} xs={8}>
+                    <TimeRangeTypeSelector disabled={disableSearch}
+                                           config={config}
+                                           noOverride />
+                    <StyledTimeRange type="text"
+                                     value={JSON.stringify(values?.timerange)}
+                                     disabled />
+                  </FlexCol>
                   <Col lg={8} md={6} xs={4}>
                     <RefreshControls />
                   </Col>
