@@ -26,7 +26,7 @@ const NewDashboardPage = ({ route, location }: Props) => {
   const { state = {} } = location;
   const { view: searchView } = state;
   const loadedView = useMemo(() => {
-    if (searchView) {
+    if (searchView?.search) {
       const dashboardView = viewTransformer(searchView);
 
       return ViewActions.load(dashboardView, true).then(() => dashboardView);
