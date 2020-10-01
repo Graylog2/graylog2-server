@@ -17,7 +17,7 @@ type Props = {
   route: {},
   location: {
     state?: {
-      view?: View | ViewJson,
+      view?: View,
     },
     query: { [string]: any },
   },
@@ -27,8 +27,7 @@ const NewDashboardPage = ({ route, location }: Props) => {
   const { state = {} } = location;
   const { view: searchView } = state;
   const loadedView = useMemo(() => {
-    if (searchView?.search) {
-      /* $FlowFixMe the searchView.search is guard enough and instanceof does not work here */
+    if (searchView) {
       const dashboardView = viewTransformer(searchView);
 
       return ViewActions.load(dashboardView, true).then(() => dashboardView);
