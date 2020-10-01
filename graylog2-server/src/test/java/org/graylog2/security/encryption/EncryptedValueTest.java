@@ -64,6 +64,8 @@ class EncryptedValueTest {
         final EncryptedValue value = EncryptedValue.builder()
                 .value("2d043f9a7d5a5a7537d3e93c93c5dc40")
                 .salt("c93c0263bfc3713d")
+                .isKeepValue(false)
+                .isDeleteValue(false)
                 .build();
 
         final String jsonString = objectMapper.writeValueAsString(TestDTO.create("abc123", value));
@@ -91,6 +93,8 @@ class EncryptedValueTest {
         assertThat(dto.id()).isNotBlank();
         assertThat(dto.passwordValue().value()).isNotBlank();
         assertThat(dto.passwordValue().salt()).isNotBlank();
+        assertThat(dto.passwordValue().isKeepValue()).isFalse();
+        assertThat(dto.passwordValue().isDeleteValue()).isFalse();
         assertThat(encryptedValueService.decrypt(dto.passwordValue())).isEqualTo("new-password");
     }
 
@@ -101,7 +105,31 @@ class EncryptedValueTest {
         assertThat(dto.id()).isNotBlank();
         assertThat(dto.passwordValue().value()).isNotBlank();
         assertThat(dto.passwordValue().salt()).isNotBlank();
+        assertThat(dto.passwordValue().isKeepValue()).isFalse();
+        assertThat(dto.passwordValue().isDeleteValue()).isFalse();
         assertThat(encryptedValueService.decrypt(dto.passwordValue())).isEqualTo("new-password");
+    }
+
+    @Test
+    void testDeserializeWithKeepValue() throws Exception {
+        final TestDTO dto = objectMapper.readValue("{\"id\":\"abc123\",\"password_value\":{\"keep_value\":true}}", TestDTO.class);
+
+        assertThat(dto.id()).isNotBlank();
+        assertThat(dto.passwordValue().value()).isBlank();
+        assertThat(dto.passwordValue().salt()).isBlank();
+        assertThat(dto.passwordValue().isKeepValue()).isTrue();
+        assertThat(dto.passwordValue().isDeleteValue()).isFalse();
+    }
+
+    @Test
+    void testDeserializeWithDeleteValue() throws Exception {
+        final TestDTO dto = objectMapper.readValue("{\"id\":\"abc123\",\"password_value\":{\"delete_value\":true}}", TestDTO.class);
+
+        assertThat(dto.id()).isNotBlank();
+        assertThat(dto.passwordValue().value()).isBlank();
+        assertThat(dto.passwordValue().salt()).isBlank();
+        assertThat(dto.passwordValue().isKeepValue()).isFalse();
+        assertThat(dto.passwordValue().isDeleteValue()).isTrue();
     }
 
     @Test
@@ -111,6 +139,8 @@ class EncryptedValueTest {
         assertThat(dto.id()).isNotBlank();
         assertThat(dto.passwordValue().value()).isEmpty();
         assertThat(dto.passwordValue().salt()).isEmpty();
+        assertThat(dto.passwordValue().isKeepValue()).isFalse();
+        assertThat(dto.passwordValue().isDeleteValue()).isFalse();
     }
 
     @Test
@@ -118,6 +148,8 @@ class EncryptedValueTest {
         final EncryptedValue value = EncryptedValue.builder()
                 .value("2d043f9a7d5a5a7537d3e93c93c5dc40")
                 .salt("c93c0263bfc3713d")
+                .isKeepValue(false)
+                .isDeleteValue(false)
                 .build();
 
         final String savedId = dbService.save(TestDTO.create(value)).id();

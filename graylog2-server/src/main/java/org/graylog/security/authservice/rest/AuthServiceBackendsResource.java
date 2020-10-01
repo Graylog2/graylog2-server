@@ -120,7 +120,7 @@ public class AuthServiceBackendsResource extends RestResource {
 
         final AuthServiceBackendDTO currentConfig = loadConfig(backendId);
 
-        return toResponse(updatedConfig.withId(currentConfig.id()));
+        return toResponse(dbService.save(updatedConfig.withId(currentConfig.id())));
     }
 
     @DELETE

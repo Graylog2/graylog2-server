@@ -31,8 +31,22 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * This takes a new value and the {@link EncryptedValueDeserializer} automatically creates an
  * encrypted value for it. (admin wants to set a new password via HTTP request)
  * <pre>{@code
+ * // Setting a new password
  * {
  *   "set_value": "set a new password"
+ * }
+ *
+ * // Alternative to set a new password (pass a string instead of an object)
+ * "set a new password"
+ *
+ * // Keep existing value
+ * {
+ *   "keep_value": true
+ * }
+ *
+ * // Delete existing value
+ * {
+ *   "delete_value": true
  * }
  * }</pre>
  *
@@ -72,12 +86,24 @@ public abstract class EncryptedValue {
 
     public abstract String salt();
 
+    public abstract boolean isKeepValue();
+
+    public abstract boolean isDeleteValue();
+
     public boolean isSet() {
         return !isNullOrEmpty(value()) && !isNullOrEmpty(salt());
     }
 
     public static EncryptedValue createUnset() {
-        return builder().value("").salt("").build();
+        return builder().value("").salt("").isKeepValue(false).isDeleteValue(false).build();
+    }
+
+    public static EncryptedValue createWithKeepValue() {
+        return builder().value("").salt("").isKeepValue(true).isDeleteValue(false).build();
+    }
+
+    public static EncryptedValue createWithDeleteValue() {
+        return builder().value("").salt("").isKeepValue(false).isDeleteValue(true).build();
     }
 
     public static Builder builder() {
@@ -89,6 +115,10 @@ public abstract class EncryptedValue {
         public abstract Builder value(String value);
 
         public abstract Builder salt(String salt);
+
+        public abstract Builder isKeepValue(boolean isKeepValue);
+
+        public abstract Builder isDeleteValue(boolean isDeleteValue);
 
         public abstract EncryptedValue build();
     }

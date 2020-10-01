@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import type { AdditionalQueries } from 'util/PaginationURL';
 import mockedPermissions from 'logic/permissions/mocked';
-import type { PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
+import type { PaginatedEntitySharesType } from 'actions/permissions/EntityShareActions';
 import { DataTable, PaginatedList } from 'components/common';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';
@@ -15,8 +15,8 @@ const TABLE_HEADERS = ['Entiy Name', 'Entity Type', 'Owner', 'Capability'];
 
 type Props = {
   entityType: string,
-  paginatedEntityShares: PaginatedEnititySharesType,
-  searchPaginated: (newPage: number, newPerPage: number, newQuery: string, additonalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
+  paginatedEntityShares: PaginatedEntitySharesType,
+  searchPaginated: (newPage: number, newPerPage: number, newQuery: string, additonalQueries?: AdditionalQueries) => Promise<?PaginatedEntitySharesType>,
   setLoading: (loading: boolean) => void,
 };
 
@@ -40,7 +40,7 @@ const _sharedEntityOverviewItem = (sharedEntity, { granteeCapabilities } = {}) =
 };
 
 const SharedEntitiesOverview = ({ paginatedEntityShares: initialPaginatedEntityShares, entityType, searchPaginated, setLoading }: Props) => {
-  const [paginatedEntityShares, setPaginatedEntityShares] = useState<PaginatedEnititySharesType>(initialPaginatedEntityShares);
+  const [paginatedEntityShares, setPaginatedEntityShares] = useState<PaginatedEntitySharesType>(initialPaginatedEntityShares);
   const { list, pagination: { page, perPage, total, query, additionalQueries }, context } = paginatedEntityShares;
 
   const _loadSharedEntities = (newPage = page, newPerPage = perPage, newQuery = query, newAdditonalQueries = additionalQueries) => {

@@ -16,7 +16,8 @@
  */
 package org.graylog.security.authservice.ldap;
 
-import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.BindRequest;
 import com.unboundid.ldap.sdk.BindResult;
@@ -34,24 +35,25 @@ import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.SimpleBindRequest;
 import com.unboundid.ldap.sdk.extensions.StartTLSExtendedRequest;
+import com.unboundid.util.Base64;
 import com.unboundid.util.LDAPTestUtils;
 import com.unboundid.util.ssl.SSLUtil;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.security.ldap.LdapEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.SocketFactory;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -64,20 +66,24 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class UnboundLDAPConnector {
     private static final Logger LOG = LoggerFactory.getLogger(UnboundLDAPConnector.class);
 
+    private static final String OBJECT_CLASS_ATTRIBUTE = "objectClass";
+
     private final int connectionTimeout;
     private final Set<String> enabledTlsProtocols;
     private final TrustManagerProvider trustManagerProvider;
     private final EncryptedValueService encryptedValueService;
+    private final int requestTimeoutSeconds;
 
     @Inject
     public UnboundLDAPConnector(@Named("ldap_connection_timeout") int connectionTimeout,
                                 @Named("enabled_tls_protocols") Set<String> enabledTlsProtocols,
                                 TrustManagerProvider trustManagerProvider,
                                 EncryptedValueService encryptedValueService) {
-        this.connectionTimeout = connectionTimeout;
+        this.connectionTimeout = connectionTimeout; // TODO: Make configurable per backend
         this.enabledTlsProtocols = enabledTlsProtocols;
         this.trustManagerProvider = trustManagerProvider;
         this.encryptedValueService = encryptedValueService;
+        this.requestTimeoutSeconds = 60; // TODO: Make configurable per backend
     }
 
     public LDAPConnection connect(LDAPConnectorConfig ldapConfig) throws GeneralSecurityException, LDAPException {
@@ -131,47 +137,96 @@ public class UnboundLDAPConnector {
         return connection;
     }
 
-    @Nullable
-    public LdapEntry search(LDAPConnection connection,
-                            String searchBase,
-                            String userSearchPattern,
-                            String displayNameAttribute,
-                            String uniqueIdAttribute,
-                            String principal) throws LDAPException {
-        final LdapEntry ldapEntry = new LdapEntry();
-
-        final String filterString = new MessageFormat(userSearchPattern, Locale.ENGLISH).format(new Object[]{Filter.encodeValue(principal)});
-        final Filter filter = Filter.create(filterString);
-        final SearchRequest searchRequest = new SearchRequest(
-                searchBase,
-                SearchScope.SUB,
-                filter,
-                displayNameAttribute, uniqueIdAttribute, "dn", "uid", "userPrincipalName", "mail", "rfc822Mailbox"
-        );
+    public ImmutableList<LDAPEntry> search(LDAPConnection connection,
+                                           String searchBase,
+                                           Filter filter,
+                                           Set<String> attributes) throws LDAPException {
+        final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
+                .add(OBJECT_CLASS_ATTRIBUTE)
+                .addAll(attributes)
+                .build();
+        final SearchRequest searchRequest = new SearchRequest(searchBase, SearchScope.SUB, filter, allAttributes.toArray(new String[0]));
+        searchRequest.setTimeLimitSeconds(requestTimeoutSeconds);
 
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Search LDAP for {}, starting at {}", filterString, searchBase);
+            LOG.trace("Search LDAP for <{}> using search base <{}>", filter.toNormalizedString(), searchBase);
         }
 
         final SearchResult searchResult = connection.search(searchRequest);
         if (searchResult.getSearchEntries().isEmpty()) {
-            LOG.trace("No LDAP entry found for filter {}", filterString);
-            return null;
+            LOG.trace("No LDAP entry found for filter <{}>", filter.toNormalizedString());
+            return ImmutableList.of();
         }
-        for (SearchResultEntry entry : searchResult.getSearchEntries()) {
+
+        final ImmutableList.Builder<LDAPEntry> entriesBuilder = ImmutableList.builder();
+
+        for (final SearchResultEntry entry : searchResult.getSearchEntries()) {
+            final LDAPEntry.Builder ldapEntryBuilder = LDAPEntry.builder();
+
             // Always set the proper DN for the entry
-            ldapEntry.setDn(entry.getDN());
+            ldapEntryBuilder.dn(entry.getDN());
 
-            // for generic LDAP use the dn of the entry for the subsequent bind, active directory needs the userPrincipalName attribute (set below)
-            ldapEntry.setBindPrincipal(entry.getDN());
+            if (entry.getObjectClassValues() != null) {
+                ldapEntryBuilder.objectClasses(Arrays.asList(entry.getObjectClassValues()));
+            }
 
-            for (Attribute attribute : entry.getAttributes()) {
-                if (!attribute.needsBase64Encoding()) {
-                    ldapEntry.put(attribute.getBaseName(), Joiner.on(", ").join(attribute.getValues()));
+            for (final Attribute attribute : entry.getAttributes()) {
+                // No need to add the objectClass attribute to the attribute map, we already make it available
+                // in LDAPEntry#objectClasses
+                if (OBJECT_CLASS_ATTRIBUTE.equalsIgnoreCase(attribute.getBaseName())) {
+                    continue;
+                }
+
+                if (attribute.needsBase64Encoding()) {
+                    for (final byte[] value : attribute.getValueByteArrays()) {
+                        ldapEntryBuilder.addAttribute(attribute.getBaseName(), Base64.encode(value));
+                    }
+                } else {
+                    for (final String value : attribute.getValues()) {
+                        ldapEntryBuilder.addAttribute(attribute.getBaseName(), value);
+                    }
                 }
             }
+
+            entriesBuilder.add(ldapEntryBuilder.build());
         }
-        return ldapEntry;
+
+        return entriesBuilder.build();
+    }
+
+    public Optional<LDAPUser> searchUser(LDAPConnection connection,
+                                         String searchBase,
+                                         String userSearchPattern,
+                                         String principal,
+                                         String userUniqueIdAttribute,
+                                         String userNameAttribute,
+                                         String userFullNameAttribute) throws LDAPException {
+        final String filterString = new MessageFormat(userSearchPattern, Locale.ENGLISH).format(new Object[]{Filter.encodeValue(principal)});
+        final Filter filter = Filter.create(filterString);
+
+        final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
+                .add("userPrincipalName") // TODO: This is ActiveDirectory specific - Do we need this here?
+                .add("mail")
+                .add("rfc822Mailbox")
+                .add(userUniqueIdAttribute)
+                .add(userNameAttribute)
+                .add(userFullNameAttribute)
+                .build();
+
+        final ImmutableList<LDAPEntry> result = search(connection, searchBase, filter, allAttributes);
+
+        if (result.size() > 1) {
+            LOG.warn("Found more than one user for <{}> in search base <{}> - Using the first one", filterString, searchBase);
+        }
+
+        return result.stream().findFirst()
+                .map(entry -> LDAPUser.builder()
+                        .uniqueId(entry.nonBlankAttribute(userUniqueIdAttribute))
+                        .username(entry.nonBlankAttribute(userNameAttribute))
+                        .fullName(entry.nonBlankAttribute(userFullNameAttribute))
+                        .email(entry.firstAttributeValue("mail").orElse(entry.firstAttributeValue("rfc822Mailbox").orElse("")))
+                        .entry(entry)
+                        .build());
     }
 
     public boolean authenticate(LDAPConnection connection, String bindDn, EncryptedValue password) throws LDAPException {

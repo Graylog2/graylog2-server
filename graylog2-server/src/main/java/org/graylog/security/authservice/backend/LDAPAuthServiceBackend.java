@@ -25,9 +25,10 @@ import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.ProvisionerService;
 import org.graylog.security.authservice.UserDetails;
+import org.graylog.security.authservice.ldap.LDAPUser;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
 import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
-import org.graylog2.shared.security.ldap.LdapEntry;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,26 +68,26 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
                 return Optional.empty();
             }
 
-            final Optional<LdapEntry> optionalUserEntry = findUser(connection, authCredentials);
-            if (!optionalUserEntry.isPresent()) {
+            final Optional<LDAPUser> optionalUser = findUser(connection, authCredentials);
+            if (!optionalUser.isPresent()) {
                 LOG.debug("User <{}> not found in LDAP", authCredentials.username());
                 return Optional.empty();
             }
 
-            final LdapEntry userEntry = optionalUserEntry.get();
+            final LDAPUser userEntry = optionalUser.get();
 
             if (!isAuthenticated(connection, userEntry, authCredentials)) {
-                LOG.debug("Invalid credentials for user <{}> (DN: {})", authCredentials.username(), userEntry.getDn());
+                LOG.debug("Invalid credentials for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
                 return Optional.empty();
             }
 
             final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                     .authServiceType(backendType())
                     .authServiceId(backendId())
-                    .authServiceUid(userEntry.getNonBlank(config.userUniqueIdAttribute()))
-                    .username(userEntry.getNonBlank(config.userNameAttribute()))
-                    .fullName(userEntry.getNonBlank(config.userFullNameAttribute()))
-                    .email(userEntry.getEmail())
+                    .authServiceUid(userEntry.uniqueId())
+                    .username(userEntry.username())
+                    .fullName(userEntry.fullName())
+                    .email(userEntry.email())
                     .defaultRoles(backend.defaultRoles())
                     .build());
 
@@ -101,24 +102,25 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     }
 
     private boolean isAuthenticated(LDAPConnection connection,
-                                    LdapEntry userEntry,
+                                    LDAPUser user,
                                     AuthServiceCredentials authCredentials) throws LDAPException {
         return ldapConnector.authenticate(
                 connection,
-                userEntry.getDn(),
+                user.dn(),
                 authCredentials.password()
         );
     }
 
-    private Optional<LdapEntry> findUser(LDAPConnection connection, AuthServiceCredentials authCredentials) throws LDAPException {
-        return Optional.ofNullable(ldapConnector.search(
+    private Optional<LDAPUser> findUser(LDAPConnection connection, AuthServiceCredentials authCredentials) throws LDAPException {
+        return ldapConnector.searchUser(
                 connection,
                 config.userSearchBase(),
                 config.userSearchPattern(),
-                config.userFullNameAttribute(),
+                authCredentials.username(),
                 config.userUniqueIdAttribute(),
-                authCredentials.username()
-        ));
+                config.userNameAttribute(),
+                config.userFullNameAttribute()
+        );
     }
 
     @Override
@@ -134,6 +136,31 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     @Override
     public String backendTitle() {
         return backend.title();
+    }
+
+    @Override
+    public AuthServiceBackendDTO prepareConfigUpdate(AuthServiceBackendDTO existingBackend, AuthServiceBackendDTO newBackend) {
+        final LDAPAuthServiceBackendConfig newConfig = (LDAPAuthServiceBackendConfig) newBackend.config();
+
+        if (newConfig.systemUserPassword().isDeleteValue()) {
+            // If the system user password should be deleted, use an unset value
+            return newBackend.toBuilder()
+                    .config(newConfig.toBuilder()
+                            .systemUserPassword(EncryptedValue.createUnset())
+                            .build())
+                    .build();
+        }
+        if (newConfig.systemUserPassword().isKeepValue()) {
+            // If the system user password should be kept, use the value from the existing config
+            final LDAPAuthServiceBackendConfig existingConfig = (LDAPAuthServiceBackendConfig) existingBackend.config();
+            return newBackend.toBuilder()
+                    .config(newConfig.toBuilder()
+                            .systemUserPassword(existingConfig.systemUserPassword())
+                            .build())
+                    .build();
+        }
+
+        return newBackend;
     }
 
     @Override
@@ -161,7 +188,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
             if (connection == null) {
                 return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.serverUrls());
             }
-            final Optional<LdapEntry> user = findUser(connection, credentials);
+            final Optional<LDAPUser> user = findUser(connection, credentials);
 
             if (!user.isPresent()) {
                 return AuthServiceBackendTestResult.createFailure(
@@ -191,12 +218,10 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     private LDAPAuthServiceBackendConfig buildTestConfig(@Nullable AuthServiceBackendDTO existingBackendConfig) {
         final LDAPAuthServiceBackendConfig.Builder newConfigBuilder = config.toBuilder();
 
-        // If there is no password set in the current config and we got an existing config, use the password of the
+        // If the existing password should be kept and we got an existing config, use the password of the
         // existing config for the connection check. This is needed to make connection tests of existing backends work
         // because the UI doesn't have access to the existing password.
-        // TODO: This logic doesn't work if a user wants to update a backend that currently has a password set to a
-        //       backend that doesn't need a password.
-        if (!config.systemUserPassword().isSet() && existingBackendConfig != null) {
+        if (config.systemUserPassword().isKeepValue() && existingBackendConfig != null) {
             final LDAPAuthServiceBackendConfig existingConfig = (LDAPAuthServiceBackendConfig) existingBackendConfig.config();
             newConfigBuilder.systemUserPassword(existingConfig.systemUserPassword());
         }
@@ -207,18 +232,18 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     private Map<String, Object> createTestResult(LDAPAuthServiceBackendConfig config,
                                                  boolean userExists,
                                                  boolean loginSuccess,
-                                                 @Nullable LdapEntry user) {
+                                                 @Nullable LDAPUser user) {
         final ImmutableMap.Builder<String, Object> userDetails = ImmutableMap.<String, Object>builder()
                 .put("user_exists", userExists)
                 .put("login_success", loginSuccess);
 
         if (user != null) {
             userDetails.put("user_details", ImmutableMap.of(
-                    "dn", user.getDn(),
-                    config.userUniqueIdAttribute(), user.get(config.userUniqueIdAttribute()),
-                    config.userNameAttribute(), user.get(config.userNameAttribute()),
-                    config.userFullNameAttribute(), user.get(config.userFullNameAttribute()),
-                    "email", user.getEmail()
+                    "dn", user.dn(),
+                    config.userUniqueIdAttribute(), user.uniqueId(),
+                    config.userNameAttribute(), user.username(),
+                    config.userFullNameAttribute(), user.fullName(),
+                    "email", user.email()
             ));
         } else {
             userDetails.put("user_details", ImmutableMap.of());
