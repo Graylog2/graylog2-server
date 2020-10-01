@@ -36,9 +36,7 @@ const NewDashboardPage = ({ route, location }: Props) => {
     }
 
     return ViewActions.create(View.Type.Dashboard).then(({ view }) => view);
-  },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  []);
+  }, []);
 
   const [loaded, HookComponent] = useLoadView(loadedView, location.query);
 
