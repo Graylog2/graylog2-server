@@ -4,13 +4,13 @@ import { Field } from 'formik';
 
 import { Input } from 'components/bootstrap';
 
-import FieldError from './FieldError';
-
 type Props = {
   label: string,
   name: string,
   type?: string,
   help?: string,
+  labelClassName?: string,
+  wrapperClassName?: string,
   validate?: (string) => ?string,
 };
 
@@ -22,34 +22,33 @@ const inputProps = (value) => {
   return { value: value ?? '' };
 };
 
-const FormField = ({ label, name, type, help, validate, ...rest }: Props) => (
+/** Wraps the common Input component with a formik Field */
+const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
   <Field name={name} validate={validate}>
     {({ field: { value, onChange }, meta: { error } }) => {
-      const inputSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
+      const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
 
       return (
         <Input {...rest}
-               help={error ?? help}
-               label={label}
-               id={name}
+               {...typeSepcificProps}
                bsStyle={error ? 'error' : undefined}
+               help={error ?? help}
+               id={name}
+               label={label}
                name={name}
                onChange={onChange}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9"
-               type={type}
-               {...inputSepcificProps}>
-          {error && <FieldError>{error}</FieldError>}
-        </Input>
+               type={type} />
       );
     }}
   </Field>
 );
 
-FormField.defaultProps = {
-  type: 'text',
+FormikInput.defaultProps = {
   help: undefined,
+  labelClassName: undefined,
+  type: 'text',
   validate: () => {},
+  wrapperClassName: undefined,
 };
 
-export default FormField;
+export default FormikInput;

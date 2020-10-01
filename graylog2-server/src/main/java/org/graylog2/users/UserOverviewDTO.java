@@ -37,6 +37,8 @@ import java.util.Set;
 public abstract class UserOverviewDTO {
 
     private static final String FIELD_ID = "id";
+    private static final String FIELD_AUTH_SERVICE_ID = "auth_service_id";
+    private static final String FIELD_AUTH_SERVICE_UID = "auth_service_uid";
     public static final String FIELD_USERNAME = "username";
     public static final String FIELD_EMAIL = "email";
     public static final String FIELD_FULL_NAME = "full_name";
@@ -52,6 +54,12 @@ public abstract class UserOverviewDTO {
     @Nullable
     @JsonProperty(FIELD_ID)
     public abstract String id();
+
+    @JsonProperty(FIELD_AUTH_SERVICE_ID)
+    public abstract Optional<String> authServiceId();
+
+    @JsonProperty(FIELD_AUTH_SERVICE_UID)
+    public abstract Optional<String> authServiceUid();
 
     @JsonProperty(FIELD_USERNAME)
     public abstract String username();
@@ -107,6 +115,12 @@ public abstract class UserOverviewDTO {
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
 
+        @JsonProperty(FIELD_AUTH_SERVICE_ID)
+        public abstract Builder authServiceId(@Nullable String authServiceId);
+
+        @JsonProperty(FIELD_AUTH_SERVICE_UID)
+        public abstract Builder authServiceUid(@Nullable String authServiceUid);
+
         @JsonProperty(FIELD_USERNAME)
         public abstract Builder username(String username);
 
@@ -121,7 +135,7 @@ public abstract class UserOverviewDTO {
 
         @ObjectId
         @JsonProperty(FIELD_ROLES)
-        public abstract Builder roles(@Nullable Set<String> roles);
+        public abstract Builder roles(Set<String> roles);
 
         @JsonProperty(FIELD_READ_ONLY)
         public abstract Builder readOnly(@Nullable Boolean readOnly);

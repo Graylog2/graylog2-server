@@ -28,6 +28,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.SESSION_CREATE;
 
@@ -87,7 +87,7 @@ public class SessionCreator {
                 session.setTimeout(timeoutInMillis);
             } else {
                 // set a sane default. really we should be able to load the user from above.
-                session.setTimeout(TimeUnit.HOURS.toMillis(8));
+                session.setTimeout(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
             }
             session.touch();
 

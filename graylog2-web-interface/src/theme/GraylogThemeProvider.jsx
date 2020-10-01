@@ -6,7 +6,6 @@ import { ThemeProvider } from 'styled-components';
 
 import { breakpoints, colors, fonts, utils } from 'theme';
 import type { ThemeInterface } from 'theme';
-import usePrefersColorScheme from 'hooks/usePrefersColorScheme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 
@@ -14,6 +13,7 @@ import useCurrentThemeMode from './UseCurrentThemeMode';
 
 type Props = {
   children: React.Node,
+  overrideMode: ?string,
 };
 
 const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
@@ -37,13 +37,13 @@ const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
   };
 };
 
-const GraylogThemeProvider = ({ children }: Props) => {
-  const colorScheme = usePrefersColorScheme();
-  const [mode, setCurrentThemeMode] = useCurrentThemeMode(colorScheme);
+const GraylogThemeProvider = ({ children, overrideMode }: Props) => {
+  const [mode, setCurrentThemeMode] = useCurrentThemeMode(overrideMode);
 
   const themeColors = colors[mode];
 
-  const theme = useMemo(() => (themeColors ? createTheme(mode, themeColors, setCurrentThemeMode) : undefined), [themeColors]);
+  const generatedTheme = themeColors ? createTheme(mode, themeColors, setCurrentThemeMode) : undefined;
+  const theme = useMemo(() => (generatedTheme), [mode, themeColors]);
 
   return theme ? (
     <ThemeProvider theme={theme}>
@@ -54,6 +54,11 @@ const GraylogThemeProvider = ({ children }: Props) => {
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.any.isRequired,
+  overrideMode: PropTypes.string,
+};
+
+GraylogThemeProvider.defaultProps = {
+  overrideMode: undefined,
 };
 
 export default GraylogThemeProvider;

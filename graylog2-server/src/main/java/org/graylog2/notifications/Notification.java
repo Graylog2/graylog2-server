@@ -61,6 +61,7 @@ public interface Notification extends Persisted {
         JOURNAL_UTILIZATION_TOO_HIGH,
         JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
         OUTPUT_DISABLED,
+        OUTPUT_FAILING,
         INDEX_RANGES_RECALCULATION,
         GENERIC,
         ES_NODE_DISK_WATERMARK_LOW,

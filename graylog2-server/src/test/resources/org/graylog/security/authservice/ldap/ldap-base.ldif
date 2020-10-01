@@ -1,0 +1,48 @@
+# Make sure the "nis" schema is enabled in the LDAP server and the dc=example,dc=com context exists.
+
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=groups,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+dn: cn=John Doe,ou=users,dc=example,dc=com
+gidNumber: 1001
+objectClass: posixAccount
+objectClass: top
+objectClass: person
+uidNumber: 1001
+uid: john
+homeDirectory: /home/john
+sn: Doe
+cn: John Doe
+userPassword:: dGVzdA==
+
+dn: cn=Developers,ou=groups,dc=example,dc=com
+gidNumber: 2000
+objectClass: posixGroup
+objectClass: top
+cn: Developers
+memberUid: john
+
+dn: cn=Engineers,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: Engineers
+uniqueMember: cn=John Doe,ou=users,dc=example,dc=com
+
+dn: cn=Whitespace Engineers,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: Whitespace Engineers
+uniqueMember: cn=John Doe, ou=users, dc=example, dc=com
+
+dn: cn=QA,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: QA
+member: cn=John Doe,ou=users,dc=example,dc=com

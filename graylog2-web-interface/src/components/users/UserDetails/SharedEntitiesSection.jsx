@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import SharedEntitiesOverview from 'components/permissions/SharedEntitiesOverview';
-import type { PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
+import type { PaginatedEntitySharesType } from 'actions/permissions/EntityShareActions';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import User from 'logic/users/User';
 import { Spinner } from 'components/common';
@@ -11,7 +11,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
   username: $PropertyType<User, 'username'>,
-  paginatedUserShares: ?PaginatedEnititySharesType,
+  paginatedUserShares: ?PaginatedEntitySharesType,
 };
 
 const SharedEntitiesSection = ({ paginatedUserShares, username }: Props) => {

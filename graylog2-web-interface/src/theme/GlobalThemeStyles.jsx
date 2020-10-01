@@ -1,31 +1,6 @@
-// @flow strict
-import * as React from 'react';
-import { createContext, useState } from 'react';
-import PropTypes from 'prop-types';
-import { createGlobalStyle, css, type CSSRules } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 
-type Props = {
-  children: React.Node,
-};
-
-type StyleTypes = {
-  addGlobalStyles: (?CSSRules) => void,
-};
-
-export const GlobalStylesContext = createContext<StyleTypes>({ addGlobalStyles: () => {} });
-
-const GlobalStylesProvider = ({ children }: Props) => {
-  const [additionalStyles, addGlobalStyles] = useState<?CSSRules>();
-
-  return (
-    <GlobalStylesContext.Provider value={{ addGlobalStyles }}>
-      <ThemeStyles additionalStyles={additionalStyles} />
-      {children}
-    </GlobalStylesContext.Provider>
-  );
-};
-
-const ThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
+const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
     height: 256px;
   }
@@ -629,6 +604,19 @@ const ThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
     vertical-align: middle;
     width: auto;
   }
+  
+  .typeahead-wrapper .tt-menu {
+    background-color: ${theme.colors.global.contentBackground};
+    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
+    color: ${theme.colors.global.textDefault};
+    
+    .tt-suggestion:hover, 
+    .tt-suggestion.tt-cursor {
+      color: ${theme.colors.variant.darkest.info};
+      background-color: ${theme.colors.variant.lighter.info};
+      background-image: none;
+    }
+  }
 
   .form-group-inline {
     display: inline-block;
@@ -713,12 +701,6 @@ const ThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
     box-shadow: none;
     height: auto;
   }
-
-  ${additionalStyles}
 `);
 
-GlobalStylesProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-export default GlobalStylesProvider;
+export default GlobalThemeStyles;

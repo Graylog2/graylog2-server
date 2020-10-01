@@ -122,7 +122,7 @@ public abstract class OffsetRange extends TimeRange implements DerivableTimeRang
         @JsonProperty
         public abstract Builder id(@Nullable String id);
         @JsonProperty
-        public abstract Builder offset(@Nullable String offset);
+        public abstract Builder offset(String offset);
         public Builder offset(Integer offset) {
             return offset(offset.toString());
         }

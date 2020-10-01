@@ -82,7 +82,7 @@ const _getWidgetPosition = (widgetId: WidgetId, queryId: QueryId, view: View): W
 };
 
 const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): ?string => {
-  return view.state.get(queryId).titles.get('widget').get(widgetId);
+  return view.state.get(queryId).titles.getIn(['widget', widgetId]);
 };
 
 const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): ?View => {

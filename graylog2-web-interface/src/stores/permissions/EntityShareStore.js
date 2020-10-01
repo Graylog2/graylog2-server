@@ -5,9 +5,8 @@ import * as Immutable from 'immutable';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import permissionsMock from 'logic/permissions/mocked';
 import EntityShareState, { type EntityShareStateJson } from 'logic/permissions/EntityShareState';
-import EntityShareActions, { type EntitySharePayload, type PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
+import EntityShareActions, { type EntitySharePayload, type PaginatedEntitySharesType } from 'actions/permissions/EntityShareActions';
 import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'views/logic/singleton';
 import type { Store } from 'stores/StoreTypes';
@@ -21,6 +20,30 @@ type EntityShareStoreState = {
 };
 
 type EntityShareStoreType = Store<EntityShareStoreState>;
+
+const formatPaginatedSharesResponse = ({
+  additional_queries: additionalQueries,
+  context,
+  count,
+  entities,
+  page,
+  per_page: perPage,
+  query,
+  total,
+}) => ({
+  list: Immutable.List(entities.map((se) => SharedEntity.fromJSON(se))),
+  context: {
+    granteeCapabilities: context.grantee_capabilities,
+  },
+  pagination: {
+    additionalQueries,
+    count,
+    total,
+    page,
+    perPage,
+    query,
+  },
+});
 
 const EntityShareStore: EntityShareStoreType = singletonStore(
   'permissions.EntityShare',
@@ -51,35 +74,11 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    loadUserSharesPaginated(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+    loadUserSharesPaginated(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEntitySharesType> {
       const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
-      const promise = fetch('GET', qualifyUrl(url)).then((response) => {
-        return {
-          list: Immutable.List(response.entities.map((se) => SharedEntity.fromJSON(se))),
-          context: {
-            granteeCapabilities: response.context.grantee_capabilities,
-          },
-          pagination: {
-            additionalQueries: response.additional_queries,
-            count: response.count,
-            total: response.total,
-            page: response.page,
-            perPage: response.per_page,
-            query: response.query,
-          },
-        };
-      });
+      const promise = fetch('GET', qualifyUrl(url)).then(formatPaginatedSharesResponse);
 
       EntityShareActions.loadUserSharesPaginated.promise(promise);
-
-      return promise;
-    },
-
-    loadTeamSharesPaginated(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
-      // Todo implement same code like for loadUserSharesPaginated, but with EntityShareController.teamSharesPaginated
-
-      const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);
-      EntityShareActions.loadTeamSharesPaginated.promise(promise);
 
       return promise;
     },

@@ -67,6 +67,7 @@ const ApiRoutes = {
   },
   GrokPatternsController: {
     test: () => { return { url: '/system/grok/test' }; },
+    paginated: () => { return { url: '/system/grok/paginated' }; },
   },
   DashboardsApiController: {
     create: () => { return { url: '/dashboards' }; },
@@ -96,7 +97,6 @@ const ApiRoutes = {
     prepare: (entityGRN) => { return { url: `/shares/entities/${entityGRN}/prepare` }; },
     update: (entityGRN) => { return { url: `/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username) => { return { url: `/shares/user/${username}` }; },
-    teamSharesPaginated: (teamId) => { return { url: `/shares/team/${teamId}` }; },
   },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },

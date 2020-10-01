@@ -24,22 +24,21 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.SimpleType;
-
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
 import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
 import org.graylog2.jackson.MongoJodaDateTimeSerializer;
 import org.graylog2.jackson.MongoZonedDateTimeDeserializer;
 import org.graylog2.jackson.MongoZonedDateTimeSerializer;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.joda.time.DateTime;
 import org.mongojack.internal.MongoJackModule;
-
-import java.io.IOException;
-import java.time.ZonedDateTime;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.time.ZonedDateTime;
 
 @Singleton
 public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
@@ -58,6 +57,7 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
                         .addDeserializer(DateTime.class, new MongoJodaDateTimeDeserializer()));
 
         MongoJackModule.configure(this.objectMapper);
+        EncryptedValueMapperConfig.enableDatabase(this.objectMapper);
     }
 
     @Override

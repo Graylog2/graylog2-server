@@ -16,34 +16,48 @@
  */
 package org.graylog.security.authzroles;
 
+import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Projections;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
-import org.graylog2.shared.users.UserService;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
-import javax.ws.rs.NotFoundException;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 
 public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO> {
     private static final String COLLECTION_NAME = "roles";
 
-    private UserService userService;
+    private final MongoCollection<Document> dbCollection;
 
     @Inject
     public PaginatedAuthzRolesService(MongoConnection mongoConnection,
-                                      UserService userService,
                                       MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, AuthzRoleDTO.class, COLLECTION_NAME);
-        this.userService = userService;
+        this.dbCollection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
     }
 
     public long count() {
-        return db.count();
+        return dbCollection.countDocuments();
+    }
+
+    public ImmutableSet<String> getAllRoleIds() {
+        // Use a MongoCollection query here to avoid the mongojack deserializing and object creation overhead
+        final FindIterable<Document> docs = dbCollection.find().projection(Projections.include("_id"));
+
+        return StreamSupport.stream(docs.spliterator(), false)
+                .map(doc -> doc.get("_id", ObjectId.class).toHexString())
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     public PaginatedList<AuthzRoleDTO> findPaginated(SearchQuery searchQuery, int page,
@@ -53,15 +67,32 @@ public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO>
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
     }
 
-    public PaginatedList<AuthzRoleDTO> findPaginatedForUser(SearchQuery searchQuery, int page,
-                                                     int perPage, String sortField, String order, String username) {
-        final User user = userService.load(username);
-        if (user == null) {
-            throw new NotFoundException("Could not find user: " + username);
-        }
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery()
-                .in("_id", user.getRoleIds());
+    public PaginatedList<AuthzRoleDTO> findPaginatedByIds(SearchQuery searchQuery,
+                                                          int page,
+                                                          int perPage,
+                                                          String sortField,
+                                                          String order,
+                                                          Set<String> roleIds) {
+        final DBQuery.Query dbQuery = buildRoleIdsQuery(searchQuery, roleIds);
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
+
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+    }
+
+    public PaginatedList<AuthzRoleDTO> findPaginatedByIdsWithFilter(SearchQuery searchQuery,
+                                                                    Predicate<AuthzRoleDTO> filter,
+                                                                    int page,
+                                                                    int perPage,
+                                                                    String sortField,
+                                                                    String order,
+                                                                    Set<String> roleIds) {
+        final DBQuery.Query dbQuery = buildRoleIdsQuery(searchQuery, roleIds);
+        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
+
+        return findPaginatedWithQueryFilterAndSort(dbQuery, filter, sortBuilder, page, perPage);
+    }
+
+    private DBQuery.Query buildRoleIdsQuery(SearchQuery searchQuery, Set<String> roleIds) {
+        return DBQuery.and(DBQuery.in("_id", roleIds), searchQuery.toDBQuery());
     }
 }

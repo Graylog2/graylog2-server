@@ -40,7 +40,7 @@ public abstract class SearchQueryOperator {
     public static class Regexp extends SearchQueryOperator {
         @Override
         public DBQuery.Query buildQuery(String key, Object value) {
-            return DBQuery.regex(key, Pattern.compile(value.toString(), CASE_INSENSITIVE));
+            return DBQuery.regex(key, Pattern.compile(Pattern.quote(value.toString()), CASE_INSENSITIVE));
         }
     }
 

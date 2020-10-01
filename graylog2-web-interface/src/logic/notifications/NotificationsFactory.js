@@ -208,6 +208,19 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'output_failing':
+        return {
+          title: 'Output failing',
+          description: (
+            <span>
+              The output "{notification.details.outputTitle}" (id: {notification.details.outputId})
+              in stream "{notification.details.streamTitle}" (id: {notification.details.streamId})
+              is unable to send messages to the configured destination.
+              <br/>
+                The error message from the output is: <em>{notification.details.errorMessage}</em>
+            </span>
+          ),
+        };
       case 'stream_processing_disabled':
         return {
           title: 'Processing of a stream has been disabled due to excessive processing time.',

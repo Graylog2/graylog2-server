@@ -66,7 +66,10 @@ const Navigation = ({ location }) => {
 
   const pluginExports = PluginStore.exports('navigation');
 
-  if (!pluginExports.find((value) => value.description.toLowerCase() === 'enterprise')) {
+  const enterpriseMenuIsMissing = !pluginExports.find((value) => value.description.toLowerCase() === 'enterprise');
+  const isPermittedToEnterprise = isPermitted(permissions, ['licenseinfos:read']);
+
+  if (enterpriseMenuIsMissing && isPermittedToEnterprise) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
       path: Routes.SYSTEM.ENTERPRISE,
@@ -94,11 +97,9 @@ const Navigation = ({ location }) => {
 
       <Navbar.Collapse>
         <Nav navbar>
-          <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
-            <LinkContainer to={Routes.SEARCH}>
-              <NavItem to="search">Search</NavItem>
-            </LinkContainer>
-          </IfPermitted>
+          <LinkContainer to={Routes.SEARCH}>
+            <NavItem to="search">Search</NavItem>
+          </LinkContainer>
 
           <LinkContainer to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>

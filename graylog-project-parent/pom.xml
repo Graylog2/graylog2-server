@@ -538,6 +538,11 @@
                 <artifactId>jdot</artifactId>
                 <version>${jdot.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.unboundid</groupId>
+                <artifactId>unboundid-ldapsdk</artifactId>
+                <version>${unboundid-ldap.version}</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

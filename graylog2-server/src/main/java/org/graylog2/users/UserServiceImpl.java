@@ -21,7 +21,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
@@ -54,6 +53,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +145,15 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User create() {
-        return userFactory.create(Maps.newHashMap());
+        final Map<String, Object> fields = new HashMap<>();
+
+        // We always want the authentication service fields in new user objects, event if they don't get set
+        fields.put(UserImpl.AUTH_SERVICE_ID, null);
+        fields.put(UserImpl.AUTH_SERVICE_UID, null);
+        // User objects are internal by default. Ensure that we set this fields on all user objects.
+        fields.put(UserImpl.EXTERNAL_USER, false);
+
+        return userFactory.create(fields);
     }
 
     @Override
@@ -192,6 +200,20 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public long count() {
         return totalCount(UserImpl.class);
+    }
+
+    @Override
+    public List<User> loadAllForAuthServiceBackend(String authServiceBackendId) {
+        final DBObject query = BasicDBObjectBuilder.start(UserImpl.AUTH_SERVICE_ID, authServiceBackendId).get();
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        final List<User> users = Lists.newArrayList();
+        for (DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+
+        return users;
     }
 
     @Override
@@ -266,7 +288,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId));
         }
         grantPermissionResolver.resolveRolesForPrincipal(grnRegistry.ofUser(user)).forEach(roleId ->
-            permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId))
+                permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId))
         );
 
         return permSet.build();

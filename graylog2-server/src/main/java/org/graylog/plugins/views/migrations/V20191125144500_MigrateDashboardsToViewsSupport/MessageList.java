@@ -62,7 +62,7 @@ abstract class MessageList implements SearchType {
                     .streams(Collections.emptySet());
         }
 
-        abstract Builder id(@Nullable String id);
+        abstract Builder id(String id);
 
         abstract Builder timerange(@Nullable TimeRange timerange);
 

@@ -16,7 +16,7 @@ type EntitySharesPaginationType = {
   additionalQueries?: AdditionalQueries,
 };
 
-export type PaginatedEnititySharesType = {
+export type PaginatedEntitySharesType = {
   list: SharedEntities,
   pagination: EntitySharesPaginationType,
   context: {
@@ -31,8 +31,7 @@ export type EntitySharePayload = {
 export type ActionsType = {
   prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: ?EntitySharePayload) => Promise<?EntityShareState>,
   update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<?EntityShareState>,
-  loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
-  loadTeamSharesPaginated: (teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
+  loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEntitySharesType>,
 };
 
 type EntityShareActionsType = RefluxActions<ActionsType>;
@@ -43,7 +42,6 @@ const EntityShareActions: EntityShareActionsType = singletonActions(
     prepare: { asyncResult: true },
     update: { asyncResult: true },
     loadUserSharesPaginated: { asyncResult: true },
-    loadTeamSharesPaginated: { asyncResult: true },
   }),
 );
 
