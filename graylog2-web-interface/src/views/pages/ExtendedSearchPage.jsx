@@ -225,8 +225,4 @@ ExtendedSearchPage.defaultProps = {
   },
 };
 
-const mapping = {
-  searchRefreshHooks: 'views.hooks.searchRefresh',
-};
-
 export default withRouter(ExtendedSearchPage);
