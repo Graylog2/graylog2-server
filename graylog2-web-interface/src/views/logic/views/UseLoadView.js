@@ -28,7 +28,9 @@ const useLoadView = (view: Promise<View>, query: { [string]: any }) => {
 
       setHookComponent(e);
     });
-  }, [executingViewHooks, loadingViewHooks, view]);
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [executingViewHooks, loadingViewHooks, view]);
 
   return [loaded, hookComponent];
 };

@@ -36,7 +36,9 @@ const useViewLoader = (viewId: string, query: { [string]: any }, viewLoader: Vie
 
       return results;
     }).catch((e) => e);
-  }, [executingViewHooks, loadingViewHooks, viewId, viewLoader]);
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [executingViewHooks, loadingViewHooks, viewId, viewLoader]);
 
   return [loaded, hookComponent];
 };
