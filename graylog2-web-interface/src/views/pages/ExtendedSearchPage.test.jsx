@@ -90,7 +90,6 @@ jest.mock('views/components/WithSearchStatus', () => (x) => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
 jest.mock('views/stores/SearchMetadataStore');
-jest.mock('views/logic/withPluginEntities', () => (x) => x);
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
 
