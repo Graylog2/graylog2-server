@@ -65,5 +65,6 @@ public class GrantsMetaMigration extends Migration {
         new ViewSharingToGrantsMigration(mongoConnection, dbGrantService, userService, roleService, rootUsername, viewService).upgrade();
         new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, rootUsername).upgrade();
         new ViewOwnerShipToGrantsMigration(userService, dbGrantService, rootUsername, viewService).upgrade();
+        new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, rootUsername).upgrade();
     }
 }
