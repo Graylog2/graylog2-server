@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
@@ -12,10 +13,13 @@ export type WizardFormValues = {
   serverUrlPort?: string | number,
   systemUserDn?: string,
   systemUserPassword?: string,
+  synchronizeGroups?: boolean,
   teamDefaultRoles?: string,
   teamNameAttribute?: string,
   teamUniqueIdAttribute?: string,
-  transportSecurity?: ('tls' | 'start_tls' | 'none'),
+  teamSelectionType?: 'all' | 'include' | 'exclude',
+  teamSelection?: Immutable.Set<string>,
+  transportSecurity?: 'tls' | 'start_tls' | 'none',
   userFullNameAttribute?: string,
   userNameAttribute?: string,
   userSearchBase?: string,
@@ -34,6 +38,14 @@ export type WizardStepsState = {
   formValues: WizardFormValues,
   invalidStepKeys: Array<string>,
   authBackendMeta: AuthBackendMeta,
+  loadGroupsResult: ?{
+    success: boolean,
+    message: string,
+    errors: Immutable.List<string>,
+    result: {
+      groups: Immutable.List<any>,
+    },
+  },
 };
 
 export type BackendWizardType = WizardStepsState & {
@@ -41,11 +53,12 @@ export type BackendWizardType = WizardStepsState & {
 };
 
 const initialState = {
-  setStepsState: () => {},
   activeStepKey: '',
-  formValues: {},
   authBackendMeta: {},
+  formValues: {},
   invalidStepKeys: [],
+  loadGroupsResult: undefined,
+  setStepsState: () => {},
 };
 
 const BackendWizardContext = React.createContext<BackendWizardType>(initialState);

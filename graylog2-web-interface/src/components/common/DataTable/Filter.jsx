@@ -32,9 +32,11 @@ const Filter = ({
                                searchInKeys={filterKeys}
                                onDataFiltered={onDataFiltered} />
         </div>
-        <div className="col-md-4">
-          {children}
-        </div>
+        {children && (
+          <div className="col-md-4">
+            {children}
+          </div>
+        )}
       </div>
     );
   }

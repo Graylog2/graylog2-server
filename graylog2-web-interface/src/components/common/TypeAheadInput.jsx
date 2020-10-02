@@ -134,13 +134,15 @@ class TypeAheadInput extends React.Component {
   };
 
   render() {
-    const { id, label, onKeyPress } = this.props;
+    const { id, label, onKeyPress, ...rest } = this.props;
 
     return (
-      <Input id={id}
+      <Input {...rest}
+             id={id}
              type="text"
              ref={(fieldInput) => { this.fieldInputElem = fieldInput; }}
              wrapperClassName="typeahead-wrapper"
+             form
              label={label}
              onKeyPress={onKeyPress} />
     );

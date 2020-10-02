@@ -42,7 +42,7 @@ const GroupSyncSection = ({ authenticationBackend }: Props) => {
     );
   }
 
-  const { GroupSyncDetails } = authGroupSyncPlugins[0];
+  const { components: { GroupSyncDetails } } = authGroupSyncPlugins[0];
 
   return (
     <Section>

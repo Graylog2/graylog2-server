@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 
+import type { LdapCreate } from 'logic/authentication/ldap/types';
+
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY, type StepKeyType as UserSyncKey } from './UserSyncStep';
 import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY, type StepKeyType as GroupSyncKey } from './GroupSyncStep';
@@ -13,11 +15,19 @@ type Props = {
   },
   handleSubmitAll: () => void,
   invalidStepKeys: Array<string>,
+  prepareSubmitPayload: () => LdapCreate,
   setActiveStepKey: (stepKey: string)=> void,
   submitAllError: ?React.Node,
 };
 
-const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStepKey, submitAllError }: Props) => [
+const wizardSteps = ({
+  formRefs,
+  handleSubmitAll,
+  invalidStepKeys,
+  prepareSubmitPayload,
+  setActiveStepKey,
+  submitAllError,
+}: Props) => [
   {
     key: SERVER_CONFIG_KEY,
     title: (
@@ -61,6 +71,7 @@ const wizardSteps = ({ formRefs, handleSubmitAll, invalidStepKeys, setActiveStep
     component: (
       <GroupSyncStep formRef={formRefs[GROUP_SYNC_KEY]}
                      onSubmitAll={handleSubmitAll}
+                     prepareSubmitPayload={prepareSubmitPayload}
                      submitAllError={submitAllError}
                      validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)} />
     ),

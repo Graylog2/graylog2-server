@@ -48,9 +48,11 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       };
     },
 
-    create(authBackend: AuthenticationBackendCreate): Promise<void> {
+    create(authBackend: AuthenticationBackendCreate): Promise<?LoadResponse> {
       const url = qualifyUrl(ApiRoutes.Authentication.create().url);
-      const promise = fetch('POST', url, authBackend);
+      const promise = fetch('POST', url, authBackend).then((result) => (result ? {
+        backend: AuthenticationBackend.fromJSON(result.backend),
+      } : null));
       AuthenticationActions.create.promise(promise);
 
       return promise;
@@ -79,9 +81,12 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    update(backendId: ?$PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<void> {
+    update(backendId: ?$PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<?LoadResponse> {
       const url = qualifyUrl(ApiRoutes.Authentication.update(backendId).url);
-      const promise = fetch('PUT', url, payload);
+      const promise = fetch('PUT', url, payload).then((result) => (result ? {
+        backend: AuthenticationBackend.fromJSON(result.backend),
+      } : null));
+
       AuthenticationActions.update.promise(promise);
 
       return promise;

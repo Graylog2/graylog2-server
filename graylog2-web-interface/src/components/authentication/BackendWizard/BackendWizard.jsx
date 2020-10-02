@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { compact } from 'lodash';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import { validateField } from 'util/FormsUtils';
@@ -81,7 +82,15 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
 };
 
 const _getInvalidStepKeys = (formValues) => {
-  const invalidStepKeys = Object.entries(FORMS_VALIDATION).map(([stepKey, formValidation]) => {
+  const validation = { ...FORMS_VALIDATION, [GROUP_SYNC_KEY]: {} };
+  const authGroupSyncPlugins = PluginStore.exports('authentication.groupSync');
+  const groupSyncValidation = authGroupSyncPlugins?.[0]?.validation?.GroupSyncValidation;
+
+  if (groupSyncValidation && formValues.synchronizeGroups) {
+    validation[GROUP_SYNC_KEY] = groupSyncValidation(formValues.teamSelectionType);
+  }
+
+  const invalidStepKeys = Object.entries(validation).map(([stepKey, formValidation]) => {
     // $FlowFixMe formValidation is valid input for Object.entries
     const stepHasError = Object.entries(formValidation).some(([fieldName, fieldValidation]) => {
       return !!validateField(fieldValidation)(formValues?.[fieldName]);
@@ -104,7 +113,7 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
 
   const payload = getSubmitPayload(formValues);
 
-  onSubmit(payload).then(() => {
+  onSubmit(payload, stepsState.formValues).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
@@ -115,7 +124,7 @@ type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  onSubmit: (LdapCreate) => Promise<void>,
+  onSubmit: (LdapCreate, WizardFormValues) => Promise<void>,
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
@@ -125,6 +134,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     authBackendMeta,
     formValues: initialValues,
     invalidStepKeys: [],
+    loadGroupsResult: undefined,
   });
   const formRefs = {
     [SERVER_CONFIG_KEY]: useRef(),
@@ -185,6 +195,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     formRefs,
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
+    prepareSubmitPayload: _getSubmitPayload,
     setActiveStepKey: _setActiveStepKey,
     submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });

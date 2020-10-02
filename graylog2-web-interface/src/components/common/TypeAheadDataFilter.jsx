@@ -214,10 +214,11 @@ class TypeAheadDataFilter extends React.Component {
 
     return (
       <div className="filter">
-        <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline' }}>
+        <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline-flex', 'align-items': 'flex-end' }}>
           <TypeAheadInput id={id}
                           ref={(typeAheadInput) => { this.typeAheadInput = typeAheadInput; }}
                           onSuggestionSelected={this._onFilterAdded}
+                          formGroupClassName=""
                           suggestionText={`Filter by ${filterBy}: `}
                           suggestions={suggestions}
                           label={label}
