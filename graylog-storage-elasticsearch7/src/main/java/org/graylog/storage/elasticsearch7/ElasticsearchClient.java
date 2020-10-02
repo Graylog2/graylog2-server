@@ -11,6 +11,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 import org.graylog2.indexer.IndexNotFoundException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,10 +20,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class ElasticsearchClient {
     private final RestHighLevelClient client;
+    private final boolean compressionEnabled;
 
     @Inject
-    public ElasticsearchClient(RestHighLevelClient client) {
+    public ElasticsearchClient(RestHighLevelClient client,
+                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled) {
         this.client = client;
+        this.compressionEnabled = compressionEnabled;
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
@@ -84,12 +88,17 @@ public class ElasticsearchClient {
     }
 
     private RequestOptions requestOptions() {
-        return RequestOptions.DEFAULT;
+        return compressionEnabled
+                ? RequestOptions.DEFAULT.toBuilder()
+                .addHeader("Accept-Encoding", "gzip")
+                .addHeader("Content-type", "application/json")
+                .build()
+                : RequestOptions.DEFAULT;
     }
 
     private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof ElasticsearchException) {
-            final ElasticsearchException elasticsearchException = (ElasticsearchException)e;
+            final ElasticsearchException elasticsearchException = (ElasticsearchException) e;
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }

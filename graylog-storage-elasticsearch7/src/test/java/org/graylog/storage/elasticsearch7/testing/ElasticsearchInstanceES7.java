@@ -31,7 +31,7 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     protected ElasticsearchInstanceES7(String image, Version version, Network network) {
         super(image, version, network);
         this.restHighLevelClient = buildRestClient();
-        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient);
+        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false);
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
     }
@@ -50,7 +50,6 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
                 null,
                 Duration.seconds(60),
                 "http",
-                false,
                 false,
                 new BasicCredentialsProvider())
                 .get();

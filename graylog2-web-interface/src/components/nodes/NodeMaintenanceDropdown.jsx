@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import URI from 'urijs';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { ExternalLink, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';

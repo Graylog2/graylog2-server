@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link } from 'react-router';
 
+import { Link } from 'components/graylog/router';
 import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';

@@ -36,7 +36,6 @@ const FormikInput = ({ name, type, help, validate, ...rest }: Props) => {
           <Input {...rest}
                  {...typeSepcificProps}
                  onBlur={onBlur}
-                 bsStyle={displayError ? 'error' : undefined}
                  help={help}
                  id={name}
                  error={displayError ? error : undefined}

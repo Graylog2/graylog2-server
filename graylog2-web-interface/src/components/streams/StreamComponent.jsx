@@ -109,24 +109,22 @@ class StreamComponent extends React.Component {
       );
     }
 
-    if (streams.length === 0) {
-      const createStreamButton = (
-        <IfPermitted permissions="streams:create">
-          <CreateStreamButton bsSize="small"
-                              bsStyle="link"
-                              className="btn-text"
-                              buttonText="Create one now"
-                              indexSets={indexSets}
-                              onSave={onStreamSave} />
-        </IfPermitted>
-      );
+    const createStreamButton = (
+      <IfPermitted permissions="streams:create">
+        <CreateStreamButton bsSize="small"
+                            bsStyle="link"
+                            className="btn-text"
+                            buttonText="Create one now"
+                            indexSets={indexSets}
+                            onSave={onStreamSave} />
+      </IfPermitted>
+    );
 
-      return (
-        <Alert bsStyle="warning">
-          <Icon name="info-circle" />&nbsp;No streams configured. {createStreamButton}
-        </Alert>
-      );
-    }
+    const noStreams = (
+      <Alert bsStyle="warning">
+        <Icon name="info-circle" />&nbsp;No streams found. {createStreamButton}
+      </Alert>
+    );
 
     const streamsList = (
       <StreamList streams={streams}
@@ -137,6 +135,10 @@ class StreamComponent extends React.Component {
                   indexSets={indexSets} />
     );
 
+    const streamListComp = streams.length === 0
+      ? noStreams
+      : streamsList;
+
     return (
       <div>
         <PaginatedList onChange={this._onPageChange}
@@ -144,7 +146,7 @@ class StreamComponent extends React.Component {
           <div style={{ marginBottom: 15 }}>
             <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
           </div>
-          <div>{streamsList}</div>
+          <div>{streamListComp}</div>
         </PaginatedList>
       </div>
     );

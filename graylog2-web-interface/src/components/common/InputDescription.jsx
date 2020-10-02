@@ -1,15 +1,16 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { HelpBlock } from 'components/graylog';
 
-const Wrapper: StyledComponent<{hasError: boolean}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme, hasError }) => `
-  ${hasError ? `
-    color: ${theme.colors.variant.danger};
-  ` : ''};
+const ErrorMessage = styled.span(({ theme }) => `
+  color: ${theme.colors.variant.danger};
+`);
+
+const HelpMessage = styled.span(({ theme }) => `
+  color: ${theme.colors.gray[50]};
 `);
 
 type Props = {
@@ -17,18 +18,29 @@ type Props = {
   error?: React.Node,
 };
 
+/**
+ * Component that renders a help and error message for an input.
+ * It always displays both messages.
+ */
 const InputDescription = ({ help, error }: Props) => {
   if (!help && !error) {
     return null;
   }
 
   return (
-    <Wrapper hasError={!!error}>
-      <HelpBlock>
-        {error && <>{error}<br /></>}
-        {help}
-      </HelpBlock>
-    </Wrapper>
+    <HelpBlock>
+      {error && (
+        <ErrorMessage>
+          {error}
+        </ErrorMessage>
+      )}
+      {(!!error && !!help) && <br />}
+      {help && (
+        <HelpMessage>
+          {help}
+        </HelpMessage>
+      )}
+    </HelpBlock>
   );
 };
 

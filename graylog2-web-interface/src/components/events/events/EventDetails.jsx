@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Link } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { Link } from 'components/graylog/router';
 import { Col, Row } from 'components/graylog';
 import { Timestamp } from 'components/common';
 import Routes from 'routing/Routes';

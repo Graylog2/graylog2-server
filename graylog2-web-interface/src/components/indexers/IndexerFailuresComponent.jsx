@@ -1,8 +1,8 @@
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Alert, Col, Row, Button } from 'components/graylog';
 import { Icon, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';

@@ -1,7 +1,6 @@
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router';
 
+import { LinkContainer, Link } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
