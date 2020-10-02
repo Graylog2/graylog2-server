@@ -1,9 +1,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import styled from 'styled-components';
-import { enzymeFind } from 'styled-components/test-utils';
 
-import { Nav } from 'components/graylog';
 import Wizard from 'components/common/Wizard';
 
 import 'helpers/mocking/react-dom_mock';
@@ -215,16 +212,5 @@ describe('<Wizard />', () => {
 
     expect(wrapperH.find('button > svg.fa-caret-left').exists()).toBe(false);
     expect(wrapperH.find('button > svg.fa-caret-right').exists()).toBe(false);
-  });
-
-  it('should render a new component if NavigationComponent is passed', () => {
-    const TestNavComponentFaux = styled(Nav)``;
-    const TestNavComponent = styled(Nav)`
-      background: #000;
-    `;
-    const wrapper = mount(<Wizard steps={steps} NavigationComponent={TestNavComponent} />);
-
-    expect(enzymeFind(wrapper, TestNavComponent).exists()).toBe(true);
-    expect(enzymeFind(wrapper, TestNavComponentFaux).exists()).toBe(false);
   });
 });
