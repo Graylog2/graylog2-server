@@ -179,7 +179,7 @@
     "react-select-event": "^5.0.0",
     "react-styleguidist": "^11.0.8",
     "script-loader": "^0.7.0",
-    "style-loader": "^0.20.3",
+    "style-loader": "^1.2.1",
     "stylelint": "^13.6.0",
     "stylelint-config-standard": "20.0.0",
     "url-loader": "^4.0.0",
