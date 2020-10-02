@@ -16,11 +16,7 @@
  */
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
@@ -38,17 +34,11 @@ import javax.inject.Named;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog.grn.GRNTypes.DASHBOARD;
-import static org.graylog.grn.GRNTypes.STREAM;
-import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_EDIT;
-import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
-import static org.graylog2.shared.security.RestPermissions.STREAMS_EDIT;
-import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+import static org.graylog2.migrations.V20200803120800_GrantsMigrations.GrantsMetaMigration.MIGRATION_MAP;
 
 public class RolesToGrantsMigration {
     private static final Logger LOG = LoggerFactory.getLogger(RolesToGrantsMigration.class);
@@ -69,13 +59,6 @@ public class RolesToGrantsMigration {
         this.grnRegistry = grnRegistry;
         this.rootUsername = rootUsername;
     }
-
-    private final Map<Set<String>, GRNTypeCapability> MIGRATION_MAP = ImmutableMap.of(
-            ImmutableSet.of(DASHBOARDS_READ, DASHBOARDS_EDIT), new GRNTypeCapability(DASHBOARD, Capability.MANAGE),
-            ImmutableSet.of(DASHBOARDS_READ), new GRNTypeCapability(DASHBOARD, Capability.VIEW),
-            ImmutableSet.of(STREAMS_READ, STREAMS_EDIT), new GRNTypeCapability(STREAM, Capability.MANAGE),
-            ImmutableSet.of(STREAMS_READ), new GRNTypeCapability(STREAM, Capability.VIEW)
-            );
 
     public void upgrade() {
         final Set<MigratableRole> migratableRoles = findMigratableRoles();
@@ -108,7 +91,7 @@ public class RolesToGrantsMigration {
         final Collection<User> allRoleUsers = userService.loadAllForRole(migratableRole.role);
 
         migratableRole.migratableEntities.forEach((entityID, permissions) -> {
-            final GRNTypeCapability grnTypeCapability = MIGRATION_MAP.get(permissions);
+            final GrantsMetaMigration.GRNTypeCapability grnTypeCapability = MIGRATION_MAP.get(permissions);
 
             // Permissions are mappable to a grant
             if (grnTypeCapability != null) {
@@ -139,7 +122,7 @@ public class RolesToGrantsMigration {
             final Map<String, Set<String>> migratableIds = new HashMap<>();
 
             // Inspect all permissions that are made of 3 parts and don't contain multiple subparts
-            role.getPermissions().stream().map(MigrationWildcardPermission::new)
+            role.getPermissions().stream().map(GrantsMetaMigration.MigrationWildcardPermission::new)
                     .filter(p -> p.getParts().size() == 3 && p.getParts().stream().allMatch(part -> part.size() == 1))
                     .forEach(p -> {
                         String permissionType = p.subPart(0);
@@ -163,16 +146,6 @@ public class RolesToGrantsMigration {
         return migratableRoles;
     }
 
-    private static class GRNTypeCapability {
-        final GRNType grnType;
-        final Capability capability;
-
-        public GRNTypeCapability(GRNType grnType, Capability capability) {
-            this.grnType = grnType;
-            this.capability = capability;
-        }
-    }
-
     private static class MigratableRole {
         Role role;
         Map<String, Set<String>> migratableEntities;
@@ -188,22 +161,6 @@ public class RolesToGrantsMigration {
                     "roleID='" + role.getId() + '\'' +
                     ", migratableIds=" + migratableEntities +
                     '}';
-        }
-    }
-
-    // only needed to access protected getParts() method from WildcardPermission
-    public static class MigrationWildcardPermission extends WildcardPermission {
-        public MigrationWildcardPermission(String wildcardString) {
-            super(wildcardString);
-        }
-
-        @Override
-        protected List<Set<String>> getParts() {
-            return super.getParts();
-        }
-
-        protected String subPart(int idx) {
-            return Iterables.getOnlyElement(getParts().get(idx));
         }
     }
 }
