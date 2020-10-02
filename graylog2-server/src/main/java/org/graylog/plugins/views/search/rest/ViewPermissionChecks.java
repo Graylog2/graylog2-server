@@ -47,6 +47,7 @@ public class ViewPermissionChecks {
     boolean allowedToSeeDashboard(User user, ViewDTO dashboard, BiPredicate<String, String> isPermitted) {
         return isPermitted.test(ViewsRestPermissions.VIEW_READ, dashboard.id())
                 || isPermitted.test(RestPermissions.DASHBOARDS_READ, dashboard.id())
+                || ownsView(user, dashboard)
                 || isSharedWithUser(user, dashboard);
     }
 
