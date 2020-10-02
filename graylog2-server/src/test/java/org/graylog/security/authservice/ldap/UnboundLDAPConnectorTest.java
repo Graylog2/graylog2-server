@@ -113,14 +113,14 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
 
     @Test
     public void testUserLookup() throws Exception {
-        final LDAPUser entry = connector.searchUser(connection,
-                "ou=users,dc=example,dc=com",
-                "(&(objectClass=posixAccount)(uid={0}))",
-                "john",
-                "entryUUID",
-                "uid",
-                "cn")
-                .orElse(null);
+        final UnboundLDAPConfig searchConfig = UnboundLDAPConfig.builder()
+                .userSearchBase("ou=users,dc=example,dc=com")
+                .userSearchPattern("(&(objectClass=posixAccount)(uid={0}))")
+                .userUniqueIdAttribute("entryUUID")
+                .userNameAttribute("uid")
+                .userFullNameAttribute("cn")
+                .build();
+        final LDAPUser entry = connector.searchUser(connection, searchConfig, "john").orElse(null);
 
         assertThat(entry).isNotNull();
         assertThat(entry.dn())

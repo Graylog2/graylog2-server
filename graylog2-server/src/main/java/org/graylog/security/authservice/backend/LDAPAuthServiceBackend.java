@@ -26,6 +26,7 @@ import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.ProvisionerService;
 import org.graylog.security.authservice.UserDetails;
 import org.graylog.security.authservice.ldap.LDAPUser;
+import org.graylog.security.authservice.ldap.UnboundLDAPConfig;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
 import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
 import org.graylog2.security.encryption.EncryptedValue;
@@ -112,15 +113,15 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     }
 
     private Optional<LDAPUser> findUser(LDAPConnection connection, AuthServiceCredentials authCredentials) throws LDAPException {
-        return ldapConnector.searchUser(
-                connection,
-                config.userSearchBase(),
-                config.userSearchPattern(),
-                authCredentials.username(),
-                config.userUniqueIdAttribute(),
-                config.userNameAttribute(),
-                config.userFullNameAttribute()
-        );
+        final UnboundLDAPConfig searchConfig = UnboundLDAPConfig.builder()
+                .userSearchBase(config.userSearchBase())
+                .userSearchPattern(config.userSearchPattern())
+                .userUniqueIdAttribute(config.userUniqueIdAttribute())
+                .userNameAttribute(config.userNameAttribute())
+                .userFullNameAttribute(config.userFullNameAttribute())
+                .build();
+
+        return ldapConnector.searchUser(connection, searchConfig, authCredentials.username());
     }
 
     @Override

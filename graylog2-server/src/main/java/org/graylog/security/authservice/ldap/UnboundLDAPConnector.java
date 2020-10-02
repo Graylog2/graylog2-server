@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.BindRequest;
 import com.unboundid.ldap.sdk.BindResult;
+import com.unboundid.ldap.sdk.Entry;
 import com.unboundid.ldap.sdk.ExtendedResult;
 import com.unboundid.ldap.sdk.FailoverServerSet;
 import com.unboundid.ldap.sdk.Filter;
@@ -31,7 +32,6 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
-import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.SimpleBindRequest;
 import com.unboundid.ldap.sdk.extensions.StartTLSExtendedRequest;
@@ -58,6 +58,7 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 
 // TODO: Possible improvements:
 //   - Use a connection pool to improve performance and reduce load (see: https://docs.ldap.com/ldap-sdk/docs/getting-started/connection-pools.html)
@@ -158,75 +159,34 @@ public class UnboundLDAPConnector {
             return ImmutableList.of();
         }
 
-        final ImmutableList.Builder<LDAPEntry> entriesBuilder = ImmutableList.builder();
-
-        for (final SearchResultEntry entry : searchResult.getSearchEntries()) {
-            final LDAPEntry.Builder ldapEntryBuilder = LDAPEntry.builder();
-
-            // Always set the proper DN for the entry
-            ldapEntryBuilder.dn(entry.getDN());
-
-            if (entry.getObjectClassValues() != null) {
-                ldapEntryBuilder.objectClasses(Arrays.asList(entry.getObjectClassValues()));
-            }
-
-            for (final Attribute attribute : entry.getAttributes()) {
-                // No need to add the objectClass attribute to the attribute map, we already make it available
-                // in LDAPEntry#objectClasses
-                if (OBJECT_CLASS_ATTRIBUTE.equalsIgnoreCase(attribute.getBaseName())) {
-                    continue;
-                }
-
-                if (attribute.needsBase64Encoding()) {
-                    for (final byte[] value : attribute.getValueByteArrays()) {
-                        ldapEntryBuilder.addAttribute(attribute.getBaseName(), Base64.encode(value));
-                    }
-                } else {
-                    for (final String value : attribute.getValues()) {
-                        ldapEntryBuilder.addAttribute(attribute.getBaseName(), value);
-                    }
-                }
-            }
-
-            entriesBuilder.add(ldapEntryBuilder.build());
-        }
-
-        return entriesBuilder.build();
+        return searchResult.getSearchEntries().stream()
+                .map(this::createLDAPEntry)
+                .collect(ImmutableList.toImmutableList());
     }
 
     public Optional<LDAPUser> searchUser(LDAPConnection connection,
-                                         String searchBase,
-                                         String userSearchPattern,
-                                         String principal,
-                                         String userUniqueIdAttribute,
-                                         String userNameAttribute,
-                                         String userFullNameAttribute) throws LDAPException {
-        final String filterString = new MessageFormat(userSearchPattern, Locale.ENGLISH).format(new Object[]{Filter.encodeValue(principal)});
+                                         UnboundLDAPConfig config,
+                                         String principal) throws LDAPException {
+        final String filterString = new MessageFormat(config.userSearchPattern(), Locale.ENGLISH).format(new Object[]{Filter.encodeValue(principal)});
         final Filter filter = Filter.create(filterString);
 
         final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
                 .add("userPrincipalName") // TODO: This is ActiveDirectory specific - Do we need this here?
                 .add("mail")
                 .add("rfc822Mailbox")
-                .add(userUniqueIdAttribute)
-                .add(userNameAttribute)
-                .add(userFullNameAttribute)
+                .add(config.userUniqueIdAttribute())
+                .add(config.userNameAttribute())
+                .add(config.userFullNameAttribute())
                 .build();
 
-        final ImmutableList<LDAPEntry> result = search(connection, searchBase, filter, allAttributes);
+        final ImmutableList<LDAPEntry> result = search(connection, config.userSearchBase(), filter, allAttributes);
 
         if (result.size() > 1) {
-            LOG.warn("Found more than one user for <{}> in search base <{}> - Using the first one", filterString, searchBase);
+            LOG.warn("Found more than one user for <{}> in search base <{}> - Using the first one", filterString, config.userSearchBase());
         }
 
         return result.stream().findFirst()
-                .map(entry -> LDAPUser.builder()
-                        .uniqueId(entry.nonBlankAttribute(userUniqueIdAttribute))
-                        .username(entry.nonBlankAttribute(userNameAttribute))
-                        .fullName(entry.nonBlankAttribute(userFullNameAttribute))
-                        .email(entry.firstAttributeValue("mail").orElse(entry.firstAttributeValue("rfc822Mailbox").orElse("")))
-                        .entry(entry)
-                        .build());
+                .map(entry -> createLDAPUser(config, entry));
     }
 
     public boolean authenticate(LDAPConnection connection, String bindDn, EncryptedValue password) throws LDAPException {
@@ -251,5 +211,52 @@ public class UnboundLDAPConnector {
             LOG.trace("Re-binding DN <{}> failed", bindDn);
             return false;
         }
+    }
+
+    public LDAPEntry createLDAPEntry(Entry entry) {
+        requireNonNull(entry, "entry cannot be null");
+
+        final LDAPEntry.Builder ldapEntryBuilder = LDAPEntry.builder();
+
+        // Always set the proper DN for the entry
+        ldapEntryBuilder.dn(entry.getDN());
+
+        if (entry.getObjectClassValues() != null) {
+            ldapEntryBuilder.objectClasses(Arrays.asList(entry.getObjectClassValues()));
+        }
+
+        for (final Attribute attribute : entry.getAttributes()) {
+            // No need to add the objectClass attribute to the attribute map, we already make it available
+            // in LDAPEntry#objectClasses
+            if (OBJECT_CLASS_ATTRIBUTE.equalsIgnoreCase(attribute.getBaseName())) {
+                continue;
+            }
+
+            if (attribute.needsBase64Encoding()) {
+                for (final byte[] value : attribute.getValueByteArrays()) {
+                    ldapEntryBuilder.addAttribute(attribute.getBaseName(), Base64.encode(value));
+                }
+            } else {
+                for (final String value : attribute.getValues()) {
+                    ldapEntryBuilder.addAttribute(attribute.getBaseName(), value);
+                }
+            }
+        }
+
+        return ldapEntryBuilder.build();
+    }
+
+    public LDAPUser createLDAPUser(UnboundLDAPConfig config, Entry entry) {
+        return createLDAPUser(config, createLDAPEntry(entry));
+    }
+
+    public LDAPUser createLDAPUser(UnboundLDAPConfig config, LDAPEntry ldapEntry) {
+        return LDAPUser.builder()
+                .uniqueId(ldapEntry.nonBlankAttribute(config.userUniqueIdAttribute()))
+                .username(ldapEntry.nonBlankAttribute(config.userNameAttribute()))
+                .fullName(ldapEntry.nonBlankAttribute(config.userFullNameAttribute()))
+                .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("")))
+                .entry(ldapEntry)
+                .build();
     }
 }
