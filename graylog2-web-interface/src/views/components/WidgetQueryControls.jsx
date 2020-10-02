@@ -20,6 +20,7 @@ import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<any>,
@@ -27,15 +28,9 @@ type Props = {
   globalOverride: ?GlobalOverride,
 };
 
-const StyledTimeRange = styled.input`
-  width: 100%;
-  padding: 3px 9px;
-  margin: 0 12px;
-`;
-
 const FlexCol = styled(Col)`
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
 `;
 
@@ -89,9 +84,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {} }: 
             <FlexCol md={4}>
               <TimeRangeTypeSelector disabled={isGloballyOverridden}
                                      config={config} />
-              <StyledTimeRange type="text"
-                               value={JSON.stringify(values?.timerange)}
-                               disabled />
+              <TimeRangeDisplay timerange={values?.timerange} />
             </FlexCol>
 
             <Col md={8}>

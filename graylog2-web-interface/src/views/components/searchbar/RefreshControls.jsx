@@ -67,7 +67,7 @@ class RefreshControls extends React.Component<Props> {
     let buttonText = 'Not updating';
 
     if (refreshConfigEnabled) {
-      buttonText = <>Update every {naturalInterval}</>;
+      buttonText = <>Every {naturalInterval}</>;
     }
 
     return <ButtonLabel>{buttonText}</ButtonLabel>;

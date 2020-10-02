@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
@@ -54,6 +54,10 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const nextRangeHelpers = useField('temp')[2];
   const [activeTab, setActiveTab] = useState(originalTimerange?.value?.type);
 
+  useEffect(() => {
+    nextRangeHelpers.setValue(originalTimerange.value, originalTimerange.value);
+  }, []);
+
   const onSelect = (newType) => {
     setActiveTab(newType);
     nextRangeHelpers.setValue(migrateTimeRangeToNewType(originalTimerange.value, newType));
@@ -65,6 +69,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   };
 
   const handleApply = () => {
+    console.log('handleApply', nextRangeProps?.value);
     originalTimerangeHelpers.setValue(nextRangeProps?.value || {});
     formik.unregisterField('temp');
     toggleDropdownShow();
