@@ -28,12 +28,6 @@ type Props = {
   globalOverride: ?GlobalOverride,
 };
 
-const StyledTimeRange = styled.input`
-  width: 100%;
-  padding: 3px 9px;
-  margin: 0 12px;
-`;
-
 const FlexCol = styled(Col)`
   display: flex;
   align-items: stretch;
@@ -90,9 +84,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {} }: 
             <FlexCol md={4}>
               <TimeRangeTypeSelector disabled={isGloballyOverridden}
                                      config={config} />
-              <StyledTimeRange type="text"
-                               value={JSON.stringify(values?.timerange)}
-                               disabled />
+              <TimeRangeDisplay timerange={values?.timerange} />
             </FlexCol>
 
             <Col md={8}>
