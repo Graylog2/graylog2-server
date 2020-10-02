@@ -25,28 +25,23 @@ import { Col, Row } from 'components/graylog';
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { Icon, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
-import SearchButton from 'views/components/searchbar/SearchButton';
-import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
-import TopRow from 'views/components/searchbar/TopRow';
 
+import QueryInput from './searchbar/AsyncQueryInput';
+import SearchButton from './searchbar/SearchButton';
+import RefreshControls from './searchbar/RefreshControls';
+import TopRow from './searchbar/TopRow';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-
-const StyledTimeRange = styled.input`
-  width: 100%;
-  padding: 3px 9px;
-  margin: 0 12px;
-`;
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 const FlexCol = styled(Col)`
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
 `;
 
@@ -77,17 +72,13 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
               <>
                 <TopRow>
-                  <FlexCol lg={4} md={6} xs={8}>
+                  <FlexCol lg={6} md={6} xs={12}>
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            config={config}
                                            noOverride />
-                    <StyledTimeRange type="text"
-                                     value={JSON.stringify(values?.timerange)}
-                                     disabled />
-                  </FlexCol>
-                  <Col lg={8} md={6} xs={4}>
+                    <TimeRangeDisplay timerange={values?.timerange} />
                     <RefreshControls />
-                  </Col>
+                  </FlexCol>
                 </TopRow>
 
                 <Row className="no-bm">
