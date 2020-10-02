@@ -38,10 +38,6 @@ class Input extends React.Component {
       PropTypes.element,
       PropTypes.string,
     ]),
-    error: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string,
-    ]),
     wrapperClassName: PropTypes.string,
     addonAfter: PropTypes.oneOfType([
       PropTypes.element,
