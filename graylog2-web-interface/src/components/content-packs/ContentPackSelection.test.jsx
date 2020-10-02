@@ -175,14 +175,14 @@ describe('<ContentPackSelection />', () => {
       wrapper.instance()._validate();
       wrapper.update();
 
-      expect(wrapper.find('span[children="Must be filled out."]').length).toEqual(3);
+      expect(wrapper.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(3);
 
       const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
 
       wrapper2.instance()._validate();
       wrapper2.update();
 
-      expect(wrapper2.find('span[children="Must be filled out."]').length).toEqual(2);
+      expect(wrapper2.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(2);
 
       const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }}
                                                    entities={entities} />);
@@ -190,7 +190,7 @@ describe('<ContentPackSelection />', () => {
       wrapper1.instance()._validate();
       wrapper1.update();
 
-      expect(wrapper1.find('span[children="Must be filled out."]').length).toEqual(1);
+      expect(wrapper1.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(1);
 
       const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }}
                                                    entities={entities} />);
@@ -198,7 +198,7 @@ describe('<ContentPackSelection />', () => {
       wrapper0.instance()._validate();
       wrapper0.update();
 
-      expect(wrapper0.find('span[children="Must be filled out."]').length).toEqual(0);
+      expect(wrapper0.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(0);
     });
 
     it('should validate that URLs only have http or https protocols', () => {
@@ -218,7 +218,7 @@ describe('<ContentPackSelection />', () => {
         invalidWrapper.instance()._validate();
         invalidWrapper.update();
 
-        expect(invalidWrapper.find('span[children="Must use a URL starting with http or https."]')).toHaveLength(errors);
+        expect(invalidWrapper.find({ error: 'Must use a URL starting with http or https.' }).find('InputDescription')).toHaveLength(errors);
       });
     });
   });

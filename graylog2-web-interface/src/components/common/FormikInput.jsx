@@ -32,7 +32,8 @@ const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
         <Input {...rest}
                {...typeSepcificProps}
                bsStyle={error ? 'error' : undefined}
-               help={error ?? help}
+               error={error}
+               help={help}
                id={name}
                label={label}
                name={name}
