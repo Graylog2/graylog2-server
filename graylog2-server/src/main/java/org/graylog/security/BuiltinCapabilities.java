@@ -79,10 +79,13 @@ public class BuiltinCapabilities {
                                 RestPermissions.DASHBOARDS_EDIT,
                                 ViewsRestPermissions.VIEW_READ,
                                 ViewsRestPermissions.VIEW_EDIT,
+                                ViewsRestPermissions.VIEW_DELETE,
                                 RestPermissions.EVENT_DEFINITIONS_READ,
                                 RestPermissions.EVENT_DEFINITIONS_EDIT,
+                                RestPermissions.EVENT_DEFINITIONS_DELETE,
                                 RestPermissions.EVENT_NOTIFICATIONS_READ,
-                                RestPermissions.EVENT_NOTIFICATIONS_EDIT
+                                RestPermissions.EVENT_NOTIFICATIONS_EDIT,
+                                RestPermissions.EVENT_NOTIFICATIONS_DELETE
                                 // TODO: Add missing collection permissions
                         )
                 ))
