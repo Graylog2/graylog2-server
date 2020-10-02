@@ -81,7 +81,6 @@
     "deep-equal": "^1.0.1",
     "dompurify": "^2.0.11",
     "downloadjs": "^1.4.7",
-    "formik": "^2.1.4",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",
