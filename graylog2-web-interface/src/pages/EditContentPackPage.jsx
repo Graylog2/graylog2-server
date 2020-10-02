@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import { cloneDeep, groupBy } from 'lodash';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
 import history from 'util/History';
