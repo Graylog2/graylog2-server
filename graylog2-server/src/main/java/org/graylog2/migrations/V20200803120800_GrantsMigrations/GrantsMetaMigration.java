@@ -38,9 +38,15 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.graylog.grn.GRNTypes.DASHBOARD;
+import static org.graylog.grn.GRNTypes.EVENT_DEFINITION;
+import static org.graylog.grn.GRNTypes.SEARCH;
 import static org.graylog.grn.GRNTypes.STREAM;
+import static org.graylog.plugins.views.search.rest.ViewsRestPermissions.VIEW_EDIT;
+import static org.graylog.plugins.views.search.rest.ViewsRestPermissions.VIEW_READ;
 import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
+import static org.graylog2.shared.security.RestPermissions.EVENT_DEFINITIONS_EDIT;
+import static org.graylog2.shared.security.RestPermissions.EVENT_DEFINITIONS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
@@ -75,13 +81,16 @@ public class GrantsMetaMigration extends Migration {
         return ZonedDateTime.parse("2020-08-03T12:08:00Z");
     }
 
-    // TODO add VIEW_READ,EDIT and Event Permissions...
-    public static final Map<Set<String>, GRNTypeCapability> MIGRATION_MAP = ImmutableMap.of(
-            ImmutableSet.of(DASHBOARDS_READ, DASHBOARDS_EDIT), new GRNTypeCapability(DASHBOARD, Capability.MANAGE),
-            ImmutableSet.of(DASHBOARDS_READ), new GRNTypeCapability(DASHBOARD, Capability.VIEW),
-            ImmutableSet.of(STREAMS_READ, STREAMS_EDIT), new GRNTypeCapability(STREAM, Capability.MANAGE),
-            ImmutableSet.of(STREAMS_READ), new GRNTypeCapability(STREAM, Capability.VIEW)
-    );
+    public static final Map<Set<String>, GRNTypeCapability> MIGRATION_MAP = ImmutableMap.<Set<String>, GRNTypeCapability>builder()
+            .put(ImmutableSet.of(DASHBOARDS_READ, DASHBOARDS_EDIT), new GRNTypeCapability(DASHBOARD, Capability.MANAGE))
+            .put(ImmutableSet.of(DASHBOARDS_READ), new GRNTypeCapability(DASHBOARD, Capability.VIEW))
+            .put(ImmutableSet.of(STREAMS_READ, STREAMS_EDIT), new GRNTypeCapability(STREAM, Capability.MANAGE))
+            .put(ImmutableSet.of(STREAMS_READ), new GRNTypeCapability(STREAM, Capability.VIEW))
+            .put(ImmutableSet.of(VIEW_READ, VIEW_EDIT), new GRNTypeCapability(SEARCH, Capability.MANAGE))
+            .put(ImmutableSet.of(VIEW_READ), new GRNTypeCapability(SEARCH, Capability.VIEW))
+            .put(ImmutableSet.of(EVENT_DEFINITIONS_READ, EVENT_DEFINITIONS_EDIT), new GRNTypeCapability(EVENT_DEFINITION, Capability.MANAGE))
+            .put(ImmutableSet.of(EVENT_DEFINITIONS_READ), new GRNTypeCapability(EVENT_DEFINITION, Capability.VIEW))
+            .build();
 
     @Override
     public void upgrade() {
