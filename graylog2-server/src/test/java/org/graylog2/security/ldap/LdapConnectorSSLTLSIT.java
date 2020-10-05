@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.assertj.core.api.Assertions;
+import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
@@ -33,12 +34,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.net.ssl.TrustManager;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -62,7 +59,6 @@ public class LdapConnectorSSLTLSIT {
     private static final String ADMIN_NAME = "cn=admin,dc=example,dc=org";
     private static final String ADMIN_PASSWORD = "admin";
     private static final String CONTAINER_CERTS_PATH = "/container/service/slapd/assets/certs";
-    private static final String LOCAL_CERTS_PATH = "certs";
 
     private static final GenericContainer<?> container = new GenericContainer<>("osixia/openldap:1.4.0")
             .waitingFor(Wait.forLogMessage(".*slapd starting.*", 1))
@@ -71,7 +67,7 @@ public class LdapConnectorSSLTLSIT {
             .withEnv("LDAP_TLS_KEY_FILENAME", "server-key.pem")
             .withEnv("LDAP_TLS_CA_CRT_FILENAME", "CA-cert.pem")
             .withEnv("LDAP_TLS_DH_PARAM_FILENAME", "dhparam.pem")
-            .withFileSystemBind(customCerts(), CONTAINER_CERTS_PATH, BindMode.READ_ONLY)
+            .withFileSystemBind(LDAPTestUtils.testTLSCertsPath(), CONTAINER_CERTS_PATH, BindMode.READ_ONLY)
             .withCommand("--copy-service")
             .withNetworkAliases(NETWORK_ALIAS)
             .withExposedPorts(PORT, SSL_PORT)
@@ -211,26 +207,13 @@ public class LdapConnectorSSLTLSIT {
     }
 
     private KeyStore singleCA() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
-        KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(this.getClass().getResource("single-ca.jks").openStream(), "changeit".toCharArray());
-
-        return keystore;
+        return LDAPTestUtils.getKeystore("single-ca.jks");
     }
 
     private TrustManager provideTrustManager(String host, KeyStore keyStore) {
         try {
             return new DefaultX509TrustManager(host, keyStore);
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static String customCerts() {
-        final URL resourceUrl = LdapConnectorSSLTLSIT.class.getResource(LOCAL_CERTS_PATH);
-        try {
-            final File file = Paths.get(resourceUrl.toURI()).toFile();
-            return file.getAbsolutePath();
-        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

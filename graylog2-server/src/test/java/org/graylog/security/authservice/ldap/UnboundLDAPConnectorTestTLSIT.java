@@ -17,10 +17,10 @@
 package org.graylog.security.authservice.ldap;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.Resources;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPException;
 import org.assertj.core.api.Assertions;
+import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -33,16 +33,11 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.net.ssl.TrustManager;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Locale;
@@ -64,7 +59,6 @@ public class UnboundLDAPConnectorTestTLSIT {
     private static final String ADMIN_NAME = "cn=admin,dc=example,dc=org";
     private static final String ADMIN_PASSWORD = "admin";
     private static final String CONTAINER_CERTS_PATH = "/container/service/slapd/assets/certs";
-    private static final String LOCAL_CERTS_PATH = "certs";
 
     private static final GenericContainer<?> container = new GenericContainer<>("osixia/openldap:1.4.0")
             .waitingFor(Wait.forLogMessage(".*slapd starting.*", 1))
@@ -73,7 +67,7 @@ public class UnboundLDAPConnectorTestTLSIT {
             .withEnv("LDAP_TLS_KEY_FILENAME", "server-key.pem")
             .withEnv("LDAP_TLS_CA_CRT_FILENAME", "CA-cert.pem")
             .withEnv("LDAP_TLS_DH_PARAM_FILENAME", "dhparam.pem")
-            .withFileSystemBind(customCerts(), CONTAINER_CERTS_PATH, BindMode.READ_ONLY)
+            .withFileSystemBind(LDAPTestUtils.testTLSCertsPath(), CONTAINER_CERTS_PATH, BindMode.READ_ONLY)
             .withCommand("--copy-service")
             .withNetworkAliases("ldap-server")
             .withStartupTimeout(Duration.ofMinutes(1));
@@ -202,26 +196,14 @@ public class UnboundLDAPConnectorTestTLSIT {
                 .then((invocation) -> provideTrustManager(invocation.getArgument(0), keyStore));
     }
 
-    private KeyStore singleCA() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
-        final KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(Resources.getResource(this.getClass(), "single-ca.jks").openStream(), "changeit".toCharArray());
-
-        return keystore;
+    private KeyStore singleCA() {
+        return LDAPTestUtils.getKeystore("single-ca.jks");
     }
 
     private TrustManager provideTrustManager(String host, KeyStore keyStore) {
         try {
             return new DefaultX509TrustManager(host, keyStore);
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static String customCerts() {
-        final URL resourceUrl = Resources.getResource(UnboundLDAPConnectorTestTLSIT.class, LOCAL_CERTS_PATH);
-        try {
-            return Paths.get(resourceUrl.toURI()).toAbsolutePath().toString();
-        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

@@ -33,6 +33,7 @@ import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.directory.server.core.partition.impl.avl.AvlPartition;
 import org.apache.directory.server.ldap.LdapServer;
+import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog2.ApacheDirectoryTestServiceFactory;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.junit.After;
@@ -78,7 +79,7 @@ import static org.mockito.Mockito.mock;
                 @LoadSchema(name = "nis", enabled = true)
         }
 )
-@ApplyLdifFiles("org/graylog2/security/ldap/base.ldif")
+@ApplyLdifFiles(LDAPTestUtils.BASE_LDIF)
 public class LdapConnectorTest extends AbstractLdapTestUnit {
     private static final Set<String> ENABLED_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2", "TLSv1.3");
     private static final String ADMIN_DN = "uid=admin,ou=system";
