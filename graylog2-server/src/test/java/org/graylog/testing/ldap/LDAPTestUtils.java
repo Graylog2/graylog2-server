@@ -27,6 +27,7 @@ public class LDAPTestUtils {
     private static final String RESOURCE_ROOT = "org/graylog/testing/ldap";
 
     public static final String BASE_LDIF = RESOURCE_ROOT + "/ldif/base.ldif";
+    public static final String NESTED_GROUPS_LDIF = RESOURCE_ROOT + "/ldif/nested-groups.ldif";
 
     public static String testTLSCertsPath() {
         final URL resourceUrl = Resources.getResource(RESOURCE_ROOT + "/certs");
@@ -43,6 +44,15 @@ public class LDAPTestUtils {
             keystore.load(Resources.getResource(RESOURCE_ROOT + "/" + filename).openStream(), "changeit".toCharArray());
             return keystore;
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getResourcePath(String resourcePath) {
+        final URL resourceUrl = Resources.getResource(resourcePath);
+        try {
+            return Paths.get(resourceUrl.toURI()).toAbsolutePath().toString();
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
