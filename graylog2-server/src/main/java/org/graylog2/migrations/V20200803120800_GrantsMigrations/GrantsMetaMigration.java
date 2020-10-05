@@ -94,7 +94,7 @@ public class GrantsMetaMigration extends Migration {
 
     @Override
     public void upgrade() {
-        // ViewSharingToGrantsMigration needs to run first, so empty roles get dropped
+        // ViewSharingToGrantsMigration needs to run before the RolesToGrantsMigration drops empty roles
         new ViewSharingToGrantsMigration(mongoConnection, dbGrantService, userService, roleService, rootUsername, viewService).upgrade();
         new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, rootUsername).upgrade();
         new ViewOwnerShipToGrantsMigration(userService, dbGrantService, rootUsername, viewService).upgrade();
