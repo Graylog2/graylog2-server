@@ -26,7 +26,7 @@ const NoEnterpriseComponent = () => (
 );
 
 const GroupSyncSection = ({ authenticationBackend }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.groupSync');
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
 
   const Section = ({ children }: { children: React.Node }) => (
     <SectionComponent title="Group Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>

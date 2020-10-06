@@ -26,7 +26,7 @@ type Props = {
 };
 
 const GroupSyncStep = ({ onSubmitAll, formRef, submitAllError, validateOnMount }: Props) => {
-  const authenticationPlugin = PluginStore.exports('authentication.groupSync');
+  const authenticationPlugin = PluginStore.exports('authentication.enterprise.ldap.groupSync');
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
     return <NoEnterpriseComponent />;
