@@ -32,6 +32,9 @@ public interface UserService extends PersistedService {
     @Nullable
     User load(String username);
 
+    @Nullable
+    User loadById(String id);
+
     int delete(String username);
 
     User create();

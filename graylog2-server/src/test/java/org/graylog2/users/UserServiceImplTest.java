@@ -104,6 +104,15 @@ public class UserServiceImplTest {
         assertThat(user.getEmail()).isEqualTo("user1@example.com");
     }
 
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testLoadByUserId() throws Exception {
+        final User user = userService.loadById("1");
+        assertThat(user).isNotNull();
+        assertThat(user.getName()).isEqualTo("user1");
+        assertThat(user.getEmail()).isEqualTo("user1@example.com");
+    }
+
     @Test(expected = RuntimeException.class)
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadDuplicateUser() throws Exception {

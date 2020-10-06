@@ -374,6 +374,7 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     public static class LocalAdminUser extends UserImpl {
+        public static final String LOCAL_ADMIN_ID = "local:admin";
         private final Configuration configuration;
         private final Set<String> roles;
 
@@ -388,7 +389,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public String getId() {
-            return "local:admin";
+            return LOCAL_ADMIN_ID;
         }
 
         @Override
