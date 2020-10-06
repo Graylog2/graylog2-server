@@ -76,10 +76,16 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
         return BIND_PASSWORD;
     }
 
+    /**
+     * The mapped LDAP port for plain text or StartTLS connections.
+     */
     public int ldapPort() {
         return getMappedPort(PORT);
     }
 
+    /**
+     * The mapped LDAP port for TLS connections.
+     */
     public int ldapsPort() {
         return getMappedPort(TLS_PORT);
     }
