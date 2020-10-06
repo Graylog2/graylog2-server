@@ -8,7 +8,7 @@ import {} from 'components/authentication/bindings'; // Bind all authentication 
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { useActiveBackend } from 'components/authentication/hooks';
+import useActiveBackend from 'components/authentication/useActiveBackend';
 import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';

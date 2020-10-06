@@ -5,7 +5,7 @@ import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 import { PageHeader } from 'components/common';
-import { useActiveBackend } from 'components/authentication/hooks';
+import useActiveBackend from 'components/authentication/useActiveBackend';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';

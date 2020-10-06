@@ -6,7 +6,7 @@ import type { LoadActiveResponse } from 'actions/authentication/AuthenticationAc
 import type { ListenableAction } from 'stores/StoreTypes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
-export const useActiveBackend = <T>(listenableActions: Array<ListenableAction<T>> = []) => {
+const useActiveBackend = <T>(listenableActions: Array<ListenableAction<T>> = []) => {
   const [loadActiveResponse, setLoadActiveResponse] = useState<?LoadActiveResponse>();
   const [finishedLoading, setFinishedLoading] = useState(false);
   const _loadActive = () => AuthenticationDomain.loadActive().then((response) => {
@@ -32,3 +32,5 @@ export const useActiveBackend = <T>(listenableActions: Array<ListenableAction<T>
     backendsTotal: loadActiveResponse?.context?.backendsTotal,
   };
 };
+
+export default useActiveBackend;

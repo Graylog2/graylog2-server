@@ -10,7 +10,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import BackendsOverview from 'components/authentication/BackendsOverview';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
-import { useActiveBackend } from 'components/authentication/hooks';
+import useActiveBackend from 'components/authentication/useActiveBackend';
 
 const AuthenticationOverviewPage = () => {
   const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend([AuthenticationAction.setActiveBackend]);

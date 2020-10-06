@@ -7,7 +7,7 @@ import StringUtils from 'util/StringUtils';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import { useActiveBackend } from 'components/authentication/hooks';
+import useActiveBackend from 'components/authentication/useActiveBackend';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import BackendDetailsActive from 'components/authentication/BackendDetailsActive';

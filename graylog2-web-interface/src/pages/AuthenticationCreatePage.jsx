@@ -4,7 +4,7 @@ import * as React from 'react';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import { DocumentTitle, PageHeader } from 'components/common';
-import { useActiveBackend } from 'components/authentication/hooks';
+import useActiveBackend from 'components/authentication/useActiveBackend';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';

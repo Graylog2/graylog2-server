@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 import { PageHeader } from 'components/common';
-import { useActiveBackend } from 'components/authentication/hooks';
+import useActiveBackend from 'components/authentication/useActiveBackend';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
