@@ -65,6 +65,7 @@ export default class EditableTitle extends React.Component<Props, State> {
 
   _onSubmit = (e: SyntheticInputEvent<HTMLInputElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     this._toggleEditing();
     this._submitValue();
   };
