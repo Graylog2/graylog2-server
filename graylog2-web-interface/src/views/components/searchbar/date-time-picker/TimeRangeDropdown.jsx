@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 import { useEffect, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 
@@ -24,12 +24,12 @@ const timeRangeTypes = {
 type Props = {
   config: SearchesConfig,
   noOverride?: boolean,
-  toggleDropdownShow: () => boolean,
+  toggleDropdownShow: (void) => void,
 };
 
 type RangeType = React.Element<Tab>;
 
-const StyledPopover = styled(Popover)`
+const StyledPopover: StyledComponent<{}, void, typeof Popover> = styled(Popover)`
   max-width: 50vw;
   min-width: 745px;
 `;
@@ -48,10 +48,8 @@ const timeRangeTypeTabs = (config) => availableTimeRangeTypes.map<RangeType>(({ 
 
 const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) => {
   const formik = useFormikContext();
-  const originalTimerange = useField('timerange')[0];
-  const originalTimerangeHelpers = useField('timerange')[2];
-  const nextRangeProps = useField('temp')[0];
-  const nextRangeHelpers = useField('temp')[2];
+  const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
+  const [nextRangeProps, , nextRangeHelpers] = useField('temp');
   const [activeTab, setActiveTab] = useState(originalTimerange?.value?.type);
 
   useEffect(() => {

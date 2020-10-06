@@ -1,19 +1,16 @@
 // @flow strict
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 import moment from 'moment';
 
-type Props = {
-  timerange: {
-    type?: string,
-    range?: number,
-    to?: string,
-    from?: string,
-    keyword?: string,
-  },
-};
+import { type ThemeInterface } from 'theme';
+import { type TimeRange } from 'views/logic/queries/Query';
 
-const TimeRange = styled.p(({ theme }) => css`
+type Props = {|
+  timerange: ?TimeRange,
+|};
+
+const TimeRangeWrapper: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
   width: 100%;
   padding: 3px 9px;
   margin: 0 12px;
@@ -34,18 +31,24 @@ const TimeRange = styled.p(({ theme }) => css`
   }
 `);
 
-const dateOutput = ({ type, ...restRange }) => {
+const dateOutput = (timerange: TimeRange) => {
   let from = '----/--/-- --:--:--.---';
 
-  switch (type) {
+  switch (timerange.type) {
     case 'relative':
-      from = restRange.range === 0 ? 'All Time' : moment().subtract(restRange.range * 1000).fromNow();
+      from = !timerange.range ? 'All Time' : moment()
+        .subtract(timerange.range * 1000)
+        .fromNow();
 
-      return { from, until: 'Now' };
+      return {
+        from,
+        until: 'Now',
+      };
+
     case 'absolute':
-      return { from: restRange.from, until: restRange.to };
+      return { from: timerange.from, until: timerange.to };
     case 'keyword':
-      return { from: restRange.keyword, until: 'Now' };
+      return { from: timerange.keyword, until: 'TODO' };
     default:
       return { from, until: from };
   }
@@ -54,19 +57,19 @@ const dateOutput = ({ type, ...restRange }) => {
 const TimeRangeDisplay = ({ timerange }: Props) => {
   if (!timerange?.type) {
     return (
-      <TimeRange>
+      <TimeRangeWrapper>
         <span><code>No Override</code></span>
-      </TimeRange>
+      </TimeRangeWrapper>
     );
   }
 
   const { from, until } = dateOutput(timerange);
 
   return (
-    <TimeRange>
+    <TimeRangeWrapper>
       <span><strong>From</strong>: <code>{from}</code></span>
       <span><strong>Until</strong>: <code>{until}</code></span>
-    </TimeRange>
+    </TimeRangeWrapper>
   );
 };
 

@@ -24,7 +24,7 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => css`
+const KeywordInput: StyledComponent<{}, ThemeInterface, typeof FormControl> = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);
@@ -41,6 +41,7 @@ const _parseKeywordPreview = (data) => {
 };
 
 type Props = {
+  defaultValue: string,
   disabled: boolean,
 };
 
@@ -59,7 +60,7 @@ const _validateKeyword = (
       .then(_setSuccessfullPreview, _setFailedPreview);
 };
 
-const KeywordTimeRangeSelector = ({ disabled }: Props) => {
+const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   const [keywordPreview, setKeywordPreview] = useState(Immutable.Map());
   const _setSuccessfullPreview = useCallback(
     (response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)),
@@ -116,7 +117,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
                               placeholder="Last week"
                               onChange={onChange}
                               required
-                              value={value} />
+                              value={value || defaultValue} />
               </InputGroup>
             </FormGroup>
           )}
@@ -130,10 +131,12 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
 };
 
 KeywordTimeRangeSelector.propTypes = {
+  defaultValue: PropTypes.string,
   disabled: PropTypes.bool,
 };
 
 KeywordTimeRangeSelector.defaultProps = {
+  defaultValue: '',
   disabled: false,
 };
 
