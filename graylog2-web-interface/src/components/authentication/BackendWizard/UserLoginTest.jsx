@@ -61,6 +61,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
             <Col sm={6}>
               <FormikInput label="Password"
                            name="password"
+                           type="password"
                            required />
             </Col>
           </Row>
@@ -68,43 +69,41 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
             {loading ? <Spinner delay={0} /> : 'Test User Login'}
           </Button>
           {(!hasErrors && testFinished) && (
-          <NotificationContainer bsStyle={success ? 'success' : 'danger'}>
-            <b>
-              {!result.user_exists && 'User does not exist'}
-              {result.user_exists && (
-              <>
-                {result.login_success ? message : 'Login failed'}
-              </>
-              )}
-            </b>
-            {(result.user_exists && result.user_details) && (
-            <p>
-              <br />
-              <table className="table">
-                <tr>
-                  <th>User Attribute</th>
-                  <th>Value</th>
-                </tr>
-
-                {Object.entries(result.user_details).map(([key, value]) => {
-                  return (
+            <NotificationContainer bsStyle={success ? 'success' : 'danger'}>
+              <b>
+                {!result.user_exists && 'User does not exist'}
+                {result.user_exists && (
+                  <>
+                    {result.login_success ? message : 'Login failed'}
+                  </>
+                )}
+              </b>
+              {(result.user_exists && result.user_details) && (
+                <p>
+                  <br />
+                  <table className="table">
                     <tr>
-                      <td>
-                        {String(key)}
-                      </td>
-                      <td>
-                        {String(value)}
-                      </td>
+                      <th>User Attribute</th>
+                      <th>Value</th>
                     </tr>
-                  );
-                })}
-              </table>
-            </p>
-            )}
-          </NotificationContainer>
+
+                    {Object.entries(result.user_details).map(([key, value]) => (
+                      <tr>
+                        <td>
+                          {String(key)}
+                        </td>
+                        <td>
+                          {String(value)}
+                        </td>
+                      </tr>
+                    ))}
+                  </table>
+                </p>
+              )}
+            </NotificationContainer>
           )}
           {hasErrors && (
-          <ConnectionErrors errors={errors} message={message} />
+            <ConnectionErrors errors={errors} message={message} />
           )}
         </Form>
       </Formik>
