@@ -7,7 +7,7 @@ declare module 'formik/@@yup' {
 }
 
 declare module 'formik/@flow-typed' {
-  import type { Schema } from 'formik/@@yup';
+  import type { Schema , Schema , YupError, Schema } from 'formik/@@yup';
 
   declare export type FieldValidator = (
     value: any
@@ -136,7 +136,7 @@ declare module 'formik/@flow-typed' {
 }
 
 declare module 'formik/@withFormik' {
-  import type { Schema } from 'formik/@@yup';
+
   import type {
     FormikHelpers,
     FormikProps,
@@ -351,7 +351,7 @@ declare module 'formik/@Form' {
 
 declare module 'formik/@Formik' {
   import type { UseFieldConfig } from 'formik/@Field';
-  import type { YupError, Schema } from 'formik/@@yup';
+
   import type {
     FormikConfig,
     FormikErrors,
@@ -377,8 +377,7 @@ declare module 'formik/@Formik' {
     resetForm: (nextState?: $Shape<FormikState<Values>>) => void,
     setErrors: (errors: FormikErrors<Values>) => void,
     setFormikState: (
-      stateOrCb:
-        | FormikState<Values>
+      stateOrCb: | FormikState<Values>
         | ((state: FormikState<Values>) => FormikState<Values>)
     ) => void,
     setFieldTouched: (
@@ -407,7 +406,7 @@ declare module 'formik/@Formik' {
       name: Name | UseFieldConfig<Name>
     ): [
       FieldInputProps<$ElementType<Values, Name>>,
-      FieldMetaProps<$ElementType<Values, Name>>
+      FieldMetaProps<$ElementType<Values, Name>>,
     ],
     validateOnBlur: boolean,
     validateOnChange: boolean,
