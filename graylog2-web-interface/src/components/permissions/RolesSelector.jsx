@@ -45,6 +45,10 @@ const _options = (roles: Immutable.Set<Role>, assignedRolesIds, identifier) => r
   .map((r) => ({ label: r.name, value: r.name, role: r }));
 
 const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting) => {
+  if (!selectedRoleName) {
+    return;
+  }
+
   const selectedRoleNames = selectedRoleName.split(',');
 
   const selectedRoles = Immutable.Set(compact(selectedRoleNames.map((selection) => {
@@ -74,7 +78,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
-      .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(paginatedRoles.list));
+      .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(Immutable.Set(paginatedRoles.list)));
   }, [assignedRolesIds]);
 
   return (
