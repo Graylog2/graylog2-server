@@ -30,14 +30,13 @@ import ScrollToHint from 'views/components/common/ScrollToHint';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
-
-import QueryInput from './searchbar/AsyncQueryInput';
-import SearchButton from './searchbar/SearchButton';
-import RefreshControls from './searchbar/RefreshControls';
-import TopRow from './searchbar/TopRow';
-import DashboardSearchForm from './DashboardSearchBarForm';
-import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
+import QueryInput from 'views/components/searchbar/AsyncQueryInput';
+import SearchButton from 'views/components/searchbar/SearchButton';
+import RefreshControls from 'views/components/searchbar/RefreshControls';
+import TopRow from 'views/components/searchbar/TopRow';
+import DashboardSearchForm from 'views/components/DashboardSearchBarForm';
+import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
+import TimeRangeDisplay from 'views/components/searchbar/TimeRangeDisplay';
 
 const FlexCol = styled(Col)`
   display: flex;

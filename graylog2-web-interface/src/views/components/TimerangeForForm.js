@@ -67,7 +67,7 @@ const migrationStrategies = {
     to: formatDatetime(new DateTime(moment())),
   }),
   relative: () => ({ type: 'relative', range: 300 }),
-  keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
+  keyword: () => ({ type: 'keyword', keyword: 'Last five minutes', from: null, to: null }),
   disabled: () => undefined,
 };
 

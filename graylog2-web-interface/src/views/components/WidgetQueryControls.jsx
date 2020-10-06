@@ -100,7 +100,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {} }: 
             <FlexCol md={4}>
               <TimeRangeTypeSelector disabled={isGloballyOverridden}
                                      config={config} />
-              <TimeRangeDisplay timerange={values?.timerange} />
+              <TimeRangeDisplay timerange={globalOverride?.timerange || values?.timerange} />
             </FlexCol>
 
             <Col md={8}>
