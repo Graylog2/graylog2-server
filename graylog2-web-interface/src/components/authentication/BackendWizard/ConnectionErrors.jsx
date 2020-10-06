@@ -15,10 +15,11 @@ const ErrorsTitle = styled.div`
   margin-bottom: 5px;
 `;
 
-const ErrorsList = styled.ul`
+const ErrorsList = styled.ul(({ theme }) => `
+  font-family: ${theme.fonts.family.monospace};
   list-style: initial;
   padding-left: 20px;
-`;
+`);
 
 type Props = {
   errors: Array<string>,
