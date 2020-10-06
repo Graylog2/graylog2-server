@@ -18,9 +18,9 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: flex-start;
 
-  * + * {
-   margin-left: 10px;
- }
+  *:not(:first-child) {
+    margin-left: 10px;
+  }
 `;
 
 export const Headline: StyledComponent<{}, ThemeInterface, HTMLHeadingElement> = styled.h2`
