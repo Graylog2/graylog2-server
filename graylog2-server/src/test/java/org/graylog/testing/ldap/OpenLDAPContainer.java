@@ -22,6 +22,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.time.Duration;
+import java.util.Locale;
 
 /**
  * Creates an OpenLDAP server container configured with users and (nested) groups.
@@ -88,5 +89,19 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
      */
     public int ldapsPort() {
         return getMappedPort(TLS_PORT);
+    }
+
+    /**
+     * Returns an LDAP URL string for plain text or StartTLS connections.
+     */
+    public String ldapURL() {
+        return String.format(Locale.US, "ldap://127.0.0.1:%s/", ldapPort());
+    }
+
+    /**
+     * Returns an LDAP URL string for TLS connections.
+     */
+    public String ldapsURL() {
+        return String.format(Locale.US, "ldaps://127.0.0.1:%s/", ldapsPort());
     }
 }
