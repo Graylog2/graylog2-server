@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { ExternalLink } from 'components/common';
-
 import { FormDataContext } from 'aws/context/FormData';
 import { AdvancedOptionsContext } from 'aws/context/AdvancedOptions';
 import AdditionalFields from 'aws/common/AdditionalFields';

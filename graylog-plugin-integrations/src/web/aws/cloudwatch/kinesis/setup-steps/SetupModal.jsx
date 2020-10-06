@@ -18,6 +18,7 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }) => {
     setSuccess(true);
     setError(false);
   };
+
   const handleError = () => {
     setSuccess(false);
     setError(true);
@@ -32,8 +33,7 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }) => {
       <Modal.Body>
         {agreed
           ? <KinesisSetupSteps onSuccess={handleSuccess} onError={handleError} />
-          : <Agree groupName={groupName} streamName={streamName} />
-        }
+          : <Agree groupName={groupName} streamName={streamName} />}
 
         {agreed && success && (
           <Alert key="delayedLogs" variant="warning">

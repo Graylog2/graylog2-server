@@ -41,7 +41,7 @@ AdditionalFields.defaultProps = {
 };
 
 const AdditionalFieldsContent = styled.div`
-  display: ${props => (props.visible ? 'block' : 'none')};
+  display: ${(props) => (props.visible ? 'block' : 'none')};
   padding: 0 100px 0 25px;
 `;
 

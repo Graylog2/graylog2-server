@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import PageHeader from 'components/common/PageHeader';
-
 import { SidebarProvider } from 'aws/context/Sidebar';
 import { FormDataProvider } from 'aws/context/FormData';
 import { StepsProvider } from 'aws/context/Steps';

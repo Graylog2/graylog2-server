@@ -5,7 +5,7 @@ const Routes = {
       AUTHORIZE: '/integrations/aws/auth',
       CLOUDWATCH: {
         index: '/integrations/aws/cloudwatch',
-        step: step => `/integrations/aws/cloudwatch/${step}`,
+        step: (step) => `/integrations/aws/cloudwatch/${step}`,
       },
     },
   },

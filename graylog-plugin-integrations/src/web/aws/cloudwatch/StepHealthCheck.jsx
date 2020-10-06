@@ -4,14 +4,12 @@ import styled from 'styled-components';
 
 import { Button, Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-
 import FormWrap from 'aws/common/FormWrap';
 import SkipHealthCheck from 'aws/common/SkipHealthCheck';
 import useFetch from 'aws/common/hooks/useFetch';
 import { ApiRoutes } from 'aws/common/Routes';
 import Countdown from 'aws/common/Countdown';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'aws/common/constants';
-
 import { ApiContext } from 'aws/context/Api';
 import { FormDataContext } from 'aws/context/FormData';
 
@@ -86,8 +84,9 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
   const iconClass = knownLog ? 'check' : 'exclamation-triangle';
   const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
   const bsStyle = knownLog ? 'success' : 'warning';
-  const logTypeLabel = KINESIS_LOG_TYPES.find(type => type.value === logData.type).label;
+  const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
   const logType = knownLog ? `a ${logTypeLabel}` : 'an unknown';
+
   const handleSubmit = () => {
     onSubmit();
     onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: logData.type } });
