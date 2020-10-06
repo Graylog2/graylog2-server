@@ -1,5 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
+import Immutable from 'immutable';
 
 import Role from 'logic/roles/Role';
 import type { PaginatedListType, PaginatedUserListType } from 'stores/roles/AuthzRolesStore';
@@ -9,7 +10,7 @@ import type { RefluxActions } from 'stores/StoreTypes';
 export type ActionsType = {
   load: (roleId: string) => Promise<?Role>,
   delete: (roleId: string, roleName: string) => Promise<void>,
-  addMember: (roleId: string, username: string) => Promise<?Role>,
+  addMembers: (roleId: string, usernames: Immutable.Set<string>) => Promise<?Role>,
   removeMember: (roleId: string, username: string) => Promise<?Role>,
   loadUsersForRole: (roleId: string, roleName: string, page: number, perPage: number, query: string) => Promise<?PaginatedUserListType>,
   loadRolesForUser: (
@@ -28,7 +29,7 @@ const AuthzRolesActions: RefluxActions<ActionsType> = singletonActions(
   () => Reflux.createActions({
     load: { asyncResult: true },
     delete: { asyncResult: true },
-    addMember: { asyncResult: true },
+    addMembers: { asyncResult: true },
     removeMember: { asyncResult: true },
     loadUsersForRole: { asyncResult: true },
     loadRolesForUser: { asyncResult: true },
