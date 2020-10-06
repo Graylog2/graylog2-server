@@ -49,7 +49,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
   }
 
   return (
-    <Field name="temp.range">
+    <Field name="tempTimeRange.range">
       {({ field: { name, value, onChange } }) => {
         const _onChange = (e) => {
           const { target: { value: newValue } } = e;

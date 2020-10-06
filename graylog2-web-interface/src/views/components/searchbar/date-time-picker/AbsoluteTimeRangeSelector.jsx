@@ -45,7 +45,7 @@ const _isValidDateString = (dateString: string) => {
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
   return (
     <StyledTimerangeSelector className="absolute">
-      <Field name="temp.from" validate={_isValidDateString}>
+      <Field name="tempTimeRange.from" validate={_isValidDateString}>
         {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
           <InputWrap>
             <DateInputWithPicker disabled={disabled}
@@ -63,7 +63,7 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
         <Icon name="long-arrow-alt-right" />
       </Separator>
 
-      <Field name="temp.to" validate={_isValidDateString}>
+      <Field name="tempTimeRange.to" validate={_isValidDateString}>
         {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
           <InputWrap>
             <DateInputWithPicker disabled={disabled}

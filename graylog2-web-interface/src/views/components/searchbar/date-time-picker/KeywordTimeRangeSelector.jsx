@@ -85,7 +85,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
     ToolsStore.testNaturalDate(timerange?.keyword)
       .then(_setSuccessfullPreview, _setFailedPreview);
 
-    return () => formik.unregisterField('temp.keyword');
+    return () => formik.unregisterField('tempTimeRange.keyword');
   }, []);
 
   const { from, to } = keywordPreview.toObject();
@@ -99,7 +99,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   return (
     <Row className="no-bm" style={{ marginLeft: 50 }}>
       <Col xs={3} style={{ padding: 0 }}>
-        <Field name="temp.keyword" validate={_validate}>
+        <Field name="tempTimeRange.keyword" validate={_validate}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
