@@ -7,13 +7,12 @@ import { useFormikContext, useField } from 'formik';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm.js';
 
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from './RelativeTimeRangeSelector';
 import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
-
-import { migrateTimeRangeToNewType } from '../../TimerangeForForm';
 
 const timeRangeTypes = {
   absolute: AbsoluteTimeRangeSelector,
@@ -67,7 +66,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   };
 
   const handleApply = () => {
-    console.log('handleApply', nextRangeProps?.value);
     originalTimerangeHelpers.setValue(nextRangeProps?.value || {});
     formik.unregisterField('temp');
     toggleDropdownShow();

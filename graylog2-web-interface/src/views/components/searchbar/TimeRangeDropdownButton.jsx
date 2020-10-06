@@ -41,5 +41,3 @@ TimeRangeDropdownButton.defaultProps = {
 };
 
 export default TimeRangeDropdownButton;
-
-// trigger={<Button bsStyle="info" disabled={disabled} ref={containerRef}><Icon name="clock" /></Button>}

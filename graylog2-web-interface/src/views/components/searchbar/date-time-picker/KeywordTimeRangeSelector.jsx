@@ -11,7 +11,7 @@ import { connect, Field, useFormikContext } from 'formik';
 import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
-import type { ThemeInterface } from 'theme/index';
+import type { ThemeInterface } from 'theme';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 

@@ -7,11 +7,10 @@ import type { StyledComponent } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
-import type { ThemeInterface } from 'theme/index';
+import type { ThemeInterface } from 'theme';
+import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
 
 import TimerangeSelector from './TimerangeSelector';
-
-import DateInputWithPicker from '../DateInputWithPicker';
 
 type Props = {
   disabled: boolean,
