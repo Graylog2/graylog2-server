@@ -90,7 +90,6 @@ const _getInvalidStepKeys = (formValues) => {
     return stepHasError ? stepKey : undefined;
   });
 
-  // Remove undefined values
   return compact(invalidStepKeys);
 };
 
