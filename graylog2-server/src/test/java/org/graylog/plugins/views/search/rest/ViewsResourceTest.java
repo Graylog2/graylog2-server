@@ -19,8 +19,6 @@ package org.graylog.plugins.views.search.rest;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
@@ -71,13 +69,10 @@ public class ViewsResourceTest {
     private ViewService viewService;
 
     @Mock
-    private ViewSharingService viewSharingService;
-
-    @Mock
     private ViewDTO view;
 
     @Mock
-    private IsViewSharedForUser isViewSharedForUser;
+    private ViewPermissionChecks permissionChecks;
 
     @Mock
     private ClusterEventBus clusterEventBus;
@@ -88,8 +83,8 @@ public class ViewsResourceTest {
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser, ClusterEventBus clusterEventBus, UserService userService) {
-            super(viewService, viewSharingService, isViewSharedForUser, clusterEventBus);
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, ViewPermissionChecks permissionChecks) {
+            super(viewService, clusterEventBus, permissionChecks);
             this.userService = userService;
         }
 
@@ -107,7 +102,7 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, viewSharingService, isViewSharedForUser, clusterEventBus, userService);
+        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, permissionChecks);
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
     }
 
@@ -133,6 +128,7 @@ public class ViewsResourceTest {
     @Test
     public void shouldNotCreateADashboardWithoutPermission() throws Exception {
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        when(permissionChecks.isDashboard(view)).thenReturn(true);
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 

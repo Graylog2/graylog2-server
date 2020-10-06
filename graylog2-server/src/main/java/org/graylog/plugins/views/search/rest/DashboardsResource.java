@@ -24,16 +24,12 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharing;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
@@ -43,7 +39,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Optional;
 
 import static java.util.Locale.ENGLISH;
 
@@ -58,16 +53,15 @@ public class DashboardsResource extends RestResource {
             .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
             .build();
     private final ViewService dbService;
+    private final ViewPermissionChecks permissionChecks;
     private final SearchQueryParser searchQueryParser;
-    private final ViewSharingService viewSharingService;
-    private final IsViewSharedForUser isViewSharedForUser;
 
     @Inject
-    public DashboardsResource(ViewService dbService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser) {
+    public DashboardsResource(ViewService dbService,
+                              ViewPermissionChecks permissionChecks) {
         this.dbService = dbService;
+        this.permissionChecks = permissionChecks;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
-        this.viewSharingService = viewSharingService;
-        this.isViewSharedForUser = isViewSharedForUser;
     }
 
     @GET
@@ -91,13 +85,7 @@ public class DashboardsResource extends RestResource {
             final PaginatedList<ViewDTO> result = dbService.searchPaginatedByType(
                     ViewDTO.Type.DASHBOARD,
                     searchQuery,
-                    view -> {
-                        final Optional<ViewSharing> viewSharing = viewSharingService.forView(view.id());
-
-                        return isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
-                                || isPermitted(RestPermissions.DASHBOARDS_READ, view.id())
-                                || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false);
-                    },
+                    view -> permissionChecks.allowedToSeeDashboard(getCurrentUser(), view, this::isPermitted),
                     order,
                     sortField,
                     page,
