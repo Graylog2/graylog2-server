@@ -71,6 +71,7 @@ class DescriptionBox extends React.Component {
     if (configurableOptions) {
       return (
         <ConfigButton ref={(node) => { this.target = node; }}
+                      type="button"
                       onClick={this.onToggleConfig}>
           <Icon name="wrench" />
         </ConfigButton>
