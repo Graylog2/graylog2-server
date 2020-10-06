@@ -7,7 +7,7 @@ declare module 'formik/@@yup' {
 }
 
 declare module 'formik/@flow-typed' {
-  import type { Schema , Schema , YupError, Schema } from 'formik/@@yup';
+  import type { Schema , YupError, Schema } from 'formik/@@yup';
 
   declare export type FieldValidator = (
     value: any
@@ -351,7 +351,7 @@ declare module 'formik/@Form' {
 
 declare module 'formik/@Formik' {
   import type { UseFieldConfig } from 'formik/@Field';
-
+  
   import type {
     FormikConfig,
     FormikErrors,
