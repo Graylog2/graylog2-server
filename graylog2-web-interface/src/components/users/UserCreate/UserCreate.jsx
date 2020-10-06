@@ -46,7 +46,7 @@ const _validate = (values) => {
 const UserCreate = () => {
   const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
   const [users, setUsers] = useState();
-  const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.List([initialRole.name])).build());
+  const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
   const [submitError, setSubmitError] = useState();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
 
@@ -54,17 +54,18 @@ const UserCreate = () => {
     UsersDomain.loadUsers().then((newUsers) => newUsers && setUsers(newUsers));
   }, []);
 
-  const _onAssignRole = (role: DescriptiveItem) => {
-    setSelectedRoles(selectedRoles.add(role));
+  const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
+    setSelectedRoles(selectedRoles.union(roles));
+    const roleNames = roles.map((r) => r.name);
 
     return Promise.resolve(
-      setUser(user.toBuilder().roles(user.roles.toSet().add(role?.name).toList()).build()),
+      setUser(user.toBuilder().roles(user.roles.union(roleNames)).build()),
     );
   };
 
   const _onUnassignRole = (role: DescriptiveItem) => {
     setSelectedRoles(selectedRoles.remove(role));
-    setUser(user.toBuilder().roles(user.roles.toSet().remove(role?.name).toList()).build());
+    setUser(user.toBuilder().roles(user.roles.remove(role?.name)).build());
   };
 
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
@@ -99,6 +100,7 @@ const UserCreate = () => {
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Assign Roles">
+                  { /* $FlowFixMe: assignRole has DescriptiveItem */}
                   <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
                 </Input>
 

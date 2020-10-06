@@ -73,6 +73,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     <SectionComponent title="Roles" showLoading={loading}>
       <h3>Assign Roles</h3>
       <Container>
+        { /* $FlowFixMe: assignRole has DescriptiveItem */}
         <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
       </Container>
       <h3>Selected Roles</h3>
