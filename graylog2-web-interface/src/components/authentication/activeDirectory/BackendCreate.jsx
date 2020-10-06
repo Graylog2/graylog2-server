@@ -59,6 +59,7 @@ const BackendCreate = () => (
   <DocumentTitle title="Create Active Directory Authentication Services">
     <WizardPageHeader />
     <BackendWizard authBackendMeta={AUTH_BACKEND_META}
+                   help={HELP}
                    onSubmit={AuthenticationDomain.create} />
   </DocumentTitle>
 );
