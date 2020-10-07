@@ -13,17 +13,15 @@ type Props = {
   route: any,
 };
 
-const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView, route }: Props) => {
-  return (
-    <NewViewLoaderContext.Provider value={loadNewView}>
-      <ViewLoaderContext.Provider value={loadView}>
-        <IfUserHasAccessToAnyStream>
-          <Search route={route} />
-        </IfUserHasAccessToAnyStream>
-      </ViewLoaderContext.Provider>
-    </NewViewLoaderContext.Provider>
-  );
-};
+const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView, route }: Props) => (
+  <NewViewLoaderContext.Provider value={loadNewView}>
+    <ViewLoaderContext.Provider value={loadView}>
+      <IfUserHasAccessToAnyStream>
+        <Search route={route} />
+      </IfUserHasAccessToAnyStream>
+    </ViewLoaderContext.Provider>
+  </NewViewLoaderContext.Provider>
+);
 
 SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
