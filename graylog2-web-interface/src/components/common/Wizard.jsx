@@ -114,18 +114,16 @@ const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
-
 type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: string,
+  title: React.Node,
   component: React.Node,
   disabled?: boolean,
 };
 
 export type Steps = Array<Step>;
-
 type Props = {
   steps: Steps,
   activeStep: ?StepKey,

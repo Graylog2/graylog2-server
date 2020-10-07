@@ -136,6 +136,7 @@ public class ViewsResourceTest {
     @Test
     public void shouldNotCreateADashboardWithoutPermission() {
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        when(permissionChecks.isDashboard(view)).thenReturn(true);
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 

@@ -6,7 +6,7 @@ import { cloneDeep } from 'lodash';
 import { Col, HelpBlock, Panel, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 
@@ -104,7 +104,7 @@ class ContentPackSelection extends React.Component {
   };
 
   _bindValue = (event) => {
-    this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
+    this._updateField(event.target.name, getValueFromInput(event.target));
   }
 
   _updateSelectionEntity = (entity) => {

@@ -5,8 +5,14 @@ import { Row, Col } from 'components/graylog';
 import { FormikInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 
+export const PASSWORD_MIN_LENGTH = 6;
+
 export const validatePasswords = (errors: { [name: string]: string }, password: string, passwordRepeat: string) => {
   const newErrors = { ...errors };
+
+  if (password && password.length < PASSWORD_MIN_LENGTH) {
+    newErrors.password = `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`;
+  }
 
   if (password && passwordRepeat) {
     const passwordMatches = password === passwordRepeat;
@@ -23,7 +29,7 @@ const PasswordFormGroup = () => {
   return (
     <Input id="password-field"
            label="Password"
-           help="Passwords must be at least 6 characters long. We recommend using a strong password."
+           help={`Passwords must be at least ${PASSWORD_MIN_LENGTH} characters long. We recommend using a strong password.`}
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9">
       <Row className="no-bm">
@@ -35,7 +41,7 @@ const PasswordFormGroup = () => {
                        required
                        formGroupClassName="form-group no-bm"
                        wrapperClassName="col-xs-12"
-                       minLength={6} />
+                       minLength={PASSWORD_MIN_LENGTH} />
         </Col>
         <Col sm={6}>
           <FormikInput name="password_repeat"
@@ -45,7 +51,7 @@ const PasswordFormGroup = () => {
                        formGroupClassName="form-group no-bm"
                        required
                        wrapperClassName="col-xs-12"
-                       minLength={6} />
+                       minLength={PASSWORD_MIN_LENGTH} />
         </Col>
       </Row>
     </Input>

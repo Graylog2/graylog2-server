@@ -52,11 +52,13 @@ public class SavedSearchesResource extends RestResource {
             .build();
 
     private final ViewService dbService;
+    private final ViewPermissionChecks permissionChecks;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
     public SavedSearchesResource(ViewService dbService) {
         this.dbService = dbService;
+        this.permissionChecks = permissionChecks;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
