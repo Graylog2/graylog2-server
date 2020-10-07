@@ -1,6 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import Role from 'logic/roles/Role';
 import type { PaginatedListType, PaginatedUserListType } from 'stores/roles/AuthzRolesStore';
