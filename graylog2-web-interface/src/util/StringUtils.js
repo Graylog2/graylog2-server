@@ -22,6 +22,13 @@ const StringUtils = {
   replaceSpaces(text, newCharacter = '-') {
     return text.replace(/\s/g, newCharacter);
   },
+  truncateWithEllipses(text = '', maxLength = 10, end = '...') {
+    if (text.length > maxLength) {
+      return `${text.substring(0, maxLength)}${end}`;
+    }
+
+    return text;
+  },
 };
 
 export default StringUtils;

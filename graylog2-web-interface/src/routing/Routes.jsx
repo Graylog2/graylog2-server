@@ -69,19 +69,13 @@ const Routes = {
     OVERVIEW: '/system/overview',
     PROCESSBUFFERDUMP: (nodeId) => `/system/processbufferdump/${nodeId}`,
     AUTHENTICATION: {
-      OVERVIEW: '/system/authentication',
-      ROLES: '/system/authentication/roles',
-      USERS: {
-        CREATE: '/system/authentication/users/new',
-        edit: (username) => `/system/authentication/users/edit/${username}`,
-        TOKENS: {
-          edit: (username) => `/system/authentication/users/tokens/${username}`,
-        },
-        LIST: '/system/authentication/users',
-      },
-      PROVIDERS: {
-        CONFIG: '/system/authentication/config',
-        provider: (name) => `/system/authentication/config/${name}`,
+      BACKENDS: {
+        OVERVIEW: '/system/authentication/services',
+        ACTIVE: '/system/authentication/services/active',
+        CREATE: '/system/authentication/services/create',
+        createBackend: (name) => `/system/authentication/services/create/${name}`,
+        show: (id) => `/system/authentication/services/${id}`,
+        edit: (id) => `/system/authentication/services/edit/${id}`,
       },
     },
     USERS: {

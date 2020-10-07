@@ -12,6 +12,9 @@ export type UserOverviewJSON = {
   session_active: ?boolean,
   client_address: string,
   last_activity: ?string,
+  enabled: boolean,
+  auth_service_id: string,
+  auth_service_uid: string,
 };
 
 type InternalState = {
@@ -25,6 +28,9 @@ type InternalState = {
   sessionActive: boolean,
   clientAddress: string,
   lastActivity: ?string,
+  enabled: boolean,
+  authServiceId: string,
+  authServiceUid: string,
 };
 
 export default class UserOverview {
@@ -41,6 +47,9 @@ export default class UserOverview {
     sessionActive: $PropertyType<InternalState, 'sessionActive'>,
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
+    enabled: $PropertyType<InternalState, 'enabled'>,
+    authServiceId: $PropertyType<InternalState, 'authServiceId'>,
+    authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
   ) {
     this._value = {
       id,
@@ -53,6 +62,9 @@ export default class UserOverview {
       sessionActive,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     };
   }
 
@@ -104,6 +116,18 @@ export default class UserOverview {
     return this._value.lastActivity;
   }
 
+  get enabled() {
+    return this._value.enabled;
+  }
+
+  get authServiceId() {
+    return this._value.authServiceId;
+  }
+
+  get authServiceUid() {
+    return this._value.authServiceUid;
+  }
+
   toBuilder() {
     const {
       id,
@@ -116,6 +140,9 @@ export default class UserOverview {
       sessionActive,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     } = this._value;
 
     // eslint-disable-next-line no-use-before-define
@@ -130,6 +157,9 @@ export default class UserOverview {
       sessionActive,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     }));
   }
 
@@ -144,6 +174,9 @@ export default class UserOverview {
     sessionActive: $PropertyType<InternalState, 'sessionActive'>,
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
+    enabled: $PropertyType<InternalState, 'enabled'>,
+    authServiceId: $PropertyType<InternalState, 'authServiceId'>,
+    authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
   ) {
     return new UserOverview(
       id,
@@ -156,6 +189,9 @@ export default class UserOverview {
       sessionActive,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     );
   }
 
@@ -171,6 +207,9 @@ export default class UserOverview {
       sessionActive,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     } = this._value;
 
     return {
@@ -184,6 +223,9 @@ export default class UserOverview {
       session_active: sessionActive,
       client_address: clientAddress,
       last_activity: lastActivity,
+      enabled,
+      auth_service_id: authServiceId,
+      auth_service_uid: authServiceUid,
     };
   }
 
@@ -199,6 +241,9 @@ export default class UserOverview {
       session_active: sessionActive,
       client_address: clientAddress,
       last_activity: lastActivity,
+      enabled,
+      auth_service_id: authServiceId,
+      auth_service_uid: authServiceUid,
     } = value;
 
     return UserOverview.create(
@@ -212,6 +257,9 @@ export default class UserOverview {
       sessionActive ?? false,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     );
   }
 
@@ -271,6 +319,18 @@ class Builder {
     return new Builder(this.value.set('lastActivity', value));
   }
 
+  enabled(value: $PropertyType<InternalState, 'enabled'>) {
+    return new Builder(this.value.set('enabled', value));
+  }
+
+  authServiceId(value: $PropertyType<InternalState, 'authServiceId'>) {
+    return new Builder(this.value.set('authServiceId', value));
+  }
+
+  authServiceUid(value: $PropertyType<InternalState, 'authServiceUid'>) {
+    return new Builder(this.value.set('authServiceUid', value));
+  }
+
   build() {
     const {
       id,
@@ -283,6 +343,9 @@ class Builder {
       sessionActive,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     } = this.value.toObject();
 
     return new UserOverview(
@@ -296,6 +359,9 @@ class Builder {
       sessionActive,
       clientAddress,
       lastActivity,
+      enabled,
+      authServiceId,
+      authServiceUid,
     );
   }
 }

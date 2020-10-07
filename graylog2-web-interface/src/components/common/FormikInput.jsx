@@ -1,21 +1,21 @@
 // @flow strict
 import * as React from 'react';
-import { Field } from 'formik';
+import PropTypes from 'prop-types';
+import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
 
 type Props = {
-  label: string,
   name: string,
   type?: string,
-  help?: string,
+  help?: React.Node,
   labelClassName?: string,
   wrapperClassName?: string,
   validate?: (string) => ?string,
 };
 
 const checkboxProps = (value) => {
-  return { checked: value ?? false };
+  return { defaultChecked: value ?? false };
 };
 
 const inputProps = (value) => {
@@ -23,26 +23,38 @@ const inputProps = (value) => {
 };
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
-  <Field name={name} validate={validate}>
-    {({ field: { value, onChange }, meta: { error } }) => {
-      const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
+const FormikInput = ({ name, type, help, validate, ...rest }: Props) => {
+  const { validateOnChange } = useFormikContext();
 
-      return (
-        <Input {...rest}
-               {...typeSepcificProps}
-               bsStyle={error ? 'error' : undefined}
-               error={error}
-               help={help}
-               id={name}
-               label={label}
-               name={name}
-               onChange={onChange}
-               type={type} />
-      );
-    }}
-  </Field>
-);
+  return (
+    <Field name={name} validate={validate}>
+      {({ field: { value, onChange, onBlur }, meta: { error, touched } }) => {
+        const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
+        const displayError = validateOnChange ? !!(error && touched) : !!error;
+
+        return (
+          <Input {...rest}
+                 {...typeSepcificProps}
+                 onBlur={onBlur}
+                 help={help}
+                 id={name}
+                 error={displayError ? error : undefined}
+                 onChange={onChange}
+                 type={type} />
+        );
+      }}
+    </Field>
+  );
+};
+
+FormikInput.propTypes = {
+  help: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  labelClassName: PropTypes.string,
+  type: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  wrapperClassName: PropTypes.string,
+  validate: PropTypes.func,
+};
 
 FormikInput.defaultProps = {
   help: undefined,

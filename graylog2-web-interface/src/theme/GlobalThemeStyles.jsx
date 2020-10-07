@@ -610,7 +610,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     color: ${theme.colors.global.textDefault};
     
-    .tt-suggestion:hover, 
+    .tt-suggestion:hover,
     .tt-suggestion.tt-cursor {
       color: ${theme.colors.variant.darkest.info};
       background-color: ${theme.colors.variant.lighter.info};

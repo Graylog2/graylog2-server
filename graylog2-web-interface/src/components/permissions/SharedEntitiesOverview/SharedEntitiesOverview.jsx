@@ -32,8 +32,8 @@ const _onPageChange = (fetchSharedEntities, setLoading) => (page, perPage) => {
   return fetchSharedEntities(page, perPage).then(() => setLoading(false));
 };
 
-const _sharedEntityOverviewItem = (sharedEntity, context) => {
-  const capability = context?.granteeCapabilities?.[sharedEntity.id];
+const _sharedEntityOverviewItem = (sharedEntity, { granteeCapabilities } = {}) => {
+  const capability = granteeCapabilities?.[sharedEntity.id];
   const capabilityTitle = mockedPermissions.availableCapabilities[capability];
 
   return <SharedEntitiesOverviewItem sharedEntity={sharedEntity} capabilityTitle={capabilityTitle} />;
