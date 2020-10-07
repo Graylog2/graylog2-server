@@ -136,6 +136,13 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         return create(GrantDTO.of(grantee, capability, target), creatorUsername);
     }
 
+    public GrantDTO ensure(GRN grantee, Capability capability, GRN target, String creatorUsername) {
+        if (!hasGrantFor(grantee, capability, target)) {
+            return create(grantee, capability, target, creatorUsername);
+        }
+        return null;
+    }
+
     public GrantDTO update(GrantDTO updatedGrant, @Nullable User currentUser) {
         final GrantDTO existingGrant = get(updatedGrant.id())
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find grant with ID " + updatedGrant.id()));

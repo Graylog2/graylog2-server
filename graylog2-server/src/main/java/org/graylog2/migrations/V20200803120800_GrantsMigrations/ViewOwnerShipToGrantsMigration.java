@@ -66,9 +66,7 @@ public class ViewOwnerShipToGrantsMigration {
         // TODO: Needs to use the user ID once we don't use user names in references anymore!
         final GRN grantee = GRNTypes.USER.toGRN(username);
 
-        if (!dbGrantService.hasGrantFor(grantee, CAPABILITY, target)) {
-            LOG.info("Registering user <{}> ownership for <{}>", username, target);
-            dbGrantService.create(grantee, CAPABILITY, target, rootUsername);
-        }
+        LOG.info("Registering user <{}> ownership for <{}>", username, target);
+        dbGrantService.ensure(grantee, CAPABILITY, target, rootUsername);
     }
 }

@@ -146,6 +146,24 @@ public class DBGrantServiceTest {
     }
 
     @Test
+    @MongoDBFixtures("grants.json")
+    public void ensure() {
+        final GRN jane = grnRegistry.parse("grn::::user:jane");
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
+        final GRN newStream = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0888");
+
+        assertThat(dbService.ensure(jane, Capability.VIEW, stream1, "admin")).isNull();
+        assertThat(dbService.ensure(jane, Capability.MANAGE, newStream, "admin")).isNotNull();
+
+        assertThat(dbService.getForTarget(newStream)).satisfies(grantDTOS -> {
+            assertThat(grantDTOS.size()).isEqualTo(1);
+            assertThat(grantDTOS.get(0).grantee()).isEqualTo(jane);
+            assertThat(grantDTOS.get(0).capability()).isEqualTo(Capability.MANAGE);
+            assertThat(grantDTOS.get(0).target()).isEqualTo(newStream);
+        });
+    }
+
+    @Test
     public void createWithGrantDTOAndUserObject() {
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         final GRN grantee = GRNTypes.USER.toGRN("jane");

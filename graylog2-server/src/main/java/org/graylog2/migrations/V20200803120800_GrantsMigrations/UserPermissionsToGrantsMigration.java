@@ -22,7 +22,6 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
-import org.graylog.security.GrantDTO;
 import org.graylog2.migrations.V20200803120800_GrantsMigrations.GrantsMetaMigration.GRNTypeCapability;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -74,12 +73,7 @@ public class UserPermissionsToGrantsMigration {
             if (grnTypeCapability != null) {
                 final Capability capability = grnTypeCapability.capability;
                 final GRNType grnType = grnTypeCapability.grnType;
-                final GrantDTO grant = GrantDTO.builder()
-                        .grantee(grnRegistry.ofUser(user))
-                        .target(grnType.toGRN(entityID))
-                        .capability(capability)
-                        .build();
-                dbGrantService.create(grant, rootUsername);
+                dbGrantService.ensure(grnRegistry.ofUser(user), capability, grnType.toGRN(entityID), rootUsername);
 
                 final List<String> updatedPermissions = user.getPermissions();
                 updatedPermissions.removeAll(permissions.stream().map(p -> p + ":" + entityID).collect(Collectors.toSet()));

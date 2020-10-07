@@ -21,7 +21,6 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
-import org.graylog.security.GrantDTO;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;
@@ -98,12 +97,7 @@ public class RolesToGrantsMigration {
                 final Capability capability = grnTypeCapability.capability;
                 final GRNType grnType = grnTypeCapability.grnType;
                 allRoleUsers.forEach(user -> {
-                    final GrantDTO grant = GrantDTO.builder()
-                            .grantee(grnRegistry.ofUser(user))
-                            .target(grnType.toGRN(entityID))
-                            .capability(capability)
-                            .build();
-                    dbGrantService.create(grant, rootUsername);
+                    dbGrantService.ensure(grnRegistry.ofUser(user), capability, grnType.toGRN(entityID), rootUsername);
                     LOG.info("Migrating entity <{}> permissions <{}> to <{}> grant for user <{}>", entityID, permissions, capability, user.getName());
                 });
                 migratedRolePermissions.addAll(permissions.stream().map(p -> p + ":" + entityID).collect(Collectors.toSet()));
