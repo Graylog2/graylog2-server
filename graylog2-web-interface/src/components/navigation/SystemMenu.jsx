@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
+import withLocation from 'routing/withLocation';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import naturalSort from 'javascript-natural-sort';
 
@@ -141,4 +141,4 @@ SystemMenu.propTypes = {
   }).isRequired,
 };
 
-export default withRouter(SystemMenu);
+export default withLocation(SystemMenu);
