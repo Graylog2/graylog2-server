@@ -29,6 +29,8 @@ class TypeAheadInput extends React.Component {
     onKeyPress: PropTypes.func,
     /** Object key where to store auto-completion result. */
     displayKey: PropTypes.string,
+    /** String that allows overriding the input form group */
+    formGroupClassName: PropTypes.string,
     /**
      * Array of strings providing auto-completion.
      * E.g. `[ "some string", "otherstring" ]`
@@ -57,6 +59,7 @@ class TypeAheadInput extends React.Component {
 
   static defaultProps = {
     displayKey: 'suggestion',
+    formGroupClassName: undefined,
     onKeyPress: () => {},
     onTypeaheadLoaded: () => {},
     onSuggestionSelected: () => {},
@@ -134,16 +137,15 @@ class TypeAheadInput extends React.Component {
   };
 
   render() {
-    const { id, label, onKeyPress, ...rest } = this.props;
+    const { id, label, onKeyPress, formGroupClassName } = this.props;
 
     return (
-      <Input {...rest}
-             id={id}
+      <Input id={id}
              type="text"
              ref={(fieldInput) => { this.fieldInputElem = fieldInput; }}
              wrapperClassName="typeahead-wrapper"
-             form
              label={label}
+             formGroupClassName={formGroupClassName}
              onKeyPress={onKeyPress} />
     );
   }
