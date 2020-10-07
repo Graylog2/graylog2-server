@@ -54,7 +54,7 @@ describe('NewSearchPage', () => {
   };
   const SimpleNewSearchPage = (props) => (
     <StreamsContext.Provider value={[{}]}>
-      <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />
+      <NewSearchPage route={{}} router={mockRouter} location={{ pathname: '/foo', query: {} }} {...props} />
     </StreamsContext.Provider>
   );
 

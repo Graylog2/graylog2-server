@@ -60,7 +60,13 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
   return formatSinglePluginRoute(pluginRoute, true);
 };
 
-const Navigation = ({ location }) => {
+type Props = {
+  location: {
+    pathname: string,
+  },
+};
+
+const Navigation = ({ location }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const { permissions, username, full_name: fullName } = currentUser || {};
 
