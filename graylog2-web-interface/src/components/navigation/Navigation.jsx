@@ -2,10 +2,10 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import withLocation from 'routing/withLocation';
 import { LinkContainer } from 'components/graylog/router';
 import { appPrefixed } from 'util/URLUtils';
 import { IfPermitted } from 'components/common';
@@ -147,4 +147,4 @@ Navigation.propTypes = {
   }).isRequired,
 };
 
-export default withRouter(Navigation);
+export default withLocation(Navigation);
