@@ -101,29 +101,28 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     @Nullable
     public User loadById(final String id) {
-        return load("_id", id);
+        // special case for the locally defined user, we don't store that in MongoDB.
+        if (!configuration.isRootUserDisabled() && id.equals(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID)) {
+            LOG.debug("User {} is the built-in admin user", id);
+            return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
+        }
+        final DBObject userObject = get(UserImpl.class, id);
+        return userFactory.create(userObject.toMap());
     }
 
     @Override
     @Nullable
     public User load(final String username) {
-        return load(UserImpl.USERNAME, username);
-    }
-
-    private User load(final String lookupKey, final String identifier) {
-        LOG.debug("Loading user by {} {}", lookupKey, identifier);
+        LOG.debug("Loading user {}", username);
 
         // special case for the locally defined user, we don't store that in MongoDB.
-        if (!configuration.isRootUserDisabled()) {
-            if ((lookupKey.equals(UserImpl.USERNAME) && configuration.getRootUsername().equals(identifier)) ||
-                    lookupKey.equals("_id") && identifier.equals(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID)) {
-                LOG.debug("User {} is the built-in admin user", identifier);
-                return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
-            }
+        if (!configuration.isRootUserDisabled() && configuration.getRootUsername().equals(username)) {
+            LOG.debug("User {} is the built-in admin user", username);
+            return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
         }
 
         final DBObject query = new BasicDBObject();
-        query.put(lookupKey, identifier);
+        query.put(UserImpl.USERNAME, username);
 
         final List<DBObject> result = query(UserImpl.class, query);
         if (result == null || result.isEmpty()) {
@@ -131,14 +130,13 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         }
 
         if (result.size() > 1) {
-            final String msg = "There was more than one matching user for username/id " + identifier + ". This should never happen.";
+            final String msg = "There was more than one matching user for username " + username + ". This should never happen.";
             LOG.error(msg);
             throw new RuntimeException(msg);
         }
 
         final DBObject userObject = result.get(0);
         final Object userId = userObject.get("_id");
-        final Object username = userObject.get(UserImpl.USERNAME);
 
         LOG.debug("Loaded user {}/{} from MongoDB", username, userId);
         return userFactory.create((ObjectId) userId, userObject.toMap());

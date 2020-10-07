@@ -16,12 +16,17 @@
  */
 package org.graylog2.security.realm;
 
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.realm.SimpleAccountRealm;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.util.CollectionUtils;
+import org.graylog2.users.UserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,4 +58,15 @@ public class RootAccountRealm extends SimpleAccountRealm {
         ));
     }
 
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+        final AuthenticationInfo authenticationInfo = super.doGetAuthenticationInfo(token);
+        // After successful authentication, exchange the principals to unique admin userId
+        if (authenticationInfo instanceof SimpleAccount) {
+            SimpleAccount account = (SimpleAccount) authenticationInfo;
+            account.setPrincipals(new SimplePrincipalCollection(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID, NAME));
+            return account;
+        }
+        return null;
+    }
 }

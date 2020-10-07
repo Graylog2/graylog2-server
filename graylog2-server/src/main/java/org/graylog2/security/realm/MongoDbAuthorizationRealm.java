@@ -63,7 +63,7 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
             return new SimpleAuthorizationInfo();
         }
 
-        final User user = userService.load(principalString);
+        final User user = userService.loadById(principalString);
         if (user == null) {
             return new SimpleAuthorizationInfo();
         } else {

@@ -94,7 +94,7 @@ public class EntitySharesService {
         requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
         final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
-        final GRN sharingUserGRN = grnRegistry.newGRN("user", sharingUser.getName());
+        final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         return EntityShareResponse.builder()
                 .entity(ownedEntity.toString())
                 .sharingUser(sharingUserGRN)
@@ -124,7 +124,7 @@ public class EntitySharesService {
                 .orElse(ImmutableMap.of());
 
         final String userName = sharingUser.getName();
-        final GRN sharingUserGRN = grnRegistry.newGRN("user", sharingUser.getName());
+        final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, sharingUserGRN);
 
         final EntityShareResponse.Builder responseBuilder = EntityShareResponse.builder()
@@ -261,7 +261,7 @@ public class EntitySharesService {
     }
 
     private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser) {
-        final List<GrantDTO> activeGrants = grantService.getForTargetExcludingGrantee(ownedEntity, grnRegistry.newGRN("user", sharingUser.getName()));
+        final List<GrantDTO> activeGrants = grantService.getForTargetExcludingGrantee(ownedEntity, grnRegistry.ofUser(sharingUser));
 
         return activeGrants.stream()
                 .map(grant -> ActiveShare.create(grnRegistry.newGRN("grant", grant.id()).toString(), grant.grantee(), grant.capability()))

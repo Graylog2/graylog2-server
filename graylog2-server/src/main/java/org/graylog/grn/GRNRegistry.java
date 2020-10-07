@@ -119,7 +119,7 @@ public class GRNRegistry {
     }
 
     public GRN ofUser(User user) {
-        return newGRN(GRNTypes.USER, user.getName());
+        return newGRN(GRNTypes.USER, user.getId());
     }
 
     public boolean isUser(GRN grn) {
