@@ -13,6 +13,7 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { StreamsStore } = CombinedProvider.get('Streams');
@@ -103,4 +104,4 @@ const EditAlertConditionPage = createReactClass({
   },
 });
 
-export default EditAlertConditionPage;
+export default withParams(EditAlertConditionPage);

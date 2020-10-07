@@ -7,6 +7,7 @@ import { Row, Col } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import DateTime from 'logic/datetimes/DateTime';
+import withParams from 'routing/withParams';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -70,4 +71,4 @@ const ProcessBufferDumpPage = createReactClass({
   },
 });
 
-export default ProcessBufferDumpPage;
+export default withParams(ProcessBufferDumpPage);

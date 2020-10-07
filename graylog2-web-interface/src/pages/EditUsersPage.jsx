@@ -7,6 +7,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import UserForm from 'components/users/UserForm';
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
 import { UsersActions } from 'stores/users/UsersStore';
+import withParams from 'routing/withParams';
 
 const StartpageStore = StoreProvider.getStore('Startpage');
 
@@ -90,4 +91,4 @@ class EditUsersPage extends React.Component {
   }
 }
 
-export default EditUsersPage;
+export default withParams(EditUsersPage);

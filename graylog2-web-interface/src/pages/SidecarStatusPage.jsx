@@ -10,6 +10,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
+import withParams from 'routing/withParams';
 
 const { SidecarsActions } = CombinedProvider.get('Sidecars');
 const { CollectorsActions } = CombinedProvider.get('Collectors');
@@ -92,4 +93,4 @@ class SidecarStatusPage extends React.Component {
   }
 }
 
-export default SidecarStatusPage;
+export default withParams(SidecarStatusPage);

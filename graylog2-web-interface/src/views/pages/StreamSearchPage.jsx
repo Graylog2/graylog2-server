@@ -13,6 +13,7 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import Spinner from 'components/common/Spinner';
 import { ExtendedSearchPage } from 'views/pages';
+import withParams from 'routing/withParams';
 
 type URLQuery = { [string]: any };
 
@@ -110,4 +111,4 @@ const mapping = {
   loadingViewHooks: 'views.hooks.loadingView',
   executingViewHooks: 'views.hooks.executingView',
 };
-export default withPluginEntities(StreamSearchPage, mapping);
+export default withPluginEntities(withParams(StreamSearchPage), mapping);

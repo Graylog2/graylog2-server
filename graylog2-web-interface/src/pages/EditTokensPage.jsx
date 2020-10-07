@@ -8,6 +8,7 @@ import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, PageHeader } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import { UsersActions } from 'stores/users/UsersStore';
+import withParams from 'routing/withParams';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -95,4 +96,4 @@ const EditTokensPage = createReactClass({
   },
 });
 
-export default EditTokensPage;
+export default withParams(EditTokensPage);
