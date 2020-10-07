@@ -30,7 +30,6 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
@@ -54,11 +53,13 @@ public class DashboardsResource extends RestResource {
             .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
             .build();
     private final ViewService dbService;
+    private final ViewPermissionChecks permissionChecks;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
     public DashboardsResource(ViewService dbService) {
         this.dbService = dbService;
+        this.permissionChecks = permissionChecks;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 

@@ -33,6 +33,7 @@ export default class PivotConfiguration extends React.Component {
 
   _onSubmit = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     const { onClose } = this.props;
 
     onClose(this.state);
