@@ -11,8 +11,8 @@ import { Input } from 'components/bootstrap';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
-export type StepKeyType = 'user-synchronization';
-export const STEP_KEY: StepKeyType = 'user-synchronization';
+export type StepKeyType = 'user-synchronisation';
+export const STEP_KEY: StepKeyType = 'user-synchronisation';
 export const FORM_VALIDATION = {
   defaultRoles: { required: true },
   userFullNameAttribute: { required: true },
