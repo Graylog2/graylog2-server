@@ -156,13 +156,15 @@ class SavedSearchControls extends React.Component<Props, State> {
 
     ViewManagementActions.create(newView)
       .then((createdView) => {
+        this.toggleFormModal();
+
+        return createdView;
+      })
+      .then((createdView) => {
         const loaderFunc = this.context;
 
-        loaderFunc(createdView.id).then(() => {
-          browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(createdView.id));
-        });
+        loaderFunc(createdView.id);
       })
-      .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
       .catch((error) => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
