@@ -116,7 +116,7 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const Search = ({ route, location = { query: {} }, router }: Props) => {
+const Search = ({ location = { query: {} }, router }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
   const searchRefreshHooks: Array<SearchRefreshCondition> = usePluginEntities('views.hooks.searchRefresh');
@@ -156,7 +156,7 @@ const Search = ({ route, location = { query: {} }, router }: Props) => {
     <CurrentViewTypeProvider>
       <IfInteractive>
         <IfDashboard>
-          <WindowLeaveMessage route={route} />
+          <WindowLeaveMessage />
         </IfDashboard>
       </IfInteractive>
       <InteractiveContext.Consumer>
@@ -204,7 +204,6 @@ const Search = ({ route, location = { query: {} }, router }: Props) => {
 };
 
 Search.propTypes = {
-  route: PropTypes.object.isRequired,
   location: PropTypes.shape({
     query: PropTypes.object.isRequired,
   }),
