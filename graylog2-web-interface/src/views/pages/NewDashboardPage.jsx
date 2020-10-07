@@ -8,7 +8,7 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-import { ExtendedSearchPage } from 'views/pages';
+import Search from 'views/components/Search';
 import { IfPermitted } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
 
@@ -42,7 +42,7 @@ const NewDashboardPage = ({ route, location }: Props) => {
   }
 
   return loaded
-    ? <IfPermitted permissions="dashboards:create"><ExtendedSearchPage route={route} /></IfPermitted>
+    ? <IfPermitted permissions="dashboards:create"><Search route={route} /></IfPermitted>
     : <Spinner />;
 };
 

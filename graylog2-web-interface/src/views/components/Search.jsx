@@ -116,7 +116,7 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const ExtendedSearchPage = ({ route, location = { query: {} }, router }: Props) => {
+const Search = ({ route, location = { query: {} }, router }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
   const searchRefreshHooks: Array<SearchRefreshCondition> = usePluginEntities('views.hooks.searchRefresh');
@@ -203,7 +203,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router }: Props) 
   );
 };
 
-ExtendedSearchPage.propTypes = {
+Search.propTypes = {
   route: PropTypes.object.isRequired,
   location: PropTypes.shape({
     query: PropTypes.object.isRequired,
@@ -211,7 +211,7 @@ ExtendedSearchPage.propTypes = {
   router: PropTypes.object,
 };
 
-ExtendedSearchPage.defaultProps = {
+Search.defaultProps = {
   location: { query: {} },
   router: {
     getCurrentLocation: () => ({ pathname: '', search: '' }),
@@ -225,4 +225,4 @@ ExtendedSearchPage.defaultProps = {
   },
 };
 
-export default withRouter(ExtendedSearchPage);
+export default withRouter(Search);

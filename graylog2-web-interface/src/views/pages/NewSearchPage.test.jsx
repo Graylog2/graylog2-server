@@ -8,6 +8,7 @@ import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import Search from 'views/logic/search/Search';
+import SearchComponent from 'views/components/Search';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import StreamsContext from 'contexts/StreamsContext';
@@ -15,7 +16,6 @@ import { loadNewView, loadView } from 'views/logic/views/Actions';
 
 import NewSearchPage from './NewSearchPage';
 
-const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
 const mockView = View.create()
   .toBuilder()
   .type(View.Type.Search)
@@ -23,7 +23,7 @@ const mockView = View.create()
   .build();
 
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
-jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
+jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('views/stores/SearchStore');
 
 jest.mock('views/stores/ViewStore', () => ({
@@ -103,7 +103,7 @@ describe('NewSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      mockExtendedSearchPage.mockImplementationOnce(() => (
+      SearchComponent.mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
@@ -121,7 +121,7 @@ describe('NewSearchPage', () => {
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      mockExtendedSearchPage.mockImplementationOnce(() => (
+      SearchComponent.mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
           {(_loadNewView) => <button type="button" onClick={() => _loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>

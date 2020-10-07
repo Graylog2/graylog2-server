@@ -11,18 +11,18 @@ import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Search from 'views/logic/search/Search';
+import SearchComponent from 'views/components/Search';
 import { loadNewViewForStream, loadView } from 'views/logic/views/Actions';
 
 import StreamSearchPage from './StreamSearchPage';
 
-const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
 const mockView = View.create()
   .toBuilder()
   .type(View.Type.Search)
   .search(Search.builder().build())
   .build();
 
-jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
+jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('views/stores/SearchStore', () => ({ SearchActions: {} }));
 
 jest.mock('views/stores/ViewStore', () => ({
@@ -102,7 +102,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      mockExtendedSearchPage.mockImplementationOnce(() => (
+      SearchComponent.mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
@@ -120,7 +120,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      mockExtendedSearchPage.mockImplementationOnce(() => (
+      SearchComponent.mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
           {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>
