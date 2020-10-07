@@ -213,11 +213,11 @@ class NotificationsFactory {
           title: 'Output failing',
           description: (
             <span>
-              The output &quot;{notification.details.outputTitle}&quot; (id: {notification.details.outputId})
-              in stream &quot;{notification.details.streamTitle}&quot; (id: {notification.details.streamId})
+              The output "{notification.details.outputTitle}" (id: {notification.details.outputId})
+              in stream "{notification.details.streamTitle}" (id: {notification.details.streamId})
               is unable to send messages to the configured destination.
-              <br />
-              The error message from the output is: <em>{notification.details.errorMessage}</em>
+              <br/>
+                The error message from the output is: <em>{notification.details.errorMessage}</em>
             </span>
           ),
         };
