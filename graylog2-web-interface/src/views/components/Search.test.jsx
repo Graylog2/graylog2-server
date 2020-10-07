@@ -24,7 +24,6 @@ import Search from './Search';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/layout/Footer', () => <div />);
 jest.mock('util/History');
 
@@ -139,16 +138,6 @@ describe('Search', () => {
     const wrapper = mount(<SimpleSearch />);
 
     expect(wrapper.find('WindowLeaveMessage')).toHaveLength(1);
-  });
-
-  it('passes the given route to the WindowLeaveMessage component', () => {
-    const route = { path: '/foo' };
-    const wrapper = mount(<SimpleSearch route={route} />);
-
-    const windowLeaveMessage = wrapper.find('WindowLeaveMessage');
-
-    expect(windowLeaveMessage).toHaveLength(1);
-    expect(windowLeaveMessage).toHaveProp('route', route);
   });
 
   it('executes search upon mount', () => {
