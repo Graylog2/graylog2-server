@@ -22,7 +22,7 @@ const mockView = View.create()
   .search(Search.builder().build())
   .build();
 
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
+jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('views/stores/SearchStore');
 

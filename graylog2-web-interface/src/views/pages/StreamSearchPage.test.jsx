@@ -31,7 +31,7 @@ jest.mock('views/stores/ViewStore', () => ({
   },
 }));
 
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
+jest.mock('routing/withLocation', () => (x) => x);
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
