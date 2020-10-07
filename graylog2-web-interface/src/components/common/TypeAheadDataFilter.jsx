@@ -100,6 +100,7 @@ class TypeAheadDataFilter extends React.Component {
 
   _onSearchTextChanged = (event) => {
     event.preventDefault();
+    event.stopPropagation();
     this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
   };
 
