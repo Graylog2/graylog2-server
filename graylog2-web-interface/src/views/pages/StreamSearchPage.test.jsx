@@ -31,6 +31,8 @@ jest.mock('views/stores/ViewStore', () => ({
   },
 }));
 
+jest.mock('react-router', () => ({ withRouter: (x) => x }));
+
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.resolve()),

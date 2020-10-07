@@ -9,6 +9,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import DocumentationLink from 'components/support/DocumentationLink';
 import CollectorsAdministrationContainer from 'components/sidecars/administration/CollectorsAdministrationContainer';
+import withLocation from 'routing/withLocation';
 
 const SidecarAdministrationPage = createReactClass({
   propTypes: {
@@ -55,4 +56,4 @@ const SidecarAdministrationPage = createReactClass({
   },
 });
 
-export default SidecarAdministrationPage;
+export default withLocation(SidecarAdministrationPage);

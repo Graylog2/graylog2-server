@@ -9,6 +9,7 @@ import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import StoreProvider from 'injection/StoreProvider';
+import withLocation from 'routing/withLocation';
 
 const SystemStore = StoreProvider.getStore('System');
 
@@ -54,7 +55,7 @@ GettingStartedPage.propTypes = {
 };
 
 export default connect(
-  GettingStartedPage,
+  withLocation(GettingStartedPage),
   { systemStore: SystemStore },
   (props) => ({
     ...props,

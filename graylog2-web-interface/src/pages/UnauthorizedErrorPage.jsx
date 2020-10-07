@@ -1,11 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
 import { FetchError } from 'logic/rest/FetchProvider';
 import { Icon, ClipboardButton } from 'components/common';
 import ErrorPage from 'components/errors/ErrorPage';
+import withLocation from 'routing/withLocation';
 
 const createErrorMessageString = (errorDetails: ?string, pageDetails: string, errorMessage: string) => {
   const defaultText = `${pageDetails}\n${errorMessage}`;
@@ -86,4 +86,4 @@ UnauthorizedErrorPage.defaultProps = {
   title: 'Missing Permissions',
 };
 
-export default withRouter(UnauthorizedErrorPage);
+export default withLocation(UnauthorizedErrorPage);

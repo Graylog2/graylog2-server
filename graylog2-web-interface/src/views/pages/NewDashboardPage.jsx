@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
+import withLocation from 'routing/withLocation';
 import Spinner from 'components/common/Spinner';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
@@ -55,4 +56,4 @@ const mapping = {
   loadingViewHooks: 'views.hooks.loadingView',
   executingViewHooks: 'views.hooks.executingView',
 };
-export default withPluginEntities(NewDashboardPage, mapping);
+export default withPluginEntities(withLocation(NewDashboardPage), mapping);

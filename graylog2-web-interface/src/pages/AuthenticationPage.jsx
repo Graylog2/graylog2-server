@@ -6,6 +6,7 @@ import { Row, Col } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
 import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 
@@ -46,4 +47,4 @@ const AuthenticationPage = createReactClass({
   },
 });
 
-export default withParams(AuthenticationPage);
+export default withParams(withLocation(AuthenticationPage));

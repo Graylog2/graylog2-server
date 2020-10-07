@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
+import withLocation from 'routing/withLocation';
 import { Spinner } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
@@ -42,4 +42,4 @@ NewSearchPage.propTypes = {
   }).isRequired,
 };
 
-export default withRouter(NewSearchPage);
+export default withLocation(NewSearchPage);

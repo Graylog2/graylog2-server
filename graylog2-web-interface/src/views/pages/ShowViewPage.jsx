@@ -7,6 +7,7 @@ import Spinner from 'components/common/Spinner';
 import View from 'views/logic/views/View';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
+import withLocation from 'routing/withLocation';
 import withParams from 'routing/withParams';
 
 import SearchPage from './SearchPage';
@@ -59,4 +60,4 @@ ShowViewPage.defaultProps = {
   viewLoader: ViewLoader,
 };
 
-export default withParams(ShowViewPage);
+export default withParams(withLocation(ShowViewPage));

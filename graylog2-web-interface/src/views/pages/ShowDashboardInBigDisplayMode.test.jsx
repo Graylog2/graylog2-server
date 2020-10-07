@@ -13,8 +13,6 @@ const mockView = View.builder()
   .title('view title')
   .build();
 
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
-
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
     setInterval: jest.fn(),

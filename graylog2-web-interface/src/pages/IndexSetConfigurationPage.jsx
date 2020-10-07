@@ -13,6 +13,7 @@ import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
@@ -98,4 +99,4 @@ const IndexSetConfigurationPage = createReactClass({
   },
 });
 
-export default withParams(IndexSetConfigurationPage);
+export default withParams(withLocation(IndexSetConfigurationPage));

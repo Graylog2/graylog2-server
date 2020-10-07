@@ -6,6 +6,7 @@ import Spinner from 'components/common/Spinner';
 import withParams from 'routing/withParams';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
+import withLocation from 'routing/withLocation';
 
 import SearchPage from './SearchPage';
 
@@ -38,4 +39,4 @@ const StreamSearchPage = ({ params: { streamId }, route, location: { query } }: 
   return <SearchPage route={route} loadNewView={_loadNewView} />;
 };
 
-export default withParams(StreamSearchPage);
+export default withParams(withLocation(StreamSearchPage));

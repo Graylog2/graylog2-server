@@ -1,6 +1,5 @@
 // @flow strict
 import React, { useEffect } from 'react';
-import { withRouter } from 'react-router';
 import styled from 'styled-components';
 
 import connect from 'stores/connect';
@@ -13,6 +12,7 @@ import View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
 import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -69,4 +69,4 @@ const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, 
   );
 };
 
-export default withRouter(connect(withParams(ShowDashboardInBigDisplayMode), { view: ViewStore }));
+export default withLocation(connect(withParams(ShowDashboardInBigDisplayMode), { view: ViewStore }));
