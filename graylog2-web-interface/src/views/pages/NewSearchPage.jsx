@@ -7,7 +7,7 @@ import { Spinner } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
-import SavedSearchPage from './SavedSearchPage';
+import SearchPage from './SearchPage';
 
 type URLQuery = { [string]: any };
 
@@ -31,7 +31,7 @@ const NewSearchPage = ({ location: { query }, route }: Props) => {
     return <Spinner />;
   }
 
-  return <SavedSearchPage route={route} />;
+  return <SearchPage route={route} />;
 };
 
 NewSearchPage.propTypes = {

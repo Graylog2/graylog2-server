@@ -13,7 +13,7 @@ type Props = {
   route: any,
 };
 
-const SavedSearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView, route }: Props) => (
+const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView, route }: Props) => (
   <NewViewLoaderContext.Provider value={loadNewView}>
     <ViewLoaderContext.Provider value={loadView}>
       <IfUserHasAccessToAnyStream>
@@ -23,9 +23,9 @@ const SavedSearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultL
   </NewViewLoaderContext.Provider>
 );
 
-SavedSearchPage.defaultProps = {
+SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
 };
 
-export default SavedSearchPage;
+export default SearchPage;

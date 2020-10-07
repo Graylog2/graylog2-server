@@ -9,7 +9,7 @@ import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
 import withParams from 'routing/withParams';
 
-import SavedSearchPage from './SavedSearchPage';
+import SearchPage from './SearchPage';
 
 type Props = {
   location: {
@@ -37,7 +37,7 @@ const ShowViewPage = ({ params: { viewId }, route, location: { query }, viewLoad
     return <Spinner />;
   }
 
-  return <SavedSearchPage route={route} />;
+  return <SearchPage route={route} />;
 };
 
 ShowViewPage.propTypes = {

@@ -7,7 +7,7 @@ import withParams from 'routing/withParams';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
-import SavedSearchPage from './SavedSearchPage';
+import SearchPage from './SearchPage';
 
 import { loadNewViewForStream } from '../logic/views/Actions';
 
@@ -35,7 +35,7 @@ const StreamSearchPage = ({ params: { streamId }, route, location: { query } }: 
     return <Spinner />;
   }
 
-  return <SavedSearchPage route={route} loadNewView={_loadNewView} />;
+  return <SearchPage route={route} loadNewView={_loadNewView} />;
 };
 
 export default withParams(StreamSearchPage);
