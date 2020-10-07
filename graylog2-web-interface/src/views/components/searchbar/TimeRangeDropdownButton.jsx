@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Overlay } from 'react-overlays';
 
 import { Button } from 'components/graylog';

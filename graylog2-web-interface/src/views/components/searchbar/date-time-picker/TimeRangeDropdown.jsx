@@ -53,7 +53,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
   useEffect(() => {
     nextRangeHelpers.setValue(originalTimerange.value, originalTimerange.value);
-  }, []);
+  });
 
   const onSelect = (newType) => {
     setActiveTab(newType);

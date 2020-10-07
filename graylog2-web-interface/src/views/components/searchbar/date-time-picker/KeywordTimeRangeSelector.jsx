@@ -86,7 +86,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
       .then(_setSuccessfullPreview, _setFailedPreview);
 
     return () => formik.unregisterField('tempTimeRange.keyword');
-  }, []);
+  });
 
   const { from, to } = keywordPreview.toObject();
   const keywordPreviewElement = !keywordPreview.isEmpty() && (
