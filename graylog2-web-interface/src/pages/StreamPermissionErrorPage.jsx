@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
 import { FetchError } from 'logic/rest/FetchProvider';
 
@@ -32,4 +31,4 @@ StreamPermissionErrorPage.propTypes = {
   }).isRequired,
 };
 
-export default withRouter(StreamPermissionErrorPage);
+export default StreamPermissionErrorPage;
