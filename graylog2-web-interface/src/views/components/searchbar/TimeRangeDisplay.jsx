@@ -46,9 +46,8 @@ const dateOutput = (timerange: TimeRange) => {
       };
 
     case 'absolute':
-      return { from: timerange.from, until: timerange.to };
     case 'keyword':
-      return { from: timerange.keyword, until: 'TODO' };
+      return { from: timerange.from, until: timerange.to };
     default:
       return { from, until: from };
   }

@@ -33,14 +33,17 @@ const StyledPopover: StyledComponent<{}, void, typeof Popover> = styled(Popover)
   min-width: 745px;
 `;
 
-const timeRangeTypeTabs = (config) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+const timeRangeTypeTabs = (config, activeKey) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
     <Tab title={name}
          key={`time-range-type-selector-${type}`}
          eventKey={type}>
-      <RangeComponent config={config} disabled={false} />
+      {type === activeKey && (
+        <RangeComponent config={config}
+                        disabled={false} />
+      )}
     </Tab>
   );
 });
@@ -49,27 +52,34 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const formik = useFormikContext();
   const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
-  const [activeTab, setActiveTab] = useState(originalTimerange?.value?.type);
+  const { value: nextRangeValue } = nextRangeProps;
+  const { value: originalRangeValue } = originalTimerange;
+
+  const [activeTab, setActiveTab] = useState(originalRangeValue?.type);
 
   useEffect(() => {
-    nextRangeHelpers.setValue(originalTimerange.value, originalTimerange.value);
+    if (!nextRangeValue) {
+      nextRangeHelpers.setValue(originalRangeValue);
+    }
   });
 
   const onSelect = (newType) => {
+    nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
     setActiveTab(newType);
-    nextRangeHelpers.setValue(migrateTimeRangeToNewType(originalTimerange.value, newType));
   };
 
   const handleCancel = () => {
-    nextRangeHelpers.setValue(originalTimerange.value);
+    nextRangeHelpers.setValue(originalRangeValue);
     toggleDropdownShow();
   };
 
   const handleApply = () => {
-    originalTimerangeHelpers.setValue(nextRangeProps?.value || {});
+    originalTimerangeHelpers.setValue(nextRangeValue);
     formik.unregisterField('tempTimeRange');
     toggleDropdownShow();
   };
+
+  const activeKey = activeTab || 'disabled';
 
   return (
     <StyledPopover id="timerange-type"
@@ -80,17 +90,17 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
         <Col md={12}>
           <Tabs id="dateTimeTypes"
                 defaultActiveKey={availableTimeRangeTypes[0].type}
-                activeKey={activeTab || 'disabled'}
+                activeKey={activeKey}
                 onSelect={onSelect}
                 animation={false}>
             {noOverride && (
-              <Tab title="No Override"
-                   key="time-range-type-selector-disabled"
-                   eventKey="disabled">
-                <p>No Override to Date.</p>
-              </Tab>
+            <Tab title="No Override"
+                 key="time-range-type-selector-disabled"
+                 eventKey="disabled">
+              <p>No Override to Date.</p>
+            </Tab>
             )}
-            {timeRangeTypeTabs(config)}
+            {timeRangeTypeTabs(config, activeKey)}
           </Tabs>
         </Col>
       </Row>

@@ -1,12 +1,12 @@
 // @flow strict
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
-import { trim } from 'lodash';
-import { connect, Field, useFormikContext } from 'formik';
+import trim from 'lodash/trim';
+import isEqual from 'lodash/isEqual';
+import { connect, Field, useField } from 'formik';
 
 import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
@@ -21,7 +21,7 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   min-height: 34px;
   padding-top: 5px;
   padding-bottom: 5px;
-  margin-top: 0 !important;  /* Would be overwritten by graylog.less */
+  margin-top: 0;
 `;
 
 const KeywordInput: StyledComponent<{}, ThemeInterface, typeof FormControl> = styled(FormControl)(({ theme }) => css`
@@ -37,7 +37,7 @@ const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();
   const to = DateTime.fromUTCDateTime(data.to).toString();
 
-  return Immutable.Map({ from, to });
+  return { from, to };
 };
 
 type Props = {
@@ -61,40 +61,54 @@ const _validateKeyword = (
 };
 
 const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
-  const [keywordPreview, setKeywordPreview] = useState(Immutable.Map());
+  const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+  const keywordRef = useRef();
+  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
+
   const _setSuccessfullPreview = useCallback(
     (response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)),
-    [setKeywordPreview],
+    [],
   );
+
   const _setFailedPreview = useCallback(() => {
-    setKeywordPreview(Immutable.Map());
+    setKeywordPreview({ from: '', to: '' });
 
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
-
-  const formik = useFormikContext();
 
   const _validate = useCallback(
     (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
     [_setSuccessfullPreview, _setFailedPreview],
   );
 
-  useEffect(() => {
-    const { values: { timerange } } = formik;
-
-    ToolsStore.testNaturalDate(timerange?.keyword)
-      .then(_setSuccessfullPreview, _setFailedPreview);
-
-    return () => formik.unregisterField('tempTimeRange.keyword');
-  });
-
-  const { from, to } = keywordPreview.toObject();
-  const keywordPreviewElement = !keywordPreview.isEmpty() && (
+  const keywordPreviewElement = (keywordPreview.from && keywordPreview.to) && (
     <KeywordPreview bsStyle="info">
       <strong style={{ marginRight: 8 }}>Preview:</strong>
-      {from} to {to}
+      {keywordPreview.from} to {keywordPreview.to}
     </KeywordPreview>
   );
+
+  useEffect(() => {
+    if (keywordRef.current !== nextRangeProps.value.keyword) {
+      keywordRef.current = nextRangeProps.value.keyword;
+
+      ToolsStore.testNaturalDate(keywordRef.current)
+        .then(_setSuccessfullPreview, _setFailedPreview);
+    }
+  });
+
+  useEffect(() => {
+    const { type, keyword, ...restPreview } = nextRangeProps.value;
+
+    if (!isEqual(restPreview, keywordPreview)) {
+      nextRangeHelpers.setValue({
+        type,
+        keyword,
+        ...restPreview,
+        ...keywordPreview,
+      });
+    }
+  });
 
   return (
     <Row className="no-bm" style={{ marginLeft: 50 }}>
