@@ -1,6 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SavedSearchControls Button handling has "Share search" option which should be hidden if search is unsaved 1`] = `
+.c0 {
+  margin-top: 3px;
+}
+
 <MenuItem
   bsClass="dropdown"
   disabled={true}
@@ -45,7 +49,71 @@ exports[`SavedSearchControls Button handling has "Share search" option which sho
             />
           </FontAwesomeIcon>
         </Icon>
-         Share
+         Share 
+        <SharingDisabledPopover
+          type="search"
+        >
+          <SharingDisabledPopover__StyledHelpPopover
+            title="Sharing not possible"
+          >
+            <HelpPopover
+              className="c0"
+              id="help-popover"
+              title="Sharing not possible"
+            >
+              <OverlayTrigger
+                defaultOverlayShown={false}
+                overlay={
+                  <Popover
+                    id="help-popover"
+                    title="Sharing not possible"
+                  >
+                    Only owners of this 
+                    search
+                     are allowed to share it.
+                  </Popover>
+                }
+                placement="bottom"
+                trigger={
+                  Array [
+                    "hover",
+                    "focus",
+                  ]
+                }
+              >
+                <Icon
+                  className="c0 pull-right"
+                  name="question-circle"
+                  onBlur={[Function]}
+                  onClick={null}
+                  onFocus={[Function]}
+                  onMouseOut={[Function]}
+                  onMouseOver={[Function]}
+                  type="solid"
+                >
+                  <FontAwesomeIcon
+                    className="c0 pull-right"
+                    icon={
+                      Object {
+                        "iconName": "question-circle",
+                        "prefix": "fas",
+                      }
+                    }
+                    onBlur={[Function]}
+                    onClick={null}
+                    onFocus={[Function]}
+                    onMouseOut={[Function]}
+                    onMouseOver={[Function]}
+                  >
+                    <svg
+                      className="svg-inline--fa fa-question-circle"
+                    />
+                  </FontAwesomeIcon>
+                </Icon>
+              </OverlayTrigger>
+            </HelpPopover>
+          </SharingDisabledPopover__StyledHelpPopover>
+        </SharingDisabledPopover>
       </a>
     </SafeAnchor>
   </li>

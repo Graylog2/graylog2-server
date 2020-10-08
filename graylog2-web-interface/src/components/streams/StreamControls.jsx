@@ -3,6 +3,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted, HasOwnership } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -88,7 +89,7 @@ const StreamControls = createReactClass({
           <HasOwnership id={stream.id} type="stream">
             {({ disabled }) => (
               <MenuItem key={`share-${stream.id}`} onSelect={onShare} disabled={disabled}>
-                Share
+                Share {disabled && <SharingDisabledPopover type="stream" />}
               </MenuItem>
             )}
           </HasOwnership>
