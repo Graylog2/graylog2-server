@@ -171,12 +171,14 @@ const AppRouter = () => {
                         <Route path={Routes.import_extractors(':nodeId', ':inputId')} component={ImportExtractorsPage} />
                         <Route path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage} />
                         <Route path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage} />
-                        <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
-                        <Route path={Routes.SYSTEM.CONTENTPACKS.CREATE} component={CreateContentPackPage} />
-                        <Route path={Routes.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev')}
+
+                        <Route exact path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
+                        <Route exact path={Routes.SYSTEM.CONTENTPACKS.CREATE} component={CreateContentPackPage} />
+                        <Route exact path={Routes.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev')}
                                component={EditContentPackPage} />
-                        <Route path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')}
+                        <Route exact path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')}
                                component={ShowContentPackPage} />
+
                         <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
                         <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
                         <Route path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
