@@ -1,14 +1,21 @@
 // @flow strict
 import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
 import moment from 'moment';
+import { useField } from 'formik';
 
 import { type ThemeInterface } from 'theme';
 import { type TimeRange } from 'views/logic/queries/Query';
+import StoreProvider from 'injection/StoreProvider';
 
 type Props = {|
   timerange: ?TimeRange,
 |};
+
+const EMPTY_RANGE = '----/--/-- --:--:--.---';
+
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const TimeRangeWrapper: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
   width: 100%;
@@ -32,7 +39,7 @@ const TimeRangeWrapper: StyledComponent<{}, ThemeInterface, HTMLParagraphElement
 `);
 
 const dateOutput = (timerange: TimeRange) => {
-  let from = '----/--/-- --:--:--.---';
+  let from = EMPTY_RANGE;
 
   switch (timerange.type) {
     case 'relative':
@@ -54,20 +61,38 @@ const dateOutput = (timerange: TimeRange) => {
 };
 
 const TimeRangeDisplay = ({ timerange }: Props) => {
-  if (!timerange?.type) {
-    return (
-      <TimeRangeWrapper>
-        <span><code>No Override</code></span>
-      </TimeRangeWrapper>
-    );
-  }
+  const emptyOutput = useMemo(() => ({ from: EMPTY_RANGE, until: EMPTY_RANGE }), []);
+  const [{ from, until }, setTimeOutput] = useState(emptyOutput);
+  const [, , nextRangeHelpers] = useField('tempTimeRange');
 
-  const { from, until } = dateOutput(timerange);
+  useEffect(() => {
+    if (timerange?.type === 'keyword') {
+      ToolsStore.testNaturalDate(timerange.keyword)
+        .then((response) => {
+          setTimeOutput({
+            from: response.from,
+            until: response.to,
+          });
+
+          nextRangeHelpers.setValue({ ...timerange, ...response });
+        }, () => {
+          setTimeOutput(emptyOutput);
+        });
+    } else if (timerange?.type) {
+      setTimeOutput(dateOutput(timerange));
+    }
+  }, [timerange, emptyOutput, nextRangeHelpers]);
 
   return (
     <TimeRangeWrapper>
-      <span><strong>From</strong>: <code>{from}</code></span>
-      <span><strong>Until</strong>: <code>{until}</code></span>
+      {!timerange?.type
+        ? <span><code>No Override</code></span>
+        : (
+          <>
+            <span><strong>From</strong>: <code>{from}</code></span>
+            <span><strong>Until</strong>: <code>{until}</code></span>
+          </>
+        )}
     </TimeRangeWrapper>
   );
 };
