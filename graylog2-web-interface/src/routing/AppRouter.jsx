@@ -3,7 +3,6 @@ import { Redirect, Router, Route, Switch } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
-import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
@@ -186,43 +185,54 @@ const AppRouter = () => {
                                component={IndexSetConfigurationPage} />
                         <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
 
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.CREATE} component={LUTTablesPage} action="create" />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.show(':tableName')}
-                               component={LUTTablesPage}
-                               action="show" />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.edit(':tableName')}
-                               component={LUTTablesPage}
-                               action="edit" />
+                        <Route exact path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
+                        <Route exact path={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+                          <LUTTablesPage action="create" />
+                        </Route>
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.show(':tableName')}>
+                          <LUTTablesPage action="show" />
+                        </Route>
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.edit(':tableName')}>
+                          <LUTTablesPage action="edit" />
+                        </Route>
 
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} component={LUTCachesPage} />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}
-                               component={LUTCachesPage}
-                               action="create" />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')}
-                               component={LUTCachesPage}
-                               action="show" />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')}
-                               component={LUTCachesPage}
-                               action="edit" />
+                        <Route exact path={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} component={LUTCachesPage} />
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
+                          <LUTCachesPage action="create" />
+                        </Route>
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')}>
+                          <LUTCachesPage action="show" />
+                        </Route>
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')}>
+                          <LUTCachesPage action="edit" />
+                        </Route>
 
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
                                component={LUTDataAdaptersPage} />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}
-                               component={LUTDataAdaptersPage}
-                               action="create" />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')}
-                               component={LUTDataAdaptersPage}
-                               action="show" />
-                        <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')}
-                               component={LUTDataAdaptersPage}
-                               action="edit" />
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
+                          <LUTDataAdaptersPage action="create" />
+                        </Route>
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')}>
+                          <LUTDataAdaptersPage action="show" />
+                        </Route>
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')}>
+                          <LUTDataAdaptersPage action="edit" />
+                        </Route>
 
-                        <Route path={Routes.SYSTEM.PIPELINES.OVERVIEW} component={PipelinesOverviewPage} />
-                        <Route path={Routes.SYSTEM.PIPELINES.RULES} component={RulesPage} />
-                        <Route path={Routes.SYSTEM.PIPELINES.RULE(':ruleId')} component={RuleDetailsPage} />
-                        <Route path={Routes.SYSTEM.PIPELINES.SIMULATOR} component={SimulatorPage} />
-                        <Route path={Routes.SYSTEM.PIPELINES.PIPELINE(':pipelineId')} component={PipelineDetailsPage} />
+                        <Route exact path={Routes.SYSTEM.PIPELINES.OVERVIEW} component={PipelinesOverviewPage} />
+                        <Route exact path={Routes.SYSTEM.PIPELINES.RULES} component={RulesPage} />
+                        <Route exact path={Routes.SYSTEM.PIPELINES.RULE(':ruleId')} component={RuleDetailsPage} />
+                        <Route exact path={Routes.SYSTEM.PIPELINES.SIMULATOR} component={SimulatorPage} />
+                        <Route exact path={Routes.SYSTEM.PIPELINES.PIPELINE(':pipelineId')} component={PipelineDetailsPage} />
 
                         <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage} />
                         <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
