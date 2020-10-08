@@ -53,10 +53,10 @@ exports[`SavedSearchControls Button handling has "Share search" option which sho
         <SharingDisabledPopover
           type="search"
         >
-          <SharingDisabledPopover__StyledHelpPopover
+          <SharingDisabledPopover__StyledHoverForHelp
             title="Sharing not possible"
           >
-            <HelpPopover
+            <HoverForHelp
               className="c0"
               id="help-popover"
               title="Sharing not possible"
@@ -111,8 +111,8 @@ exports[`SavedSearchControls Button handling has "Share search" option which sho
                   </FontAwesomeIcon>
                 </Icon>
               </OverlayTrigger>
-            </HelpPopover>
-          </SharingDisabledPopover__StyledHelpPopover>
+            </HoverForHelp>
+          </SharingDisabledPopover__StyledHoverForHelp>
         </SharingDisabledPopover>
       </a>
     </SafeAnchor>
