@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { alertsManager as exampleRole } from 'fixtures/roles';
-import { alice, bob } from 'fixtures/userOverviews';
+import { alice, bob, charlie } from 'fixtures/userOverviews';
 import mockAction from 'helpers/mocking/MockAction';
 
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
@@ -26,14 +26,14 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesStore: {},
   AuthzRolesActions: {
     removeMember: mockAction(jest.fn(() => Promise.resolve())),
-    addMember: mockAction(jest.fn(() => Promise.resolve())),
+    addMembers: mockAction(jest.fn(() => Promise.resolve())),
     loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
   },
 }));
 
 // mock loadUsersPaginated
 const paginatedUsers = {
-  list: Immutable.List([bob]),
+  list: Immutable.List([bob, charlie]),
   pagination: {
     page: 1,
     perPage: 10,
@@ -80,12 +80,17 @@ describe('RoleEdit', () => {
     await act(() => mockLoadUsersPromise);
 
     const assignUserButton = getByRole('button', { name: 'Assign User' });
-    const usersSelector = getByLabelText('Search for users');
-    await selectEvent.openMenu(usersSelector);
-    await selectEvent.select(usersSelector, bob.username);
+    const usersSelectorBob = getByLabelText('Search for users');
+    await selectEvent.openMenu(usersSelectorBob);
+    await selectEvent.select(usersSelectorBob, bob.username);
+
+    const userSelectorCharlie = getByLabelText('Search for users');
+    await selectEvent.openMenu(userSelectorCharlie);
+    await selectEvent.select(userSelectorCharlie, charlie.username);
+
     fireEvent.click(assignUserButton);
 
-    await waitFor(() => expect(AuthzRolesActions.addMember).toHaveBeenCalledWith(exampleRole.id, bob.username));
+    await waitFor(() => expect(AuthzRolesActions.addMembers).toHaveBeenCalledWith(exampleRole.id, Immutable.Set.of(bob.username, charlie.username)));
   });
 
   it('should filter assigned users', async () => {

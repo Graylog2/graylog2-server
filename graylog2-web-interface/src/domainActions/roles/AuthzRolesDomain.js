@@ -22,13 +22,13 @@ const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   }),
 });
 
-const addMember: $PropertyType<ActionsType, 'addMember'> = notifyingAction({
-  action: AuthzRolesActions.addMember,
-  success: (roleId, username) => ({
-    message: `User "${username}" was assigned successfully`,
+const addMembers: $PropertyType<ActionsType, 'addMembers'> = notifyingAction({
+  action: AuthzRolesActions.addMembers,
+  success: (roleId, usernames) => ({
+    message: `Users:"${usernames.join(', ')}" were assigned successfully`,
   }),
-  error: (error, roleId, username) => ({
-    message: `Assigning user "${username}" failed with status: ${error}`,
+  error: (error, roleId, usernames) => ({
+    message: `Assigning users "${usernames.join(', ')}" failed with status: ${error}`,
   }),
 });
 
@@ -66,7 +66,7 @@ const loadRolesPaginated: $PropertyType<ActionsType, 'loadRolesPaginated'> = not
 export default {
   load,
   delete: deleteAction,
-  addMember,
+  addMembers,
   removeMember,
   loadUsersForRole,
   loadRolesForUser,

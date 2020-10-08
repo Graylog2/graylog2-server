@@ -43,7 +43,7 @@ const ApiRoutes = {
     delete: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
     list: () => { return { url: '/authzRoles' }; },
     removeMember: (roleId, username) => { return { url: `/authzRoles/${roleId}/assignee/${username}` }; },
-    addMember: (roleId, username) => { return { url: `/authzRoles/${roleId}/assignee/${username}` }; },
+    addMembers: (roleId) => { return { url: `/authzRoles/${roleId}/assignee/` }; },
     loadRolesForUser: (username) => { return { url: `/authzRoles/rolesForUser/${username}` }; },
     loadUsersForRole: (roleId) => { return { url: `/authzRoles/${roleId}/assignees` }; },
   },
