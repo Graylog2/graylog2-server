@@ -5,7 +5,6 @@ import { withTheme } from 'styled-components';
 
 import connect from 'stores/connect';
 import type { ThemeInterface } from 'theme';
-import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -23,11 +22,10 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
 import type { UserJSON } from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
+import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
-
-import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 
 type Props = {
   viewStoreState: ViewStoreState,

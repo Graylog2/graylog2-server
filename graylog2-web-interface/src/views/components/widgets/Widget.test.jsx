@@ -22,11 +22,11 @@ import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import { loadDashboard } from 'views/logic/views/Actions';
 
 import Widget from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
-import { loadDashboard } from '../../logic/views/Actions';
 
 jest.mock('views/actions/SearchActions', () => ({
   create: mockAction(jest.fn()),
