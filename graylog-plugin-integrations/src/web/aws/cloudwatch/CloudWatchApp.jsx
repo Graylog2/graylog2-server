@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import PageHeader from 'components/common/PageHeader';
+import withParams from 'routing/withParams';
 import { SidebarProvider } from 'aws/context/Sidebar';
 import { FormDataProvider } from 'aws/context/FormData';
 import { StepsProvider } from 'aws/context/Steps';
@@ -38,4 +39,4 @@ CloudWatchApp.propTypes = {
   route: PropTypes.object.isRequired,
 };
 
-export default CloudWatchApp;
+export default withParams(CloudWatchApp);
