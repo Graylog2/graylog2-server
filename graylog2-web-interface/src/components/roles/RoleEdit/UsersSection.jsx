@@ -45,7 +45,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
 
   const _loadUsers = (u) => u && setUsers(u);
   const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => AuthzRolesDomain.addMembers(id,
-    newUsers.map((u) => u.username).toArray()).then(() => _onLoad(defaultPageInfo)
+    newUsers.map((u) => u.username)).then(() => _onLoad(defaultPageInfo)
     .then(_loadUsers));
 
   const _onUnassignUser = (user: DescriptiveItem) => {

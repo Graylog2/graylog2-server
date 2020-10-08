@@ -25,10 +25,10 @@ const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
 const addMembers: $PropertyType<ActionsType, 'addMembers'> = notifyingAction({
   action: AuthzRolesActions.addMembers,
   success: (roleId, usernames) => ({
-    message: `Users:"${usernames}" were assigned successfully`,
+    message: `Users:"${usernames.join(', ')}" were assigned successfully`,
   }),
   error: (error, roleId, usernames) => ({
-    message: `Assigning users "${usernames}" failed with status: ${error}`,
+    message: `Assigning users "${usernames.join(', ')}" failed with status: ${error}`,
   }),
 });
 

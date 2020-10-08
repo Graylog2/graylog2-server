@@ -87,7 +87,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
 
     addMembers(roleId: string, usernames: Immutable.Set<string>): Promise<?Role> {
       const { url } = ApiRoutes.AuthzRolesController.addMembers(roleId);
-      const promise = fetch('PUT', qualifyUrl(url), usernames);
+      const promise = fetch('PUT', qualifyUrl(url), usernames.toArray());
 
       AuthzRolesActions.addMembers.promise(promise);
 
