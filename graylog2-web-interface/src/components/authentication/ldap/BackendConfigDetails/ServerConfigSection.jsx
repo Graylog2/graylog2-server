@@ -15,7 +15,6 @@ type Props = {
 
 const ServerConfigSection = ({ authenticationBackend }: Props) => {
   const { servers = [], systemUserDn, systemUserPassword, transportSecurity, verifyCertificates } = authenticationBackend.config;
-
   const serverUrls = servers.map((server) => `${server.host}:${server.port}`).join(', ');
 
   return (
