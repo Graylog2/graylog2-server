@@ -106,6 +106,10 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         )).collect(ImmutableSet.toImmutableSet());
     }
 
+    public List<GrantDTO> getForTargetAndGrantee(GRN target, GRN grantee) {
+       return getForTargetAndGrantees(target, ImmutableSet.of(grantee));
+    }
+
     public List<GrantDTO> getForTargetAndGrantees(GRN target, Set<GRN> grantees) {
         return db.find(DBQuery.and(
                 DBQuery.is(GrantDTO.FIELD_TARGET, target),
@@ -136,11 +140,25 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         return create(GrantDTO.of(grantee, capability, target), creatorUsername);
     }
 
+    /**
+     * Ensure that a grant with the requested or a higher capability exists.
+     * @return the created, updated or existing grant
+     */
     public GrantDTO ensure(GRN grantee, Capability capability, GRN target, String creatorUsername) {
-        if (!hasGrantFor(grantee, capability, target)) {
+        final List<GrantDTO> existingGrants = getForTargetAndGrantee(target, grantee);
+        if (existingGrants.isEmpty()) {
             return create(grantee, capability, target, creatorUsername);
         }
-        return null;
+        // This should never happen
+        assert existingGrants.size() == 1;
+
+        final GrantDTO grantDTO = existingGrants.get(0);
+        // Only upgrade capabilities: VIEW < MANAGE < OWNER
+        if (capability.ordinal() > grantDTO.capability().ordinal()) {
+            final GrantDTO grantUpdate = grantDTO.toBuilder().capability(capability).build();
+            return save(grantUpdate);
+        }
+        return grantDTO;
     }
 
     public GrantDTO update(GrantDTO updatedGrant, @Nullable User currentUser) {

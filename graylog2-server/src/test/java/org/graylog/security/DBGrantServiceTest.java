@@ -152,9 +152,21 @@ public class DBGrantServiceTest {
         final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
         final GRN newStream = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0888");
 
-        assertThat(dbService.ensure(jane, Capability.VIEW, stream1, "admin")).isNull();
-        assertThat(dbService.ensure(jane, Capability.MANAGE, newStream, "admin")).isNotNull();
+        // Matches existing grant. Returns original
+        final GrantDTO stream1Grant = dbService.getForTargetAndGrantee(stream1, jane).get(0);
+        GrantDTO result = dbService.ensure(jane, Capability.VIEW, stream1, "admin");
+        assertThat(result).isEqualTo(stream1Grant);
 
+        // Updates to a higher capability
+        result = dbService.ensure(jane, Capability.MANAGE, stream1, "admin");
+        assertThat(result.capability()).isEqualTo(Capability.MANAGE);
+
+        // Don't downgrade to a lower capability
+        result = dbService.ensure(jane, Capability.VIEW, stream1, "admin");
+        assertThat(result.capability()).isEqualTo(Capability.MANAGE);
+
+        // Create a new grant
+        assertThat(dbService.ensure(jane, Capability.MANAGE, newStream, "admin")).isNotNull();
         assertThat(dbService.getForTarget(newStream)).satisfies(grantDTOS -> {
             assertThat(grantDTOS.size()).isEqualTo(1);
             assertThat(grantDTOS.get(0).grantee()).isEqualTo(jane);
