@@ -4,8 +4,6 @@ import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import history from 'util/History';
-import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
 import IfSearch from 'views/components/search/IfSearch';
@@ -31,6 +29,7 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
+import { loadDashboard } from 'views/logic/views/Actions';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -51,7 +50,6 @@ import ReplaySearchButton from './ReplaySearchButton';
 import IfDashboard from '../dashboard/IfDashboard';
 import InteractiveContext from '../contexts/InteractiveContext';
 import IfInteractive from '../dashboard/IfInteractive';
-import {loadDashboard} from "../../logic/views/Actions";
 
 const WidgetActionsWBar = styled.div`
   > * {
