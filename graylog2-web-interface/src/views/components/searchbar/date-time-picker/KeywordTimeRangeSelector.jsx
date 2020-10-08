@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
-import { connect, Field, useField } from 'formik';
+import { Field, useField } from 'formik';
 
 import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
@@ -15,7 +15,7 @@ import type { ThemeInterface } from 'theme';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
+const KeywordPreview: StyledComponent<{}, void, typeof Alert> = styled(Alert)`
   display: flex;
   align-items: center;
   min-height: 34px;
@@ -89,7 +89,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   );
 
   useEffect(() => {
-    if (keywordRef.current !== nextRangeProps.value.keyword) {
+    if (keywordRef.current !== nextRangeProps?.value?.keyword) {
       keywordRef.current = nextRangeProps.value.keyword;
 
       ToolsStore.testNaturalDate(keywordRef.current)
@@ -98,17 +98,19 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   });
 
   useEffect(() => {
-    const { type, keyword, ...restPreview } = nextRangeProps.value;
+    if (nextRangeProps?.value) {
+      const { type, keyword, ...restPreview } = nextRangeProps?.value;
 
-    if (!isEqual(restPreview, keywordPreview)) {
-      nextRangeHelpers.setValue({
-        type,
-        keyword,
-        ...restPreview,
-        ...keywordPreview,
-      });
+      if (!isEqual(restPreview, keywordPreview)) {
+        nextRangeHelpers.setValue({
+          type,
+          keyword,
+          ...restPreview,
+          ...keywordPreview,
+        });
+      }
     }
-  });
+  }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
 
   return (
     <Row className="no-bm" style={{ marginLeft: 50 }}>
@@ -154,4 +156,4 @@ KeywordTimeRangeSelector.defaultProps = {
   disabled: false,
 };
 
-export default connect(KeywordTimeRangeSelector);
+export default KeywordTimeRangeSelector;

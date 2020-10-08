@@ -1,9 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
 import moment from 'moment';
-import { useField } from 'formik';
 
 import { type ThemeInterface } from 'theme';
 import { type TimeRange } from 'views/logic/queries/Query';
@@ -14,6 +13,7 @@ type Props = {|
 |};
 
 const EMPTY_RANGE = '----/--/-- --:--:--.---';
+const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
@@ -61,27 +61,28 @@ const dateOutput = (timerange: TimeRange) => {
 };
 
 const TimeRangeDisplay = ({ timerange }: Props) => {
-  const emptyOutput = useMemo(() => ({ from: EMPTY_RANGE, until: EMPTY_RANGE }), []);
-  const [{ from, until }, setTimeOutput] = useState(emptyOutput);
-  const [, , nextRangeHelpers] = useField('tempTimeRange');
+  const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
+  const dateTested = useRef(false);
 
   useEffect(() => {
-    if (timerange?.type === 'keyword') {
-      ToolsStore.testNaturalDate(timerange.keyword)
-        .then((response) => {
-          setTimeOutput({
-            from: response.from,
-            until: response.to,
-          });
+    if (timerange?.type === 'keyword' && !timerange.from) {
+      if (!dateTested.current) {
+        ToolsStore.testNaturalDate(timerange.keyword)
+          .then((response) => {
+            dateTested.current = true;
 
-          nextRangeHelpers.setValue({ ...timerange, ...response });
-        }, () => {
-          setTimeOutput(emptyOutput);
-        });
+            setTimeOutput({
+              from: response.from,
+              until: response.to,
+            });
+          }, () => {
+            setTimeOutput(EMPTY_OUTPUT);
+          });
+      }
     } else if (timerange?.type) {
       setTimeOutput(dateOutput(timerange));
     }
-  }, [timerange, emptyOutput, nextRangeHelpers]);
+  }, [dateTested, timerange]);
 
   return (
     <TimeRangeWrapper>
