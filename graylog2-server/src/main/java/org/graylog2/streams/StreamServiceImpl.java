@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -221,12 +222,21 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                     .map(outputsById::get)
                     .collect(Collectors.toSet());
 
+            if (outputs.contains(null)) {
+                final String streamTitle = Strings.nullToEmpty((String)o.get(StreamImpl.FIELD_TITLE));
+                LOG.warn("Stream \"" + streamTitle + "\" <" + id + "> references missing outputs - ignoring these outputs.");
+            }
+
+            final Set<Output> nonNullOutputs = outputs.stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
             @SuppressWarnings("unchecked")
             final Map<String, Object> fields = o.toMap();
 
             final String indexSetId = (String)fields.get(StreamImpl.FIELD_INDEX_SET_ID);
 
-            streams.add(new StreamImpl(objectId, fields, streamRules, outputs, indexSets.get(indexSetId)));
+            streams.add(new StreamImpl(objectId, fields, streamRules, nonNullOutputs, indexSets.get(indexSetId)));
         }
 
         return streams.build();
