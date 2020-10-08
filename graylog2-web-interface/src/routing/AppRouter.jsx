@@ -236,8 +236,8 @@ const AppRouter = () => {
 
                         <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage} />
                         <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
-                        <Route path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
-                        <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
+                        <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
+                        <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
                         <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
                         <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
                         <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
