@@ -155,7 +155,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
         final GrantDTO grantDTO = existingGrants.get(0);
         // Only upgrade capabilities: VIEW < MANAGE < OWNER
-        if (capability.ordinal() > grantDTO.capability().ordinal()) {
+        if (capability.priority() > grantDTO.capability().priority()) {
             final GrantDTO grantUpdate = grantDTO.toBuilder().capability(capability).build();
             return save(grantUpdate);
         }
