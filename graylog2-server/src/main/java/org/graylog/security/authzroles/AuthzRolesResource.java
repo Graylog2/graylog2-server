@@ -18,6 +18,7 @@ package org.graylog.security.authzroles;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,6 +38,8 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.UserOverviewDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -63,6 +66,8 @@ import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 @Path("/authzRoles")
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthzRolesResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
+
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(AuthzRoleDTO.FIELD_NAME, SearchQueryField.create(AuthzRoleDTO.FIELD_NAME))
             .put(AuthzRoleDTO.FIELD_DESCRIPTION, SearchQueryField.create(AuthzRoleDTO.FIELD_DESCRIPTION))
@@ -194,11 +199,11 @@ public class AuthzRolesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Add user to role")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
-    @Path("{roleId}/assignee/{username}")
+    @Path("{roleId}/assignee")
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
-            @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
-        updateUserRole(roleId, username, Set::add);
+            @ApiParam(name = "usernames") Set<String> usernames) throws ValidationException {
+        updateUserRole(roleId, usernames, Set::add);
     }
 
     @DELETE
@@ -208,25 +213,31 @@ public class AuthzRolesResource extends RestResource {
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
-        updateUserRole(roleId, username, Set::remove);
+        updateUserRole(roleId, ImmutableSet.of(username), Set::remove);
     }
 
     interface UpdateRoles {
         boolean update(Set<String> roles, String roleId);
     }
 
-    private void updateUserRole(String roleId, String username, UpdateRoles rolesUpdater) throws ValidationException {
-        checkPermission(USERS_EDIT, username);
+    private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater) throws ValidationException {
+        usernames.forEach(username -> {
+            checkPermission(USERS_EDIT, username);
 
-        final User user = userService.load(username);
-        if (user == null) {
-            throw new NotFoundException("Cannot find user with name: " + username);
-        }
-        authzRolesService.get(roleId).orElseThrow(() -> new NotFoundException("Cannot find role with id: " + roleId));
-        Set<String> roles = user.getRoleIds();
-        rolesUpdater.update(roles, roleId);
-        user.setRoleIds(roles);
-        userService.save(user);
+            final User user = userService.load(username);
+            if (user == null) {
+                throw new NotFoundException("Cannot find user with name: " + username);
+            }
+            authzRolesService.get(roleId).orElseThrow(() -> new NotFoundException("Cannot find role with id: " + roleId));
+            Set<String> roles = user.getRoleIds();
+            rolesUpdater.update(roles, roleId);
+            user.setRoleIds(roles);
+            try {
+                userService.save(user);
+            } catch (ValidationException e) {
+                LOG.warn("Could not update user: {}", username);
+            }
+        });
     }
 
     @DELETE

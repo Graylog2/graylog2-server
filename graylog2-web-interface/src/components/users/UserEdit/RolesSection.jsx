@@ -55,11 +55,12 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     UsersDomain.load(username);
   });
 
-  const _onAssignRole = (newRole: DescriptiveItem) => {
+  const _onAssignRole = (newRoles: Immutable.Set<DescriptiveItem>) => {
     const userRoles = user.roles;
-    const newRoles = userRoles.push(newRole.name).toJS();
+    const newRoleNames = newRoles.map((r) => r.name);
+    const newUserRoles = userRoles.union(newRoleNames).toJS();
 
-    return onRolesUpdate({ roles: newRoles });
+    return onRolesUpdate({ roles: newUserRoles });
   };
 
   const onDeleteRole = (role: DescriptiveItem) => {
@@ -72,6 +73,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     <SectionComponent title="Roles" showLoading={loading}>
       <h3>Assign Roles</h3>
       <Container>
+        { /* $FlowFixMe: assignRole has DescriptiveItem */}
         <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
       </Container>
       <h3>Selected Roles</h3>

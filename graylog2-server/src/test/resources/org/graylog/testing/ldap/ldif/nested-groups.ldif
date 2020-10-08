@@ -20,23 +20,27 @@ member: cn=Operations,ou=Groups,dc=example,dc=com
 dn: cn=Developers,ou=Groups,dc=example,dc=com
 objectClass: groupOfNames
 cn: Developers
+description: All developers
 member: cn=Senior Developers,ou=Groups,dc=example,dc=com
 member: cn=Bob Barker,ou=People,dc=example,dc=com
 
 dn: cn=Senior Developers,ou=Groups,dc=example,dc=com
 objectClass: groupOfNames
+description: All senior developers
 cn: Senior Developers
 member: cn=Alice Allison,ou=People,dc=example,dc=com
 
 dn: cn=Operations,ou=Groups,dc=example,dc=com
 objectClass: groupOfNames
 cn: Operations
+description: All of operations
 member: cn=Senior Operations,ou=Groups,dc=example,dc=com
 member: cn=John Doe,ou=People,dc=example,dc=com
 
 dn: cn=Senior Operations,ou=Groups,dc=example,dc=com
 objectClass: groupOfNames
 cn: Senior Operations
+description: All of senior operations
 member: cn=Jane Doe,ou=People,dc=example,dc=com
 
 #### People ##########################################################

@@ -22,6 +22,7 @@ import type { UserJSON } from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
@@ -70,7 +71,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
         <HasOwnership id={view.id} type="dashboard">
           {({ disabled }) => (
             <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit || disabled}>
-              <Icon name="share-alt" /> Share
+              <Icon name="share-alt" /> Share {disabled && <SharingDisabledPopover type="dashboard" />}
             </MenuItem>
           )}
         </HasOwnership>

@@ -1,9 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
+import { compact } from 'lodash';
+import * as Immutable from 'immutable';
 
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import Role from 'logic/roles/Role';
@@ -15,7 +17,7 @@ import { Button } from 'components/graylog';
 import { Select } from 'components/common';
 
 type Props = {
-  onSubmit: (user: UserOverview) => Promise<?PaginatedListType>,
+  onSubmit: (user: Immutable.Set<UserOverview>) => Promise<?PaginatedListType>,
   role: Role,
 };
 
@@ -59,23 +61,33 @@ const _isRequired = (field) => (value) => (!value ? `The ${field} is required` :
 const UsersSelector = ({ role, onSubmit }: Props) => {
   const [users, setUsers] = useState([]);
   const [options, setOptions] = useState([]);
-  const getUnlimited = [1, 0, ''];
 
-  const _loadUsers = () => UsersDomain.loadUsersPaginated(...getUnlimited)
-    .then((newPaginatedUsers) => {
-      if (newPaginatedUsers) {
-        const resultUsers = newPaginatedUsers.list
-          .filter((u) => !u.roles.includes(role.name))
-          .map((u) => ({ label: u.name, value: u.name }))
-          .toArray();
+  const _loadUsers = useCallback(() => {
+    const getUnlimited = [1, 0, ''];
 
-        setOptions(resultUsers);
-        setUsers(newPaginatedUsers.list);
-      }
-    });
+    UsersDomain.loadUsersPaginated(...getUnlimited)
+      .then((newPaginatedUsers) => {
+        if (newPaginatedUsers) {
+          const resultUsers = newPaginatedUsers.list
+            .filter((u) => !u.roles.includes(role.name))
+            .map((u) => ({ label: u.name, value: u.name }))
+            .toArray();
+
+          setOptions(resultUsers);
+          setUsers(newPaginatedUsers.list);
+        }
+      });
+  }, [role]);
 
   const onUpdate = ({ user }: { user: string }, { resetForm }) => {
-    const userOverview = users.find((u) => u.username === user);
+    if (!user) {
+      return;
+    }
+
+    const newUsers = user.split(',');
+    const userOverview = Immutable.Set(compact(newUsers.map((newUser) => {
+      return users.find((u) => u.username === newUser);
+    })));
 
     if (!userOverview) {
       throw new Error(`Unable to find user with name ${user} in ${users.map((u) => u.username).join(', ')}`);
@@ -87,14 +99,14 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
   useEffect(() => {
     _loadUsers();
 
-    const unlistenAddMember = AuthzRolesActions.addMember.completed.listen(_loadUsers);
+    const unlistenAddMember = AuthzRolesActions.addMembers.completed.listen(_loadUsers);
     const unlistenRemoveMember = AuthzRolesActions.removeMember.completed.listen(_loadUsers);
 
     return () => {
       unlistenRemoveMember();
       unlistenAddMember();
     };
-  }, [role]);
+  }, [role, _loadUsers]);
 
   return (
     <div>
@@ -110,6 +122,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
                                   onChange({ target: { value: user, name } });
                                 }}
                                 optionRenderer={_renderOption}
+                                multi
                                 options={options}
                                 placeholder="Search for users"
                                 value={value} />

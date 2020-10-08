@@ -25,6 +25,7 @@ export { default as ExternalLinkButton } from './ExternalLinkButton';
 export { default as FormikFormGroup } from './FormikFormGroup';
 export { default as FormikInput } from './FormikInput';
 export { default as HasOwnership } from './HasOwnership';
+export { default as HoverForHelp } from './HoverForHelp';
 export { default as Icon } from './Icon';
 export { default as IconButton } from './IconButton';
 export { default as IfPermitted } from './IfPermitted';

@@ -26,6 +26,7 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
 import type { UserJSON } from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -267,7 +268,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                       <HasOwnership id={view.id} type="search">
                         {({ disabled }) => (
                           <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit || disabled}>
-                            <Icon name="share-alt" /> Share
+                            <Icon name="share-alt" /> Share {disabled && <SharingDisabledPopover type="search" />}
                           </MenuItem>
                         )}
                       </HasOwnership>
