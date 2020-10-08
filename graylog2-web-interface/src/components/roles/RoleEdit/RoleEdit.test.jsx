@@ -90,7 +90,7 @@ describe('RoleEdit', () => {
 
     fireEvent.click(assignUserButton);
 
-    await waitFor(() => expect(AuthzRolesActions.addMembers).toHaveBeenCalledWith(exampleRole.id, [bob.username, charlie.username]));
+    await waitFor(() => expect(AuthzRolesActions.addMembers).toHaveBeenCalledWith(exampleRole.id, Immutable.Set.of(bob.username, charlie.username)));
   });
 
   it('should filter assigned users', async () => {
