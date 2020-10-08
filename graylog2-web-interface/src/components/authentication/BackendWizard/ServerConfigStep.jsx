@@ -15,10 +15,10 @@ import BackendWizardContext from './contexts/BackendWizardContext';
 export type StepKeyType = 'server-configuration';
 export const STEP_KEY: StepKeyType = 'server-configuration';
 export const FORM_VALIDATION = {
-  serverUrlHost: {
+  serverHost: {
     required: true,
   },
-  serverUrlPort: {
+  serverPort: {
     required: true,
     min: 1,
     max: 65535,
@@ -106,19 +106,16 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                  wrapperClassName="col-sm-9">
             <>
               <ServerUrl className="input-group">
-                <span className="input-group-addon">
-                  {stepsState.authBackendMeta.urlScheme}://
-                </span>
                 <FormikInput formGroupClassName=""
-                             name="serverUrlHost"
+                             name="serverHost"
                              placeholder="Hostname"
-                             validate={validateField(FORM_VALIDATION.serverUrlPort)} />
+                             validate={validateField(FORM_VALIDATION.serverPort)} />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikInput formGroupClassName=""
-                             name="serverUrlPort"
+                             name="serverPort"
                              placeholder="Port"
                              type="number"
-                             validate={validateField(FORM_VALIDATION.serverUrlPort)} />
+                             validate={validateField(FORM_VALIDATION.serverPort)} />
               </ServerUrl>
 
               <ProtocolOptions>

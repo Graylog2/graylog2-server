@@ -3,7 +3,6 @@ import * as React from 'react';
 import { useState, useRef } from 'react';
 import { compact } from 'lodash';
 import PropTypes from 'prop-types';
-import URI from 'urijs';
 
 import Routes from 'routing/Routes';
 import { validateField } from 'util/FormsUtils';
@@ -43,8 +42,8 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
   const {
     defaultRoles = '',
-    serverUrlHost,
-    serverUrlPort,
+    serverHost,
+    serverPort,
     systemUserDn,
     systemUserPassword,
     transportSecurity,
@@ -57,16 +56,15 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   const {
     serviceTitle,
     serviceType,
-    urlScheme,
   } = stepsState.authBackendMeta;
-  const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme(urlScheme)}`;
+  const serverUrl = `${serverHost}:${serverPort}`;
 
   return {
     default_roles: defaultRoles.split(','),
     description: '',
     title: `${serviceTitle} ${serverUrl}`,
     config: {
-      server_urls: [serverUrl],
+      servers: [{ host: serverHost, port: serverPort }],
       system_user_dn: systemUserDn,
       system_user_password: systemUserPassword,
       transport_security: transportSecurity,
@@ -210,8 +208,8 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 BackendWizard.defaultProps = {
   initialStepKey: SERVER_CONFIG_KEY,
   initialValues: {
-    serverUrlHost: 'localhost',
-    serverUrlPort: 389,
+    serverHost: 'localhost',
+    serverPort: 389,
     transportSecurity: 'tls',
     userFullNameAttribute: 'cn',
     userNameAttribute: 'uid',
@@ -225,7 +223,6 @@ BackendWizard.propTypes = {
     backendId: PropTypes.string,
     serviceTitle: PropTypes.string.isRequired,
     serviceType: PropTypes.string.isRequired,
-    urlScheme: PropTypes.string.isRequired,
   }).isRequired,
   initialStepKey: PropTypes.string,
   initialValues: PropTypes.object,
