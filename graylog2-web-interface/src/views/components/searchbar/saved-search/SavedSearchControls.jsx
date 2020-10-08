@@ -2,13 +2,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
-import { browserHistory } from 'react-router';
 
 import connect from 'stores/connect';
 import type { ThemeInterface } from 'theme';
-import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
-import { newDashboardsPath } from 'views/Constants';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -25,6 +22,7 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
 import type { UserJSON } from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
+import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -182,22 +180,17 @@ class SavedSearchControls extends React.Component<Props, State> {
       .then(() => ViewActions.create(View.Type.Search))
       .then(() => {
         if (deletedView.id === view.id) {
-          browserHistory.push(Routes.SEARCH);
+          loadNewSearch();
         }
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
-  loadAsDashboard = () => {
+  _loadAsDashboard = () => {
     const { viewStoreState } = this.props;
     const { view } = viewStoreState;
 
-    browserHistory.push({
-      pathname: newDashboardsPath,
-      state: {
-        view: view,
-      },
-    });
+    loadAsDashboard(view);
   };
 
   render() {
@@ -258,7 +251,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                       <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
                         <Icon name="edit" /> Edit metadata
                       </MenuItem>
-                      <MenuItem onSelect={this.loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+                      <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
                       <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
                       <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                         <Icon name="eraser" /> Reset search
