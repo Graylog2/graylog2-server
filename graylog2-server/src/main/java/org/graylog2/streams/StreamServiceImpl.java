@@ -219,15 +219,14 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             final Set<Output> outputs = outputIdsForRawStream(o)
                     .stream()
                     .map(ObjectId::toHexString)
-                    .map(outputsById::get)
-                    .collect(Collectors.toSet());
-
-            if (outputs.contains(null)) {
-                final String streamTitle = Strings.nullToEmpty((String)o.get(StreamImpl.FIELD_TITLE));
-                LOG.warn("Stream \"" + streamTitle + "\" <" + id + "> references missing outputs - ignoring these outputs.");
-            }
-
-            final Set<Output> nonNullOutputs = outputs.stream()
+                    .map(outputId -> {
+                        final Output output = outputsById.get(outputId);
+                        if (output == null) {
+                            final String streamTitle = Strings.nullToEmpty((String)o.get(StreamImpl.FIELD_TITLE));
+                            LOG.warn("Stream \"" + streamTitle + "\" <" + id + "> references missing output <" + outputId + "> - ignoring output.");
+                        }
+                        return output;
+                    })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
 
@@ -236,7 +235,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
             final String indexSetId = (String)fields.get(StreamImpl.FIELD_INDEX_SET_ID);
 
-            streams.add(new StreamImpl(objectId, fields, streamRules, nonNullOutputs, indexSets.get(indexSetId)));
+            streams.add(new StreamImpl(objectId, fields, streamRules, outputs, indexSets.get(indexSetId)));
         }
 
         return streams.build();
