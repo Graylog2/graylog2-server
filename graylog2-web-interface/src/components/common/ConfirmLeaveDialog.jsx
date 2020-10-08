@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Prompt } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
 
 import AppConfig from 'util/AppConfig';
 
@@ -11,9 +12,29 @@ import AppConfig from 'util/AppConfig';
 type Props = {
   question: string,
 };
-const ConfirmLeaveDialog = ({ question }: Props) => (
-  <Prompt when={!AppConfig.gl2DevMode()} message={question} />
-);
+const ConfirmLeaveDialog = ({ question }: Props) => {
+  const handleLeavePage = useCallback((e) => {
+    if (AppConfig.gl2DevMode()) {
+      return null;
+    }
+
+    e.returnValue = question;
+
+    return question;
+  }, [question]);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', handleLeavePage);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleLeavePage);
+    };
+  }, [handleLeavePage]);
+
+  return (
+    <Prompt when={!AppConfig.gl2DevMode()} message={question} />
+  );
+};
 
 ConfirmLeaveDialog.propTypes = {
   /** Phrase used in the confirmation dialog. */
