@@ -3,10 +3,9 @@ import React, { useCallback } from 'react';
 import { capitalize } from 'lodash';
 
 import { Input } from 'components/bootstrap';
+import { HoverForHelp } from 'components/common';
 import Select from 'views/components/Select';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-
-import HoverForHelp from './HoverForHelp';
 
 type Props = {
   onChange: (config: NumberVisualizationConfig) => void,

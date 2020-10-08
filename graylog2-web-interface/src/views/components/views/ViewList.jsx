@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted, HasOwnership, PaginatedList, SearchForm, Spinner, EntityList } from 'components/common';
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 
 import View from './View';
@@ -15,7 +16,9 @@ const itemActionsFactory = (view, onViewDelete, setViewToShare) => {
       <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} bsSize="small" pullRight>
         <HasOwnership type="dashboard" id={view.id}>
           {({ disabled }) => (
-            <MenuItem disabled={disabled} onSelect={() => setViewToShare(view)}>Share</MenuItem>
+            <MenuItem disabled={disabled} onSelect={() => setViewToShare(view)}>
+              Share {disabled && <SharingDisabledPopover type="dashboard" />}
+            </MenuItem>
           )}
         </HasOwnership>
         <IfPermitted permissions={[`view:edit:${view.id}`, 'view:edit']} anyPermissions>
