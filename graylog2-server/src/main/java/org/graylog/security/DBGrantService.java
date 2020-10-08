@@ -16,6 +16,7 @@
  */
 package org.graylog.security;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
@@ -150,7 +151,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
             return create(grantee, capability, target, creatorUsername);
         }
         // This should never happen
-        assert existingGrants.size() == 1;
+        Preconditions.checkState(existingGrants.size() == 1);
 
         final GrantDTO grantDTO = existingGrants.get(0);
         // Only upgrade capabilities: VIEW < MANAGE < OWNER
