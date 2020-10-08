@@ -49,6 +49,11 @@ public class EntityOwnershipService {
         registerNewEntity(grn, user);
     }
 
+    public void registerNewEventNotification(String id, User user) {
+        final GRN grn = grnRegistry.newGRN(GRNTypes.EVENT_NOTIFICATION, id);
+        registerNewEntity(grn, user);
+    }
+
     public void registerNewDashboard(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, id);
         registerNewEntity(grn, user);

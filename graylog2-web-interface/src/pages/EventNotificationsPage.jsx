@@ -24,12 +24,12 @@ const EventNotificationsPage = () => {
             <LinkContainer to={Routes.ALERTS.LIST}>
               <Button bsStyle="info">Alerts & Events</Button>
             </LinkContainer>
-            <IfPermitted permissions="eventdefinitions:read">
+            <IfPermitted permissions={['eventdefinitions:read', 'eventdefinitions:create']} anyPermissions>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
                 <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
             </IfPermitted>
-            <IfPermitted permissions="eventnotifications:read">
+            <IfPermitted permissions={['eventnotifications:read', 'eventnotifications:create']} anyPermissions>
               <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
                 <Button bsStyle="info" className="active">Notifications</Button>
               </LinkContainer>
