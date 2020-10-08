@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { fireEvent } from '@testing-library/dom';
+
 import EditableTitle from './EditableTitle';
 
 describe('EditableTitle', () => {
   it('stops submit event propagation', () => {
     const onSubmit = jest.fn((e) => e.persist());
+
     render((
       <div onSubmit={onSubmit}>
         <EditableTitle value="Current title" onChange={jest.fn()} />
