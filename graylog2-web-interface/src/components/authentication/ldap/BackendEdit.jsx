@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import URI from 'urijs';
 
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
