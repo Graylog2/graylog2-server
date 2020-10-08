@@ -2,9 +2,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import { browserHistory } from 'react-router';
 import styled from 'styled-components';
 
+import history from 'util/History';
 import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
@@ -51,6 +51,7 @@ import ReplaySearchButton from './ReplaySearchButton';
 import IfDashboard from '../dashboard/IfDashboard';
 import InteractiveContext from '../contexts/InteractiveContext';
 import IfInteractive from '../dashboard/IfInteractive';
+import {loadDashboard} from "../../logic/views/Actions";
 
 const WidgetActionsWBar = styled.div`
   > * {
@@ -188,9 +189,7 @@ class Widget extends React.Component<Props, State> {
   _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string) => ({ search: newSearch }) => {
     const newDashboard = dashboard.toBuilder().search(newSearch).build();
 
-    ViewManagementActions.update(newDashboard).then(() => {
-      browserHistory.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
-    });
+    ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
   };
 
   _onMoveWidgetToTab = (widgetId, queryId, keepCopy) => {
