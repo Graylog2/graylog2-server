@@ -4,6 +4,7 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import suppressConsole from 'helpers/suppressConsole';
 
+import history from 'util/History';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
 import { FetchError } from 'logic/rest/FetchProvider';
@@ -11,7 +12,6 @@ import { FetchError } from 'logic/rest/FetchProvider';
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
 jest.unmock('logic/rest/FetchProvider');
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('routing/withLocation', () => Component => (props) => <Component {...props} location={{ pathname: '/' }} />);
 
 const router = {
@@ -19,28 +19,6 @@ const router = {
 };
 
 describe('ReportedErrorBoundary', () => {
-  it('registers to router upon mount', () => {
-    const mockRouter = {
-      listen: jest.fn(() => jest.fn()),
-    };
-
-    render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
-
-    expect(mockRouter.listen).toHaveBeenCalledTimes(1);
-  });
-
-  it('unregisters from router upon unmount', () => {
-    const unlisten = jest.fn();
-    const mockRouter = {
-      listen: () => unlisten,
-    };
-    const { unmount } = render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
-
-    unmount();
-
-    expect(unlisten).toHaveBeenCalled();
-  });
-
   it('displays child component if there is no error', () => {
     const { getByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
 
@@ -103,11 +81,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('resets error when navigation changes', async () => {
-    const mockRouter = {
-      listen: jest.fn(() => jest.fn()),
-    };
-
-    const { getByText } = render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
+    const { getByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 403, body: { message: 'The request error message' } };
 
     expect(getByText('Hello World!')).not.toBeNull();
@@ -117,9 +91,8 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await waitFor(() => expect(getByText('Missing Permissions')).not.toBeNull());
-    const listenCallback = mockRouter.listen.mock.calls[1][0];
 
-    act(() => listenCallback());
+    act(() => history.push('/'));
 
     await waitFor(() => expect(getByText('Hello World!')).not.toBeNull());
   });
