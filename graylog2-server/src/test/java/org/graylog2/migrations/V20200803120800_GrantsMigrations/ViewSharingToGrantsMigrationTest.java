@@ -14,7 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.migrations;
+
+package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.MongoCollection;
@@ -37,7 +38,6 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.migrations.V20200803120800_GrantsMigrations.ViewSharingToGrantsMigration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;

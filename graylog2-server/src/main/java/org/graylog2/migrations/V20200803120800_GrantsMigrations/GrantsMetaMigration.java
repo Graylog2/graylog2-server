@@ -16,8 +16,14 @@
  */
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNType;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
@@ -27,6 +33,22 @@ import org.graylog2.users.RoleService;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.graylog.grn.GRNTypes.DASHBOARD;
+import static org.graylog.grn.GRNTypes.EVENT_DEFINITION;
+import static org.graylog.grn.GRNTypes.SEARCH;
+import static org.graylog.grn.GRNTypes.STREAM;
+import static org.graylog.plugins.views.search.rest.ViewsRestPermissions.VIEW_EDIT;
+import static org.graylog.plugins.views.search.rest.ViewsRestPermissions.VIEW_READ;
+import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_EDIT;
+import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
+import static org.graylog2.shared.security.RestPermissions.EVENT_DEFINITIONS_EDIT;
+import static org.graylog2.shared.security.RestPermissions.EVENT_DEFINITIONS_READ;
+import static org.graylog2.shared.security.RestPermissions.STREAMS_EDIT;
+import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 public class GrantsMetaMigration extends Migration {
     private final RoleService roleService;
@@ -59,11 +81,49 @@ public class GrantsMetaMigration extends Migration {
         return ZonedDateTime.parse("2020-08-03T12:08:00Z");
     }
 
+    public static final Map<Set<String>, GRNTypeCapability> MIGRATION_MAP = ImmutableMap.<Set<String>, GRNTypeCapability>builder()
+            .put(ImmutableSet.of(DASHBOARDS_READ, DASHBOARDS_EDIT), new GRNTypeCapability(DASHBOARD, Capability.MANAGE))
+            .put(ImmutableSet.of(DASHBOARDS_READ), new GRNTypeCapability(DASHBOARD, Capability.VIEW))
+            .put(ImmutableSet.of(STREAMS_READ, STREAMS_EDIT), new GRNTypeCapability(STREAM, Capability.MANAGE))
+            .put(ImmutableSet.of(STREAMS_READ), new GRNTypeCapability(STREAM, Capability.VIEW))
+            .put(ImmutableSet.of(VIEW_READ, VIEW_EDIT), new GRNTypeCapability(SEARCH, Capability.MANAGE))
+            .put(ImmutableSet.of(VIEW_READ), new GRNTypeCapability(SEARCH, Capability.VIEW))
+            .put(ImmutableSet.of(EVENT_DEFINITIONS_READ, EVENT_DEFINITIONS_EDIT), new GRNTypeCapability(EVENT_DEFINITION, Capability.MANAGE))
+            .put(ImmutableSet.of(EVENT_DEFINITIONS_READ), new GRNTypeCapability(EVENT_DEFINITION, Capability.VIEW))
+            .build();
+
     @Override
     public void upgrade() {
-        // ViewSharingToGrantsMigration needs to run first, so empty roles get dropped
+        // ViewSharingToGrantsMigration needs to run before the RolesToGrantsMigration drops empty roles
         new ViewSharingToGrantsMigration(mongoConnection, dbGrantService, userService, roleService, rootUsername, viewService).upgrade();
         new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, rootUsername).upgrade();
         new ViewOwnerShipToGrantsMigration(userService, dbGrantService, rootUsername, viewService).upgrade();
+        new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, rootUsername).upgrade();
+    }
+
+    public static class GRNTypeCapability {
+        final GRNType grnType;
+        final Capability capability;
+
+        public GRNTypeCapability(GRNType grnType, Capability capability) {
+            this.grnType = grnType;
+            this.capability = capability;
+        }
+    }
+
+    // only needed to access protected getParts() method from WildcardPermission
+    public static class MigrationWildcardPermission extends WildcardPermission {
+        public MigrationWildcardPermission(String wildcardString) {
+            super(wildcardString);
+        }
+
+        @Override
+        protected List<Set<String>> getParts() {
+            return super.getParts();
+        }
+
+        protected String subPart(int idx) {
+            return Iterables.getOnlyElement(getParts().get(idx));
+        }
     }
 }

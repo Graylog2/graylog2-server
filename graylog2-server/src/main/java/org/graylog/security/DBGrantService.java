@@ -16,6 +16,7 @@
  */
 package org.graylog.security;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
@@ -106,6 +107,10 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         )).collect(ImmutableSet.toImmutableSet());
     }
 
+    public List<GrantDTO> getForTargetAndGrantee(GRN target, GRN grantee) {
+       return getForTargetAndGrantees(target, ImmutableSet.of(grantee));
+    }
+
     public List<GrantDTO> getForTargetAndGrantees(GRN target, Set<GRN> grantees) {
         return db.find(DBQuery.and(
                 DBQuery.is(GrantDTO.FIELD_TARGET, target),
@@ -134,6 +139,27 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         checkArgument(target != null, "target cannot be null");
 
         return create(GrantDTO.of(grantee, capability, target), creatorUsername);
+    }
+
+    /**
+     * Ensure that a grant with the requested or a higher capability exists.
+     * @return the created, updated or existing grant
+     */
+    public GrantDTO ensure(GRN grantee, Capability capability, GRN target, String creatorUsername) {
+        final List<GrantDTO> existingGrants = getForTargetAndGrantee(target, grantee);
+        if (existingGrants.isEmpty()) {
+            return create(grantee, capability, target, creatorUsername);
+        }
+        // This should never happen
+        Preconditions.checkState(existingGrants.size() == 1);
+
+        final GrantDTO grantDTO = existingGrants.get(0);
+        // Only upgrade capabilities: VIEW < MANAGE < OWNER
+        if (capability.priority() > grantDTO.capability().priority()) {
+            final GrantDTO grantUpdate = grantDTO.toBuilder().capability(capability).build();
+            return save(grantUpdate);
+        }
+        return grantDTO;
     }
 
     public GrantDTO update(GrantDTO updatedGrant, @Nullable User currentUser) {
