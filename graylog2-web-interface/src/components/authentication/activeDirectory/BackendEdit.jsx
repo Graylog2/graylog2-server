@@ -30,7 +30,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const groupSyncFormValues = authGroupSyncPlugins?.[0]?.hooks?.useBackendFormValues;
+  const groupSyncFormValues = authGroupSyncPlugins?.[0]?.hooks?.useBackendFormValues();
   const backendHasGroupSync = !!groupSyncFormValues;
   const initialValues = { ...prepareInitialValues(authenticationBackend), ...groupSyncFormValues, synchronizeGroups: backendHasGroupSync };
   const optionalProps = _optionalWizardProps(initialStepKey);
