@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Link } from 'react-router';
 import { cloneDeep } from 'lodash';
 
+import { Link } from 'components/graylog/router';
 import { Button, FormGroup, ControlLabel } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';

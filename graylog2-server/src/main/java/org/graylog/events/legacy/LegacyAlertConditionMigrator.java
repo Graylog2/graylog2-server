@@ -198,7 +198,7 @@ public class LegacyAlertConditionMigrator {
                 .build();
 
         LOG.info("Migrate legacy alarm callback <{}>", dto.title());
-        return notificationResourceHandler.create(dto);
+        return notificationResourceHandler.create(dto, userService.getRootUser());
     }
 
     /**

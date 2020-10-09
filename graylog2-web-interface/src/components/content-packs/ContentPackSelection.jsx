@@ -6,7 +6,7 @@ import { cloneDeep } from 'lodash';
 import { Col, HelpBlock, Panel, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 
@@ -104,7 +104,7 @@ class ContentPackSelection extends React.Component {
   };
 
   _bindValue = (event) => {
-    this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
+    this._updateField(event.target.name, getValueFromInput(event.target));
   }
 
   _updateSelectionEntity = (entity) => {
@@ -265,22 +265,22 @@ class ContentPackSelection extends React.Component {
                 <Input name="name"
                        id="name"
                        type="text"
-                       bsStyle={errors.name ? 'error' : null}
                        maxLength={250}
                        value={contentPack.name}
                        onChange={this._bindValue}
                        label="Name"
-                       help={errors.name ? errors.name : 'Required. Give a descriptive name for this content pack.'}
+                       help="Required. Give a descriptive name for this content pack."
+                       error={errors.name}
                        required />
                 <Input name="summary"
                        id="summary"
                        type="text"
-                       bsStyle={errors.summary ? 'error' : null}
                        maxLength={250}
                        value={contentPack.summary}
                        onChange={this._bindValue}
                        label="Summary"
-                       help={errors.summary ? errors.summary : 'Required. Give a short summary of the content pack.'}
+                       help="Required. Give a short summary of the content pack."
+                       error={errors.summary}
                        required />
                 <Input name="description"
                        id="description"
@@ -293,22 +293,22 @@ class ContentPackSelection extends React.Component {
                 <Input name="vendor"
                        id="vendor"
                        type="text"
-                       bsStyle={errors.vendor ? 'error' : null}
                        maxLength={250}
                        value={contentPack.vendor}
                        onChange={this._bindValue}
                        label="Vendor"
-                       help={errors.vendor ? errors.vendor : 'Required. Who did this content pack and how can they be reached, e.g. Name and email.'}
+                       help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
+                       error={errors.vendor}
                        required />
                 <Input name="url"
                        id="url"
                        type="text"
                        maxLength={250}
-                       bsStyle={errors.url ? 'error' : null}
                        value={contentPack.url}
                        onChange={this._bindValue}
                        label="URL"
-                       help={errors.url ? errors.url : 'Where can I find the content pack. e.g. github url'} />
+                       help="Where can I find the content pack. e.g. github url"
+                       error={errors.url} />
               </fieldset>
             </form>
           </Col>

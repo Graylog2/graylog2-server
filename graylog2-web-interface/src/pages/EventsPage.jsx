@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -35,7 +35,7 @@ const EventsPage = ({ location }) => {
                 <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
             </IfPermitted>
-            <IfPermitted permissions="eventnotifications:read">
+            <IfPermitted permissions={['eventnotifications:read', 'eventnotifications:create']} anyPermissions>
               <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
                 <Button bsStyle="info">Notifications</Button>
               </LinkContainer>

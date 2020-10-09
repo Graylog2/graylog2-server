@@ -17,21 +17,113 @@ const HorizontalCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)`
   margin-bottom: 15px;
 `;
 
+const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme }) => css`
+  &.nav {
+    > li {
+      border: 1px solid ${theme.colors.variant.lighter.default};
+      border-left: 0;
+
+      &:first-child {
+        border-left: 1px solid ${theme.colors.variant.lighter.default};
+        border-radius: 4px 0 0 4px;
+
+        > a {
+          border-radius: 4px 0 0 4px;
+        }
+      }
+
+      &:last-child {
+        border-radius: 0 4px 4px 0;
+
+        > a {
+          border-radius: 0 4px 4px 0;
+        }
+      }
+
+      &:not(:last-child) > a {
+        ::after {
+          transition: background-color 150ms ease-in-out;
+          background-color: ${theme.colors.global.contentBackground};
+          border-color: ${theme.colors.variant.lighter.default};
+          border-style: solid;
+          border-width: 0 1px 1px 0;
+          content: '';
+          display: block;
+          height: 15px;
+          position: absolute;
+          right: -1px;
+          top: 50%;
+          transform: translateY(-50%) translateX(50%) rotate(-45deg);
+          width: 15px;
+          z-index: 2;
+        }
+
+        :hover::after {
+          background-color: ${theme.colors.variant.lightest.default};
+        }
+      }
+
+      &.active a {
+        &,
+        &:hover,
+        &::after,
+        &:hover::after {
+          background-color: ${theme.colors.global.link};
+        }
+      }
+
+      > a {
+        border-radius: 0;
+      }
+    }
+  }
+
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    &.nav {
+      > li {
+        border-right: 0;
+        border-left: 0;
+
+        &:last-child a, &:first-child a {
+          border-radius: 0;
+        }
+
+        &:not(:last-child) {
+          border-bottom: 0;
+        }
+
+        &:not(:last-child) > a {
+          ::after {
+            bottom: 0;
+            left: 50%;
+            top: auto;
+            width: 10px;
+            height: 10px;
+            transform: translateY(50%) translateX(-50%) rotate(45deg);
+          }
+        }
+      }
+
+      &.nav-justified > li > a {
+        margin-bottom: 0;
+      }
+    }
+  }
+`);
+
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
-
 type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: string,
+  title: React.Node,
   component: React.Node,
   disabled?: boolean,
 };
 
 export type Steps = Array<Step>;
-
 type Props = {
   steps: Steps,
   activeStep: ?StepKey,
@@ -40,7 +132,6 @@ type Props = {
   horizontal: boolean,
   justified: boolean,
   containerClassName: string,
-  NavigationComponent: Nav,
   hidePreviousNextButtons: boolean,
 };
 
@@ -81,8 +172,6 @@ class Wizard extends React.Component<Props, State> {
     justified: PropTypes.bool,
     /** Customize the container CSS class used by this component */
     containerClassName: PropTypes.string,
-    /** Customize the navigation componment used by Wizard */
-    NavigationComponent: PropTypes.elementType,
     /** Indicates if wizard should render next/previous buttons or not */
     hidePreviousNextButtons: PropTypes.bool,
   };
@@ -94,7 +183,6 @@ class Wizard extends React.Component<Props, State> {
     horizontal: false,
     justified: false,
     containerClassName: 'content',
-    NavigationComponent: Nav,
     hidePreviousNextButtons: false,
   };
 
@@ -183,22 +271,22 @@ class Wizard extends React.Component<Props, State> {
   };
 
   _renderVerticalStepNav = () => {
-    const { justified, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
+    const { justified, steps, hidePreviousNextButtons } = this.props;
     const selectedStep = this._getSelectedStep();
 
     return (
       <SubnavigationCol md={2}>
-        <NavigationComponent stacked
-                             bsStyle="pills"
-                             activeKey={selectedStep}
-                             onSelect={this._wizardChanged}
-                             justified={justified}>
+        <Nav stacked
+             bsStyle="pills"
+             activeKey={selectedStep}
+             onSelect={this._wizardChanged}
+             justified={justified}>
           {steps.map((navItem) => {
             return (
               <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
             );
           })}
-        </NavigationComponent>
+        </Nav>
         {!hidePreviousNextButtons && (
           <>
             <br />
@@ -226,7 +314,7 @@ class Wizard extends React.Component<Props, State> {
 
   _renderHorizontalStepNav = () => {
     const selectedStep = this._getSelectedStep();
-    const { justified, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
+    const { justified, steps, hidePreviousNextButtons } = this.props;
 
     return (
       <HorizontalCol sm={12}>
@@ -248,15 +336,15 @@ class Wizard extends React.Component<Props, State> {
             </HorizontalButtonToolbar>
           </div>
         )}
-        <NavigationComponent bsStyle="pills"
-                             activeKey={selectedStep}
-                             onSelect={this._wizardChanged}
-                             justified={justified}>
+        <StyledNav bsStyle="pills"
+                   activeKey={selectedStep}
+                   onSelect={this._wizardChanged}
+                   justified={justified}>
           {steps.map((navItem) => {
             return (
               <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
-        </NavigationComponent>
+        </StyledNav>
       </HorizontalCol>
     );
   };

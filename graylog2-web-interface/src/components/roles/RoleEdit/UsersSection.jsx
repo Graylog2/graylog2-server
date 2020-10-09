@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
+import * as Immutable from 'immutable';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import UserOverview from 'logic/users/UserOverview';
@@ -43,7 +44,8 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   };
 
   const _loadUsers = (u) => u && setUsers(u);
-  const _onAssignUser = (user: UserOverview) => AuthzRolesDomain.addMember(id, user.username).then(() => _onLoad(defaultPageInfo)
+  const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => AuthzRolesDomain.addMembers(id,
+    newUsers.map((u) => u.username)).then(() => _onLoad(defaultPageInfo)
     .then(_loadUsers));
 
   const _onUnassignUser = (user: DescriptiveItem) => {

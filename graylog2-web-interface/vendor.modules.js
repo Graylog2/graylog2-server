@@ -2,6 +2,7 @@ module.exports = [
   'chroma-js',
   'create-react-class',
   'deep-equal',
+  'formik',
   'jquery',
   'leaflet',
   'moment-timezone',

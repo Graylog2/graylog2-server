@@ -62,7 +62,8 @@ public class EntityDependencyResolver {
 
         final Set<org.graylog2.contentpacks.model.entities.EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(org.graylog2.contentpacks.model.entities.EntityDescriptor.builder()
                 .id(ModelId.of(entity.entity()))
-                .type(ModelType.of(entity.type(), "2")) // TODO: Any way of NOT hardcoding the version here?
+                // TODO: This is a hack! Until we stop using the content-pack dependency resolver, we have to use a different version for dashboards here
+                .type(ModelType.of(entity.type(), "dashboard".equals(entity.type()) ? "2" : "1")) // TODO: Any way of NOT hardcoding the version here?
                 .build()));
 
         final ImmutableSet<GRN> dependencies = descriptors.stream()

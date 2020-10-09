@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import connect from 'stores/connect';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
@@ -9,6 +9,7 @@ import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
   'LookupTableCaches',
@@ -150,7 +151,7 @@ LUTCachesPage.defaultProps = {
   caches: null,
 };
 
-export default connect(LUTCachesPage, { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
+export default connect(withParams(LUTCachesPage), { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
   ...otherProps,
   ...cachesStore,
 }));

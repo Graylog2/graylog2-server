@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
@@ -10,6 +10,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import history from 'util/History';
+import withParams from 'routing/withParams';
 
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
@@ -102,4 +103,4 @@ const SidecarEditConfigurationPage = createReactClass({
   },
 });
 
-export default SidecarEditConfigurationPage;
+export default withParams(SidecarEditConfigurationPage);

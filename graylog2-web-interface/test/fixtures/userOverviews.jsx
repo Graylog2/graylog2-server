@@ -27,6 +27,18 @@ export const bob = UserOverview.builder()
   .clientAddress('172.0.0.1')
   .build();
 
+export const charlie = UserOverview.builder()
+  .id('charlie-id')
+  .username('charlie')
+  .fullName('Charlie Root')
+  .email('charlie@example.org')
+  .roles(Immutable.List(['Reader']))
+  .readOnly(false)
+  .external(true)
+  .sessionActive(false)
+  .clientAddress('172.0.0.1')
+  .build();
+
 export const admin = UserOverview.builder()
   .id('admin-id')
   .username('admin')

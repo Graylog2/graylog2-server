@@ -2,12 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Link } from 'react-router';
 
+import { Link } from 'components/graylog/router';
 import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';
 import Routes from 'routing/Routes';
+import withParams from 'routing/withParams';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -62,4 +63,4 @@ const NodeInputsPage = createReactClass({
   },
 });
 
-export default NodeInputsPage;
+export default withParams(NodeInputsPage);

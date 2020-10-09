@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
@@ -12,6 +12,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
+import withParams from 'routing/withParams';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
@@ -97,4 +98,4 @@ const IndexSetConfigurationPage = createReactClass({
   },
 });
 
-export default IndexSetConfigurationPage;
+export default withParams(IndexSetConfigurationPage);

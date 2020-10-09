@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Col, DropdownButton, MenuItem, Row, Button } from 'components/graylog';
 import {
   EmptyEntity,
@@ -103,7 +103,7 @@ class EventNotifications extends React.Component {
             <Button bsStyle="info">Edit</Button>
           </IfPermitted>
         </LinkContainer>
-        <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}>
+        <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]} anyPermissions>
           <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
               <MenuItem disabled={isTestLoading} onClick={onTest(notification)}>

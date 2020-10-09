@@ -1,9 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router';
 
+import { LinkContainer, Link } from 'components/graylog/router';
 import { Col, Label, DropdownButton, MenuItem, Button } from 'components/graylog';
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
 import Routes from 'routing/Routes';

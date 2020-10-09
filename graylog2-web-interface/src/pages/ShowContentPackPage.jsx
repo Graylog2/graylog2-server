@@ -2,8 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button, ButtonToolbar } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import { BootstrapModalConfirm } from 'components/bootstrap';
@@ -16,6 +16,7 @@ import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
 import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
@@ -196,4 +197,4 @@ const ShowContentPackPage = createReactClass({
   },
 });
 
-export default ShowContentPackPage;
+export default withParams(ShowContentPackPage);

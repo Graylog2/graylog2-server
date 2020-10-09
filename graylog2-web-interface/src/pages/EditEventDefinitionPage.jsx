@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer
@@ -13,6 +13,7 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
 import history from 'util/History';
+import withParams from 'routing/withParams';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
@@ -116,7 +117,7 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default connect(EditEventDefinitionPage, {
+export default connect(withParams(EditEventDefinitionPage), {
   currentUser: CurrentUserStore,
 },
 ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

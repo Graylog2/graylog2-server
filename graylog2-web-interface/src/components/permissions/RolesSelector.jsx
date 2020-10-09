@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { compact } from 'lodash';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -12,9 +13,9 @@ import { Button } from 'components/graylog';
 import { Select } from 'components/common';
 
 type Props = {
-  assignedRolesIds: Immutable.List<string>,
+  assignedRolesIds: Immutable.Set<string>,
   identifier: (role: Role) => string,
-  onSubmit: (role: Role) => Promise<void>,
+  onSubmit: (role: Immutable.Set<Role>) => Promise<void>,
 };
 
 const SubmitButton = styled(Button)`
@@ -38,28 +39,36 @@ const _renderRoleOption = ({ label }: { label: string }) => (
   <RoleSelectOption>{label}</RoleSelectOption>
 );
 
-const _options = (roles: Immutable.List<Role>, assignedRolesIds, identifier) => roles
+const _options = (roles: Immutable.Set<Role>, assignedRolesIds, identifier) => roles
   .filter((role) => !assignedRolesIds.includes(identifier(role)))
   .toArray()
   .map((r) => ({ label: r.name, value: r.name, role: r }));
 
 const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting) => {
-  const selectedRole = roles.find((r) => r.name === selectedRoleName);
+  if (!selectedRoleName) {
+    return;
+  }
 
-  if (!selectedRole) {
-    throw Error(`Role assigment failed, because role with name ${selectedRoleName ?? '(undefined)'} does not exist`);
+  const selectedRoleNames = selectedRoleName.split(',');
+
+  const selectedRoles = Immutable.Set(compact(selectedRoleNames.map((selection) => {
+    return roles.find((r) => r.name === selection);
+  })));
+
+  if (selectedRoles.size <= 0) {
+    throw Error(`Role assigment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
   }
 
   setIsSubmitting(true);
 
-  onSubmit(selectedRole).then(() => {
+  onSubmit(selectedRoles).then(() => {
     setSelectedRoleName();
     setIsSubmitting(false);
   });
 };
 
 const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
-  const [roles, setRoles] = useState(Immutable.List());
+  const [roles, setRoles] = useState(Immutable.Set());
   const [selectedRoleName, setSelectedRoleName] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const _onSubmit = () => _assignRole(selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting);
@@ -69,7 +78,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
-      .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(paginatedRoles.list));
+      .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(Immutable.Set(paginatedRoles.list)));
   }, [assignedRolesIds]);
 
   return (
@@ -80,6 +89,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
                       optionRenderer={_renderRoleOption}
                       options={options}
                       placeholder="Search for roles"
+                      multi
                       value={selectedRoleName} />
         <SubmitButton bsStyle="success"
                       onClick={_onSubmit}

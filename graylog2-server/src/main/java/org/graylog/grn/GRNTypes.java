@@ -23,6 +23,7 @@ public class GRNTypes {
     public static final GRNType COLLECTION = GRNType.create("collection", "collections:");
     public static final GRNType DASHBOARD = GRNType.create("dashboard", "dashboards:");
     public static final GRNType EVENT_DEFINITION = GRNType.create("event_definition", "eventdefinitions:");
+    public static final GRNType EVENT_NOTIFICATION = GRNType.create("notification", "eventnotifications:");
     public static final GRNType GRANT = GRNType.create("grant", "grants:");
     public static final GRNType ROLE = GRNType.create("role", "roles:");
     public static final GRNType SEARCH = GRNType.create("search", "view:");
@@ -37,6 +38,7 @@ public class GRNTypes {
             .add(COLLECTION)
             .add(DASHBOARD)
             .add(EVENT_DEFINITION)
+            .add(EVENT_NOTIFICATION)
             .add(GRANT)
             .add(ROLE)
             .add(SEARCH)

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import { cloneDeep, groupBy } from 'lodash';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
 import history from 'util/History';
@@ -14,6 +14,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
+import withParams from 'routing/withParams';
 
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
@@ -210,4 +211,4 @@ const EditContentPackPage = createReactClass({
   },
 });
 
-export default EditContentPackPage;
+export default withParams(EditContentPackPage);

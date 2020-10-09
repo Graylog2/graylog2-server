@@ -85,11 +85,11 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    addMember(roleId: string, username: string): Promise<?Role> {
-      const { url } = ApiRoutes.AuthzRolesController.addMember(roleId, username);
-      const promise = fetch('PUT', qualifyUrl(url));
+    addMembers(roleId: string, usernames: Immutable.Set<string>): Promise<?Role> {
+      const { url } = ApiRoutes.AuthzRolesController.addMembers(roleId);
+      const promise = fetch('PUT', qualifyUrl(url), usernames.toArray());
 
-      AuthzRolesActions.addMember.promise(promise);
+      AuthzRolesActions.addMembers.promise(promise);
 
       return promise;
     },

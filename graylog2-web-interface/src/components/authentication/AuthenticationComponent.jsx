@@ -3,16 +3,17 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Alert, Nav, NavItem, Row, Col } from 'components/graylog';
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
+import withParams from 'routing/withParams';
 
 import AuthProvidersConfig from './AuthProvidersConfig';
 
@@ -160,4 +161,4 @@ const AuthenticationComponent = createReactClass({
   },
 });
 
-export default AuthenticationComponent;
+export default withParams(AuthenticationComponent);

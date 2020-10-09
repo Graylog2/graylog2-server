@@ -5,9 +5,7 @@ import { Position } from 'react-overlays';
 import styled, { css } from 'styled-components';
 
 import { Popover } from 'components/graylog';
-import { Icon } from 'components/common';
-
-import HoverForHelp from './HoverForHelp';
+import { Icon, HoverForHelp } from 'components/common';
 
 const StyledDescriptionBox = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
@@ -74,6 +72,7 @@ class DescriptionBox extends React.Component {
     if (configurableOptions) {
       return (
         <ConfigButton ref={(node) => { this.target = node; }}
+                      type="button"
                       onClick={this.onToggleConfig}>
           <Icon name="wrench" />
         </ConfigButton>

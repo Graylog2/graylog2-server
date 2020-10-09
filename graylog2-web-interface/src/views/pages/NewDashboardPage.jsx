@@ -1,67 +1,49 @@
 // @flow strict
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import Spinner from 'components/common/Spinner';
-import type { ViewHook } from 'views/logic/hooks/ViewHook';
-import { processHooks } from 'views/logic/views/ViewLoader';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-import type { ViewJson } from 'views/logic/views/View';
-import { ExtendedSearchPage } from 'views/pages';
 import { IfPermitted } from 'components/common';
+import useLoadView from 'views/logic/views/UseLoadView';
+
+import SearchPage from './SearchPage';
 
 type Props = {
   route: {},
   location: {
     state?: {
-      view?: View | ViewJson,
+      view?: View,
     },
     query: { [string]: any },
-  };
-  loadingViewHooks: Array<ViewHook>,
-  executingViewHooks: Array<ViewHook>,
+  },
 };
-const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHooks }: Props) => {
-  const [loaded, setLoaded] = useState(false);
-  const [hookComponent, setHookComponent] = useState(undefined);
 
-  useEffect(() => {
-    let mounted = true;
-    const { state = {} } = location;
-    const { view: searchView } = state;
-
-    if (searchView && searchView.search) {
-      const { query } = location;
-      /* $FlowFixMe the searchView.search is guard enough and instanceof does not work here */
+const NewDashboardPage = ({ route, location }: Props) => {
+  const { state = {} } = location;
+  const { view: searchView } = state;
+  const loadedView = useMemo(() => {
+    if (searchView?.search) {
       const dashboardView = viewTransformer(searchView);
-      const loadPromise = ViewActions.load(dashboardView, true).then(() => dashboardView);
 
-      processHooks(
-        loadPromise,
-        loadingViewHooks,
-        executingViewHooks,
-        query,
-        () => {
-          setHookComponent(undefined);
-          setLoaded(true);
-        },
-      ).catch((e) => setHookComponent(e));
-    } else {
-      ViewActions.create(View.Type.Dashboard).then(() => mounted && setLoaded(true));
+      return ViewActions.load(dashboardView, true).then(() => dashboardView);
     }
 
-    return () => { mounted = false; };
-  }, []);
+    return ViewActions.create(View.Type.Dashboard).then(({ view }) => view);
+  }, [searchView]);
 
-  if (hookComponent) {
-    return (<>{hookComponent}</>);
+  const [loaded, HookComponent] = useLoadView(loadedView, location.query);
+
+  if (HookComponent) {
+    return HookComponent;
   }
 
   return loaded
-    ? <IfPermitted permissions="dashboards:create"><ExtendedSearchPage route={route} /></IfPermitted>
+    ? <IfPermitted permissions="dashboards:create"><SearchPage route={route} /></IfPermitted>
     : <Spinner />;
 };
 

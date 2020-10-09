@@ -68,9 +68,9 @@ public class DashboardsResource extends RestResource {
     public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                             @ApiParam(name = "sort",
-                                                    value = "The field to sort the result on",
-                                                    required = true,
-                                                    allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
+                                                      value = "The field to sort the result on",
+                                                      required = true,
+                                                      allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
                                             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
                                             @ApiParam(name = "query") @QueryParam("query") String query) {
 

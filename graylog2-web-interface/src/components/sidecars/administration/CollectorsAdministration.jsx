@@ -3,9 +3,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Link } from 'react-router';
 import styled, { css } from 'styled-components';
 
+import { Link } from 'components/graylog/router';
 import { Col, Row } from 'components/graylog';
 import Routes from 'routing/Routes';
 import { ControlledTableList, PaginatedList } from 'components/common';

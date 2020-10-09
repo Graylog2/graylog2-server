@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -9,6 +9,7 @@ import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
@@ -202,7 +203,7 @@ LUTTablesPage.defaultProps = {
   dataAdapter: null,
 };
 
-export default connect(LUTTablesPage, { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
+export default connect(withParams(LUTTablesPage), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
   ...otherProps,
   ...lookupTableStore,
 }));

@@ -1,10 +1,8 @@
 // @flow strict
 import * as React from 'react';
 
-import View from './views/View';
+export type NewViewLoaderContextType = () => mixed;
 
-export type NewViewLoaderContextType = () => Promise<?View>;
-
-const NewViewLoaderContext = React.createContext<NewViewLoaderContextType>(() => Promise.resolve());
+const NewViewLoaderContext = React.createContext<NewViewLoaderContextType>(() => {});
 
 export default NewViewLoaderContext;

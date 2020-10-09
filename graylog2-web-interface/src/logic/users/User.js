@@ -35,7 +35,7 @@ type InternalState = {
   permissions: Immutable.List<string>,
   timezone: ?string,
   preferences: PreferencesMap,
-  roles: Immutable.List<string>,
+  roles: Immutable.Set<string>,
   readOnly: boolean,
   external: boolean,
   sessionTimeoutMs: number,
@@ -260,7 +260,7 @@ export default class User {
   }
 
   static empty() {
-    return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.List(), false, false, -1, undefined, false, '', '');
+    return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.Set(), false, false, -1, undefined, false, '', '');
   }
 
   toJSON(): UserJSON {
@@ -334,7 +334,7 @@ export default class User {
       Immutable.List(permissions),
       timezone,
       preferences,
-      Immutable.List(roles),
+      Immutable.Set(roles),
       read_only,
       external,
       session_timeout_ms,
