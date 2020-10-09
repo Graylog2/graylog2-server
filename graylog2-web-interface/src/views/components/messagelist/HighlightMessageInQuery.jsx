@@ -11,7 +11,7 @@ type Props = {
   location: Location,
 };
 
-const HighlightMessageInQuery = ({ children, location: { query = {} } }: Props) => {
+const HighlightMessageInQuery = ({ children, location: { query = {} } = {} }: Props) => {
   const { highlightMessage } = query;
 
   return (
