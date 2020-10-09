@@ -9,16 +9,16 @@ import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
 import withLocation from 'routing/withLocation';
 import withParams from 'routing/withParams';
+import type { Location } from 'routing/withLocation';
 
 import SearchPage from './SearchPage';
 
 type Props = {
-  location: {
+  location: Location & {
     state?: {
       view: ?View,
       widgetId: ?string,
     },
-    query: { [string]: any },
   },
   params: {
     viewId: string,
