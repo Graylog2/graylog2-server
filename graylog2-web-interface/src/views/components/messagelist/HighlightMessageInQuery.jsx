@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import withLocation from 'routing/withLocation'
+import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
@@ -11,7 +11,7 @@ type Props = {
   location: Location,
 };
 
-const HighlightMessageInQuery = ({ children, location: { query } }: Props) => {
+const HighlightMessageInQuery = ({ children, location: { query = {} } }: Props) => {
   const { highlightMessage } = query;
 
   return (

@@ -63,7 +63,7 @@ const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, 
       <BodyPositioningWrapper>
         {view && activeQuery ? <CycleQueryTab interval={configuration.interval} view={view} activeQuery={activeQuery} tabs={configuration.tabs} /> : null}
         <BigDisplayModeHeader />
-        <ShowViewPage location={{ query }} params={params} route={route} />
+        <ShowViewPage location={{ query }} params={params} />
       </BodyPositioningWrapper>
     </InteractiveContext.Provider>
   );

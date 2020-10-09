@@ -6,6 +6,8 @@ import HighlightMessageInQuery from './HighlightMessageInQuery';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
+jest.mock('routing/withLocation', () => (Component) => ({ query, ...rest }) => <Component location={{ query }} {...rest} />);
+
 describe('HighlightMessageInQuery', () => {
   const TestComponent = () => (
     <HighlightMessageContext.Consumer>

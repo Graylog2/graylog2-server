@@ -16,7 +16,6 @@ import useLoadView from 'views/logic/views/UseLoadView';
 import SearchPage from './SearchPage';
 
 type Props = {
-  route: {},
   location: Location & {
     state?: {
       view?: View,
@@ -24,7 +23,7 @@ type Props = {
   },
 };
 
-const NewDashboardPage = ({ route, location }: Props) => {
+const NewDashboardPage = ({ location }: Props) => {
   const { state = {} } = location;
   const { view: searchView } = state;
   const loadedView = useMemo(() => {
@@ -44,13 +43,11 @@ const NewDashboardPage = ({ route, location }: Props) => {
   }
 
   return loaded
-    ? <IfPermitted permissions="dashboards:create"><SearchPage route={route} /></IfPermitted>
+    ? <IfPermitted permissions="dashboards:create"><SearchPage /></IfPermitted>
     : <Spinner />;
 };
 
-NewDashboardPage.propTypes = {
-  route: PropTypes.object.isRequired,
-};
+NewDashboardPage.propTypes = {};
 
 const mapping = {
   loadingViewHooks: 'views.hooks.loadingView',

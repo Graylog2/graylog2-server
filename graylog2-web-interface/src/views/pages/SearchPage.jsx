@@ -10,14 +10,13 @@ import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStr
 type Props = {
   loadNewView?: () => mixed,
   loadView?: (string) => mixed,
-  route: any,
 };
 
-const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView, route }: Props) => (
+const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
   <NewViewLoaderContext.Provider value={loadNewView}>
     <ViewLoaderContext.Provider value={loadView}>
       <IfUserHasAccessToAnyStream>
-        <Search route={route} />
+        <Search />
       </IfUserHasAccessToAnyStream>
     </ViewLoaderContext.Provider>
   </NewViewLoaderContext.Provider>

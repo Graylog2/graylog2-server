@@ -67,7 +67,6 @@ describe('StreamSearchPage', () => {
     <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
       <StreamSearchPage location={{ query: {} }}
                         params={{ streamId: 'stream-id-1' }}
-                        route={{}}
                         router={mockRouter}
                         {...props} />
     </StreamsContext.Provider>

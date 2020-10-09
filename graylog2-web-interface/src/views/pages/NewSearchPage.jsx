@@ -11,11 +11,10 @@ import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import SearchPage from './SearchPage';
 
 type Props = {
-  route: {},
   location: Location,
 };
 
-const NewSearchPage = ({ location: { query }, route }: Props) => {
+const NewSearchPage = ({ location: { query } }: Props) => {
   const view = useCreateSavedSearch();
   const [loaded, HookComponent] = useLoadView(view, query);
 
@@ -27,11 +26,10 @@ const NewSearchPage = ({ location: { query }, route }: Props) => {
     return <Spinner />;
   }
 
-  return <SearchPage route={route} />;
+  return <SearchPage />;
 };
 
 NewSearchPage.propTypes = {
-  route: PropTypes.object.isRequired,
   location: PropTypes.shape({
     query: PropTypes.object,
     pathname: PropTypes.string,

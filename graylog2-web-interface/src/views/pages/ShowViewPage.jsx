@@ -23,11 +23,10 @@ type Props = {
   params: {
     viewId: string,
   },
-  route: any,
   viewLoader: ViewLoaderFn,
 };
 
-const ShowViewPage = ({ params: { viewId }, route, location: { query }, viewLoader }: Props) => {
+const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: Props) => {
   const [loaded, HookComponent] = useViewLoader(viewId, query, viewLoader);
 
   if (HookComponent) {
@@ -38,7 +37,7 @@ const ShowViewPage = ({ params: { viewId }, route, location: { query }, viewLoad
     return <Spinner />;
   }
 
-  return <SearchPage route={route} />;
+  return <SearchPage />;
 };
 
 ShowViewPage.propTypes = {
@@ -52,7 +51,6 @@ ShowViewPage.propTypes = {
   params: PropTypes.shape({
     viewId: PropTypes.string.isRequired,
   }).isRequired,
-  route: PropTypes.object.isRequired,
   viewLoader: PropTypes.func,
 };
 

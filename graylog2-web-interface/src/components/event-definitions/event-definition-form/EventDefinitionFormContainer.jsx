@@ -27,7 +27,6 @@ class EventDefinitionFormContainer extends React.Component {
     currentUser: PropTypes.object.isRequired,
     entityTypes: PropTypes.object,
     notifications: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
     onEventDefinitionChange: PropTypes.func,
   };
 
@@ -147,7 +146,7 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, notifications, currentUser, route } = this.props;
+    const { action, entityTypes, notifications, currentUser } = this.props;
     const { isDirty, eventDefinition, eventsClusterConfig, validation } = this.state;
     const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
 

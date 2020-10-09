@@ -15,7 +15,7 @@ import EventNotificationFormContainer from 'components/event-notifications/event
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const CreateEventDefinitionPage = ({ currentUser, route }) => {
+const CreateEventDefinitionPage = ({ currentUser }) => {
   if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')) {
     history.push(Routes.NOTFOUND);
   }
@@ -54,7 +54,7 @@ const CreateEventDefinitionPage = ({ currentUser, route }) => {
 
         <Row className="content">
           <Col md={12}>
-            <EventNotificationFormContainer action="create" route={route} />
+            <EventNotificationFormContainer action="create" />
           </Col>
         </Row>
       </span>
@@ -64,7 +64,6 @@ const CreateEventDefinitionPage = ({ currentUser, route }) => {
 
 CreateEventDefinitionPage.propTypes = {
   currentUser: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
 };
 
 export default connect(CreateEventDefinitionPage, {
