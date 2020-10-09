@@ -13,6 +13,7 @@ import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from './RelativeTimeRangeSelector';
 import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
+import TimeRangeLivePreview from './TimeRangeLivePreview';
 
 const timeRangeTypes = {
   absolute: AbsoluteTimeRangeSelector,
@@ -86,6 +87,12 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                    placement="bottom"
                    positionTop={36}
                    arrowOffsetLeft={34}>
+      <Row>
+        <Col md={12}>
+          <TimeRangeLivePreview timerange={nextRangeProps.value || originalTimerange.value} />
+        </Col>
+      </Row>
+
       <Row>
         <Col md={12}>
           <Tabs id="dateTimeTypes"
