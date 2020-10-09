@@ -27,7 +27,6 @@ type Props = {
     query: UntypedBigDisplayModeQuery,
   },
   params: any,
-  route: any,
   view: {
     view: ?View,
     activeQuery: ?QueryId,
@@ -45,7 +44,7 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, activeQuery } = {} }: Props) => {
+const ShowDashboardInBigDisplayMode = ({ location, params, view: { view, activeQuery } = {} }: Props) => {
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
 
