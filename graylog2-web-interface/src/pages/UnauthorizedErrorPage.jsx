@@ -74,14 +74,13 @@ UnauthorizedErrorPage.propTypes = {
   errorDetails: PropTypes.string,
   location: PropTypes.shape({
     pathname: PropTypes.string,
-  }),
+  }).isRequired,
   title: PropTypes.string,
 };
 
 UnauthorizedErrorPage.defaultProps = {
   description: undefined,
   errorDetails: undefined,
-  location: {},
   title: 'Missing Permissions',
 };
 
