@@ -90,8 +90,8 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
         return groupSyncActions.handleUpdate(formValues, backendId, serviceType);
       }
 
+      // Delete existing group sync config
       if (backendHasGroupSync && !formValues.synchronizeGroups && groupSyncActions?.delete) {
-        // Delete existing group sync config
         return groupSyncActions.delete(backendId);
       }
     }

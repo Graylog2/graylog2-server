@@ -45,13 +45,13 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
         system_user_password: passwordUpdatePayload(payload.config.system_user_password),
       },
     }).then((result) => {
+      // Create and update group sync config
       if (formValues.synchronizeGroups && authGroupSyncPlugins?.[0]?.actions?.handleUpdate) {
-        // Create and update group sync config
         return authGroupSyncPlugins[0].actions.handleUpdate(formValues, authBackendMeta);
       }
 
+      // Delete existing group sync config
       if (backendHasGroupSync && !formValues.synchronizeGroups && authGroupSyncPlugins?.[0]?.actions?.delete) {
-        // Delete existing group sync config
         return authGroupSyncPlugins[0].actions.delete(authenticationBackend.id);
       }
 
