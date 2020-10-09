@@ -6,7 +6,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { DocumentTitle } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 
 import { AUTH_BACKEND_META } from './BackendCreate';
 import WizardPageHeader from './WizardPageHeader';
@@ -31,7 +31,7 @@ export const prepareInitialValues = ({
     userSearchPattern,
     verifyCertificates,
   },
-}: LdapBackend) => {
+}: LdapBackend): WizardFormValues => {
   const serverUrl = new URI(serverUrls[0]);
 
   return {
@@ -72,7 +72,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
   return props;
 };
 
-export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, backendId: string, backendHasGroupSync: boolean, serviceType: string) => {
+export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, backendId: string, backendAlreadyHasGroupSync: boolean, serviceType: string) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
   const groupSyncActions = authGroupSyncPlugins?.[0]?.actions;
 
@@ -85,13 +85,18 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
     },
   }).then((result) => {
     if (result) {
-      // Create and update group sync config
-      if (formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
+      // Create group sync config
+      if (backendAlreadyHasGroupSync && formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
         return groupSyncActions.handleUpdate(formValues, backendId, serviceType);
       }
 
+      // Update group sync config
+      if (!backendAlreadyHasGroupSync && formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
+        return groupSyncActions.handleCreate(formValues, backendId, serviceType);
+      }
+
       // Delete existing group sync config
-      if (backendHasGroupSync && !formValues.synchronizeGroups && groupSyncActions?.delete) {
+      if (backendAlreadyHasGroupSync && !formValues.synchronizeGroups && groupSyncActions?.delete) {
         return groupSyncActions.delete(backendId);
       }
     }
@@ -102,22 +107,33 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const groupSyncFormValues = authGroupSyncPlugins?.[0]?.hooks?.useBackendFormValues();
-  const backendHasGroupSync = !!groupSyncFormValues;
-  const initialValues = { ...prepareInitialValues(authenticationBackend), ...groupSyncFormValues, synchronizeGroups: !!backendHasGroupSync };
-  const optionalProps = _optionalWizardProps(initialStepKey);
+  const hasGroupSyncPlugin = !!authGroupSyncPlugins?.[0];
   const authBackendMeta = {
     ...AUTH_BACKEND_META,
     backendId: authenticationBackend.id,
     backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
   };
+  let initialValues = prepareInitialValues(authenticationBackend);
 
-  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authBackendMeta.backendId, backendHasGroupSync, authBackendMeta.serviceType);
+  if (hasGroupSyncPlugin) {
+    const {
+      initialValues: initialGroupSyncValues,
+      finishedLoading,
+    } = authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues(authenticationBackend.id);
+
+    if (!finishedLoading) {
+      return <Spinner />;
+    }
+
+    initialValues = { ...initialValues, ...initialGroupSyncValues };
+  }
+
+  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authBackendMeta.backendId, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
 
   return (
     <DocumentTitle title="Edit LDAP Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
-      <BackendWizard {...optionalProps}
+      <BackendWizard {..._optionalWizardProps(initialStepKey)}
                      authBackendMeta={authBackendMeta}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit} />

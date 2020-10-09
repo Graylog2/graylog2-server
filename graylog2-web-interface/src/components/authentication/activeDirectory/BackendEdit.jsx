@@ -2,15 +2,13 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { DocumentTitle } from 'components/common';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
+import type { LdapBackend } from 'logic/authentication/ldap/types';
+import { DocumentTitle, Spinner } from 'components/common';
 
 import WizardPageHeader from './WizardPageHeader';
 import { HELP, AUTH_BACKEND_META } from './BackendCreate';
 
-import { prepareInitialValues, passwordUpdatePayload } from '../ldap/BackendEdit';
-import type { WizardFormValues } from '../BackendWizard/contexts/BackendWizardContext';
+import { prepareInitialValues, handleSubmit } from '../ldap/BackendEdit';
 import BackendWizard from '../BackendWizard';
 
 type Props = {
@@ -30,39 +28,29 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const groupSyncFormValues = authGroupSyncPlugins?.[0]?.hooks?.useBackendFormValues();
-  const backendHasGroupSync = !!groupSyncFormValues;
-  const initialValues = { ...prepareInitialValues(authenticationBackend), ...groupSyncFormValues, synchronizeGroups: backendHasGroupSync };
-  const optionalProps = _optionalWizardProps(initialStepKey);
+  const hasGroupSyncPlugin = !!authGroupSyncPlugins?.[0];
   const authBackendMeta = { ...AUTH_BACKEND_META, backendId: authenticationBackend.id };
+  let initialValues = prepareInitialValues(authenticationBackend);
 
-  const _handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) => {
-    return AuthenticationDomain.update(authenticationBackend.id, {
-      ...payload,
-      id: authenticationBackend.id,
-      config: {
-        ...payload.config,
-        system_user_password: passwordUpdatePayload(payload.config.system_user_password),
-      },
-    }).then((result) => {
-      // Create and update group sync config
-      if (formValues.synchronizeGroups && authGroupSyncPlugins?.[0]?.actions?.handleUpdate) {
-        return authGroupSyncPlugins[0].actions.handleUpdate(formValues, authBackendMeta);
-      }
+  if (hasGroupSyncPlugin) {
+    const {
+      initialValues: initialGroupSyncValues,
+      finishedLoading,
+    } = authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues(authenticationBackend.id);
 
-      // Delete existing group sync config
-      if (backendHasGroupSync && !formValues.synchronizeGroups && authGroupSyncPlugins?.[0]?.actions?.delete) {
-        return authGroupSyncPlugins[0].actions.delete(authenticationBackend.id);
-      }
+    if (!finishedLoading) {
+      return <Spinner />;
+    }
 
-      return result;
-    });
-  };
+    initialValues = { ...initialValues, ...initialGroupSyncValues };
+  }
+
+  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authBackendMeta.backendId, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
 
   return (
     <DocumentTitle title="Edit Active Directory Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
-      <BackendWizard {...optionalProps}
+      <BackendWizard {..._optionalWizardProps(initialStepKey)}
                      authBackendMeta={authBackendMeta}
                      help={HELP}
                      initialValues={initialValues}

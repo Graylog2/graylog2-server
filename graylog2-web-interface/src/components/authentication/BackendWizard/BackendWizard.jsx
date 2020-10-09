@@ -113,7 +113,7 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
 
   const payload = getSubmitPayload(formValues);
 
-  onSubmit(payload, stepsState.formValues).then(() => {
+  onSubmit(payload, formValues).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
