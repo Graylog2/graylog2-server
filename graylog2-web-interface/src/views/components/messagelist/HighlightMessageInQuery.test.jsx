@@ -6,6 +6,7 @@ import HighlightMessageInQuery from './HighlightMessageInQuery';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
+// eslint-disable-next-line react/prop-types
 jest.mock('routing/withLocation', () => (Component) => ({ query, ...rest }) => <Component location={{ query }} {...rest} />);
 
 describe('HighlightMessageInQuery', () => {

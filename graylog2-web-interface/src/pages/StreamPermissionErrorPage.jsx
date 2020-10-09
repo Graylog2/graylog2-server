@@ -28,6 +28,11 @@ const StreamPermissionErrorPage = ({ error }: Props) => {
 StreamPermissionErrorPage.propTypes = {
   error: PropTypes.shape({
     message: PropTypes.string.isRequired,
+    additional: PropTypes.shape({
+      body: PropTypes.shape({
+        streams: PropTypes.arrayOf(PropTypes.string),
+      }),
+    }),
   }).isRequired,
 };
 
