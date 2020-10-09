@@ -51,7 +51,7 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
         Performs a background connection check with the address and credentials defined in the step &quot;Server Configuration&quot;.
       </p>
       <Button onClick={_handleConnectionCheck} type="button">
-        {loading ? <Spinner delay={0} /> : 'Test Server Connection'}
+        {loading ? <Spinner delay={0} text="Test Server Connection" /> : 'Test Server Connection'}
       </Button>
       {success && (
         <NotificationContainer bsStyle="success">

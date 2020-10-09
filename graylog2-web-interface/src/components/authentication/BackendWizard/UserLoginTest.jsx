@@ -66,7 +66,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
             </Col>
           </Row>
           <Button type="submit">
-            {loading ? <Spinner delay={0} /> : 'Test User Login'}
+            {loading ? <Spinner delay={0} text="Test User Login" /> : 'Test User Login'}
           </Button>
           {(!hasErrors && testFinished) && (
             <NotificationContainer bsStyle={success ? 'success' : 'danger'}>
