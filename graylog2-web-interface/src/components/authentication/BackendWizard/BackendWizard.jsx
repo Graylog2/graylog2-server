@@ -83,7 +83,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
 
 const _getInvalidStepKeys = (formValues) => {
   const validation = { ...FORMS_VALIDATION, [GROUP_SYNC_KEY]: {} };
-  const authGroupSyncPlugins = PluginStore.exports('authentication.groupSync');
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
   const groupSyncValidation = authGroupSyncPlugins?.[0]?.validation?.GroupSyncValidation;
 
   if (groupSyncValidation && formValues.synchronizeGroups) {

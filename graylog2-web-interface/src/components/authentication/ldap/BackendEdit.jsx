@@ -73,7 +73,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 };
 
 export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, backendId: string, backendHasGroupSync: boolean, serviceType: string) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.groupSync');
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
   const groupSyncActions = authGroupSyncPlugins?.[0]?.actions;
 
   return AuthenticationDomain.update(backendId, {
@@ -101,7 +101,7 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.groupSync');
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
   const groupSyncFormValues = authGroupSyncPlugins?.[0]?.hooks?.useBackendFormValues;
   const backendHasGroupSync = !!groupSyncFormValues;
   const initialValues = { ...prepareInitialValues(authenticationBackend), ...groupSyncFormValues, synchronizeGroups: !!backendHasGroupSync };

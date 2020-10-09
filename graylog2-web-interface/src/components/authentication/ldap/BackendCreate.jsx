@@ -18,7 +18,7 @@ export const AUTH_BACKEND_META = {
 };
 
 const BackendCreate = () => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.groupSync');
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
   const groupSyncActions = authGroupSyncPlugins?.[0]?.actions;
 
   const _handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) => {
