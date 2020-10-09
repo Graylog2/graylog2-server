@@ -20,11 +20,13 @@ import SearchMetadata from 'views/logic/search/SearchMetadata';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
-import ExtendedSearchPage from './ExtendedSearchPage';
+import Search from './Search';
+
+import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/layout/Footer', () => <div />);
-jest.mock('util/History', () => ({ push: jest.fn() }));
+jest.mock('util/History');
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
@@ -82,14 +84,14 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
-jest.mock('views/stores/StreamsStore', () => ({ StreamsActions: { refresh: jest.fn() } }));
+jest.mock('views/stores/StreamsStore');
 jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
 jest.mock('views/components/WithSearchStatus', () => (x) => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
-jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
-jest.mock('views/logic/withPluginEntities', () => (x) => x);
+jest.mock('views/stores/SearchMetadataStore');
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
+jest.mock('views/hooks/SyncWithQueryParameters');
 
 const mockPromise = (res) => {
   const promise = Promise.resolve(res);
@@ -100,7 +102,7 @@ const mockPromise = (res) => {
   return promise;
 };
 
-describe('ExtendedSearchPage', () => {
+describe('Search', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
@@ -126,22 +128,22 @@ describe('ExtendedSearchPage', () => {
     asMock(CurrentViewTypeProvider).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
-  const SimpleExtendedSearchPage = (props) => (
-    <ExtendedSearchPage route={{}}
-                        location={{ query: {} }}
-                        searchRefreshHooks={[]}
-                        {...props} />
+  const SimpleSearch = (props) => (
+    <Search route={{}}
+            location={{ query: {} }}
+            searchRefreshHooks={[]}
+            {...props} />
   );
 
   it('register a WindowLeaveMessage', () => {
-    const wrapper = mount(<SimpleExtendedSearchPage />);
+    const wrapper = mount(<SimpleSearch />);
 
     expect(wrapper.find('WindowLeaveMessage')).toHaveLength(1);
   });
 
   it('passes the given route to the WindowLeaveMessage component', () => {
     const route = { path: '/foo' };
-    const wrapper = mount(<SimpleExtendedSearchPage route={route} />);
+    const wrapper = mount(<SimpleSearch route={route} />);
 
     const windowLeaveMessage = wrapper.find('WindowLeaveMessage');
 
@@ -150,19 +152,19 @@ describe('ExtendedSearchPage', () => {
   });
 
   it('executes search upon mount', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(SearchActions.execute).toHaveBeenCalled();
   });
 
   it('refreshes search config upon mount', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(SearchConfigActions.refresh).toHaveBeenCalled();
   });
 
   it('does not register to WidgetStore upon mount', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(WidgetStore.listen).not.toHaveBeenCalled();
   });
@@ -171,7 +173,7 @@ describe('ExtendedSearchPage', () => {
     const unsubscribe = jest.fn();
 
     WidgetStore.listen = jest.fn(() => unsubscribe);
-    const wrapper = mount(<SimpleExtendedSearchPage />);
+    const wrapper = mount(<SimpleSearch />);
 
     wrapper.unmount();
 
@@ -179,7 +181,7 @@ describe('ExtendedSearchPage', () => {
   });
 
   it('does not register to QueryFiltersStore upon mount', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(QueryFiltersStore.listen).not.toHaveBeenCalled();
   });
@@ -188,7 +190,7 @@ describe('ExtendedSearchPage', () => {
     const unsubscribe = jest.fn();
 
     QueryFiltersStore.listen = jest.fn(() => unsubscribe);
-    const wrapper = mount(<SimpleExtendedSearchPage />);
+    const wrapper = mount(<SimpleSearch />);
 
     wrapper.unmount();
 
@@ -196,19 +198,19 @@ describe('ExtendedSearchPage', () => {
   });
 
   it('registers to SearchActions.refresh upon mount', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(SearchActions.refresh.listen).toHaveBeenCalled();
   });
 
   it('registers to ViewActions.search.completed upon mount', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(ViewActions.search.completed.listen).toHaveBeenCalled();
   });
 
   it('registers to ViewActions.search.completed even if search refresh condition fails', () => {
-    mount(<SimpleExtendedSearchPage searchRefreshHools={[() => false]} />);
+    mount(<SimpleSearch searchRefreshHools={[() => false]} />);
 
     expect(ViewActions.search.completed.listen).toHaveBeenCalled();
   });
@@ -217,7 +219,7 @@ describe('ExtendedSearchPage', () => {
     const unsubscribe = jest.fn();
 
     ViewActions.search.completed.listen = jest.fn(() => unsubscribe);
-    const wrapper = mount(<SimpleExtendedSearchPage />);
+    const wrapper = mount(<SimpleSearch />);
 
     expect(unsubscribe).not.toHaveBeenCalled();
 
@@ -227,13 +229,19 @@ describe('ExtendedSearchPage', () => {
   });
 
   it('refreshes Streams upon mount', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(StreamsActions.refresh).toHaveBeenCalled();
   });
 
+  it('synchronizes URL upon mount', async () => {
+    mount(<SimpleSearch />);
+
+    expect(useSyncWithQueryParameters).toHaveBeenCalled();
+  });
+
   it('updating search in view triggers search execution', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
 
@@ -250,13 +258,13 @@ describe('ExtendedSearchPage', () => {
   it('refreshes field types store upon mount', () => {
     expect(FieldTypesActions.all).not.toHaveBeenCalled();
 
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     expect(FieldTypesActions.all).toHaveBeenCalled();
   });
 
   it('refreshes field types upon every search execution', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     asMock(FieldTypesActions.all).mockClear();
     const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
@@ -268,7 +276,7 @@ describe('ExtendedSearchPage', () => {
   });
 
   it('refreshing after query change parses search metadata first', (done) => {
-    const wrapper = mount(<SimpleExtendedSearchPage />);
+    const wrapper = mount(<SimpleSearch />);
 
     const searchBar = wrapper.find('DashboardSearchBar');
     const cb = searchBar.at(0).props().onExecute;
@@ -286,7 +294,7 @@ describe('ExtendedSearchPage', () => {
   });
 
   it('changing current query in view does not trigger search execution', () => {
-    mount(<SimpleExtendedSearchPage />);
+    mount(<SimpleSearch />);
 
     asMock(SearchActions.execute).mockClear();
 

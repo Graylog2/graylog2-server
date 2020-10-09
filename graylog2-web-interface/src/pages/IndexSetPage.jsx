@@ -13,6 +13,7 @@ import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
+import withParams from 'routing/withParams';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesStore, IndicesActions } = CombinedProvider.get('Indices');
@@ -182,4 +183,4 @@ const IndexSetPage = createReactClass({
   },
 });
 
-export default IndexSetPage;
+export default withParams(IndexSetPage);

@@ -52,11 +52,13 @@ import OperatorCompletion from 'views/components/searchbar/completions/OperatorC
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import {
-  dashboardsPath, dashboardsTvPath,
+  dashboardsPath,
+  dashboardsTvPath,
   extendedSearchPath,
   newDashboardsPath,
   showDashboardsPath,
   showViewsPath,
+  newSearchPath,
   showSearchPath,
   viewsPath,
 } from 'views/Constants';
@@ -76,6 +78,7 @@ import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
 import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
+import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -96,12 +99,16 @@ export default {
   },
   routes: [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: AppWithExtendedSearchBar },
-    { path: showSearchPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
-    { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
+
+    { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
+    { path: showSearchPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
+    { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
+    { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
+
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
   ],

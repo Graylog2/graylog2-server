@@ -9,6 +9,7 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
+import withParams from 'routing/withParams';
 
 const { CollectorsActions } = CombinedProvider.get('Collectors');
 
@@ -85,4 +86,4 @@ const SidecarEditCollectorPage = createReactClass({
   },
 });
 
-export default SidecarEditCollectorPage;
+export default withParams(SidecarEditCollectorPage);

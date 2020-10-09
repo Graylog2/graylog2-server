@@ -58,6 +58,8 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.unboundid.util.StaticUtils.isValidUTF8;
+import static com.unboundid.util.StaticUtils.toUTF8String;
 import static java.util.Objects.requireNonNull;
 
 // TODO: Possible improvements:
@@ -234,7 +236,11 @@ public class UnboundLDAPConnector {
 
             if (attribute.needsBase64Encoding()) {
                 for (final byte[] value : attribute.getValueByteArrays()) {
-                    ldapEntryBuilder.addAttribute(attribute.getBaseName(), Base64.encode(value));
+                    if (isValidUTF8(value)) {
+                        ldapEntryBuilder.addAttribute(attribute.getBaseName(), toUTF8String(value));
+                    } else {
+                        ldapEntryBuilder.addAttribute(attribute.getBaseName(), Base64.encode(value));
+                    }
                 }
             } else {
                 for (final String value : attribute.getValues()) {

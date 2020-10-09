@@ -1,5 +1,6 @@
 // @flow strict
-import React, { useEffect } from 'react';
+import * as React from 'react';
+import { useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
@@ -38,12 +39,12 @@ import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessa
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-import withPluginEntities from 'views/logic/withPluginEntities';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
   ${({ interactive }) => (interactive ? css`
@@ -76,7 +77,6 @@ const ConnectedSidebar = connect(
 
 type Props = {
   route: any,
-  searchRefreshHooks: Array<SearchRefreshCondition>,
   router: {
     getCurrentLocation: () => ({ pathname: string, search: string }),
   },
@@ -116,16 +116,20 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
+const Search = ({ route, location = { query: {} }, router }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
-  const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
+  const searchRefreshHooks: Array<SearchRefreshCondition> = usePluginEntities('views.hooks.searchRefresh');
+  const refreshIfNotUndeclared = useCallback(
+    () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState()),
+    [searchRefreshHooks],
+  );
 
   useEffect(() => {
     const { view } = ViewStore.getInitialState();
 
     bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
-  }, [query]);
+  }, [location.query]);
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -140,13 +144,11 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       storeListenersUnsubscribes = storeListenersUnsubscribes
         .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
-
-      return null;
     });
 
     // Returning cleanup function used when unmounting
     return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
-  }, []);
+  }, [refreshIfNotUndeclared]);
 
   useSyncWithQueryParameters(query);
 
@@ -201,16 +203,15 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   );
 };
 
-ExtendedSearchPage.propTypes = {
+Search.propTypes = {
   route: PropTypes.object.isRequired,
   location: PropTypes.shape({
     query: PropTypes.object.isRequired,
   }),
   router: PropTypes.object,
-  searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
 
-ExtendedSearchPage.defaultProps = {
+Search.defaultProps = {
   location: { query: {} },
   router: {
     getCurrentLocation: () => ({ pathname: '', search: '' }),
@@ -224,8 +225,4 @@ ExtendedSearchPage.defaultProps = {
   },
 };
 
-const mapping = {
-  searchRefreshHooks: 'views.hooks.searchRefresh',
-};
-
-export default withPluginEntities<$Rest<Props, {| router: any |}>, typeof mapping>(withRouter(ExtendedSearchPage), mapping);
+export default withRouter(Search);

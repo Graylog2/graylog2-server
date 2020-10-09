@@ -107,7 +107,7 @@ public class LegacyAlertConditionMigratorTest {
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoConnection, mongoJackObjectMapperProvider);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoConnection, mongoJackObjectMapperProvider, mock(NodeId.class), clock);
-        notificationService = new DBNotificationService(mongoConnection, mongoJackObjectMapperProvider);
+        notificationService = new DBNotificationService(mongoConnection, mongoJackObjectMapperProvider, mock(EntityOwnershipService.class));
 
         this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class));
         this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock));
@@ -149,7 +149,7 @@ public class LegacyAlertConditionMigratorTest {
         verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class), any(Optional.class));
 
         // Make sure we use the NotificationResourceHandler to create the notifications
-        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class));
+        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class), any(Optional.class));
 
         assertThat(eventDefinitionService.streamAll().count()).isEqualTo(migratedConditions);
         assertThat(notificationService.streamAll().count()).isEqualTo(migratedCallbacks);
@@ -624,7 +624,7 @@ public class LegacyAlertConditionMigratorTest {
         verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class), any(Optional.class));
 
         // Make sure we use the NotificationResourceHandler to create the notifications
-        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class));
+        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class), any(Optional.class));
 
         assertThat(eventDefinitionService.streamAll().count()).isEqualTo(migratedConditions);
         assertThat(notificationService.streamAll().count()).isEqualTo(migratedCallbacks);

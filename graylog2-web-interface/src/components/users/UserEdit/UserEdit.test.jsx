@@ -27,7 +27,7 @@ const user = User
   .builder()
   .fullName('The full name')
   .username('The username')
-  .roles(Immutable.List([assignedRole.name]))
+  .roles(Immutable.Set([assignedRole.name]))
   .email('theemail@example.org')
   .clientAddress('127.0.0.1')
   .lastActivity('2020-01-01T10:40:05.376+0000')

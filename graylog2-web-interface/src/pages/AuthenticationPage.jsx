@@ -2,7 +2,9 @@
 import * as React from 'react';
 
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
+
 import DocsHelper from 'util/DocsHelper';
+import withParams from 'routing/withParams';
 import StringUtils from 'util/StringUtils';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import history from 'util/History';
@@ -66,4 +68,4 @@ const AuthenticationPage = () => {
   );
 };
 
-export default AuthenticationPage;
+export default withParams(AuthenticationPage);

@@ -6,6 +6,7 @@ import Reflux from 'reflux';
 import StoreProvider from 'injection/StoreProvider';
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageErrorOverview, PageHeader, Spinner } from 'components/common';
+import withParams from 'routing/withParams';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
@@ -105,4 +106,4 @@ const ShowNodePage = createReactClass({
   },
 });
 
-export default ShowNodePage;
+export default withParams(ShowNodePage);

@@ -9,6 +9,7 @@ import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
   'LookupTableCaches',
@@ -150,7 +151,7 @@ LUTCachesPage.defaultProps = {
   caches: null,
 };
 
-export default connect(LUTCachesPage, { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
+export default connect(withParams(LUTCachesPage), { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
   ...otherProps,
   ...cachesStore,
 }));
