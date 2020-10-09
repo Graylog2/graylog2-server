@@ -762,7 +762,7 @@ public class PipelineRuleParser {
         public void exitNot(RuleLangParser.NotContext ctx) {
             final Expression expression = parseContext.expressions().get(ctx.expression());
             Class type = expression.getType();
-            if (!Boolean.class.equals(type)) {
+            if (!Boolean.class.isAssignableFrom(type)) {
                 parseContext.addError(new IncompatibleType(ctx, Boolean.class, type));
             }
         }
