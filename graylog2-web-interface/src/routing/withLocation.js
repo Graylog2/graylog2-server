@@ -1,5 +1,4 @@
 // @flow strict
-import * as React from 'react';
 import { withRouter } from 'react-router';
 
 export type Location = {
