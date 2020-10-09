@@ -7,8 +7,6 @@ import { Field } from 'formik';
 import Input from 'components/bootstrap/Input';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
-import TimerangeSelector from '../TimerangeSelector';
-
 type Props = {
   disabled: boolean,
   config: SearchesConfig,
@@ -58,18 +56,16 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
         };
 
         return (
-          <TimerangeSelector className="relative">
-            <Input id="relative-timerange-selector"
-                   disabled={disabled}
-                   type="select"
-                   value={value}
-                   title="Select a relative time range"
-                   className="relative"
-                   name={name}
-                   onChange={_onChange}>
-              {options}
-            </Input>
-          </TimerangeSelector>
+          <Input id="relative-timerange-selector"
+                 disabled={disabled}
+                 type="select"
+                 value={value}
+                 title="Select a relative time range"
+                 className="relative"
+                 name={name}
+                 onChange={_onChange}>
+            {options}
+          </Input>
         );
       }}
     </Field>
