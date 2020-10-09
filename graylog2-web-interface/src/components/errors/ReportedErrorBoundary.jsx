@@ -35,7 +35,11 @@ const ReportedErrorPage = ({ reportedError }: { reportedError: ReportedError }) 
   }
 };
 
-const ReportedErrorBoundary = ({ children, router }) => {
+type Props = {
+  children: React.Node,
+};
+
+const ReportedErrorBoundary = ({ children }: Props) => {
   const [reportedError, setReportedError] = useState<?ReportedError>();
 
   const report = (newError: ReportedError) => setReportedError(newError);
@@ -54,7 +58,9 @@ const ReportedErrorBoundary = ({ children, router }) => {
     if (reportedError) {
       setReportedError(null);
     }
-  }, [location]);
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [location]);
 
   if (reportedError) {
     return <ReportedErrorPage reportedError={reportedError} />;
