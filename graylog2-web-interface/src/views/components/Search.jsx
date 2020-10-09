@@ -182,7 +182,7 @@ const Search = ({ location }: Props) => {
                           <QueryBar />
                         </IfDashboard>
                       </IfInteractive>
-                      <HighlightMessageInQuery query={location.query}>
+                      <HighlightMessageInQuery>
                         <SearchResult />
                       </HighlightMessageInQuery>
                       <Footer />
