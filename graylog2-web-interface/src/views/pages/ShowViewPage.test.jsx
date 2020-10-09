@@ -45,7 +45,7 @@ jest.mock('actions/errors/ErrorsActions', () => ({
 }));
 
 jest.mock('util/History', () => ({}));
-jest.mock('./ExtendedSearchPage', () => 'extended-search-page');
+jest.mock('views/components/Search', () => 'extended-search-page');
 
 describe('ShowViewPage', () => {
   const viewJson: ViewJson = {

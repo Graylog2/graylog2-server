@@ -13,6 +13,7 @@ import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
+import withParams from 'routing/withParams';
 
 import AuthProvidersConfig from './AuthProvidersConfig';
 
@@ -160,4 +161,4 @@ const AuthenticationComponent = createReactClass({
   },
 });
 
-export default AuthenticationComponent;
+export default withParams(AuthenticationComponent);

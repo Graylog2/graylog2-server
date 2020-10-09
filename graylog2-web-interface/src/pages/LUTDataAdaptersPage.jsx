@@ -9,6 +9,7 @@ import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
   'LookupTableDataAdapters',
@@ -192,7 +193,7 @@ LUTDataAdaptersPage.defaultProps = {
   dataAdapter: null,
 };
 
-export default connect(LUTDataAdaptersPage, { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+export default connect(withParams(LUTDataAdaptersPage), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
   ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
     ...otherProps,
     ...dataAdaptersStore,

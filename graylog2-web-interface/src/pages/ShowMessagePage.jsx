@@ -10,6 +10,7 @@ import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/graylog';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
+import withParams from 'routing/withParams';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -92,4 +93,4 @@ ShowMessagePage.propTypes = {
   }).isRequired,
 };
 
-export default ShowMessagePage;
+export default withParams(ShowMessagePage);

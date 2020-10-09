@@ -11,6 +11,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 import style from './ShowAlertPage.css';
 
@@ -156,4 +157,4 @@ const ShowAlertPage = createReactClass({
   },
 });
 
-export default ShowAlertPage;
+export default withParams(ShowAlertPage);
