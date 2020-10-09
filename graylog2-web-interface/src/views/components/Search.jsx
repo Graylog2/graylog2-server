@@ -78,6 +78,8 @@ const ConnectedSidebar = connect(
 type Props = {
   location?: {
     query: { [string]: string },
+    pathname: string,
+    search: string,
   },
 };
 

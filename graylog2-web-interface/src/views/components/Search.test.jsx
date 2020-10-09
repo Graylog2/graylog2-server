@@ -129,7 +129,7 @@ describe('Search', () => {
 
   const SimpleSearch = (props) => (
     <Search route={{}}
-            location={{ query: {} }}
+            location={{ query: {}, pathname: '/search', search: '' }}
             searchRefreshHooks={[]}
             {...props} />
   );
