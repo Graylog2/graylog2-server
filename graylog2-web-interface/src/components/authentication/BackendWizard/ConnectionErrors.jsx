@@ -8,6 +8,7 @@ import { Alert } from 'components/graylog';
 
 export const NotificationContainer: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
   margin-top: 10px;
+  word-break: break-word;
 `;
 
 const ErrorsTitle = styled.div`
