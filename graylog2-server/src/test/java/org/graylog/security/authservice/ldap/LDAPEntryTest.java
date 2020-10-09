@@ -17,8 +17,10 @@
 package org.graylog.security.authservice.ldap;
 
 import com.google.common.collect.ImmutableList;
+import com.unboundid.util.Base64;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +31,7 @@ class LDAPEntryTest {
     void dn() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("foo", "bar")
                 .build();
 
@@ -36,9 +39,23 @@ class LDAPEntryTest {
     }
 
     @Test
+    void uniqueId() {
+        final LDAPEntry entry = LDAPEntry.builder()
+                .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
+                .addAttribute("foo", "bar")
+                .build();
+
+        assertThat(entry.base64UniqueId()).isEqualTo("dW5pcXVlLWlk");
+
+        assertThat(entry.uniqueId()).isEqualTo("unique-id".getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Test
     void objectClasses() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("foo", "bar")
                 .build();
 
@@ -46,6 +63,7 @@ class LDAPEntryTest {
 
         final LDAPEntry entry2 = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("foo", "bar")
                 .objectClasses(Collections.singleton("inetOrgPerson"))
                 .build();
@@ -57,6 +75,7 @@ class LDAPEntryTest {
     void attributes() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("foo", "bar")
                 .build();
 
@@ -68,6 +87,7 @@ class LDAPEntryTest {
     void addAndReadAttributes() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("HeLLo", null)
                 .addAttribute("Test", "1")
                 .addAttribute("foo", "bar")
@@ -83,6 +103,7 @@ class LDAPEntryTest {
     void readNonBlankAttribute() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("zero", "0")
                 .addAttribute("one", null)
                 .addAttribute("two", "")
@@ -99,6 +120,7 @@ class LDAPEntryTest {
     void addAttributesWithDuplicateKey() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("test", "1")
                 .addAttribute("test", "2")
                 .build();
@@ -110,6 +132,7 @@ class LDAPEntryTest {
     void hasAttribute() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
+                .base64UniqueId(Base64.encode("unique-id"))
                 .addAttribute("zero", "0")
                 .addAttribute("one", null)
                 .build();
