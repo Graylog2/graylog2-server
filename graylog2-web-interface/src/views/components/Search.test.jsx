@@ -91,6 +91,7 @@ jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardS
 jest.mock('views/stores/SearchMetadataStore');
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
+jest.mock('routing/withLocation', () => (Component) => (props) => <Component location={{ query: {}, pathname: '', search: '' }} {...props} />);
 
 const mockPromise = (res) => {
   const promise = Promise.resolve(res);
@@ -128,8 +129,7 @@ describe('Search', () => {
   });
 
   const SimpleSearch = (props) => (
-    <Search route={{}}
-            location={{ query: {}, pathname: '/search', search: '' }}
+    <Search location={{ query: {}, pathname: '/search', search: '' }}
             searchRefreshHooks={[]}
             {...props} />
   );
