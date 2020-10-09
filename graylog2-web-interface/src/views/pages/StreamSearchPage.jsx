@@ -7,15 +7,14 @@ import withParams from 'routing/withParams';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
 
 import SearchPage from './SearchPage';
 
 import { loadNewViewForStream } from '../logic/views/Actions';
 
 type Props = {
-  location: {
-    query: { [string]: any },
-  },
+  location: Location,
   params: {
     streamId: string,
   },

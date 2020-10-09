@@ -104,7 +104,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      SearchComponent.mockImplementationOnce(() => (
+      asMock(SearchComponent).mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
@@ -122,7 +122,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      SearchComponent.mockImplementationOnce(() => (
+      asMock(SearchComponent).mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
           {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>

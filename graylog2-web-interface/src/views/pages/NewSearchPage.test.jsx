@@ -103,7 +103,7 @@ describe('NewSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      SearchComponent.mockImplementationOnce(() => (
+      asMock(SearchComponent).mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
@@ -121,7 +121,7 @@ describe('NewSearchPage', () => {
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      SearchComponent.mockImplementationOnce(() => (
+      asMock(SearchComponent).mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
           {(_loadNewView) => <button type="button" onClick={() => _loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>

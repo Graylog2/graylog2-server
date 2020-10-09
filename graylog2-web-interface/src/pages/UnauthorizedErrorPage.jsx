@@ -6,6 +6,7 @@ import { FetchError } from 'logic/rest/FetchProvider';
 import { Icon, ClipboardButton } from 'components/common';
 import ErrorPage from 'components/errors/ErrorPage';
 import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
 
 const createErrorMessageString = (errorDetails: ?string, pageDetails: string, errorMessage: string) => {
   const defaultText = `${pageDetails}\n${errorMessage}`;
@@ -21,9 +22,7 @@ type Props = {
   description?: React.Node,
   error: FetchError,
   errorDetails?: string,
-  location: {
-    pathname: string,
-  },
+  location: Location,
   title: string,
 };
 

@@ -3,20 +3,16 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
 import { Spinner } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
 import SearchPage from './SearchPage';
 
-type URLQuery = { [string]: any };
-
 type Props = {
   route: {},
-  location: {
-    query: URLQuery,
-    pathname: string,
-  },
+  location: Location,
 };
 
 const NewSearchPage = ({ location: { query }, route }: Props) => {

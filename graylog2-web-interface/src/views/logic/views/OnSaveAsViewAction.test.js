@@ -1,4 +1,6 @@
 // @flow strict
+import asMock from 'helpers/mocking/AsMock';
+
 import { ViewActions } from 'views/stores/ViewStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
@@ -63,7 +65,7 @@ describe('OnSaveAsViewAction', () => {
   });
 
   it('does not do anything if saving fails', async () => {
-    ViewManagementActions.create.mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
+    asMock(ViewManagementActions.create).mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
 
     const view = View.create();
 

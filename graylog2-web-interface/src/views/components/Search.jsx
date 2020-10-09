@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 
 import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
@@ -76,11 +77,7 @@ const ConnectedSidebar = connect(
 );
 
 type Props = {
-  location?: {
-    query: { [string]: string },
-    pathname: string,
-    search: string,
-  },
+  location: Location,
 };
 
 const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshConditionArguments) => {
@@ -114,7 +111,7 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const Search = ({ location = { query: {} } }: Props) => {
+const Search = ({ location }: Props) => {
   const { pathname, search } = location;
   const query = `${pathname}${search}`;
   const searchRefreshHooks: Array<SearchRefreshCondition> = usePluginEntities('views.hooks.searchRefresh');
@@ -204,21 +201,9 @@ const Search = ({ location = { query: {} } }: Props) => {
 Search.propTypes = {
   location: PropTypes.shape({
     query: PropTypes.object.isRequired,
-  }),
-};
-
-Search.defaultProps = {
-  location: { query: {} },
-  router: {
-    getCurrentLocation: () => ({ pathname: '', search: '' }),
-    push: () => {},
-    replace: () => {},
-    go: () => {},
-    goBack: () => {},
-    goForward: () => {},
-    setRouteLeaveHook: () => {},
-    isActive: () => {},
-  },
+    pathname: PropTypes.string.isRequired,
+    search: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default withLocation(Search);
