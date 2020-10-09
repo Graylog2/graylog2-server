@@ -49,7 +49,7 @@ export const validateValue = (fieldValue, conditionType, conditionValue) => {
   return undefined;
 };
 
-export const validateField = (validationRules) => (fieldValue) => {
+export const validateField = (validationRules = {}) => (fieldValue) => {
   let error;
 
   Object.entries(validationRules).some(([validationType, validationValue]) => {
