@@ -19,8 +19,6 @@ package org.graylog.plugins.views.search.rest;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
@@ -67,19 +65,16 @@ public class ViewsResourceTest {
     private ViewService viewService;
 
     @Mock
-    private ViewSharingService viewSharingService;
-
-    @Mock
     private ViewDTO view;
 
     @Mock
-    private IsViewSharedForUser isViewSharedForUser;
+    private ViewPermissionChecks permissionChecks;
 
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser) {
-            super(viewService, viewSharingService, isViewSharedForUser);
+        ViewsTestResource(ViewService viewService, ViewPermissionChecks permissionChecks) {
+            super(viewService, permissionChecks);
         }
 
         @Override
@@ -96,7 +91,8 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, viewSharingService, isViewSharedForUser);
+        this.viewsResource = new ViewsTestResource(viewService, permissionChecks);
+        when(subject.isPermitted("dashboards:create")).thenReturn(true);
     }
 
     @Test
@@ -111,8 +107,6 @@ public class ViewsResourceTest {
         when(currentUser.getName()).thenReturn("basti");
         when(currentUser.isLocalAdmin()).thenReturn(true);
 
-        when(subject.isPermitted("dashboards:create")).thenReturn(true);
-
         this.viewsResource.create(view);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
@@ -123,6 +117,7 @@ public class ViewsResourceTest {
     @Test
     public void shouldNotCreateADashboardWithoutPermission() throws Exception {
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        when(permissionChecks.isDashboard(view)).thenReturn(true);
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 

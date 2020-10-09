@@ -92,6 +92,7 @@ const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Pro
   return (
     <SortIcon sortActive={sortActive}
               title={tooltip(fieldName)}
+              type="button"
               aria-label={tooltip(fieldName)}
               onClick={() => handleSortChange(changeSort)}
               data-testid="messages-sort-icon">
