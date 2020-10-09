@@ -110,7 +110,7 @@ export default class ViewState {
 
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
-    const value: Object = this._value;
+    const value: {} = this._value;
 
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map(value));

@@ -4,25 +4,25 @@ import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 
+import StreamsContext from 'contexts/StreamsContext';
 import { processHooks } from 'views/logic/views/ViewLoader';
-import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Search from 'views/logic/search/Search';
+import SearchComponent from 'views/components/Search';
+import { loadNewViewForStream, loadView } from 'views/logic/views/Actions';
 
 import StreamSearchPage from './StreamSearchPage';
 
-const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
 const mockView = View.create()
   .toBuilder()
   .type(View.Type.Search)
   .search(Search.builder().build())
   .build();
 
-jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
+jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('views/stores/SearchStore', () => ({ SearchActions: {} }));
 
 jest.mock('views/stores/ViewStore', () => ({
@@ -37,19 +37,13 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 
-jest.mock('views/hooks/SyncWithQueryParameters', () => ({
-  syncWithQueryParameters: jest.fn(),
+jest.mock('views/logic/views/ViewLoader', () => ({
+  processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
-jest.mock('views/logic/views/ViewLoader', () => {
-  const originalModule = jest.requireActual('views/logic/views/ViewLoader');
+jest.mock('views/hooks/SyncWithQueryParameters');
 
-  return {
-    __esModule: true,
-    ...originalModule,
-    processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
-  };
-});
+jest.mock('views/logic/views/Actions');
 
 describe('StreamSearchPage', () => {
   beforeAll(() => {
@@ -68,11 +62,13 @@ describe('StreamSearchPage', () => {
     },
   };
   const SimpleStreamSearchPage = (props) => (
-    <StreamSearchPage location={{ query: {} }}
-                      params={{ streamId: 'stream-id-1' }}
-                      route={{}}
-                      router={mockRouter}
-                      {...props} />
+    <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
+      <StreamSearchPage location={{ query: {} }}
+                        params={{ streamId: 'stream-id-1' }}
+                        route={{}}
+                        router={mockRouter}
+                        {...props} />
+    </StreamsContext.Provider>
   );
 
   afterEach(() => {
@@ -106,26 +102,25 @@ describe('StreamSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      mockExtendedSearchPage.mockImplementationOnce(() => (
+      SearchComponent.mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
-          {(loadView) => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
+          {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
       ));
-
-      const viewGetAction = asMock(ViewManagementActions.get);
 
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewLoadButton = await findByText('Load view');
       fireEvent.click(viewLoadButton);
 
-      await waitFor(() => expect(viewGetAction).toHaveBeenCalledTimes(1));
-      await waitFor(() => expect(viewGetAction).toHaveBeenCalledWith('special-view-id'));
+      await waitFor(() => expect(loadView).toHaveBeenCalled());
+
+      expect(loadView).toHaveBeenCalledWith('special-view-id');
     });
   });
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      mockExtendedSearchPage.mockImplementationOnce(() => (
+      SearchComponent.mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
           {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>
@@ -138,8 +133,9 @@ describe('StreamSearchPage', () => {
 
       fireEvent.click(viewCreateButton);
 
-      await waitFor(() => expect(ViewActions.create).toBeCalledTimes(2));
-      await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+      await waitFor(() => expect(loadNewViewForStream).toHaveBeenCalled());
+
+      expect(loadNewViewForStream).toHaveBeenCalledWith('stream-id-1');
     });
 
     it('should process hooks with empty query', async () => {
@@ -149,18 +145,15 @@ describe('StreamSearchPage', () => {
 
       fireEvent.click(viewCreateButton);
 
-      await waitFor(() => expect(processHooksAction).toBeCalledTimes(2));
-      await waitFor(() => expect(processHooksAction.mock.calls[1][3]).toStrictEqual({}));
-    });
+      await waitFor(() => expect(processHooksAction).toHaveBeenCalled());
 
-    it('should sync query params with current url', async () => {
-      const { findByText } = render(<SimpleStreamSearchPage location={mockLocation} />);
-      const viewCreateButton = await findByText('Load new view');
+      const query = {
+        q: '',
+        rangetype: 'relative',
+        relative: '300',
+      };
 
-      fireEvent.click(viewCreateButton);
-
-      await waitFor(() => expect(syncWithQueryParameters).toBeCalledTimes(1));
-      await waitFor(() => expect(syncWithQueryParameters).toHaveBeenCalledWith('/search?q=&rangetype=relative&relative=300'));
+      expect(processHooksAction).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), query, expect.anything());
     });
   });
 });

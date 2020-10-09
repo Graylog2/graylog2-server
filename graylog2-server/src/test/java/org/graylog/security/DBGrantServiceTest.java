@@ -146,6 +146,36 @@ public class DBGrantServiceTest {
     }
 
     @Test
+    @MongoDBFixtures("grants.json")
+    public void ensure() {
+        final GRN jane = grnRegistry.parse("grn::::user:jane");
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
+        final GRN newStream = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0888");
+
+        // Matches existing grant. Returns original
+        final GrantDTO stream1Grant = dbService.getForTargetAndGrantee(stream1, jane).get(0);
+        GrantDTO result = dbService.ensure(jane, Capability.VIEW, stream1, "admin");
+        assertThat(result).isEqualTo(stream1Grant);
+
+        // Updates to a higher capability
+        result = dbService.ensure(jane, Capability.MANAGE, stream1, "admin");
+        assertThat(result.capability()).isEqualTo(Capability.MANAGE);
+
+        // Don't downgrade to a lower capability
+        result = dbService.ensure(jane, Capability.VIEW, stream1, "admin");
+        assertThat(result.capability()).isEqualTo(Capability.MANAGE);
+
+        // Create a new grant
+        assertThat(dbService.ensure(jane, Capability.MANAGE, newStream, "admin")).isNotNull();
+        assertThat(dbService.getForTarget(newStream)).satisfies(grantDTOS -> {
+            assertThat(grantDTOS.size()).isEqualTo(1);
+            assertThat(grantDTOS.get(0).grantee()).isEqualTo(jane);
+            assertThat(grantDTOS.get(0).capability()).isEqualTo(Capability.MANAGE);
+            assertThat(grantDTOS.get(0).target()).isEqualTo(newStream);
+        });
+    }
+
+    @Test
     public void createWithGrantDTOAndUserObject() {
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         final GRN grantee = GRNTypes.USER.toGRN("jane");

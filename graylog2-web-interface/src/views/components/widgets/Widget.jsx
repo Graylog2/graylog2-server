@@ -2,10 +2,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import { browserHistory } from 'react-router';
 import styled from 'styled-components';
 
-import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
 import IfSearch from 'views/components/search/IfSearch';
@@ -31,6 +29,7 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
+import { loadDashboard } from 'views/logic/views/Actions';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -188,9 +187,7 @@ class Widget extends React.Component<Props, State> {
   _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string) => ({ search: newSearch }) => {
     const newDashboard = dashboard.toBuilder().search(newSearch).build();
 
-    ViewManagementActions.update(newDashboard).then(() => {
-      browserHistory.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
-    });
+    ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
   };
 
   _onMoveWidgetToTab = (widgetId, queryId, keepCopy) => {

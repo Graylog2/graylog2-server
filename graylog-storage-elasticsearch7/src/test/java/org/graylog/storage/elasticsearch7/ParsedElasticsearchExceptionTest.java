@@ -34,4 +34,19 @@ class ParsedElasticsearchExceptionTest {
             assertThat(p.reason()).isEqualTo("index [messages_it_deflector] blocked by: [TOO_MANY_REQUESTS/12/index read-only / allow delete (api)");
         });
     }
+
+    @Test
+    void parsingPrimaryShardIsNotAvailable() {
+        final String exception = "Elasticsearch exception: ElasticsearchException[Elasticsearch exception [type=unavailable_shards_exception, " +
+                "reason=[graylog_0][2] primary shard is not active Timeout: [1m], request: [BulkShardRequest [[graylog_0][2]] containing [125] " +
+                "requests]]]";
+
+        final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
+
+        assertThat(parsed).satisfies(p -> {
+            assertThat(p.type()).isEqualTo("unavailable_shards_exception");
+            assertThat(p.reason()).isEqualTo("[graylog_0][2] primary shard is not active Timeout: [1m], " +
+                    "request: [BulkShardRequest [[graylog_0][2]] containing [125] requests]]");
+        });
+    }
 }

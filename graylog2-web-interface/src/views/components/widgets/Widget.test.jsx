@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
-import { browserHistory } from 'react-router';
 import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
@@ -23,6 +22,7 @@ import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import { loadDashboard } from 'views/logic/views/Actions';
 
 import Widget from './Widget';
 
@@ -76,6 +76,7 @@ jest.mock('views/stores/ChartColorRulesStore', () => ({
 jest.mock('views/stores/WidgetStore');
 jest.mock('views/stores/TitlesStore');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/logic/views/Actions');
 
 describe('<Widget />', () => {
   afterEach(() => {
@@ -338,7 +339,6 @@ describe('<Widget />', () => {
       ViewManagementActions.update = mockAction(jest.fn(() => Promise.resolve()));
       SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
       Routes.pluginRoute = jest.fn((route) => (id) => `${route}-${id}`);
-      browserHistory.push = jest.fn();
 
       asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
         .search(Search.builder().id('search-id').build())
@@ -398,9 +398,9 @@ describe('<Widget />', () => {
 
     it('should redirect to updated dashboard', async () => {
       renderAndClick();
-      await waitFor(() => expect(browserHistory.push).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
-      expect(browserHistory.push).toHaveBeenCalledWith('DASHBOARDS_VIEWID-view-1');
+      expect(loadDashboard).toHaveBeenCalledWith('view-1');
     });
   });
 });

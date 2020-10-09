@@ -159,9 +159,7 @@ public class ViewSharingToGrantsMigration {
         // TODO: Needs to use the user ID once we don't use user names in references anymore!
         final GRN grantee = GRNTypes.USER.toGRN(username);
 
-        if (!grantService.hasGrantFor(grantee, CAPABILITY, target)) {
-            grantService.create(grantee, CAPABILITY, target, rootUsername);
-        }
+        grantService.ensure(grantee, CAPABILITY, target, rootUsername);
     }
 
     private GRN getTarget(String viewId) {

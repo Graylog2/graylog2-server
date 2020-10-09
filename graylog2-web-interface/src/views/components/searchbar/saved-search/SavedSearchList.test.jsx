@@ -1,9 +1,7 @@
 // @flow strict
 import React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { browserHistory } from 'react-router';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 
-import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
@@ -73,7 +71,7 @@ describe('SavedSearchList', () => {
       expect(onToggleModal).toBeCalledTimes(1);
     });
 
-    it('should handle with delete', () => {
+    it('should call `onDelete` if saved search is deleted', () => {
       window.confirm = jest.fn(() => true);
       const onDelete = jest.fn(() => {
         return new Promise(() => {});
@@ -91,7 +89,7 @@ describe('SavedSearchList', () => {
       expect(onDelete).toBeCalledTimes(1);
     });
 
-    it('should handle with load', () => {
+    it('should call load function from context', () => {
       const onLoad = jest.fn(() => { return new Promise(() => {}); });
       const views = createViewsResponse(1);
 
@@ -108,33 +106,6 @@ describe('SavedSearchList', () => {
       fireEvent.click(listItem);
 
       expect(onLoad).toBeCalledTimes(1);
-    });
-  });
-
-  describe('load new saved search', () => {
-    it('should change url after load', async () => {
-      const onLoad = jest.fn(() => Promise.resolve());
-
-      Routes.pluginRoute = jest.fn((route) => (id) => `${route}:${id}`);
-      browserHistory.push = jest.fn();
-      const views = createViewsResponse(1);
-
-      const { getByText } = render(
-        <ViewLoaderContext.Provider value={onLoad}>
-          <SavedSearchList toggleModal={() => {}}
-                           showModal
-                           deleteSavedSearch={() => {}}
-                           views={views} />
-        </ViewLoaderContext.Provider>,
-      );
-      const listItem = getByText('test-0');
-
-      fireEvent.click(listItem);
-
-      await waitFor(() => {
-        expect(browserHistory.push).toBeCalledTimes(1);
-        expect(browserHistory.push).toHaveBeenCalledWith('SEARCH_VIEWID:foo-bar-0');
-      });
     });
   });
 });
