@@ -1,12 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 import Spinner from 'components/common/Spinner';
-import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
@@ -48,9 +46,4 @@ const NewDashboardPage = ({ location }: Props) => {
 };
 
 NewDashboardPage.propTypes = {};
-
-const mapping = {
-  loadingViewHooks: 'views.hooks.loadingView',
-  executingViewHooks: 'views.hooks.executingView',
-};
-export default withPluginEntities(withLocation(NewDashboardPage), mapping);
+export default withLocation(NewDashboardPage);
