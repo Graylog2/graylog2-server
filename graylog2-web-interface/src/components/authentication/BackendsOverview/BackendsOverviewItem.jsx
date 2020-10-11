@@ -31,8 +31,7 @@ const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<
 };
 
 const EditButton = ({ isActive, authenticationBackend }: { authenticationBackend: AuthenticationBackend, isActive: boolean }) => {
-  const link = isActive
-    ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE : Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackend.id);
+  const link = Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackend.id);
 
   return (
     <LinkContainer to={link}>
