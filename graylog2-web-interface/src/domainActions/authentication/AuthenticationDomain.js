@@ -19,6 +19,7 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
   error: (error, authBackendId) => ({
     message: `Loading authentication service with id "${authBackendId}" failed with status: ${error}`,
   }),
+  notFoundRedirect: true,
 });
 
 const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
