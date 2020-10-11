@@ -105,19 +105,30 @@ const _getInvalidStepKeys = (formValues) => {
 const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps) => {
   const formValues = getUpdatedFormsValues();
   const invalidStepKeys = validateSteps(formValues);
-  setSubmitAllError();
 
+  // Do not submit if there are invalid steps
   if (invalidStepKeys.length >= 1) {
-    return;
+    return null;
   }
 
-  const payload = getSubmitPayload(formValues);
+  // Reset submit all errors
+  setSubmitAllError(null);
 
-  onSubmit(payload, formValues).then(() => {
+  const payload = getSubmitPayload(formValues);
+  const _submit = () => onSubmit(payload, formValues).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
   });
+
+  if (stepsState.authBackendMeta.backendGroupSyncIsActive && !formValues.synchronizeGroups) {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Do you really want to remove the group synchronization config for this authentication service?')) {
+      return _submit();
+    }
+  }
+
+  return _submit();
 };
 
 type Props = {
