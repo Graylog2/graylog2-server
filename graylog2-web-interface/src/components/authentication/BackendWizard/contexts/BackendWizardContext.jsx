@@ -29,6 +29,7 @@ export type WizardFormValues = {
 export type AuthBackendMeta = {
   backendId?: string, // only needed when editing an auth service
   backendHasPassword?: boolean, // only needed when editing an auth service
+  backendGroupSyncIsActive: boolean, // only needed when editing an auth service
   serviceType: string,
   serviceTitle: string,
   urlScheme: string,
@@ -38,14 +39,6 @@ export type WizardStepsState = {
   formValues: WizardFormValues,
   invalidStepKeys: Array<string>,
   authBackendMeta: AuthBackendMeta,
-  loadGroupsResult: ?{
-    success: boolean,
-    message: string,
-    errors: Immutable.List<string>,
-    result: {
-      groups: Immutable.List<any>,
-    },
-  },
 };
 
 export type BackendWizardType = WizardStepsState & {
@@ -57,7 +50,6 @@ const initialState = {
   authBackendMeta: {},
   formValues: {},
   invalidStepKeys: [],
-  loadGroupsResult: undefined,
   setStepsState: () => {},
 };
 

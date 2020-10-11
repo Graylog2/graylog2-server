@@ -29,7 +29,6 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
   const hasGroupSyncPlugin = !!authGroupSyncPlugins?.[0];
-  const authBackendMeta = { ...AUTH_BACKEND_META, backendId: authenticationBackend.id };
   let initialValues = prepareInitialValues(authenticationBackend);
 
   if (hasGroupSyncPlugin) {
@@ -45,7 +44,13 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     initialValues = { ...initialValues, ...initialGroupSyncValues };
   }
 
-  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authBackendMeta.backendId, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
+  const authBackendMeta = {
+    ...AUTH_BACKEND_META,
+    backendId: authenticationBackend.id,
+    backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
+    backendGroupSyncIsActive: !!initialValues.synchronizeGroups,
+  };
+  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
 
   return (
     <DocumentTitle title="Edit Active Directory Authentication Service">

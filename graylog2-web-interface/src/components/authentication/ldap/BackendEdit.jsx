@@ -85,6 +85,8 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
     },
   }).then((result) => {
     if (result) {
+      console.log('backendId', backendId, result);
+
       // Create group sync config
       if (backendAlreadyHasGroupSync && formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
         return groupSyncActions.handleUpdate(formValues, backendId, serviceType);
@@ -107,19 +109,13 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const hasGroupSyncPlugin = !!authGroupSyncPlugins?.[0];
-  const authBackendMeta = {
-    ...AUTH_BACKEND_META,
-    backendId: authenticationBackend.id,
-    backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
-  };
   let initialValues = prepareInitialValues(authenticationBackend);
 
-  if (hasGroupSyncPlugin) {
+  if (typeof authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues === 'function') {
     const {
       initialValues: initialGroupSyncValues,
       finishedLoading,
-    } = authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues(authenticationBackend.id);
+    } = authGroupSyncPlugins[0].hooks.useInitialGroupSyncValues(authenticationBackend.id);
 
     if (!finishedLoading) {
       return <Spinner />;
@@ -128,7 +124,13 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     initialValues = { ...initialValues, ...initialGroupSyncValues };
   }
 
-  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authBackendMeta.backendId, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
+  const authBackendMeta = {
+    ...AUTH_BACKEND_META,
+    backendId: authenticationBackend.id,
+    backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
+    backendGroupSyncIsActive: !!initialValues.synchronizeGroups,
+  };
+  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
 
   return (
     <DocumentTitle title="Edit LDAP Authentication Service">

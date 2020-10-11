@@ -128,6 +128,8 @@ type Props = {
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
+  const MatchingGroupsProvider = authGroupSyncPlugins?.[0]?.components?.MatchingGroupsProvider;
   const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
@@ -200,20 +202,26 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });
 
+  const wizard = (
+    <Wizard activeStep={stepsState.activeStep}
+            hidePreviousNextButtons
+            horizontal
+            justified
+            onStepChange={_setActiveStepKey}
+            steps={steps}>
+      <Sidebar prepareSubmitPayload={_getSubmitPayload} />
+    </Wizard>
+  );
+
   return (
     <BackendWizardContext.Provider value={{ ...stepsState, setStepsState }}>
-      <BackendWizardContext.Consumer>
-        {({ activeStepKey: activeStep }) => (
-          <Wizard activeStep={activeStep}
-                  hidePreviousNextButtons
-                  horizontal
-                  justified
-                  onStepChange={_setActiveStepKey}
-                  steps={steps}>
-            <Sidebar prepareSubmitPayload={_getSubmitPayload} />
-          </Wizard>
-        )}
-      </BackendWizardContext.Consumer>
+      {MatchingGroupsProvider
+        ? (
+          <MatchingGroupsProvider prepareSubmitPayload={_getSubmitPayload}>
+            {wizard}
+          </MatchingGroupsProvider>
+        )
+        : wizard}
     </BackendWizardContext.Provider>
   );
 };
