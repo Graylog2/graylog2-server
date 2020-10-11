@@ -72,7 +72,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
   return props;
 };
 
-export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, backendId: string, backendAlreadyHasGroupSync: boolean, serviceType: string) => {
+export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
   const groupSyncActions = authGroupSyncPlugins?.[0]?.actions;
 
@@ -84,23 +84,8 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
       system_user_password: passwordUpdatePayload(payload.config.system_user_password),
     },
   }).then((result) => {
-    if (result) {
-      console.log('backendId', backendId, result);
-
-      // Create group sync config
-      if (backendAlreadyHasGroupSync && formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
-        return groupSyncActions.handleUpdate(formValues, backendId, serviceType);
-      }
-
-      // Update group sync config
-      if (!backendAlreadyHasGroupSync && formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
-        return groupSyncActions.handleCreate(formValues, backendId, serviceType);
-      }
-
-      // Delete existing group sync config
-      if (backendAlreadyHasGroupSync && !formValues.synchronizeGroups && groupSyncActions?.delete) {
-        return groupSyncActions.delete(backendId);
-      }
+    if (result && typeof groupSyncActions?.handleBackendUpdate === 'function') {
+      return groupSyncActions.handleBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);
     }
 
     return result;

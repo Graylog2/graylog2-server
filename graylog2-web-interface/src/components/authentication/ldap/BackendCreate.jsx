@@ -43,8 +43,8 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) 
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
 
   return AuthenticationDomain.create(payload).then((result) => {
-    if (result && formValues.synchronizeGroups && typeof authGroupSyncPlugins?.[0]?.actions?.handleUpdate === 'function') {
-      return authGroupSyncPlugins[0].actions.handleUpdate.handleUpdate(formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
+    if (result && formValues.synchronizeGroups && typeof authGroupSyncPlugins?.[0]?.actions?.handleBackendUpdate === 'function') {
+      return authGroupSyncPlugins[0].actions.handleUpdate.handleBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 
     return result;
