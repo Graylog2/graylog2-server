@@ -85,7 +85,7 @@ const disableUser: $PropertyType<ActionsType, 'disableUser'> = notifyingAction({
 const setActiveBackend: $PropertyType<ActionsType, 'setActiveBackend'> = notifyingAction({
   action: AuthenticationActions.setActiveBackend,
   success: (authBackendId, authBackendTitle) => ({
-    message: `Authentication service "${authBackendTitle} was disabled successfully"`,
+    message: `Authentication service "${authBackendTitle} was ${authBackendId ? 'activated' : 'deactivated'} successfully"`,
   }),
   error: (error, authBackendId, authBackendTitle) => ({
     message: `Activating authentication service "${authBackendTitle}" failed with status: ${error}`,
