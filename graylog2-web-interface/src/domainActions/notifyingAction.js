@@ -38,8 +38,8 @@ const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result
       return;
     }
 
-    if (error?.status === 400 && error?.additional?.body?.message) {
-      readableError = error.additional.body.message;
+    if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
+      readableError = `${error.additional.body.message} - ${error.message}`;
     }
 
     const { message, title } = errorNotification(readableError, ...args);
