@@ -58,11 +58,11 @@ const ProtocolOptions = styled.div`
 const defaultHelp = {
   systemUserDn: (
     <span>
-      The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.
+      The username for the initial connection to the LDAP server, e.g. <code>ldapbind@some.domain</code>.
       This needs to match the <code>userPrincipalName</code> of that user.
     </span>
   ),
-  systemUserPassword: 'The password for the initial connection to the Active Directory server.',
+  systemUserPassword: 'The password for the initial connection to the LDAP server.',
 };
 
 type Props = {
