@@ -31,6 +31,11 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
             Managing synchronized users is only possible for the active authentication service.
           </Alert>
         </SectionComponent>
+        <SectionComponent title="Synchronized Teams">
+          <Alert>
+            Managing synchronized teams is only possible for the active authentication service.
+          </Alert>
+        </SectionComponent>
       </div>
     </SectionGrid>
   );

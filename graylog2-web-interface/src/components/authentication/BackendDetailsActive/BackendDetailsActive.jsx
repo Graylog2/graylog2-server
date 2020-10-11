@@ -6,6 +6,7 @@ import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import SectionGrid from 'components/common/Section/SectionGrid';
 
 import SyncedUsersSection from './SyncedUsersSection';
+import SyncedTeamsSection from './SyncedTeamsSection';
 
 type Props = {
   authenticationBackend: AuthenticationBackend,
@@ -27,6 +28,7 @@ const BackendDetailsActive = ({ authenticationBackend }: Props) => {
       </div>
       <div>
         <SyncedUsersSection authenticationBackend={authenticationBackend} />
+        <SyncedTeamsSection authenticationBackend={authenticationBackend} />
       </div>
     </SectionGrid>
   );

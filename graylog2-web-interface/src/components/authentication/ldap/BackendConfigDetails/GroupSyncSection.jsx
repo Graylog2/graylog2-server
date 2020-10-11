@@ -27,27 +27,12 @@ const NoEnterpriseComponent = () => (
 
 const GroupSyncSection = ({ authenticationBackend }: Props) => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-
-  const Section = ({ children }: { children: React.Node }) => (
-    <SectionComponent title="Group Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>
-      {children}
-    </SectionComponent>
-  );
-
-  if (!authGroupSyncPlugins || authGroupSyncPlugins.length <= 0) {
-    return (
-      <Section>
-        <NoEnterpriseComponent />
-      </Section>
-    );
-  }
-
-  const { components: { GroupSyncDetails } } = authGroupSyncPlugins[0];
+  const GroupSyncDetails = authGroupSyncPlugins?.[0]?.components?.GroupSyncDetails;
 
   return (
-    <Section>
-      <GroupSyncDetails authenticationBackend={authenticationBackend} />
-    </Section>
+    <SectionComponent title="Group Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>
+      {GroupSyncDetails ? <GroupSyncDetails authenticationBackend={authenticationBackend} /> : <NoEnterpriseComponent />}
+    </SectionComponent>
   );
 };
 
