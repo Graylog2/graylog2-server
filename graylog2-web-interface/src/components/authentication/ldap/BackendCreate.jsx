@@ -17,25 +17,49 @@ export const AUTH_BACKEND_META = {
   urlScheme: 'ldap',
 };
 
-const BackendCreate = () => {
+export const prepareInitialValues = () => {
   const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const groupSyncActions = authGroupSyncPlugins?.[0]?.actions;
-
-  const _handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) => {
-    return AuthenticationDomain.create(payload).then((result) => {
-      if (result && formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
-        return groupSyncActions.handleUpdate(formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
-      }
-
-      return result;
-    });
+  let initialValues = {
+    serverUrlHost: 'localhost',
+    serverUrlPort: 389,
+    transportSecurity: 'tls',
+    userFullNameAttribute: 'cn',
+    userNameAttribute: 'uid',
+    verifyCertificates: true,
   };
+
+  if (typeof authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues === 'function') {
+    const {
+      initialValues: initialGroupSyncValues,
+    } = authGroupSyncPlugins[0].hooks.useInitialGroupSyncValues();
+
+    initialValues = { ...initialValues, ...initialGroupSyncValues };
+  }
+
+  return initialValues;
+};
+
+export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) => {
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
+
+  return AuthenticationDomain.create(payload).then((result) => {
+    if (result && formValues.synchronizeGroups && typeof authGroupSyncPlugins?.[0]?.actions?.handleUpdate === 'function') {
+      return authGroupSyncPlugins[0].actions.handleUpdate.handleUpdate(formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
+    }
+
+    return result;
+  });
+};
+
+const BackendCreate = () => {
+  const initialValues = prepareInitialValues();
 
   return (
     <DocumentTitle title="Create LDAP Authentication Service">
       <WizardPageHeader />
-      <BackendWizard onSubmit={_handleSubmit}
-                     authBackendMeta={AUTH_BACKEND_META} />
+      <BackendWizard onSubmit={handleSubmit}
+                     authBackendMeta={AUTH_BACKEND_META}
+                     initialValues={initialValues} />
     </DocumentTitle>
   );
 };

@@ -220,14 +220,6 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
 BackendWizard.defaultProps = {
   initialStepKey: SERVER_CONFIG_KEY,
-  initialValues: {
-    serverUrlHost: 'localhost',
-    serverUrlPort: 389,
-    transportSecurity: 'tls',
-    userFullNameAttribute: 'cn',
-    userNameAttribute: 'uid',
-    verifyCertificates: true,
-  },
 };
 
 BackendWizard.propTypes = {
@@ -239,7 +231,7 @@ BackendWizard.propTypes = {
     urlScheme: PropTypes.string.isRequired,
   }).isRequired,
   initialStepKey: PropTypes.string,
-  initialValues: PropTypes.object,
+  initialValues: PropTypes.object.isRequired,
 };
 
 export default BackendWizard;

@@ -1,15 +1,12 @@
 // @flow strict
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DocumentTitle } from 'components/common';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
 import BackendWizard from 'components/authentication/BackendWizard';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
 import WizardPageHeader from './WizardPageHeader';
 
-import type { WizardFormValues } from '../BackendWizard/contexts/BackendWizardContext';
+import { prepareInitialValues, handleSubmit } from '../ldap/BackendCreate';
 
 export const HELP = {
   systemUserDn: (
@@ -60,25 +57,15 @@ export const AUTH_BACKEND_META = {
 };
 
 const BackendCreate = () => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const groupSyncActions = authGroupSyncPlugins?.[0]?.actions;
-
-  const _handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) => {
-    return AuthenticationDomain.create(payload).then((result) => {
-      if (result && formValues.synchronizeGroups && groupSyncActions?.handleUpdate) {
-        return groupSyncActions.handleUpdate(formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
-      }
-
-      return result;
-    });
-  };
+  const initialValues = prepareInitialValues();
 
   return (
     <DocumentTitle title="Create Active Directory Authentication Services">
       <WizardPageHeader />
       <BackendWizard authBackendMeta={AUTH_BACKEND_META}
                      help={HELP}
-                     onSubmit={_handleSubmit} />
+                     initialValues={initialValues}
+                     onSubmit={handleSubmit} />
     </DocumentTitle>
   );
 };
