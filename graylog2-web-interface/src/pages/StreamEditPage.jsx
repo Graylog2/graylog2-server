@@ -24,13 +24,17 @@ const StreamEditPage = createReactClass({
   mixins: [Reflux.connect(CurrentUserStore)],
 
   componentDidMount() {
-    StreamsStore.get(this.props.params.streamId, (stream) => {
+    const { params } = this.props;
+
+    StreamsStore.get(params.streamId, (stream) => {
       this.setState({ stream });
     });
   },
 
   _isLoading() {
-    return !this.state.currentUser || !this.state.stream;
+    const { currentUser, stream } = this.state;
+
+    return !currentUser || !stream;
   },
 
   render() {
@@ -38,14 +42,16 @@ const StreamEditPage = createReactClass({
       return <Spinner />;
     }
 
+    const { currentUser, stream } = this.state;
+    const { params, location } = this.props;
     let content = (
-      <StreamRulesEditor currentUser={this.state.currentUser}
-                         streamId={this.props.params.streamId}
-                         messageId={this.props.location.query.message_id}
-                         index={this.props.location.query.index} />
+      <StreamRulesEditor currentUser={currentUser}
+                         streamId={params.streamId}
+                         messageId={location.query.message_id}
+                         index={location.query.index} />
     );
 
-    if (this.state.stream.is_default) {
+    if (stream.is_default) {
       content = (
         <div className="row content">
           <div className="col-md-12">
@@ -58,9 +64,9 @@ const StreamEditPage = createReactClass({
     }
 
     return (
-      <DocumentTitle title={`Rules of Stream ${this.state.stream.title}`}>
+      <DocumentTitle title={`Rules of Stream ${stream.title}`}>
         <div>
-          <PageHeader title={<span>Rules of Stream &raquo;{this.state.stream.title}&raquo;</span>}>
+          <PageHeader title={<span>Rules of Stream &raquo;{stream.title}&raquo;</span>}>
             <span>
               This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can{' '}
               see the effect configured stream rules have on message matching here.
