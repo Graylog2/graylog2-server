@@ -52,7 +52,6 @@ export const HELP = {
 export const AUTH_BACKEND_META = {
   serviceTitle: 'Active Directory',
   serviceType: 'active-directory',
-  urlScheme: 'ldap',
 };
 
 const BackendCreate = () => (

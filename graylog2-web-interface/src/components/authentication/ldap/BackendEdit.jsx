@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import URI from 'urijs';
 
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
@@ -20,7 +19,7 @@ type Props = {
 export const prepareInitialValues = ({
   defaultRoles = Immutable.List(),
   config: {
-    serverUrls = [],
+    servers = [],
     systemUserDn,
     transportSecurity,
     userFullNameAttribute,
@@ -30,12 +29,10 @@ export const prepareInitialValues = ({
     verifyCertificates,
   },
 }: LdapBackend) => {
-  const serverUrl = new URI(serverUrls[0]);
-
   return {
     defaultRoles: defaultRoles.join(),
-    serverUrlHost: serverUrl.hostname(),
-    serverUrlPort: serverUrl.port(),
+    serverHost: servers[0].host,
+    serverPort: servers[0].port,
     systemUserDn,
     transportSecurity,
     userFullNameAttribute,

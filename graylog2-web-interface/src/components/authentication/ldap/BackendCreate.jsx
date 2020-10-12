@@ -11,7 +11,6 @@ import BackendWizard from '../BackendWizard';
 export const AUTH_BACKEND_META = {
   serviceType: 'ldap',
   serviceTitle: 'LDAP',
-  urlScheme: 'ldap',
 };
 
 const BackendCreate = () => (
