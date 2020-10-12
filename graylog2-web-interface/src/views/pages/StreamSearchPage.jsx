@@ -23,7 +23,13 @@ const StreamSearchPage = ({ params: { streamId }, location: { query } }: Props) 
   const newView = useCreateSavedSearch(streamId);
   const [loaded, HookComponent] = useLoadView(newView, query);
 
-  const _loadNewView = useCallback(() => loadNewViewForStream(streamId), [streamId]);
+  const _loadNewView = useCallback(() => {
+    if (streamId) {
+      return loadNewViewForStream(streamId);
+    }
+
+    throw new Error('No stream id specified!');
+  }, [streamId]);
 
   if (HookComponent) {
     return HookComponent;
