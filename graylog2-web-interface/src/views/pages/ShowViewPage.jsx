@@ -7,26 +7,26 @@ import Spinner from 'components/common/Spinner';
 import View from 'views/logic/views/View';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
+import withLocation from 'routing/withLocation';
 import withParams from 'routing/withParams';
+import type { Location } from 'routing/withLocation';
 
 import SearchPage from './SearchPage';
 
 type Props = {
-  location: {
+  location: Location & {
     state?: {
       view: ?View,
       widgetId: ?string,
     },
-    query: { [string]: any },
   },
   params: {
     viewId: string,
   },
-  route: any,
   viewLoader: ViewLoaderFn,
 };
 
-const ShowViewPage = ({ params: { viewId }, route, location: { query }, viewLoader }: Props) => {
+const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: Props) => {
   const [loaded, HookComponent] = useViewLoader(viewId, query, viewLoader);
 
   if (HookComponent) {
@@ -37,7 +37,7 @@ const ShowViewPage = ({ params: { viewId }, route, location: { query }, viewLoad
     return <Spinner />;
   }
 
-  return <SearchPage route={route} />;
+  return <SearchPage />;
 };
 
 ShowViewPage.propTypes = {
@@ -51,7 +51,6 @@ ShowViewPage.propTypes = {
   params: PropTypes.shape({
     viewId: PropTypes.string.isRequired,
   }).isRequired,
-  route: PropTypes.object.isRequired,
   viewLoader: PropTypes.func,
 };
 
@@ -59,4 +58,4 @@ ShowViewPage.defaultProps = {
   viewLoader: ViewLoader,
 };
 
-export default withParams(ShowViewPage);
+export default withParams(withLocation(ShowViewPage));

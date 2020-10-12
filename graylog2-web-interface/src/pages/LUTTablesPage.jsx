@@ -10,6 +10,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
@@ -203,7 +204,7 @@ LUTTablesPage.defaultProps = {
   dataAdapter: null,
 };
 
-export default connect(withParams(LUTTablesPage), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
+export default connect(withParams(withLocation(LUTTablesPage)), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
   ...otherProps,
   ...lookupTableStore,
 }));

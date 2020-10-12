@@ -23,12 +23,15 @@ class EditEventDefinitionPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
   };
 
-  state = {
-    notification: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      notification: undefined,
+    };
+  }
 
   componentDidMount() {
     const { params, currentUser } = this.props;
@@ -48,7 +51,7 @@ class EditEventDefinitionPage extends React.Component {
 
   render() {
     const { notification } = this.state;
-    const { params, currentUser, route } = this.props;
+    const { params, currentUser } = this.props;
 
     if (!isPermitted(currentUser.permissions, `eventnotifications:edit:${params.definitionId}`)) {
       history.push(Routes.NOTFOUND);
@@ -100,7 +103,7 @@ class EditEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventNotificationFormContainer action="edit" notification={notification} route={route} />
+              <EventNotificationFormContainer action="edit" notification={notification} />
             </Col>
           </Row>
         </span>

@@ -12,7 +12,6 @@ jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 

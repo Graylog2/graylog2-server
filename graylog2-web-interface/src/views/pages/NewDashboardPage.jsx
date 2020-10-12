@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
 
+import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
 import Spinner from 'components/common/Spinner';
-import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
@@ -14,16 +14,14 @@ import useLoadView from 'views/logic/views/UseLoadView';
 import SearchPage from './SearchPage';
 
 type Props = {
-  route: {},
-  location: {
+  location: Location & {
     state?: {
       view?: View,
     },
-    query: { [string]: any },
   },
 };
 
-const NewDashboardPage = ({ route, location }: Props) => {
+const NewDashboardPage = ({ location }: Props) => {
   const { state = {} } = location;
   const { view: searchView } = state;
   const loadedView = useMemo(() => {
@@ -43,16 +41,9 @@ const NewDashboardPage = ({ route, location }: Props) => {
   }
 
   return loaded
-    ? <IfPermitted permissions="dashboards:create"><SearchPage route={route} /></IfPermitted>
+    ? <IfPermitted permissions="dashboards:create"><SearchPage /></IfPermitted>
     : <Spinner />;
 };
 
-NewDashboardPage.propTypes = {
-  route: PropTypes.object.isRequired,
-};
-
-const mapping = {
-  loadingViewHooks: 'views.hooks.loadingView',
-  executingViewHooks: 'views.hooks.executingView',
-};
-export default withPluginEntities(NewDashboardPage, mapping);
+NewDashboardPage.propTypes = {};
+export default withLocation(NewDashboardPage);
