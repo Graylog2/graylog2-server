@@ -43,7 +43,7 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
 
   return AuthenticationDomain.create(payload).then((result) => {
     if (result && formValues.synchronizeGroups && enterpriseGroupSyncPlugin) {
-      return enterpriseGroupSyncPlugin.actions.handleUpdate.handleBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
+      return enterpriseGroupSyncPlugin.actions.handleBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 
     return result;
