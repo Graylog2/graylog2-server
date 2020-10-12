@@ -107,6 +107,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
         }
         final DBObject userObject = get(UserImpl.class, id);
+        if (userObject == null) {
+            return null;
+        }
         return userFactory.create(userObject.toMap());
     }
 

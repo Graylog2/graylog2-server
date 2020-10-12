@@ -154,7 +154,9 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
 
         when(ldapSettingsService.load())
                 .thenReturn(ldapSettings);
-        doReturn(mock(User.class))
+        final User user = mock(User.class);
+        when(user.getId()).thenReturn("54e3deadbeefdeadbeef0001");
+        doReturn(user)
                 .when(authenticator)
                 .syncFromLdapEntry(any(LdapEntry.class),any(LdapSettings.class), anyString());
 
