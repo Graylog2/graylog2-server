@@ -2,8 +2,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import URI from 'urijs';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle, Spinner } from 'components/common';
@@ -73,8 +73,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 };
 
 export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const groupSyncActions = authGroupSyncPlugins?.[0]?.actions;
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
   return AuthenticationDomain.update(backendId, {
     ...payload,
@@ -84,8 +83,8 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
       system_user_password: passwordUpdatePayload(payload.config.system_user_password),
     },
   }).then((result) => {
-    if (result && typeof groupSyncActions?.handleBackendUpdate === 'function') {
-      return groupSyncActions.handleBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);
+    if (result && enterpriseGroupSyncPlugin) {
+      return enterpriseGroupSyncPlugin.actions.handleBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);
     }
 
     return result;
@@ -93,14 +92,14 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   let initialValues = prepareInitialValues(authenticationBackend);
 
-  if (typeof authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues === 'function') {
+  if (enterpriseGroupSyncPlugin) {
     const {
       initialValues: initialGroupSyncValues,
       finishedLoading,
-    } = authGroupSyncPlugins[0].hooks.useInitialGroupSyncValues(authenticationBackend.id);
+    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id);
 
     if (!finishedLoading) {
       return <Spinner />;

@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { LdapCreate } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle } from 'components/common';
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 
@@ -18,7 +18,7 @@ export const AUTH_BACKEND_META = {
 };
 
 export const prepareInitialValues = () => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   let initialValues = {
     serverUrlHost: 'localhost',
     serverUrlPort: 389,
@@ -28,10 +28,10 @@ export const prepareInitialValues = () => {
     verifyCertificates: true,
   };
 
-  if (typeof authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues === 'function') {
+  if (enterpriseGroupSyncPlugin) {
     const {
       initialValues: initialGroupSyncValues,
-    } = authGroupSyncPlugins[0].hooks.useInitialGroupSyncValues();
+    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues();
 
     initialValues = { ...initialValues, ...initialGroupSyncValues };
   }
@@ -40,11 +40,11 @@ export const prepareInitialValues = () => {
 };
 
 export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
   return AuthenticationDomain.create(payload).then((result) => {
-    if (result && formValues.synchronizeGroups && typeof authGroupSyncPlugins?.[0]?.actions?.handleBackendUpdate === 'function') {
-      return authGroupSyncPlugins[0].actions.handleUpdate.handleBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
+    if (result && formValues.synchronizeGroups && enterpriseGroupSyncPlugin) {
+      return enterpriseGroupSyncPlugin.actions.handleUpdate.handleBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 
     return result;

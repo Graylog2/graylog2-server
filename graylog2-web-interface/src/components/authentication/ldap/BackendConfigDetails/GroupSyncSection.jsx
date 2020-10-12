@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
@@ -26,8 +26,8 @@ const NoEnterpriseComponent = () => (
 );
 
 const GroupSyncSection = ({ authenticationBackend }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const GroupSyncDetails = authGroupSyncPlugins?.[0]?.components?.GroupSyncDetails;
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const GroupSyncDetails = enterpriseGroupSyncPlugin?.components.GroupSyncDetails;
 
   return (
     <SectionComponent title="Group Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>

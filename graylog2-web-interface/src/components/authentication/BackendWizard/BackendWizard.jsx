@@ -4,9 +4,9 @@ import { useState, useRef } from 'react';
 import { compact } from 'lodash';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
 import type { LdapCreate } from 'logic/authentication/ldap/types';
@@ -83,8 +83,8 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
 
 const _getInvalidStepKeys = (formValues) => {
   const validation = { ...FORMS_VALIDATION, [GROUP_SYNC_KEY]: {} };
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const groupSyncValidation = authGroupSyncPlugins?.[0]?.validation?.GroupSyncValidation;
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const groupSyncValidation = enterpriseGroupSyncPlugin?.validation.GroupSyncValidation;
 
   if (groupSyncValidation && formValues.synchronizeGroups) {
     validation[GROUP_SYNC_KEY] = groupSyncValidation(formValues.teamSelectionType);
@@ -139,8 +139,8 @@ type Props = {
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const MatchingGroupsProvider = authGroupSyncPlugins?.[0]?.components?.MatchingGroupsProvider;
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,

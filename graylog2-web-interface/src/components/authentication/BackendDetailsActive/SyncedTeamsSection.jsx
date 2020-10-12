@@ -1,9 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 import type { LdapBackend } from 'logic/authentication/ldap/types';
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const Header = styled.h4`
@@ -22,8 +22,8 @@ type Props = {
 };
 
 const SyncedTeamsSection = ({ authenticationBackend }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const EnterpriseSyncedTeamsSection = authGroupSyncPlugins?.[0]?.components?.SyncedTeamsSection;
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const EnterpriseSyncedTeamsSection = enterpriseGroupSyncPlugin?.components.SyncedTeamsSection;
 
   return (EnterpriseSyncedTeamsSection ? <EnterpriseSyncedTeamsSection authenticationBackend={authenticationBackend} /> : (
     <SectionComponent title="Synchronized Users">

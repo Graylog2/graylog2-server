@@ -1,9 +1,9 @@
 // @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Formik } from 'formik';
 
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 export type StepKeyType = 'group-synchronisation';
@@ -29,13 +29,13 @@ type Props = {
 };
 
 const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
-  if (!authGroupSyncPlugins || authGroupSyncPlugins.length <= 0) {
+  if (!enterpriseGroupSyncPlugin) {
     return <NoEnterpriseComponent />;
   }
 
-  const { components: { GroupSyncForm } } = authGroupSyncPlugins[0];
+  const { components: { GroupSyncForm } } = enterpriseGroupSyncPlugin;
 
   return (
     <GroupSyncForm formRef={formRef}

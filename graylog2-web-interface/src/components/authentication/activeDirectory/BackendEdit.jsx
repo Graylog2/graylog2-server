@@ -1,9 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { LdapBackend } from 'logic/authentication/ldap/types';
 import { DocumentTitle, Spinner } from 'components/common';
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 import { HELP, AUTH_BACKEND_META } from './BackendCreate';
@@ -27,15 +27,14 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-  const hasGroupSyncPlugin = !!authGroupSyncPlugins?.[0];
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   let initialValues = prepareInitialValues(authenticationBackend);
 
-  if (hasGroupSyncPlugin) {
+  if (enterpriseGroupSyncPlugin) {
     const {
       initialValues: initialGroupSyncValues,
       finishedLoading,
-    } = authGroupSyncPlugins?.[0]?.hooks?.useInitialGroupSyncValues(authenticationBackend.id);
+    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id);
 
     if (!finishedLoading) {
       return <Spinner />;
