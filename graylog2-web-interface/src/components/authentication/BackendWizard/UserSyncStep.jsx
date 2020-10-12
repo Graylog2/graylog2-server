@@ -31,7 +31,7 @@ type Props = {
     userSearchPattern?: React.Node,
   },
   onSubmit: () => void,
-  onSubmitAll: () => void,
+  onSubmitAll: () => Promise<void>,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };

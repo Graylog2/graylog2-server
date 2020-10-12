@@ -9,7 +9,7 @@ import Routes from 'routing/Routes';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { type Step } from 'components/common/Wizard';
 import { FetchError } from 'logic/rest/FetchProvider';
@@ -38,7 +38,7 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?s
   </Row>
 );
 
-export const _passwordPayload = (backendId: string, systemUserPassword: ?string) => {
+export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string) => {
   // Only update password on edit if necessary,
   // if a users resets the previously defined password its form value is an empty string
   if (backendId) {
@@ -56,7 +56,7 @@ export const _passwordPayload = (backendId: string, systemUserPassword: ?string)
   return systemUserPassword;
 };
 
-const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues) => {
+const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues): WizardSubmitPayload => {
   // We need to ensure that we are using the actual form values
   // It is possible to provide already updated form values, so we do not need to get them twice
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
@@ -127,7 +127,7 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
 
   // Do not submit if there are invalid steps
   if (invalidStepKeys.length >= 1) {
-    return null;
+    return Promise.resolve();
   }
 
   // Reset submit all errors
@@ -145,6 +145,8 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
     if (window.confirm('Do you really want to remove the group synchronization config for this authentication service?')) {
       return _submit();
     }
+
+    return Promise.resolve();
   }
 
   return _submit();
@@ -154,7 +156,7 @@ type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  onSubmit: (LdapCreate, WizardFormValues) => Promise<void>,
+  onSubmit: (WizardSubmitPayload, WizardFormValues) => Promise<void>,
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {

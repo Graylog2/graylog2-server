@@ -2,7 +2,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import type { LdapBackend } from 'logic/authentication/ldap/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
@@ -17,19 +16,16 @@ const NoEnterpriseComponent = () => (
   </>
 );
 
-type Props = {
-  authenticationBackend: LdapBackend,
-};
-
-const SyncedTeamsSection = ({ authenticationBackend }: Props) => {
+const SyncedTeamsSection = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const EnterpriseSyncedTeamsSection = enterpriseGroupSyncPlugin?.components.SyncedTeamsSection;
 
-  return (EnterpriseSyncedTeamsSection ? <EnterpriseSyncedTeamsSection authenticationBackend={authenticationBackend} /> : (
-    <SectionComponent title="Synchronized Users">
-      <NoEnterpriseComponent />
-    </SectionComponent>
-  )
+  return (
+    EnterpriseSyncedTeamsSection ? <EnterpriseSyncedTeamsSection /> : (
+      <SectionComponent title="Synchronized Users">
+        <NoEnterpriseComponent />
+      </SectionComponent>
+    )
   );
 };
 

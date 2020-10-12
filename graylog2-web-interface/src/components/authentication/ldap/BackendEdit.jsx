@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import URI from 'urijs';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
+import type { LdapBackend, WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle, Spinner } from 'components/common';
 
@@ -58,7 +58,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
   return props;
 };
 
-export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string) => {
+export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
   return AuthenticationDomain.update(backendId, {

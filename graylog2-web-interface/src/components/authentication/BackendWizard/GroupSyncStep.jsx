@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Formik } from 'formik';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 
 export type StepKeyType = 'group-synchronisation';
 export const STEP_KEY: StepKeyType = 'group-synchronisation';
@@ -22,8 +22,8 @@ const NoEnterpriseComponent = () => (
 
 type Props = {
   formRef: React.Ref<typeof Formik>,
-  onSubmitAll: () => void,
-  prepareSubmitPayload: () => LdapCreate,
+  onSubmitAll: () => Promise<void>,
+  prepareSubmitPayload: () => WizardSubmitPayload,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };

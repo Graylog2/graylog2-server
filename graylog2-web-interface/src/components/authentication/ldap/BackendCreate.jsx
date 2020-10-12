@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
@@ -39,7 +39,7 @@ export const prepareInitialValues = () => {
   return initialValues;
 };
 
-export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues) => {
+export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
   return AuthenticationDomain.create(payload).then((result) => {

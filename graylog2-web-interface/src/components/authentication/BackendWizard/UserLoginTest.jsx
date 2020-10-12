@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/graylog';
@@ -12,7 +12,7 @@ import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
 import BackendWizardContext from './contexts/BackendWizardContext';
 
 type Props = {
-  prepareSubmitPayload: () => LdapCreate,
+  prepareSubmitPayload: () => WizardSubmitPayload,
 };
 
 const UserLoginTest = ({ prepareSubmitPayload }: Props) => {

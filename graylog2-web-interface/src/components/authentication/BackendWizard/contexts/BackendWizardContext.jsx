@@ -26,10 +26,11 @@ export type WizardFormValues = {
   userSearchPattern?: string,
   verifyCertificates?: boolean,
 };
+
 export type AuthBackendMeta = {
   backendId?: string, // only needed when editing an auth service
   backendHasPassword?: boolean, // only needed when editing an auth service
-  backendGroupSyncIsActive: boolean, // only needed when editing an auth service
+  backendGroupSyncIsActive?: boolean, // only needed when editing an auth service
   serviceType: string,
   serviceTitle: string,
   urlScheme: string,

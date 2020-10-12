@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY, type StepKeyType as UserSyncKey } from './UserSyncStep';
@@ -13,10 +13,10 @@ type Props = {
   formRefs: {
     [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
-  handleSubmitAll: () => void,
+  handleSubmitAll: () => Promise<void>,
   invalidStepKeys: Array<string>,
-  prepareSubmitPayload: () => LdapCreate,
-  setActiveStepKey: (stepKey: string)=> void,
+  prepareSubmitPayload: () => WizardSubmitPayload,
+  setActiveStepKey: (stepKey: string) => void,
   submitAllError: ?React.Node,
 };
 

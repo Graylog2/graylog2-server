@@ -4,7 +4,7 @@ import { useState, useContext, useEffect } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import { PanelGroup, Panel } from 'components/graylog';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -36,7 +36,7 @@ const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled
   }
 `;
 type Props = {
-  prepareSubmitPayload: () => LdapCreate,
+  prepareSubmitPayload: () => WizardSubmitPayload,
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {

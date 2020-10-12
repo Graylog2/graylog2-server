@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useState, useContext } from 'react';
 
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
@@ -25,7 +25,7 @@ const _addRequiredRequestPayload = (formValues) => {
 };
 
 type Props = {
-  prepareSubmitPayload: () => LdapCreate,
+  prepareSubmitPayload: () => WizardSubmitPayload,
 };
 
 const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
