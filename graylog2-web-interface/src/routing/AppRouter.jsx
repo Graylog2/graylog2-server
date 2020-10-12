@@ -94,6 +94,7 @@ import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
 import {} from 'components/authentication';
 import AuthProvidersConfig from '../components/authentication/AuthProvidersConfig';
+import AuthProvidersConfigContext from '../components/authentication/AuthProvidersConfigContext';
 
 const renderPluginRoute = ({ path, component: Component }) => (
   <Route key={`${path}-${Component.displayName}`}
