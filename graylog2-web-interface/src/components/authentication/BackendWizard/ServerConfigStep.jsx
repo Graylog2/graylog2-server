@@ -96,12 +96,12 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
     const defaultPort = 389;
     const defaultTlsPort = 636;
 
-    if (currentValue === 'tls' && newValue !== 'tls' && values.serverUrlPort === defaultTlsPort) {
-      setFieldValue('serverUrlPort', defaultPort);
+    if (currentValue === 'tls' && newValue !== 'tls' && values.serverPort === defaultTlsPort) {
+      setFieldValue('serverPort', defaultPort);
     }
 
-    if (currentValue !== 'tls' && newValue === 'tls' && values.serverUrlPort === defaultPort) {
-      setFieldValue('serverUrlPort', defaultTlsPort);
+    if (currentValue !== 'tls' && newValue === 'tls' && values.serverPort === defaultPort) {
+      setFieldValue('serverPort', defaultTlsPort);
     }
 
     onChange(event);
