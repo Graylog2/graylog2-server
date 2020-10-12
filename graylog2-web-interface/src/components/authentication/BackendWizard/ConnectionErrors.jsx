@@ -32,7 +32,7 @@ const ConnectionErrors = ({ errors, message }: Props) => (
     <ErrorsTitle>{message}</ErrorsTitle>
     <ErrorsList>
       {errors.map((error) => {
-        return <li key={error}>{error}</li>;
+        return <li key={String(error)}>{String(error)}</li>;
       })}
     </ErrorsList>
   </NotificationContainer>
