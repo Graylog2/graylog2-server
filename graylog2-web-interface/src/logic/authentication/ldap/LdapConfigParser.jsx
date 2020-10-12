@@ -3,7 +3,7 @@
 import type { LdapConfigJson, LdapConfig } from './types';
 
 const toJson = ({
-  serverUrls,
+  servers,
   systemUserDn,
   systemUserPassword,
   transportSecurity,
@@ -14,7 +14,7 @@ const toJson = ({
   userSearchPattern,
   verifyCertificates,
 }: LdapConfig): LdapConfigJson => ({
-  server_urls: serverUrls,
+  servers,
   system_user_dn: systemUserDn,
   system_user_password: { is_set: systemUserPassword.isSet },
   transport_security: transportSecurity,
@@ -27,7 +27,7 @@ const toJson = ({
 });
 
 const fromJson = ({
-  server_urls,
+  servers,
   system_user_dn,
   system_user_password,
   transport_security,
@@ -38,7 +38,7 @@ const fromJson = ({
   user_search_pattern,
   verify_certificates,
 }: LdapConfigJson): LdapConfig => ({
-  serverUrls: server_urls,
+  servers,
   systemUserDn: system_user_dn,
   systemUserPassword: { isSet: system_user_password.is_set },
   transportSecurity: transport_security,

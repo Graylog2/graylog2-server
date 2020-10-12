@@ -170,12 +170,12 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
 
         try (final LDAPConnection connection = ldapConnector.connect(testConfig.getLDAPConnectorConfig())) {
             if (connection == null) {
-                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.serverUrls());
+                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.servers());
             }
-            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + testConfig.serverUrls());
+            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + testConfig.servers());
         } catch (Exception e) {
             return AuthServiceBackendTestResult.createFailure(
-                    "Couldn't establish connection to " + testConfig.serverUrls(),
+                    "Couldn't establish connection to " + testConfig.servers(),
                     Collections.singletonList(e.getMessage())
             );
         }
@@ -187,7 +187,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
 
         try (final LDAPConnection connection = ldapConnector.connect(testConfig.getLDAPConnectorConfig())) {
             if (connection == null) {
-                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.serverUrls());
+                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.servers());
             }
             final Optional<LDAPUser> user = findUser(connection, credentials);
 
@@ -200,7 +200,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
 
             if (isAuthenticated(connection, user.get(), credentials)) {
                 return AuthServiceBackendTestResult.createSuccess(
-                        "Successfully logged in <" + credentials.username() + "> into " + testConfig.serverUrls(),
+                        "Successfully logged in <" + credentials.username() + "> into " + testConfig.servers(),
                         createTestResult(testConfig, true, true, user.get())
                 );
             }
@@ -210,7 +210,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
             );
         } catch (Exception e) {
             return AuthServiceBackendTestResult.createFailure(
-                    "Couldn't test user login on " + testConfig.serverUrls(),
+                    "Couldn't test user login on " + testConfig.servers(),
                     Collections.singletonList(e.getMessage())
             );
         }

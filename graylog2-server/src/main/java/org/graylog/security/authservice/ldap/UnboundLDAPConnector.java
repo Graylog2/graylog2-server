@@ -133,9 +133,14 @@ public class UnboundLDAPConnector {
         }
 
         if (ldapConfig.systemUsername().isPresent()) {
-            final String systemPassword = encryptedValueService.decrypt(ldapConfig.systemPassword());
-            final BindRequest bindRequest = new SimpleBindRequest(ldapConfig.systemUsername().get(), systemPassword);
-            connection.bind(bindRequest);
+            if (ldapConfig.systemPassword().isSet()) {
+                final String systemPassword = encryptedValueService.decrypt(ldapConfig.systemPassword());
+                final BindRequest bindRequest = new SimpleBindRequest(ldapConfig.systemUsername().get(), systemPassword);
+                connection.bind(bindRequest);
+            } else {
+                LOG.warn("System username has been set to <{}> but no system password has been set. Skipping bind request.",
+                        ldapConfig.systemUsername().get());
+            }
         }
         return connection;
     }

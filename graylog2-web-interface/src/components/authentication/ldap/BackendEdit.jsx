@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import URI from 'urijs';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { LdapBackend, WizardSubmitPayload } from 'logic/authentication/ldap/types';
@@ -22,7 +21,7 @@ type Props = {
 export const prepareInitialValues = ({
   defaultRoles = Immutable.List(),
   config: {
-    serverUrls = [],
+    servers = [],
     systemUserDn,
     transportSecurity,
     userFullNameAttribute,
@@ -32,12 +31,10 @@ export const prepareInitialValues = ({
     verifyCertificates,
   },
 }: LdapBackend): WizardFormValues => {
-  const serverUrl = new URI(serverUrls[0]);
-
   return {
     defaultRoles: defaultRoles.join(),
-    serverUrlHost: serverUrl.hostname(),
-    serverUrlPort: serverUrl.port(),
+    serverHost: servers[0].host,
+    serverPort: servers[0].port,
     systemUserDn,
     transportSecurity,
     userFullNameAttribute,

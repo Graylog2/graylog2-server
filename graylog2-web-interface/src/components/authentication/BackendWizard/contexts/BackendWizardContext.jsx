@@ -9,8 +9,8 @@ export type WizardFormValues = {
   defaultRoles?: string,
   groupSearchBase?: string,
   groupSearchPattern?: string,
-  serverUrlHost?: string,
-  serverUrlPort?: string | number,
+  serverHost?: string,
+  serverPort?: string | number,
   systemUserDn?: string,
   systemUserPassword?: string,
   synchronizeGroups?: boolean,
@@ -33,7 +33,6 @@ export type AuthBackendMeta = {
   backendGroupSyncIsActive?: boolean, // only needed when editing an auth service
   serviceType: string,
   serviceTitle: string,
-  urlScheme: string,
 };
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,

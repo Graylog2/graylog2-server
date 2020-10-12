@@ -2,9 +2,9 @@
 import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 
 type TransportSecurity = ('tls' | 'start_tls' | 'none');
-
+type ServerAddress = { host: string, port: number };
 export type LdapConfig = {
-  serverUrls: Array<string>,
+  servers: Array<ServerAddress>,
   systemUserDn: string,
   systemUserPassword: { isSet: boolean },
   transportSecurity: TransportSecurity,
@@ -17,7 +17,7 @@ export type LdapConfig = {
 };
 
 export type LdapConfigJson = {
-  server_urls: Array<string>,
+  servers: Array<ServerAddress>,
   system_user_dn: string,
   system_user_password: { is_set: boolean },
   transport_security: TransportSecurity,

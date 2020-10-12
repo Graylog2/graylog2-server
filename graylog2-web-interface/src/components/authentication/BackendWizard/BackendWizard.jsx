@@ -3,7 +3,6 @@ import * as React from 'react';
 import { useState, useRef } from 'react';
 import { compact } from 'lodash';
 import PropTypes from 'prop-types';
-import URI from 'urijs';
 
 import Routes from 'routing/Routes';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
@@ -62,8 +61,8 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
   const {
     defaultRoles = '',
-    serverUrlHost,
-    serverUrlPort,
+    serverHost,
+    serverPort,
     systemUserDn,
     systemUserPassword,
     transportSecurity,
@@ -76,17 +75,16 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   const {
     serviceTitle,
     serviceType,
-    urlScheme,
     backendId,
   } = stepsState.authBackendMeta;
-  const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme(urlScheme)}`;
+  const serverUrl = `${serverHost}:${serverPort}`;
 
   return {
     default_roles: defaultRoles.split(','),
     description: '',
     title: `${serviceTitle} ${serverUrl}`,
     config: {
-      server_urls: [serverUrl],
+      servers: [{ host: serverHost, port: serverPort }],
       system_user_dn: systemUserDn,
       system_user_password: _passwordPayload(backendId, systemUserPassword),
       transport_security: transportSecurity,
@@ -268,7 +266,6 @@ BackendWizard.propTypes = {
     backendId: PropTypes.string,
     serviceTitle: PropTypes.string.isRequired,
     serviceType: PropTypes.string.isRequired,
-    urlScheme: PropTypes.string.isRequired,
   }).isRequired,
   initialStepKey: PropTypes.string,
   initialValues: PropTypes.object.isRequired,

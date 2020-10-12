@@ -41,7 +41,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @JsonDeserialize(builder = LDAPAuthServiceBackendConfig.Builder.class)
 @JsonTypeName(LDAPAuthServiceBackend.TYPE_NAME)
 public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackendConfig, LDAPConnectorConfigProvider {
-    private static final String FIELD_SERVER_URLS = "server_urls";
+    private static final String FIELD_SERVERS = "servers";
     private static final String FIELD_TRANSPORT_SECURITY = "transport_security";
     private static final String FIELD_VERIFY_CERTIFICATES = "verify_certificates";
     private static final String FIELD_SYSTEM_USER_DN = "system_user_dn";
@@ -52,8 +52,8 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
     private static final String FIELD_USER_NAME_ATTRIBUTE = "user_name_attribute";
     private static final String FIELD_USER_FULL_NAME_ATTRIBUTE = "user_full_name_attribute";
 
-    @JsonProperty(FIELD_SERVER_URLS)
-    public abstract ImmutableList<String> serverUrls();
+    @JsonProperty(FIELD_SERVERS)
+    public abstract ImmutableList<HostAndPort> servers();
 
     @JsonProperty(FIELD_TRANSPORT_SECURITY)
     public abstract LDAPTransportSecurity transportSecurity();
@@ -84,8 +84,8 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
 
     @Override
     public void validate(ValidationResult result) {
-        if (serverUrls().size() > 1) {
-            result.addError(FIELD_SERVER_URLS, "Currently only a single server URL is supported.");
+        if (servers().size() > 1) {
+            result.addError(FIELD_SERVERS, "Currently only a single server URL is supported.");
         }
         if (isBlank(userSearchBase())) {
             result.addError(FIELD_USER_SEARCH_BASE, "User search base cannot be empty.");
@@ -113,8 +113,8 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
     @Override
     public LDAPConnectorConfig getLDAPConnectorConfig() {
         return LDAPConnectorConfig.builder()
-                .serverList(serverUrls().stream()
-                        .map(LDAPConnectorConfig.LDAPServer::fromUrl)
+                .serverList(servers().stream()
+                        .map(hap -> LDAPConnectorConfig.LDAPServer.create(hap.host(), hap.port()))
                         .collect(Collectors.toList()))
                 .systemUsername(StringUtils.trimToNull(systemUserDn()))
                 .systemPassword(systemUserPassword())
@@ -141,8 +141,8 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
                     .userUniqueIdAttribute("entryUUID");
         }
 
-        @JsonProperty(FIELD_SERVER_URLS)
-        public abstract Builder serverUrls(List<String> serverUrls);
+        @JsonProperty(FIELD_SERVERS)
+        public abstract Builder servers(List<HostAndPort> servers);
 
         @JsonProperty(FIELD_TRANSPORT_SECURITY)
         public abstract Builder transportSecurity(LDAPTransportSecurity transportSecurity);
@@ -172,5 +172,24 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
         public abstract Builder userFullNameAttribute(String userFullNameAttribute);
 
         public abstract LDAPAuthServiceBackendConfig build();
+    }
+
+    @AutoValue
+    public static abstract class HostAndPort {
+        @JsonProperty("host")
+        public abstract String host();
+
+        @JsonProperty("port")
+        public abstract int port();
+
+        @JsonCreator
+        public static HostAndPort create(@JsonProperty("host") String host, @JsonProperty("port") int port) {
+            return new AutoValue_LDAPAuthServiceBackendConfig_HostAndPort(host, port);
+        }
+
+        @Override
+        public String toString() {
+            return host() + ":" + port();
+        }
     }
 }
