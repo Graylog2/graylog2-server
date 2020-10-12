@@ -15,7 +15,7 @@ import SearchPage from './SearchPage';
 type Props = {
   location: Location,
   params: {
-    streamId: string,
+    streamId: ?string,
   },
 };
 
