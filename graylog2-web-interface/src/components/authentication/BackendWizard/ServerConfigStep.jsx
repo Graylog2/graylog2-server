@@ -90,6 +90,23 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
     });
   };
 
+  const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
+    const currentValue = values.transportSecurity;
+    const newValue = event.target.value;
+    const defaultPort = 389;
+    const defaultTlsPort = 636;
+
+    if (currentValue === 'tls' && newValue !== 'tls' && values.serverUrlPort === defaultTlsPort) {
+      setFieldValue('serverUrlPort', defaultPort);
+    }
+
+    if (currentValue !== 'tls' && newValue === 'tls' && values.serverUrlPort === defaultPort) {
+      setFieldValue('serverUrlPort', defaultTlsPort);
+    }
+
+    onChange(event);
+  };
+
   return (
     // $FlowFixMe innerRef works as expected
     <Formik initialValues={stepsState.formValues}
@@ -130,7 +147,7 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                              id={name}
                              label="None"
                              onBlur={onBlur}
-                             onChange={onChange}
+                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
                              type="radio"
                              value="none" />
                       <Input defaultChecked={value === 'tls'}
@@ -138,7 +155,7 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                              id={name}
                              label="TLS"
                              onBlur={onBlur}
-                             onChange={onChange}
+                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
                              type="radio"
                              value="tls" />
                       <Input defaultChecked={value === 'start_tls'}
@@ -146,7 +163,7 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                              id={name}
                              label="StartTLS"
                              onBlur={onBlur}
-                             onChange={onChange}
+                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
                              type="radio"
                              value="start_tls" />
                     </>

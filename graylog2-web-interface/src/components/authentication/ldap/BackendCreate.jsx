@@ -21,7 +21,7 @@ export const prepareInitialValues = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   let initialValues = {
     serverUrlHost: 'localhost',
-    serverUrlPort: 389,
+    serverUrlPort: 636,
     transportSecurity: 'tls',
     userFullNameAttribute: 'cn',
     userNameAttribute: 'uid',
