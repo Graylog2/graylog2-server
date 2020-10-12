@@ -22,6 +22,8 @@ jest.mock('util/AppConfig', () => ({
   isFeatureEnabled: jest.fn(() => false),
 }));
 
+jest.mock('routing/withLocation', () => (x) => x);
+
 const currentUser = viewsManager;
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
