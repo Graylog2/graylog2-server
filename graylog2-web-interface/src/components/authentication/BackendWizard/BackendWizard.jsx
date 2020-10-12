@@ -214,7 +214,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
   });
 
   const wizard = (
-    <Wizard activeStep={stepsState.activeStep}
+    <Wizard activeStep={stepsState.activeStepKey}
             hidePreviousNextButtons
             horizontal
             justified
