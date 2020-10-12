@@ -1,10 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { useEffect, useState } from 'react';
 
 import type { LdapBackend } from 'logic/authentication/ldap/types';
-import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Role from 'logic/roles/Role';
 import { ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -21,10 +19,10 @@ const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<
 
 type Props = {
   authenticationBackend: LdapBackend,
+  roles: Immutable.List<Role>,
 };
 
-const UserSyncSection = ({ authenticationBackend }: Props) => {
-  const [{ list: roles }, setPaginatedRoles] = useState({ list: Immutable.List() });
+const UserSyncSection = ({ authenticationBackend, roles }: Props) => {
   const {
     userSearchBase,
     userSearchPattern,
@@ -34,12 +32,6 @@ const UserSyncSection = ({ authenticationBackend }: Props) => {
   const {
     defaultRoles = Immutable.List(),
   } = authenticationBackend;
-
-  useEffect(() => {
-    const getUnlimited = [1, 0, ''];
-
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
-  }, []);
 
   return (
     <SectionComponent title="User Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={USER_SYNC_KEY} />}>
