@@ -27,7 +27,7 @@ const SessionStore = Reflux.createStore({
       .json({ username: username, password: password, host: host });
     const promise = builder.build()
       .then((sessionInfo) => {
-        return { sessionId: sessionInfo.session_id, username: username };
+        return { sessionId: sessionInfo.session_id, username: sessionInfo.username };
       });
 
     SessionActions.login.promise(promise);
