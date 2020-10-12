@@ -2,19 +2,19 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
+import type { DirectoryServiceBackend, WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import type { LdapBackend, WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle, Spinner } from 'components/common';
 
 import { AUTH_BACKEND_META } from './BackendCreate';
 import WizardPageHeader from './WizardPageHeader';
 
-import type { WizardFormValues } from '../BackendWizard/contexts/BackendWizardContext';
+import type { WizardFormValues } from '../BackendWizard//BackendWizardContext';
 import BackendWizard from '../BackendWizard';
 
 type Props = {
-  authenticationBackend: LdapBackend,
+  authenticationBackend: DirectoryServiceBackend,
   initialStepKey: ?string,
 };
 
@@ -30,7 +30,7 @@ export const prepareInitialValues = ({
     userSearchPattern,
     verifyCertificates,
   },
-}: LdapBackend): WizardFormValues => {
+}: DirectoryServiceBackend): WizardFormValues => {
   return {
     defaultRoles: defaultRoles.join(),
     serverHost: servers[0].host,
@@ -63,7 +63,7 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
     id: backendId,
   }).then((result) => {
     if (result && enterpriseGroupSyncPlugin) {
-      return enterpriseGroupSyncPlugin.actions.handleBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);
     }
 
     return result;

@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import type { LdapBackend } from 'logic/authentication/ldap/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import { DocumentTitle, Spinner } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
@@ -12,7 +12,7 @@ import { prepareInitialValues, handleSubmit } from '../ldap/BackendEdit';
 import BackendWizard from '../BackendWizard';
 
 type Props = {
-  authenticationBackend: LdapBackend,
+  authenticationBackend: DirectoryServiceBackend,
   initialStepKey: ?string,
 };
 

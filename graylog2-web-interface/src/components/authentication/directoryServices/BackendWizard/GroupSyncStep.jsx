@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Formik } from 'formik';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 
 export type StepKeyType = 'group-synchronisation';
 export const STEP_KEY: StepKeyType = 'group-synchronisation';

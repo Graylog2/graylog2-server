@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import type { LdapBackend } from 'logic/authentication/ldap/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import { ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
@@ -10,7 +10,7 @@ import EditLinkButton from './EditLinkButton';
 import { STEP_KEY as SERVER_CONFIG_KEY } from '../../BackendWizard/ServerConfigStep';
 
 type Props = {
-  authenticationBackend: LdapBackend,
+  authenticationBackend: DirectoryServiceBackend,
 };
 
 const ServerConfigSection = ({ authenticationBackend }: Props) => {

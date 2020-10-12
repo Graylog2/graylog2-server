@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 // @flow strict
-import type { LdapConfigJson, LdapConfig } from './types';
+import type { DirectoryServiceBackendConfigJson, DirectoryServiceBackendConfig } from './types';
 
 const toJson = ({
   servers,
@@ -13,7 +13,7 @@ const toJson = ({
   userSearchBase,
   userSearchPattern,
   verifyCertificates,
-}: LdapConfig): LdapConfigJson => ({
+}: DirectoryServiceBackendConfig): DirectoryServiceBackendConfigJson => ({
   servers,
   system_user_dn: systemUserDn,
   system_user_password: { is_set: systemUserPassword.isSet },
@@ -37,7 +37,7 @@ const fromJson = ({
   user_search_base,
   user_search_pattern,
   verify_certificates,
-}: LdapConfigJson): LdapConfig => ({
+}: DirectoryServiceBackendConfigJson): DirectoryServiceBackendConfig => ({
   servers,
   systemUserDn: system_user_dn,
   systemUserPassword: { isSet: system_user_password.is_set },

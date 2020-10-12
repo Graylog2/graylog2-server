@@ -1,17 +1,17 @@
 // @flow strict
 import * as React from 'react';
 
-import { PageHeader } from 'components/common';
-import useActiveBackend from 'components/authentication/useActiveBackend';
-import DocumentationLink from 'components/support/DocumentationLink';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
-import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-import type { LdapBackend } from 'logic/authentication/ldap/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import { PageHeader } from 'components/common';
+import useActiveBackend from 'components/authentication/useActiveBackend';
+import BackendActionLinks from 'components/authentication/BackendActionLinks';
+import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
-  authenticationBackend?: LdapBackend,
+  authenticationBackend?: DirectoryServiceBackend,
 };
 
 const _pageTitle = (authBackend) => {
@@ -21,7 +21,7 @@ const _pageTitle = (authBackend) => {
     return <>Edit Authentication Service - <i>{backendTitle}</i></>;
   }
 
-  return 'Create Active Directory Authentication Service';
+  return 'Create LDAP Authentication Service';
 };
 
 const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
@@ -39,6 +39,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
         Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                            text="documentation" />.
       </span>
+
       <BackendOverviewLinks activeBackend={activeBackend}
                             finishedLoading={finishedLoading} />
     </PageHeader>

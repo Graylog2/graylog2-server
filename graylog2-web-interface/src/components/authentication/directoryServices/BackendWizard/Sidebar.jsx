@@ -4,12 +4,12 @@ import { useState, useContext, useEffect } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
-import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/graylog';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
-import BackendWizardContext from './contexts/BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
 

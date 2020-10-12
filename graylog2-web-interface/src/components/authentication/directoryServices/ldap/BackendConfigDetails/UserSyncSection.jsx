@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import type { LdapBackend } from 'logic/authentication/ldap/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
 import { ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -18,7 +18,7 @@ const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<
 };
 
 type Props = {
-  authenticationBackend: LdapBackend,
+  authenticationBackend: DirectoryServiceBackend,
   roles: Immutable.List<Role>,
 };
 

@@ -1,14 +1,14 @@
 // @flow strict
 import * as React from 'react';
 
-import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 
-import type { WizardFormValues } from '../BackendWizard/contexts/BackendWizardContext';
+import type { WizardFormValues } from '../BackendWizard//BackendWizardContext';
 import BackendWizard from '../BackendWizard';
 
 export const AUTH_BACKEND_META = {
@@ -43,7 +43,7 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
 
   return AuthenticationDomain.create(payload).then((result) => {
     if (result && formValues.synchronizeGroups && enterpriseGroupSyncPlugin) {
-      return enterpriseGroupSyncPlugin.actions.handleBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 
     return result;

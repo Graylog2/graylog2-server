@@ -2,7 +2,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
+import { getEnterpriseAuthenticationPlugin } from 'util/AuthenticationService';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const Header = styled.h4`
@@ -17,8 +17,8 @@ const NoEnterpriseComponent = () => (
 );
 
 const SyncedTeamsSection = () => {
-  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const EnterpriseSyncedTeamsSection = enterpriseGroupSyncPlugin?.components.SyncedTeamsSection;
+  const enterpriseAuthenticationPlugin = getEnterpriseAuthenticationPlugin();
+  const EnterpriseSyncedTeamsSection = enterpriseAuthenticationPlugin?.components.SyncedTeamsSection;
 
   return (
     EnterpriseSyncedTeamsSection ? <EnterpriseSyncedTeamsSection /> : (

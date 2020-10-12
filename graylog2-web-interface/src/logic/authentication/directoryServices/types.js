@@ -3,7 +3,8 @@ import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/aut
 
 type TransportSecurity = ('tls' | 'start_tls' | 'none');
 type ServerAddress = { host: string, port: number };
-export type LdapConfig = {
+
+export type DirectoryServiceBackendConfig = {
   servers: Array<ServerAddress>,
   systemUserDn: string,
   systemUserPassword: { isSet: boolean },
@@ -16,7 +17,7 @@ export type LdapConfig = {
   verifyCertificates: boolean,
 };
 
-export type LdapConfigJson = {
+export type DirectoryServiceBackendConfigJson = {
   servers: Array<ServerAddress>,
   system_user_dn: string,
   system_user_password: { is_set: boolean },
@@ -29,12 +30,12 @@ export type LdapConfigJson = {
   verify_certificates: boolean,
 };
 
-export type LdapBackend = {
+export type DirectoryServiceBackend = {
   id: $PropertyType<AuthenticationBackend, 'id'>,
   defaultRoles: $PropertyType<AuthenticationBackend, 'defaultRoles'>,
   title: $PropertyType<AuthenticationBackend, 'title'>,
   description: $PropertyType<AuthenticationBackend, 'description'>,
-  config: LdapConfig,
+  config: DirectoryServiceBackendConfig,
 };
 
 export type WizardSubmitPayload = {
@@ -42,7 +43,7 @@ export type WizardSubmitPayload = {
   description: $PropertyType<AuthenticationBackendJSON, 'description'>,
   default_roles: $PropertyType<AuthenticationBackendJSON, 'default_roles'>,
   config: {
-    ...LdapConfigJson,
+    ...DirectoryServiceBackendConfigJson,
     system_user_password: ?(string | { keep_value: true } | { delete_value: true } | { set_value: ?string }),
   },
 };

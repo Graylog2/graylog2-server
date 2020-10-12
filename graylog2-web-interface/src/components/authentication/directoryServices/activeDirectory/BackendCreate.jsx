@@ -2,10 +2,10 @@
 import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
-import BackendWizard from 'components/authentication/BackendWizard';
 
 import WizardPageHeader from './WizardPageHeader';
 
+import BackendWizard from '../BackendWizard';
 import { prepareInitialValues, handleSubmit } from '../ldap/BackendCreate';
 
 export const HELP = {
