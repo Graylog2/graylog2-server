@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 import useQuery from './useQuery';
 
 export type Location = {
-  query: { [string]: ?string },
+  query: { [string]: ?mixed },
   pathname: string,
   search: string,
 };
