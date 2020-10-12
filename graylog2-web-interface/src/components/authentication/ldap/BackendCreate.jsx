@@ -19,8 +19,8 @@ export const AUTH_BACKEND_META = {
 export const prepareInitialValues = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   let initialValues = {
-    serverUrlHost: 'localhost',
-    serverUrlPort: 636,
+    serverHost: 'localhost',
+    serverPort: 636,
     transportSecurity: 'tls',
     userFullNameAttribute: 'cn',
     userNameAttribute: 'uid',
