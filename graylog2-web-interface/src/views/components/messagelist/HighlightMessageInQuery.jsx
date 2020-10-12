@@ -15,7 +15,7 @@ const HighlightMessageInQuery = ({ children, location: { query = {} } = {} }: Pr
   const { highlightMessage } = query;
 
   return (
-    <HighlightMessageContext.Provider value={highlightMessage}>
+    <HighlightMessageContext.Provider value={String(highlightMessage)}>
       {children}
     </HighlightMessageContext.Provider>
   );
