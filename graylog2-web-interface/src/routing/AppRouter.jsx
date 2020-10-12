@@ -174,9 +174,11 @@ const AppRouter = () => {
 
                         <Route exact path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
                         <Route exact path={Routes.SYSTEM.CONTENTPACKS.CREATE} component={CreateContentPackPage} />
-                        <Route exact path={Routes.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev')}
+                        <Route exact
+                               path={Routes.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev')}
                                component={EditContentPackPage} />
-                        <Route exact path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')}
+                        <Route exact
+                               path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')}
                                component={ShowContentPackPage} />
 
                         <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
@@ -268,10 +270,12 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.SIDECARS.ADMINISTRATION} component={SidecarAdministrationPage} />
                         <Route exact path={Routes.SYSTEM.SIDECARS.CONFIGURATION} component={SidecarConfigurationPage} />
                         <Route exact path={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION} component={SidecarNewConfigurationPage} />
-                        <Route exact path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')}
+                        <Route exact
+                               path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')}
                                component={SidecarEditConfigurationPage} />
                         <Route exact path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR} component={SidecarNewCollectorPage} />
-                        <Route exact path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
+                        <Route exact
+                               path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
                                component={SidecarEditCollectorPage} />
                         {standardPluginRoutes}
                       </Switch>

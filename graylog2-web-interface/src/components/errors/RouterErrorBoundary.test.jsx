@@ -5,8 +5,6 @@ import suppressConsole from 'helpers/suppressConsole';
 
 import RouterErrorBoundary from './RouterErrorBoundary';
 
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
-
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal
   throw {

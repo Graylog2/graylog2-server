@@ -8,10 +8,6 @@ import CurrentUserProvider from 'contexts/CurrentUserProvider';
 
 import AppRouter from './AppRouter';
 
-jest.mock('pages', () => ({
-  StartPage: mockComponent('StartPage'),
-}));
-
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 
 jest.mock('injection/CombinedProvider', () => {
@@ -31,6 +27,9 @@ jest.mock('injection/CombinedProvider', () => {
 
 // To prevent exceptions from getting swallwoed
 jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterErrorBoundary'));
+
+jest.mock('pages/StartPage', () => mockComponent('StartPage'));
+jest.mock('routing/loadAsync', () => (fn) => fn());
 
 describe('AppRouter', () => {
   it('routes to Getting Started Page for `/` or empty location', () => {

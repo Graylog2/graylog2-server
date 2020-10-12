@@ -28,7 +28,7 @@ jest.mock('views/stores/ViewStore', () => ({
   },
 }));
 
-jest.mock('util/History', () => ({ push: jest.fn(), replace: jest.fn() }));
+jest.mock('util/History');
 
 const lastFiveMinutes = { type: 'relative', range: 300 };
 const createSearch = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') => Search.builder()

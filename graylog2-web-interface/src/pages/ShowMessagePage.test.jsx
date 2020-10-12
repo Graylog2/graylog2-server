@@ -32,6 +32,8 @@ jest.mock('injection/CombinedProvider', () => ({
   }[type])),
 }));
 
+jest.mock('routing/withParams', () => (x) => x);
+
 describe('ShowMessagePage', () => {
   it('triggers a node list refresh on mount', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));

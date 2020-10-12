@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
-type ParamsContext = { params: { [string]: string } };
+type ParamsContext = { params: { [string]: ?string } };
 
 function withParams<Props: ParamsContext & { ... }, ComponentType: React$ComponentType<Props>>(
   Component: ComponentType,

@@ -6,8 +6,6 @@ import ConfirmLeaveDialog from './ConfirmLeaveDialog';
 
 jest.mock('util/AppConfig');
 
-jest.mock('react-router-dom', () => ({ Prompt: () => null }));
-
 describe('ConfirmLeaveDialog', () => {
   const { addEventListener } = window;
   const { removeEventListener } = window;

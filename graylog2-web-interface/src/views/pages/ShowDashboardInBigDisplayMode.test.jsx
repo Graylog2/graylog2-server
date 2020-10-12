@@ -36,8 +36,9 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
 }));
 
 jest.mock('views/pages/ShowViewPage', () => () => null);
+jest.mock('routing/withParams', () => x => x);
 
-describe('ShowDashboardInBigDisplayMode should', () => {
+describe('ShowDashboardInBigDisplayMode', () => {
   const mockLocation = {
     query: {
       interval: '30', refresh: '10',
