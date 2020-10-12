@@ -79,26 +79,30 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
                 )}
               </b>
               {(result.user_exists && result.user_details) && (
-                <p>
+                <div>
                   <br />
                   <table className="table">
-                    <tr>
-                      <th>User Attribute</th>
-                      <th>Value</th>
-                    </tr>
-
-                    {Object.entries(result.user_details).map(([key, value]) => (
+                    <thead>
                       <tr>
-                        <td>
-                          {String(key)}
-                        </td>
-                        <td>
-                          {String(value)}
-                        </td>
+                        <th>User Attribute</th>
+                        <th>Value</th>
                       </tr>
-                    ))}
+                    </thead>
+
+                    <tbody>
+                      {Object.entries(result.user_details).map(([key, value]) => (
+                        <tr key={key}>
+                          <td>
+                            {String(key)}
+                          </td>
+                          <td>
+                            {String(value)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
-                </p>
+                </div>
               )}
             </NotificationContainer>
           )}
