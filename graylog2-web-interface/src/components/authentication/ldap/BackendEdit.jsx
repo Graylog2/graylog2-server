@@ -48,20 +48,6 @@ export const prepareInitialValues = ({
   };
 };
 
-export const passwordUpdatePayload = (systemUserPassword: ?string) => {
-  // Only update password on edit if necessary,
-  // if a users resets the previously defined password its form value is an empty string
-  if (systemUserPassword === undefined) {
-    return { keep_value: true };
-  }
-
-  if (systemUserPassword === '') {
-    return { delete_value: true };
-  }
-
-  return { set_value: systemUserPassword };
-};
-
 const _optionalWizardProps = (initialStepKey: ?string) => {
   const props = {};
 
@@ -78,10 +64,6 @@ export const handleSubmit = (payload: LdapCreate, formValues: WizardFormValues, 
   return AuthenticationDomain.update(backendId, {
     ...payload,
     id: backendId,
-    config: {
-      ...payload.config,
-      system_user_password: passwordUpdatePayload(payload.config.system_user_password),
-    },
   }).then((result) => {
     if (result && enterpriseGroupSyncPlugin) {
       return enterpriseGroupSyncPlugin.actions.handleBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);

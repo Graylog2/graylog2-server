@@ -38,6 +38,24 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?s
   </Row>
 );
 
+export const _passwordPayload = (backendId: string, systemUserPassword: ?string) => {
+  // Only update password on edit if necessary,
+  // if a users resets the previously defined password its form value is an empty string
+  if (backendId) {
+    if (systemUserPassword === undefined) {
+      return { keep_value: true };
+    }
+
+    if (systemUserPassword === '') {
+      return { delete_value: true };
+    }
+
+    return { set_value: systemUserPassword };
+  }
+
+  return systemUserPassword;
+};
+
 const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues) => {
   // We need to ensure that we are using the actual form values
   // It is possible to provide already updated form values, so we do not need to get them twice
@@ -59,6 +77,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     serviceTitle,
     serviceType,
     urlScheme,
+    backendId,
   } = stepsState.authBackendMeta;
   const serverUrl = `${new URI('').host(serverUrlHost).port(serverUrlPort).scheme(urlScheme)}`;
 
@@ -69,7 +88,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     config: {
       server_urls: [serverUrl],
       system_user_dn: systemUserDn,
-      system_user_password: systemUserPassword,
+      system_user_password: _passwordPayload(backendId, systemUserPassword),
       transport_security: transportSecurity,
       type: serviceType,
       user_full_name_attribute: userFullNameAttribute,
