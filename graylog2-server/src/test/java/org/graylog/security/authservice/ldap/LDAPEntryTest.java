@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.unboundid.util.Base64;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,7 @@ class LDAPEntryTest {
     }
 
     @Test
-    void uniqueId() {
+    void base64UniqueId() {
         final LDAPEntry entry = LDAPEntry.builder()
                 .dn("cn=jane,ou=people,dc=example,dc=com")
                 .base64UniqueId(Base64.encode("unique-id"))
@@ -47,8 +46,6 @@ class LDAPEntryTest {
                 .build();
 
         assertThat(entry.base64UniqueId()).isEqualTo("dW5pcXVlLWlk");
-
-        assertThat(entry.uniqueId()).isEqualTo("unique-id".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test

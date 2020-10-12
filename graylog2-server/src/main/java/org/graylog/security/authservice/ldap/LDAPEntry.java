@@ -20,9 +20,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.unboundid.util.Base64;
 
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
@@ -40,14 +38,6 @@ public abstract class LDAPEntry {
     public abstract ImmutableSet<String> objectClasses();
 
     public abstract ImmutableListMultimap<String, String> attributes();
-
-    public byte[] uniqueId() {
-        try {
-            return Base64.decode(base64UniqueId());
-        } catch (ParseException e) {
-            throw new IllegalStateException("base64UniqueId field doesn't contain valid base64 data", e);
-        }
-    }
 
     public boolean hasAttribute(String key) {
         return attributes().containsKey(toKey(key));
