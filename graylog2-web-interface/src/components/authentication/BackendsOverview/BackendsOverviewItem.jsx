@@ -30,7 +30,7 @@ const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<
   return defaultRolesNames.join(', ');
 };
 
-const EditButton = ({ isActive, authenticationBackend }: { authenticationBackend: AuthenticationBackend, isActive: boolean }) => {
+const EditButton = ({ authenticationBackend }: { authenticationBackend: AuthenticationBackend }) => {
   const link = Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackend.id);
 
   return (
@@ -76,14 +76,14 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
             <Button onClick={_deactiveBackend} bsStyle="warning" bsSize="xs" type="button">
               Deactivate
             </Button>
-            <EditButton isActive={isActive} authenticationBackend={authenticationBackend} />
+            <EditButton authenticationBackend={authenticationBackend} />
           </>
         ) : (
           <>
             <Button onClick={_activateBackend} bsStyle="warning" bsSize="xs" type="button">
               Activate
             </Button>
-            <EditButton isActive={isActive} authenticationBackend={authenticationBackend} />
+            <EditButton authenticationBackend={authenticationBackend} />
             <Button onClick={_deleteBackend} bsStyle="danger" bsSize="xs" type="button">
               Delete
             </Button>
