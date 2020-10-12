@@ -201,6 +201,10 @@ public class Configuration extends BaseConfiguration {
         return outputBufferProcessorKeepAliveTime;
     }
 
+    public boolean isCloud() {
+        return isCloud;
+    }
+
     @Override
     public String getNodeIdFile() {
         return nodeIdFile;
