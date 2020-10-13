@@ -96,28 +96,20 @@ import {} from 'components/authentication';
 import AuthProvidersConfig from '../components/authentication/AuthProvidersConfig';
 import AuthProvidersConfigContext from '../components/authentication/AuthProvidersConfigContext';
 
-const renderPluginRoute = ({ path, component: Component }) => (
+const renderPluginRoute = ({ path, component: Component, parentComponent: ParentComponent = React.Fragment }) => (
   <Route key={`${path}-${Component.displayName}`}
+         exact
          path={URLUtils.appPrefixed(path)}>
-    <Component />
+    <ParentComponent>
+      <Component />
+    </ParentComponent>
   </Route>
 );
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map(renderPluginRoute);
-  const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map((pluginRoute) => {
-    const PluginRouteComponent = pluginRoute.component;
-    const PluginParentComponent = pluginRoute.parentComponent;
-
-    return (
-      <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`} exact path={URLUtils.appPrefixed(pluginRoute.path)}>
-        <PluginParentComponent>
-          <PluginRouteComponent />
-        </PluginParentComponent>
-      </Route>
-    );
-  });
+  const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
 
   return (
