@@ -10,6 +10,7 @@ type Props = {
   type?: string,
   help?: React.Node,
   labelClassName?: string,
+  onChange?: (SyntheticInputEvent<Input>) => void,
   wrapperClassName?: string,
   validate?: (string) => ?string,
 };
@@ -23,7 +24,7 @@ const inputProps = (value) => {
 };
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ name, type, help, validate, ...rest }: Props) => {
+const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, ...rest }: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (
@@ -32,6 +33,14 @@ const FormikInput = ({ name, type, help, validate, ...rest }: Props) => {
         const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
         const displayError = validateOnChange ? !!(error && touched) : !!error;
 
+        const _handleChange = (e) => {
+          if (typeof propagateOnChange === 'function') {
+            propagateOnChange(e);
+          }
+
+          onChange(e);
+        };
+
         return (
           <Input {...rest}
                  {...typeSepcificProps}
@@ -39,7 +48,7 @@ const FormikInput = ({ name, type, help, validate, ...rest }: Props) => {
                  help={help}
                  id={name}
                  error={displayError ? error : undefined}
-                 onChange={onChange}
+                 onChange={_handleChange}
                  type={type} />
         );
       }}
@@ -59,6 +68,7 @@ FormikInput.propTypes = {
 FormikInput.defaultProps = {
   help: undefined,
   labelClassName: undefined,
+  onChange: undefined,
   type: 'text',
   validate: () => {},
   wrapperClassName: undefined,

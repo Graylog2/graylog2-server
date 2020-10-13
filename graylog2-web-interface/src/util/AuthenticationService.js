@@ -12,3 +12,15 @@ export const getAuthServicePlugin = (type: string, throwError?: boolean = false)
 
   return authService;
 };
+
+export const getEnterpriseGroupSyncPlugin = () => {
+  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.directoryServices.groupSync');
+
+  return authGroupSyncPlugins?.[0];
+};
+
+export const getEnterpriseAuthenticationPlugin = () => {
+  const authPlugins = PluginStore.exports('authentication.enterprise');
+
+  return authPlugins?.[0];
+};

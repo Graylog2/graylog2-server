@@ -24,7 +24,7 @@ const ApiRoutes = {
     available: () => { return { url: '/alerts/conditions/types' }; },
     list: () => { return { url: '/alerts/conditions' }; },
   },
-  Authentication: {
+  AuthenticationController: {
     create: () => ({ url: '/system/authentication/services/backends' }),
     delete: (backendId) => ({ url: `/system/authentication/services/backends/${backendId}` }),
     disableUser: (userId) => ({ url: `/system/authentication/users/${userId}/disable` }),
