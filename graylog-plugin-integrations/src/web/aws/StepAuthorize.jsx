@@ -5,14 +5,12 @@ import styled from 'styled-components';
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import { SidebarContext } from 'aws/context/Sidebar';
-
 import ValidatedInput from 'aws/common/ValidatedInput';
 import FormWrap from 'aws/common/FormWrap';
 import { renderOptions } from 'aws/common/Options';
 import { ApiRoutes } from 'aws/common/Routes';
 import { AWS_AUTH_TYPES } from 'aws/common/constants';
 import useFetch from 'aws/common/hooks/useFetch';
-
 import formValidation from 'aws/utils/formValidation';
 import AWSAuthenticationTypes from 'aws/authentication/AWSAuthenticationTypes';
 import AWSCustomEndpoints from 'aws/authentication/AWSCustomEndpoints';
@@ -35,12 +33,14 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
 
   useEffect(() => {
     setStreamsFetch(null);
+
     if (fetchRegionsStatus.error) {
       setFormError({ full_message: fetchRegionsStatus.error });
     } else if (fetchStreamsStatus.error) {
       const badKey = /security token/g;
       const badSecret = /signing method/g;
       const noStreams = /No Kinesis streams/g;
+
       if (fetchStreamsStatus.error.match(badKey)) {
         setFormError({ full_message: fetchStreamsStatus.error, nice_message: 'Invalid AWS Key, check out your AWS account for the 20-character long, alphanumeric string that usually starts with the letters "AK"' });
       } else if (fetchStreamsStatus.error.match(badSecret)) {

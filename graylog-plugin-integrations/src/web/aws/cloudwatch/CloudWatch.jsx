@@ -4,11 +4,9 @@ import { withRouter } from 'react-router';
 
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
-
 import FormUtils from 'util/FormsUtils.js';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
 import StepAuthorize from 'aws/StepAuthorize';
 import { StepsContext } from 'aws/context/Steps';
 import { FormDataContext } from 'aws/context/FormData';
@@ -39,7 +37,7 @@ const CloudWatch = ({ route }) => {
     setCurrentStep(nextStep);
   };
 
-  const handleEditClick = nextStep => () => {
+  const handleEditClick = (nextStep) => () => {
     setCurrentStep(nextStep);
   };
 
@@ -47,6 +45,7 @@ const CloudWatch = ({ route }) => {
     const id = target.name || target.id;
 
     let value = FormUtils.getValueFromInput(target);
+
     if (typeof value === 'string') {
       value = value.trim();
     }
@@ -106,7 +105,7 @@ const CloudWatch = ({ route }) => {
   ];
 
   if (availableSteps.length === 0) {
-    setAvailableStep(wizardSteps.map(step => step.key));
+    setAvailableStep(wizardSteps.map((step) => step.key));
   }
 
   return (

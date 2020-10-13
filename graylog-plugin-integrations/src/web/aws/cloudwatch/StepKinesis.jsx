@@ -11,8 +11,7 @@ const StepKinesis = ({ hasStreams, ...restProps }) => {
     <>
       { renderStreams
         ? <ExistingStreams {...restProps} toggleSetup={() => toggleRenderStreams(false)} />
-        : <SetupNewStream {...restProps} toggleSetup={hasStreams ? () => toggleRenderStreams(true) : null} />
-      }
+        : <SetupNewStream {...restProps} toggleSetup={hasStreams ? () => toggleRenderStreams(true) : null} />}
     </>
   );
 };

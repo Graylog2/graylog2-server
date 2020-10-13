@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Input } from 'components/bootstrap';
-
 import formValidation from 'aws/utils/formValidation';
 
 const Label = ({ label, error }) => {

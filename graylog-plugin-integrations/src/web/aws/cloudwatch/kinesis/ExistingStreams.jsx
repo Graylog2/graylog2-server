@@ -3,11 +3,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, Modal, Panel } from 'components/graylog';
-
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import { SidebarContext } from 'aws/context/Sidebar';
-
 import useFetch from 'aws/common/hooks/useFetch';
 import FormWrap from 'aws/common/FormWrap';
 import ValidatedInput from 'aws/common/ValidatedInput';
@@ -61,6 +59,7 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
   useEffect(() => {
     if (logDataStatus.error) {
       setLogDataUrl(null);
+
       setFormError({
         full_message: logDataStatus.error,
         nice_message: <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>,
@@ -98,7 +97,7 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
                     <p>
                       Please select the stream you would like to read messages from, or follow the&nbsp;
                       <DocumentationLink page={DocsRoutes.INTEGRATIONS.AWS.AWS_KINESIS_CLOUDWATCH_INPUTS} text="AWS Kinesis/CloudWatch Input " />
-                         documentation for more details on this set up.
+                      documentation for more details on this set up.
                     </p>
                   </>
                 )}>

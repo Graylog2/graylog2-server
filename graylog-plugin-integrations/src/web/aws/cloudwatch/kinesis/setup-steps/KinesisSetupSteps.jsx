@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import { ApiRoutes } from 'aws/common/Routes';
 import useFetch from 'aws/common/hooks/useFetch';
-
 import { FormDataContext } from 'aws/context/FormData';
 
 import KinesisSetupStep from './KinesisSetupStep';
