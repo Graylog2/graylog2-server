@@ -71,7 +71,7 @@ class ViewOwnershipToGrantsMigrationTest {
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService);
 
-        this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService);
+        this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
 
     @Test

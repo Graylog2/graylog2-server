@@ -51,6 +51,7 @@ public class ViewSharingToGrantsMigration {
 
     private final DBGrantService grantService;
     private final MongoCollection<Document> collection;
+    private GRNRegistry grnRegistry;
     private final UserService userService;
     private final RoleService roleService;
     private final String rootUsername;
@@ -61,7 +62,8 @@ public class ViewSharingToGrantsMigration {
                                         UserService userService,
                                         RoleService roleService,
                                         @Named("root_username") String rootUsername,
-                                        ViewService viewService) {
+                                        ViewService viewService,
+                                        GRNRegistry grnRegistry) {
 
         this.grantService = grantService;
         this.userService = userService;
@@ -69,6 +71,7 @@ public class ViewSharingToGrantsMigration {
         this.rootUsername = rootUsername;
         this.viewService = viewService;
         this.collection = mongoConnection.getMongoDatabase().getCollection("view_sharings", Document.class);
+        this.grnRegistry = grnRegistry;
     }
 
     public void upgrade() {
@@ -105,12 +108,13 @@ public class ViewSharingToGrantsMigration {
         }
     }
 
-    private void migrateUsers(String viewId, Collection<String> users) {
+    private void migrateUsers(String viewId, Collection<String> userNames) {
+        final Set<User> users = userNames.stream().map(userService::load).collect(Collectors.toSet());
         LOG.info("Migrate users for view {} to grants: {}", viewId, users);
 
         final GRN target = getTarget(viewId);
 
-        for (final String user : users) {
+        for (final User user : users) {
             ensureGrant(user, target);
         }
     }
@@ -134,7 +138,7 @@ public class ViewSharingToGrantsMigration {
 
         for (final Role role : roles) {
             for (final User user : userService.loadAllForRole(role)) {
-                ensureGrant(user.getName(), target);
+                ensureGrant(user, target);
             }
         }
     }
@@ -155,9 +159,8 @@ public class ViewSharingToGrantsMigration {
         }
     }
 
-    private void ensureGrant(String username, GRN target) {
-        // TODO: Needs to use the user ID once we don't use user names in references anymore!
-        final GRN grantee = GRNTypes.USER.toGRN(username);
+    private void ensureGrant(User user, GRN target) {
+        final GRN grantee = grnRegistry.ofUser(user);
 
         grantService.ensure(grantee, CAPABILITY, target, rootUsername);
     }

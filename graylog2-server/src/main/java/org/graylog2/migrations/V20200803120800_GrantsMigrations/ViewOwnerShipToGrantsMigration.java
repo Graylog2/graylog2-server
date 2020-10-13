@@ -17,6 +17,7 @@
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -37,17 +38,20 @@ public class ViewOwnerShipToGrantsMigration {
     private final DBGrantService dbGrantService;
     private final String rootUsername;
     private final ViewService viewService;
+    private final GRNRegistry grnRegistry;
 
     private static final Capability CAPABILITY = Capability.OWN;
 
     public ViewOwnerShipToGrantsMigration(UserService userService,
                                           DBGrantService dbGrantService,
                                           @Named("root_username") String rootUsername,
-                                          ViewService viewService) {
+                                          ViewService viewService,
+                                          GRNRegistry grnRegistry) {
         this.userService = userService;
         this.dbGrantService = dbGrantService;
         this.rootUsername = rootUsername;
         this.viewService = viewService;
+        this.grnRegistry = grnRegistry;
     }
 
     public void upgrade() {
@@ -57,16 +61,15 @@ public class ViewOwnerShipToGrantsMigration {
                 final GRNType grnType = ViewDTO.Type.DASHBOARD.equals(view.type()) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
                 final GRN target = grnType.toGRN(view.id());
 
-                ensureGrant(user.get().getName(), target);
+                ensureGrant(user.get(), target);
             }
         });
     }
 
-    private void ensureGrant(String username, GRN target) {
-        // TODO: Needs to use the user ID once we don't use user names in references anymore!
-        final GRN grantee = GRNTypes.USER.toGRN(username);
+    private void ensureGrant(User user, GRN target) {
+        final GRN grantee = grnRegistry.ofUser(user);
 
-        LOG.info("Registering user <{}> ownership for <{}>", username, target);
+        LOG.info("Registering user <{}> ownership for <{}/{}>", user.getName(), user.getId(), target);
         dbGrantService.ensure(grantee, CAPABILITY, target, rootUsername);
     }
 }
