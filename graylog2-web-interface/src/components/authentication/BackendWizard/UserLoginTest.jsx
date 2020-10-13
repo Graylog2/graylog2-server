@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/graylog';
@@ -12,7 +12,7 @@ import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
 import BackendWizardContext from './contexts/BackendWizardContext';
 
 type Props = {
-  prepareSubmitPayload: () => LdapCreate,
+  prepareSubmitPayload: () => WizardSubmitPayload,
 };
 
 const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
@@ -66,7 +66,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
             </Col>
           </Row>
           <Button type="submit">
-            {loading ? <Spinner delay={0} /> : 'Test User Login'}
+            {loading ? <Spinner delay={0} text="Test User Login" /> : 'Test User Login'}
           </Button>
           {(!hasErrors && testFinished) && (
             <NotificationContainer bsStyle={success ? 'success' : 'danger'}>
@@ -79,26 +79,30 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
                 )}
               </b>
               {(result.user_exists && result.user_details) && (
-                <p>
+                <div>
                   <br />
                   <table className="table">
-                    <tr>
-                      <th>User Attribute</th>
-                      <th>Value</th>
-                    </tr>
-
-                    {Object.entries(result.user_details).map(([key, value]) => (
+                    <thead>
                       <tr>
-                        <td>
-                          {String(key)}
-                        </td>
-                        <td>
-                          {String(value)}
-                        </td>
+                        <th>User Attribute</th>
+                        <th>Value</th>
                       </tr>
-                    ))}
+                    </thead>
+
+                    <tbody>
+                      {Object.entries(result.user_details).map(([key, value]) => (
+                        <tr key={key}>
+                          <td>
+                            {String(key)}
+                          </td>
+                          <td>
+                            {String(value)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
-                </p>
+                </div>
               )}
             </NotificationContainer>
           )}

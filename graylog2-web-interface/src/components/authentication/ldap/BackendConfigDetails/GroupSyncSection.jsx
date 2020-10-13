@@ -1,9 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import * as Immutable from 'immutable';
 
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { LdapBackend } from 'logic/authentication/ldap/types';
+import Role from 'logic/roles/Role';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import EditLinkButton from './EditLinkButton';
@@ -12,6 +14,7 @@ import { STEP_KEY as GROUP_SYNC_KEY } from '../../BackendWizard/GroupSyncStep';
 
 type Props = {
   authenticationBackend: LdapBackend,
+  roles: Immutable.List<Role>,
 };
 
 const Header = styled.h4`
@@ -25,29 +28,14 @@ const NoEnterpriseComponent = () => (
   </>
 );
 
-const GroupSyncSection = ({ authenticationBackend }: Props) => {
-  const authGroupSyncPlugins = PluginStore.exports('authentication.enterprise.ldap.groupSync');
-
-  const Section = ({ children }: { children: React.Node }) => (
-    <SectionComponent title="Group Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>
-      {children}
-    </SectionComponent>
-  );
-
-  if (!authGroupSyncPlugins || authGroupSyncPlugins.length <= 0) {
-    return (
-      <Section>
-        <NoEnterpriseComponent />
-      </Section>
-    );
-  }
-
-  const { GroupSyncDetails } = authGroupSyncPlugins[0];
+const GroupSyncSection = ({ authenticationBackend, roles }: Props) => {
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const GroupSyncDetails = enterpriseGroupSyncPlugin?.components.GroupSyncDetails;
 
   return (
-    <Section>
-      <GroupSyncDetails authenticationBackend={authenticationBackend} />
-    </Section>
+    <SectionComponent title="Group Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>
+      {GroupSyncDetails ? <GroupSyncDetails authenticationBackend={authenticationBackend} roles={roles} /> : <NoEnterpriseComponent />}
+    </SectionComponent>
   );
 };
 

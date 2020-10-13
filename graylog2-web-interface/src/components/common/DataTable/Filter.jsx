@@ -1,7 +1,14 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
+
+const Wrapper = styled.div`
+  .control-label {
+    padding-top: 0;
+  }
+`;
 
 const Filter = ({
   children,
@@ -21,7 +28,7 @@ const Filter = ({
 
   if (filterKeys.length !== 0) {
     return (
-      <div className="row">
+      <Wrapper className="row">
         <div className="col-md-8">
           <TypeAheadDataFilter id={`${id}-data-filter`}
                                label={label}
@@ -32,10 +39,12 @@ const Filter = ({
                                searchInKeys={filterKeys}
                                onDataFiltered={onDataFiltered} />
         </div>
-        <div className="col-md-4">
-          {children}
-        </div>
-      </div>
+        {children && (
+          <div className="col-md-4">
+            {children}
+          </div>
+        )}
+      </Wrapper>
     );
   }
 

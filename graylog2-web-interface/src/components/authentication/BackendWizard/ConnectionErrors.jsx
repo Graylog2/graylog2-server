@@ -8,6 +8,7 @@ import { Alert } from 'components/graylog';
 
 export const NotificationContainer: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
   margin-top: 10px;
+  word-break: break-word;
 `;
 
 const ErrorsTitle = styled.div`
@@ -31,7 +32,7 @@ const ConnectionErrors = ({ errors, message }: Props) => (
     <ErrorsTitle>{message}</ErrorsTitle>
     <ErrorsList>
       {errors.map((error) => {
-        return <li key={error}>{error}</li>;
+        return <li key={String(error)}>{String(error)}</li>;
       })}
     </ErrorsList>
   </NotificationContainer>

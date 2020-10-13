@@ -58,11 +58,11 @@ const ProtocolOptions = styled.div`
 const defaultHelp = {
   systemUserDn: (
     <span>
-      The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.
+      The username for the initial connection to the LDAP server, e.g. <code>ldapbind@some.domain</code>.
       This needs to match the <code>userPrincipalName</code> of that user.
     </span>
   ),
-  systemUserPassword: 'The password for the initial connection to the Active Directory server.',
+  systemUserPassword: 'The password for the initial connection to the LDAP server.',
 };
 
 type Props = {
@@ -72,7 +72,7 @@ type Props = {
     systemUserPassword?: React.Node,
   },
   onSubmit: () => void,
-  onSubmitAll: () => void,
+  onSubmitAll: () => Promise<void>,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
@@ -88,6 +88,23 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
         onSubmitAll();
       }
     });
+  };
+
+  const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
+    const currentValue = values.transportSecurity;
+    const newValue = event.target.value;
+    const defaultPort = 389;
+    const defaultTlsPort = 636;
+
+    if (currentValue === 'tls' && newValue !== 'tls' && values.serverPort === defaultTlsPort) {
+      setFieldValue('serverPort', defaultPort);
+    }
+
+    if (currentValue !== 'tls' && newValue === 'tls' && values.serverPort === defaultPort) {
+      setFieldValue('serverPort', defaultTlsPort);
+    }
+
+    onChange(event);
   };
 
   return (
@@ -127,7 +144,7 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                              id={name}
                              label="None"
                              onBlur={onBlur}
-                             onChange={onChange}
+                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
                              type="radio"
                              value="none" />
                       <Input defaultChecked={value === 'tls'}
@@ -135,7 +152,7 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                              id={name}
                              label="TLS"
                              onBlur={onBlur}
-                             onChange={onChange}
+                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
                              type="radio"
                              value="tls" />
                       <Input defaultChecked={value === 'start_tls'}
@@ -143,7 +160,7 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
                              id={name}
                              label="StartTLS"
                              onBlur={onBlur}
-                             onChange={onChange}
+                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
                              type="radio"
                              value="start_tls" />
                     </>

@@ -3,9 +3,10 @@ import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
 import BackendWizard from 'components/authentication/BackendWizard';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
 import WizardPageHeader from './WizardPageHeader';
+
+import { prepareInitialValues, handleSubmit } from '../ldap/BackendCreate';
 
 export const HELP = {
   systemUserDn: (
@@ -54,13 +55,18 @@ export const AUTH_BACKEND_META = {
   serviceType: 'active-directory',
 };
 
-const BackendCreate = () => (
-  <DocumentTitle title="Create Active Directory Authentication Services">
-    <WizardPageHeader />
-    <BackendWizard authBackendMeta={AUTH_BACKEND_META}
-                   help={HELP}
-                   onSubmit={AuthenticationDomain.create} />
-  </DocumentTitle>
-);
+const BackendCreate = () => {
+  const initialValues = prepareInitialValues();
+
+  return (
+    <DocumentTitle title="Create Active Directory Authentication Services">
+      <WizardPageHeader />
+      <BackendWizard authBackendMeta={AUTH_BACKEND_META}
+                     help={HELP}
+                     initialValues={initialValues}
+                     onSubmit={handleSubmit} />
+    </DocumentTitle>
+  );
+};
 
 export default BackendCreate;

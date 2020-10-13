@@ -1,14 +1,14 @@
 // @flow strict
 import * as React from 'react';
 
-import { DocumentTitle } from 'components/common';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
+import type { LdapBackend } from 'logic/authentication/ldap/types';
+import { DocumentTitle, Spinner } from 'components/common';
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 import { HELP, AUTH_BACKEND_META } from './BackendCreate';
 
-import { prepareInitialValues, passwordUpdatePayload } from '../ldap/BackendEdit';
+import { prepareInitialValues, handleSubmit } from '../ldap/BackendEdit';
 import BackendWizard from '../BackendWizard';
 
 type Props = {
@@ -27,23 +27,35 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
-  const initialValues = prepareInitialValues(authenticationBackend);
-  const optionalProps = _optionalWizardProps(initialStepKey);
-  const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
-    {
-      ...payload,
-      id: authenticationBackend.id,
-      config: {
-        ...payload.config,
-        system_user_password: passwordUpdatePayload(payload.config.system_user_password),
-      },
-    });
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  let initialValues = prepareInitialValues(authenticationBackend);
+
+  if (enterpriseGroupSyncPlugin) {
+    const {
+      initialValues: initialGroupSyncValues,
+      finishedLoading,
+    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id);
+
+    if (!finishedLoading) {
+      return <Spinner />;
+    }
+
+    initialValues = { ...initialValues, ...initialGroupSyncValues };
+  }
+
+  const authBackendMeta = {
+    ...AUTH_BACKEND_META,
+    backendId: authenticationBackend.id,
+    backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
+    backendGroupSyncIsActive: !!initialValues.synchronizeGroups,
+  };
+  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
 
   return (
     <DocumentTitle title="Edit Active Directory Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
-      <BackendWizard {...optionalProps}
-                     authBackendMeta={{ ...AUTH_BACKEND_META, backendId: authenticationBackend.id }}
+      <BackendWizard {..._optionalWizardProps(initialStepKey)}
+                     authBackendMeta={authBackendMeta}
                      help={HELP}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit} />

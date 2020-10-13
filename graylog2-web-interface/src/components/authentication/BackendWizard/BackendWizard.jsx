@@ -5,9 +5,10 @@ import { compact } from 'lodash';
 import PropTypes from 'prop-types';
 
 import Routes from 'routing/Routes';
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { validateField } from 'util/FormsUtils';
 import history from 'util/History';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { type Step } from 'components/common/Wizard';
 import { FetchError } from 'logic/rest/FetchProvider';
@@ -36,7 +37,25 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?s
   </Row>
 );
 
-const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues) => {
+export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string) => {
+  // Only update password on edit if necessary,
+  // if a users resets the previously defined password its form value is an empty string
+  if (backendId) {
+    if (systemUserPassword === undefined) {
+      return { keep_value: true };
+    }
+
+    if (systemUserPassword === '') {
+      return { delete_value: true };
+    }
+
+    return { set_value: systemUserPassword };
+  }
+
+  return systemUserPassword;
+};
+
+const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues): WizardSubmitPayload => {
   // We need to ensure that we are using the actual form values
   // It is possible to provide already updated form values, so we do not need to get them twice
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
@@ -56,6 +75,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   const {
     serviceTitle,
     serviceType,
+    backendId,
   } = stepsState.authBackendMeta;
   const serverUrl = `${serverHost}:${serverPort}`;
 
@@ -66,7 +86,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     config: {
       servers: [{ host: serverHost, port: serverPort }],
       system_user_dn: systemUserDn,
-      system_user_password: systemUserPassword,
+      system_user_password: _passwordPayload(backendId, systemUserPassword),
       transport_security: transportSecurity,
       type: serviceType,
       user_full_name_attribute: userFullNameAttribute,
@@ -79,7 +99,15 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
 };
 
 const _getInvalidStepKeys = (formValues) => {
-  const invalidStepKeys = Object.entries(FORMS_VALIDATION).map(([stepKey, formValidation]) => {
+  const validation = { ...FORMS_VALIDATION, [GROUP_SYNC_KEY]: {} };
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const groupSyncValidation = enterpriseGroupSyncPlugin?.validation.GroupSyncValidation;
+
+  if (groupSyncValidation && formValues.synchronizeGroups) {
+    validation[GROUP_SYNC_KEY] = groupSyncValidation(formValues.teamSelectionType);
+  }
+
+  const invalidStepKeys = Object.entries(validation).map(([stepKey, formValidation]) => {
     // $FlowFixMe formValidation is valid input for Object.entries
     const stepHasError = Object.entries(formValidation).some(([fieldName, fieldValidation]) => {
       return !!validateField(fieldValidation)(formValues?.[fieldName]);
@@ -94,35 +122,51 @@ const _getInvalidStepKeys = (formValues) => {
 const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps) => {
   const formValues = getUpdatedFormsValues();
   const invalidStepKeys = validateSteps(formValues);
-  setSubmitAllError();
 
+  // Do not submit if there are invalid steps
   if (invalidStepKeys.length >= 1) {
-    return;
+    return Promise.resolve();
   }
 
-  const payload = getSubmitPayload(formValues);
+  // Reset submit all errors
+  setSubmitAllError(null);
 
-  onSubmit(payload).then(() => {
+  const payload = getSubmitPayload(formValues);
+  const _submit = () => onSubmit(payload, formValues).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
   });
+
+  if (stepsState.authBackendMeta.backendGroupSyncIsActive && !formValues.synchronizeGroups) {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Do you really want to remove the group synchronization config for this authentication service?')) {
+      return _submit();
+    }
+
+    return Promise.resolve();
+  }
+
+  return _submit();
 };
 
 type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  onSubmit: (LdapCreate) => Promise<void>,
+  onSubmit: (WizardSubmitPayload, WizardFormValues) => Promise<void>,
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
     authBackendMeta,
     formValues: initialValues,
     invalidStepKeys: [],
+    loadGroupsResult: undefined,
   });
   const formRefs = {
     [SERVER_CONFIG_KEY]: useRef(),
@@ -183,38 +227,37 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     formRefs,
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
+    prepareSubmitPayload: _getSubmitPayload,
     setActiveStepKey: _setActiveStepKey,
     submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });
 
+  const wizard = (
+    <Wizard activeStep={stepsState.activeStepKey}
+            hidePreviousNextButtons
+            horizontal
+            justified
+            onStepChange={_setActiveStepKey}
+            steps={steps}>
+      <Sidebar prepareSubmitPayload={_getSubmitPayload} />
+    </Wizard>
+  );
+
   return (
     <BackendWizardContext.Provider value={{ ...stepsState, setStepsState }}>
-      <BackendWizardContext.Consumer>
-        {({ activeStepKey: activeStep }) => (
-          <Wizard activeStep={activeStep}
-                  hidePreviousNextButtons
-                  horizontal
-                  justified
-                  onStepChange={_setActiveStepKey}
-                  steps={steps}>
-            <Sidebar prepareSubmitPayload={_getSubmitPayload} />
-          </Wizard>
-        )}
-      </BackendWizardContext.Consumer>
+      {MatchingGroupsProvider
+        ? (
+          <MatchingGroupsProvider prepareSubmitPayload={_getSubmitPayload}>
+            {wizard}
+          </MatchingGroupsProvider>
+        )
+        : wizard}
     </BackendWizardContext.Provider>
   );
 };
 
 BackendWizard.defaultProps = {
   initialStepKey: SERVER_CONFIG_KEY,
-  initialValues: {
-    serverHost: 'localhost',
-    serverPort: 389,
-    transportSecurity: 'tls',
-    userFullNameAttribute: 'cn',
-    userNameAttribute: 'uid',
-    verifyCertificates: true,
-  },
 };
 
 BackendWizard.propTypes = {
@@ -225,7 +268,7 @@ BackendWizard.propTypes = {
     serviceType: PropTypes.string.isRequired,
   }).isRequired,
   initialStepKey: PropTypes.string,
-  initialValues: PropTypes.object,
+  initialValues: PropTypes.object.isRequired,
 };
 
 export default BackendWizard;

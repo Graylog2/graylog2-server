@@ -37,21 +37,12 @@ export type LdapBackend = {
   config: LdapConfig,
 };
 
-export type LdapCreate = {
+export type WizardSubmitPayload = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,
   description: $PropertyType<AuthenticationBackendJSON, 'description'>,
   default_roles: $PropertyType<AuthenticationBackendJSON, 'default_roles'>,
   config: {
     ...LdapConfigJson,
-    system_user_password: ?string,
-  },
-};
-
-export type LdapUpdate = {
-  ...LdapCreate,
-  id: $PropertyType<AuthenticationBackendJSON, 'id'>,
-  config: {
-    ...LdapConfigJson,
-    system_user_password: string | { keep_value: true } | { delete_value: true },
+    system_user_password: ?(string | { keep_value: true } | { delete_value: true } | { set_value: ?string }),
   },
 };

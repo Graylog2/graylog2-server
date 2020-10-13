@@ -19,6 +19,7 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
   error: (error, authBackendId) => ({
     message: `Loading authentication service with id "${authBackendId}" failed with status: ${error}`,
   }),
+  notFoundRedirect: true,
 });
 
 const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
@@ -85,7 +86,7 @@ const disableUser: $PropertyType<ActionsType, 'disableUser'> = notifyingAction({
 const setActiveBackend: $PropertyType<ActionsType, 'setActiveBackend'> = notifyingAction({
   action: AuthenticationActions.setActiveBackend,
   success: (authBackendId, authBackendTitle) => ({
-    message: `Authentication service "${authBackendTitle} was disabled successfully"`,
+    message: `Authentication service "${authBackendTitle} was ${authBackendId ? 'activated' : 'deactivated'} successfully"`,
   }),
   error: (error, authBackendId, authBackendTitle) => ({
     message: `Activating authentication service "${authBackendTitle}" failed with status: ${error}`,

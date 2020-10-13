@@ -4,12 +4,11 @@ import { useState, useContext, useEffect } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
-import type { LdapCreate } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 import { PanelGroup, Panel } from 'components/graylog';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
-import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import BackendWizardContext from './contexts/BackendWizardContext';
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
@@ -37,7 +36,7 @@ const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled
   }
 `;
 type Props = {
-  prepareSubmitPayload: () => LdapCreate,
+  prepareSubmitPayload: () => WizardSubmitPayload,
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
@@ -67,14 +66,6 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
         </Panel.Heading>
         <Panel.Body collapsible>
           <UserLoginTest prepareSubmitPayload={prepareSubmitPayload} />
-        </Panel.Body>
-      </Panel>
-      <Panel eventKey={GROUP_SYNC_KEY}>
-        <Panel.Heading>
-          <Panel.Title toggle>Grouping Review</Panel.Title>
-        </Panel.Heading>
-        <Panel.Body collapsible>
-          You will find information about grouping here.
         </Panel.Body>
       </Panel>
     </StyledPanelGroup>

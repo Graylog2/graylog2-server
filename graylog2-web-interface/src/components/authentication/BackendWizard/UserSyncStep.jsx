@@ -11,8 +11,8 @@ import { Input } from 'components/bootstrap';
 
 import BackendWizardContext from './contexts/BackendWizardContext';
 
-export type StepKeyType = 'user-synchronization';
-export const STEP_KEY: StepKeyType = 'user-synchronization';
+export type StepKeyType = 'user-synchronisation';
+export const STEP_KEY: StepKeyType = 'user-synchronisation';
 export const FORM_VALIDATION = {
   defaultRoles: { required: true },
   userFullNameAttribute: { required: true },
@@ -31,7 +31,7 @@ type Props = {
     userSearchPattern?: React.Node,
   },
   onSubmit: () => void,
-  onSubmitAll: () => void,
+  onSubmitAll: () => Promise<void>,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
@@ -39,7 +39,7 @@ type Props = {
 const defaultHelp = {
   userSearchBase: (
     <span>
-      The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
+      The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
     </span>
   ),
   userSearchPattern: (
@@ -50,13 +50,13 @@ const defaultHelp = {
   ),
   userNameAttribute: (
     <span>
-      Which Active Directory attribute to use for the username of the user in Graylog.<br />
+      Which LDAP attribute to use for the username of the user in Graylog.<br />
       Try to load a test user using the sidebar form, if you are unsure which attribute to use.
     </span>
   ),
   userFullNameAttribute: (
     <span>
-      Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.<br />
+      Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.<br />
     </span>
   ),
   defaultRoles: (
@@ -125,7 +125,7 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitA
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br />
+                Changing the static role assignment will only affect to new users created via LDAP/LDAP!<br />
                 Existing user accounts will be updated on their next login, or if you edit their roles manually.
               </Panel>
             </Col>

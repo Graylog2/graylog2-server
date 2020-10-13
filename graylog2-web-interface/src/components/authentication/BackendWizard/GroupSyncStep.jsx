@@ -1,8 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Formik } from 'formik';
+
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
+import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
 
 export type StepKeyType = 'group-synchronisation';
 export const STEP_KEY: StepKeyType = 'group-synchronisation';
@@ -20,23 +22,25 @@ const NoEnterpriseComponent = () => (
 
 type Props = {
   formRef: React.Ref<typeof Formik>,
-  onSubmitAll: () => void,
+  onSubmitAll: () => Promise<void>,
+  prepareSubmitPayload: () => WizardSubmitPayload,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-const GroupSyncStep = ({ onSubmitAll, formRef, submitAllError, validateOnMount }: Props) => {
-  const authenticationPlugin = PluginStore.exports('authentication.enterprise.ldap.groupSync');
+const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount }: Props) => {
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
-  if (!authenticationPlugin || authenticationPlugin.length <= 0) {
+  if (!enterpriseGroupSyncPlugin) {
     return <NoEnterpriseComponent />;
   }
 
-  const { GroupSyncForm } = authenticationPlugin[0];
+  const { components: { GroupSyncForm } } = enterpriseGroupSyncPlugin;
 
   return (
     <GroupSyncForm formRef={formRef}
                    onSubmitAll={onSubmitAll}
+                   prepareSubmitPayload={prepareSubmitPayload}
                    submitAllError={submitAllError}
                    validateOnMount={validateOnMount} />
   );
