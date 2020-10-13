@@ -16,6 +16,7 @@
  */
 package org.graylog.security.authservice.backend;
 
+import com.unboundid.util.Base64;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.AuthServiceCredentials;
@@ -87,7 +88,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
                 .fullName(user.getFullName())
                 // No need to set default roles because MongoDB users will not be provisioned by the provisioner
                 .defaultRoles(Collections.emptySet())
-                .authServiceUid(user.getId())
+                .base64AuthServiceUid(Base64.encode(user.getId()))
                 .build());
 
         return Optional.of(userDetails);

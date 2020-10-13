@@ -33,7 +33,7 @@ public abstract class UserDetails {
 
     public abstract String authServiceId();
 
-    public abstract String authServiceUid();
+    public abstract String base64AuthServiceUid();
 
     public abstract String username();
 
@@ -67,7 +67,7 @@ public abstract class UserDetails {
 
         public abstract Builder authServiceId(String authServiceId);
 
-        public abstract Builder authServiceUid(String authServiceUid);
+        public abstract Builder base64AuthServiceUid(String base64AuthServiceUid);
 
         public abstract Builder username(String username);
 

@@ -20,7 +20,7 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class LDAPUser {
-    public abstract String uniqueId();
+    public abstract String base64UniqueId();
 
     public abstract String username();
 
@@ -44,7 +44,7 @@ public abstract class LDAPUser {
             return new AutoValue_LDAPUser.Builder();
         }
 
-        public abstract Builder uniqueId(String uniqueId);
+        public abstract Builder base64UniqueId(String base64UniqueId);
 
         public abstract Builder username(String username);
 

@@ -35,6 +35,15 @@ public interface UserService extends PersistedService {
     @Nullable
     User loadById(String id);
 
+    /**
+     * Tries to find a user for the given authentication service UID or username. (in that order)
+     *
+     * @param authServiceUid the authentication service UID (tried first)
+     * @param username       the username (tried second)
+     * @return the user or an empty option if no user can be found
+     */
+    Optional<User> loadByAuthServiceUidOrUsername(String authServiceUid, String username);
+
     int delete(String username);
 
     User create();

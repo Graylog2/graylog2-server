@@ -85,7 +85,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
             final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                     .authServiceType(backendType())
                     .authServiceId(backendId())
-                    .authServiceUid(userEntry.uniqueId())
+                    .base64AuthServiceUid(userEntry.base64UniqueId())
                     .username(userEntry.username())
                     .fullName(userEntry.fullName())
                     .email(userEntry.email())
@@ -121,7 +121,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
                 .userFullNameAttribute(config.userFullNameAttribute())
                 .build();
 
-        return ldapConnector.searchUser(connection, searchConfig, authCredentials.username());
+        return ldapConnector.searchUserByPrincipal(connection, searchConfig, authCredentials.username());
     }
 
     @Override
@@ -241,7 +241,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
         if (user != null) {
             userDetails.put("user_details", ImmutableMap.of(
                     "dn", user.dn(),
-                    config.userUniqueIdAttribute(), user.uniqueId(),
+                    config.userUniqueIdAttribute(), user.base64UniqueId(),
                     config.userNameAttribute(), user.username(),
                     config.userFullNameAttribute(), user.fullName(),
                     "email", user.email()

@@ -42,6 +42,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Set;
 
@@ -121,17 +123,15 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
                 .userNameAttribute("uid")
                 .userFullNameAttribute("cn")
                 .build();
-        final LDAPUser entry = connector.searchUser(connection, searchConfig, "john").orElse(null);
+        final LDAPUser entry = connector.searchUserByPrincipal(connection, searchConfig, "john").orElse(null);
 
         assertThat(entry).isNotNull();
         assertThat(entry.dn())
                 .isNotNull()
                 .isEqualTo("cn=John Doe,ou=users,dc=example,dc=com");
-        assertThat(entry.uniqueId()).isNotBlank().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
-        assertThat(entry.entry().firstAttributeValue("entryUUID")).get().satisfies(value -> {
-            assertThat(value).isNotBlank().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
-        });
-        assertThat(entry.entry().firstAttributeValue("entryUUID")).get().isEqualTo(entry.uniqueId());
+        assertThat(new String(Base64.getDecoder().decode(entry.base64UniqueId()), StandardCharsets.UTF_8))
+                .isNotBlank()
+                .matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
     }
 
     @Test

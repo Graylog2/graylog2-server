@@ -85,6 +85,11 @@ public class TestUserService extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    public Optional<User> loadByAuthServiceUidOrUsername(String authServiceUid, String username) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public int delete(String username) {
         return 0;
     }

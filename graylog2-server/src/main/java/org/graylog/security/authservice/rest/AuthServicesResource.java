@@ -120,8 +120,6 @@ public class AuthServicesResource extends RestResource {
         final PaginatedList<UserOverviewDTO> userList = userService.findPaginatedByAuthServiceBackend(
                 parseSearchQuery(query), page, perPage, sort, order, activeConfig.id());
 
-        createRoleContext(userList.delegate());
-
         return PaginatedResponse.create(
                 "users",
                 userList,
