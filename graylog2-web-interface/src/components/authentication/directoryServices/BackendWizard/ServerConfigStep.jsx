@@ -10,7 +10,7 @@ import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'componen
 import { Button, ButtonToolbar } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
-import BackendWizardContext from './contexts/BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 
 export type StepKeyType = 'server-configuration';
 export const STEP_KEY: StepKeyType = 'server-configuration';

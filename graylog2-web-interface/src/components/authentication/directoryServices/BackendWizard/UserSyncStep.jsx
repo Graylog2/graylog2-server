@@ -9,7 +9,7 @@ import { Alert, Button, ButtonToolbar, Row, Col, Panel } from 'components/graylo
 import { Icon, FormikFormGroup, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 
-import BackendWizardContext from './contexts/BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 
 export type StepKeyType = 'user-synchronisation';
 export const STEP_KEY: StepKeyType = 'user-synchronisation';

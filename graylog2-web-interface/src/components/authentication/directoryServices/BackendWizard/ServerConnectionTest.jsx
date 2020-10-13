@@ -2,13 +2,13 @@
 import * as React from 'react';
 import { useState, useContext } from 'react';
 
-import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
-import BackendWizardContext from './contexts/BackendWizardContext';
+import BackendWizardContext from './BackendWizardContext';
 
 const _addRequiredRequestPayload = (formValues) => {
   const neccessaryAttributes = { ...formValues };

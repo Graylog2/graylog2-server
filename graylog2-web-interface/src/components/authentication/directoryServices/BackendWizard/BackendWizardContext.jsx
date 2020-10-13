@@ -54,4 +54,4 @@ const initialState = {
 };
 
 const BackendWizardContext = React.createContext<BackendWizardType>(initialState);
-export default singleton('contexts.authentication.ldap.wizard', () => BackendWizardContext);
+export default singleton('contexts.authentication.directoryServices.backendWizard', () => BackendWizardContext);

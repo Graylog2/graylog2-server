@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import type { LdapBackend } from 'logic/authentication/ldap/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
@@ -13,7 +13,7 @@ import EditLinkButton from './EditLinkButton';
 import { STEP_KEY as GROUP_SYNC_KEY } from '../../BackendWizard/GroupSyncStep';
 
 type Props = {
-  authenticationBackend: LdapBackend,
+  authenticationBackend: DirectoryServiceBackend,
   roles: Immutable.List<Role>,
 };
 

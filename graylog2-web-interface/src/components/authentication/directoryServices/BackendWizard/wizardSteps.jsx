@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 
-import type { WizardSubmitPayload } from 'logic/authentication/ldap/types';
+import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY, type StepKeyType as UserSyncKey } from './UserSyncStep';

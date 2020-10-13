@@ -1,12 +1,11 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import ConfigParser from 'logic/authentication/directoryServices/BackendConfigParser';
 
-import LdapConfigParser from 'logic/authentication/ldap/LdapConfigParser';
-
-import BackendCreateLDAP from './ldap/BackendCreate';
-import BackendEditLDAP from './ldap/BackendEdit';
-import BackendConfigDetails from './ldap/BackendConfigDetails';
-import BackendCreateAD from './activeDirectory/BackendCreate';
-import BackendEditAD from './activeDirectory/BackendEdit';
+import BackendCreateLDAP from './directoryServices/ldap/BackendCreate';
+import BackendEditLDAP from './directoryServices/ldap/BackendEdit';
+import BackendConfigDetails from './directoryServices/ldap/BackendConfigDetails';
+import BackendCreateAD from './directoryServices/activeDirectory/BackendCreate';
+import BackendEditAD from './directoryServices/activeDirectory/BackendEdit';
 
 PluginStore.register(new PluginManifest({}, {
   'authentication.services': [
@@ -16,8 +15,8 @@ PluginStore.register(new PluginManifest({}, {
       createComponent: BackendCreateLDAP,
       editComponent: BackendEditLDAP,
       configDetailsComponent: BackendConfigDetails,
-      configToJson: LdapConfigParser.toJson,
-      configFromJson: LdapConfigParser.fromJson,
+      configToJson: ConfigParser.toJson,
+      configFromJson: ConfigParser.fromJson,
     },
     {
       name: 'active-directory',
@@ -25,8 +24,8 @@ PluginStore.register(new PluginManifest({}, {
       createComponent: BackendCreateAD,
       editComponent: BackendEditAD,
       configDetailsComponent: BackendConfigDetails,
-      configToJson: LdapConfigParser.toJson,
-      configFromJson: LdapConfigParser.fromJson,
+      configToJson: ConfigParser.toJson,
+      configFromJson: ConfigParser.fromJson,
     },
   ],
 }));

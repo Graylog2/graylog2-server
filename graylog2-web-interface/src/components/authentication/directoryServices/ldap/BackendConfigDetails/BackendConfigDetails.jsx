@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 
 import { Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import type { LdapBackend } from 'logic/authentication/ldap/types';
+import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 
 import ServerConfigSection from './ServerConfigSection';
 import UserSyncSection from './UserSyncSection';
 import GroupSyncSection from './GroupSyncSection';
 
 type Props = {
-  authenticationBackend: LdapBackend,
+  authenticationBackend: DirectoryServiceBackend,
 };
 
 const BackendConfigDetails = ({ authenticationBackend }: Props) => {
