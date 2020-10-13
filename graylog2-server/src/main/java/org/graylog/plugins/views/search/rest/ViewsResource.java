@@ -149,7 +149,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
             checkPermission(RestPermissions.DASHBOARDS_CREATE);
         }
-        final ViewDTO savedDto = dbService.saveWithOwner(dto.toBuilder().owner(userContext.getUsername()).build(), userContext.getUser());
+        final User user = userContext.getUser();
+        final ViewDTO savedDto = dbService.saveWithOwner(dto.toBuilder().owner(user.getName()).build(), user);
         ensureUserPermissions(savedDto);
         return savedDto;
     }
