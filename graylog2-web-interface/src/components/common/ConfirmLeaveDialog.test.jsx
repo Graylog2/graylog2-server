@@ -9,6 +9,7 @@ jest.mock('util/AppConfig');
 
 const mockRouter = () => ({
   setRouteLeaveHook: jest.fn(),
+  routes: [{ __id__: 42 }],
 });
 
 describe('ConfirmLeaveDialog', () => {
@@ -29,7 +30,7 @@ describe('ConfirmLeaveDialog', () => {
   it('registers window beforeunload handler', () => {
     const router = mockRouter();
 
-    mount(<ConfirmLeaveDialog route={{}} router={router} />);
+    mount(<ConfirmLeaveDialog router={router} />);
 
     expect(window.addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
   });
@@ -40,7 +41,7 @@ describe('ConfirmLeaveDialog', () => {
 
     router.setRouteLeaveHook.mockReturnValue(unsubscribe);
 
-    const wrapper = mount(<ConfirmLeaveDialog route={{}} router={router} />);
+    const wrapper = mount(<ConfirmLeaveDialog router={router} />);
 
     wrapper.unmount();
 
@@ -50,7 +51,7 @@ describe('ConfirmLeaveDialog', () => {
   it('registers route leave handler', () => {
     const router = mockRouter();
 
-    mount(<ConfirmLeaveDialog route={{ __id__: 42 }} router={router} />);
+    mount(<ConfirmLeaveDialog router={router} />);
 
     expect(router.setRouteLeaveHook).toHaveBeenCalledTimes(1);
     expect(router.setRouteLeaveHook).toHaveBeenCalledWith({ __id__: 42 }, expect.any(Function));
@@ -62,7 +63,7 @@ describe('ConfirmLeaveDialog', () => {
 
     router.setRouteLeaveHook.mockReturnValue(unsubscribe);
 
-    const wrapper = mount(<ConfirmLeaveDialog route={{ __id__: 42 }} router={router} />);
+    const wrapper = mount(<ConfirmLeaveDialog router={router} />);
 
     wrapper.unmount();
 
