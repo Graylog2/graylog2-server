@@ -27,7 +27,8 @@ type Props = {
 const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled(BootstrapPagination)(({ theme }) => css`
   &.pagination {
     font-size: ${theme.fonts.size.small};
-    margin: 0;
+    margin-top: 10px;
+    margin-bottom: 0;
 
     > li {
       > a,
