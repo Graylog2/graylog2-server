@@ -9,7 +9,7 @@ import Routes from 'routing/Routes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import UserOverview from 'logic/users/UserOverview';
 import { Button, ButtonToolbar } from 'components/graylog';
-import RolesCell from 'components/users/UsersOverview/UserOverviewItem/RolesCell';
+import RolesCell from 'components/permissions/RolesCell';
 
 type Props = {
   user: UserOverview,

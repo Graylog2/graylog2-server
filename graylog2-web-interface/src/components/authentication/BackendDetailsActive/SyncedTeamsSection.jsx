@@ -3,6 +3,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { getEnterpriseAuthenticationPlugin } from 'util/AuthenticationService';
+import Role from 'logic/roles/Role';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const Header = styled.h4`
@@ -16,12 +17,16 @@ const NoEnterpriseComponent = () => (
   </>
 );
 
-const SyncedTeamsSection = () => {
+type Props = {
+  roles: Immutable.List<Role>,
+};
+
+const SyncedTeamsSection = ({ roles }: Props) => {
   const enterpriseAuthenticationPlugin = getEnterpriseAuthenticationPlugin();
   const EnterpriseSyncedTeamsSection = enterpriseAuthenticationPlugin?.components.SyncedTeamsSection;
 
   return (
-    EnterpriseSyncedTeamsSection ? <EnterpriseSyncedTeamsSection /> : (
+    EnterpriseSyncedTeamsSection ? <EnterpriseSyncedTeamsSection roles={roles} /> : (
       <SectionComponent title="Synchronized Users">
         <NoEnterpriseComponent />
       </SectionComponent>

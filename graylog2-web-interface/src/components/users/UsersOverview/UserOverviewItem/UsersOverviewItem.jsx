@@ -4,10 +4,10 @@ import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
 import UserOverview from 'logic/users/UserOverview';
+import RolesCell from 'components/permissions/RolesCell';
 
 import ActionsCell from './ActionsCell';
 import LoggedInCell from './LoggedInCell';
-import RolesCell from './RolesCell';
 
 type Props = {
   user: UserOverview,
