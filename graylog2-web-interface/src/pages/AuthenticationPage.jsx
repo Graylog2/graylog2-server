@@ -8,6 +8,7 @@ import withLocation from 'routing/withLocation';
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
 import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
+import {} from 'components/authentication';
 
 const AuthenticationPage = ({ params, location, children }) => (
   <span>
