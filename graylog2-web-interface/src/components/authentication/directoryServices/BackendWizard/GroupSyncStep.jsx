@@ -1,24 +1,13 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
 import { Formik } from 'formik';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { EnterprisePluginNotFound } from 'components/common';
 
 export type StepKeyType = 'group-synchronisation';
 export const STEP_KEY: StepKeyType = 'group-synchronisation';
-
-const Header = styled.h4`
-  margin-bottom: 5px;
-`;
-
-const NoEnterpriseComponent = () => (
-  <>
-    <Header>No enterprise plugin found</Header>
-    <p>To use the <b>Teams</b> functionality you need to install the Graylog <b>Enterprise</b> plugin.</p>
-  </>
-);
 
 type Props = {
   formRef: React.Ref<typeof Formik>,
@@ -31,8 +20,8 @@ type Props = {
 const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
-  if (!enterpriseGroupSyncPlugin) {
-    return <NoEnterpriseComponent />;
+  if (enterpriseGroupSyncPlugin) {
+    return <EnterprisePluginNotFound featureName="group synchronization" />;
   }
 
   const { components: { GroupSyncForm } } = enterpriseGroupSyncPlugin;

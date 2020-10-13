@@ -10,6 +10,7 @@ class DocsHelper {
     CONFIGURING_ES: 'configuration/elasticsearch.html',
     DASHBOARDS: 'dashboards.html',
     DECORATORS: 'queries.html#decorators',
+    ENTERPRISE_SETUP: 'enterprise/setup.html',
     ES_CLUSTER_STATUS_RED: 'configuration/elasticsearch.html#cluster-status-explained',
     ES_CLUSTER_UNAVAILABLE: 'configuration/elasticsearch.html#configuration',
     ES_OPEN_FILE_LIMITS: 'configuration/elasticsearch.html#open-file-limits',
