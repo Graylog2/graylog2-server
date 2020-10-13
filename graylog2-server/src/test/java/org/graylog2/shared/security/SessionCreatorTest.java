@@ -235,8 +235,10 @@ public class SessionCreatorTest {
 
     private void setUpUserMock() {
         User user = mock(User.class);
+        when(user.getName()).thenReturn("username");
         when(user.getSessionTimeoutMs()).thenReturn(SESSION_TIMEOUT);
         when(userService.load("username")).thenReturn(user);
+        when(userService.loadById("username")).thenReturn(user);
     }
 
     @NotNull
