@@ -34,7 +34,7 @@ public class UserGRNDescriptorProvider implements GRNDescriptorProvider {
 
     @Override
     public GRNDescriptor get(GRN grn) {
-        return Optional.ofNullable(userService.load(grn.entity()))
+        return Optional.ofNullable(userService.loadById(grn.entity()))
                 .map(user -> GRNDescriptor.create(grn, user.getFullName()))
                 .orElse(GRNDescriptor.create(grn, "ERROR: User for <" + grn.toString() + "> not found!"));
     }
