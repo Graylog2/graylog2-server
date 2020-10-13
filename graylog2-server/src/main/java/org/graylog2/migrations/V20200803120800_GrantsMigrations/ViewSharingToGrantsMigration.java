@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -109,7 +110,10 @@ public class ViewSharingToGrantsMigration {
     }
 
     private void migrateUsers(String viewId, Collection<String> userNames) {
-        final Set<User> users = userNames.stream().map(userService::load).collect(Collectors.toSet());
+        final Set<User> users = userNames.stream()
+                .map(userService::load)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
         LOG.info("Migrate users for view {} to grants: {}", viewId, users);
 
         final GRN target = getTarget(viewId);
