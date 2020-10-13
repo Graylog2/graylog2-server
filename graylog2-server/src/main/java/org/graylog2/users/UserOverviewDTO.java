@@ -36,7 +36,7 @@ import java.util.Set;
 @JsonDeserialize(builder = UserOverviewDTO.Builder.class)
 public abstract class UserOverviewDTO {
 
-    private static final String FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
     private static final String FIELD_AUTH_SERVICE_ID = "auth_service_id";
     private static final String FIELD_AUTH_SERVICE_UID = "auth_service_uid";
     public static final String FIELD_USERNAME = "username";
