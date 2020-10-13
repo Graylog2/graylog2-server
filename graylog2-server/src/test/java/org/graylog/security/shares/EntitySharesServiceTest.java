@@ -47,7 +47,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -96,9 +95,8 @@ public class EntitySharesServiceTest {
         final GRN entity = grnRegistry.newGRN(GRNTypes.STREAM, "54e3deadbeefdeadbeefaffe");
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of());
 
-        final User user = mock(User.class);
+        final User user = createMockUser("hans");
         final Subject subject = mock(Subject.class);
-        when(user.getName()).thenReturn("hans");
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isTrue();
@@ -115,9 +113,8 @@ public class EntitySharesServiceTest {
         final GRN jane = grnRegistry.newGRN(GRNTypes.USER, "jane");
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(jane, Capability.VIEW));
 
-        final User user = mock(User.class);
+        final User user = createMockUser("hans");
         final Subject subject = mock(Subject.class);
-        when(user.getName()).thenReturn("hans");
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isTrue();
@@ -134,9 +131,8 @@ public class EntitySharesServiceTest {
         final GRN horst = grnRegistry.newGRN(GRNTypes.USER, "horst");
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(horst, Capability.OWN));
 
-        final User user = mock(User.class);
+        final User user = createMockUser("hans");
         final Subject subject = mock(Subject.class);
-        when(user.getName()).thenReturn("hans");
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
@@ -151,9 +147,8 @@ public class EntitySharesServiceTest {
         final GRN horst = grnRegistry.newGRN(GRNTypes.USER, "horst");
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(horst, Capability.MANAGE));
 
-        final User user = mock(User.class);
+        final User user = createMockUser("hans");
         final Subject subject = mock(Subject.class);
-        when(user.getName()).thenReturn("hans");
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
@@ -167,13 +162,19 @@ public class EntitySharesServiceTest {
         final GRN entity = grnRegistry.newGRN(GRNTypes.DASHBOARD, "54e3deadbeefdeadbeefaffe");
         final EntityShareRequest shareRequest = EntityShareRequest.create(null);
 
-        final User user = mock(User.class);
+        final User user = createMockUser("hans");
         final Subject subject = mock(Subject.class);
-        when(user.getName()).thenReturn("hans");
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
             assertThat(validationResult.getErrors()).isEmpty();
         });
+    }
+
+    private User createMockUser(String name) {
+        final User user = mock(User.class);
+        lenient().when(user.getName()).thenReturn(name);
+        lenient().when(user.getId()).thenReturn(name);
+        return user;
     }
 }
