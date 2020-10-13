@@ -96,15 +96,19 @@ import {} from 'components/authentication';
 import AuthProvidersConfig from '../components/authentication/AuthProvidersConfig';
 import AuthProvidersConfigContext from '../components/authentication/AuthProvidersConfigContext';
 
-const renderPluginRoute = ({ path, component: Component, parentComponent: ParentComponent = React.Fragment }) => (
-  <Route key={`${path}-${Component.displayName}`}
-         exact
-         path={URLUtils.appPrefixed(path)}>
-    <ParentComponent>
-      <Component />
-    </ParentComponent>
-  </Route>
-);
+const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
+  const ParentComponent = parentComponent ?? React.Fragment;
+
+  return (
+    <Route key={`${path}-${Component.displayName}`}
+           exact
+           path={URLUtils.appPrefixed(path)}>
+      <ParentComponent>
+        <Component />
+      </ParentComponent>
+    </Route>
+  );
+};
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');
