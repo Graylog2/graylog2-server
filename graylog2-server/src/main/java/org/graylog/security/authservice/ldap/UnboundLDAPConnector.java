@@ -237,7 +237,7 @@ public class UnboundLDAPConnector {
 
     public LDAPEntry createLDAPEntry(Entry entry, String uniqueIdAttribute) {
         requireNonNull(entry, "entry cannot be null");
-        checkArgument(!isBlank(uniqueIdAttribute), "unieuqIdAttribute cannot be blank");
+        checkArgument(!isBlank(uniqueIdAttribute), "uniqueIdAttribute cannot be blank");
 
         final LDAPEntry.Builder ldapEntryBuilder = LDAPEntry.builder();
 
