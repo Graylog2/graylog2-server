@@ -107,7 +107,7 @@ public class UserServiceImplTest {
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadByUserId() throws Exception {
-        final User user = userService.loadById("1");
+        final User user = userService.loadById("54e3deadbeefdeadbeef0001");
         assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo("user1");
         assertThat(user.getEmail()).isEqualTo("user1@example.com");
@@ -242,7 +242,7 @@ public class UserServiceImplTest {
 
         when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
         final GRNPermission ownerShipPermission = GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"));
-        final GRN userGRN = grnRegistry.newGRN(GRNTypes.USER, "user");
+        final GRN userGRN = grnRegistry.ofUser(user);
         when(grantPermissionResolver.resolvePermissionsForPrincipal(userGRN))
                 .thenReturn(ImmutableSet.of(
                         new WildcardPermission("perm:from:grant"),
