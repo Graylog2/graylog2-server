@@ -83,6 +83,7 @@ class ViewOwnershipToGrantsMigrationTest {
 
         final User testuser = mock(User.class);
         when(testuser.getName()).thenReturn("testuser");
+        when(testuser.getId()).thenReturn("testuser");
 
         final User adminuser = mock(User.class);
         when(adminuser.isLocalAdmin()).thenReturn(true);
@@ -114,6 +115,7 @@ class ViewOwnershipToGrantsMigrationTest {
 
         final User testuser = mock(User.class);
         when(testuser.getName()).thenReturn("testuser");
+        when(testuser.getId()).thenReturn("testuser");
 
         final User adminuser = mock(User.class);
         when(adminuser.isLocalAdmin()).thenReturn(true);

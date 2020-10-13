@@ -70,12 +70,13 @@ class UserContextTest {
 
         final User user = new UserImpl(mock(PasswordAlgorithmFactory.class), mock(Permissions.class), ImmutableMap.of());
         when(userService.load(anyString())).thenReturn(user);
+        when(userService.loadById(anyString())).thenReturn(user);
 
-        final String USERNAME = "unknown-user";
-        UserContext.<Void>runAs(USERNAME, () -> {
+        final String USERID = "123456";
+        UserContext.<Void>runAs(USERID, () -> {
 
             final UserContext userContext = new UserContext.Factory(userService).create();
-            assertThat(userContext.getUsername()).isEqualTo(USERNAME);
+            assertThat(userContext.getUserId()).isEqualTo(USERID);
             assertThat(userContext.getUser()).isEqualTo(user);
 
             return null;

@@ -122,7 +122,7 @@ public class ViewsResourceTest {
 
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
-        when(userContext.getUsername()).thenReturn("testuser");
+        when(userContext.getUserId()).thenReturn("testuser");
         when(currentUser.getName()).thenReturn("testuser");
         when(currentUser.isLocalAdmin()).thenReturn(true);
 

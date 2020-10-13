@@ -36,7 +36,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class UserContext {
     private final UserService userService;
-    private final String username;
+    private final String userId;
     private final Subject subject;
 
     public static class Factory {
@@ -106,18 +106,18 @@ public class UserContext {
         subject.execute(runnable);
     }
 
-    public UserContext(String username, Subject subject, UserService userService) {
-        this.username = username;
+    public UserContext(String userId, Subject subject, UserService userService) {
+        this.userId = userId;
         this.subject = subject;
         this.userService = userService;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserId() {
+        return userId;
     }
 
     public User getUser() {
-        return Optional.ofNullable(userService.load(username)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + username + "> from db"));
+        return Optional.ofNullable(userService.loadById(userId)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + userId + "> from db"));
     }
 
     protected boolean isOwner(GRN entity) {
