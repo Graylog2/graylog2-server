@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
+import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
@@ -35,12 +36,16 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const SyncedUsersSection = () => {
+type Props = {
+  roles: Immutable.List<Role>,
+};
+
+const SyncedUsersSection = ({ roles }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION });
   const { list: users, pagination: { page, perPage, query, total } } = paginatedUsers;
 
-  const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} />;
+  const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
     return AuthenticationDomain.loadUsersPaginated(newPage, newPerPage, newQuery)
