@@ -18,6 +18,7 @@ package org.graylog2.users;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -60,6 +61,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class UserServiceImpl extends PersistedServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -128,6 +132,42 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         LOG.debug("Loaded user {}/{} from MongoDB", username, userId);
         return userFactory.create((ObjectId) userId, userObject.toMap());
+    }
+
+    @Override
+    public Optional<User> loadByAuthServiceUidOrUsername(String authServiceUid, String username) {
+        checkArgument(!isBlank(authServiceUid), "authServiceUid cannot be blank");
+        checkArgument(!isBlank(username), "username cannot be blank");
+
+        LOG.debug("Loading user by auth service UID <{}> or username <{}>", authServiceUid, username);
+
+        // special case for the locally defined user, we don't store that in MongoDB.
+        if (!configuration.isRootUserDisabled() && configuration.getRootUsername().equals(username)) {
+            LOG.debug("User <{}> is the built-in admin user", username);
+            return Optional.ofNullable(userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId()));
+        }
+
+        final DBObject query = new BasicDBObject("$or", ImmutableList.of(
+                new BasicDBObject(UserImpl.AUTH_SERVICE_UID, authServiceUid),
+                new BasicDBObject(UserImpl.USERNAME, username)
+        ));
+
+        final List<DBObject> result = query(UserImpl.class, query);
+        if (result == null || result.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (result.size() > 1) {
+            final String msg = "There was more than one matching user for auth service UID <" + authServiceUid + "> or username <" + username + ">. This should never happen.";
+            LOG.error(msg);
+            throw new RuntimeException(msg);
+        }
+
+        final DBObject userObject = result.get(0);
+        final Object userId = userObject.get("_id");
+
+        LOG.debug("Loaded user {}/{}/{} from MongoDB", authServiceUid, username, userId);
+        return Optional.ofNullable(userFactory.create((ObjectId) userId, userObject.toMap()));
     }
 
     @Override

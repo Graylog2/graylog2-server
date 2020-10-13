@@ -23,9 +23,7 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -34,6 +32,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @AutoValue
 public abstract class LDAPEntry {
     public abstract String dn();
+
+    public abstract String base64UniqueId();
 
     public abstract ImmutableSet<String> objectClasses();
 
@@ -81,6 +81,8 @@ public abstract class LDAPEntry {
         }
 
         public abstract Builder dn(String dn);
+
+        public abstract Builder base64UniqueId(String base64UniqueId);
 
         public abstract Builder objectClasses(Collection<String> objectClasses);
 
