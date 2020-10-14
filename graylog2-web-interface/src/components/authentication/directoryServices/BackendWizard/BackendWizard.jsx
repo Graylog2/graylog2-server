@@ -167,10 +167,11 @@ type Props = {
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
   groupSyncForm: ?GroupSyncFormComponent,
+  help: { [inputName: string]: ?React.Node },
   onSubmit: (WizardSubmitPayload, WizardFormValues, licenseIsValid?: boolean) => Promise<void>,
 };
 
-const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, groupSyncForm }: Props) => {
+const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, groupSyncForm, help }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [roles, setRoles] = useState<?Immutable.List<Role>>();
@@ -261,6 +262,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
   const steps = wizardSteps({
     formRefs,
     groupSyncForm: groupSyncForm,
+    help,
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
     prepareSubmitPayload: _getSubmitPayload,
@@ -295,6 +297,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
 BackendWizard.defaultProps = {
   initialStepKey: SERVER_CONFIG_KEY,
+  help: undefined,
 };
 
 BackendWizard.propTypes = {
@@ -304,6 +307,7 @@ BackendWizard.propTypes = {
     serviceTitle: PropTypes.string.isRequired,
     serviceType: PropTypes.string.isRequired,
   }).isRequired,
+  help: PropTypes.object,
   initialStepKey: PropTypes.string,
   initialValues: PropTypes.object.isRequired,
 };

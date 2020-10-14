@@ -7,7 +7,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle, Spinner } from 'components/common';
 
-import { AUTH_BACKEND_META } from './BackendCreate';
+import { AUTH_BACKEND_META, HELP } from './BackendCreate';
 import WizardPageHeader from './WizardPageHeader';
 
 import type { WizardFormValues } from '../BackendWizard/BackendWizardContext';
@@ -101,6 +101,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {..._optionalWizardProps(initialStepKey)}
                      groupSyncForm={GroupSyncForm}
+                     help={HELP}
                      authBackendMeta={authBackendMeta}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit} />

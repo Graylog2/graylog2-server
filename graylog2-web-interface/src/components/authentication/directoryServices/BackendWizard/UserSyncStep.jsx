@@ -24,13 +24,7 @@ export const FORM_VALIDATION = {
 
 type Props = {
   formRef: React.Ref<typeof Formik>,
-  help?: {
-    defaultRoles?: React.Node,
-    userFullNameAttribute?: React.Node,
-    userNameAttribute?: React.Node,
-    userSearchBase?: React.Node,
-    userSearchPattern?: React.Node,
-  },
+  help: { [inputName: string]: ?React.Node },
   roles: Immutable.List<Role>,
   onSubmit: () => void,
   onSubmitAll: () => Promise<void>,
@@ -38,36 +32,7 @@ type Props = {
   validateOnMount: boolean,
 };
 
-const defaultHelp = {
-  userSearchBase: (
-    <span>
-      The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
-    </span>
-  ),
-  userSearchPattern: (
-    <span>
-      For example <code className="text-nowrap">{'(&(objectClass=user)(sAMAccountName={0}))'}</code>.{' '}
-      The string <code>{'{0}'}</code> will be replaced by the entered username.
-    </span>
-  ),
-  userNameAttribute: (
-    <span>
-      Which LDAP attribute to use for the username of the user in Graylog.<br />
-      Try to load a test user using the sidebar form, if you are unsure which attribute to use.
-    </span>
-  ),
-  userFullNameAttribute: (
-    <span>
-      Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.<br />
-    </span>
-  ),
-  defaultRoles: (
-    'The default Graylog roles determine whether a user created via LDAP can access the entire system, or has limited access.'
-  ),
-};
-
-const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
-  const help = { ...defaultHelp, ...propsHelp };
+const UserSyncStep = ({ help, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
 
@@ -169,10 +134,6 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitA
       )}
     </Formik>
   );
-};
-
-UserSyncStep.defaultProps = {
-  help: {},
 };
 
 export default UserSyncStep;

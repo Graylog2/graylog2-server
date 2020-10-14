@@ -18,6 +18,7 @@ type Props = {
   },
   groupSyncForm: ?GroupSyncFormComponent,
   handleSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
+  help: { [inputName: string]: ?React.Node },
   invalidStepKeys: Array<string>,
   prepareSubmitPayload: () => WizardSubmitPayload,
   roles: Immutable.List<Role>,
@@ -29,6 +30,7 @@ const wizardSteps = ({
   formRefs,
   groupSyncForm,
   handleSubmitAll,
+  help,
   invalidStepKeys,
   prepareSubmitPayload,
   roles,
@@ -45,6 +47,7 @@ const wizardSteps = ({
     ),
     component: (
       <ServerConfigStep formRef={formRefs[SERVER_CONFIG_KEY]}
+                        help={help}
                         onSubmit={() => setActiveStepKey(USER_SYNC_KEY)}
                         onSubmitAll={handleSubmitAll}
                         submitAllError={submitAllError}
@@ -61,6 +64,7 @@ const wizardSteps = ({
     ),
     component: (
       <UserSyncStep formRef={formRefs[USER_SYNC_KEY]}
+                    help={help}
                     onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
                     onSubmitAll={handleSubmitAll}
                     roles={roles}
@@ -79,6 +83,7 @@ const wizardSteps = ({
     component: (
       <GroupSyncStep formRef={formRefs[GROUP_SYNC_KEY]}
                      formComponent={groupSyncForm}
+                     help={help}
                      onSubmitAll={handleSubmitAll}
                      prepareSubmitPayload={prepareSubmitPayload}
                      submitAllError={submitAllError}
