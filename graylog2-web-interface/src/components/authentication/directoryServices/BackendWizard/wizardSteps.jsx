@@ -13,7 +13,7 @@ type Props = {
   formRefs: {
     [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
-  handleSubmitAll: () => Promise<void>,
+  handleSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
   invalidStepKeys: Array<string>,
   prepareSubmitPayload: () => WizardSubmitPayload,
   setActiveStepKey: (stepKey: string) => void,

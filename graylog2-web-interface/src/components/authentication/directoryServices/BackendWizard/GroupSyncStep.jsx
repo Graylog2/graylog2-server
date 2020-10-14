@@ -11,7 +11,7 @@ export const STEP_KEY: StepKeyType = 'group-synchronisation';
 
 type Props = {
   formRef: React.Ref<typeof Formik>,
-  onSubmitAll: () => Promise<void>,
+  onSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
   prepareSubmitPayload: () => WizardSubmitPayload,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
@@ -20,7 +20,7 @@ type Props = {
 const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
-  if (enterpriseGroupSyncPlugin) {
+  if (!enterpriseGroupSyncPlugin) {
     return <EnterprisePluginNotFound featureName="group synchronization" />;
   }
 

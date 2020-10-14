@@ -8,7 +8,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 
-import type { WizardFormValues } from '../BackendWizard//BackendWizardContext';
+import type { WizardFormValues } from '../BackendWizard/BackendWizardContext';
 import BackendWizard from '../BackendWizard';
 
 export const AUTH_BACKEND_META = {
@@ -38,11 +38,11 @@ export const prepareInitialValues = () => {
   return initialValues;
 };
 
-export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues) => {
+export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, licenseIsValid?: boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
   return AuthenticationDomain.create(payload).then((result) => {
-    if (result && formValues.synchronizeGroups && enterpriseGroupSyncPlugin) {
+    if (result && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid) {
       return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 
