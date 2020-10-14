@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-
+import { useEffect } from 'react';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 
 import DocsHelper from 'util/DocsHelper';
@@ -28,20 +28,26 @@ const _pageTilte = (activeBackend: ?AuthenticationBackend) => {
   return title;
 };
 
+const useRedirectToAppropriatePage = (finishedLoading, activeBackend, backendsTotal) => {
+  useEffect(() => {
+    if (finishedLoading && !activeBackend && backendsTotal === 0) {
+      history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE);
+    } else if (finishedLoading && !activeBackend && backendsTotal) {
+      history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
+    }
+  }, [finishedLoading, activeBackend, backendsTotal]);
+};
+
 const AuthenticationPage = () => {
   const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend();
   const pageTitle = _pageTilte(activeBackend);
 
-  if (!finishedLoading) {
-    return <Spinner />;
-  }
-
   // Only display this page if there is an active backend
   // Otherwise redirect to correct page
-  if (finishedLoading && !activeBackend && backendsTotal === 0) {
-    history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE);
-  } else if (finishedLoading && !activeBackend && backendsTotal) {
-    history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
+  useRedirectToAppropriatePage(finishedLoading, activeBackend, backendsTotal);
+
+  if (!finishedLoading) {
+    return <Spinner />;
   }
 
   return (
