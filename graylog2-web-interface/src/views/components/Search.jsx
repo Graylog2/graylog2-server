@@ -5,8 +5,9 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
-import { withRouter } from 'react-router';
 
+import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
@@ -76,13 +77,7 @@ const ConnectedSidebar = connect(
 );
 
 type Props = {
-  route: any,
-  router: {
-    getCurrentLocation: () => ({ pathname: string, search: string }),
-  },
-  location?: {
-    query: { [string]: string },
-  },
+  location: Location,
 };
 
 const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshConditionArguments) => {
@@ -116,8 +111,8 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const Search = ({ route, location = { query: {} }, router }: Props) => {
-  const { pathname, search } = router.getCurrentLocation();
+const Search = ({ location }: Props) => {
+  const { pathname, search } = location;
   const query = `${pathname}${search}`;
   const searchRefreshHooks: Array<SearchRefreshCondition> = usePluginEntities('views.hooks.searchRefresh');
   const refreshIfNotUndeclared = useCallback(
@@ -156,7 +151,7 @@ const Search = ({ route, location = { query: {} }, router }: Props) => {
     <CurrentViewTypeProvider>
       <IfInteractive>
         <IfDashboard>
-          <WindowLeaveMessage route={route} />
+          <WindowLeaveMessage />
         </IfDashboard>
       </IfInteractive>
       <InteractiveContext.Consumer>
@@ -187,7 +182,7 @@ const Search = ({ route, location = { query: {} }, router }: Props) => {
                           <QueryBar />
                         </IfDashboard>
                       </IfInteractive>
-                      <HighlightMessageInQuery query={location.query}>
+                      <HighlightMessageInQuery>
                         <SearchResult />
                       </HighlightMessageInQuery>
                       <Footer />
@@ -204,25 +199,11 @@ const Search = ({ route, location = { query: {} }, router }: Props) => {
 };
 
 Search.propTypes = {
-  route: PropTypes.object.isRequired,
   location: PropTypes.shape({
     query: PropTypes.object.isRequired,
-  }),
-  router: PropTypes.object,
+    pathname: PropTypes.string.isRequired,
+    search: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
-Search.defaultProps = {
-  location: { query: {} },
-  router: {
-    getCurrentLocation: () => ({ pathname: '', search: '' }),
-    push: () => {},
-    replace: () => {},
-    go: () => {},
-    goBack: () => {},
-    goForward: () => {},
-    setRouteLeaveHook: () => {},
-    isActive: () => {},
-  },
-};
-
-export default withRouter(Search);
+export default withLocation(Search);

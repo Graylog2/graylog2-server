@@ -65,7 +65,6 @@ describe('ShowViewPage', () => {
   const SimpleShowViewPage = (props) => (
     <ShowViewPage location={{ query: {} }}
                   params={{ viewId: 'foo' }}
-                  route={{}}
                   {...props} />
   );
 

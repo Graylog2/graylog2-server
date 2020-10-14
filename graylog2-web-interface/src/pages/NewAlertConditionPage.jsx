@@ -11,6 +11,7 @@ import { CreateAlertConditionInput } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import StoreProvider from 'injection/StoreProvider';
+import withLocation from 'routing/withLocation';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -54,4 +55,4 @@ const NewAlertConditionPage = createReactClass({
   },
 });
 
-export default NewAlertConditionPage;
+export default withLocation(NewAlertConditionPage);

@@ -8,6 +8,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import withLocation from 'routing/withLocation';
 
 const EventsPage = ({ location }) => {
   const filteredSourceStream = location.query.stream_id;
@@ -57,4 +58,4 @@ EventsPage.propTypes = {
   location: PropTypes.object.isRequired,
 };
 
-export default EventsPage;
+export default withLocation(EventsPage);

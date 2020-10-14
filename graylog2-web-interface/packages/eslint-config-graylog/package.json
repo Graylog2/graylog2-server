@@ -13,14 +13,14 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "MIT",
   "dependencies": {
-    "eslint": "7.10.0",
+    "eslint": "7.11.0",
     "eslint-config-airbnb": "18.2.0",
     "eslint-import-resolver-webpack": "0.13.0",
     "eslint-plugin-flowtype": "5.2.0",
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-jest-formatting": "2.0.0",
     "eslint-plugin-jsx-a11y": "6.3.1",
-    "eslint-plugin-react": "7.21.3",
+    "eslint-plugin-react": "7.21.4",
     "eslint-plugin-react-hooks": "4.1.2"
   },
   "peerDependencies": {

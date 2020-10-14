@@ -2,7 +2,6 @@
 import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -33,7 +32,7 @@ const _isAllowedToEdit = (view: View, currentUser: ?UserJSON) => isPermitted(cur
 
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
 
-const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
+const ViewActionsMenu = ({ view, isNewView, metadata }) => {
   const currentUser = useContext(CurrentUserContext);
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
@@ -88,7 +87,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
                              view={view.toBuilder().newId().build()}
                              title="Save new dashboard"
                              onClose={() => setSaveAsViewOpen(false)}
-                             onSave={(newView) => onSaveAsView(newView, router)} />
+                             onSave={(newView) => onSaveAsView(newView)} />
       )}
       {editViewOpen && (
         <ViewPropertiesModal show
@@ -111,7 +110,6 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
 };
 
 ViewActionsMenu.propTypes = {
-  router: PropTypes.any.isRequired,
   metadata: PropTypes.shape({
     undeclared: ImmutablePropTypes.Set,
   }).isRequired,
@@ -120,7 +118,7 @@ ViewActionsMenu.propTypes = {
 };
 
 export default connect(
-  withRouter(ViewActionsMenu),
+  ViewActionsMenu,
   { metadata: SearchMetadataStore, view: ViewStore },
   ({ view: { view, isNew }, ...rest }) => ({ view, isNewView: isNew, ...rest }),
 );

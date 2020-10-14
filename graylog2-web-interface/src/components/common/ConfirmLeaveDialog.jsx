@@ -7,7 +7,7 @@ import AppConfig from 'util/AppConfig';
 /**
  * This component should be conditionally rendered if you have a form that is in a "dirty" state. It will confirm with the user that they want to navigate away, refresh, or in any way unload the component.
  */
-const ConfirmLeaveDialog = ({ question, router, route }) => {
+const ConfirmLeaveDialog = ({ question, router }) => {
   const handleLeavePage = (e) => {
     if (AppConfig.gl2DevMode()) {
       return null;
@@ -24,6 +24,8 @@ const ConfirmLeaveDialog = ({ question, router, route }) => {
 
   useEffect(() => {
     window.addEventListener('beforeunload', handleLeavePage);
+    const { routes } = router;
+    const route = routes[routes.length - 1];
     const unsubscribe = router.setRouteLeaveHook(route, routerWillLeave);
 
     return () => {
@@ -38,8 +40,6 @@ const ConfirmLeaveDialog = ({ question, router, route }) => {
 ConfirmLeaveDialog.propTypes = {
   /** Phrase used in the confirmation dialog. */
   question: PropTypes.string,
-  /** `route` object from withRouter() HOC */
-  route: PropTypes.object.isRequired,
   router: PropTypes.shape({
     setRouteLeaveHook: PropTypes.func.isRequired,
   }).isRequired,

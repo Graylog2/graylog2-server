@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
@@ -194,7 +195,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         final Request request = new Request("GET", "/_cluster/stats/nodes");
 
         final JsonNode clusterStatsResponseJson = jsonApi.perform(request,
-            "Couldn't read Elasticsearch cluster stats");
+                "Couldn't read Elasticsearch cluster stats");
         final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
 
         String clusterVersion = null;
@@ -246,12 +247,12 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     private Optional<ClusterHealthResponse> clusterHealth(Collection<String> indices) {
         final String[] indicesAry = indices.toArray(new String[0]);
-        if (!indicesExist(indicesAry)) {
+        if (!indices.isEmpty() && !indicesExist(indicesAry)) {
             return Optional.empty();
         }
-
         final ClusterHealthRequest request = new ClusterHealthRequest(indicesAry)
-                .indicesOptions(IndicesOptions.fromOptions(false, false, true, true));
+                .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())))
+                .indicesOptions(IndicesOptions.lenientExpand());
 
         try {
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));

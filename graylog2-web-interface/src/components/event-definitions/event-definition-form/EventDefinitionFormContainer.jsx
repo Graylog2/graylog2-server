@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { withRouter } from 'react-router';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -28,7 +27,6 @@ class EventDefinitionFormContainer extends React.Component {
     currentUser: PropTypes.object.isRequired,
     entityTypes: PropTypes.object,
     notifications: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
     onEventDefinitionChange: PropTypes.func,
   };
 
@@ -148,7 +146,7 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, notifications, currentUser, route } = this.props;
+    const { action, entityTypes, notifications, currentUser } = this.props;
     const { isDirty, eventDefinition, eventsClusterConfig, validation } = this.state;
     const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
 
@@ -161,8 +159,7 @@ class EventDefinitionFormContainer extends React.Component {
     return (
       <>
         {isDirty && (
-          <ConfirmLeaveDialog route={route}
-                              question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
+          <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
         )}
         <EventDefinitionForm action={action}
                              eventDefinition={eventDefinition}
@@ -179,7 +176,7 @@ class EventDefinitionFormContainer extends React.Component {
   }
 }
 
-export default connect(withRouter(EventDefinitionFormContainer), {
+export default connect(EventDefinitionFormContainer, {
   entityTypes: AvailableEventDefinitionTypesStore,
   notifications: EventNotificationsStore,
   currentUser: CurrentUserStore,

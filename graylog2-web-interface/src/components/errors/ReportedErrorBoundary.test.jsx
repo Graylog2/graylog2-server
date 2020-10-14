@@ -12,6 +12,7 @@ import ReportedErrorBoundary from './ReportedErrorBoundary';
 
 jest.unmock('logic/rest/FetchProvider');
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
+jest.mock('routing/withLocation', () => Component => (props) => <Component {...props} location={{ pathname: '/' }} />);
 
 const router = {
   listen: () => jest.fn(),
@@ -88,17 +89,17 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { findByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
     const response = { status: 403, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
     });
 
-    await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
+    await findByText('Missing Permissions');
 
-    expect(getByText('Missing Permissions')).not.toBeNull();
-    expect(getByText(/The request error message/)).not.toBeNull();
+    expect(queryByText('Hello World!')).toBeNull();
+    expect(queryByText(/The request error message/)).toBeInTheDocument();
   });
 
   it('resets error when navigation changes', async () => {

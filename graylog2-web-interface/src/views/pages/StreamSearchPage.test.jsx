@@ -31,6 +31,8 @@ jest.mock('views/stores/ViewStore', () => ({
   },
 }));
 
+jest.mock('routing/withLocation', () => (x) => x);
+
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.resolve()),
@@ -65,7 +67,6 @@ describe('StreamSearchPage', () => {
     <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
       <StreamSearchPage location={{ query: {} }}
                         params={{ streamId: 'stream-id-1' }}
-                        route={{}}
                         router={mockRouter}
                         {...props} />
     </StreamsContext.Provider>
@@ -102,7 +103,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      SearchComponent.mockImplementationOnce(() => (
+      asMock(SearchComponent).mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
@@ -120,7 +121,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      SearchComponent.mockImplementationOnce(() => (
+      asMock(SearchComponent).mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
           {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>

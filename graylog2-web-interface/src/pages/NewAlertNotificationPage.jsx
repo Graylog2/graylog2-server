@@ -9,6 +9,7 @@ import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertNotificationInput } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
+import withLocation from 'routing/withLocation';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -50,4 +51,4 @@ const NewAlertNotificationPage = createReactClass({
   },
 });
 
-export default NewAlertNotificationPage;
+export default withLocation(NewAlertNotificationPage);

@@ -1,14 +1,17 @@
 // @flow strict
 import * as React from 'react';
 
+import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
+
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 type Props = {
   children: ?React.Node,
-  query: { [string]: string },
+  location: Location,
 };
 
-const HighlightMessageInQuery = ({ children, query = {} }: Props) => {
+const HighlightMessageInQuery = ({ children, location: { query = {} } = {} }: Props) => {
   const { highlightMessage } = query;
 
   return (
@@ -20,4 +23,4 @@ const HighlightMessageInQuery = ({ children, query = {} }: Props) => {
 
 HighlightMessageInQuery.propTypes = {};
 
-export default HighlightMessageInQuery;
+export default withLocation(HighlightMessageInQuery);
