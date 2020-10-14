@@ -98,7 +98,7 @@ public class RolesToGrantsMigration {
                 final GRNType grnType = grnTypeCapability.grnType;
                 allRoleUsers.forEach(user -> {
                     dbGrantService.ensure(grnRegistry.ofUser(user), capability, grnType.toGRN(entityID), rootUsername);
-                    LOG.info("Migrating entity <{}> permissions <{}> to <{}> grant for user <{}>", entityID, permissions, capability, user.getName());
+                    LOG.info("Migrating entity <{}> permissions <{}> to <{}> grant for user <{}>", grnType.toGRN(entityID), permissions, capability, user.getName());
                 });
                 migratedRolePermissions.addAll(permissions.stream().map(p -> p + ":" + entityID).collect(Collectors.toSet()));
             } else {
@@ -109,7 +109,7 @@ public class RolesToGrantsMigration {
     }
 
     private Set<MigratableRole> findMigratableRoles() {
-        final Set<MigratableRole> migratableRoles= new HashSet<>();
+        final Set<MigratableRole> migratableRoles = new HashSet<>();
 
         final Set<Role> roles = roleService.loadAll();
         roles.forEach(role -> {

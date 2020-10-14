@@ -148,9 +148,9 @@ public class ViewSharingToGrantsMigration {
     }
 
     private void migrateAllOfInstance(String viewId) {
-        LOG.info("Migrate all-of-instance for view {} to grants", viewId);
-
         final GRN target = getTarget(viewId);
+
+        LOG.info("Migrate all-of-instance for view <{}> to grants", target);
 
         ensureEveryoneGrant(target);
     }
