@@ -56,7 +56,7 @@ const dateOutput = (timerange: TimeRange) => {
     case 'keyword':
       return { from: timerange.from, until: timerange.to };
     default:
-      return { from, until: from };
+      throw new Error('Invalid Timerange Type');
   }
 };
 
