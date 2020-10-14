@@ -72,7 +72,8 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.ldap?.GroupSyncForm;
+  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
+  const help = { ...HELP, ...groupSyncFormHelp };
   let initialValues = prepareInitialValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
@@ -100,8 +101,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     <DocumentTitle title="Edit LDAP Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {..._optionalWizardProps(initialStepKey)}
-                     groupSyncForm={GroupSyncForm}
-                     help={HELP}
+                     help={help}
                      authBackendMeta={authBackendMeta}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit} />

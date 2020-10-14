@@ -6,7 +6,6 @@ import { Formik } from 'formik';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
 
-import type { FormComponent as GroupSyncFormComponent } from './GroupSyncStep';
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY, type StepKeyType as UserSyncKey } from './UserSyncStep';
 import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY, type StepKeyType as GroupSyncKey } from './GroupSyncStep';
@@ -16,7 +15,6 @@ type Props = {
   formRefs: {
     [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
-  groupSyncForm: ?GroupSyncFormComponent,
   handleSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
   help: { [inputName: string]: ?React.Node },
   invalidStepKeys: Array<string>,
@@ -28,7 +26,6 @@ type Props = {
 
 const wizardSteps = ({
   formRefs,
-  groupSyncForm,
   handleSubmitAll,
   help,
   invalidStepKeys,
@@ -82,7 +79,6 @@ const wizardSteps = ({
     ),
     component: (
       <GroupSyncStep formRef={formRefs[GROUP_SYNC_KEY]}
-                     formComponent={groupSyncForm}
                      help={help}
                      onSubmitAll={handleSubmitAll}
                      prepareSubmitPayload={prepareSubmitPayload}

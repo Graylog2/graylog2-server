@@ -28,7 +28,8 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.activeDirectory?.GroupSyncForm;
+  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
+  const help = { ...HELP, ...groupSyncFormHelp };
   let initialValues = prepareInitialValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
@@ -56,9 +57,8 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     <DocumentTitle title="Edit Active Directory Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {..._optionalWizardProps(initialStepKey)}
-                     groupSyncForm={GroupSyncForm}
                      authBackendMeta={authBackendMeta}
-                     help={HELP}
+                     help={help}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit} />
     </DocumentTitle>

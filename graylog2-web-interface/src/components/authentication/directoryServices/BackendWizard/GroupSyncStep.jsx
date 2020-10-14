@@ -2,27 +2,26 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { EnterprisePluginNotFound } from 'components/common';
 
 export type StepKeyType = 'group-synchronisation';
 export const STEP_KEY: StepKeyType = 'group-synchronisation';
 
-export type FormComponentProps = {
+export type Props = {
   formRef: React.Ref<typeof Formik>,
   onSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
+  help: { [inputName: string]: ?React.Node },
   prepareSubmitPayload: () => WizardSubmitPayload,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-export type FormComponent = React.ComponentType<FormComponentProps>;
+const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount }: Props) => {
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
 
-type Props = FormComponentProps & {
-  formComponent: ?FormComponent,
-};
-
-const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, formComponent: GroupSyncForm, submitAllError, validateOnMount }: Props) => {
   if (!GroupSyncForm) {
     return <EnterprisePluginNotFound featureName="group synchronization" />;
   }

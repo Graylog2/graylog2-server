@@ -58,15 +58,15 @@ export const AUTH_BACKEND_META = {
 
 const BackendCreate = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.ldap?.GroupSyncForm;
+  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
+  const help = { ...HELP, ...groupSyncFormHelp };
   const initialValues = prepareInitialValues();
 
   return (
     <DocumentTitle title="Create Active Directory Authentication Services">
       <WizardPageHeader />
       <BackendWizard authBackendMeta={AUTH_BACKEND_META}
-                     groupSyncForm={GroupSyncForm}
-                     help={HELP}
+                     help={help}
                      initialValues={initialValues}
                      onSubmit={handleSubmit} />
     </DocumentTitle>

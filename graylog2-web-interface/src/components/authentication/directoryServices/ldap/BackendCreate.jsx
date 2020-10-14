@@ -89,15 +89,15 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
 
 const BackendCreate = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.ldap?.GroupSyncForm;
+  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
+  const help = { ...HELP, ...groupSyncFormHelp };
   const initialValues = prepareInitialValues();
 
   return (
     <DocumentTitle title="Create LDAP Authentication Service">
       <WizardPageHeader />
       <BackendWizard onSubmit={handleSubmit}
-                     groupSyncForm={GroupSyncForm}
-                     help={HELP}
+                     help={help}
                      authBackendMeta={AUTH_BACKEND_META}
                      initialValues={initialValues} />
     </DocumentTitle>

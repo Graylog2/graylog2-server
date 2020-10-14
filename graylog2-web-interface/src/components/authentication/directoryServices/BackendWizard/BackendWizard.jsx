@@ -20,7 +20,7 @@ import { FetchError } from 'logic/rest/FetchProvider';
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './BackendWizardContext';
 import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { FORM_VALIDATION as USER_SYNC_VALIDATION, STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
-import { STEP_KEY as GROUP_SYNC_KEY, type FormComponent as GroupSyncFormComponent } from './GroupSyncStep';
+import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import wizardSteps from './wizardSteps';
 import Sidebar from './Sidebar';
 
@@ -166,12 +166,11 @@ type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  groupSyncForm: ?GroupSyncFormComponent,
   help: { [inputName: string]: ?React.Node },
   onSubmit: (WizardSubmitPayload, WizardFormValues, licenseIsValid?: boolean) => Promise<void>,
 };
 
-const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, groupSyncForm, help }: Props) => {
+const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
   const [roles, setRoles] = useState<?Immutable.List<Role>>();
@@ -261,7 +260,6 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
   const steps = wizardSteps({
     formRefs,
-    groupSyncForm: groupSyncForm,
     help,
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
