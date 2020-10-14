@@ -13,11 +13,10 @@ import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { type Step } from 'components/common/Wizard';
 import { FetchError } from 'logic/rest/FetchProvider';
 
-import type { FromComponent as GroupSyncFromComponent } from './GroupSyncStep';
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './BackendWizardContext';
 import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { FORM_VALIDATION as USER_SYNC_VALIDATION, STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
-import { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
+import { STEP_KEY as GROUP_SYNC_KEY, type FormComponent as GroupSyncFormComponent } from './GroupSyncStep';
 import wizardSteps from './wizardSteps';
 import Sidebar from './Sidebar';
 
@@ -155,7 +154,7 @@ type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  groupSyncForm: ?GroupSyncFromComponent,
+  groupSyncForm: ?GroupSyncFormComponent,
   onSubmit: (WizardSubmitPayload, WizardFormValues, licenseIsValid?: boolean) => Promise<void>,
 };
 

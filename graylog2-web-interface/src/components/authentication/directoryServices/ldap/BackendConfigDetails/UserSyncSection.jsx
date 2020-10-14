@@ -12,7 +12,7 @@ import EditLinkButton from './EditLinkButton';
 import { STEP_KEY as USER_SYNC_KEY } from '../../BackendWizard/UserSyncStep';
 
 const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
-  const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name);
+  const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found');
 
   return defaultRolesNames.join(', ');
 };

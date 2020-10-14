@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';

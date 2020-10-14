@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
+import * as Immutable from 'immutable';
 
 import type { ThemeInterface } from 'theme';
 
@@ -16,7 +17,7 @@ const Role = styled.span`
 `;
 
 type Props = {
-  roles: Immutable.S<string>,
+  roles: Immutable.Set<string>,
 };
 
 const RolesCell = ({ roles }: Props) => (

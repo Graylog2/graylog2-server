@@ -16,19 +16,19 @@ export type FormComponentProps = {
   validateOnMount: boolean,
 };
 
-export type FromComponent = React.ComponentType<FormComponentProps>;
+export type FormComponent = React.ComponentType<FormComponentProps>;
 
 type Props = FormComponentProps & {
-  formComponent: ?FromComponent,
+  formComponent: ?FormComponent,
 };
 
-const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, formComponent: FormComponent, submitAllError, validateOnMount }: Props) => {
-  if (!FormComponent) {
+const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, formComponent: GroupSyncForm, submitAllError, validateOnMount }: Props) => {
+  if (!GroupSyncForm) {
     return <EnterprisePluginNotFound featureName="group synchronization" />;
   }
 
   return (
-    <FormComponent formRef={formRef}
+    <GroupSyncForm formRef={formRef}
                    onSubmitAll={onSubmitAll}
                    prepareSubmitPayload={prepareSubmitPayload}
                    submitAllError={submitAllError}

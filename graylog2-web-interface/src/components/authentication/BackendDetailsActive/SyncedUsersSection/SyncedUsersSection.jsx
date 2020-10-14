@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import * as Immutable from 'immutable';
 
 import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';

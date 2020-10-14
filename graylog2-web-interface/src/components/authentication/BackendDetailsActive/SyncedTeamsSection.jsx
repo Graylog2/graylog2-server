@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import { EnterprisePluginNotFound } from 'components/common';
 import { getEnterpriseAuthenticationPlugin } from 'util/AuthenticationService';

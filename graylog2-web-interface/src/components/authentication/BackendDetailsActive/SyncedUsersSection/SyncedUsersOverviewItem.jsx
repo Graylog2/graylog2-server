@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -32,7 +33,7 @@ const SyncedUsersOverviewItem = ({
   roles,
 }: Props) => {
   const userRolesNames = userRolesIds.map((roleId) => {
-    return roles.find((role) => role.id === roleId)?.name;
+    return roles.find((role) => role.id === roleId)?.name ?? 'Role not found';
   });
 
   return (
