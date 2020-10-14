@@ -33,6 +33,9 @@ const StyledPopover: StyledComponent<{}, void, typeof Popover> = styled(Popover)
   max-width: 50vw;
   min-width: 745px;
 `;
+const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
+  margin-top: 1px;
+`;
 
 const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
   margin-top: 1px;
