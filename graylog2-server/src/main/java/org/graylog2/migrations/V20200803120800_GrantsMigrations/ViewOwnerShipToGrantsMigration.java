@@ -69,7 +69,7 @@ public class ViewOwnerShipToGrantsMigration {
     private void ensureGrant(User user, GRN target) {
         final GRN grantee = grnRegistry.ofUser(user);
 
-        LOG.info("Registering user <{}> ownership for <{}/{}>", user.getName(), user.getId(), target);
+        LOG.info("Registering user <{}/{}> ownership for <{}>", user.getName(), user.getId(), target);
         dbGrantService.ensure(grantee, CAPABILITY, target, rootUsername);
     }
 }
