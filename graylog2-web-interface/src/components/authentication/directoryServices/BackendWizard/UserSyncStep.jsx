@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useEffect, useContext } from 'react';
+import * as Immutable from 'immutable';
+import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
+import Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
-import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
 import { Icon, FormikFormGroup, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -30,6 +31,7 @@ type Props = {
     userSearchBase?: React.Node,
     userSearchPattern?: React.Node,
   },
+  roles: Immutable.List<Role>,
   onSubmit: () => void,
   onSubmitAll: () => Promise<void>,
   submitAllError: ?React.Node,
@@ -64,10 +66,10 @@ const defaultHelp = {
   ),
 };
 
-const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
+const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
-  const [rolesOptions, setRolesOptions] = useState([]);
+  const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
 
   const _onSubmitAll = (validateForm) => {
     validateForm().then((errors) => {
@@ -76,17 +78,6 @@ const UserSyncStep = ({ help: propsHelp, formRef, onSubmit, onSubmitAll, submitA
       }
     });
   };
-
-  useEffect(() => {
-    const getUnlimited = [1, 0, ''];
-
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((roles) => {
-      if (roles) {
-        const options = roles.list.map((role) => ({ label: role.name, value: role.id })).toArray();
-        setRolesOptions(options);
-      }
-    });
-  }, []);
 
   return (
     // $FlowFixMe innerRef works as expected

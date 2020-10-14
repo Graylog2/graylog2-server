@@ -1,8 +1,10 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { Formik } from 'formik';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import Role from 'logic/roles/Role';
 
 import type { FormComponent as GroupSyncFormComponent } from './GroupSyncStep';
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
@@ -18,6 +20,7 @@ type Props = {
   handleSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
   invalidStepKeys: Array<string>,
   prepareSubmitPayload: () => WizardSubmitPayload,
+  roles: Immutable.List<Role>,
   setActiveStepKey: (stepKey: string) => void,
   submitAllError: ?React.Node,
 };
@@ -28,6 +31,7 @@ const wizardSteps = ({
   handleSubmitAll,
   invalidStepKeys,
   prepareSubmitPayload,
+  roles,
   setActiveStepKey,
   submitAllError,
 }: Props) => [
@@ -59,6 +63,7 @@ const wizardSteps = ({
       <UserSyncStep formRef={formRefs[USER_SYNC_KEY]}
                     onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
                     onSubmitAll={handleSubmitAll}
+                    roles={roles}
                     submitAllError={submitAllError}
                     validateOnMount={invalidStepKeys.includes(USER_SYNC_KEY)} />
     ),

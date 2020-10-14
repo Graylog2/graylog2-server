@@ -1,9 +1,13 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { compact } from 'lodash';
 import PropTypes from 'prop-types';
+import * as Immutable from 'immutable';
 
+import { Spinner } from 'components/common';
+import Role from 'logic/roles/Role';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { validateField } from 'util/FormsUtils';
@@ -150,6 +154,14 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
   return _submit();
 };
 
+const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
+  const defaultCreateRoleId = roles?.find((role) => role.name === 'Reader')?.id;
+
+  if (defaultCreateRoleId) {
+    setStepsState({ ...stepsState, formValues: { ...stepsState.formValues, defaultRoles: defaultCreateRoleId } });
+  }
+};
+
 type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
@@ -161,6 +173,7 @@ type Props = {
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, groupSyncForm }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
+  const [roles, setRoles] = useState<?Immutable.List<Role>>();
   const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
@@ -174,6 +187,26 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     [USER_SYNC_KEY]: useRef(),
     [GROUP_SYNC_KEY]: useRef(),
   };
+
+  useEffect(() => {
+    const getUnlimited = [1, 0, ''];
+
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((paginatedRoles) => {
+      if (paginatedRoles) {
+        setRoles(paginatedRoles.list);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!authBackendMeta.backendId && !stepsState.formValues.defaultRoles) {
+      _setDefaultCreateRole(roles, stepsState, setStepsState);
+    }
+  }, [roles, authBackendMeta.backendId, stepsState, setStepsState]);
+
+  if (!roles) {
+    return <Spinner />;
+  }
 
   const _getUpdatedFormsValues = () => {
     const activeForm = formRefs[stepsState.activeStepKey]?.current;
@@ -231,6 +264,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
     prepareSubmitPayload: _getSubmitPayload,
+    roles,
     setActiveStepKey: _setActiveStepKey,
     submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });
