@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
+import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 
@@ -56,12 +57,15 @@ export const AUTH_BACKEND_META = {
 };
 
 const BackendCreate = () => {
+  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.ldap?.GroupSyncForm;
   const initialValues = prepareInitialValues();
 
   return (
     <DocumentTitle title="Create Active Directory Authentication Services">
       <WizardPageHeader />
       <BackendWizard authBackendMeta={AUTH_BACKEND_META}
+                     groupSyncForm={GroupSyncForm}
                      help={HELP}
                      initialValues={initialValues}
                      onSubmit={handleSubmit} />
