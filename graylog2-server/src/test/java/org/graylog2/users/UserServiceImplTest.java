@@ -111,6 +111,7 @@ public class UserServiceImplTest {
     public void testLoadByUserId() throws Exception {
         final User user = userService.loadById("54e3deadbeefdeadbeef0001");
         assertThat(user).isNotNull();
+        assertThat(user.getId()).isEqualTo("54e3deadbeefdeadbeef0001");
         assertThat(user.getName()).isEqualTo("user1");
         assertThat(user.getEmail()).isEqualTo("user1@example.com");
     }

@@ -114,7 +114,8 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (userObject == null) {
             return null;
         }
-        return userFactory.create(userObject.toMap());
+        final Object userId = userObject.get("_id");
+        return userFactory.create((ObjectId) userId, userObject.toMap());
     }
 
     @Override
