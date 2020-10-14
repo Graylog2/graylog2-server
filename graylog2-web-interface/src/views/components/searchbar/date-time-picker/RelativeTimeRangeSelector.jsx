@@ -112,7 +112,7 @@ const initialRangeType = ({ range, ...restRange }) => {
 
     if (diff - Math.floor(diff) === 0) {
       return {
-        rangeValue: diff || '1',
+        rangeValue: diff || 1,
         rangeType: value || 'seconds',
         range,
         ...restRange,
@@ -141,7 +141,7 @@ function reducer(state, action) {
       return {
         ...state,
         rangeAllTime: action.value,
-        range: action.value ? 0 : state.rangeValue,
+        range: action.value ? 0 : moment.duration(state.rangeValue, state.rangeType).asSeconds(),
       };
     default:
       throw new Error();
@@ -180,6 +180,12 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
     }
   }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleAllTime = (event) => dispatch({
+    type: 'rangeAllTime',
+    value: event.target.checked,
+    rangeValue: event.target.checked ? state.rangeValue : initialRangeType(originalTimeRange),
+  });
+
   return (
     <RelativeWrapper>
       <RangeWrapper>
@@ -189,10 +195,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
                  id="relative-all-time"
                  value="0"
                  checked={state.rangeAllTime}
-                 onChange={(event) => dispatch({
-                   type: 'rangeAllTime',
-                   value: event.target.checked,
-                 })} />All Time
+                 onChange={handleAllTime} />All Time
         </RangeCheck>
         <InputWrap>
           <Input id="relative-timerange-from-value"
