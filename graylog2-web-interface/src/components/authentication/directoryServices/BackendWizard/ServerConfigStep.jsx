@@ -55,32 +55,18 @@ const ProtocolOptions = styled.div`
   }
 `;
 
-const defaultHelp = {
-  systemUserDn: (
-    <span>
-      The username for the initial connection to the LDAP server, e.g. <code>ldapbind@some.domain</code>.
-      This needs to match the <code>userPrincipalName</code> of that user.
-    </span>
-  ),
-  systemUserPassword: 'The password for the initial connection to the LDAP server.',
-};
-
 type Props = {
   formRef: React.Ref<typeof Formik>,
-  help?: {
-    systemUserDn?: React.Node,
-    systemUserPassword?: React.Node,
-  },
+  help: { [inputName: string]: ?React.Node },
   onSubmit: () => void,
   onSubmitAll: () => Promise<void>,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
+const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendHasPassword } = stepsState.authBackendMeta;
-  const help = { ...defaultHelp, ...propsHelp };
 
   const _onSubmitAll = (validateForm) => {
     validateForm().then((errors) => {
@@ -221,10 +207,6 @@ const ServerConfigStep = ({ formRef, help: propsHelp, onSubmit, onSubmitAll, sub
       )}
     </Formik>
   );
-};
-
-ServerConfigStep.defaultProps = {
-  help: {},
 };
 
 export default ServerConfigStep;

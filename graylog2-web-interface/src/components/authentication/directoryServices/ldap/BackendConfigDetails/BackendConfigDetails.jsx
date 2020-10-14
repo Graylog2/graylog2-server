@@ -1,10 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import * as Immutable from 'immutable';
 
-import { Spinner } from 'components/common';
-import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import Role from 'logic/roles/Role';
 
 import ServerConfigSection from './ServerConfigSection';
 import UserSyncSection from './UserSyncSection';
@@ -12,21 +11,10 @@ import GroupSyncSection from './GroupSyncSection';
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
+  roles: Immutable.List<Role>,
 };
 
-const BackendConfigDetails = ({ authenticationBackend }: Props) => {
-  const [{ list: roles }, setPaginatedRoles] = useState({ list: undefined });
-
-  useEffect(() => {
-    const getUnlimited = [1, 0, ''];
-
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
-  }, []);
-
-  if (!roles) {
-    return <Spinner />;
-  }
-
+const BackendConfigDetails = ({ authenticationBackend, roles }: Props) => {
   return (
     <>
       <ServerConfigSection authenticationBackend={authenticationBackend} />

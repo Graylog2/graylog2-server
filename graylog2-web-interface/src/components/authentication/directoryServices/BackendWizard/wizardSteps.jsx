@@ -1,8 +1,10 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { Formik } from 'formik';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import Role from 'logic/roles/Role';
 
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY, type StepKeyType as UserSyncKey } from './UserSyncStep';
@@ -13,9 +15,11 @@ type Props = {
   formRefs: {
     [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
-  handleSubmitAll: () => Promise<void>,
+  handleSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
+  help: { [inputName: string]: ?React.Node },
   invalidStepKeys: Array<string>,
   prepareSubmitPayload: () => WizardSubmitPayload,
+  roles: Immutable.List<Role>,
   setActiveStepKey: (stepKey: string) => void,
   submitAllError: ?React.Node,
 };
@@ -23,8 +27,10 @@ type Props = {
 const wizardSteps = ({
   formRefs,
   handleSubmitAll,
+  help,
   invalidStepKeys,
   prepareSubmitPayload,
+  roles,
   setActiveStepKey,
   submitAllError,
 }: Props) => [
@@ -38,6 +44,7 @@ const wizardSteps = ({
     ),
     component: (
       <ServerConfigStep formRef={formRefs[SERVER_CONFIG_KEY]}
+                        help={help}
                         onSubmit={() => setActiveStepKey(USER_SYNC_KEY)}
                         onSubmitAll={handleSubmitAll}
                         submitAllError={submitAllError}
@@ -54,8 +61,10 @@ const wizardSteps = ({
     ),
     component: (
       <UserSyncStep formRef={formRefs[USER_SYNC_KEY]}
+                    help={help}
                     onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
                     onSubmitAll={handleSubmitAll}
+                    roles={roles}
                     submitAllError={submitAllError}
                     validateOnMount={invalidStepKeys.includes(USER_SYNC_KEY)} />
     ),
@@ -70,8 +79,10 @@ const wizardSteps = ({
     ),
     component: (
       <GroupSyncStep formRef={formRefs[GROUP_SYNC_KEY]}
+                     help={help}
                      onSubmitAll={handleSubmitAll}
                      prepareSubmitPayload={prepareSubmitPayload}
+                     roles={roles}
                      submitAllError={submitAllError}
                      validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)} />
     ),

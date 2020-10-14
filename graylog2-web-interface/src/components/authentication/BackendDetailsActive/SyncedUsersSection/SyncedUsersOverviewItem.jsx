@@ -1,17 +1,20 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import UserOverview from 'logic/users/UserOverview';
 import { Button, ButtonToolbar } from 'components/graylog';
-import RolesCell from 'components/users/UsersOverview/UserOverviewItem/RolesCell';
+import RolesCell from 'components/permissions/RolesCell';
 
 type Props = {
   user: UserOverview,
+  roles: Immutable.List<Role>,
 };
 
 const ActtionsWrapper = styled(ButtonToolbar)`
@@ -24,10 +27,15 @@ const SyncedUsersOverviewItem = ({
     enabled,
     fullName,
     id,
-    roles,
+    roles: userRolesIds,
     username,
   },
+  roles,
 }: Props) => {
+  const userRolesNames = userRolesIds.map((roleId) => {
+    return roles.find((role) => role.id === roleId)?.name ?? 'Role not found';
+  });
+
   return (
     <tr key={username}>
       <td className="limited">
@@ -36,7 +44,7 @@ const SyncedUsersOverviewItem = ({
         </Link>
       </td>
       <td className="limited">{fullName}</td>
-      <RolesCell roles={roles} />
+      <RolesCell roles={userRolesNames} />
       <td className="limited">
         <ActtionsWrapper>
           {enabled

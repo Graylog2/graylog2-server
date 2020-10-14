@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
+import * as Immutable from 'immutable';
 
-import UserOverview from 'logic/users/UserOverview';
 import type { ThemeInterface } from 'theme';
 
 const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
@@ -16,7 +16,11 @@ const Role = styled.span`
   line-height: 15px;
 `;
 
-const RolesCell = ({ roles }: { roles: $PropertyType<UserOverview, 'roles'> }) => (
+type Props = {
+  roles: Immutable.Set<string>,
+};
+
+const RolesCell = ({ roles }: Props) => (
   <Td>
     {roles.map((role) => (
       <Role key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`}>

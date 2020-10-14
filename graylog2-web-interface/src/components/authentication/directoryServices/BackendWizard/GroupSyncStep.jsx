@@ -1,46 +1,40 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
+import * as Immutable from 'immutable';
 import { Formik } from 'formik';
 
+import Role from 'logic/roles/Role';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { EnterprisePluginNotFound } from 'components/common';
 
 export type StepKeyType = 'group-synchronisation';
 export const STEP_KEY: StepKeyType = 'group-synchronisation';
 
-const Header = styled.h4`
-  margin-bottom: 5px;
-`;
-
-const NoEnterpriseComponent = () => (
-  <>
-    <Header>No enterprise plugin found</Header>
-    <p>To use the <b>Teams</b> functionality you need to install the Graylog <b>Enterprise</b> plugin.</p>
-  </>
-);
-
-type Props = {
+export type Props = {
   formRef: React.Ref<typeof Formik>,
-  onSubmitAll: () => Promise<void>,
+  onSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
+  help: { [inputName: string]: ?React.Node },
   prepareSubmitPayload: () => WizardSubmitPayload,
+  roles: Immutable.List<Role>,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount }: Props) => {
+const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount, roles, help }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
 
-  if (!enterpriseGroupSyncPlugin) {
-    return <NoEnterpriseComponent />;
+  if (!GroupSyncForm) {
+    return <EnterprisePluginNotFound featureName="group synchronization" />;
   }
-
-  const { components: { GroupSyncForm } } = enterpriseGroupSyncPlugin;
 
   return (
     <GroupSyncForm formRef={formRef}
+                   help={help}
                    onSubmitAll={onSubmitAll}
                    prepareSubmitPayload={prepareSubmitPayload}
+                   roles={roles}
                    submitAllError={submitAllError}
                    validateOnMount={validateOnMount} />
   );

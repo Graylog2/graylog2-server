@@ -28,6 +28,8 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.activeDirectory ?? {};
+  const help = { ...HELP, ...groupSyncFormHelp };
   let initialValues = prepareInitialValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
@@ -56,7 +58,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {..._optionalWizardProps(initialStepKey)}
                      authBackendMeta={authBackendMeta}
-                     help={HELP}
+                     help={help}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit} />
     </DocumentTitle>

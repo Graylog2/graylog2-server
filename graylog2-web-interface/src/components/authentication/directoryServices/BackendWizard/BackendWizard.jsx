@@ -1,9 +1,13 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { compact } from 'lodash';
 import PropTypes from 'prop-types';
+import * as Immutable from 'immutable';
 
+import { Spinner } from 'components/common';
+import Role from 'logic/roles/Role';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { validateField } from 'util/FormsUtils';
@@ -119,7 +123,7 @@ const _getInvalidStepKeys = (formValues) => {
   return compact(invalidStepKeys);
 };
 
-const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps) => {
+const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps, licenseIsValid) => {
   const formValues = getUpdatedFormsValues();
   const invalidStepKeys = validateSteps(formValues);
 
@@ -132,7 +136,7 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
   setSubmitAllError(null);
 
   const payload = getSubmitPayload(formValues);
-  const _submit = () => onSubmit(payload, formValues).then(() => {
+  const _submit = () => onSubmit(payload, formValues, licenseIsValid).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
@@ -150,16 +154,26 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
   return _submit();
 };
 
+const _setDefaultCreateRole = (roles, stepsState, setStepsState) => {
+  const defaultCreateRoleId = roles?.find((role) => role.name === 'Reader')?.id;
+
+  if (defaultCreateRoleId) {
+    setStepsState({ ...stepsState, formValues: { ...stepsState.formValues, defaultRoles: defaultCreateRoleId } });
+  }
+};
+
 type Props = {
   authBackendMeta: AuthBackendMeta,
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
-  onSubmit: (WizardSubmitPayload, WizardFormValues) => Promise<void>,
+  help: { [inputName: string]: ?React.Node },
+  onSubmit: (WizardSubmitPayload, WizardFormValues, licenseIsValid?: boolean) => Promise<void>,
 };
 
-const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta }: Props) => {
+const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
+  const [roles, setRoles] = useState<?Immutable.List<Role>>();
   const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
@@ -173,6 +187,26 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     [USER_SYNC_KEY]: useRef(),
     [GROUP_SYNC_KEY]: useRef(),
   };
+
+  useEffect(() => {
+    const getUnlimited = [1, 0, ''];
+
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((paginatedRoles) => {
+      if (paginatedRoles) {
+        setRoles(paginatedRoles.list);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!authBackendMeta.backendId && !stepsState.formValues.defaultRoles) {
+      _setDefaultCreateRole(roles, stepsState, setStepsState);
+    }
+  }, [roles, authBackendMeta.backendId, stepsState, setStepsState]);
+
+  if (!roles) {
+    return <Spinner />;
+  }
 
   const _getUpdatedFormsValues = () => {
     const activeForm = formRefs[stepsState.activeStepKey]?.current;
@@ -214,20 +248,23 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     });
   };
 
-  const _handleSubmitAll = () => _onSubmitAll(
+  const _handleSubmitAll = (licenseIsValid?: boolean) => _onSubmitAll(
     stepsState,
     setSubmitAllError,
     onSubmit,
     _getUpdatedFormsValues,
     _getSubmitPayload,
     _validateSteps,
+    licenseIsValid,
   );
 
   const steps = wizardSteps({
     formRefs,
+    help,
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
     prepareSubmitPayload: _getSubmitPayload,
+    roles,
     setActiveStepKey: _setActiveStepKey,
     submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });
@@ -258,6 +295,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
 BackendWizard.defaultProps = {
   initialStepKey: SERVER_CONFIG_KEY,
+  help: undefined,
 };
 
 BackendWizard.propTypes = {
@@ -267,6 +305,7 @@ BackendWizard.propTypes = {
     serviceTitle: PropTypes.string.isRequired,
     serviceType: PropTypes.string.isRequired,
   }).isRequired,
+  help: PropTypes.object,
   initialStepKey: PropTypes.string,
   initialValues: PropTypes.object.isRequired,
 };
