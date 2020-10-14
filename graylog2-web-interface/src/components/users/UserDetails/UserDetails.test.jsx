@@ -168,7 +168,7 @@ describe('<UserDetails />', () => {
       const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
       await act(() => mockAuthzRolesPromise);
 
-      expect(getByText('No enterprise plugin found')).not.toBeNull();
+      expect(getByText(/Enterprise Feature/)).not.toBeNull();
     });
   });
 });

@@ -240,7 +240,7 @@ describe('<UserEdit />', () => {
       await act(() => mockRolesForUserPromise);
       await act(() => mockLoadRolesPromise);
 
-      expect(getByText('No enterprise plugin found')).not.toBeNull();
+      expect(getByText(/Enterprise Feature/)).not.toBeNull();
     });
   });
 });
