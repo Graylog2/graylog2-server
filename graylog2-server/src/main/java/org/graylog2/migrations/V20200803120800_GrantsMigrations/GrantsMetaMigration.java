@@ -16,6 +16,9 @@
  */
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -27,8 +30,11 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,6 +57,7 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 public class GrantsMetaMigration extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(GrantsMetaMigration.class);
     private final RoleService roleService;
     private final UserService userService;
     private final DBGrantService dbGrantService;
@@ -58,6 +65,7 @@ public class GrantsMetaMigration extends Migration {
     private final String rootUsername;
     private final MongoConnection mongoConnection;
     private final ViewService viewService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public GrantsMetaMigration(RoleService roleService,
@@ -66,7 +74,8 @@ public class GrantsMetaMigration extends Migration {
                                GRNRegistry grnRegistry,
                                @Named("root_username") String rootUsername,
                                MongoConnection mongoConnection,
-                               ViewService viewService) {
+                               ViewService viewService,
+                               ClusterConfigService clusterConfigService) {
         this.roleService = roleService;
         this.userService = userService;
         this.dbGrantService = dbGrantService;
@@ -74,6 +83,7 @@ public class GrantsMetaMigration extends Migration {
         this.rootUsername = rootUsername;
         this.mongoConnection = mongoConnection;
         this.viewService = viewService;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -94,11 +104,17 @@ public class GrantsMetaMigration extends Migration {
 
     @Override
     public void upgrade() {
+        if (clusterConfigService.get(MigrationCompleted.class) != null) {
+            LOG.debug("Migration already completed.");
+            return;
+        }
         // ViewSharingToGrantsMigration needs to run before the RolesToGrantsMigration drops empty roles
         new ViewSharingToGrantsMigration(mongoConnection, dbGrantService, userService, roleService, rootUsername, viewService, grnRegistry).upgrade();
         new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, rootUsername).upgrade();
         new ViewOwnerShipToGrantsMigration(userService, dbGrantService, rootUsername, viewService, grnRegistry).upgrade();
         new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, rootUsername).upgrade();
+
+        this.clusterConfigService.write(MigrationCompleted.create());
     }
 
     public static class GRNTypeCapability {
@@ -124,6 +140,15 @@ public class GrantsMetaMigration extends Migration {
 
         protected String subPart(int idx) {
             return Iterables.getOnlyElement(getParts().get(idx));
+        }
+    }
+
+    @JsonAutoDetect
+    @AutoValue
+    public static abstract class MigrationCompleted {
+        @JsonCreator
+        public static MigrationCompleted create() {
+            return new AutoValue_GrantsMetaMigration_MigrationCompleted();
         }
     }
 }
