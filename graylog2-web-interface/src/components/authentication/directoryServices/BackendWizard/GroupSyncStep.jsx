@@ -1,7 +1,9 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { Formik } from 'formik';
 
+import Role from 'logic/roles/Role';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { EnterprisePluginNotFound } from 'components/common';
@@ -14,11 +16,12 @@ export type Props = {
   onSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
   help: { [inputName: string]: ?React.Node },
   prepareSubmitPayload: () => WizardSubmitPayload,
+  roles: Immutable.List<Role>,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount }: Props) => {
+const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount, roles, help }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
 
@@ -28,8 +31,10 @@ const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllEr
 
   return (
     <GroupSyncForm formRef={formRef}
+                   help={help}
                    onSubmitAll={onSubmitAll}
                    prepareSubmitPayload={prepareSubmitPayload}
+                   roles={roles}
                    submitAllError={submitAllError}
                    validateOnMount={validateOnMount} />
   );

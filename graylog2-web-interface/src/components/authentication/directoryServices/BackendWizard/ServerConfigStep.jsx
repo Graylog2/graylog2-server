@@ -64,7 +64,7 @@ type Props = {
   validateOnMount: boolean,
 };
 
-const ServerConfigStep = ({ formRef, help, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
+const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendHasPassword } = stepsState.authBackendMeta;
 

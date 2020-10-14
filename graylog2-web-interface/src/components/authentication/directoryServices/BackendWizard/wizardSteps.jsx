@@ -82,6 +82,7 @@ const wizardSteps = ({
                      help={help}
                      onSubmitAll={handleSubmitAll}
                      prepareSubmitPayload={prepareSubmitPayload}
+                     roles={roles}
                      submitAllError={submitAllError}
                      validateOnMount={invalidStepKeys.includes(GROUP_SYNC_KEY)} />
     ),

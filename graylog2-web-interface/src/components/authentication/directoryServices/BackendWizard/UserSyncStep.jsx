@@ -32,7 +32,7 @@ type Props = {
   validateOnMount: boolean,
 };
 
-const UserSyncStep = ({ help, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
+const UserSyncStep = ({ help = {}, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
 

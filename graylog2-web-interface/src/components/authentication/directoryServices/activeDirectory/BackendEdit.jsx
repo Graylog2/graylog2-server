@@ -28,7 +28,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
+  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.activeDirectory ?? {};
   const help = { ...HELP, ...groupSyncFormHelp };
   let initialValues = prepareInitialValues(authenticationBackend);
 
