@@ -104,6 +104,21 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     @Nullable
+    public User loadById(final String id) {
+        // special case for the locally defined user, we don't store that in MongoDB.
+        if (!configuration.isRootUserDisabled() && id.equals(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID)) {
+            LOG.debug("User {} is the built-in admin user", id);
+            return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
+        }
+        final DBObject userObject = get(UserImpl.class, id);
+        if (userObject == null) {
+            return null;
+        }
+        return userFactory.create(userObject.toMap());
+    }
+
+    @Override
+    @Nullable
     public User load(final String username) {
         LOG.debug("Loading user {}", username);
 

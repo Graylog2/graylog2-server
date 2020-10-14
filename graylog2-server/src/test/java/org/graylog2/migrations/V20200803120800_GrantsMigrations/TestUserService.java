@@ -56,6 +56,12 @@ public class TestUserService extends PersistedServiceImpl implements UserService
         userFactory = new UserServiceImplTest.UserImplFactory(new Configuration(), permissions);
     }
 
+    @Override
+    @Nullable
+    public User loadById(String id) {
+        return null;
+    }
+
     @Nullable
     @Override
     public User load(String username) {

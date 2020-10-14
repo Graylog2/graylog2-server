@@ -32,6 +32,9 @@ public interface UserService extends PersistedService {
     @Nullable
     User load(String username);
 
+    @Nullable
+    User loadById(String id);
+
     /**
      * Tries to find a user for the given authentication service UID or username. (in that order)
      *

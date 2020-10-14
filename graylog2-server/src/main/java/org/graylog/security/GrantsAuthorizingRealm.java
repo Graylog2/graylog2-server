@@ -78,11 +78,11 @@ public class GrantsAuthorizingRealm extends AuthorizingRealm {
     }
 
     private Optional<GRN> getUserPrincipal(PrincipalCollection principals) {
-        final String userName = Iterables.getFirst(principals.byType(String.class), null);
-        if (isNullOrEmpty(userName)) {
+        final String userId = Iterables.getFirst(principals.byType(String.class), null);
+        if (isNullOrEmpty(userId)) {
             return Optional.empty();
         }
-        return Optional.of(grnRegistry.newGRN("user", userName));
+        return Optional.of(grnRegistry.newGRN("user", userId));
     }
 
     private Optional<GRN> getGRNPrincipal(PrincipalCollection principals) {

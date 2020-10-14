@@ -51,11 +51,11 @@ public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
     }
 
-    public PaginatedList<UserOverviewDTO> findPaginatedByUserName(SearchQuery searchQuery, int page,
-                                                                  int perPage, String sortField, String order,
-                                                                  Set<String> usernames) {
+    public PaginatedList<UserOverviewDTO> findPaginatedByUserId(SearchQuery searchQuery, int page,
+                                                                int perPage, String sortField, String order,
+                                                                Set<String> userIds) {
         final DBQuery.Query dbQuery = searchQuery.toDBQuery()
-                .in(UserOverviewDTO.FIELD_USERNAME, usernames);
+                .in("_id", userIds);
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
     }

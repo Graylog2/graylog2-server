@@ -67,8 +67,7 @@ public class AuthServiceAuthenticator {
         if (userDetails.isPresent()) {
             return AuthServiceResult.builder()
                     .username(authCredentials.username())
-                    //.userProfileId(userProfile.get().uid())
-                    .userProfileId(userDetails.get().username()) // TODO: Switch to uid() once our session implementation can handle it
+                    .userProfileId(userDetails.get().databaseId().get())
                     .backendType(backend.backendType())
                     .backendId(backend.backendId())
                     .backendTitle(backend.backendTitle())

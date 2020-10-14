@@ -48,6 +48,7 @@ class EntityOwnershipServiceTest {
     void registerNewEventDefinition() {
         final User mockUser = mock(User.class);
         when(mockUser.getName()).thenReturn("mockuser");
+        when(mockUser.getId()).thenReturn("mockuser");
 
         entityOwnershipService.registerNewEventDefinition("1234", mockUser);
 

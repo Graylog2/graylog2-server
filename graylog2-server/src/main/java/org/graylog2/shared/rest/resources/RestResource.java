@@ -143,7 +143,7 @@ public abstract class RestResource {
     @Nullable
     protected User getCurrentUser() {
         final Object principal = getSubject().getPrincipal();
-        final User user = userService.load(principal.toString());
+        final User user = userService.loadById(principal.toString());
 
         if (user == null) {
             LOG.error("Loading the current user failed, this should not happen. Did you call this method in an unauthenticated REST resource?");

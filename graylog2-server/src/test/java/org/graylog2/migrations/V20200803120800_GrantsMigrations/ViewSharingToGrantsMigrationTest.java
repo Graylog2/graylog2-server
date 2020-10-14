@@ -56,6 +56,7 @@ import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,10 +85,15 @@ class ViewSharingToGrantsMigrationTest {
         this.roleService = roleService;
         this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
 
+        when(userService.load(anyString())).thenAnswer(a -> {
+            final String argument = a.getArgument(0);
+            return createUser(argument);
+        });
+
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService);
 
-        this.migration = new ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService);
+        this.migration = new ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService, grnRegistry);
     }
 
     private void assertDeletedViewSharing(String id) {
@@ -176,7 +182,8 @@ class ViewSharingToGrantsMigrationTest {
 
     private User createUser(String name) {
         final User user = mock(User.class);
-        when(user.getName()).thenReturn(name);
+        lenient().when(user.getName()).thenReturn(name);
+        lenient().when(user.getId()).thenReturn(name);
         return user;
     }
 

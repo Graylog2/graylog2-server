@@ -79,12 +79,13 @@ public class SessionCreator {
 
             subject.login(authToken);
 
-            String username = subject.getPrincipal().toString();
-            final User user = userService.load(username);
+            String userId = subject.getPrincipal().toString();
+            final User user = userService.loadById(userId);
 
             if (user != null) {
                 long timeoutInMillis = user.getSessionTimeoutMs();
                 session.setTimeout(timeoutInMillis);
+                session.setAttribute("username", user.getName());
             } else {
                 // set a sane default. really we should be able to load the user from above.
                 session.setTimeout(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
@@ -98,7 +99,7 @@ public class SessionCreator {
                     "session_id", session.getId(),
                     "remote_address", host
             );
-            auditEventSender.success(AuditActor.user(username), SESSION_CREATE, auditEventContext);
+            auditEventSender.success(AuditActor.user(user.getName()), SESSION_CREATE, auditEventContext);
 
             return Optional.of(session);
         } catch (AuthenticationServiceUnavailableException e) {

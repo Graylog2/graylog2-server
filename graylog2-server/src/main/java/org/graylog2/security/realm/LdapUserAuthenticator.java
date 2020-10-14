@@ -130,7 +130,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
                 return null;
             }
 
-            return new SimpleAccount(principal, null, "ldap realm");
+            return new SimpleAccount(user.getId(), null, "ldap realm");
         } catch (LdapException e) {
             LOG.error("LDAP error", e);
             throw new AuthenticationServiceUnavailableException("LDAP error", e);

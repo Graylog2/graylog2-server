@@ -50,7 +50,7 @@ public class DefaultGranteeService implements GranteeService {
                 // can remove themselves from an entity.
                 .filter(user -> !sharingUser.getId().equals(user.getId()))
                 .map(user -> AvailableGrantee.create(
-                        grnRegistry.newGRN("user", user.getName()),
+                        grnRegistry.ofUser(user),
                         "user",
                         user.getFullName()
                 ))

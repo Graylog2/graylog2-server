@@ -30,6 +30,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.UserContext;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -84,6 +85,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -151,7 +153,8 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 404, message = "The user could not be found.")
     })
     public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
-                           @PathParam("username") String username) {
+                           @PathParam("username") String username,
+                           @Context UserContext userContext) {
         // If a user has permissions to edit another user's profile, it should be able to see it.
         // Reader users always have permissions to edit their own profile.
         if (!isPermitted(USERS_EDIT, username)) {
@@ -163,7 +166,7 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
-        final String requestingUser = getSubject().getPrincipal().toString();
+        final String requestingUser = userContext.getUser().getName();
         final boolean isSelf = requestingUser.equals(username);
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
 
