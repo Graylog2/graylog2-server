@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { Field, useField } from 'formik';
+import { useField } from 'formik';
 import styled, { css, type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import Input from 'components/bootstrap/Input';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { Icon, Select } from 'components/common';
@@ -13,9 +14,12 @@ import { Icon, Select } from 'components/common';
 type Props = {
   disabled: boolean,
   config: SearchesConfig,
+  originalTimeRange: {
+    range: string | number,
+  },
 };
 
-const rangeValues = [
+const RANGE_VALUES = [
   {
     value: 'seconds',
     label: 'Seconds',
@@ -31,9 +35,6 @@ const rangeValues = [
   }, {
     value: 'weeks',
     label: 'Weeks',
-  }, {
-    value: 'months',
-    label: 'Months',
   },
 ];
 
@@ -75,7 +76,7 @@ const RangeTitle = styled.h3`
   grid-area: 1 / 1 / 2 / 2;
 `;
 
-const Ago: StyledComponent<{}, void, HTMLSpanElement> = styled.span(({ theme }) => css`
+const Ago: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   grid-area: 2 / 7 / 3 / 8;
   font-size: ${theme.fonts.size.large};
 
@@ -84,7 +85,7 @@ const Ago: StyledComponent<{}, void, HTMLSpanElement> = styled.span(({ theme }) 
   }
 `);
 
-const RangeCheck: StyledComponent<{}, void, HTMLLabelElement> = styled.label(({ theme }) => css`
+const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.label(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
   grid-area: 1 / 2 / 2 / 7;
   margin-left: 15px;
@@ -96,160 +97,157 @@ const RangeCheck: StyledComponent<{}, void, HTMLLabelElement> = styled.label(({ 
   }
 `);
 
-export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
-  // const timeRangeLimit = moment.duration(config.query_time_range_limit);
-  // let options;
-  //
-  // if (availableOptions) {
-  //   let all = null;
-  //
-  //   options = Object.keys(availableOptions).map((key) => {
-  //     const seconds = moment.duration(key).asSeconds();
-  //
-  //     if (timeRangeLimit.seconds() > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
-  //       return null;
-  //     }
-  //
-  //     const option = (<option key={`relative-option-${key}`} value={seconds}>{availableOptions[key]}</option>);
-  //
-  //     // The "search in all messages" option should be the last one.
-  //     if (key === 'PT0S') {
-  //       all = option;
-  //
-  //       return null;
-  //     }
-  //
-  //     return option;
-  //   });
-  //
-  //   if (all) {
-  //     options.push(all);
-  //   }
-  // } else {
-  //   options = (<option value="300">Loading...</option>);
-  // }
+const initialRangeType = ({ range, ...restRange }) => {
+  if (range === 0) {
+    return {
+      rangeValue: 1,
+      rangeType: 'seconds',
+      range,
+      ...restRange,
+    };
+  }
 
+  return RANGE_VALUES.map(({ value }) => {
+    const diff = moment.duration(range, 'seconds').as(value);
+
+    if (diff - Math.floor(diff) === 0) {
+      return {
+        rangeValue: diff || '1',
+        rangeType: value || 'seconds',
+        range,
+        ...restRange,
+      };
+    }
+
+    return null;
+  }).filter(Boolean).pop();
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'rangeValue':
+      return {
+        ...state,
+        rangeValue: action.value,
+        range: moment.duration(action.value, state.rangeType).asSeconds(),
+      };
+    case 'rangeType':
+      return {
+        ...state,
+        rangeType: action.value,
+        range: moment.duration(state.rangeValue, action.value).asSeconds(),
+      };
+    case 'rangeAllTime':
+      return {
+        ...state,
+        rangeAllTime: action.value,
+        range: action.value ? 0 : state.rangeValue,
+      };
+    default:
+      throw new Error();
+  }
+}
+
+const buildRangeTypes = (config) => RANGE_VALUES.map(({ label, value }) => {
+  const typeDuration = moment.duration(1, value).asSeconds();
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
+
+  if (limitDuration === 0 || typeDuration <= limitDuration) {
+    return { label, value };
+  }
+
+  return null;
+}).filter(Boolean);
+
+export default function RelativeTimeRangeSelector({ config, disabled, originalTimeRange }: Props) {
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
 
-  const [fromTimeValue, setFromTimeValue] = useState();
-  const [fromTimeRange, setFromTimeRange] = useState(rangeValues[0].value);
+  const [state, dispatch] = useReducer(reducer, {
+    range: originalTimeRange.range,
+    rangeAllTime: originalTimeRange.range === 0,
+  }, initialRangeType);
 
-  const getRangeSeconds = useCallback((value = fromTimeValue, range = fromTimeRange) => {
-    return moment.duration(value, range).asSeconds();
-  }, [fromTimeValue, fromTimeRange]);
-
-  const setRange = (range) => {
-    const ms = moment.duration(range, fromTimeRange).asMilliseconds();
-    const difference = moment().subtract(ms);
-
-    const nextRange = rangeValues.map(({ value }) => {
-      const diff = Number.parseFloat((moment().diff(difference, value, true)).toFixed(2));
-
-      if (diff && diff - Math.floor(diff) === 0) {
-        return { diff, value };
-      }
-
-      return null;
-    }).filter(Boolean).pop();
-
-    setFromTimeValue(nextRange.diff);
-    setFromTimeRange(nextRange.value);
-  };
+  const availableRangeTypes = buildRangeTypes(config);
 
   useEffect(() => {
-    if (nextRangeProps.value?.range && nextRangeProps.value.range !== getRangeSeconds()) {
-      setRange(nextRangeProps.value.range);
+    const typeDuration = moment.duration(state.rangeValue, state.rangeType).asSeconds();
+    const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
+
+    if (typeDuration <= limitDuration) {
+      nextRangeHelpers.setValue({ ...nextRangeProps.value, ...state });
+    } else {
+      console.log('Nuh uh uh - you went over the limit!');
     }
-  }, [nextRangeProps.value]);
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <RelativeWrapper>
       <RangeWrapper>
-        <Field name="tempTimeRange.from">
-          {({ field: { name, onChange } }) => {
-            const _onChange = (event) => {
-              let fromMs;
+        <RangeTitle>From:</RangeTitle>
+        <RangeCheck htmlFor="relative-all-time">
+          <input type="checkbox"
+                 id="relative-all-time"
+                 value="0"
+                 checked={state.rangeAllTime}
+                 onChange={(event) => dispatch({
+                   type: 'rangeAllTime',
+                   value: event.target.checked,
+                 })} />All Time
+        </RangeCheck>
+        <InputWrap>
+          <Input id="relative-timerange-from-value"
+                 disabled={disabled || state.rangeAllTime}
+                 type="number"
+                 value={state.rangeValue}
+                 min="1"
+                 title="Set the range value"
+                 name="relative-timerange-from-value"
+                 onChange={(event) => dispatch({
+                   type: 'rangeValue',
+                   value: event.target.value,
+                 })} />
+        </InputWrap>
+        <StyledSelect id="relative-timerange-from-length"
+                      disabled={disabled || state.rangeAllTime}
+                      value={state.rangeType}
+                      options={availableRangeTypes}
+                      placeholder="Select a range"
+                      name="relative-timerange-from-length"
+                      onChange={(event) => dispatch({
+                        type: 'rangeType',
+                        value: event,
+                      })}
+                      clearable={false} />
 
-              if (typeof event === 'string') {
-                setFromTimeRange(event);
-
-                fromMs = getRangeSeconds(undefined, event);
-              } else {
-                setFromTimeValue(event.target.value);
-                fromMs = getRangeSeconds(event.target.value);
-              }
-
-              nextRangeHelpers.setValue({ ...nextRangeProps.value, range: fromMs });
-              onChange(fromMs);
-            };
-
-            return (
-              <>
-                <RangeTitle>From:</RangeTitle>
-                <RangeCheck htmlFor="relative-all-time">
-                  <input type="checkbox" id="relative-all-time" value="0" />All Time
-                </RangeCheck>
-                <InputWrap>
-                  <Input id="relative-timerange-from-value"
-                         disabled={disabled}
-                         type="number"
-                         value={fromTimeValue}
-                         title="Set the range value"
-                         name={name}
-                         onChange={_onChange} />
-                </InputWrap>
-                <StyledSelect id="relative-timerange-from-length"
-                              disabled={disabled}
-                              value={fromTimeRange}
-                              options={rangeValues}
-                              placeholder="Select a range"
-                              name={name}
-                              onChange={_onChange}
-                              clearable={false} />
-
-                <Ago />
-              </>
-            );
-          }}
-        </Field>
+        <Ago />
       </RangeWrapper>
 
       <StyledIcon name="arrow-right" />
 
       <RangeWrapper>
         <RangeTitle>Until:</RangeTitle>
-        <RangeCheck htmlFor="relative-now">
-          <input type="checkbox" id="relative-now" checked disabled />Now
+        <RangeCheck htmlFor="relative-offset">
+          <input type="checkbox" id="relative-offset" checked disabled />Now
         </RangeCheck>
-        <Field name="tempTimeRange.to.number">
-          {({ field: { name, onChange } }) => {
-            return (
-              <InputWrap>
-                <Input id="relative-timerange-until-value"
-                       disabled
-                       type="number"
-                       value="0"
-                       title="Set the range value"
-                       name={name}
-                       onChange={onChange} />
-              </InputWrap>
-            );
-          }}
-        </Field>
 
-        <Field name="tempTimeRange.to.length">
-          {({ field: { name, onChange } }) => {
-            return (
-              <StyledSelect id="relative-timerange-until-length"
-                            disabled
-                            value={rangeValues[0].value}
-                            options={rangeValues}
-                            placeholder="Select a range"
-                            name={name}
-                            onChange={onChange} />
-            );
-          }}
-        </Field>
+        <InputWrap>
+          <Input id="relative-timerange-until-value"
+                 disabled
+                 type="number"
+                 value="0"
+                 min="1"
+                 title="Set the range value"
+                 name="relative-timerange-until-value"
+                 onChange={() => {}} />
+        </InputWrap>
+
+        <StyledSelect id="relative-timerange-until-length"
+                      disabled
+                      value={RANGE_VALUES[0].value}
+                      options={availableRangeTypes}
+                      placeholder="Select a range"
+                      name="relative-timerange-until-length"
+                      onChange={() => {}} />
         <Ago />
       </RangeWrapper>
     </RelativeWrapper>
@@ -261,6 +259,9 @@ RelativeTimeRangeSelector.propTypes = {
     query_time_range_limit: PropTypes.string.isRequired,
   }).isRequired,
   disabled: PropTypes.bool,
+  originalTimeRange: PropTypes.shape({
+    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }).isRequired,
 };
 
 RelativeTimeRangeSelector.defaultProps = {
