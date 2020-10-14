@@ -83,7 +83,7 @@ public class UserPermissionsToGrantsMigration {
                 } catch (ValidationException e) {
                     LOG.error("Failed to update permssions on user <{}>", user.getName(), e);
                 }
-                LOG.info("Migrating entity <{}> permissions <{}> to <{}> grant for user <{}>", entityID, permissions, capability, user.getName());
+                LOG.info("Migrating entity <{}> permissions <{}> to <{}> grant for user <{}>", grnType.toGRN(entityID), permissions, capability, user.getName());
             } else {
                 LOG.info("Skipping non-migratable entity <{}>. Permissions <{}> cannot be converted to a grant capability", entityID, permissions);
             }

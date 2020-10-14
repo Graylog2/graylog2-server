@@ -114,9 +114,12 @@ public class ViewSharingToGrantsMigration {
                 .map(userService::load)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-        LOG.info("Migrate users for view {} to grants: {}", viewId, users);
 
         final GRN target = getTarget(viewId);
+
+        LOG.info("Migrate users for view <{}> to grants: {}", target, users.stream()
+                .map(u -> u.getId() + "/" + u.getName())
+                .collect(Collectors.toSet()));
 
         for (final User user : users) {
             ensureGrant(user, target);
@@ -124,9 +127,9 @@ public class ViewSharingToGrantsMigration {
     }
 
     private void migrateRoles(String viewId, Collection<String> roleNames) {
-        LOG.info("Migrate roles for view {} to grants: {}", viewId, roleNames);
-
         final GRN target = getTarget(viewId);
+
+        LOG.info("Migrate roles for view <{}> to grants: {}", target, roleNames);
 
         final Set<Role> roles = roleNames.stream()
                 .map(roleName -> {
