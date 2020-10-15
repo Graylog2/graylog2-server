@@ -236,22 +236,23 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
                         <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
                         <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
-                        <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
-                        <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
-                        <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW} component={AuthenticationOverviewPage} />
-                        <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')} component={AuthenticationBackendDetailsPage} />
-                        <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')} component={AuthenticationBackendEditPage} />
-                        <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')} component={AuthenticationBackendCreatePage} />
 
-                        <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
-                        <Route path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />
-                        <Route path={Routes.SYSTEM.USERS.show(':username')} component={UserDetailsPage} />
-                        <Route path={Routes.SYSTEM.USERS.edit(':username')} component={UserEditPage} />
-                        <Route path={Routes.SYSTEM.USERS.TOKENS.edit(':username')} component={UserTokensEditPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW} component={AuthenticationOverviewPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')} component={AuthenticationBackendDetailsPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')} component={AuthenticationBackendEditPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')} component={AuthenticationBackendCreatePage} />
 
-                        <Route path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} component={RolesOverviewPage} />
-                        <Route path={Routes.SYSTEM.AUTHZROLES.show(':roleId')} component={RoleDetailsPage} />
-                        <Route path={Routes.SYSTEM.AUTHZROLES.edit(':roleId')} component={RoleEditPage} />
+                        <Route exact path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
+                        <Route exact path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />
+                        <Route exact path={Routes.SYSTEM.USERS.show(':username')} component={UserDetailsPage} />
+                        <Route exact path={Routes.SYSTEM.USERS.edit(':username')} component={UserEditPage} />
+                        <Route exact path={Routes.SYSTEM.USERS.TOKENS.edit(':username')} component={UserTokensEditPage} />
+
+                        <Route exact path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} component={RolesOverviewPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHZROLES.show(':roleId')} component={RoleDetailsPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHZROLES.edit(':roleId')} component={RoleEditPage} />
 
                         <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
                         <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
