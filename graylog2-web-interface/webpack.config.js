@@ -147,7 +147,7 @@ const webpackConfig = {
       filename: 'config.js',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/config.js.template'),
-      isCloud: process.env.IS_CLOUD,
+      isCloud: false,
     }),
     new webpack.DefinePlugin({
       FEATURES: JSON.stringify(process.env.FEATURES),

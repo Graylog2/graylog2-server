@@ -18,7 +18,7 @@ const globOptions = {
 
 const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions).map(config => `${globCwd}/${config}`);
 
-if (pluginConfigs.filter(config => config.includes('graylog-plugin-cloud/server-plugin')).length > 0) {
+if (pluginConfigs.filter((config) => config.includes('graylog-plugin-cloud/server-plugin')).length > 0) {
   process.env.IS_CLOUD = true;
 }
 
@@ -69,6 +69,14 @@ if (TARGET === 'start') {
   });
 
   webpackConfig.entry = hmrEntries;
+}
+
+// If the cloud plugin is present, inject "isCloud = true" into the generated `config.js` file
+if (pluginConfigs.filter((config) => config.includes('graylog-plugin-cloud/server-plugin')).length > 0) {
+  const configJs = webpackConfig.plugins.find((plugin) => 'options' in plugin
+    && 'filename' in plugin.options
+    && plugin.options.filename === 'config.js');
+  configJs.options.isCloud = true;
 }
 
 module.exports = webpackConfig;
