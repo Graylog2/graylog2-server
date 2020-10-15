@@ -70,7 +70,7 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
       if (urlwhitelistConfig && entries.length === 0) {
         this._setDefaultWhiteListState(urlwhitelistConfig);
       } else if (prevProps.newUrlEntry !== newUrlEntry) {
-        this._setDefaultWhiteListState(urlwhitelistConfig);
+        this._setDefaultWhiteListState({ entries: [], disabled: false });
       }
     }
 
