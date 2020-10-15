@@ -12,7 +12,7 @@ import { FetchError } from 'logic/rest/FetchProvider';
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
 jest.unmock('logic/rest/FetchProvider');
-jest.mock('routing/withLocation', () => Component => (props) => <Component {...props} location={{ pathname: '/' }} />);
+jest.mock('routing/withLocation', () => (Component) => (props) => <Component {...props} location={{ pathname: '/' }} />);
 
 const router = {
   listen: () => jest.fn(),
