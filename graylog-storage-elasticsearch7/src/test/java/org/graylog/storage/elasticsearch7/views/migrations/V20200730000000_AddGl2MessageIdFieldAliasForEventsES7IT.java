@@ -35,7 +35,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
 
     @Before
     public void setUp() {
-        sut = new V20200730000000_AddGl2MessageIdFieldAliasForEventsES7(elasticsearch.restHighLevelClient());
+        sut = new V20200730000000_AddGl2MessageIdFieldAliasForEventsES7(elasticsearch.elasticsearchClient());
     }
 
     @Test
