@@ -31,16 +31,16 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.plugin.streams.Stream;
 
 public class NotificationTestData {
-    public static final String TEST_NOTIFICATION_ID = "this-is-a-test-notification";
+    public static final String TEST_NOTIFICATION_ID = "NotificationTestId";
 
-    static EventNotificationContext getDummyContext(NotificationDto notificationDto, String userName) {
+    public static EventNotificationContext getDummyContext(NotificationDto notificationDto, String userName) {
         final EventDto eventDto = EventDto.builder()
                 .alert(true)
                 .eventDefinitionId("EventDefinitionTestId")
                 .eventDefinitionType("notification-test-v1")
                 .eventTimestamp(Tools.nowUTC())
                 .processingTimestamp(Tools.nowUTC())
-                .id("NotificationTestId")
+                .id("TEST_NOTIFICATION_ID")
                 .streams(ImmutableSet.of(Stream.DEFAULT_EVENTS_STREAM_ID))
                 .message("Notification test message triggered from user <" + userName + ">")
                 .source(Stream.DEFAULT_STREAM_ID)
