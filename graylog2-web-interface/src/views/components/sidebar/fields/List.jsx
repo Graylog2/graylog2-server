@@ -4,6 +4,7 @@ import { SizeMe } from 'react-sizeme';
 import { FixedSizeList } from 'react-window';
 import { List as ImmutableList } from 'immutable';
 import type { Styles } from 'styled-components';
+import styled from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
@@ -12,6 +13,10 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ListItem from './ListItem';
 
 const DEFAULT_HEIGHT_PX = 50;
+
+const DynamicHeight = styled.div`
+  overflow: hidden;
+`;
 
 type Props = {
   activeQueryFields: ImmutableList<FieldTypeMapping>,
@@ -62,12 +67,14 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
   return (
     <SizeMe monitorHeight refreshRate={100}>
       {({ size: { height, width } }) => (
-        <FixedSizeList height={height || DEFAULT_HEIGHT_PX}
-                       width={width}
-                       itemCount={fieldList.size}
-                       itemSize={20}>
-          {Row}
-        </FixedSizeList>
+        <DynamicHeight>
+          <FixedSizeList height={height || DEFAULT_HEIGHT_PX}
+                         width={width}
+                         itemCount={fieldList.size}
+                         itemSize={20}>
+            {Row}
+          </FixedSizeList>
+        </DynamicHeight>
       )}
     </SizeMe>
   );
