@@ -41,7 +41,7 @@ const PaginatedList = ({
   const initialPage = activePage > 0 ? activePage : INITIAL_PAGE;
   const [pageSize, setPageSize] = useState(propsPageSize);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const numberPages = Math.ceil(totalItems / pageSize);
+  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
 
   useEffect(() => {
     if (activePage > 0) {
