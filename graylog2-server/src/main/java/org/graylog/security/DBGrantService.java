@@ -17,7 +17,6 @@
 package org.graylog.security;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -108,7 +107,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     }
 
     public List<GrantDTO> getForTargetAndGrantee(GRN target, GRN grantee) {
-       return getForTargetAndGrantees(target, ImmutableSet.of(grantee));
+        return getForTargetAndGrantees(target, ImmutableSet.of(grantee));
     }
 
     public List<GrantDTO> getForTargetAndGrantees(GRN target, Set<GRN> grantees) {
@@ -143,6 +142,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
     /**
      * Ensure that a grant with the requested or a higher capability exists.
+     *
      * @return the created, updated or existing grant
      */
     public GrantDTO ensure(GRN grantee, Capability capability, GRN target, String creatorUsername) {
@@ -175,9 +175,9 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                 .build());
     }
 
-    public ImmutableMap<String, Set<GrantDTO>> listAll() {
+    public ImmutableSet<GrantDTO> getAll() {
         try (final Stream<GrantDTO> stream = streamAll()) {
-            return ImmutableMap.of("grants", stream.collect(Collectors.toSet()));
+            return stream.collect(ImmutableSet.toImmutableSet());
         }
     }
 

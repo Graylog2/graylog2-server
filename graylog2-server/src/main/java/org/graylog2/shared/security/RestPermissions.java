@@ -72,6 +72,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String EVENT_NOTIFICATIONS_EDIT = "eventnotifications:edit";
     public static final String EVENT_NOTIFICATIONS_READ = "eventnotifications:read";
     public static final String FIELDNAMES_READ = "fieldnames:read";
+    public static final String GRANTS_OVERVIEW_READ = "grantsoverview:read";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
@@ -199,6 +200,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
             .add(create(EVENT_NOTIFICATIONS_READ, ""))
             .add(create(FIELDNAMES_READ, ""))
+            .add(create(GRANTS_OVERVIEW_READ, ""))
             .add(create(INDEXERCLUSTER_READ, ""))
             .add(create(INDEXRANGES_READ, ""))
             .add(create(INDEXRANGES_REBUILD, ""))
