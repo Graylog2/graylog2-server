@@ -71,12 +71,4 @@ if (TARGET === 'start') {
   webpackConfig.entry = hmrEntries;
 }
 
-// If the cloud plugin is present, inject "isCloud = true" into the generated `config.js` file
-if (pluginConfigs.filter((config) => config.includes('graylog-plugin-cloud/server-plugin')).length > 0) {
-  const configJs = webpackConfig.plugins.find((plugin) => 'options' in plugin
-    && 'filename' in plugin.options
-    && plugin.options.filename === 'config.js');
-  configJs.options.isCloud = true;
-}
-
 module.exports = webpackConfig;

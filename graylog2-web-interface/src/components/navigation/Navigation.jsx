@@ -124,7 +124,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           AppConfig.gl2DevMode()
             && (
               <InactiveNavItem className="dev-badge-wrap">
-                <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
+                <Badge bsStyle="danger" className="dev-badge">{AppConfig.isCloud() ? 'CLOUD ' : ''} DEV</Badge>
               </InactiveNavItem>
             )
           }

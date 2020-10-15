@@ -143,12 +143,6 @@ const webpackConfig = {
       template: path.resolve(ROOT_PATH, 'templates/module.json.template'),
       excludeChunks: ['config'],
     }),
-    new HtmlWebpackPlugin({
-      filename: 'config.js',
-      inject: false,
-      template: path.resolve(ROOT_PATH, 'templates/config.js.template'),
-      isCloud: false,
-    }),
     new webpack.DefinePlugin({
       FEATURES: JSON.stringify(process.env.FEATURES),
     }),
@@ -170,7 +164,9 @@ if (TARGET === 'start') {
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
         GRAYLOG_HTTP_PUBLISH_URI: JSON.stringify(process.env.GRAYLOG_HTTP_PUBLISH_URI),
+        IS_CLOUD: process.env.IS_CLOUD,
       }),
+      new CopyWebpackPlugin([{ from: 'config.js' }]),
       new webpack.HotModuleReplacementPlugin(),
     ],
   });
