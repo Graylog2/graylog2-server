@@ -23,24 +23,27 @@ import type { StyledComponent } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
-import type { ThemeInterface } from 'theme';
+// import type { ThemeInterface } from 'theme';
 import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
 
 type Props = {
   disabled: boolean,
 };
 
-const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
-  width: 200px;
+const AbsoluteWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 `;
 
-const Separator: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
-  margin: 0;
-  line-height: 34px;
-  font-size: ${theme.fonts.size.large};
-  padding-left: 15px;
-  padding-right: 15px;
-`);
+const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+  flex: 4;
+  align-items: center;
+`;
+
+const StyledIcon: StyledComponent<{}, void, typeof Icon> = styled(Icon)`
+  flex: 0.75;
+`;
 
 const _isValidDateString = (dateString: string) => {
   if (dateString === undefined) {
@@ -54,10 +57,10 @@ const _isValidDateString = (dateString: string) => {
 
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
   return (
-    <>
-      <Field name="tempTimeRange.from" validate={_isValidDateString}>
-        {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
-          <InputWrap>
+    <AbsoluteWrapper>
+      <RangeWrapper>
+        <Field name="tempTimeRange.from" validate={_isValidDateString}>
+          {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
             <DateInputWithPicker disabled={disabled}
                                  onChange={onChange}
                                  onBlur={onBlur}
@@ -65,17 +68,15 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
                                  name={name}
                                  title="Search start date"
                                  error={error} />
-          </InputWrap>
-        )}
-      </Field>
+          )}
+        </Field>
+      </RangeWrapper>
 
-      <Separator className="text-center">
-        <Icon name="long-arrow-alt-right" />
-      </Separator>
+      <StyledIcon name="arrow-right" />
 
-      <Field name="tempTimeRange.to" validate={_isValidDateString}>
-        {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
-          <InputWrap>
+      <RangeWrapper>
+        <Field name="tempTimeRange.to" validate={_isValidDateString}>
+          {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
             <DateInputWithPicker disabled={disabled}
                                  onChange={onChange}
                                  onBlur={onBlur}
@@ -83,10 +84,10 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
                                  name={name}
                                  title="Search end date"
                                  error={error} />
-          </InputWrap>
-        )}
-      </Field>
-    </>
+          )}
+        </Field>
+      </RangeWrapper>
+    </AbsoluteWrapper>
   );
 };
 
