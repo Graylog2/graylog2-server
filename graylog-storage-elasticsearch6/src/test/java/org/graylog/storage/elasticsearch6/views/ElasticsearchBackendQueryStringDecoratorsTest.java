@@ -16,10 +16,10 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -95,7 +95,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
         return searchJob;
     }
 
-    @NotNull
+    @Nonnull
     private SearchType basicSearchType() {
         final SearchType searchType = mock(SearchType.class);
 
@@ -103,7 +103,7 @@ class ElasticsearchBackendQueryStringDecoratorsTest {
         return searchType;
     }
 
-    @NotNull
+    @Nonnull
     private SearchJob basicSearchJob(Query query, SearchType searchType) throws InvalidRangeParametersException {
         final SearchJob searchJob = mock(SearchJob.class);
         final Search search = mock(Search.class);
