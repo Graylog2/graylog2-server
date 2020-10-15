@@ -168,12 +168,12 @@
         <equalsverifier.version>3.4.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
-        <junit-jupiter.version>5.6.0</junit-jupiter.version>
+        <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <mockito.version>3.4.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.14.3</testcontainers.version>
+        <testcontainers.version>1.15.0-rc2</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v12.13.1</nodejs.version>
