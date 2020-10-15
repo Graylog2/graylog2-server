@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import { DropdownButton, MenuItem } from 'components/graylog';
-import { IfPermitted } from 'components/common';
+import { IfPermitted, HasOwnership } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -20,6 +22,7 @@ const StreamControls = createReactClass({
     indexSets: PropTypes.array.isRequired,
     onDelete: PropTypes.func.isRequired,
     onClone: PropTypes.func.isRequired,
+    onShare: PropTypes.func.isRequired,
     onQuickAdd: PropTypes.func.isRequired,
     onUpdate: PropTypes.func.isRequired,
     isDefaultStream: PropTypes.bool,
@@ -34,7 +37,8 @@ const StreamControls = createReactClass({
   },
 
   _onDelete() {
-    this.props.onDelete(this.props.stream);
+    const { onDelete, stream } = this.props;
+    onDelete(stream);
   },
 
   _onEdit() {
@@ -46,26 +50,29 @@ const StreamControls = createReactClass({
   },
 
   _onCloneSubmit(_, stream) {
-    this.props.onClone(this.props.stream.id, stream);
+    const { onClone, stream: propsStream } = this.props;
+    onClone(propsStream.id, stream);
   },
 
   _onQuickAdd() {
-    this.props.onQuickAdd(this.props.stream.id);
+    const { onQuickAdd, stream } = this.props;
+    onQuickAdd(stream.id);
   },
 
   _setStartpage() {
-    StartpageStore.set(this.props.user.username, 'stream', this.props.stream.id);
+    const { user, stream } = this.props;
+    StartpageStore.set(user.username, 'stream', stream.id);
   },
 
   render() {
-    const { stream } = this.props;
+    const { stream, isDefaultStream, user, onShare, onUpdate, indexSets } = this.props;
 
     return (
       <span>
         <DropdownButton title="More Actions"
                         pullRight
                         id={`more-actions-dropdown-${stream.id}`}
-                        disabled={this.props.isDefaultStream}>
+                        disabled={isDefaultStream}>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit}>Edit stream</MenuItem>
           </IfPermitted>
@@ -75,9 +82,17 @@ const StreamControls = createReactClass({
           <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
             <MenuItem key={`cloneStream-${stream.id}`} onSelect={this._onClone}>Clone this stream</MenuItem>
           </IfPermitted>
-          <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={this.props.user.read_only}>
+          <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={user.read_only}>
             Set as startpage
           </MenuItem>
+
+          <HasOwnership id={stream.id} type="stream">
+            {({ disabled }) => (
+              <MenuItem key={`share-${stream.id}`} onSelect={onShare} disabled={disabled}>
+                Share {disabled && <SharingDisabledPopover type="stream" />}
+              </MenuItem>
+            )}
+          </HasOwnership>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`divider-${stream.id}`} divider />
           </IfPermitted>
@@ -87,8 +102,8 @@ const StreamControls = createReactClass({
             </MenuItem>
           </IfPermitted>
         </DropdownButton>
-        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }} title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets} />
-        <StreamForm ref={(cloneForm) => { this.cloneForm = cloneForm; }} title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={this.props.indexSets} />
+        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }} title="Editing Stream" onSubmit={onUpdate} stream={stream} indexSets={indexSets} />
+        <StreamForm ref={(cloneForm) => { this.cloneForm = cloneForm; }} title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={indexSets} />
       </span>
     );
   },

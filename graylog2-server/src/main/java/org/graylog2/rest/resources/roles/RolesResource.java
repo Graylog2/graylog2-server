@@ -16,12 +16,15 @@
  */
 package org.graylog2.rest.resources.roles;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -56,8 +59,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -191,13 +194,22 @@ public class RolesResource extends RestResource {
         for (User user : users) {
             final Set<String> roleNames = userService.getRoleNames(user);
 
+            List<WildcardPermission> wildcardPermissions;
+            List<GRNPermission> grnPermissions;
+            if (isPermitted(RestPermissions.USERS_PERMISSIONSEDIT, user.getName())) {
+                wildcardPermissions = userService.getWildcardPermissionsForUser(user);
+                grnPermissions = userService.getGRNPermissionsForUser(user);
+            } else {
+                wildcardPermissions = ImmutableList.of();
+                grnPermissions = ImmutableList.of();
+            }
             userSummaries.add(UserSummary.create(
                     user.getId(),
                     user.getName(),
                     user.getEmail(),
                     user.getFullName(),
-                    isPermitted(RestPermissions.USERS_PERMISSIONSEDIT,
-                            user.getName()) ? userService.getPermissionsForUser(user) : Collections.<String>emptyList(),
+                    wildcardPermissions,
+                    grnPermissions,
                     user.getPreferences(),
                     firstNonNull(user.getTimeZone(), DateTimeZone.UTC).getID(),
                     user.getSessionTimeoutMs(),

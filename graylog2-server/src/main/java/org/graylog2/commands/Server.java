@@ -27,6 +27,7 @@ import com.mongodb.MongoException;
 import org.graylog.events.EventsModule;
 import org.graylog.freeenterprise.FreeEnterpriseConfiguration;
 import org.graylog.freeenterprise.FreeEnterpriseModule;
+import org.graylog.grn.GRNModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -36,6 +37,7 @@ import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
+import org.graylog.security.SecurityModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
@@ -160,7 +162,9 @@ public class Server extends ServerBootstrap {
                 new ViewsBindings(),
                 new JobSchedulerModule(),
                 new EventsModule(),
-                new FreeEnterpriseModule()
+                new FreeEnterpriseModule(),
+                new GRNModule(),
+                new SecurityModule()
         );
 
         return modules.build();

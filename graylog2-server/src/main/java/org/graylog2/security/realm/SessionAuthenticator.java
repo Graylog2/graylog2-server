@@ -61,15 +61,15 @@ public class SessionAuthenticator extends AuthenticatingRealm {
             return null;
         }
 
-        final Object username = subject.getPrincipal();
-        final User user = userService.load(String.valueOf(username));
+        final Object userId = subject.getPrincipal();
+        final User user = userService.loadById(String.valueOf(userId));
         if (user == null) {
-            LOG.debug("No user named {} found for session {}", username, sessionIdToken.getSessionId());
+            LOG.debug("No user with userId {} found for session {}", userId, sessionIdToken.getSessionId());
             return null;
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Found session {} for user name {}", session.getId(), username);
+            LOG.debug("Found session {} for userId {}", session.getId(), userId);
         }
 
         @SuppressWarnings("unchecked")
@@ -83,6 +83,6 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         }
         ThreadContext.bind(subject);
 
-        return new SimpleAccount(user.getName(), null, "session authenticator");
+        return new SimpleAccount(user.getId(), null, "session authenticator");
     }
 }

@@ -28,6 +28,8 @@ import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.storage.EventStorageHandler;
+import org.graylog.grn.GRNDescriptorProvider;
+import org.graylog.grn.GRNType;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
@@ -296,5 +298,10 @@ public abstract class PluginModule extends Graylog2Module {
         install(new FactoryModuleBuilder().implement(EventNotification.class, handlerClass).build(factoryClass));
         eventNotificationBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(notificationClass, name);
+    }
+
+    protected void addGRNType(GRNType type, Class<? extends GRNDescriptorProvider> descriptorProvider) {
+        final MapBinder<GRNType, GRNDescriptorProvider> mapBinder = MapBinder.newMapBinder(binder(), GRNType.class, GRNDescriptorProvider.class);
+        mapBinder.addBinding(type).to(descriptorProvider);
     }
 }

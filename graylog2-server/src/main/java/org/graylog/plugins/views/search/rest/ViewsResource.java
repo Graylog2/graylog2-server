@@ -26,6 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
@@ -56,6 +57,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,15 +81,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
     private final ClusterEventBus clusterEventBus;
-    private final ViewPermissionChecks permissionChecks;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         ClusterEventBus clusterEventBus,
-                         ViewPermissionChecks permissionChecks) {
+                         ClusterEventBus clusterEventBus) {
         this.dbService = dbService;
         this.clusterEventBus = clusterEventBus;
-        this.permissionChecks = permissionChecks;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
@@ -96,9 +95,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                             @ApiParam(name = "sort",
-                                                    value = "The field to sort the result on",
-                                                    required = true,
-                                                    allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
+                                                      value = "The field to sort the result on",
+                                                      required = true,
+                                                      allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
                                             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
                                             @ApiParam(name = "query") @QueryParam("query") String query) {
 
@@ -110,7 +109,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
                     searchQuery,
-                    view -> permissionChecks.allowedToSeeView(getCurrentUser(), view, this::isPermitted),
+                    view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
+                            || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id())),
                     order,
                     sortField,
                     page,
@@ -125,7 +125,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{id}")
     @ApiOperation("Get a single view")
-    public ViewDTO get(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
+    public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
@@ -134,7 +134,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
 
         final ViewDTO view = loadView(id);
-        if (permissionChecks.allowedToSeeView(getCurrentUser(), view, this::isPermitted)) {
+        if (isPermitted(ViewsRestPermissions.VIEW_READ, id)
+                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))) {
             return view;
         }
 
@@ -144,12 +145,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid ViewDTO dto) throws ValidationException {
-        if (permissionChecks.isDashboard(dto)) {
+    public ViewDTO create(@ApiParam @Valid ViewDTO dto, @Context UserContext userContext) throws ValidationException {
+        if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
             checkPermission(RestPermissions.DASHBOARDS_CREATE);
         }
-        final String username = getCurrentUser() == null ? null : getCurrentUser().getName();
-        final ViewDTO savedDto = dbService.save(dto.toBuilder().owner(username).build());
+        final User user = userContext.getUser();
+        final ViewDTO savedDto = dbService.saveWithOwner(dto.toBuilder().owner(user.getName()).build(), user);
         ensureUserPermissions(savedDto);
         return savedDto;
     }
@@ -158,18 +159,15 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
-    public ViewDTO update(@ApiParam(name="id") @PathParam("id") @NotEmpty String id,
+    public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid ViewDTO dto) {
-        final ViewDTO savedView = loadView(id);
-        if (!permissionChecks.ownsView(getCurrentUser(), savedView)) {
-            if (permissionChecks.isDashboard(dto)) {
-                checkAnyPermission(new String[]{
-                        ViewsRestPermissions.VIEW_EDIT,
-                        RestPermissions.DASHBOARDS_EDIT
-                }, id);
-            } else {
-                checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
-            }
+        if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
+            checkAnyPermission(new String[]{
+                    ViewsRestPermissions.VIEW_EDIT,
+                    RestPermissions.DASHBOARDS_EDIT
+            }, id);
+        } else {
+            checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
         }
         return dbService.update(dto.toBuilder().id(id).build());
     }
@@ -178,24 +176,19 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}/default")
     @ApiOperation("Configures the view as default view")
     @AuditEvent(type = ViewsAuditEventTypes.DEFAULT_VIEW_SET)
-    public void setDefault(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
-        final ViewDTO savedView = loadView(id);
-        if (!permissionChecks.ownsView(getCurrentUser(), savedView)) {
-            checkPermission(ViewsRestPermissions.VIEW_READ, id);
-        }
+    public void setDefault(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
+        checkPermission(ViewsRestPermissions.VIEW_READ, id);
         checkPermission(ViewsRestPermissions.DEFAULT_VIEW_SET);
-        dbService.saveDefault(savedView);
+        dbService.saveDefault(loadView(id));
     }
 
     @DELETE
     @Path("{id}")
     @ApiOperation("Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
-    public ViewDTO delete(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
+    public ViewDTO delete(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
+        checkPermission(ViewsRestPermissions.VIEW_DELETE, id);
         final ViewDTO dto = loadView(id);
-        if (!permissionChecks.ownsView(getCurrentUser(), dto)) {
-            checkPermission(ViewsRestPermissions.VIEW_DELETE, id);
-        }
         dbService.delete(id);
         removeUserPermissions(dto);
         triggerDeletedEvent(dto);

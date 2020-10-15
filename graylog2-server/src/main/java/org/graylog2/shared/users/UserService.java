@@ -16,6 +16,9 @@
  */
 package org.graylog2.shared.users;
 
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.users.User;
 
@@ -28,6 +31,18 @@ import java.util.Set;
 public interface UserService extends PersistedService {
     @Nullable
     User load(String username);
+
+    @Nullable
+    User loadById(String id);
+
+    /**
+     * Tries to find a user for the given authentication service UID or username. (in that order)
+     *
+     * @param authServiceUid the authentication service UID (tried first)
+     * @param username       the username (tried second)
+     * @return the user or an empty option if no user can be found
+     */
+    Optional<User> loadByAuthServiceUidOrUsername(String authServiceUid, String username);
 
     int delete(String username);
 
@@ -44,17 +59,24 @@ public interface UserService extends PersistedService {
     /**
      * Get the root user. The root user might not be present in all environments and there shouldn't really be
      * a need to explicitly refer to the root user. But if you really need it, here you go.
+     *
      * @return The root user, if present. An empty optional otherwise.
      */
     Optional<User> getRootUser();
 
     long count();
 
+    List<User> loadAllForAuthServiceBackend(String authServiceBackendId);
+
     Collection<User> loadAllForRole(Role role);
 
     Set<String> getRoleNames(User user);
 
-    List<String> getPermissionsForUser(User user);
+    List<Permission> getPermissionsForUser(User user);
+
+    List<WildcardPermission> getWildcardPermissionsForUser(User user);
+
+    List<GRNPermission> getGRNPermissionsForUser(User user);
 
     Set<String> getUserPermissionsFromRoles(User user);
 

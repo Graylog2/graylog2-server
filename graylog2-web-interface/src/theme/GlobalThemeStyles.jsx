@@ -112,10 +112,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     }
   }
 
-  label {
-    font-size: ${theme.fonts.size.large};
-  }
-
   legend small {
     color: ${theme.colors.gray[60]};
     margin-left: 5px;
@@ -144,7 +140,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .actions-lg .actions-container {
-    height: 60px;
     margin-top: 10px;
     padding-left: 50px;
   }
@@ -260,10 +255,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   dl.metric-histogram dd {
     margin-left: 125px;
-  }
-
-  #user-list th.user-type {
-    width: 50px;
   }
 
   td.centered {
@@ -619,7 +610,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     color: ${theme.colors.global.textDefault};
     
-    .tt-suggestion:hover, 
+    .tt-suggestion:hover,
     .tt-suggestion.tt-cursor {
       color: ${theme.colors.variant.darkest.info};
       background-color: ${theme.colors.variant.lighter.info};

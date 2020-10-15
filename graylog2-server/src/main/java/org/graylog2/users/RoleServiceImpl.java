@@ -56,6 +56,7 @@ public class RoleServiceImpl implements RoleService {
     private static final String ROLES = "roles";
     private static final String NAME_LOWER = "name_lower";
     private static final String READ_ONLY = "read_only";
+    private static final String ID = "_id";
 
     private static final String ADMIN_ROLENAME = "Admin";
     private static final String READER_ROLENAME = "Reader";
@@ -66,7 +67,7 @@ public class RoleServiceImpl implements RoleService {
     private final String readerRoleObjectId;
 
     @Inject
-    protected RoleServiceImpl(MongoConnection mongoConnection,
+    public RoleServiceImpl(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
                               Permissions permissions,
                               Validator validator) {
@@ -153,9 +154,24 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Set<Role> loadAll() throws NotFoundException {
+    public Set<Role> loadAll() {
         try (DBCursor<RoleImpl> rolesCursor = dbCollection.find()) {
             return ImmutableSet.copyOf((Iterable<? extends Role>) rolesCursor);
+        }
+    }
+
+    @Override
+    public Map<String, Role> findIdMap(Set<String> roleIds) throws NotFoundException {
+        final DBQuery.Query query = DBQuery.in(ID, roleIds);
+        try (DBCursor<RoleImpl> rolesCursor = dbCollection.find(query)) {
+            ImmutableSet<Role> roles = ImmutableSet.copyOf((Iterable<? extends Role>) rolesCursor);
+            return Maps.uniqueIndex(roles, new Function<Role, String>() {
+                @Nullable
+                @Override
+                public String apply(Role input) {
+                    return input.getId();
+                }
+            });
         }
     }
 

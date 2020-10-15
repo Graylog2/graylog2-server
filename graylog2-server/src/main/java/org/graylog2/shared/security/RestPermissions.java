@@ -17,6 +17,7 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.authzroles.BuiltinRole;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
@@ -32,6 +33,13 @@ public class RestPermissions implements PluginPermissions {
      */
     public static final String AUTHENTICATION_READ = "authentication:read";
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
+    public static final String AUTH_SERVICE_BACKEND_CREATE = "authservicebackend:create";
+    public static final String AUTH_SERVICE_BACKEND_DELETE = "authservicebackend:delete";
+    public static final String AUTH_SERVICE_BACKEND_EDIT = "authservicebackend:edit";
+    public static final String AUTH_SERVICE_BACKEND_READ = "authservicebackend:read";
+    public static final String AUTH_SERVICE_GLOBAL_CONFIG_READ = "authserviceglobalconfig:read";
+    public static final String AUTH_SERVICE_GLOBAL_CONFIG_EDIT = "authserviceglobalconfig:edit";
+    public static final String AUTH_SERVICE_TEST_BACKEND_EXECUTE = "authservicetestbackend:execute";
     public static final String BUFFERS_READ = "buffers:read";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
@@ -115,9 +123,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String ROLES_DELETE = "roles:delete";
     public static final String ROLES_EDIT = "roles:edit";
     public static final String ROLES_READ = "roles:read";
-    public static final String SAVEDSEARCHES_CREATE = "savedsearches:create";
-    public static final String SAVEDSEARCHES_EDIT = "savedsearches:edit";
-    public static final String SAVEDSEARCHES_READ = "savedsearches:read";
     public static final String SEARCHES_ABSOLUTE = "searches:absolute";
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
@@ -149,9 +154,20 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
+    // This is a special permission that ONLY works with GRNs as ID/target
+    // TODO does this belong here?
+    public static final String ENTITY_OWN = "entity:own";
+
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(AUTHENTICATION_EDIT, ""))
             .add(create(AUTHENTICATION_READ, ""))
+            .add(create(AUTH_SERVICE_BACKEND_CREATE, ""))
+            .add(create(AUTH_SERVICE_BACKEND_DELETE, ""))
+            .add(create(AUTH_SERVICE_BACKEND_EDIT, ""))
+            .add(create(AUTH_SERVICE_BACKEND_READ, ""))
+            .add(create(AUTH_SERVICE_GLOBAL_CONFIG_READ, ""))
+            .add(create(AUTH_SERVICE_GLOBAL_CONFIG_EDIT, ""))
+            .add(create(AUTH_SERVICE_TEST_BACKEND_EXECUTE, ""))
             .add(create(BUFFERS_READ, ""))
             .add(create(CONTENT_PACK_CREATE, ""))
             .add(create(CONTENT_PACK_DELETE, ""))
@@ -233,9 +249,6 @@ public class RestPermissions implements PluginPermissions {
             .add(create(ROLES_DELETE, ""))
             .add(create(ROLES_EDIT, ""))
             .add(create(ROLES_READ, ""))
-            .add(create(SAVEDSEARCHES_CREATE, ""))
-            .add(create(SAVEDSEARCHES_EDIT, ""))
-            .add(create(SAVEDSEARCHES_READ, ""))
             .add(create(SEARCHES_ABSOLUTE, ""))
             .add(create(SEARCHES_KEYWORD, ""))
             .add(create(SEARCHES_RELATIVE, ""))
@@ -282,9 +295,6 @@ public class RestPermissions implements PluginPermissions {
             MESSAGES_ANALYZE,
             MESSAGES_READ,
             METRICS_READ,
-            SAVEDSEARCHES_CREATE,
-            SAVEDSEARCHES_EDIT,
-            SAVEDSEARCHES_READ,
             SYSTEM_READ,
             THROUGHPUT_READ
     ).build();
@@ -292,6 +302,18 @@ public class RestPermissions implements PluginPermissions {
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
             .filter(permission -> READER_BASE_PERMISSION_SELECTION.contains(permission.permission()))
             .collect(Collectors.toSet());
+
+    protected static final ImmutableSet<BuiltinRole> BUILTIN_ROLES = ImmutableSet.<BuiltinRole>builder().add(
+            BuiltinRole.create("Dashboard Creator", "Allows creation of Dashboards (built-in)", ImmutableSet.of(
+                    RestPermissions.DASHBOARDS_CREATE
+            )),
+            BuiltinRole.create("Event Definition Creator", "Allows creation of Event Definitions (built-in)", ImmutableSet.of(
+                    RestPermissions.EVENT_DEFINITIONS_CREATE
+            )),
+            BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
+                    RestPermissions.EVENT_NOTIFICATIONS_CREATE
+            ))
+    ).build();
 
     @Override
     public Set<Permission> readerBasePermissions() {
@@ -301,5 +323,10 @@ public class RestPermissions implements PluginPermissions {
     @Override
     public Set<Permission> permissions() {
         return PERMISSIONS;
+    }
+
+    @Override
+    public Set<BuiltinRole> builtinRoles() {
+        return BUILTIN_ROLES;
     }
 }

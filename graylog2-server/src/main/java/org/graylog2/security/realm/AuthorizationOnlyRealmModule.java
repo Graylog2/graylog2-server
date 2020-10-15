@@ -19,6 +19,7 @@ package org.graylog2.security.realm;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.graylog.security.GrantsAuthorizingRealm;
 import org.graylog2.plugin.inject.Graylog2Module;
 
 public class AuthorizationOnlyRealmModule extends Graylog2Module {
@@ -28,6 +29,7 @@ public class AuthorizationOnlyRealmModule extends Graylog2Module {
         final MapBinder<String, AuthorizingRealm> authz = authorizationOnlyRealmBinder();
 
         add(authz, MongoDbAuthorizationRealm.NAME, MongoDbAuthorizationRealm.class);
+        add(authz, GrantsAuthorizingRealm.NAME, GrantsAuthorizingRealm.class);
     }
 
     private void add(MapBinder<String, AuthorizingRealm> authz, String name,

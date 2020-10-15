@@ -100,6 +100,7 @@ class TypeAheadDataFilter extends React.Component {
 
   _onSearchTextChanged = (event) => {
     event.preventDefault();
+    event.stopPropagation();
     this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
   };
 
@@ -214,10 +215,11 @@ class TypeAheadDataFilter extends React.Component {
 
     return (
       <div className="filter">
-        <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline' }}>
+        <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline-flex', alignItems: 'flex-end' }}>
           <TypeAheadInput id={id}
                           ref={(typeAheadInput) => { this.typeAheadInput = typeAheadInput; }}
                           onSuggestionSelected={this._onFilterAdded}
+                          formGroupClassName=""
                           suggestionText={`Filter by ${filterBy}: `}
                           suggestions={suggestions}
                           label={label}

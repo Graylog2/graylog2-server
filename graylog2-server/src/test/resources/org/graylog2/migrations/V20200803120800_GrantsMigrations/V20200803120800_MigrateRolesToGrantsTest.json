@@ -1,0 +1,112 @@
+{
+  "roles": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "name" : "mig-test",
+      "name_lower" : "mig-test",
+      "description" : "what can be done",
+      "read_only" : false,
+      "permissions": [
+        "dashboards:read:5e2afc66cd19517ec2dabadd",
+        "dashboards:read:5e2afc66cd19517ec2dabadf",
+        "dashboards:edit:5e2afc66cd19517ec2dabadf",
+        "streams:read:5c40ad603c034441a56942bd",
+        "streams:read:5e2f5cfb4868e67ad4da562d",
+        "streams:read:000000000000000000000002",
+        "streams:edit:000000000000000000000002"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "name" : "non-migratable-role",
+      "name_lower" : "non-migratable-role",
+      "description" : "contains non-migratable permissions",
+      "read_only" : false,
+      "permissions": [
+        "streams:read",
+        "streams:read:4e40ad603c034441a56942b0",
+        "streams:changestate:4e40ad603c034441a56942b0",
+        "dashboards:edit"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "name" : "partly-migratable-role",
+      "name_lower" : "partly-migratable-role",
+      "description" : "contains partly migratable permissions",
+      "read_only" : false,
+      "permissions": [
+        "streams:read",
+        "streams:read:4e40ad603c034441a56942b0",
+        "streams:changestate:4e40ad603c034441a56942b0",
+        "dashboards:edit:4e40ad603c034441a56942c9",
+        "dashboards:read:4e40ad603c034441a56942c9"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "_id" : {
+        "$oid": "5b8e4ef17ad37b64ee87eb57"
+      },
+      "full_name" : "Testuser1",
+      "username" : "testuser1",
+      "email" : "testuser1@graylog.org",
+      "password" : "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions" : [],
+      "timezone" : "UTC",
+      "roles" : [
+        { "$oid": "54e3deadbeefdeadbeef0001" }
+      ]
+    },
+    {
+      "_id" : {
+        "$oid": "5b8e4ef17ad37b64ee87eb58"
+      },
+      "full_name" : "Testuser2",
+      "email" : "testuser2@graylog.org",
+      "username" : "testuser2",
+      "password" : "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions" : [],
+      "timezone" : "UTC",
+      "roles" : [
+        { "$oid": "54e3deadbeefdeadbeef0001" },
+        { "$oid": "54e3deadbeefdeadbeef0008" }
+      ]
+    },
+    {
+      "_id" : {
+        "$oid": "5b8e4ef17ad37b64ee87ec59"
+      },
+      "full_name" : "Testuser3",
+      "email" : "testuser3@graylog.org",
+      "username" : "testuser3",
+      "password" : "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions" : [],
+      "timezone" : "UTC",
+      "roles" : [
+        { "$oid": "54e3deadbeefdeadbeef0002" }
+      ]
+    },
+    {
+      "_id" : {
+        "$oid": "5b8e4ef17ad37b64ee87ec7a"
+      },
+      "full_name" : "Testuser4",
+      "email" : "testuser4@graylog.org",
+      "username" : "testuser4",
+      "password" : "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions" : [],
+      "timezone" : "UTC",
+      "roles" : [
+        { "$oid": "54e3deadbeefdeadbeef0003" }
+      ]
+    }
+  ]
+}

@@ -7,12 +7,17 @@ import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
-import URLUtils from 'util/URLUtils';
 import Routes from 'routing/Routes';
+import { appPrefixed } from 'util/URLUtils';
 import {
   AlertConditionsPage,
   AlertNotificationsPage,
   AlertsPage,
+  AuthenticationCreatePage,
+  AuthenticationBackendCreatePage,
+  AuthenticationBackendDetailsPage,
+  AuthenticationBackendEditPage,
+  AuthenticationOverviewPage,
   AuthenticationPage,
   ConfigurationsPage,
   ContentPacksPage,
@@ -20,15 +25,12 @@ import {
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
-  CreateUsersPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
   EditContentPackPage,
   EditExtractorsPage,
-  EditTokensPage,
-  EditUsersPage,
   EnterprisePage,
   EventDefinitionsPage,
   EventNotificationsPage,
@@ -56,7 +58,9 @@ import {
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,
-  RolesPage,
+  RoleDetailsPage,
+  RoleEditPage,
+  RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
   ShowAlertPage,
@@ -81,7 +85,11 @@ import {
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
-  UsersPage,
+  UserDetailsPage,
+  UserCreatePage,
+  UserEditPage,
+  UserTokensEditPage,
+  UsersOverviewPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
@@ -90,21 +98,21 @@ const AppRouter = () => {
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={URLUtils.appPrefixed(pluginRoute.path)}
+             path={appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     );
   });
   const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map((pluginRoute) => (
     <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
            component={pluginRoute.parentComponent}>
-      <Route path={URLUtils.appPrefixed(pluginRoute.path)}
+      <Route path={appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     </Route>
   ));
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={URLUtils.appPrefixed(pluginRoute.path)}
+             path={appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     );
   });
@@ -202,16 +210,23 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
               <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
               <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} component={AuthenticationPage}>
-                <IndexRoute component={UsersPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.LIST} component={UsersPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.CREATE} component={CreateUsersPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.edit(':username')} component={EditUsersPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(':username')} component={EditTokensPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.ROLES} component={RolesPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
-              </Route>
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW} component={AuthenticationOverviewPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')} component={AuthenticationBackendDetailsPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')} component={AuthenticationBackendEditPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')} component={AuthenticationBackendCreatePage} />
+
+              <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
+              <Route path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />
+              <Route path={Routes.SYSTEM.USERS.show(':username')} component={UserDetailsPage} />
+              <Route path={Routes.SYSTEM.USERS.edit(':username')} component={UserEditPage} />
+              <Route path={Routes.SYSTEM.USERS.TOKENS.edit(':username')} component={UserTokensEditPage} />
+
+              <Route path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} component={RolesOverviewPage} />
+              <Route path={Routes.SYSTEM.AUTHZROLES.show(':roleId')} component={RoleDetailsPage} />
+              <Route path={Routes.SYSTEM.AUTHZROLES.edit(':roleId')} component={RoleEditPage} />
+
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
               <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
               <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />

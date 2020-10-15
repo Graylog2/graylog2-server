@@ -7,7 +7,7 @@ import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Icon, HasOwnership } from 'components/common';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -19,9 +19,11 @@ import * as Permissions from 'views/Permissions';
 import View from 'views/logic/views/View';
 import type { UserJSON } from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import EntityShareModal from 'components/permissions/EntityShareModal';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 
 import ViewPropertiesModal from './views/ViewPropertiesModal';
-import ShareViewModal from './views/ShareViewModal';
 import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
@@ -39,6 +41,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
   const [csvExportOpen, setCsvExportOpen] = useState(false);
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
+  const viewTypeLabel = ViewTypeLabel({ type: view.type });
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
       <MenuItem divider />
@@ -64,9 +67,13 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit metadata
         </MenuItem>
-        <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
-          <Icon name="share-alt" /> Share
-        </MenuItem>
+        <HasOwnership id={view.id} type="dashboard">
+          {({ disabled }) => (
+            <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit || disabled}>
+              <Icon name="share-alt" /> Share {disabled && <SharingDisabledPopover type="dashboard" />}
+            </MenuItem>
+          )}
+        </HasOwnership>
         <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
         {debugOverlay}
         <IfDashboard>
@@ -89,7 +96,14 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
                              onClose={() => setEditViewOpen(false)}
                              onSave={onSaveView} />
       )}
-      {shareViewOpen && <ShareViewModal show view={view} currentUser={currentUser} onClose={() => setShareViewOpen(false)} />}
+
+      {shareViewOpen && (
+        <EntityShareModal entityId={view.id}
+                          entityType="dashboard"
+                          entityTitle={view.title}
+                          description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
+                          onClose={() => setShareViewOpen(false)} />
+      )}
       {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
     </ButtonGroup>
   );

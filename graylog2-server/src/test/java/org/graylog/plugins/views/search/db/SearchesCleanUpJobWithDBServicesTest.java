@@ -19,6 +19,8 @@ package org.graylog.plugins.views.search.db;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -49,7 +51,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(JukitoRunner.class)
-@UseModules({ObjectMapperModule.class, ValidatorModule.class})
+@UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
 public class SearchesCleanUpJobWithDBServicesTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -61,7 +63,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
         TestViewService(MongoConnection mongoConnection,
                         MongoJackObjectMapperProvider mapper,
                         ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view));
+            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), mock(EntityOwnershipService.class));
         }
     }
 

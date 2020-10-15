@@ -7,7 +7,7 @@ import connect from 'stores/connect';
 import type { ThemeInterface } from 'theme';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Icon, HasOwnership } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -17,12 +17,14 @@ import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
-import ShareViewModal from 'views/components/views/ShareViewModal';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
 import type { UserJSON } from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -198,6 +200,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { viewStoreState: { view, dirty }, theme } = this.props;
 
     const loaded = (view && view.id);
+    const viewTypeLabel = ViewTypeLabel({ type: view?.type });
     let savedSearchColor: string = '';
 
     if (loaded) {
@@ -257,9 +260,13 @@ class SavedSearchControls extends React.Component<Props, State> {
                         <Icon name="eraser" /> Reset search
                       </MenuItem>
                       <MenuItem divider />
-                      <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit}>
-                        <Icon name="share-alt" /> Share
-                      </MenuItem>
+                      <HasOwnership id={view.id} type="search">
+                        {({ disabled }) => (
+                          <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit || disabled}>
+                            <Icon name="share-alt" /> Share {disabled && <SharingDisabledPopover type="search" />}
+                          </MenuItem>
+                        )}
+                      </HasOwnership>
                     </DropdownButton>
                     {showCSVExport && (
                       <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
@@ -272,7 +279,11 @@ class SavedSearchControls extends React.Component<Props, State> {
                                            onSave={onSaveView} />
                     )}
                     {showShareSearch && (
-                      <ShareViewModal show view={view} onClose={this.toggleShareSearch} currentUser={currentUser} />
+                      <EntityShareModal entityId={view.id}
+                                        entityType="search"
+                                        entityTitle={view.title}
+                                        description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
+                                        onClose={this.toggleShareSearch} />
                     )}
                   </ButtonGroup>
                 </div>

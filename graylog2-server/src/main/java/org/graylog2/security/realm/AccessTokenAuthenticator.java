@@ -60,6 +60,7 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         if (accessToken == null) {
             return null;
         }
+        // TODO should be using IDs
         final User user = userService.load(accessToken.getUserName());
         if (user == null) {
             return null;
@@ -73,6 +74,6 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
             LOG.warn("Unable to update access token's last access date.", e);
         }
         ShiroSecurityContext.requestSessionCreation(false);
-        return new SimpleAccount(user.getName(), null, "access token realm");
+        return new SimpleAccount(user.getId(), null, "access token realm");
     }
 }

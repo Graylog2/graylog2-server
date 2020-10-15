@@ -29,6 +29,7 @@ import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
+import org.graylog.security.UserContext;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -58,6 +59,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -117,12 +119,12 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
-    public Response create(@ApiParam(name = "JSON Body") NotificationDto dto) {
+    public Response create(@ApiParam(name = "JSON Body") NotificationDto dto, @Context UserContext userContext) {
         final ValidationResult validationResult = dto.validate();
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        return Response.ok().entity(resourceHandler.create(dto)).build();
+        return Response.ok().entity(resourceHandler.create(dto, java.util.Optional.ofNullable(userContext.getUser()))).build();
     }
 
     @PUT
