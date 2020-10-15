@@ -90,7 +90,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         {
         AppConfig.gl2DevMode()
-          && <Badge bsStyle="danger" className="small-scrn-badge dev-badge">DEV</Badge>
+          && <Badge bsStyle="danger" className="small-scrn-badge dev-badge">{AppConfig.isCloud() ? 'CLOUD ' : ''} DEV</Badge>
         }
       </Navbar.Header>
 
