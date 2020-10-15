@@ -79,7 +79,7 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
 
   return AuthenticationDomain.create(payload).then((result) => {
-    if (result && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid) {
+    if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid) {
       return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 

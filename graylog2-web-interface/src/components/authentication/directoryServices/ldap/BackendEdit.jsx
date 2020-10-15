@@ -62,7 +62,7 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
     ...payload,
     id: backendId,
   }).then((result) => {
-    if (result && enterpriseGroupSyncPlugin && licenseIsValid) {
+    if (enterpriseGroupSyncPlugin && licenseIsValid) {
       return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);
     }
 

@@ -87,18 +87,18 @@ export type LoadActiveResponse = LoadActiveResponse & {
 };
 
 export type ActionsType = {
-  create: (AuthenticationBackendCreate) => Promise<void>,
+  create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
   delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   disableUser: (userId: string, username: string) => Promise<void>,
   enableUser: (userId: string, username: string) => Promise<void>,
-  load: (id: string) => Promise<?LoadResponse>,
-  loadActive: () => Promise<?LoadActiveResponse>,
-  loadBackendsPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedBackends>,
-  loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedAuthUsers>,
+  load: (id: string) => Promise<LoadResponse>,
+  loadActive: () => Promise<LoadActiveResponse>,
+  loadBackendsPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedBackends>,
+  loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedAuthUsers>,
   setActiveBackend: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
-  testConnection: (payload: ConnectionTestPayload) => Promise<?ConnectionTestResult>,
-  testLogin: (payload: LoginTestPayload) => Promise<?LoginTestResult>,
-  update: (id: string, AuthenticationBackendUpdate) => Promise<void>,
+  testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
+  testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,
+  update: (id: string, AuthenticationBackendUpdate) => Promise<LoadResponse>,
 };
 
 const AuthenticationActions: RefluxActions<ActionsType> = singletonActions(
