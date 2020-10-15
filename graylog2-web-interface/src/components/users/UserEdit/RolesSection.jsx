@@ -78,7 +78,8 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       </Container>
       <h3>Selected Roles</h3>
       <Container>
-        <PaginatedItemOverview onLoad={_onLoad}
+        <PaginatedItemOverview noDataText="No selected roles have been found."
+                               onLoad={_onLoad}
                                overrideList={roles}
                                onDeleteItem={onDeleteRole}
                                queryHelper={<RolesQueryHelp />} />
