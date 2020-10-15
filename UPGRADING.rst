@@ -65,4 +65,8 @@ For improved security, Cross-Origin requests towards the API server are now disa
 In the rare case, that your setup is serving the frontend assets from a different
 origin than the server, you can reenable this by with ``http_enable_cors = true`` in ``graylog.conf``.
 
+[Breaking] Authentication providers from 3.x and before are incompatible with 4.0
+=================================================================================
 
+Starting with 4.0 the authentication system is rewritten and no longer supports pluggable authentication realms.
+This includes the `SSO plugin <https://github.com/Graylog2/graylog-plugin-auth-sso>`_ which will not be updated for 4.0.
