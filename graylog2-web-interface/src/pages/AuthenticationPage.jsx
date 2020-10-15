@@ -16,16 +16,20 @@ import BackendDetailsActive from 'components/authentication/BackendDetailsActive
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-const _pageTilte = (activeBackend: ?AuthenticationBackend) => {
-  const title = 'Active Authentication Service';
+const _pageTilte = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
+  const pageName = 'Active Authentication Service';
 
   if (activeBackend) {
     const backendTitle = StringUtils.truncateWithEllipses(activeBackend.title, 30);
 
-    return <>{title} - <i>{backendTitle}</i></>;
+    if (returnString) {
+      return `${pageName} - ${backendTitle}`;
+    }
+
+    return <>{pageName} - <i>{backendTitle}</i></>;
   }
 
-  return title;
+  return pageName;
 };
 
 const useRedirectToAppropriatePage = (finishedLoading, activeBackend, backendsTotal) => {
@@ -40,7 +44,6 @@ const useRedirectToAppropriatePage = (finishedLoading, activeBackend, backendsTo
 
 const AuthenticationPage = () => {
   const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend();
-  const pageTitle = _pageTilte(activeBackend);
 
   // Only display this page if there is an active backend
   // Otherwise redirect to correct page
@@ -51,9 +54,9 @@ const AuthenticationPage = () => {
   }
 
   return (
-    <DocumentTitle title={pageTitle}>
+    <DocumentTitle title={_pageTilte(activeBackend, true)}>
       <>
-        <PageHeader title={pageTitle}
+        <PageHeader title={_pageTilte(activeBackend)}
                     subactions={(
                       <BackendActionLinks activeBackend={activeBackend}
                                           finishedLoading={finishedLoading} />
