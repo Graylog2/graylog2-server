@@ -33,7 +33,7 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const _loadTokens = (username, currentUser, setTokens) => {
   if (isPermitted(currentUser?.permissions, [`users:tokenlist:${username}`])) {
-    UsersDomain.loadTokens(username).then((tokens) => tokens && setTokens(tokens));
+    UsersDomain.loadTokens(username).then(setTokens);
   } else {
     setTokens([]);
   }
