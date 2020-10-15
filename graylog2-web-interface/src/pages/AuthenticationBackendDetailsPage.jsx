@@ -38,7 +38,7 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   const { finishedLoading, activeBackend } = useActiveBackend();
 
   useEffect(() => {
-    AuthenticationDomain.load(backendId).then((response) => response && setAuthBackend(response.backend));
+    AuthenticationDomain.load(backendId).then((response) => setAuthBackend(response.backend));
   }, [backendId]);
 
   if (!authBackend) {

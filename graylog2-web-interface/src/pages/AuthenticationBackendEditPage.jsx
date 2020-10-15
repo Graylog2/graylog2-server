@@ -20,7 +20,7 @@ const AuthenticationBackendEditPage = ({ params: { backendId }, location: { quer
   const [authBackend, setAuthBackend] = useState();
 
   useEffect(() => {
-    AuthenticationDomain.load(backendId).then((response) => response && setAuthBackend(response.backend));
+    AuthenticationDomain.load(backendId).then((response) => setAuthBackend(response.backend));
   }, []);
 
   if (!authBackend) {

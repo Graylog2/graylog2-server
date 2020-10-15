@@ -76,15 +76,8 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
   };
 
   return AuthenticationDomain.create(backendCreateNotificationSettings)(payload).then((result) => {
-    if (result && shouldCreateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, serviceType).catch((error) => {
-        const backendDeleteNotificationSettings = {
-          notifyOnSuccess: false,
-        };
-        // clean up created auth backend if
-        AuthenticationDomain.delete(backendDeleteNotificationSettings)(result.backend.id, result.backend.titel);
-        throw error;
-      });
+    if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid) {
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 
     return result;

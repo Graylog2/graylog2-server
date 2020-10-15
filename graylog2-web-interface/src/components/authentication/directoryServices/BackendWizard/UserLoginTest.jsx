@@ -29,16 +29,14 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
       user_login: { username, password },
       backend_id: authBackendMeta.backendId,
     }).then((response) => {
-      if (response) {
-        setLoginStatus({
-          loading: false,
-          testFinished: true,
-          message: response.message,
-          result: response.result,
-          errors: response.errors,
-          success: response.success,
-        });
-      }
+      setLoginStatus({
+        loading: false,
+        testFinished: true,
+        message: response.message,
+        result: response.result,
+        errors: response.errors,
+        success: response.success,
+      });
     }).catch((error) => {
       const requestErrors = [error?.message, error?.additional?.res?.text];
       setLoginStatus({ loading: false, success: false, testFinished: true, result: {}, message: undefined, errors: requestErrors });

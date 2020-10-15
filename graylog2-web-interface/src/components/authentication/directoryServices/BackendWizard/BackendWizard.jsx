@@ -16,6 +16,7 @@ import type { WizardSubmitPayload } from 'logic/authentication/directoryServices
 import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { type Step } from 'components/common/Wizard';
 import { FetchError } from 'logic/rest/FetchProvider';
+import type { LoadResponse as LoadBackendResponse } from 'actions/authentication/AuthenticationActions';
 
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './BackendWizardContext';
 import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -170,7 +171,7 @@ type Props = {
   initialValues: WizardFormValues,
   excludedFields: {[ inputName: string ]: boolean },
   help: { [inputName: string]: ?React.Node },
-  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, licenseIsValid?: boolean) => Promise<void>,
+  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, licenseIsValid?: boolean) => Promise<LoadBackendResponse>,
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help, excludedFields }: Props) => {
