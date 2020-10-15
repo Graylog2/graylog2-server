@@ -88,6 +88,7 @@ public class UrlWhitelistResource extends RestResource {
     @ApiOperation(value = "Check if a url is whitelisted.")
     @NoAuditEvent("Validation only")
     @Consumes(MediaType.APPLICATION_JSON)
+    // Checking can be done without any special permission.
     public WhitelistCheckResponse check(@ApiParam(name = "JSON body", required = true)
                              @Valid @NotNull final WhitelistCheckRequest checkRequest) {
         final boolean isWhitelisted = urlWhitelistService.isWhitelisted(checkRequest.url());
