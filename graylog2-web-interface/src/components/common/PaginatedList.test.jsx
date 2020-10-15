@@ -14,6 +14,12 @@ describe('PaginatedList', () => {
     expect(getByText('1')).not.toBeNull();
   });
 
+  it('should not dived by 0 if pageSize is 0 Pagination', () => {
+    const { getByText } = render(<PaginatedList totalItems={100} pageSize={0} onChange={() => {}}>The list</PaginatedList>);
+
+    expect(getByText('The list')).not.toBeNull();
+  });
+
   it('should not display Pagination, when context is not interactive', () => {
     const { queryByText } = render(
       <InteractiveContext.Provider value={false}>
