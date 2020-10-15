@@ -64,8 +64,7 @@ const RolesOverview = () => {
   const { list: roles, pagination: { page, perPage, query, total } } = paginatedRoles;
 
   const _loadRoles = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthzRolesDomain.loadRolesPaginated(newPage, newPerPage, newQuery)
-      .then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
+    return AuthzRolesDomain.loadRolesPaginated(newPage, newPerPage, newQuery).then(setPaginatedRoles);
   };
 
   const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;

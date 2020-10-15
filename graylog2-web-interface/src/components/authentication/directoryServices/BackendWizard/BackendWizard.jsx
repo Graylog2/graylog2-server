@@ -191,11 +191,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
 
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((paginatedRoles) => {
-      if (paginatedRoles) {
-        setRoles(paginatedRoles.list);
-      }
-    });
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((paginatedRoles) => setRoles(paginatedRoles.list));
   }, []);
 
   useEffect(() => {

@@ -65,7 +65,7 @@ const BackendsOverview = () => {
 
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then(setPaginatedRoles);
     _loadBackends(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
     const unlistenDisableBackend = AuthenticationActions.disableUser.completed.listen(_refreshOverview);

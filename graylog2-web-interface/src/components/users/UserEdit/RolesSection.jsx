@@ -39,14 +39,10 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       .then((response) => {
         setLoading(false);
 
-        if (response) {
-          return {
-            pagination: response.pagination,
-            list: response.list.map((item) => (item: DescriptiveItem)),
-          };
-        }
-
-        return undefined;
+        return {
+          pagination: response.pagination,
+          list: response.list.map((item) => (item: DescriptiveItem)),
+        };
       });
   };
 
