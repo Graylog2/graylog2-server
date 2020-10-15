@@ -102,7 +102,7 @@ const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
   return (
     <Route key={`${path}-${Component.displayName}`}
            exact
-           path={URLUtils.appPrefixed(path)}>
+           path={appPrefixed(path)}>
       <ParentComponent>
         <Component />
       </ParentComponent>
