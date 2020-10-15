@@ -17,19 +17,20 @@ const AuthenticationOverviewPage = () => {
 
   return (
     <DocumentTitle title="All Authentication Services">
-      <PageHeader title="All Authentication Services"
-                  subactions={(
-                    <BackendActionLinks activeBackend={activeBackend}
-                                        finishedLoading={finishedLoading} />
+      <>
+        <PageHeader title="All Authentication Services"
+                    subactions={(
+                      <BackendActionLinks activeBackend={activeBackend}
+                                          finishedLoading={finishedLoading} />
                   )}>
-        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                 text="documentation" />.
-        </span>
-        <BackendOverviewLinks activeBackend={activeBackend}
-                              finishedLoading={finishedLoading} />
-      </PageHeader>
-      {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
+          <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+          <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                                   text="documentation" />.
+          </span>
+          <BackendOverviewLinks activeBackend={activeBackend}
+                                finishedLoading={finishedLoading} />
+        </PageHeader>
+        {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">
           <Col xs={12}>
             <Alert bsStyle="warning">
@@ -37,8 +38,9 @@ const AuthenticationOverviewPage = () => {
             </Alert>
           </Col>
         </Row>
-      )}
-      <BackendsOverview />
+        )}
+        <BackendsOverview />
+      </>
     </DocumentTitle>
   );
 };

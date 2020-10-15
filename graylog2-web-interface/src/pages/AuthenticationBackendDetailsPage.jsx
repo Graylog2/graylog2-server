@@ -22,10 +22,15 @@ type Props = {
   },
 };
 
-const _pageTilte = (authBackendTitle) => {
+const _pageTilte = (authBackendTitle, returnString) => {
+  const pageName = 'Authentication Service Details';
   const backendTitle = StringUtils.truncateWithEllipses(authBackendTitle, 30);
 
-  return <>Authentication Service Details - <i>{backendTitle}</i></>;
+  if (returnString) {
+    return `${pageName} - ${backendTitle}`;
+  }
+
+  return <>{pageName} - <i>{backendTitle}</i></>;
 };
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
@@ -34,18 +39,16 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
 
   useEffect(() => {
     AuthenticationDomain.load(backendId).then((response) => response && setAuthBackend(response.backend));
-  }, []);
+  }, [backendId]);
 
   if (!authBackend) {
     return <Spinner />;
   }
 
-  const pageTitle = _pageTilte(authBackend.title);
-
   return (
-    <DocumentTitle title={pageTitle}>
+    <DocumentTitle title={_pageTilte(authBackend.title, true)}>
       <>
-        <PageHeader title={pageTitle}
+        <PageHeader title={_pageTilte(authBackend.title)}
                     subactions={(
                       <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
                         <Button bsStyle="success"
