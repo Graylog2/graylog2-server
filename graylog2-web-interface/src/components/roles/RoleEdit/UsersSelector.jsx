@@ -67,15 +67,13 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
 
     UsersDomain.loadUsersPaginated(...getUnlimited)
       .then((newPaginatedUsers) => {
-        if (newPaginatedUsers) {
-          const resultUsers = newPaginatedUsers.list
-            .filter((u) => !u.roles.includes(role.name))
-            .map((u) => ({ label: u.name, value: u.name }))
-            .toArray();
+        const resultUsers = newPaginatedUsers.list
+          .filter((u) => !u.roles.includes(role.name))
+          .map((u) => ({ label: u.name, value: u.name }))
+          .toArray();
 
-          setOptions(resultUsers);
-          setUsers(newPaginatedUsers.list);
-        }
+        setOptions(resultUsers);
+        setUsers(newPaginatedUsers.list);
       });
   }, [role]);
 

@@ -16,7 +16,7 @@ type Props<Args, ActionResult> = {
   notFoundRedirect?: boolean,
 };
 
-const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result | void>>({
+const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result>>({
   action,
   success: successNotification,
   error: errorNotification,
@@ -34,8 +34,7 @@ const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result
 
     if (notFoundRedirect && error?.status === 404) {
       ErrorsActions.report(createNotFoundError(error));
-
-      return;
+      throw error;
     }
 
     if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
