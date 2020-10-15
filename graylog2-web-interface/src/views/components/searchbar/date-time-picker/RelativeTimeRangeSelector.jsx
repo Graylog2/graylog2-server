@@ -8,12 +8,13 @@ import styled, { css, type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 import Input from 'components/bootstrap/Input';
-import type { SearchesConfig } from 'components/search/SearchConfig';
 import { Icon, Select } from 'components/common';
 
 type Props = {
   disabled: boolean,
-  config: SearchesConfig,
+  config: {
+    query_time_range_limit: string,
+  },
   originalTimeRange: {
     range: string | number,
   },
@@ -100,10 +101,10 @@ const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled
 const initialRangeType = ({ range, ...restRange }) => {
   if (range === 0) {
     return {
+      ...restRange,
       rangeValue: 1,
       rangeType: 'seconds',
       range,
-      ...restRange,
     };
   }
 
@@ -112,10 +113,10 @@ const initialRangeType = ({ range, ...restRange }) => {
 
     if (diff - Math.floor(diff) === 0) {
       return {
+        ...restRange,
         rangeValue: diff || 1,
         rangeType: value || 'seconds',
         range,
-        ...restRange,
       };
     }
 
@@ -214,7 +215,8 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
                       disabled={disabled || state.rangeAllTime}
                       value={state.rangeType}
                       options={availableRangeTypes}
-                      placeholder="Select a range"
+                      placeholder="Select a range type"
+                      data-testid="select-from-range"
                       name="relative-timerange-from-length"
                       onChange={(event) => dispatch({
                         type: 'rangeType',
@@ -239,7 +241,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
                  type="number"
                  value="0"
                  min="1"
-                 title="Set the range value"
+                 title="Set the offset value"
                  name="relative-timerange-until-value"
                  onChange={() => {}} />
         </InputWrap>
@@ -248,7 +250,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
                       disabled
                       value={RANGE_VALUES[0].value}
                       options={availableRangeTypes}
-                      placeholder="Select a range"
+                      placeholder="Select an offset"
                       name="relative-timerange-until-length"
                       onChange={() => {}} />
         <Ago />
@@ -263,7 +265,7 @@ RelativeTimeRangeSelector.propTypes = {
   }).isRequired,
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({
-    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   }).isRequired,
 };
 
