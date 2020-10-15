@@ -1,9 +1,9 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { withRouter } from 'react-router';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import withParams from 'routing/withParams';
+import { LinkContainer } from 'components/graylog/router';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
@@ -70,4 +70,4 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   );
 };
 
-export default withRouter(AuthenticationBackendDetailsPage);
+export default withParams(AuthenticationBackendDetailsPage);

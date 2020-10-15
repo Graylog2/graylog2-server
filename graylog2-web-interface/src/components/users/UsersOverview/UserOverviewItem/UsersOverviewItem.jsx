@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { Link } from 'react-router';
 
+import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import UserOverview from 'logic/users/UserOverview';
 import RolesCell from 'components/permissions/RolesCell';

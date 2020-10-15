@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import Routes from 'routing/Routes';

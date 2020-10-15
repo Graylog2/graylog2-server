@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
+import { LinkContainer } from 'components/graylog/router';
 
 import RolesOverview from 'components/roles/RolesOverview';
 import Routes from 'routing/Routes';
