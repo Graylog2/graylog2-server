@@ -78,7 +78,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
-      .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(Immutable.Set(paginatedRoles.list)));
+      .then((paginatedRoles) => setRoles(Immutable.Set(paginatedRoles.list)));
   }, [assignedRolesIds]);
 
   return (

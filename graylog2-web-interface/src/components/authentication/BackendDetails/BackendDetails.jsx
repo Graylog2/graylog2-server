@@ -21,7 +21,7 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
 
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then(setPaginatedRoles);
   }, []);
 
   if (!authService) {
