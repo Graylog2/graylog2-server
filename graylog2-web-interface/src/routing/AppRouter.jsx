@@ -94,17 +94,25 @@ import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
   const ParentComponent = parentComponent ?? React.Fragment;
+  const WrappedComponent = () => (
+    <ParentComponent>
+      <Component />
+    </ParentComponent>
+  );
 
   return (
     <Route key={`${path}-${Component.displayName}`}
            exact
-           path={appPrefixed(path)}>
-      <ParentComponent>
-        <Component />
-      </ParentComponent>
-    </Route>
+           path={appPrefixed(path)}
+           component={WrappedComponent} />
   );
 };
+
+const WrappedNotFoundPage = () => (
+  <AppWithoutSearchBar>
+    <NotFoundPage />
+  </AppWithoutSearchBar>
+);
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');
@@ -186,47 +194,39 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
 
                         <Route exact path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
-                        <Route exact path={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-                          <LUTTablesPage action="create" />
-                        </Route>
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.show(':tableName')}>
-                          <LUTTablesPage action="show" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.CREATE}
+                               render={() => <LUTTablesPage action="create" />} />
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.edit(':tableName')}>
-                          <LUTTablesPage action="edit" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.show(':tableName')}
+                               render={() => <LUTTablesPage action="show" />} />
+                        <Route exact
+                               path={Routes.SYSTEM.LOOKUPTABLES.edit(':tableName')}
+                               render={() => <LUTTablesPage action="edit" />} />
 
                         <Route exact path={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} component={LUTCachesPage} />
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
-                          <LUTCachesPage action="create" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}
+                               render={() => <LUTCachesPage action="create" />} />
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')}>
-                          <LUTCachesPage action="show" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')}
+                               render={() => <LUTCachesPage action="show" />} />
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')}>
-                          <LUTCachesPage action="edit" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')}
+                               render={() => <LUTCachesPage action="edit" />} />
 
                         <Route exact
                                path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
                                component={LUTDataAdaptersPage} />
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
-                          <LUTDataAdaptersPage action="create" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}
+                               render={() => <LUTDataAdaptersPage action="create" />} />
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')}>
-                          <LUTDataAdaptersPage action="show" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')}
+                               render={() => <LUTDataAdaptersPage action="show" />} />
                         <Route exact
-                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')}>
-                          <LUTDataAdaptersPage action="edit" />
-                        </Route>
+                               path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')}
+                               render={() => <LUTDataAdaptersPage action="edit" />} />
 
                         <Route exact path={Routes.SYSTEM.PIPELINES.OVERVIEW} component={PipelinesOverviewPage} />
                         <Route exact path={Routes.SYSTEM.PIPELINES.RULES} component={RulesPage} />
@@ -275,27 +275,15 @@ const AppRouter = () => {
                                path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
                                component={SidecarEditCollectorPage} />
                         {standardPluginRoutes}
-                        <Route path="*">
-                          <AppWithoutSearchBar>
-                            <NotFoundPage />
-                          </AppWithoutSearchBar>
-                        </Route>
+                        <Route path="*" component={WrappedNotFoundPage} />
                       </Switch>
                     </AppWithoutSearchBar>
                   </Route>
-                  <Route exact path={Routes.NOTFOUND}>
-                    <AppWithoutSearchBar>
-                      <NotFoundPage />
-                    </AppWithoutSearchBar>
-                  </Route>
+                  <Route exact path={Routes.NOTFOUND} component={WrappedNotFoundPage} />
                 </Switch>
               </Route>
             </AppWithGlobalNotifications>
-            <Route exact path={Routes.NOTFOUND}>
-              <AppWithoutSearchBar>
-                <NotFoundPage />
-              </AppWithoutSearchBar>
-            </Route>
+            <Route exact path={Routes.NOTFOUND} component={WrappedNotFoundPage} />
           </App>
         </RouterErrorBoundary>
       </Switch>
