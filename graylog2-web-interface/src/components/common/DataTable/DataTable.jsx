@@ -12,6 +12,18 @@ const StyledTable = styled.table`
   ${tableCss}
 `;
 
+const NoData = ({ noDataText }) => {
+  if (typeof noDataText === 'string') {
+    return (
+      <p>
+        {noDataText}
+      </p>
+    );
+  }
+
+  return noDataText;
+};
+
 /**
  * Component that renders a data table, letting consumers of the component to
  * decide exactly how the data should be rendered. It optionally adds a filter
@@ -167,7 +179,7 @@ class DataTable extends React.Component {
     let data;
 
     if (rows.length === 0) {
-      data = <p>{noDataText}</p>;
+      data = <NoData noDataText={noDataText} />;
     } else if (effectiveRows.length === 0) {
       data = <p>Filter does not match any data.</p>;
     } else {

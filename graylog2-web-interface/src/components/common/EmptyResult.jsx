@@ -6,16 +6,21 @@ import { Alert } from 'components/graylog';
 
 type Props = {
   children: React.Node,
+  className: ?string,
 };
 
-const EmptyResult = ({ children }: Props) => (<Alert>{children}</Alert>);
+const EmptyResult = ({ children, className }: Props) => (
+  <Alert className={`${className ?? ''} no-bm`}>{children}</Alert>
+);
 
 EmptyResult.propTypes = {
-  children: PropTypes.element,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  className: PropTypes.string,
 };
 
 EmptyResult.defaultProps = {
-  children: 'No data available!',
+  children: 'No data available.',
+  className: undefined,
 };
 
 export default EmptyResult;

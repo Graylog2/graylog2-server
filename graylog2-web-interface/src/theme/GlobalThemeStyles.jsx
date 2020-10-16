@@ -160,6 +160,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 0;
   }
 
+  .has-bm {
+    margin-bottom: 10px;
+  }
+
   .alert {
     margin-bottom: 0;
     margin-top: 5px;

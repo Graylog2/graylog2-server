@@ -7,7 +7,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import { type ThemeInterface } from 'theme';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { DataTable, Spinner, PaginatedList } from 'components/common';
+import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 import UserOverviewItem from './UserOverviewItem';
@@ -119,6 +119,7 @@ const UsersOverview = () => {
                        headers={TABLE_HEADERS}
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="fullName"
+                       noDataText={<EmptyResult>No users have been found.</EmptyResult>}
                        rows={users.toJS()}
                        customFilter={<UsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                        dataRowFormatter={_userOverviewItem}

@@ -6,7 +6,7 @@ import styled, { type StyledComponent } from 'styled-components';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { type ThemeInterface } from 'theme';
-import { DataTable, Spinner, PaginatedList } from 'components/common';
+import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 import RolesOverviewItem from './RolesOverviewItem';
@@ -106,6 +106,7 @@ const RolesOverview = () => {
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="name"
                        rows={roles.toJS()}
+                       noDataText={<EmptyResult>No roles have been found.</EmptyResult>}
                        customFilter={<RolesFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                        dataRowFormatter={_rolesOverviewItem}
                        filterKeys={[]}
