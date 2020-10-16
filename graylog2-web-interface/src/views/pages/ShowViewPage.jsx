@@ -21,12 +21,16 @@ type Props = {
     },
   },
   params: {
-    viewId: string,
+    viewId: ?string,
   },
   viewLoader: ViewLoaderFn,
 };
 
 const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: Props) => {
+  if (!viewId) {
+    throw new Error('No view id specified!');
+  }
+
   const [loaded, HookComponent] = useViewLoader(viewId, query, viewLoader);
 
   if (HookComponent) {

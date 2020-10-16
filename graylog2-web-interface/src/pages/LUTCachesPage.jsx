@@ -46,8 +46,8 @@ class LUTCachesPage extends React.Component {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   }
 
-  _isCreating = (props) => {
-    return props.route.action === 'create';
+  _isCreating = ({ action }) => {
+    return action === 'create';
   }
 
   _validateCache = (adapter) => {
@@ -56,7 +56,7 @@ class LUTCachesPage extends React.Component {
 
   render() {
     const {
-      route: { action },
+      action,
       cache,
       validationErrors,
       types,
@@ -142,7 +142,7 @@ LUTCachesPage.propTypes = {
   caches: PropTypes.array,
   location: PropTypes.object.isRequired,
   pagination: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
+  action: PropTypes.string,
 };
 
 LUTCachesPage.defaultProps = {
@@ -150,6 +150,7 @@ LUTCachesPage.defaultProps = {
   validationErrors: {},
   types: null,
   caches: null,
+  action: undefined,
 };
 
 export default connect(

@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { withRouter } from 'react-router';
 
+import withParams from 'routing/withParams';
 import { PageHeader, DocumentTitle } from 'components/common';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import DocsHelper from 'util/DocsHelper';
@@ -66,4 +66,4 @@ const UserDetailsPage = ({ params }: Props) => {
   );
 };
 
-export default withRouter(UserDetailsPage);
+export default withParams(UserDetailsPage);

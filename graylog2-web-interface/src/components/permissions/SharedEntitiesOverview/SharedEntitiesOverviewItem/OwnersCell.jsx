@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
-import { Link } from 'react-router';
 
+import { Link } from 'components/graylog/router';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';

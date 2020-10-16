@@ -19,11 +19,15 @@ const StreamsStore = StoreProvider.getStore('Streams');
 
 type Props = {
   params: {
-    index: string,
-    messageId: string,
+    index: ?string,
+    messageId: ?string,
   },
 };
-const ShowMessagePage = ({ params: { index, messageId }, params }: Props) => {
+const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
+  if (!index || !messageId) {
+    throw new Error('index and messageId need to be specified!');
+  }
+
   const [message, setMessage] = useState();
   const [inputs, setInputs] = useState(Immutable.Map);
   const [streams, setStreams] = useState();
@@ -65,7 +69,7 @@ const ShowMessagePage = ({ params: { index, messageId }, params }: Props) => {
 
   if (isLoaded) {
     return (
-      <DocumentTitle title={`Message ${params.messageId} on ${params.index}`}>
+      <DocumentTitle title={`Message ${messageId} on ${index}`}>
         <Row className="content">
           <Col md={12}>
             <InteractiveContext.Provider value={false}>

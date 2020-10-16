@@ -4,13 +4,7 @@ import { mount } from 'wrappedEnzyme';
 
 import ConfirmLeaveDialog from './ConfirmLeaveDialog';
 
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('util/AppConfig');
-
-const mockRouter = () => ({
-  setRouteLeaveHook: jest.fn(),
-  routes: [{ __id__: 42 }],
-});
 
 describe('ConfirmLeaveDialog', () => {
   const { addEventListener } = window;
@@ -28,45 +22,16 @@ describe('ConfirmLeaveDialog', () => {
   });
 
   it('registers window beforeunload handler', () => {
-    const router = mockRouter();
-
-    mount(<ConfirmLeaveDialog router={router} />);
+    mount(<ConfirmLeaveDialog />);
 
     expect(window.addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
   });
 
   it('unregisters window beforeunload handler upon unmount', () => {
-    const router = mockRouter();
-    const unsubscribe = jest.fn();
-
-    router.setRouteLeaveHook.mockReturnValue(unsubscribe);
-
-    const wrapper = mount(<ConfirmLeaveDialog router={router} />);
+    const wrapper = mount(<ConfirmLeaveDialog />);
 
     wrapper.unmount();
 
     expect(window.removeEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
-  });
-
-  it('registers route leave handler', () => {
-    const router = mockRouter();
-
-    mount(<ConfirmLeaveDialog router={router} />);
-
-    expect(router.setRouteLeaveHook).toHaveBeenCalledTimes(1);
-    expect(router.setRouteLeaveHook).toHaveBeenCalledWith({ __id__: 42 }, expect.any(Function));
-  });
-
-  it('unregisters route leave handler upon unmount', () => {
-    const router = mockRouter();
-    const unsubscribe = jest.fn();
-
-    router.setRouteLeaveHook.mockReturnValue(unsubscribe);
-
-    const wrapper = mount(<ConfirmLeaveDialog router={router} />);
-
-    wrapper.unmount();
-
-    expect(unsubscribe).toHaveBeenCalled();
   });
 });
