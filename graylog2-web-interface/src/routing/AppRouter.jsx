@@ -128,18 +128,18 @@ const AppRouter = () => {
                   <Route path="/">
                     <AppWithoutSearchBar>
                       <Switch>
-                        <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
+                        <Route exact path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
                         <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
-                        <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
-                        <Route path={Routes.STREAMS} component={StreamsPage} />
-                        <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
-                        <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
-                        <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
-                        <Route path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
-                        <Route path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
-                        <Route path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
-                        <Route path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
-                        <Route path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
+                        <Route exact path={Routes.GETTING_STARTED} component={GettingStartedPage} />
+                        <Route exact path={Routes.STREAMS} component={StreamsPage} />
+                        <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
+                        <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
+                        <Route exact path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
+                        <Route exact path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
+                        <Route exact path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
+                        <Route exact path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
+                        <Route exact path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
+                        <Route exact path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
                         <Route exact path={Routes.ALERTS.LIST} component={EventsPage} />
                         <Route exact path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
                         <Route exact path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
@@ -151,19 +151,21 @@ const AppRouter = () => {
                         <Route exact
                                path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')}
                                component={EditEventNotificationPage} />
-                        <Route path={Routes.show_alert_condition(':streamId', ':conditionId')}
+                        <Route exact
+                               path={Routes.show_alert_condition(':streamId', ':conditionId')}
                                component={EditAlertConditionPage} />
-                        <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-                        <Route path={Routes.SYSTEM.INPUTS} component={InputsPage} />
-                        <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
-                        <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
-                        <Route path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage} />
-                        <Route path={Routes.new_extractor(':nodeId', ':inputId')} component={CreateExtractorsPage} />
-                        <Route path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')}
+                        <Route exact path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
+                        <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />
+                        <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
+                        <Route exact path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
+                        <Route exact path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage} />
+                        <Route exact path={Routes.new_extractor(':nodeId', ':inputId')} component={CreateExtractorsPage} />
+                        <Route exact
+                               path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')}
                                component={EditExtractorsPage} />
-                        <Route path={Routes.import_extractors(':nodeId', ':inputId')} component={ImportExtractorsPage} />
-                        <Route path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage} />
-                        <Route path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage} />
+                        <Route exact path={Routes.import_extractors(':nodeId', ':inputId')} component={ImportExtractorsPage} />
+                        <Route exact path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage} />
+                        <Route exact path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage} />
 
                         <Route exact path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
                         <Route exact path={Routes.SYSTEM.CONTENTPACKS.CREATE} component={CreateContentPackPage} />
@@ -174,13 +176,14 @@ const AppRouter = () => {
                                path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')}
                                component={ShowContentPackPage} />
 
-                        <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
-                        <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
-                        <Route path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-                        <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-                        <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                        <Route exact path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
+                        <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
+                        <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
+                        <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
+                        <Route exact
+                               path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
                                component={IndexSetConfigurationPage} />
-                        <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+                        <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
 
                         <Route exact path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
                         <Route exact path={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
@@ -231,11 +234,11 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.PIPELINES.SIMULATOR} component={SimulatorPage} />
                         <Route exact path={Routes.SYSTEM.PIPELINES.PIPELINE(':pipelineId')} component={PipelineDetailsPage} />
 
-                        <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage} />
-                        <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
+                        <Route exact path={Routes.SYSTEM.LOGGING} component={LoggersPage} />
+                        <Route exact path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
                         <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
                         <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
-                        <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
+                        <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
 
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
@@ -254,10 +257,10 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.AUTHZROLES.show(':roleId')} component={RoleDetailsPage} />
                         <Route exact path={Routes.SYSTEM.AUTHZROLES.edit(':roleId')} component={RoleEditPage} />
 
-                        <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
-                        <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
-                        <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
-                        <Route path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
+                        <Route exact path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
+                        <Route exact path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
+                        <Route exact path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
+                        <Route exact path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
 
                         <Route exact path={Routes.SYSTEM.SIDECARS.OVERVIEW} component={SidecarsPage} />
                         <Route exact path={Routes.SYSTEM.SIDECARS.STATUS(':sidecarId')} component={SidecarStatusPage} />
