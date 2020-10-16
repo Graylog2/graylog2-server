@@ -146,6 +146,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
+    public static final String USERS_VIEW = "users:view";
     public static final String USERS_LIST = "users:list";
     public static final String USERS_PASSWORDCHANGE = "users:passwordchange";
     public static final String USERS_PERMISSIONSEDIT = "users:permissionsedit";
@@ -272,6 +273,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(URL_WHITELIST_WRITE, ""))
             .add(create(USERS_CREATE, ""))
             .add(create(USERS_EDIT, ""))
+            .add(create(USERS_VIEW, ""))
             .add(create(USERS_LIST, ""))
             .add(create(USERS_PASSWORDCHANGE, ""))
             .add(create(USERS_PERMISSIONSEDIT, ""))
@@ -312,6 +314,9 @@ public class RestPermissions implements PluginPermissions {
             )),
             BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE
+            )),
+            BuiltinRole.create("User Inspector", "Allows listing all user accounts (built-in)", ImmutableSet.of(
+                    RestPermissions.USERS_LIST
             ))
     ).build();
 
