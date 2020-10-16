@@ -142,12 +142,13 @@ const AppRouter = () => {
                         <Route exact path={Routes.STREAMS} component={StreamsPage} />
                         <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
                         <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
-                        <Route exact path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
+
                         <Route exact path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
                         <Route exact path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
                         <Route exact path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
                         <Route exact path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
                         <Route exact path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
+
                         <Route exact path={Routes.ALERTS.LIST} component={EventsPage} />
                         <Route exact path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
                         <Route exact path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
