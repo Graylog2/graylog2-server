@@ -17,6 +17,7 @@
 package org.graylog.grn;
 
 import org.graylog.grn.providers.EventDefinitionGRNDescriptorProvider;
+import org.graylog.grn.providers.EventNotificationGRNDescriptorProvider;
 import org.graylog.grn.providers.ViewGRNDescriptorProvider;
 import org.graylog.grn.providers.FallbackGRNDescriptorProvider;
 import org.graylog.grn.providers.StreamGRNDescriptorProvider;
@@ -33,6 +34,7 @@ public class GRNModule extends PluginModule {
         addGRNType(GRNTypes.COLLECTION, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.DASHBOARD, ViewGRNDescriptorProvider.class);
         addGRNType(GRNTypes.EVENT_DEFINITION, EventDefinitionGRNDescriptorProvider.class);
+        addGRNType(GRNTypes.EVENT_NOTIFICATION, EventNotificationGRNDescriptorProvider.class);
         addGRNType(GRNTypes.GRANT, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.ROLE, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.SEARCH, ViewGRNDescriptorProvider.class);
