@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { withRouter } from 'react-router';
 
+import withParams from 'routing/withParams';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 
@@ -23,4 +23,4 @@ const AuthenticationBackendCreatePage = ({ params: { name } }: Props) => {
   return <BackendCreate />;
 };
 
-export default withRouter(AuthenticationBackendCreatePage);
+export default withParams(AuthenticationBackendCreatePage);

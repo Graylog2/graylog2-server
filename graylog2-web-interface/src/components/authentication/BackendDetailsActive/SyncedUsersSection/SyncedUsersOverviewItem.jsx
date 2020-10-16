@@ -2,9 +2,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import { Link } from 'react-router';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer, Link } from 'components/graylog/router';
 import Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';

@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { withRouter } from 'react-router';
 
+import withParams from 'routing/withParams';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
@@ -64,4 +64,4 @@ const UserEditPage = ({ params }: Props) => {
   );
 };
 
-export default withRouter(UserEditPage);
+export default withParams(UserEditPage);

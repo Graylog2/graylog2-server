@@ -12,7 +12,6 @@ import ViewState from 'views/logic/views/ViewState';
 
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
-jest.mock('util/History', () => ({}));
 jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
 
 const search = Search.create();

@@ -3,9 +3,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router';
 
+import { LinkContainer, Link } from 'components/graylog/router';
 import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';

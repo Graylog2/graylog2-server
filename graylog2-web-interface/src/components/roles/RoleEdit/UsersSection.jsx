@@ -62,7 +62,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       </Container>
       <h3>Selected Users</h3>
       <Container>
-        <PaginatedItemOverview onLoad={_onLoad} overrideList={users} onDeleteItem={_onUnassignUser} />
+        <PaginatedItemOverview noDataText="No selected users have been found." onLoad={_onLoad} overrideList={users} onDeleteItem={_onUnassignUser} />
       </Container>
     </SectionComponent>
   );

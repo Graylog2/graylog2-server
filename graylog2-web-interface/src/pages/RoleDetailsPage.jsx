@@ -1,9 +1,9 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { withRouter } from 'react-router';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import withParams from 'routing/withParams';
+import { LinkContainer } from 'components/graylog/router';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import RoleDetails from 'components/roles/RoleDetails';
 import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
@@ -58,4 +58,4 @@ const RoleDetailsPage = ({ params }: Props) => {
   );
 };
 
-export default withRouter(RoleDetailsPage);
+export default withParams(RoleDetailsPage);

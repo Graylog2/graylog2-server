@@ -83,8 +83,8 @@ class LUTDataAdaptersPage extends React.Component {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
   }
 
-  _isCreating = (props) => {
-    return props.route.action === 'create';
+  _isCreating = ({ action }) => {
+    return action === 'create';
   }
 
   _validateAdapter = (adapter) => {
@@ -93,7 +93,7 @@ class LUTDataAdaptersPage extends React.Component {
 
   render() {
     const {
-      route: { action },
+      action,
       errorStates,
       dataAdapter,
       validationErrors,
@@ -182,7 +182,7 @@ LUTDataAdaptersPage.propTypes = {
   pagination: PropTypes.object,
   dataAdapters: PropTypes.array,
   location: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
+  action: PropTypes.string,
 };
 
 LUTDataAdaptersPage.defaultProps = {
@@ -192,6 +192,7 @@ LUTDataAdaptersPage.defaultProps = {
   types: null,
   pagination: null,
   dataAdapter: null,
+  action: undefined,
 };
 
 export default connect(withParams(withLocation(LUTDataAdaptersPage)), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
