@@ -25,6 +25,8 @@ export const getShowRouteFromGRN = (grn: string) => {
       return Routes.dashboard_show(id);
     case 'event_definition':
       return Routes.ALERTS.DEFINITIONS.edit(id);
+    case 'event_notification':
+      return Routes.ALERTS.NOTIFICATIONS.edit(id);
     case 'search':
       return Routes.getPluginRoute('SEARCH_VIEWID')(id);
     case 'stream':
