@@ -77,7 +77,6 @@ import {
   SidecarStatusPage,
   SimulatorPage,
   StartPage,
-  StreamAlertsOverviewPage,
   StreamEditPage,
   StreamOutputsPage,
   StreamsPage,
