@@ -8,6 +8,7 @@ import { admin } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import history from 'util/History';
 
 import AppRouter from './AppRouter';
 
@@ -24,6 +25,7 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('views/logic/usePluginEntities');
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('AppRouter', () => {
   beforeEach(() => {
@@ -50,5 +52,13 @@ describe('AppRouter', () => {
     await findByText('Hey there!');
 
     expect(queryByTitle('Graylog Logo')).toBeNull();
+  });
+
+  it('renders a not found page for unknown URLs', async () => {
+    const { findByText } = render(<AppRouterWithContext />);
+
+    history.push('/this-url-is-not-registered-and-should-never-be');
+
+    await findByText('Page not found');
   });
 });
