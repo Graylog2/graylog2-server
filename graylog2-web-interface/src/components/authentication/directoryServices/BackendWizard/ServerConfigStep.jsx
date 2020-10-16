@@ -166,31 +166,31 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                            name="systemUserDn"
                            placeholder="System User DN" />
 
-          {(backendHasPassword && values.systemUserPassword === undefined)
-            ? (
-              <Input id="systemPassword"
-                     label={<>System Password <Opt /></>}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Button type="button" onClick={() => setFieldValue('systemUserPassword', '')}>
-                  Reset Password
-                </Button>
-              </Input>
-            )
-            : (
-              <FormikFormGroup autoComplete="authentication-service-password"
-                               buttonAfter={(backendHasPassword && values.systemUserPassword !== undefined) && (
+          {(backendHasPassword && values.systemUserPassword === undefined) ? (
+            <Input id="systemPassword"
+                   label={<>System Password <Opt /></>}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9">
+              <Button type="button" onClick={() => setFieldValue('systemUserPassword', '')}>
+                Reset Password
+              </Button>
+            </Input>
+          ) : (
+            <FormikFormGroup autoComplete="authentication-service-password"
+                             buttonAfter={(backendHasPassword && values.systemUserPassword !== undefined) ? (
                                <Button type="button" onClick={() => setFieldValue('systemUserPassword', undefined)}>
                                  Undo Reset
                                </Button>
-                               )}
-                               help={help.systemUserPassword}
-                               label={<>System Password <Opt /></>}
-                               name="systemUserPassword"
-                               placeholder="System Password"
-                               type="password" />
-            )}
+                             ) : undefined}
+                             help={help.systemUserPassword}
+                             label={<>System Password <Opt /></>}
+                             name="systemUserPassword"
+                             placeholder="System Password"
+                             type="password" />
+          )}
+
           {submitAllError}
+
           <ButtonToolbar className="pull-right">
             <Button disabled={isSubmitting}
                     onClick={() => _onSubmitAll(validateForm)}
