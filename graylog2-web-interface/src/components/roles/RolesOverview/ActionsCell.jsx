@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';

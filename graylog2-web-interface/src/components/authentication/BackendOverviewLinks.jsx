@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { LinkContainer } from 'components/graylog/router';
 
+import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { ButtonToolbar, Button } from 'components/graylog';
