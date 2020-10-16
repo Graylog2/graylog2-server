@@ -11,8 +11,8 @@ type Props = {
   to: string,
 };
 
-const LinkContainer = ({ children, onClick, to }: Props) => {
-  const { props: { onClick: childrenOnClick } } = children;
+const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
+  const { props: { onClick: childrenOnClick } } = React.Children.only(children);
   const _onClick = useCallback(() => {
     if (childrenOnClick) {
       childrenOnClick();
@@ -25,7 +25,7 @@ const LinkContainer = ({ children, onClick, to }: Props) => {
     history.push(to);
   }, [childrenOnClick, onClick, to]);
 
-  return React.cloneElement(React.Children.only(children), { onClick: _onClick });
+  return React.cloneElement(React.Children.only(children), { ...rest, onClick: _onClick });
 };
 
 export {
