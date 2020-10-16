@@ -2,13 +2,16 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import type { LocationShape } from 'react-router';
 
 import history from 'util/History';
+
+export type HistoryElement = LocationShape;
 
 type Props = {
   children: React.Node,
   onClick?: () => mixed,
-  to: string,
+  to: string | HistoryElement,
 };
 
 const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
