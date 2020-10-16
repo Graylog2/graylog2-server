@@ -21,10 +21,9 @@ import PropTypes from 'prop-types';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button, Tooltip } from 'components/graylog';
-import Input from 'components/bootstrap/Input';
 import DateTime from 'logic/datetimes/DateTime';
 
-const _setDateTimeToNow = () => new DateTime();
+import { Input } from '../../../components/bootstrap';
 
 const _onDateSelected = (date) => {
   const midnightDate = date.setHours(0);
@@ -36,15 +35,17 @@ type Props = {
   disabled: ?boolean,
   error: ?string,
   value: string,
-  onBlur: ?(({}) => void),
   onChange: ({ target: { name: string, value: string } }) => void,
   name: string,
   title: ?string,
 };
-const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}, onChange, name, title }: Props) => {
-  const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [onChange]);
-  const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
-  const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
+
+const _setDateTimeToNow = () => new DateTime();
+
+const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title }: Props) => {
+  const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [name, onChange]);
+  const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.DATE)), [_onChange]);
+  const _onSetTimeToNow = () => onChange({ target: { name, value: _setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP) } });
 
   return (
     <div>
@@ -53,29 +54,31 @@ const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}
           {error}
         </Tooltip>
       )}
+
+      <Input type="text"
+             id={`date-input-${name}`}
+             name={name}
+             autoComplete="off"
+             disabled={disabled}
+             className="absolute"
+             value={value}
+             onChange={onChange}
+             placeholder={DateTime.Formats.DATETIME}
+             buttonAfter={(
+               <Button disabled={disabled}
+                       onClick={_onSetTimeToNow}
+                       title="Insert current date">
+                 <Icon name="magic" />
+               </Button>
+             )}
+             bsStyle={error ? 'error' : null}
+             required />
+
       <DatePicker id={`date-input-datepicker-${name}`}
                   disabled={disabled}
                   title={title}
                   date={value}
-                  onChange={onDatePicked}>
-        <Input type="text"
-               id={`date-input-${name}`}
-               name={name}
-               autoComplete="off"
-               disabled={disabled}
-               className="absolute"
-               value={value}
-               onBlur={onBlur}
-               onChange={onChange}
-               placeholder={DateTime.Formats.DATETIME}
-               buttonAfter={(
-                 <Button disabled={disabled} onClick={onSetTimeToNow} title="Insert current date">
-                   <Icon name="magic" />
-                 </Button>
-             )}
-               bsStyle={error ? 'error' : null}
-               required />
-      </DatePicker>
+                  onChange={onDatePicked} />
     </div>
   );
 };
@@ -84,7 +87,6 @@ DateInputWithPicker.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.string,
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
-  onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   title: PropTypes.string,
@@ -92,7 +94,6 @@ DateInputWithPicker.propTypes = {
 
 DateInputWithPicker.defaultProps = {
   disabled: false,
-  onBlur: () => {},
   error: undefined,
   value: undefined,
   title: '',
