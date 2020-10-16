@@ -121,13 +121,13 @@ const AppRouter = () => {
 
   return (
     <Router history={history}>
-      <Switch>
-        <RouterErrorBoundary>
+      <RouterErrorBoundary>
+        <Switch>
           {pluginRoutesWithNullParent}
 
-          <App>
-            <AppWithGlobalNotifications>
-              <Route path={Routes.STARTPAGE}>
+          <Route path={Routes.STARTPAGE}>
+            <App>
+              <AppWithGlobalNotifications>
                 <Switch>
                   <Route exact path={Routes.STARTPAGE} component={StartPage} />
                   {pluginRoutesWithParent}
@@ -281,12 +281,12 @@ const AppRouter = () => {
                   </Route>
                   <Route exact path={Routes.NOTFOUND} component={WrappedNotFoundPage} />
                 </Switch>
-              </Route>
-            </AppWithGlobalNotifications>
-            <Route exact path={Routes.NOTFOUND} component={WrappedNotFoundPage} />
-          </App>
-        </RouterErrorBoundary>
-      </Switch>
+              </AppWithGlobalNotifications>
+              <Route exact path={Routes.NOTFOUND} component={WrappedNotFoundPage} />
+            </App>
+          </Route>
+        </Switch>
+      </RouterErrorBoundary>
     </Router>
   );
 };
