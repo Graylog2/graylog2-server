@@ -7,7 +7,7 @@ import history from 'util/History';
 
 type Props = {
   children: React.Node,
-  onClick: () => mixed,
+  onClick?: () => mixed,
   to: string,
 };
 
