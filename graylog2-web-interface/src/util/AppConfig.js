@@ -36,7 +36,7 @@ const AppConfig = {
       // eslint-disable-next-line no-undef
       return IS_CLOUD;
     }
-    return this.appConfig.isCloud;
+    return this.appConfig().isCloud;
   },
 
   appConfig() {
