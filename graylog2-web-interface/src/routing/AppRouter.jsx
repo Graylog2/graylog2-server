@@ -275,15 +275,15 @@ const AppRouter = () => {
                                path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
                                component={SidecarEditCollectorPage} />
                         {standardPluginRoutes}
+                        <Route path="*">
+                          <AppWithoutSearchBar>
+                            <NotFoundPage />
+                          </AppWithoutSearchBar>
+                        </Route>
                       </Switch>
                     </AppWithoutSearchBar>
                   </Route>
                   <Route exact path={Routes.NOTFOUND}>
-                    <AppWithoutSearchBar>
-                      <NotFoundPage />
-                    </AppWithoutSearchBar>
-                  </Route>
-                  <Route path="*">
                     <AppWithoutSearchBar>
                       <NotFoundPage />
                     </AppWithoutSearchBar>
