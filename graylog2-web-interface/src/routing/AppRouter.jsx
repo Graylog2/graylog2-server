@@ -1,6 +1,5 @@
 import React from 'react';
 import { Redirect, Router, Route, Switch } from 'react-router-dom';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
@@ -90,6 +89,7 @@ import {
   UsersOverviewPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
   const ParentComponent = parentComponent ?? React.Fragment;
@@ -114,7 +114,7 @@ const WrappedNotFoundPage = () => (
 );
 
 const AppRouter = () => {
-  const pluginRoutes = PluginStore.exports('routes');
+  const pluginRoutes = usePluginEntities('routes');
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map(renderPluginRoute);
   const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
