@@ -4,6 +4,22 @@ import { createNotFoundError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ListenableAction } from 'stores/StoreTypes';
 
+const _displaySuccessNotification = (successNotification, ...args) => {
+  const { message, title } = successNotification(...args);
+  UserNotification.success(message, title || 'Success');
+};
+
+const _displayErrorNotification = (errorNotification, error, ...args) => {
+  let errorMessage = String(error);
+
+  if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
+    errorMessage = `${error.additional.body.message} - ${error.message}`;
+  }
+
+  const { message, title } = errorNotification(errorMessage, ...args);
+  UserNotification.error(message, title || 'Error');
+};
+
 type Notification = {
   title?: string,
   message?: string,
@@ -23,26 +39,16 @@ const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result
   notFoundRedirect,
 }: Props<Args, ActionResult>): (...Args) => ActionResult => {
   return (...args: Args): ActionResult => action(...args).then((result) => {
-    if (successNotification) {
-      const { message, title } = successNotification(...args);
-      UserNotification.success(message, title || 'Success');
-    }
+    if (successNotification) _displaySuccessNotification(successNotification, ...args);
 
     return result;
   }).catch((error) => {
-    let readableError = String(error);
-
     if (notFoundRedirect && error?.status === 404) {
       ErrorsActions.report(createNotFoundError(error));
       throw error;
     }
 
-    if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
-      readableError = `${error.additional.body.message} - ${error.message}`;
-    }
-
-    const { message, title } = errorNotification(readableError, ...args);
-    UserNotification.error(message, title || 'Error');
+    _displayErrorNotification(errorNotification, error, ...args);
 
     throw error;
   });
