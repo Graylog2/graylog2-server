@@ -41,7 +41,7 @@ export type PaginatedUsers = {
 };
 
 export type ActionsType = {
-  create: (user: UserCreate) => Promise<string[]>,
+  create: (user: UserCreate) => Promise<void>,
   load: (username: string) => Promise<User>,
   update: (username: string, request: any) => Promise<void>,
   delete: (username: string) => Promise<void>,
