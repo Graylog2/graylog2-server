@@ -66,7 +66,7 @@ const RolesOverview = () => {
   const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { roles, total } = paginatedRoles || {};
+  const { list: roles, total } = paginatedRoles || {};
   const { page, perPage, query } = pagination;
 
   const _handleSearch = (newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });

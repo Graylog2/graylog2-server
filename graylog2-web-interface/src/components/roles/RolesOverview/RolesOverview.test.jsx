@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, act, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';
 
@@ -9,7 +9,7 @@ import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import RolesOverview from './RolesOverview';
 
 const loadRolesPaginatedResponse = {
-  roles: mockRoles,
+  list: mockRoles,
   pagination: {
     page: 1,
     perPage: 10,

@@ -25,7 +25,7 @@ type PaginatedUsersResponse = PaginatedListJSON & {
 
 // eslint-disable-next-line camelcase
 const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [] }: PaginatedRolesResponse) => ({
-  roles: Immutable.List(roles.map((r) => Role.fromJSON(r))),
+  list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
   pagination: {
     query,
     page,
@@ -37,7 +37,7 @@ const _responseToPaginatedList = ({ count, total, page, per_page, query, roles =
 
 // eslint-disable-next-line camelcase
 const _responseToPaginatedUserList = ({ count, total, page, per_page, query, users }: PaginatedUsersResponse) => ({
-  users: Immutable.List(users.map((u) => UserOverview.fromJSON(u))),
+  list: Immutable.List(users.map((u) => UserOverview.fromJSON(u))),
   pagination: {
     page,
     perPage: per_page,

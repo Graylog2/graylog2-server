@@ -73,7 +73,7 @@ const UsersOverview = () => {
   const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { users, adminUser, total } = paginatedUsers || {};
+  const { list: users, adminUser, total } = paginatedUsers || {};
   const { page, query } = pagination;
 
   const _handleSearch = (newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });

@@ -17,18 +17,17 @@ export type DescriptiveItem = {
   +description: string,
 };
 
-export type PaginatedListType<ListKey> = {
-  [listkey: ListKey]: Immutable.List<DescriptiveItem>,
+export type PaginatedListType = {
+  list: Immutable.List<DescriptiveItem>,
   pagination: Pagination,
   total: number,
   count: number,
 };
 
-type Props<ListKey> = {
-  listKey: ListKey,
+type Props = {
   noDataText?: string,
-  onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType<ListKey>>,
-  overrideList?: PaginatedListType<ListKey>,
+  onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType>,
+  overrideList?: PaginatedListType,
   onDeleteItem?: (DescriptiveItem) => void,
   queryHelper?: React.Node,
 };
@@ -36,8 +35,8 @@ type Props<ListKey> = {
 const pageSizes = [5, 10, 30];
 export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '' };
 
-const PaginatedItemOverview = <ListKey>({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText, listKey }: Props<ListKey>) => {
-  const [paginatedList, setPaginatedList] = useState<?PaginatedListType<ListKey>>();
+const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText }: Props) => {
+  const [paginatedList, setPaginatedList] = useState<?PaginatedListType>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
 
   useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
@@ -58,11 +57,11 @@ const PaginatedItemOverview = <ListKey>({ onLoad, overrideList, onDeleteItem, qu
     return <Spinner />;
   }
 
-  if (!paginatedList[listKey] || paginatedList[listKey]?.size === 0) {
+  if (!paginatedList.list || paginatedList.list.size === 0) {
     return <EmptyResult>{noDataText}</EmptyResult>;
   }
 
-  const itemList = paginatedList[listKey].toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />);
+  const itemList = paginatedList.list.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />);
 
   return (
     <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}

@@ -4,9 +4,9 @@ import * as Immutable from 'immutable';
 
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
+import type { PaginatedList } from 'stores/PaginationTypes';
 import User, { type UserJSON } from 'logic/users/User';
 import UserOverview from 'logic/users/UserOverview';
-import type { PaginatedList } from 'stores/PaginationTypes';
 
 export type UserCreate = {
   email: $PropertyType<UserJSON, 'email'>,
@@ -34,8 +34,7 @@ export type ChangePasswordRequest = {
   password: string,
 };
 
-export type PaginatedUsers = PaginatedList & {
-  users: Immutable.List<UserOverview>,
+export type PaginatedUsers = PaginatedList<UserOverview> & {
   adminUser: ?UserOverview,
 };
 

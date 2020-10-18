@@ -84,8 +84,8 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
     return <Spinner />;
   }
 
-  const _onSubmit = () => _assignRole(selectedRoleName, paginatedRoles.roles, onSubmit, setSelectedRoleName, setIsSubmitting);
-  const options = _options(paginatedRoles.roles, assignedRolesIds, identifier);
+  const _onSubmit = () => _assignRole(selectedRoleName, paginatedRoles.list, onSubmit, setSelectedRoleName, setIsSubmitting);
+  const options = _options(paginatedRoles.list, assignedRolesIds, identifier);
 
   return (
     <div>

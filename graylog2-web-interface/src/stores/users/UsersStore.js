@@ -13,7 +13,7 @@ import UserOverview from 'logic/users/UserOverview';
 import User from 'logic/users/User';
 import UsersActions from 'actions/users/UsersActions';
 import type { ChangePasswordRequest, Token, PaginatedUsers, UserCreate, UserUpdate } from 'actions/users/UsersActions';
-import type { PaginatedListJSON, PaginatedList, Pagination } from 'stores/PaginationTypes';
+import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
 type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>,
@@ -110,7 +110,7 @@ const UsersStore: Store<{}> = singletonStore(
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedUsersResponse) => ({
           adminUser: response.context.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
-          users: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
+          list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
           pagination: {
             page: response.page,
             perPage: response.per_page,

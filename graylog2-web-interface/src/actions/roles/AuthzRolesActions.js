@@ -8,12 +8,8 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 
-export type PaginatedRoles = PaginatedList & {
-  roles: Immutable.List<Role>,
-};
-export type PaginatedUsers = PaginatedList & {
-  users: Immutable.List<UserOverview>,
-};
+export type PaginatedRoles = PaginatedList<Role>;
+export type PaginatedUsers = PaginatedList<UserOverview>;
 
 export type ActionsType = {
   load: (roleId: string) => Promise<Role>,

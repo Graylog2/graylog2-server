@@ -40,7 +40,7 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
   return (
     <SectionGrid>
       <div>
-        <BackendConfigDetails authenticationBackend={authenticationBackend} roles={paginatedRoles.roles} />
+        <BackendConfigDetails authenticationBackend={authenticationBackend} roles={paginatedRoles.list} />
       </div>
       <div>
         <SectionComponent title="Synchronized Users">

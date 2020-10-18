@@ -54,7 +54,7 @@ export const admin = UserOverview.builder()
 export const userList = Immutable.List<UserOverview>([admin, bob, alice]);
 
 export const paginatedUsers = {
-  users: userList,
+  list: userList,
   pagination: {
     page: 1,
     perPage: 10,

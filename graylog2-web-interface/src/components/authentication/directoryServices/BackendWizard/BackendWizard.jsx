@@ -200,7 +200,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
 
   useEffect(() => {
     if (paginatedRoles && !authBackendMeta.backendId && !stepsState.formValues.defaultRoles) {
-      _setDefaultCreateRole(paginatedRoles.roles, stepsState, setStepsState);
+      _setDefaultCreateRole(paginatedRoles.list, stepsState, setStepsState);
     }
   }, [paginatedRoles, authBackendMeta.backendId, stepsState, setStepsState]);
 
@@ -264,7 +264,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
     prepareSubmitPayload: _getSubmitPayload,
-    roles: paginatedRoles.roles,
+    roles: paginatedRoles.list,
     setActiveStepKey: _setActiveStepKey,
     submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });

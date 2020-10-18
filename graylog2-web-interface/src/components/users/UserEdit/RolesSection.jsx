@@ -8,9 +8,8 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import User from 'logic/users/User';
 import PaginatedItemOverview, {
-  defaultPageInfo,
-  type PaginationInfo,
-  // type PaginatedListType,
+  DEFAULT_PAGINATION,
+  type PaginatedListType,
   type DescriptiveItem,
 } from 'components/common/PaginatedItemOverview';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
@@ -31,16 +30,17 @@ const Container = styled.div`
 const RolesSection = ({ user, onSubmit }: Props) => {
   const { username } = user;
   const [loading, setLoading] = useState(false);
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedListType<'roles'>>();
   const { roles } = paginatedRoles || {};
 
-  const _onLoad = (pagination: PaginationInfo = defaultPageInfo) => {
+  const _onLoad = (pagination = DEFAULT_PAGINATION) => {
     setLoading(true);
 
     return AuthzRolesDomain.loadRolesForUser(username, pagination)
-      .then((newPaginatedRoles) => {
+      .then((newPaginatedRoles): PaginatedListType<'roles'> => {
         setLoading(false);
 
+        // $FlowFixMe UserOverview is a DescriptiveItem!!!
         return newPaginatedRoles;
       });
   };

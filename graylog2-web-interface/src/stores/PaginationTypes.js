@@ -1,4 +1,5 @@
 // @flow strict
+import * as Immutable from 'immutable';
 
 export type PaginatedResponseType = {
   count: number,
@@ -30,7 +31,8 @@ export type PaginatedListJSON = {
   count: number,
 };
 
-export type PaginatedList = {
+export type PaginatedList<ItemType> = {
+  list: Immutable.List<ItemType>,
   pagination: Pagination,
   total: number,
   count: number,
