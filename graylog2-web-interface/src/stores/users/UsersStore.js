@@ -13,7 +13,7 @@ import UserOverview from 'logic/users/UserOverview';
 import User from 'logic/users/User';
 import UsersActions from 'actions/users/UsersActions';
 import type { ChangePasswordRequest, Token, PaginatedUsers, UserCreate, UserUpdate } from 'actions/users/UsersActions';
-import type { PaginatedListJSON, PaginatedList } from 'stores/PaginationTypes';
+import type { PaginatedListJSON, PaginatedList, Pagination } from 'stores/PaginationTypes';
 
 type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>,
@@ -104,7 +104,7 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadUsersPaginated({ page, perPage, query }: $PropertyType<PaginatedList, 'pagination'>): Promise<PaginatedUsers> {
+    loadUsersPaginated({ page, perPage, query }: Pagination): Promise<PaginatedUsers> {
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))

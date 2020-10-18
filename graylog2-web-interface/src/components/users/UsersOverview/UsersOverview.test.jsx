@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, act, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { admin } from 'fixtures/users';
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
@@ -27,7 +27,7 @@ describe('UsersOverview', () => {
   });
 
   it('should display table header', async () => {
-    const { findByPlaceholderText, getByText } = render(<UsersOverview />);
+    render(<UsersOverview />);
     const headers = [
       'Username',
       'Full name',
@@ -37,17 +37,18 @@ describe('UsersOverview', () => {
       'Actions',
     ];
 
-    await findByPlaceholderText('Enter search query...');
+    // wait until list is displayed
+    await screen.findByText('Users');
 
     headers.forEach((header) => {
-      expect(getByText(header)).toBeInTheDocument();
+      expect(screen.getByText(header)).toBeInTheDocument();
     });
   });
 
   it('should search users', async () => {
-    const { findByPlaceholderText, getByRole } = render(<UsersOverview />);
-    const searchInput = await findByPlaceholderText('Enter search query...');
-    const searchSubmitButton = getByRole('button', { name: 'Search' });
+    render(<UsersOverview />);
+    const searchInput = await screen.findByPlaceholderText('Enter search query...');
+    const searchSubmitButton = screen.getByRole('button', { name: 'Search' });
 
     fireEvent.change(searchInput, { target: { value: 'username:bob' } });
     fireEvent.click(searchSubmitButton);
@@ -57,13 +58,14 @@ describe('UsersOverview', () => {
 
   describe('should display user', () => {
     const displaysUserAttributes = async ({ user }) => {
-      const { getByText, findByPlaceholderText } = render(<UsersOverview />);
+      render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
-      await findByPlaceholderText('Enter search query...');
+      // wait until list is displayed
+      await screen.findByText('Users');
 
       attributes.forEach(async (attribute) => {
         if (user[attribute]) {
-          expect(getByText(user[attribute])).toBeInTheDocument();
+          expect(screen.getByText(user[attribute])).toBeInTheDocument();
         }
       });
     };
@@ -101,9 +103,9 @@ describe('UsersOverview', () => {
     it('be able to delete a modifiable user', async () => {
       const loadUsersPaginatedPromise = Promise.resolve({ ...paginatedUsers, list: modifiableUsersList });
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(loadUsersPaginatedPromise);
-      const { findByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      const deleteButton = await findByTitle(`Delete user ${modifiableUser.username}`);
+      const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.username}`);
       fireEvent.click(deleteButton);
 
       expect(window.confirm).toHaveBeenCalledTimes(1);
@@ -114,31 +116,31 @@ describe('UsersOverview', () => {
 
     it('not be able to delete a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      const { findByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await findByTitle(`Delete user ${readOnlyUser.username}`);
+      await screen.findByTitle(`Delete user ${readOnlyUser.username}`);
     });
 
     it('see edit and edit tokens link for a modifiable user ', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }));
-      const { findByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await findByTitle(`Edit user ${modifiableUser.username}`);
-      // await findByTitle(`Edit tokens of user ${modifiableUser.username}`);
+      await screen.findByTitle(`Edit user ${modifiableUser.username}`);
+      await screen.getByTitle(`Edit tokens of user ${modifiableUser.username}`);
     });
 
     it('not see edit link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      const { findByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await findByTitle(`Edit user ${readOnlyUser.username}`);
+      await screen.findByTitle(`Edit user ${readOnlyUser.username}`);
     });
 
     it('see edit tokens link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      const { findByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await findByTitle(`Edit tokens of user ${readOnlyUser.username}`);
+      await screen.findByTitle(`Edit tokens of user ${readOnlyUser.username}`);
     });
   });
 });

@@ -17,6 +17,7 @@ import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { type Step } from 'components/common/Wizard';
 import { FetchError } from 'logic/rest/FetchProvider';
 import type { LoadResponse as LoadBackendResponse } from 'actions/authentication/AuthenticationActions';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './BackendWizardContext';
 import { FORM_VALIDATION as SERVER_CONFIG_VALIDATION, STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -171,10 +172,16 @@ type Props = {
   onSubmit: (WizardSubmitPayload, WizardFormValues, licenseIsValid?: boolean) => Promise<LoadBackendResponse>,
 };
 
+const _loadRoles = (setPaginatedRoles) => {
+  const getUnlimited = { page: 1, perPage: 0, query: '' };
+
+  AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
+};
+
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
-  const [roles, setRoles] = useState<?Immutable.List<Role>>();
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
@@ -189,19 +196,15 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     [GROUP_SYNC_KEY]: useRef(),
   };
 
-  useEffect(() => {
-    const getUnlimited = [1, 0, ''];
-
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((paginatedRoles) => setRoles(paginatedRoles.list));
-  }, []);
+  useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   useEffect(() => {
-    if (!authBackendMeta.backendId && !stepsState.formValues.defaultRoles) {
-      _setDefaultCreateRole(roles, stepsState, setStepsState);
+    if (paginatedRoles && !authBackendMeta.backendId && !stepsState.formValues.defaultRoles) {
+      _setDefaultCreateRole(paginatedRoles.roles, stepsState, setStepsState);
     }
-  }, [roles, authBackendMeta.backendId, stepsState, setStepsState]);
+  }, [paginatedRoles, authBackendMeta.backendId, stepsState, setStepsState]);
 
-  if (!roles) {
+  if (!paginatedRoles) {
     return <Spinner />;
   }
 
@@ -261,7 +264,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     handleSubmitAll: _handleSubmitAll,
     invalidStepKeys: stepsState.invalidStepKeys,
     prepareSubmitPayload: _getSubmitPayload,
-    roles,
+    roles: paginatedRoles.roles,
     setActiveStepKey: _setActiveStepKey,
     submitAllError: submitAllError && <SubmitAllError error={submitAllError} backendId={authBackendMeta.backendId} />,
   });

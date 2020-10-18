@@ -10,9 +10,10 @@ import User from 'logic/users/User';
 import PaginatedItemOverview, {
   defaultPageInfo,
   type PaginationInfo,
-  type PaginatedListType,
+  // type PaginatedListType,
   type DescriptiveItem,
 } from 'components/common/PaginatedItemOverview';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import RolesSelector from 'components/permissions/RolesSelector';
 
@@ -30,24 +31,22 @@ const Container = styled.div`
 const RolesSection = ({ user, onSubmit }: Props) => {
   const { username } = user;
   const [loading, setLoading] = useState(false);
-  const [roles, setRoles] = useState();
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
+  const { roles } = paginatedRoles || {};
 
-  const _onLoad = ({ page, perPage, query }: PaginationInfo = defaultPageInfo): Promise<?PaginatedListType> => {
+  const _onLoad = (pagination: PaginationInfo = defaultPageInfo) => {
     setLoading(true);
 
-    return AuthzRolesDomain.loadRolesForUser(username, page, perPage, query)
-      .then((response) => {
+    return AuthzRolesDomain.loadRolesForUser(username, pagination)
+      .then((newPaginatedRoles) => {
         setLoading(false);
 
-        return {
-          pagination: response.pagination,
-          list: response.list.map((item) => (item: DescriptiveItem)),
-        };
+        return newPaginatedRoles;
       });
   };
 
   const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
-    _onLoad().then((response) => { if (response) setRoles(response); });
+    _onLoad().then(setPaginatedRoles);
     UsersDomain.load(username);
   });
 
@@ -76,7 +75,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       <Container>
         <PaginatedItemOverview noDataText="No selected roles have been found."
                                onLoad={_onLoad}
-                               overrideList={roles}
+                               overrideList={roles ?? Immutable.List()}
                                onDeleteItem={onDeleteRole}
                                queryHelper={<RolesQueryHelp />} />
       </Container>

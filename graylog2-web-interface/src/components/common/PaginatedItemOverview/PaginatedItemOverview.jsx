@@ -5,17 +5,11 @@ import * as Immutable from 'immutable';
 
 import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
 import SearchForm from 'components/common/SearchForm';
+import Spinner from 'components/common/Spinner';
 import EmptyResult from 'components/common/EmptyResult';
+import type { Pagination } from 'stores/PaginationTypes';
 
 import PaginatedItem from './PaginatedItem';
-
-export type PaginationInfo = {
-  total: number,
-  count: number,
-  page: number,
-  perPage: number,
-  query: string,
-};
 
 export type DescriptiveItem = {
   +id: string,
@@ -23,88 +17,67 @@ export type DescriptiveItem = {
   +description: string,
 };
 
-type ListOfDescriptiveItems = Immutable.List<DescriptiveItem>;
-
-export type PaginatedListType = {
-  pagination: PaginationInfo,
-  list: ListOfDescriptiveItems,
+export type PaginatedListType<ListKey> = {
+  [listkey: ListKey]: Immutable.List<DescriptiveItem>,
+  pagination: Pagination,
+  total: number,
+  count: number,
 };
 
-type Props = {
+type Props<ListKey> = {
+  listKey: ListKey,
   noDataText?: string,
-  onLoad: (paginationInfo: PaginationInfo, isSubscribed: boolean) => Promise<?PaginatedListType>,
-  overrideList?: PaginatedListType,
+  onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType<ListKey>>,
+  overrideList?: PaginatedListType<ListKey>,
   onDeleteItem?: (DescriptiveItem) => void,
   queryHelper?: React.Node,
 };
 
 const pageSizes = [5, 10, 30];
-export const defaultPageInfo = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '', total: 0, count: 0 };
+export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '' };
 
-const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText }: Props) => {
-  const [items, setItems] = useState();
-  const [paginationInfo, setPaginationInfo] = useState(defaultPageInfo);
+const PaginatedItemOverview = <ListKey>({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText, listKey }: Props<ListKey>) => {
+  const [paginatedList, setPaginatedList] = useState<?PaginatedListType<ListKey>>();
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
 
-  const _setResponse = (response: ?PaginatedListType) => {
-    if (!response) {
-      return;
-    }
-
-    const { list, pagination } = response;
-    setPaginationInfo(pagination);
-    setItems(list);
-  };
-
-  useEffect(() => _setResponse(overrideList), [overrideList]);
+  useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
 
   useEffect(() => {
     let isSubscribed = true;
 
-    onLoad(paginationInfo, isSubscribed).then((response) => {
+    onLoad(pagination, isSubscribed).then((response) => {
       if (isSubscribed) {
-        _setResponse(response);
+        setPaginatedList(response);
       }
     });
 
     return () => { isSubscribed = false; };
-  }, []);
+  }, [pagination, onLoad]);
 
-  const _onPageChange = (page, perPage) => {
-    const pageInfo = {
-      ...paginationInfo,
-      page,
-      perPage,
-    };
-    onLoad(pageInfo, true).then(_setResponse);
-  };
+  if (!paginatedList) {
+    return <Spinner />;
+  }
 
-  const _onSearch = (query) => {
-    const pageInfo = {
-      ...paginationInfo,
-      page: INITIAL_PAGE,
-      query,
-    };
-    onLoad(pageInfo, true).then(_setResponse);
-  };
+  if (!paginatedList[listKey] || paginatedList[listKey]?.size === 0) {
+    return <EmptyResult>{noDataText}</EmptyResult>;
+  }
 
-  const result = items && items.size > 0
-    ? items.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />)
-    : <EmptyResult>{noDataText}</EmptyResult>;
+  const itemList = paginatedList[listKey].toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />);
 
   return (
-    <PaginatedList onChange={_onPageChange}
-                   pageSize={paginationInfo.perPage}
-                   totalItems={paginationInfo.total}
+    <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
+                   pageSize={pagination.perPage}
+                   totalItems={paginatedList.total}
                    pageSizes={pageSizes}
-                   activePage={paginationInfo.page}>
-      <SearchForm onSearch={_onSearch}
+                   activePage={pagination.page}>
+      <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
                   label="Filter"
                   wrapperClass="has-bm"
                   placeholder="Enter query to filter"
                   queryHelpComponent={queryHelper}
                   searchButtonLabel="Filter" />
       <div>
-        {result}
+        {itemList}
       </div>
     </PaginatedList>
   );

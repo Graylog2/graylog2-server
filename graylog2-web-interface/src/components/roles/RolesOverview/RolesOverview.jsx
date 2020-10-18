@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { type ThemeInterface } from 'theme';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
@@ -14,8 +15,6 @@ import RolesFilter from './RolesFilter';
 
 const TABLE_HEADERS = ['Name', 'Description', 'Actions'];
 const DEFAULT_PAGINATION = {
-  count: undefined,
-  total: undefined,
   page: 1,
   perPage: 10,
   query: '',
@@ -52,35 +51,29 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _onPageChange = (loadRoles, setLoading) => (page, perPage) => {
+const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
   setLoading(true);
 
-  return loadRoles(page, perPage).then(() => setLoading(false));
+  AuthzRolesDomain.loadRolesPaginated(pagination).then((paginatedUsers) => {
+    setPaginatedRoles(paginatedUsers);
+    setLoading(false);
+  });
 };
 
+const _updateListOnRoleDelete = (perPage, query, setPagination) => AuthzRolesActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+
 const RolesOverview = () => {
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [loading, setLoading] = useState(false);
-  const [paginatedRoles, setPaginatedRoles] = useState({ list: undefined, pagination: DEFAULT_PAGINATION });
-  const { list: roles, pagination: { page, perPage, query, total } } = paginatedRoles;
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const { roles, total } = paginatedRoles || {};
+  const { page, perPage, query } = pagination;
 
-  const _loadRoles = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthzRolesDomain.loadRolesPaginated(newPage, newPerPage, newQuery).then(setPaginatedRoles);
-  };
-
+  const _handleSearch = (newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
   const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;
-  const _handleSearch = (newQuery) => _loadRoles(DEFAULT_PAGINATION.page, undefined, newQuery);
 
-  useEffect(() => {
-    _loadRoles(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
-
-    const unlistenDeleteRole = AuthzRolesActions.delete.completed.listen(() => {
-      _loadRoles(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
-
-    return () => {
-      unlistenDeleteRole();
-    };
-  }, []);
+  useEffect(() => _loadRoles(pagination, setLoading, setPaginatedRoles), [pagination]);
+  useEffect(() => _updateListOnRoleDelete(perPage, query, setPagination), [perPage, query]);
 
   if (!roles) {
     return <Spinner />;
@@ -97,7 +90,9 @@ const RolesOverview = () => {
           <p className="description">
             Found {total} roles on the system.
           </p>
-          <StyledPaginatedList onChange={_onPageChange(_loadRoles, setLoading)} totalItems={total} activePage={page}>
+          <StyledPaginatedList activePage={page}
+                               totalItems={total}
+                               onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
             <DataTable id="roles-overview"
                        className="table-hover"
                        rowClassName="no-bm"

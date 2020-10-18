@@ -57,28 +57,30 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _loadUsers = (pagination, setLoading, setLoadUsersResponse) => {
+const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
   setLoading(true);
 
   UsersDomain.loadUsersPaginated(pagination).then((paginatedUsers) => {
+    setPaginatedUsers(paginatedUsers);
     setLoading(false);
-    setLoadUsersResponse(paginatedUsers);
   });
 };
 
+const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+
 const UsersOverview = () => {
   const currentUser = useContext(CurrentUserContext);
-  const [loadUsersResponse, setLoadUsersResponse] = useState<?PaginatedUsers>();
+  const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { users, adminUser, total } = loadUsersResponse || {};
-  const { page, perPage, query } = pagination;
+  const { users, adminUser, total } = paginatedUsers || {};
+  const { page, query } = pagination;
 
   const _handleSearch = (newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
-  const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.username === user.username)} />;
+  const _usersOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.username === user.username)} />;
 
-  useEffect(() => _loadUsers(pagination, setLoading, setLoadUsersResponse), [pagination]);
-  useEffect(() => UsersActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query })), [perPage, query]);
+  useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);
+  useEffect(() => _updateListOnUserDelete(page, query, setPagination), [page, query]);
 
   if (!users) {
     return <Spinner />;
@@ -88,7 +90,7 @@ const UsersOverview = () => {
     <Container>
       {adminUser && (
         <SystemAdministrator adminUser={adminUser}
-                             dataRowFormatter={_userOverviewItem}
+                             dataRowFormatter={_usersOverviewItem}
                              headerCellFormatter={_headerCellFormatter}
                              headers={TABLE_HEADERS} />
       )}
@@ -113,7 +115,7 @@ const UsersOverview = () => {
                        noDataText={<EmptyResult>No users have been found.</EmptyResult>}
                        rows={users.toJS()}
                        customFilter={<UsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
-                       dataRowFormatter={_userOverviewItem}
+                       dataRowFormatter={_usersOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Users" />
           </StyledPaginatedList>

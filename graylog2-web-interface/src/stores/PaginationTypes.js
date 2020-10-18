@@ -16,20 +16,22 @@ export type PaginationType = {
   query: $PropertyType<PaginatedResponseType, 'query'>,
 };
 
-export type PaginatedListJSON = {
+export type Pagination = {
   page: number,
-  per_page: number,
-  total: number,
-  count: number,
+  perPage: number,
   query: string,
 };
 
+export type PaginatedListJSON = {
+  page: $PropertyType<Pagination, 'page'>,
+  per_page: $PropertyType<Pagination, 'perPage'>,
+  query: $PropertyType<Pagination, 'query'>,
+  total: number,
+  count: number,
+};
+
 export type PaginatedList = {
-  pagination: {
-    page: number,
-    perPage: number,
-    query: string,
-  },
+  pagination: Pagination,
   total: number,
   count: number,
 };
