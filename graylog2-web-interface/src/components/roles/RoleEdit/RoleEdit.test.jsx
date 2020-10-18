@@ -33,7 +33,7 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 
 // mock loadUsersPaginated
 const paginatedUsers = {
-  list: Immutable.List([bob, charlie]),
+  users: Immutable.List([bob, charlie]),
   pagination: {
     page: 1,
     perPage: 10,

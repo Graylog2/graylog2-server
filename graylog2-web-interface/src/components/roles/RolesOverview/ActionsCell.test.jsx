@@ -74,7 +74,7 @@ describe('ActionsCell', () => {
     });
 
     it('should display confirm dialog which includes information about assigned users', async () => {
-      const confirmMessage = `Do you really want to delete role "${customRoleName}"?\n\nIt is still assigned to ${paginatedUsers.list.size} users.`;
+      const confirmMessage = `Do you really want to delete role "${customRoleName}"?\n\nIt is still assigned to ${paginatedUsers.users.size} users.`;
       const mockLoadManyUsersPromise = Promise.resolve(paginatedUsers);
       asMock(AuthzRolesActions.loadUsersForRole).mockReturnValueOnce(mockLoadManyUsersPromise);
       const userPermissions = [
