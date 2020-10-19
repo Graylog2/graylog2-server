@@ -27,6 +27,7 @@ import org.graylog.security.GranteeAuthorizer;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 public class EntityDependencyPermissionChecker {
     private final GranteeAuthorizer.Factory granteeAuthorizerFactory;
@@ -50,7 +51,7 @@ public class EntityDependencyPermissionChecker {
      */
     public ImmutableMultimap<GRN, EntityDescriptor> check(GRN sharingUser,
                                                           ImmutableSet<EntityDescriptor> dependencies,
-                                                          ImmutableSet<GRN> selectedGrantees) {
+                                                          Set<GRN> selectedGrantees) {
         final ImmutableMultimap.Builder<GRN, EntityDescriptor> deniedDependencies = ImmutableMultimap.builder();
         final GranteeAuthorizer sharerAuthorizer = granteeAuthorizerFactory.create(sharingUser);
 
