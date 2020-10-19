@@ -20,15 +20,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.event.EventDto;
+import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Data object that can be used in notifications to provide structured data to plugins.
  */
 @AutoValue
 public abstract class EventNotificationModelData {
+    private static final String UNKNOWN = "<unknown>";
+
     @JsonProperty("event_definition_id")
     public abstract String eventDefinitionId();
 
@@ -78,5 +83,21 @@ public abstract class EventNotificationModelData {
         public abstract Builder backlog(List<MessageSummary> backlog);
 
         public abstract EventNotificationModelData build();
+    }
+
+    public static EventNotificationModelData of(EventNotificationContext ctx, List<MessageSummary> backlog) {
+        final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
+        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
+
+        return EventNotificationModelData.builder()
+                .eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN))
+                .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
+                .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
+                .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
+                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
+                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
+                .event(ctx.event())
+                .backlog(backlog)
+                .build();
     }
 }
