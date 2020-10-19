@@ -21,7 +21,7 @@ const AuthenticationBackendEditPage = ({ params: { backendId }, location: { quer
 
   useEffect(() => {
     AuthenticationDomain.load(backendId).then((response) => setAuthBackend(response.backend));
-  }, []);
+  }, [backendId]);
 
   if (!authBackend) {
     return <Spinner />;

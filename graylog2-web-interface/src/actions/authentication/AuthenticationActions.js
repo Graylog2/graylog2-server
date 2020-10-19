@@ -1,12 +1,11 @@
 // @flow strict
 import Reflux from 'reflux';
-import * as Immutable from 'immutable';
 
 import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
-import UserOverview from 'logic/users/UserOverview';
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
-import type { PaginationType } from 'stores/PaginationTypes';
+import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
+import type { PaginatedUsers } from 'actions/users/UsersActions';
 
 export type AuthenticationBackendCreate = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,
@@ -27,17 +26,10 @@ export type AuthenticationBackendUpdate = {
   },
 };
 
-export type PaginatedBackends = {
+export type PaginatedBackends = PaginatedList<AuthenticationBackend> & {
   context: {
     activeBackend: ?AuthenticationBackend,
   },
-  list: Immutable.List<AuthenticationBackend>,
-  pagination: PaginationType,
-};
-
-export type PaginatedAuthUsers = {
-  list: Immutable.List<UserOverview>,
-  pagination: PaginationType,
 };
 
 export type ConnectionTestPayload = {
@@ -49,7 +41,6 @@ export type ConnectionTestResult = {
   message: string,
   errors: Array<string>,
 };
-
 export type LoginTestPayload = {
   backend_id: ?string,
   backend_configuration: AuthenticationBackendCreate,
@@ -93,8 +84,8 @@ export type ActionsType = {
   enableUser: (userId: string, username: string) => Promise<void>,
   load: (id: string) => Promise<LoadResponse>,
   loadActive: () => Promise<LoadActiveResponse>,
-  loadBackendsPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedBackends>,
-  loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedAuthUsers>,
+  loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,
+  loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>,
   setActiveBackend: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
   testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,

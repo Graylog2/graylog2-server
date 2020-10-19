@@ -3,10 +3,8 @@ import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { compact } from 'lodash';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
 
 import { Spinner } from 'components/common';
-import Role from 'logic/roles/Role';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';

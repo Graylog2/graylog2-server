@@ -18,9 +18,9 @@ import type {
   LoadResponse,
   LoginTestPayload,
   LoginTestResult,
-  PaginatedAuthUsers,
   PaginatedBackends,
 } from 'actions/authentication/AuthenticationActions';
+import type { PaginatedUsers } from 'actions/users/UsersActions';
 import type { PaginatedResponseType } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -162,7 +162,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    loadUsersPaginated(page: number, perPage: number, query: string): Promise<PaginatedAuthUsers> {
+    loadUsersPaginated(page: number, perPage: number, query: string): Promise<PaginatedUsers> {
       const url = PaginationURL(ApiRoutes.AuthenticationController.loadUsersPaginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
