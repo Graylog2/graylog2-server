@@ -63,8 +63,9 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
         this.trustedProxies = trustedProxies;
 
         setAuthenticationTokenClass(HttpHeadersToken.class);
-        setCredentialsMatcher(new AllowAllCredentialsMatcher());
         setCachingEnabled(false);
+        // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
+        setCredentialsMatcher(new AllowAllCredentialsMatcher());
     }
 
     @Override
