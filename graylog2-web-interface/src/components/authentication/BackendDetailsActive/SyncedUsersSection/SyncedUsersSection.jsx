@@ -13,15 +13,12 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
 
+const TABLE_HEADERS = ['Username', 'Full Name', 'Roles', 'Actions'];
 const DEFAULT_PAGINATION = {
-  count: undefined,
   page: 1,
   perPage: 10,
   query: '',
-  total: undefined,
 };
-
-const TABLE_HEADERS = ['Username', 'Full Name', 'Roles', 'Actions'];
 
 const _headerCellFormatter = (header) => {
   switch (header.toLocaleLowerCase()) {
@@ -37,7 +34,7 @@ const _loadSyncedTeams = (pagination, setLoading, setPaginatedUsers) => {
 
   AuthenticationDomain.loadUsersPaginated(pagination).then((paginatedUsers) => {
     setPaginatedUsers(paginatedUsers);
-    setLoading(true);
+    setLoading(false);
   });
 };
 

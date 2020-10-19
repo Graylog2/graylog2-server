@@ -57,11 +57,11 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
     return <Spinner />;
   }
 
-  if (!paginatedList.list || paginatedList.list.size === 0) {
-    return <EmptyResult>{noDataText}</EmptyResult>;
-  }
+  let itemList = <EmptyResult>{noDataText}</EmptyResult>;
 
-  const itemList = paginatedList.list.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />);
+  if (paginatedList.list && paginatedList.list.size >= 1) {
+    itemList = paginatedList.list.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />);
+  }
 
   return (
     <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}

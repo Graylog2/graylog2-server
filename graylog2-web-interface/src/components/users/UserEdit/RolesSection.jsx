@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -31,7 +31,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
 
-  const _onLoad = (pagination = DEFAULT_PAGINATION) => {
+  const _onLoad = useCallback((pagination = DEFAULT_PAGINATION) => {
     setLoading(true);
 
     return AuthzRolesDomain.loadRolesForUser(username, pagination).then((newPaginatedRoles) => {
@@ -39,7 +39,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
 
       return newPaginatedRoles;
     });
-  };
+  }, [username]);
 
   const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
     _onLoad().then(setPaginatedRoles);

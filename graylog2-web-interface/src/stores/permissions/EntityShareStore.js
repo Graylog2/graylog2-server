@@ -38,12 +38,12 @@ const formatPaginatedSharesResponse = ({
   },
   pagination: {
     additionalQueries,
-    count,
-    total,
     page,
     perPage,
     query,
   },
+  count,
+  total,
 });
 
 const EntityShareStore: EntityShareStoreType = singletonStore(

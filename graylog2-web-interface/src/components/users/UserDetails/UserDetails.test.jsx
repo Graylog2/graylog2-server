@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { paginatedShares } from 'fixtures/sharedEntities';
+// import { paginatedShares } from 'fixtures/sharedEntities';
 import selectEvent from 'react-select-event';
 import { reader as assignedRole } from 'fixtures/roles';
 import { admin as currentUser } from 'fixtures/users';
@@ -14,7 +14,7 @@ import User from 'logic/users/User';
 import UserDetails from './UserDetails';
 
 const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
-const mockPaginatedUserShares = paginatedShares({ page: 1, perPage: 10, query: '' });
+// const mockPaginatedUserShares = paginatedShares({ page: 1, perPage: 10, query: '' });
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
@@ -23,11 +23,11 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   },
 }));
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
-    loadUserSharesPaginated: jest.fn(() => Promise.resolve(mockPaginatedUserShares)),
-  },
-}));
+// jest.mock('stores/permissions/EntityShareStore', () => ({
+//   EntityShareActions: {
+//     loadUserSharesPaginated: jest.fn(() => Promise.resolve(mockPaginatedUserShares)),
+//   },
+// }));
 
 const user = User
   .builder()
@@ -52,7 +52,7 @@ describe('<UserDetails />', () => {
   });
 
   it('user profile should display profile information', async () => {
-    const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+    const { getByText } = render(<SutComponent user={user} />);
     await act(() => mockAuthzRolesPromise);
 
     expect(getByText(user.username)).not.toBeNull();
@@ -67,7 +67,7 @@ describe('<UserDetails />', () => {
 
   describe('user settings', () => {
     it('should display timezone', async () => {
-      const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      const { getByText } = render(<SutComponent user={user} />);
       await act(() => mockAuthzRolesPromise);
 
       if (!user.timezone) throw Error('timezone must be defined for provided user');
@@ -78,28 +78,28 @@ describe('<UserDetails />', () => {
     describe('should display session timeout in a readable format', () => {
       it('for seconds', async () => {
         const test = user.toBuilder().sessionTimeoutMs(10000).build();
-        const { getByText } = render(<SutComponent user={test} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={test} />);
         await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Seconds')).not.toBeNull();
       });
 
       it('for minutes', async () => {
-        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
         await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Minutes')).not.toBeNull();
       });
 
       it('for hours', async () => {
-        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
         await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Hours')).not.toBeNull();
       });
 
       it('for days', async () => {
-        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
         await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Days')).not.toBeNull();
@@ -155,7 +155,7 @@ describe('<UserDetails />', () => {
 
   describe('roles section', () => {
     it('should display assigned roles', async () => {
-      const { queryByText, queryByRole } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      const { queryByText, queryByRole } = render(<SutComponent user={user} />);
       await act(() => mockAuthzRolesPromise);
 
       expect(queryByRole('heading', { level: 2, name: 'Roles' })).not.toBeNull();
@@ -165,7 +165,7 @@ describe('<UserDetails />', () => {
 
   describe('teams section', () => {
     it('should display info if license is not present', async () => {
-      const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      const { getByText } = render(<SutComponent user={user} />);
       await act(() => mockAuthzRolesPromise);
 
       expect(getByText(/Enterprise Feature/)).not.toBeNull();

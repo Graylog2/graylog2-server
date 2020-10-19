@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
@@ -26,7 +26,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState();
 
-  const _onLoad = (pagination) => {
+  const _onLoad = useCallback((pagination) => {
     setLoading(true);
 
     return AuthzRolesDomain.loadUsersForRole(id, name, pagination)
@@ -35,7 +35,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
 
         return paginatedRoles;
       });
-  };
+  }, [id, name]);
 
   const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => AuthzRolesDomain.addMembers(id,
     newUsers.map((u) => u.username)).then(() => _onLoad(DEFAULT_PAGINATION)
