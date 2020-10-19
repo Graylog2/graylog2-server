@@ -16,7 +16,11 @@ const globOptions = {
   nodir: true,
 };
 
-const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions).map(config => `${globCwd}/${config}`);
+const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions).map((config) => `${globCwd}/${config}`);
+
+if (pluginConfigs.some((config) => config.includes('graylog-plugin-cloud/server-plugin'))) {
+  process.env.IS_CLOUD = true;
+}
 
 process.env.web_src_path = path.resolve(__dirname);
 
@@ -29,10 +33,9 @@ function getPluginName(pluginConfig) {
     // If a package.json file exists (should normally be the case) use the package name for pluginName
     const pkg = JSON.parse(fs.readFileSync(packageConfig, 'utf8'));
     return pkg.name.replace(/\s+/g, '');
-  } else {
-    // Otherwise just use the directory name of the webpack config file
-    return path.basename(path.dirname(pluginConfig));
   }
+  // Otherwise just use the directory name of the webpack config file
+  return path.basename(path.dirname(pluginConfig));
 }
 
 function isNotDependency(pluginConfig) {
