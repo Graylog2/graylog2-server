@@ -61,6 +61,7 @@ export const prepareInitialValues = () => {
     transportSecurity: 'tls',
     userFullNameAttribute: 'cn',
     userNameAttribute: 'uid',
+    userUniqueIdAttribute: 'entryUUID',
     verifyCertificates: true,
   };
 

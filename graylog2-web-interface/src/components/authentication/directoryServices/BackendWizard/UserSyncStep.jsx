@@ -78,6 +78,12 @@ const UserSyncStep = ({ help = {}, formRef, onSubmit, onSubmitAll, submitAllErro
                            placeholder="Full Name Attribute"
                            validate={validateField(FORM_VALIDATION.userFullNameAttribute)} />
 
+          <FormikFormGroup help={help.userFullNameAttribute}
+                           label="ID Attribute"
+                           name="userUniqueIdAttribute"
+                           placeholder="ID Attribute"
+                           validate={validateField(FORM_VALIDATION.userFullNameAttribute)} />
+
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">

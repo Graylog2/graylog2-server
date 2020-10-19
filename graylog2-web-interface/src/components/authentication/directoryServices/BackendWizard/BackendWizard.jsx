@@ -70,6 +70,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     systemUserDn,
     systemUserPassword,
     transportSecurity,
+    userUniqueIdAttribute,
     userFullNameAttribute,
     userNameAttribute,
     userSearchBase,
@@ -97,6 +98,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
       user_name_attribute: userNameAttribute,
       user_search_base: userSearchBase,
       user_search_pattern: userSearchPattern,
+      user_unique_id_attribute: userUniqueIdAttribute,
       verify_certificates: verifyCertificates,
     },
   };
