@@ -4,12 +4,17 @@ import { createNotFoundError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ListenableAction } from 'stores/StoreTypes';
 
-const _displaySuccessNotification = (successNotification, ...args) => {
+type Notification = {
+  title?: string,
+  message?: string,
+};
+
+const _displaySuccessNotification = <T, Args: Array<T>>(successNotification: (...Args) => Notification, ...args: Args) => {
   const { message, title } = successNotification(...args);
   UserNotification.success(message, title || 'Success');
 };
 
-const _displayErrorNotification = (errorNotification, error, ...args) => {
+const _displayErrorNotification = <T, Args: Array<T>>(errorNotification: (error: string, ...Args) => Notification, error, ...args: Args) => {
   let errorMessage = String(error);
 
   if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
@@ -18,11 +23,6 @@ const _displayErrorNotification = (errorNotification, error, ...args) => {
 
   const { message, title } = errorNotification(errorMessage, ...args);
   UserNotification.error(message, title || 'Error');
-};
-
-type Notification = {
-  title?: string,
-  message?: string,
 };
 
 type Props<Args, ActionResult> = {
