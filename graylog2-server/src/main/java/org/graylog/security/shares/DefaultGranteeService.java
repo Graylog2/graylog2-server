@@ -55,7 +55,7 @@ public class DefaultGranteeService implements GranteeService {
             return userService.loadAll().stream().collect(ImmutableSet.toImmutableSet());
         } else {
             return userService.loadAll().stream()
-                    .filter(u -> userAuthorizer.isPermitted(RestPermissions.USERS_VIEW, u.getId()))
+                    .filter(u -> userAuthorizer.isPermitted(RestPermissions.USERS_READ, u.getId()))
                     .collect(ImmutableSet.toImmutableSet());
         }
     }
