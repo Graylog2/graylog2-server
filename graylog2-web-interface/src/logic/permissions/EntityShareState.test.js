@@ -21,6 +21,8 @@ describe('EntityShareState', () => {
     expect(entityShareState.activeShares.size).not.toBe(undefined);
     expect(entityShareState.selectedGranteeCapabilities.size).not.toBe(undefined);
     expect(entityShareState.missingDependencies.size).not.toBe(undefined);
+
+    expect(entityShareState).toMatchSnapshot();
   });
 
   describe('order of selected grantees', () => {
