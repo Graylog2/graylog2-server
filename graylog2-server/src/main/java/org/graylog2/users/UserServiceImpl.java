@@ -189,21 +189,30 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public int delete(final String username) {
-        final User user = load(username);
-        if (user == null) {
+        DBObject query = new BasicDBObject();
+        query.put(UserImpl.USERNAME, username);
+
+        final List<DBObject> result = query(UserImpl.class, query);
+        if (result == null || result.isEmpty()) {
             return 0;
         }
 
-        LOG.debug("Deleting user(s) with username \"{}\"", username);
-        final DBObject query = BasicDBObjectBuilder.start(UserImpl.USERNAME, username).get();
-        final int result = destroy(query, UserImpl.COLLECTION_NAME);
+        final ImmutableList.Builder<UserDeletedEvent> deletedUsers = ImmutableList.builder();
+        result.forEach(userObject -> {
+            final ObjectId userId = (ObjectId) userObject.get("_id");
+            deletedUsers.add(UserDeletedEvent.create(userId.toHexString(), username));
+        });
 
-        if (result > 1) {
-            LOG.warn("Removed {} users matching username \"{}\".", result, username);
+        LOG.debug("Deleting user(s) with username \"{}\"", username);
+        query = BasicDBObjectBuilder.start(UserImpl.USERNAME, username).get();
+        final int deleteCount = destroy(query, UserImpl.COLLECTION_NAME);
+
+        if (deleteCount > 1) {
+            LOG.warn("Removed {} users matching username \"{}\".", deleteCount, username);
         }
         accesstokenService.deleteAllForUser(username);
-        serverEventBus.post(UserDeletedEvent.create(user.getId(), user.getName()));
-        return result;
+        deletedUsers.build().forEach(serverEventBus::post);
+        return deleteCount;
     }
 
     @Override
