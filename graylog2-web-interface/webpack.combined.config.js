@@ -18,7 +18,7 @@ const globOptions = {
 
 const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions).map((config) => `${globCwd}/${config}`);
 
-if (pluginConfigs.filter((config) => config.includes('graylog-plugin-cloud/server-plugin')).length > 0) {
+if (pluginConfigs.some((config) => config.includes('graylog-plugin-cloud/server-plugin'))) {
   process.env.IS_CLOUD = true;
 }
 
