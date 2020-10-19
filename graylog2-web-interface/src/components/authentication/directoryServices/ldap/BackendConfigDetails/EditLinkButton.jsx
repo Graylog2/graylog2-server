@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import URI from 'urijs';
 
 import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
@@ -11,12 +12,9 @@ type Props = {
 };
 
 const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => {
-  const editLink = {
-    pathname: Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId),
-    query: {
-      initialStepKey: stepKey,
-    },
-  };
+  const editLink = new URI(Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId))
+    .search({ initialStepKey: stepKey })
+    .toString();
 
   return (
     <LinkContainer to={editLink}>
