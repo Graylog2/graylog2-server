@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
+import type { PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
 import withParams from 'routing/withParams';
 import { PageHeader, DocumentTitle } from 'components/common';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -29,15 +30,14 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 );
 
 const UserDetailsPage = ({ params }: Props) => {
-  const [paginatedUserShares, setPaginatedUserShares] = useState();
+  const [paginatedUserShares, setPaginatedUserShares] = useState<?PaginatedEntityShares>();
   const [loadedUser, setLoadedUser] = useState();
   const username = params?.username;
 
   useEffect(() => {
     UsersDomain.load(username).then(setLoadedUser);
 
-    EntityShareDomain.loadUserSharesPaginated(username, 1, 10, '')
-      .then((newPaginatedUserShares) => newPaginatedUserShares && setPaginatedUserShares(newPaginatedUserShares));
+    EntityShareDomain.loadUserSharesPaginated(username, { page: 1, perPage: 10, query: '' }).then(setPaginatedUserShares);
   }, [username]);
 
   return (

@@ -63,10 +63,10 @@ const UserEdit = ({ user }: Props) => {
             <RolesSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user)} />
           </IfPermitted>
-          {/* <IfPermitted permissions="teams:edit">
-              <TeamsSection user={user}
-                            onSubmit={(data) => _updateUser(data, currentUser, user)} />
-            </IfPermitted> */}
+          <IfPermitted permissions="teams:edit">
+            <TeamsSection user={user}
+                          onSubmit={(data) => _updateUser(data, currentUser, user)} />
+          </IfPermitted>
         </div>
       </IfPermitted>
     </SectionGrid>

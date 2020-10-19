@@ -7,16 +7,14 @@ import UserQueryHelper from '../UsersQueryHelper';
 
 type Props = {
   onSearch: (query: string) => void,
-  onReset: () => void,
 };
 
-const UsersFilter = ({ onSearch, onReset }: Props) => (
+const UsersFilter = ({ onSearch }: Props) => (
   <SearchForm onSearch={onSearch}
               wrapperClass="has-bm"
-              onReset={onReset}
+              onReset={() => onSearch('')}
               queryHelpComponent={<UserQueryHelper />}
               topMargin={0} />
-
 );
 
 export default UsersFilter;

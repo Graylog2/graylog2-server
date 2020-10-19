@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { IfPermitted, Spinner } from 'components/common';
 import User from 'logic/users/User';
-import type { PaginatedEntitySharesType } from 'actions/permissions/EntityShareActions';
+import type { PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
 import SectionGrid from 'components/common/Section/SectionGrid';
 
 import PreferencesSection from './PreferencesSection';
@@ -14,7 +14,7 @@ import SharedEntitiesSection from './SharedEntitiesSection';
 import TeamsSection from './TeamsSection';
 
 type Props = {
-  paginatedUserShares: ?PaginatedEntitySharesType,
+  paginatedUserShares: ?PaginatedEntityShares,
   user: ?User,
 };
 

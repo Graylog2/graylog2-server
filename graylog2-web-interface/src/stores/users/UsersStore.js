@@ -15,7 +15,7 @@ import UsersActions from 'actions/users/UsersActions';
 import type { ChangePasswordRequest, Token, PaginatedUsers, UserCreate, UserUpdate } from 'actions/users/UsersActions';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
-type PaginatedUsersResponse = PaginatedListJSON & {
+export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>,
   context: {
     admin_user: UserOverviewJSON,

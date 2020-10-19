@@ -74,17 +74,17 @@ const UsersOverview = () => {
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: users, adminUser, total } = paginatedUsers || {};
-  const { page, query } = pagination;
-
-  const _handleSearch = (newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
-  const _usersOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.username === user.username)} />;
+  const { page, query, perPage } = pagination;
 
   useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);
-  useEffect(() => _updateListOnUserDelete(page, query, setPagination), [page, query]);
+  useEffect(() => _updateListOnUserDelete(perPage, query, setPagination), [perPage, query]);
 
   if (!users) {
     return <Spinner />;
   }
+
+  const searchFilter = <UsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
+  const _usersOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.username === user.username)} />;
 
   return (
     <Container>
@@ -114,7 +114,7 @@ const UsersOverview = () => {
                        sortByKey="fullName"
                        noDataText={<EmptyResult>No users have been found.</EmptyResult>}
                        rows={users.toJS()}
-                       customFilter={<UsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
+                       customFilter={searchFilter}
                        dataRowFormatter={_usersOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Users" />

@@ -14,7 +14,7 @@ import User from 'logic/users/User';
 import UserDetails from './UserDetails';
 
 const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
-const mockPaginatedUserShares = paginatedShares(1, 10, '');
+const mockPaginatedUserShares = paginatedShares({ page: 1, perPage: 10, query: '' });
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {

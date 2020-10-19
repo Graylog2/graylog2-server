@@ -9,7 +9,6 @@ import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import User from 'logic/users/User';
 import PaginatedItemOverview, {
   DEFAULT_PAGINATION,
-  type PaginatedListType,
   type DescriptiveItem,
 } from 'components/common/PaginatedItemOverview';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
@@ -30,19 +29,16 @@ const Container = styled.div`
 const RolesSection = ({ user, onSubmit }: Props) => {
   const { username } = user;
   const [loading, setLoading] = useState(false);
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedListType<'roles'>>();
-  const { roles } = paginatedRoles || {};
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
 
   const _onLoad = (pagination = DEFAULT_PAGINATION) => {
     setLoading(true);
 
-    return AuthzRolesDomain.loadRolesForUser(username, pagination)
-      .then((newPaginatedRoles): PaginatedListType<'roles'> => {
-        setLoading(false);
+    return AuthzRolesDomain.loadRolesForUser(username, pagination).then((newPaginatedRoles) => {
+      setLoading(false);
 
-        // $FlowFixMe UserOverview is a DescriptiveItem!!!
-        return newPaginatedRoles;
-      });
+      return newPaginatedRoles;
+    });
   };
 
   const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
@@ -74,8 +70,10 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       <h3>Selected Roles</h3>
       <Container>
         <PaginatedItemOverview noDataText="No selected roles have been found."
+                               // $FlowFixMe Role is a DescriptiveItem!
                                onLoad={_onLoad}
-                               overrideList={roles ?? Immutable.List()}
+                               // $FlowFixMe Role is a DescriptiveItem!
+                               overrideList={paginatedRoles}
                                onDeleteItem={onDeleteRole}
                                queryHelper={<RolesQueryHelp />} />
       </Container>

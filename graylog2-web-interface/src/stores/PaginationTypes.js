@@ -1,6 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import type { AdditionalQueries } from 'util/PaginationURL';
+
 export type PaginatedResponseType = {
   count: number,
   total: number,
@@ -21,6 +23,7 @@ export type Pagination = {
   page: number,
   perPage: number,
   query: string,
+  additionalQueries?: AdditionalQueries,
 };
 
 export type PaginatedListJSON = {

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import User from 'logic/users/User';
-import PaginatedItemOverview from 'components/common/PaginatedItemOverview';
+import PaginatedItemOverview, { type PaginatedListType } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import RolesQueryHelp from '../RolesQueryHelp';
@@ -19,14 +19,14 @@ const RolesSection = ({ user: { username } }: Props) => {
   const _onLoad = useCallback((pagination, isSubscribed: boolean) => {
     setLoading(true);
 
-    return AuthzRolesDomain.loadRolesForUser(username, pagination)
-      .then((paginatedRoles) => {
-        if (isSubscribed) {
-          setLoading(false);
-        }
+    return AuthzRolesDomain.loadRolesForUser(username, pagination).then((paginatedRoles): PaginatedListType => {
+      if (isSubscribed) {
+        setLoading(false);
+      }
 
-        return paginatedRoles;
-      });
+      // $FlowFixMe Roles is a DescriptiveItem
+      return paginatedRoles;
+    });
   }, [username]);
 
   return (
