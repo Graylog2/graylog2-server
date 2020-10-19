@@ -47,6 +47,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.events.UserChangedEvent;
+import org.graylog2.users.events.UserDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,6 +189,11 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public int delete(final String username) {
+        final User user = load(username);
+        if (user == null) {
+            return 0;
+        }
+
         LOG.debug("Deleting user(s) with username \"{}\"", username);
         final DBObject query = BasicDBObjectBuilder.start(UserImpl.USERNAME, username).get();
         final int result = destroy(query, UserImpl.COLLECTION_NAME);
@@ -196,6 +202,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             LOG.warn("Removed {} users matching username \"{}\".", result, username);
         }
         accesstokenService.deleteAllForUser(username);
+        serverEventBus.post(UserDeletedEvent.create(user.getId(), user.getName()));
         return result;
     }
 
