@@ -2,23 +2,13 @@
 import Reflux from 'reflux';
 
 import type { RefluxActions } from 'stores/StoreTypes';
-import type { GRN, SharedEntities } from 'logic/permissions/types';
-import { type AdditionalQueries } from 'util/PaginationURL';
+import SharedEntity from 'logic/permissions/SharedEntity';
+import type { GRN } from 'logic/permissions/types';
+import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 import { singletonActions } from 'views/logic/singleton';
 import EntityShareState, { type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 
-type EntitySharesPaginationType = {
-  count: number,
-  total: number,
-  page: number,
-  perPage: number,
-  query: string,
-  additionalQueries?: AdditionalQueries,
-};
-
-export type PaginatedEntitySharesType = {
-  list: SharedEntities,
-  pagination: EntitySharesPaginationType,
+export type PaginatedEntityShares = PaginatedList<SharedEntity> & {
   context: {
     granteeCapabilities: { [grn: GRN]: string },
   },
@@ -29,9 +19,9 @@ export type EntitySharePayload = {
 };
 
 export type ActionsType = {
-  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: ?EntitySharePayload) => Promise<?EntityShareState>,
-  update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<?EntityShareState>,
-  loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEntitySharesType>,
+  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: ?EntitySharePayload) => Promise<EntityShareState>,
+  update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>,
+  loadUserSharesPaginated: (username: string, pagination: Pagination) => Promise<PaginatedEntityShares>,
 };
 
 type EntityShareActionsType = RefluxActions<ActionsType>;

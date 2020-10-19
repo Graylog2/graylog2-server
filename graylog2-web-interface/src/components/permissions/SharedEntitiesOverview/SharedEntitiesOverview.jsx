@@ -1,11 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import type { AdditionalQueries } from 'util/PaginationURL';
+import type { Pagination } from 'stores/PaginationTypes';
 import mockedPermissions from 'logic/permissions/mocked';
-import type { PaginatedEntitySharesType } from 'actions/permissions/EntityShareActions';
+import type { PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
 import { DataTable, PaginatedList } from 'components/common';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';
@@ -15,8 +15,8 @@ const TABLE_HEADERS = ['Entiy Name', 'Entity Type', 'Owner', 'Capability'];
 
 type Props = {
   entityType: string,
-  paginatedEntityShares: PaginatedEntitySharesType,
-  searchPaginated: (newPage: number, newPerPage: number, newQuery: string, additonalQueries?: AdditionalQueries) => Promise<?PaginatedEntitySharesType>,
+  paginatedEntityShares: PaginatedEntityShares,
+  searchPaginated: (pagination: Pagination) => Promise<PaginatedEntityShares>,
   setLoading: (loading: boolean) => void,
 };
 
@@ -26,12 +26,6 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const _onPageChange = (fetchSharedEntities, setLoading) => (page, perPage) => {
-  setLoading(true);
-
-  return fetchSharedEntities(page, perPage).then(() => setLoading(false));
-};
-
 const _sharedEntityOverviewItem = (sharedEntity, { granteeCapabilities } = {}) => {
   const capability = granteeCapabilities?.[sharedEntity.id];
   const capabilityTitle = mockedPermissions.availableCapabilities[capability];
@@ -39,17 +33,25 @@ const _sharedEntityOverviewItem = (sharedEntity, { granteeCapabilities } = {}) =
   return <SharedEntitiesOverviewItem sharedEntity={sharedEntity} capabilityTitle={capabilityTitle} />;
 };
 
+const _loadSharedEntites = (pagination, initialPaginatedEntityShares, searchPaginated, setPaginatedEntityShares, setLoading) => {
+  setLoading(true);
+
+  searchPaginated(pagination).then((paginatedEntityShares) => {
+    setLoading(false);
+    setPaginatedEntityShares(paginatedEntityShares);
+  });
+};
+
 const SharedEntitiesOverview = ({ paginatedEntityShares: initialPaginatedEntityShares, entityType, searchPaginated, setLoading }: Props) => {
-  const [paginatedEntityShares, setPaginatedEntityShares] = useState<PaginatedEntitySharesType>(initialPaginatedEntityShares);
-  const { list, pagination: { page, perPage, total, query, additionalQueries }, context } = paginatedEntityShares;
+  const [paginatedEntityShares, setPaginatedEntityShares] = useState<PaginatedEntityShares>(initialPaginatedEntityShares);
+  const { list, context, total } = paginatedEntityShares;
+  const [pagination, setPagination] = useState(initialPaginatedEntityShares.pagination);
+  const { page, query, additionalQueries } = pagination;
 
-  const _loadSharedEntities = (newPage = page, newPerPage = perPage, newQuery = query, newAdditonalQueries = additionalQueries) => {
-    return searchPaginated(newPage, newPerPage, newQuery, newAdditonalQueries)
-      .then((newPaginatedEntityShares) => newPaginatedEntityShares && setPaginatedEntityShares(newPaginatedEntityShares));
-  };
+  useEffect(() => _loadSharedEntites(pagination, initialPaginatedEntityShares, searchPaginated, setPaginatedEntityShares, setLoading), [pagination, initialPaginatedEntityShares, searchPaginated, setLoading]);
 
-  const _handleSearch = (newQuery: string) => _loadSharedEntities(initialPaginatedEntityShares.pagination.page, undefined, newQuery);
-  const _handleFilter = (param: string, value: string) => _loadSharedEntities(initialPaginatedEntityShares.pagination.page, undefined, query, { ...additionalQueries, [param]: value });
+  const _handleSearch = (newQuery: string) => setPagination({ ...pagination, query: newQuery });
+  const _handleFilter = (param: string, value: string) => setPagination({ ...pagination, query, additionalQueries: { ...additionalQueries, [param]: value } });
 
   return (
     <>
@@ -57,12 +59,11 @@ const SharedEntitiesOverview = ({ paginatedEntityShares: initialPaginatedEntityS
         Found {total} entities which are shared with the {entityType}.
       </p>
       <StyledPaginatedList activePage={page}
-                           onChange={_onPageChange(_loadSharedEntities, setLoading)}
-                           totalItems={total}>
+                           totalItems={total}
+                           onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
         <DataTable className="table-hover"
                    customFilter={(
                      <SharedEntitiesFilter onSearch={_handleSearch}
-                                           onReset={() => _handleSearch('')}
                                            onFilter={_handleFilter} />
                    )}
                    dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
