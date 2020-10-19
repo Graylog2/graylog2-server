@@ -84,25 +84,23 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   } = stepsState.authBackendMeta;
   const serverUrl = `${serverHost}:${serverPort}`;
 
-  const defaultConfig = {
-    servers: [{ host: serverHost, port: serverPort }],
-    system_user_dn: systemUserDn,
-    system_user_password: _passwordPayload(backendId, systemUserPassword),
-    transport_security: transportSecurity,
-    type: serviceType,
-    user_full_name_attribute: userFullNameAttribute,
-    user_name_attribute: userNameAttribute,
-    user_search_base: userSearchBase,
-    user_search_pattern: userSearchPattern,
-    user_unique_id_attribute: userUniqueIdAttribute,
-    verify_certificates: verifyCertificates,
-  };
-
   return {
     default_roles: defaultRoles.split(','),
     description: '',
     title: `${serviceTitle} ${serverUrl}`,
-    config: defaultConfig,
+    config: {
+      servers: [{ host: serverHost, port: serverPort }],
+      system_user_dn: systemUserDn,
+      system_user_password: _passwordPayload(backendId, systemUserPassword),
+      transport_security: transportSecurity,
+      type: serviceType,
+      user_full_name_attribute: userFullNameAttribute,
+      user_name_attribute: userNameAttribute,
+      user_search_base: userSearchBase,
+      user_search_pattern: userSearchPattern,
+      user_unique_id_attribute: userUniqueIdAttribute,
+      verify_certificates: verifyCertificates,
+    },
   };
 };
 
