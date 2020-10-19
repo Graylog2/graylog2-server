@@ -114,6 +114,7 @@ describe('EntityShareModal', () => {
       expect(getByDisplayValue('http://localhost/')).not.toBeNull();
       // missing dependecies warning
       expect(getByText('There are missing dependecies for the current set of collaborators')).not.toBeNull();
+      expect(getByText(/needs access to/)).not.toBeNull();
     });
   });
 
