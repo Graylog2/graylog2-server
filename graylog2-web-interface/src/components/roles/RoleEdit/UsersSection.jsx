@@ -18,8 +18,8 @@ type Props = {
 };
 
 const Container = styled.div`
-  margin-top 15px;
-  margin-bottom 15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 `;
 
 const UsersSection = ({ role: { id, name }, role }: Props) => {
@@ -30,10 +30,10 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
     setLoading(true);
 
     return AuthzRolesDomain.loadUsersForRole(id, name, pagination)
-      .then((response) => {
+      .then((paginatedRoles) => {
         setLoading(false);
 
-        return response;
+        return paginatedRoles;
       });
   };
 

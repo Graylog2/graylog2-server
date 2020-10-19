@@ -69,15 +69,15 @@ const RolesOverview = () => {
   const { list: roles, total } = paginatedRoles || {};
   const { page, perPage, query } = pagination;
 
-  const _handleSearch = (newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
-  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;
-
   useEffect(() => _loadRoles(pagination, setLoading, setPaginatedRoles), [pagination]);
   useEffect(() => _updateListOnRoleDelete(perPage, query, setPagination), [perPage, query]);
 
   if (!roles) {
     return <Spinner />;
   }
+
+  const searchFilter = <RolesFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
+  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;
 
   return (
     <Container>
@@ -101,7 +101,7 @@ const RolesOverview = () => {
                        sortByKey="name"
                        rows={roles.toJS()}
                        noDataText={<EmptyResult>No roles have been found.</EmptyResult>}
-                       customFilter={<RolesFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
+                       customFilter={searchFilter}
                        dataRowFormatter={_rolesOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Roles" />

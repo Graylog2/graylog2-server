@@ -2,7 +2,7 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
-import type { UserOverviewJSON } from 'logic/users/UserOverview';
+import type { PaginatedUsersResponse } from 'stores/users/UsersStore';
 import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -15,12 +15,8 @@ import AuthzRolesActions, { type PaginatedRoles, type PaginatedUsers } from 'act
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
-type PaginatedRolesResponse = PaginatedListJSON & {
+export type PaginatedRolesResponse = PaginatedListJSON & {
   roles: Array<RoleJSON>,
-};
-
-type PaginatedUsersResponse = PaginatedListJSON & {
-  users: Array<UserOverviewJSON>,
 };
 
 // eslint-disable-next-line camelcase

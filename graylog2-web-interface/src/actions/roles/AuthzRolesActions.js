@@ -17,9 +17,7 @@ export type ActionsType = {
   addMembers: (roleId: string, usernames: Immutable.Set<string>) => Promise<Role>,
   removeMember: (roleId: string, username: string) => Promise<Role>,
   loadUsersForRole: (roleId: string, roleName: string, pagination: Pagination) => Promise<PaginatedUsers>,
-  loadRolesForUser: (
-    username: string,
-    pagination: Pagination) => Promise<PaginatedRoles>,
+  loadRolesForUser: (username: string, pagination: Pagination) => Promise<PaginatedRoles>,
   loadRolesPaginated: (pagination: Pagination) => Promise<PaginatedRoles>,
 };
 
