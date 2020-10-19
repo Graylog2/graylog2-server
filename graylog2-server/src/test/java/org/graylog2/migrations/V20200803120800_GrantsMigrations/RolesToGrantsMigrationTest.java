@@ -23,6 +23,7 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.testing.GRNExtension;
+import org.graylog.testing.UserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -52,6 +53,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GRNExtension.class)
+@ExtendWith(UserServiceExtension.class)
 @MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
 class RolesToGrantsMigrationTest {
     private RolesToGrantsMigration migration;
@@ -70,7 +72,8 @@ class RolesToGrantsMigrationTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-               GRNRegistry grnRegistry) {
+               GRNRegistry grnRegistry,
+               UserService userService) {
         when(permissions.readerBasePermissions()).thenReturn(ImmutableSet.of());
         when(validator.validate(any())).thenReturn(ImmutableSet.of());
 
@@ -79,7 +82,7 @@ class RolesToGrantsMigrationTest {
         roleService = new RoleServiceImpl(mongodb.mongoConnection(), mongoJackObjectMapperProvider, permissions, validator);
 
         dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
-        userService = new TestUserService(mongodb.mongoConnection());
+        this.userService = userService;
         DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         migration = new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, "admin");
     }

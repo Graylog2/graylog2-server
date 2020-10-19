@@ -22,6 +22,7 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.testing.GRNExtension;
+import org.graylog.testing.UserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -46,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GRNExtension.class)
+@ExtendWith(UserServiceExtension.class)
 @MongoDBFixtures("MigrateUserPermissionsToGrantsTest.json")
 class UserPermissionsToGrantsMigrationTest {
     private UserPermissionsToGrantsMigration migration;
@@ -65,14 +67,15 @@ class UserPermissionsToGrantsMigrationTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-               GRNRegistry grnRegistry) {
+               GRNRegistry grnRegistry,
+               UserService userService) {
 
         this.grnRegistry = grnRegistry;
 
         this.userSelfEditPermissionCount = new Permissions(ImmutableSet.of()).userSelfEditPermissions("dummy").size();
 
         dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
-        userService = new TestUserService(mongodb.mongoConnection());
+        this.userService = userService;
         DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         migration = new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, "admin");
     }
