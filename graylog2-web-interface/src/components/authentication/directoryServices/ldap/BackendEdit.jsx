@@ -28,6 +28,7 @@ export const prepareInitialValues = ({
     userNameAttribute,
     userSearchBase,
     userSearchPattern,
+    userUniqueIdAttribute,
     verifyCertificates,
   },
 }: DirectoryServiceBackend): WizardFormValues => {
@@ -41,6 +42,7 @@ export const prepareInitialValues = ({
     userNameAttribute,
     userSearchBase,
     userSearchPattern,
+    userUniqueIdAttribute,
     verifyCertificates,
   };
 };
@@ -72,21 +74,24 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
-  const help = { ...HELP, ...groupSyncFormHelp };
+  const {
+    help: groupSyncHelp = {},
+    initialValues: initialGroupSyncValues = {},
+  } = enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
+  const help = { ...HELP, ...groupSyncHelp };
   let initialValues = prepareInitialValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
     const {
-      initialValues: initialGroupSyncValues,
+      formValues: groupSyncFormValues,
       finishedLoading,
-    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id);
+    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id, initialGroupSyncValues);
 
     if (!finishedLoading) {
       return <Spinner />;
     }
 
-    initialValues = { ...initialValues, ...initialGroupSyncValues };
+    initialValues = { ...initialValues, ...groupSyncFormValues };
   }
 
   const authBackendMeta = {

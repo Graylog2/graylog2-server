@@ -7,7 +7,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
-import { prepareInitialValues, handleSubmit } from '../ldap/BackendCreate';
+import { INITIAL_VALUES, handleSubmit } from '../ldap/BackendCreate';
 
 export const HELP = {
   // server config help
@@ -53,15 +53,21 @@ export const AUTH_BACKEND_META = {
 
 const BackendCreate = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.activeDirectory ?? {};
-  const help = { ...HELP, ...groupSyncFormHelp };
-  const initialValues = prepareInitialValues();
+  const {
+    help: groupSyncHelp = {},
+    excludedFields: groupSyncExcludedFields = {},
+    initialValues: initialGroupSyncValues,
+  } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
+  const help = { ...HELP, ...groupSyncHelp };
+  const initialValues = { ...INITIAL_VALUES, ...initialGroupSyncValues };
+  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
 
   return (
     <DocumentTitle title="Create Active Directory Authentication Services">
       <WizardPageHeader />
       <BackendWizard authBackendMeta={AUTH_BACKEND_META}
                      help={help}
+                     excludedFields={excludedFields}
                      initialValues={initialValues}
                      onSubmit={handleSubmit} />
     </DocumentTitle>

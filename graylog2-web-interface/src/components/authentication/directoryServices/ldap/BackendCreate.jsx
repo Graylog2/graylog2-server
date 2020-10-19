@@ -58,27 +58,14 @@ export const HELP = {
   ),
 };
 
-export const prepareInitialValues = () => {
-  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  let initialValues = {
-    serverHost: 'localhost',
-    serverPort: 636,
-    transportSecurity: 'tls',
-    userFullNameAttribute: 'cn',
-    userNameAttribute: 'uid',
-    userUniqueIdAttribute: 'entryUUID',
-    verifyCertificates: true,
-  };
-
-  if (enterpriseGroupSyncPlugin) {
-    const {
-      initialValues: initialGroupSyncValues,
-    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues();
-
-    initialValues = { ...initialValues, ...initialGroupSyncValues };
-  }
-
-  return initialValues;
+export const INITIAL_VALUES = {
+  serverHost: 'localhost',
+  serverPort: 636,
+  transportSecurity: 'tls',
+  userFullNameAttribute: 'cn',
+  userNameAttribute: 'uid',
+  userUniqueIdAttribute: 'entryUUID',
+  verifyCertificates: true,
 };
 
 export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, licenseIsValid?: boolean = true) => {
@@ -95,9 +82,12 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
 
 const BackendCreate = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
-  const help = { ...HELP, ...groupSyncFormHelp };
-  const initialValues = prepareInitialValues();
+  const {
+    help: groupSyncHelp = {},
+    initialValues: initialGroupSyncValues = {},
+  } = enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
+  const help = { ...HELP, ...groupSyncHelp };
+  const initialValues = { ...INITIAL_VALUES, ...initialGroupSyncValues };
 
   return (
     <DocumentTitle title="Create LDAP Authentication Service">

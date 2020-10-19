@@ -15,13 +15,14 @@ export type Props = {
   formRef: React.Ref<typeof Formik>,
   onSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
   help: { [inputName: string]: ?React.Node },
+  excludedFields: { [inputName: string]: boolean },
   prepareSubmitPayload: () => WizardSubmitPayload,
   roles: Immutable.List<Role>,
   submitAllError: ?React.Node,
   validateOnMount: boolean,
 };
 
-const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount, roles, help }: Props) => {
+const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount, roles, help, excludedFields }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
 
@@ -32,6 +33,7 @@ const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllEr
   return (
     <GroupSyncForm formRef={formRef}
                    help={help}
+                   excludedFields={excludedFields}
                    onSubmitAll={onSubmitAll}
                    prepareSubmitPayload={prepareSubmitPayload}
                    roles={roles}

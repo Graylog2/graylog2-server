@@ -15,6 +15,7 @@ type Props = {
   formRefs: {
     [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
+  excludedFields: { [inputName: string]: boolean },
   handleSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
   help: { [inputName: string]: ?React.Node },
   invalidStepKeys: Array<string>,
@@ -28,6 +29,7 @@ const wizardSteps = ({
   formRefs,
   handleSubmitAll,
   help,
+  excludedFields,
   invalidStepKeys,
   prepareSubmitPayload,
   roles,
@@ -62,6 +64,7 @@ const wizardSteps = ({
     component: (
       <UserSyncStep formRef={formRefs[USER_SYNC_KEY]}
                     help={help}
+                    excludedFields={excludedFields}
                     onSubmit={() => setActiveStepKey(GROUP_SYNC_KEY)}
                     onSubmitAll={handleSubmitAll}
                     roles={roles}
@@ -80,6 +83,7 @@ const wizardSteps = ({
     component: (
       <GroupSyncStep formRef={formRefs[GROUP_SYNC_KEY]}
                      help={help}
+                     excludedFields={excludedFields}
                      onSubmitAll={handleSubmitAll}
                      prepareSubmitPayload={prepareSubmitPayload}
                      roles={roles}
