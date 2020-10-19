@@ -24,7 +24,7 @@ import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.TestUserService;
-import org.graylog.testing.UserServiceExtension;
+import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GRNExtension.class)
-@ExtendWith(UserServiceExtension.class)
+@ExtendWith(TestUserServiceExtension.class)
 @MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
 class RolesToGrantsMigrationTest {
     private RolesToGrantsMigration migration;

@@ -27,7 +27,7 @@ import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
-public class UserServiceExtension implements ParameterResolver {
+public class TestUserServiceExtension implements ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return Objects.equals(TestUserService.class, parameterContext.getParameter().getType());
