@@ -7,7 +7,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
-import { INITIAL_VALUES, handleSubmit } from '../ldap/BackendCreate';
+import { handleSubmit } from '../ldap/BackendCreate';
 
 export const HELP = {
   // server config help
@@ -44,6 +44,15 @@ export const HELP = {
   defaultRoles: (
     <span>The default Graylog roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the Graylog web interface</span>
   ),
+};
+
+const INITIAL_VALUES = {
+  serverHost: 'localhost',
+  serverPort: 636,
+  transportSecurity: 'tls',
+  userFullNameAttribute: 'cn',
+  userNameAttribute: 'uid',
+  verifyCertificates: true,
 };
 
 export const AUTH_BACKEND_META = {

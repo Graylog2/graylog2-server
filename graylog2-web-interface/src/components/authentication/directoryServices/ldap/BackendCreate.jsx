@@ -58,7 +58,7 @@ export const HELP = {
   ),
 };
 
-export const INITIAL_VALUES = {
+const INITIAL_VALUES = {
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
