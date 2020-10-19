@@ -23,10 +23,10 @@ import type { StyledComponent } from 'styled-components';
 import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
-import { Icon } from 'components/common';
+import { Icon, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
-// import type { ThemeInterface } from 'theme';
 import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
+import type { ThemeInterface } from 'theme';
 
 type Props = {
   disabled: boolean,
@@ -58,19 +58,27 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const FromTimeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div``;
-const ToTimeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div``;
-
 const Label: StyledComponent<{}, void, HTMLLabelElement> = styled.label`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  font-weight: normal;
   
-  .form-group { margin: 0; }
+  .form-group,
+  .radio { margin: 0; }
 `;
+
+const LabelText: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  flex: 1;
+  font-size: ${theme.fonts.size.small};
+`);
 
 const SetTimeOption: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex: 1;
   
   b { padding: 0 3px; }
 `;
@@ -101,6 +109,24 @@ const parseTimeValue = (value, type) => {
   return timeValue;
 };
 
+const _generateSetHours = () => {
+  let minHours = 0;
+  const maxHours = 23;
+
+  const setHours = [];
+
+  while (minHours <= maxHours) {
+    setHours.push({
+      value: zeroPad(String(minHours)),
+      label: zeroPad(String(minHours)),
+    });
+
+    minHours += 1;
+  }
+
+  return setHours;
+};
+
 const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
   return (
     <AbsoluteWrapper>
@@ -120,7 +146,7 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
             const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
             const _onChangeDate = (event) => {
-              const value = event.target.value.split(' ');
+              const dateValue = event.target.value.split(' ');
               let newDate;
 
               const currentTime = {};
@@ -129,11 +155,11 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
                 currentTime[type] = Number(newFromValue[type]);
               });
 
-              if (value[1]) {
-                newDate = moment(value.join(' '))
+              if (dateValue[1]) {
+                newDate = moment(dateValue.join(' '))
                   .format(DateTime.Formats.TIMESTAMP);
               } else {
-                newDate = moment(value[0])
+                newDate = moment(dateValue[0])
                   .hours(currentTime.hours)
                   .minutes(currentTime.minutes)
                   .seconds(currentTime.seconds)
@@ -155,6 +181,14 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
               _onChange(formattedTime);
             };
 
+            const _onChangeHour = (hours) => {
+              const newDate = moment(value)
+                .set({ hours, minutes: 0, seconds: 0, milliseconds: 0 })
+                .format(DateTime.Formats.TIMESTAMP);
+
+              _onChange(newDate);
+            };
+
             return (
               <>
                 <DateInputWithPicker disabled={disabled}
@@ -164,9 +198,13 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
                                      title="Search start date"
                                      error={error} />
 
-                <FromTimeWrapper>
+                <div>
                   <Label>
-                    <Input type="radio" id="absolute-from-time" />
+                    <Input type="radio"
+                           id="absolute-from-time"
+                           name="from-time-option"
+                           value="set-time"
+                           checked />
                     <SetTimeOption>
                       <Input type="text"
                              id="absolute-from-time-hours"
@@ -197,7 +235,27 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
                              size={3} />
                     </SetTimeOption>
                   </Label>
-                </FromTimeWrapper>
+
+                  <Label as="div">
+                    <Input type="radio" id="absolute-from-hour" name="from-time-option" value="set-hour" />
+                    <LabelText>Beginning of Hour</LabelText>
+                    <SetTimeOption>
+                      <Select id="absolute-from-set-hour"
+                              onChange={_onChangeHour}
+                              options={_generateSetHours()}
+                              clearable={false}
+                              value={String(newFromValue.hours)} />
+                    </SetTimeOption>
+                  </Label>
+
+                  <Label>
+                    <Input type="radio" id="absolute-from-day" name="from-time-option" value="set-day" />
+                    <LabelText>Beginning of Day</LabelText>
+                    <SetTimeOption>
+                      <code>00:00:00.000</code>
+                    </SetTimeOption>
+                  </Label>
+                </div>
               </>
             );
           }}
@@ -221,30 +279,70 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
               event.target.select();
             };
 
+            const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+
+            const _onChangeDate = (event) => {
+              const dateValue = event.target.value.split(' ');
+              let newDate;
+
+              const currentTime = {};
+
+              Object.keys(newToValue).forEach((type) => {
+                currentTime[type] = Number(newToValue[type]);
+              });
+
+              if (dateValue[1]) {
+                newDate = moment(dateValue.join(' '))
+                  .format(DateTime.Formats.TIMESTAMP);
+              } else {
+                newDate = moment(dateValue[0])
+                  .hours(currentTime.hours)
+                  .minutes(currentTime.minutes)
+                  .seconds(currentTime.seconds)
+                  .milliseconds(currentTime.milliseconds)
+                  .format(DateTime.Formats.TIMESTAMP);
+              }
+
+              _onChange(newDate);
+            };
+
             const _onChangeSetTime = (event) => {
               const timeType = event.target.getAttribute('id').replace('absolute-to-time-', '');
-              const timeValue = parseTimeValue(event.target.value, timeType);
+              const timeValue = parseTimeValue(event.target.value);
 
               const currentTime = moment(value);
               const updatedTime = currentTime[timeType](timeValue);
               const formattedTime = updatedTime.format(DateTime.Formats.TIMESTAMP);
 
-              onChange({ target: { name, value: formattedTime } });
+              _onChange(formattedTime);
+            };
+
+            const _onChangeHour = (hours) => {
+              const newDate = moment(value)
+                .set({ hours, minutes: 0, seconds: 0, milliseconds: 0 })
+                .format(DateTime.Formats.TIMESTAMP);
+
+              _onChange(newDate);
             };
 
             return (
               <>
                 <DateInputWithPicker disabled={disabled}
-                                     onChange={onChange}
+                                     onChange={_onChangeDate}
                                      onBlur={onBlur}
                                      value={value}
                                      name={name}
                                      title="Search end date"
                                      error={error} />
 
-                <ToTimeWrapper>
+                <div>
                   <Label>
-                    <Input type="radio" id="absolute-to-time" />
+                    <Input type="radio"
+                           id="absolute-to-time"
+                           name="from-to-option"
+                           value="set-time"
+                           checked />
+
                     <SetTimeOption>
                       <Input type="text"
                              id="absolute-to-time-hours"
@@ -272,7 +370,34 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
                              size={3} />
                     </SetTimeOption>
                   </Label>
-                </ToTimeWrapper>
+
+                  <Label as="div">
+                    <Input type="radio"
+                           id="absolute-to-hour"
+                           name="from-to-option"
+                           value="set-hour" />
+
+                    <LabelText>End of Hour</LabelText>
+                    <SetTimeOption>
+                      <Select id="absolute-to-set-hour"
+                              onChange={_onChangeHour}
+                              options={_generateSetHours()}
+                              clearable={false}
+                              value={newToValue.hours} />
+                    </SetTimeOption>
+                  </Label>
+
+                  <Label>
+                    <Input type="radio"
+                           id="absolute-to-day"
+                           name="from-to-option"
+                           value="set-day" />
+                    <LabelText>End of Day</LabelText>
+                    <SetTimeOption>
+                      <code>23:59:59.999</code>
+                    </SetTimeOption>
+                  </Label>
+                </div>
               </>
             );
           }}
@@ -284,7 +409,7 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
 
 AbsoluteTimeRangeSelector.propTypes = {
   disabled: PropTypes.bool,
-  originalTimeRange: PropTypes.shape({ from: PropTypes.string }).isRequired,
+  originalTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
 };
 
 AbsoluteTimeRangeSelector.defaultProps = {

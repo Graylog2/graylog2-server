@@ -16,14 +16,13 @@
  */
 // @flow strict
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
-
-import { Input } from '../../../components/bootstrap';
+import { Input } from 'components/bootstrap';
 
 const _onDateSelected = (date) => {
   const midnightDate = date.setHours(0);
@@ -43,9 +42,15 @@ type Props = {
 const _setDateTimeToNow = () => new DateTime();
 
 const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title }: Props) => {
+  const inputRef = useRef(value);
   const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [name, onChange]);
-  const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.DATE)), [_onChange]);
-  const _onSetTimeToNow = () => onChange({ target: { name, value: _setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP) } });
+  const _onChangeInput = useCallback((event) => _onChange(event.target.value), [_onChange]);
+  const _onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.DATE)), [_onChange]);
+  const _onSetTimeToNow = () => _onChange(_setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP));
+
+  useEffect(() => {
+    inputRef.current.input.value = value;
+  }, [value]);
 
   return (
     <div>
@@ -60,10 +65,9 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
              name={name}
              autoComplete="off"
              disabled={disabled}
-             className="absolute"
-             value={value}
-             onChange={onChange}
+             onChange={_onChangeInput}
              placeholder={DateTime.Formats.DATETIME}
+             ref={inputRef}
              buttonAfter={(
                <Button disabled={disabled}
                        onClick={_onSetTimeToNow}
@@ -71,14 +75,13 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
                  <Icon name="magic" />
                </Button>
              )}
-             bsStyle={error ? 'error' : null}
-             required />
+             bsStyle={error ? 'error' : null} />
 
       <DatePicker id={`date-input-datepicker-${name}`}
                   disabled={disabled}
                   title={title}
                   date={value}
-                  onChange={onDatePicked} />
+                  onChange={_onDatePicked} />
     </div>
   );
 };
