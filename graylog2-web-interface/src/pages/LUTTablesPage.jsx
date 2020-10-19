@@ -83,8 +83,8 @@ class LUTTablesPage extends React.Component {
     history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   }
 
-  _isCreating = (props) => {
-    return props.route.action === 'create';
+  _isCreating = ({ action }) => {
+    return action === 'create';
   }
 
   _validateTable = (table) => {
@@ -93,7 +93,7 @@ class LUTTablesPage extends React.Component {
 
   render() {
     const {
-      route: { action },
+      action,
       table,
       validationErrors,
       dataAdapter,
@@ -188,7 +188,7 @@ LUTTablesPage.propTypes = {
   pagination: PropTypes.object,
   location: PropTypes.object,
   errorStates: PropTypes.object,
-  route: PropTypes.object.isRequired,
+  action: PropTypes.string,
 };
 
 LUTTablesPage.defaultProps = {
@@ -202,6 +202,7 @@ LUTTablesPage.defaultProps = {
   location: null,
   pagination: null,
   dataAdapter: null,
+  action: undefined,
 };
 
 export default connect(withParams(withLocation(LUTTablesPage)), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({

@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { Button } from 'components/graylog';

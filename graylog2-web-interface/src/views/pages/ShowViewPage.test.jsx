@@ -3,6 +3,7 @@ import * as React from 'react';
 import { List } from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import mockAction from 'helpers/mocking/MockAction';
+import asMock from 'helpers/mocking/AsMock';
 
 import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -44,8 +45,9 @@ jest.mock('actions/errors/ErrorsActions', () => ({
   report: jest.fn(),
 }));
 
-jest.mock('util/History', () => ({}));
 jest.mock('views/components/Search', () => 'extended-search-page');
+jest.mock('routing/withLocation', () => (x) => x);
+jest.mock('routing/withParams', () => (x) => x);
 
 describe('ShowViewPage', () => {
   const viewJson: ViewJson = {
@@ -74,16 +76,16 @@ describe('ShowViewPage', () => {
   });
 
   it('renders Spinner while loading', () => {
-    const promise = () => new Promise<ViewJson>((resolve) => setTimeout(resolve, 30000, viewJson));
+    const mockGet = () => new Promise<ViewJson>((resolve) => setTimeout(resolve, 30000, viewJson));
 
-    ViewManagementActions.get = mockAction(jest.fn(promise));
+    asMock(ViewManagementActions.get).mockImplementation(mockAction(mockGet));
     const wrapper = mount(<SimpleShowViewPage />);
 
     expect(wrapper.find('Spinner')).toExist();
   });
 
   it('loads view with id passed from props', () => {
-    ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject()));
+    asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.reject())));
     mount(<SimpleShowViewPage />);
 
     expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
@@ -94,7 +96,7 @@ describe('ShowViewPage', () => {
 
     // $FlowFixMe: Assigning to non-existing key on purpose
     error.status = 404;
-    ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject(error)));
+    asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.reject(error))));
 
     mount(<SimpleShowViewPage />);
 
@@ -111,7 +113,7 @@ describe('ShowViewPage', () => {
   });
 
   it('passes loaded view to ViewDeserializer', (done) => {
-    ViewManagementActions.get = mockAction(jest.fn(() => Promise.resolve(viewJson)));
+    asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.resolve(viewJson))));
     SearchExecutionStateActions.setParameterValues = mockAction(jest.fn());
     const search = Search.create().toBuilder().parameters([]).build();
 

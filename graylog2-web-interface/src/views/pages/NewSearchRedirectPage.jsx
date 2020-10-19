@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
+import withParams from 'routing/withParams';
 
 type Props = {
   params: {
@@ -22,4 +23,4 @@ const NewSearchRedirectPage = ({ params: { streamId } }: Props) => {
   return null;
 };
 
-export default NewSearchRedirectPage;
+export default withParams(NewSearchRedirectPage);

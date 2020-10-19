@@ -12,8 +12,7 @@ import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import viewsBindings from 'views/bindings';
-
-import StreamsContext from '../../contexts/StreamsContext';
+import StreamsContext from 'contexts/StreamsContext';
 
 jest.mock('views/stores/DashboardsStore', () => ({
   DashboardsActions: {

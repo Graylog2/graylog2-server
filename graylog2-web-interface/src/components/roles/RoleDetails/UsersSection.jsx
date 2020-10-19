@@ -28,7 +28,7 @@ const UsersSection = ({ role: { id, name } }: Props) => {
 
   return (
     <SectionComponent title="Users" showLoading={loading}>
-      <PaginatedItemOverview onLoad={_onLoad} />
+      <PaginatedItemOverview noDataText="No selected users have been found." onLoad={_onLoad} />
     </SectionComponent>
   );
 };

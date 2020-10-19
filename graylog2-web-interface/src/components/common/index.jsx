@@ -15,7 +15,6 @@ export { default as DatePicker } from './DatePicker';
 export { default as DocumentTitle } from './DocumentTitle';
 export { default as EmptyEntity } from './EmptyEntity';
 export { default as EmptyResult } from './EmptyResult';
-export { default as EmptySearchResult } from './EmptySearchResult';
 export { default as EnterprisePluginNotFound } from './EnterprisePluginNotFound';
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';

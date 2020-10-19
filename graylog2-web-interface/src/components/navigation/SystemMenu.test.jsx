@@ -17,6 +17,8 @@ jest.mock('util/AppConfig', () => ({
   gl2DevMode: jest.fn(() => false),
 }));
 
+jest.mock('routing/withLocation', () => (x) => x);
+
 describe('SystemMenu', () => {
   let exports;
 

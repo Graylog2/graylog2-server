@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
+import { Router } from 'react-router-dom';
 
+import history from 'util/History';
 import { breakpoints, colors, fonts, utils } from 'theme';
 import { THEME_MODE_LIGHT } from 'theme/constants';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
@@ -29,9 +31,11 @@ const WrappingContainer = ({ children }) => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
+    <Router history={history}>
+      <ThemeProvider theme={theme}>
+        {children}
+      </ThemeProvider>
+    </Router>
   );
 };
 

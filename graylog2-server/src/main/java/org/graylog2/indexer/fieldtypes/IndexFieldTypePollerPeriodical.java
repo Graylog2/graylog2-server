@@ -102,8 +102,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
      */
     @Override
     public void doRun() {
-        final Lifecycle currentLifecycle = serverStatus.getLifecycle();
-        if (skippedLifecycles.contains(currentLifecycle)) {
+        if (serverIsNotRunning()) {
             LOG.debug("Server is not running, skipping run.");
             return;
         }
@@ -142,6 +141,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                     .filter(types -> !indices.exists(types.indexName()))
                     .forEach(types -> dbService.delete(types.id()));
         });
+    }
+
+    private boolean serverIsNotRunning() {
+        final Lifecycle currentLifecycle = serverStatus.getLifecycle();
+        return skippedLifecycles.contains(currentLifecycle);
     }
 
     /**
@@ -209,6 +213,9 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         LOG.debug("Schedule index field type updating for index set <{}/{}> every {} ms", indexSetId, indexSetTitle,
                 refreshInterval.getMillis());
         final ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
+            if (serverIsNotRunning()) {
+                return;
+            }
             try {
                 // Only check the active write index on a regular basis, the others don't change anymore
                 final String activeWriteIndex = indexSet.getActiveWriteIndex();

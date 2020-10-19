@@ -6,7 +6,7 @@ import * as Immutable from 'immutable';
 import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
-import { DataTable, PaginatedList, Spinner } from 'components/common';
+import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
@@ -86,6 +86,7 @@ const SyncedUsersSection = ({ roles }: Props) => {
                    headerCellFormatter={_headerCellFormatter}
                    headers={TABLE_HEADERS}
                    id="synced-users-overview"
+                   noDataText={<EmptyResult>No synchronized users have been found.</EmptyResult>}
                    rowClassName="no-bm"
                    rows={users.toJS()}
                    sortByKey="username" />

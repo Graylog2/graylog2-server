@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState, useContext } from 'react';
-import { withRouter } from 'react-router';
 
+import withParams from 'routing/withParams';
 import { Row, Col } from 'components/graylog';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -114,4 +114,4 @@ const UserEditPage = ({ params }: Props) => {
   );
 };
 
-export default withRouter(UserEditPage);
+export default withParams(UserEditPage);
