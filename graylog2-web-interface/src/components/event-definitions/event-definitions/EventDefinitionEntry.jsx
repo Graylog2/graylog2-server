@@ -78,6 +78,9 @@ const EventDefinitionEntry = ({
           <Button bsStyle="info">Edit</Button>
         </LinkContainer>
       </IfPermitted>
+      <LinkContainer to={Routes.ALERTS.DEFINITIONS.view(eventDefinition.id)}>
+        <Button bsStyle="info">View</Button>
+      </LinkContainer>
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
           {toggle}
