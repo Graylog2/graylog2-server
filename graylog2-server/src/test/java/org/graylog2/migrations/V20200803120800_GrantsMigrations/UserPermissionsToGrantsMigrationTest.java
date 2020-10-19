@@ -22,6 +22,7 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.testing.GRNExtension;
+import org.graylog.testing.TestUserService;
 import org.graylog.testing.UserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -68,7 +69,7 @@ class UserPermissionsToGrantsMigrationTest {
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                GRNRegistry grnRegistry,
-               UserService userService) {
+               TestUserService userService) {
 
         this.grnRegistry = grnRegistry;
 

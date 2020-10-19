@@ -46,7 +46,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-// An incomplete UserService implementation, that needs fewer dependencies
+/**
+ * Provides an incomplete UserService implementation for tests.
+ * It uses fewer dependencies than a full UserServiceImpl
+ */
 public class TestUserService extends PersistedServiceImpl implements UserService {
     final UserImpl.Factory userFactory;
 

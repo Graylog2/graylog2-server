@@ -18,7 +18,6 @@ package org.graylog.testing;
 
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -31,14 +30,14 @@ import static java.util.Objects.requireNonNull;
 public class UserServiceExtension implements ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return Objects.equals(UserService.class, parameterContext.getParameter().getType());
+        return Objects.equals(TestUserService.class, parameterContext.getParameter().getType());
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         final Class<?> parameterType = parameterContext.getParameter().getType();
 
-        if (UserService.class.equals(parameterType)) {
+        if (TestUserService.class.equals(parameterType)) {
             final MongoDBTestService dbTestService = requireNonNull((MongoDBTestService) extensionContext.getStore(MongoDBExtension.NAMESPACE).get(MongoDBTestService.class));
             return new TestUserService(dbTestService.mongoConnection());
         }
