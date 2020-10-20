@@ -66,13 +66,13 @@ const RolesOverview = () => {
   const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { list: roles, total } = paginatedRoles || {};
+  const { list: roles } = paginatedRoles || {};
   const { page, perPage, query } = pagination;
 
   useEffect(() => _loadRoles(pagination, setLoading, setPaginatedRoles), [pagination]);
   useEffect(() => _updateListOnRoleDelete(perPage, query, setPagination), [perPage, query]);
 
-  if (!roles) {
+  if (!paginatedRoles) {
     return <Spinner />;
   }
 
@@ -88,10 +88,10 @@ const RolesOverview = () => {
             {loading && <LoadingSpinner text="" delay={0} />}
           </Header>
           <p className="description">
-            Found {total} roles on the system.
+            Found {paginatedRoles.pagination.total} roles on the system.
           </p>
           <StyledPaginatedList activePage={page}
-                               totalItems={total}
+                               totalItems={paginatedRoles.pagination.total}
                                onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
             <DataTable id="roles-overview"
                        className="table-hover"

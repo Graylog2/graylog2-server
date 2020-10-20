@@ -49,7 +49,7 @@ const _loadSharedEntites = (pagination, searchPaginated, setPaginatedEntityShare
 const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Props) => {
   const [paginatedEntityShares, setPaginatedEntityShares] = useState<?PaginatedEntityShares>();
   const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
-  const { list, context, total } = paginatedEntityShares || {};
+  const { list, context, pagination: { total } = {} } = paginatedEntityShares || {};
   const { page, query, additionalQueries } = pagination;
 
   useEffect(() => _loadSharedEntites(pagination, searchPaginated, setPaginatedEntityShares, setLoading), [pagination, searchPaginated, setLoading]);

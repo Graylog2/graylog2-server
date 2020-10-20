@@ -152,9 +152,9 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
             page: response.page,
             perPage: response.per_page,
             query: response.query,
+            count: response.count,
+            total: response.total,
           },
-          count: response.count,
-          total: response.total,
         }));
 
       AuthenticationActions.loadBackendsPaginated.promise(promise);
@@ -172,9 +172,9 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
             page: response.page,
             perPage: response.per_page,
             query: response.query,
+            count: response.count,
+            total: response.total,
           },
-          count: response.count,
-          total: response.total,
         }));
 
       AuthenticationActions.loadUsersPaginated.promise(promise);

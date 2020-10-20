@@ -66,7 +66,7 @@ const BackendsOverview = () => {
   const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [paginatedBackends, setPaginatedBackends] = useState<?PaginatedBackends>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { list: backends, context, total } = paginatedBackends || {};
+  const { list: backends, context } = paginatedBackends || {};
   const { page, perPage, query } = pagination;
 
   const _refreshOverview = useCallback(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }), [perPage, query]);
@@ -90,10 +90,10 @@ const BackendsOverview = () => {
           {loading && <LoadingSpinner text="" delay={0} />}
         </Header>
         <p className="description">
-          Found {total} configured authentication services on the system.
+          Found {paginatedBackends.pagination.total} configured authentication services on the system.
         </p>
         <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
-                       totalItems={total}
+                       totalItems={paginatedBackends.pagination.total}
                        activePage={page}>
           <DataTable className="table-hover"
                      customFilter={<BackendsFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />}

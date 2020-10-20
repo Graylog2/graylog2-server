@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
-import type { PaginatedList } from 'stores/PaginationTypes';
+import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import User, { type UserJSON } from 'logic/users/User';
 import UserOverview from 'logic/users/UserOverview';
 
@@ -48,7 +48,7 @@ export type ActionsType = {
   loadTokens: (username: string) => Promise<Token[]>,
   deleteToken: (username: string, tokenId: string, tokenName: string) => Promise<void>,
   loadUsers: () => Promise<Immutable.List<User>>,
-  loadUsersPaginated: ({page: number, perPage: number, query: string}) => Promise<PaginatedUsers>,
+  loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>,
 };
 
 const UsersActions: RefluxActions<ActionsType> = singletonActions(

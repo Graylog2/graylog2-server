@@ -115,9 +115,9 @@ const UsersStore: Store<{}> = singletonStore(
             page: response.page,
             perPage: response.per_page,
             query: response.query,
+            count: response.count,
+            total: response.total,
           },
-          count: response.count,
-          total: response.total,
         }));
 
       UsersActions.loadUsersPaginated.promise(promise);

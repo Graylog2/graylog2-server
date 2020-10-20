@@ -26,9 +26,9 @@ const _responseToPaginatedList = ({ count, total, page, per_page, query, roles =
     query,
     page,
     perPage: per_page,
+    count,
+    total,
   },
-  count,
-  total,
 });
 
 // eslint-disable-next-line camelcase
@@ -38,9 +38,9 @@ const _responseToPaginatedUserList = ({ count, total, page, per_page, query, use
     page,
     perPage: per_page,
     query,
+    count,
+    total,
   },
-  count,
-  total,
 });
 
 const AuthzRolesStore: Store<{}> = singletonStore(

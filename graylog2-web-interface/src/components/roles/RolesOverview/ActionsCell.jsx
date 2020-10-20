@@ -27,8 +27,8 @@ const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<
   setDeleting(true);
 
   AuthzRolesDomain.loadUsersForRole(roleId, roleName, getOneUser).then((paginatedUsers) => {
-    if (paginatedUsers.total >= 1) {
-      confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.total} users.`;
+    if (paginatedUsers.pagination.total >= 1) {
+      confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.pagination.total} users.`;
     }
 
     // eslint-disable-next-line no-alert

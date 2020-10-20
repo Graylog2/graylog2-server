@@ -73,7 +73,7 @@ const UsersOverview = () => {
   const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { list: users, adminUser, total } = paginatedUsers || {};
+  const { list: users, adminUser, pagination: { total } = {} } = paginatedUsers || {};
   const { page, query, perPage } = pagination;
 
   useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);

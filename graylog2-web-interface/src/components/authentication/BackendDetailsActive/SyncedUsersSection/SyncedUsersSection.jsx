@@ -49,7 +49,7 @@ const SyncedUsersSection = ({ roles }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { list: users, total } = paginatedUsers || {};
+  const { list: users } = paginatedUsers || {};
   const { page, perPage, query } = pagination;
 
   useEffect(() => _loadSyncedTeams(pagination, setLoading, setPaginatedUsers), [pagination]);
@@ -65,9 +65,9 @@ const SyncedUsersSection = ({ roles }: Props) => {
   return (
     <SectionComponent title="Synchronized Users" showLoading={loading}>
       <p className="description">
-        Found {total} synchronized users.
+        Found {paginatedUsers.pagination.total} synchronized users.
       </p>
-      <PaginatedList activePage={page} totalItems={total} onChange={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })}>
+      <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })}>
         <DataTable className="table-hover"
                    customFilter={<SyncedUsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />}
                    dataRowFormatter={_userOverviewItem}
