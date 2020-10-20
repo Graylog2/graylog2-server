@@ -6,8 +6,8 @@ import moment from 'moment';
 import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
-import { Col, Row } from 'components/graylog';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { Alert, Col, Row } from 'components/graylog';
+import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 // Import built-in plugins
@@ -199,14 +199,26 @@ class EventDefinitionSummary extends React.Component {
   renderNotifications = (definitionNotifications, notificationSettings) => {
     const { currentUser } = this.props;
 
-    const effectiveDefinitionNotifications = PermissionsMixin.isPermitted(currentUser.permissions,
-      'eventnotifications:read')
-      ? definitionNotifications : [];
+    const effectiveDefinitionNotifications = definitionNotifications
+      .filter((n) => isPermitted(currentUser.permissions, `eventnotifications:read${n.notification_id}`));
+    const notificationsWithMissingPermissions = definitionNotifications
+      .filter((n) => !effectiveDefinitionNotifications.map((nObj) => nObj.notification_id).includes(n.notification_id));
+    const warning = notificationsWithMissingPermissions.length > 0
+      ? (
+        <Alert bsStyle="warning">
+          Missing Notifications Permissions for:<br />
+          {notificationsWithMissingPermissions.map((n) => n.notification_id).join(', ')}
+        </Alert>
+      )
+      : null;
 
     return (
       <>
         <h3 className={commonStyles.title}>Notifications</h3>
-        {effectiveDefinitionNotifications.length === 0
+        <p>
+          {warning}
+        </p>
+        {effectiveDefinitionNotifications.length === 0 && notificationsWithMissingPermissions.length <= 0
           ? <p>This Event is not configured to trigger any Notifications.</p>
           : (
             <>

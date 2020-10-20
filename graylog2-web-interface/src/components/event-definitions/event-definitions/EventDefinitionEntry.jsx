@@ -6,7 +6,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/graylog/router';
+import { Link, LinkContainer } from 'components/graylog/router';
 import {
   Button,
   DropdownButton,
@@ -78,9 +78,6 @@ const EventDefinitionEntry = ({
           <Button bsStyle="info">Edit</Button>
         </LinkContainer>
       </IfPermitted>
-      <LinkContainer to={Routes.ALERTS.DEFINITIONS.view(eventDefinition.id)}>
-        <Button bsStyle="info">View</Button>
-      </LinkContainer>
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
           {toggle}
@@ -105,20 +102,22 @@ const EventDefinitionEntry = ({
     titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
   }
 
+  const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.view(eventDefinition.id)}>{eventDefinition.title}</Link>;
+
   return (
     <>
       <EntityListItem key={`event-definition-${eventDefinition.id}`}
-                      title={eventDefinition.title}
+                      title={linkTitle}
                       titleSuffix={titleSuffix}
                       description={renderDescription(eventDefinition, context)}
                       noItemsText="Could not find any items with the given filter."
                       actions={actions} />
       { showEntityShareModal && (
         <EntityShareModal entityId={eventDefinition.id}
-                        entityType="event_definition"
-                        entityTitle={eventDefinition.title}
-                        description="Search for a User or Team to add as collaborator on this event definition."
-                        onClose={() => setShowEntityShareModal(false)} />
+                          entityType="event_definition"
+                          entityTitle={eventDefinition.title}
+                          description="Search for a User or Team to add as collaborator on this event definition."
+                          onClose={() => setShowEntityShareModal(false)} />
       )}
     </>
   );

@@ -51,7 +51,7 @@ class FilterAggregationSummary extends React.Component {
       return 'No Streams selected, searches in all Streams';
     }
 
-    const warning = streamIdsWithMissingPermission
+    const warning = streamIdsWithMissingPermission.length > 0
       ? <Alert bsStyle="warning">Missing Stream Permissions for:<br />{streamIdsWithMissingPermission.join(', ')}</Alert>
       : null;
 
