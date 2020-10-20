@@ -75,7 +75,7 @@ class EditEventDefinitionPage extends React.Component {
     const missingStreams = this._streamsWithMissingPermissions(eventDefinition, currentUser);
 
     if (missingStreams.length > 0) {
-      return <StreamPermissionErrorPage fetchError={{}} missingStreamIds={missingStreams} />;
+      return <StreamPermissionErrorPage error={{}} missingStreamIds={missingStreams} />;
     }
 
     if (!eventDefinition) {
