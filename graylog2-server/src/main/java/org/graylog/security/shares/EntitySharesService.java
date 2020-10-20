@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -102,7 +103,7 @@ public class EntitySharesService {
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
-                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, activeShares, request))
                 .validationResult(validateRequest(ownedEntity, request, sharingUserGRN))
                 .build();
     }
@@ -132,7 +133,7 @@ public class EntitySharesService {
                 .sharingUser(sharingUserGRN)
                 .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
                 .availableCapabilities(getAvailableCapabilities())
-                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, ImmutableSet.of(), request))
                 ;
 
         final EntitySharesUpdateEvent.Builder updateEventBuilder = EntitySharesUpdateEvent.builder()
@@ -275,10 +276,17 @@ public class EntitySharesService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private ImmutableMap<GRN, Collection<EntityDescriptor>> checkMissingPermissionsOnDependencies(GRN entity, GRN sharingUser, EntityShareRequest shareRequest) {
+    private ImmutableMap<GRN, Collection<EntityDescriptor>> checkMissingPermissionsOnDependencies(GRN entity, GRN sharingUser, ImmutableSet<ActiveShare> activeShares, EntityShareRequest shareRequest) {
+        // In the initial request, the user doesn't submit a grantee selection
+        // We need to use the active shares to check the dependency permissions
+        Set<GRN> selectedGrantees;
+        if (!shareRequest.selectedGranteeCapabilities().isPresent()) {
+            selectedGrantees = activeShares.stream().map(ActiveShare::grantee).collect(Collectors.toSet());
+        } else {
+            selectedGrantees = shareRequest.selectedGranteeCapabilities()
+                    .orElse(ImmutableMap.of()).keySet();
+        }
         final ImmutableSet<EntityDescriptor> dependencies = entityDependencyResolver.resolve(entity);
-        final ImmutableSet<GRN> selectedGrantees = shareRequest.selectedGranteeCapabilities()
-                .orElse(ImmutableMap.of()).keySet();
         return entityDependencyPermissionChecker.check(sharingUser, dependencies, selectedGrantees).asMap();
     }
 }

@@ -17,12 +17,13 @@
 package org.graylog.security;
 
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
-
-import javax.inject.Inject;
+import org.graylog.grn.GRNRegistry;
+import org.graylog2.plugin.database.users.User;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -30,11 +31,19 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class GranteeAuthorizer {
     public interface Factory {
         GranteeAuthorizer create(GRN grantee);
+        GranteeAuthorizer create(User grantee);
     }
 
     private final Subject subject;
 
-    @Inject
+    @AssistedInject
+    public GranteeAuthorizer(DefaultSecurityManager securityManager,
+                             GRNRegistry grnRegistry,
+                             @Assisted User grantee) {
+        this(securityManager, grnRegistry.ofUser(grantee));
+    }
+
+    @AssistedInject
     public GranteeAuthorizer(DefaultSecurityManager securityManager, @Assisted GRN grantee) {
         this.subject = new Subject.Builder(securityManager)
                 .principals(new SimplePrincipalCollection(grantee, "GranteeAuthorizer"))
@@ -45,6 +54,11 @@ public class GranteeAuthorizer {
 
     public boolean isPermitted(String permission, GRN target) {
         return isPermitted(permission, target.entity());
+    }
+
+    public boolean isPermitted(String permission) {
+        checkArgument(isNotBlank(permission), "permission cannot be null or empty");
+        return subject.isPermitted(permission);
     }
 
     public boolean isPermitted(String permission, String id) {

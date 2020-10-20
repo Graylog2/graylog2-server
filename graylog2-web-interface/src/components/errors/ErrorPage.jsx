@@ -8,9 +8,9 @@ import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
-const generateStyles = (backgroundImage) => css`
+const generateStyles = () => css`
   body {
-    background: url(${backgroundImage}) no-repeat center center fixed;
+    background: url(${(props) => props.backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;
@@ -38,29 +38,27 @@ type Props = {
   title: string,
 };
 
-const ErrorPage = ({ children, title, description, backgroundImage }: Props) => {
-  const ErrorPageStyles = createGlobalStyle`
-    ${generateStyles(backgroundImage)}
+const ErrorPageStyles = createGlobalStyle`
+    ${generateStyles()}
   `;
 
-  return (
-    <AppContentGrid>
-      <ErrorPageStyles />
-      <div className="container-fluid">
-        <DocumentTitle title={title}>
-          <ErrorJumbotron title={title}>
-            {description}
-            {children && (
-              <ErrorMessage>
-                {children}
-              </ErrorMessage>
-            )}
-          </ErrorJumbotron>
-        </DocumentTitle>
-      </div>
-    </AppContentGrid>
-  );
-};
+const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
+  <AppContentGrid>
+    <ErrorPageStyles backgroundImage={backgroundImage} />
+    <div className="container-fluid">
+      <DocumentTitle title={title}>
+        <ErrorJumbotron title={title}>
+          {description}
+          {children && (
+          <ErrorMessage>
+            {children}
+          </ErrorMessage>
+          )}
+        </ErrorJumbotron>
+      </DocumentTitle>
+    </div>
+  </AppContentGrid>
+);
 
 ErrorPage.propTypes = {
   children: PropTypes.node,
