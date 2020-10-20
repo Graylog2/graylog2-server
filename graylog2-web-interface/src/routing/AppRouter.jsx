@@ -63,6 +63,7 @@ import {
   RulesPage,
   ShowAlertPage,
   ShowContentPackPage,
+  ShowEventNotificationPage,
   ShowMessagePage,
   ShowMetricsPage,
   ShowNodePage,
@@ -159,6 +160,9 @@ const AppRouter = () => {
                         <Route exact
                                path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')}
                                component={EditEventNotificationPage} />
+                        <Route exact
+                               path={Routes.ALERTS.NOTIFICATIONS.show(':notificationId')}
+                               component={ShowEventNotificationPage} />
                         <Route exact
                                path={Routes.show_alert_condition(':streamId', ':conditionId')}
                                component={EditAlertConditionPage} />
