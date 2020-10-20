@@ -4,11 +4,13 @@ import { AuthenticationActions } from 'stores/authentication/AuthenticationStore
 
 import notifyingAction from '../notifyingAction';
 
-const create: $PropertyType<ActionsType, 'create'> = notifyingAction({
+type OverrideSettings = { notifyOnSuccess: boolean };
+
+const create = ({ notifyOnSuccess }: OverrideSettings = { notifyOnSuccess: true }): $PropertyType<ActionsType, 'create'> => notifyingAction({
   action: AuthenticationActions.create,
-  success: (authBackend) => ({
-    message: `Authentication service "${authBackend.title} was created successfully"`,
-  }),
+  success: notifyOnSuccess ? (authBackend) => ({
+    message: `Authentication service "${authBackend.title} was created successfully`,
+  }) : undefined,
   error: (error, authBackend) => ({
     message: `Creating authentication service "${authBackend.title}" failed with status: ${error}`,
   }),
@@ -29,21 +31,21 @@ const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
   }),
 });
 
-const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
+const update = ({ notifyOnSuccess }: OverrideSettings = { notifyOnSuccess: true }): $PropertyType<ActionsType, 'update'> => notifyingAction({
   action: AuthenticationActions.update,
-  success: (authBackendId, authBackend) => ({
-    message: `Authentication service "${authBackend.title} was updated successfully"`,
-  }),
+  success: notifyOnSuccess ? (authBackendId, authBackend) => ({
+    message: `Authentication service "${authBackend.title} was updated successfully`,
+  }) : undefined,
   error: (error, authBackendId, authBackend) => ({
     message: `Updating authentication service "${authBackend.title}" failed with status: ${error}`,
   }),
 });
 
-const deleteBackend: $PropertyType<ActionsType, 'delete'> = notifyingAction({
+const deleteBackend = ({ notifyOnSuccess }: OverrideSettings = { notifyOnSuccess: true }): $PropertyType<ActionsType, 'delete'> => notifyingAction({
   action: AuthenticationActions.delete,
-  success: (authBackendId, authBackendTitle) => ({
-    message: `Authentication service "${authBackendTitle} was deleted successfully"`,
-  }),
+  success: notifyOnSuccess ? (authBackendId, authBackendTitle) => ({
+    message: `Authentication service "${authBackendTitle} was deleted successfully`,
+  }) : undefined,
   error: (error, authBackendId, authBackendTitle) => ({
     message: `Deleting authentication service "${authBackendTitle}" failed with status: ${error}`,
   }),
@@ -66,7 +68,7 @@ const testLogin: $PropertyType<ActionsType, 'testLogin'> = notifyingAction({
 const enableUser: $PropertyType<ActionsType, 'enableUser'> = notifyingAction({
   action: AuthenticationActions.enableUser,
   success: (userId, username) => ({
-    message: `User "${username} was enabled successfully"`,
+    message: `User "${username} was enabled successfully`,
   }),
   error: (error, userId, username) => ({
     message: `Enabling user "${username}" failed with status: ${error}`,
@@ -76,7 +78,7 @@ const enableUser: $PropertyType<ActionsType, 'enableUser'> = notifyingAction({
 const disableUser: $PropertyType<ActionsType, 'disableUser'> = notifyingAction({
   action: AuthenticationActions.disableUser,
   success: (userId, username) => ({
-    message: `User "${username} was disabled successfully"`,
+    message: `User "${username} was disabled successfully`,
   }),
   error: (error, userId, username) => ({
     message: `Disabling user "${username}" failed with status: ${error}`,
@@ -86,7 +88,7 @@ const disableUser: $PropertyType<ActionsType, 'disableUser'> = notifyingAction({
 const setActiveBackend: $PropertyType<ActionsType, 'setActiveBackend'> = notifyingAction({
   action: AuthenticationActions.setActiveBackend,
   success: (authBackendId, authBackendTitle) => ({
-    message: `Authentication service "${authBackendTitle} was ${authBackendId ? 'activated' : 'deactivated'} successfully"`,
+    message: `Authentication service "${authBackendTitle} was ${authBackendId ? 'activated' : 'deactivated'} successfully`,
   }),
   error: (error, authBackendId, authBackendTitle) => ({
     message: `Activating authentication service "${authBackendTitle}" failed with status: ${error}`,
