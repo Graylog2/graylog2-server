@@ -58,7 +58,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         @JsonProperty("messages")
         MESSAGES,
         @JsonProperty("events")
-        EVENTS
+        EVENTS,
+        @JsonProperty("generic")
+        GENERIC
     }
 
     @JsonProperty("id")

@@ -77,7 +77,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         );
     }
 
-    private List<Map<String, Map<String, Object>>> dynamicTemplate() {
+    protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
         final Map<String, Map<String, Object>> templateInternal = internalFieldsMapping();
 
         final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", dynamicStrings());
@@ -87,7 +87,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     abstract Map<String, Object> dynamicStrings();
 
-    private Map<String, Map<String, Object>> fieldProperties(String analyzer) {
+    protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
                 .put("message", analyzedString(analyzer, false))
                 .put("full_message", analyzedString(analyzer, false))
