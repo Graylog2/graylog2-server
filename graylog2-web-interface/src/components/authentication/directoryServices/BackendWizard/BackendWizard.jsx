@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { compact, pickBy } from 'lodash';
+import { compact } from 'lodash';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
@@ -138,7 +138,7 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
   setSubmitAllError(null);
 
   const payload = getSubmitPayload(formValues);
-  const _submit = () => onSubmit(payload, formValues, licenseIsValid).then(() => {
+  const _submit = () => onSubmit(payload, formValues, stepsState.authBackendMeta.serviceType, licenseIsValid).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
@@ -170,7 +170,7 @@ type Props = {
   initialValues: WizardFormValues,
   excludedFields: {[ inputName: string ]: boolean },
   help: { [inputName: string]: ?React.Node },
-  onSubmit: (WizardSubmitPayload, WizardFormValues, licenseIsValid?: boolean) => Promise<void>,
+  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, licenseIsValid?: boolean) => Promise<void>,
 };
 
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help, excludedFields }: Props) => {
