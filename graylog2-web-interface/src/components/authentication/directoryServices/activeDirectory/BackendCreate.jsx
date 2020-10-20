@@ -50,6 +50,7 @@ const INITIAL_VALUES = {
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
+  userSearchPattern: '(&(objectClass=user)(|(sAMAccountName={0})(userPrincipalName={0})))',
   userFullNameAttribute: 'displayName',
   userNameAttribute: 'userPrincipalName',
   verifyCertificates: true,
