@@ -50,8 +50,8 @@ const INITIAL_VALUES = {
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
-  userFullNameAttribute: 'cn',
-  userNameAttribute: 'uid',
+  userFullNameAttribute: 'displayName',
+  userNameAttribute: 'userPrincipalName',
   verifyCertificates: true,
 };
 
