@@ -21,8 +21,8 @@ jest.mock('stores/users/UsersStore', () => ({
   },
 }));
 
-const mockRolesForUserPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
-const mockLoadRolesPromise = Promise.resolve({ list: Immutable.List([notAssignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
+const mockRolesForUserPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { page: 1, perPage: 10 }, total: 1 });
+const mockLoadRolesPromise = Promise.resolve({ list: Immutable.List([notAssignedRole]), pagination: { page: 1, perPage: 10 }, total: 1 });
 const user = User
   .builder()
   .fullName('The full name')

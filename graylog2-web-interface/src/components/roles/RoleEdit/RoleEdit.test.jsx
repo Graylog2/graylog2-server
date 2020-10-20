@@ -17,8 +17,8 @@ const paginatedUsersForRole = {
   pagination: {
     page: 1,
     perPage: 10,
-    total: 1,
   },
+  total: 1,
 };
 const mockLoadUsersForRolePromise = Promise.resolve(paginatedUsersForRole);
 
@@ -33,12 +33,12 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 
 // mock loadUsersPaginated
 const paginatedUsers = {
-  users: Immutable.List([bob, charlie]),
+  list: Immutable.List([bob, charlie]),
   pagination: {
     page: 1,
     perPage: 10,
-    total: 1,
   },
+  total: 1,
 };
 const mockLoadUsersPromise = Promise.resolve(paginatedUsers);
 
@@ -103,7 +103,9 @@ describe('RoleEdit', () => {
     fireEvent.change(filterInput, { target: { value: 'name of an assigned user' } });
     fireEvent.click(filterSubmitButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, 1, 10, 'name of an assigned user'));
+    await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledTimes(2));
+
+    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, { page: 1, perPage: 5, query: 'name of an assigned user' });
   });
 
   it('should unassigning a user', async () => {

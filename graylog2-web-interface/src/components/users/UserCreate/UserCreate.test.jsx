@@ -16,12 +16,12 @@ const mockLoadUsersPromise = Promise.resolve(Immutable.List([existingUser]));
 const mockLoadRolesPromise = Promise.resolve({
   list: rolesList,
   pagination: {
-    count: 0,
-    total: 0,
     page: 0,
     per_page: 0,
     query: '',
   },
+  count: 0,
+  total: 0,
 });
 
 jest.mock('stores/users/UsersStore', () => ({

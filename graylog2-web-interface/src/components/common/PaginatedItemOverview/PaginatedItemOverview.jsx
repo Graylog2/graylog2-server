@@ -38,7 +38,6 @@ export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], q
 const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText }: Props) => {
   const [paginatedList, setPaginatedList] = useState<?PaginatedListType>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-
   useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
 
   useEffect(() => {

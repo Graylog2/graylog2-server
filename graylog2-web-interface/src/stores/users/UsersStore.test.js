@@ -54,7 +54,7 @@ describe('UsersStore', () => {
       }));
 
       UsersActions.loadUsersPaginated(pagination).then((result) => {
-        expect(result).toStrictEqual({ users: userOverviewList, adminUser: admin, pagination, ...listSizeInfo });
+        expect(result).toStrictEqual({ list: userOverviewList, adminUser: admin, pagination, ...listSizeInfo });
 
         done();
       });
@@ -73,7 +73,7 @@ describe('UsersStore', () => {
       }));
 
       UsersActions.loadUsersPaginated(pagination).then((result) => {
-        expect(result).toStrictEqual({ users: userOverviewList, adminUser: undefined, pagination, ...listSizeInfo });
+        expect(result).toStrictEqual({ list: userOverviewList, adminUser: undefined, pagination, ...listSizeInfo });
 
         done();
       });

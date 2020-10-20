@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import { render, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
 import { paginatedUsers } from 'fixtures/userOverviews';
@@ -10,7 +11,7 @@ import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import ActionsCell from './ActionsCell';
 
-const mockLoadUsersPromise = Promise.resolve();
+const mockLoadUsersPromise = Promise.resolve({ list: Immutable.List(), pagination: { perPage: 10, page: 1 }, total: 0 });
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {

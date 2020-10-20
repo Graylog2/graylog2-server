@@ -48,8 +48,8 @@ const _loadSharedEntites = (pagination, searchPaginated, setPaginatedEntityShare
 
 const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Props) => {
   const [paginatedEntityShares, setPaginatedEntityShares] = useState<?PaginatedEntityShares>();
-  const { list, context, total } = paginatedEntityShares || {};
   const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
+  const { list, context, total } = paginatedEntityShares || {};
   const { page, query, additionalQueries } = pagination;
 
   useEffect(() => _loadSharedEntites(pagination, searchPaginated, setPaginatedEntityShares, setLoading), [pagination, searchPaginated, setLoading]);
@@ -60,8 +60,6 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
   if (!paginatedEntityShares) {
     return <Spinner />;
   }
-
-  console.log(paginatedEntityShares, page, total);
 
   return (
     <>
