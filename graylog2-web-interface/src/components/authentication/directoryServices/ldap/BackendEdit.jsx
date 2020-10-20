@@ -60,7 +60,7 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string, licenseIsValid: ?boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const backendUpdateNotificationSettings = {
-    notifyOnSuccess: !!formValues.synchronizeGroups,
+    notifyOnSuccess: !formValues.synchronizeGroups,
   };
 
   return AuthenticationDomain.update(backendUpdateNotificationSettings)(backendId, {
