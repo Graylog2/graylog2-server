@@ -1,16 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import { Col, Row } from 'components/graylog';
-
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
+import { Col, Row } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+
+// Import built-in plugins
+import {} from 'components/event-definitions/event-definition-types';
+import {} from 'components/event-notifications/event-notification-types';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
@@ -21,13 +23,21 @@ class EventDefinitionSummary extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
-    validation: PropTypes.object.isRequired,
+    validation: PropTypes.object,
     currentUser: PropTypes.object.isRequired,
   };
 
-  state = {
-    showValidation: false,
+  static defaultProps = {
+    validation: undefined,
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showValidation: false,
+    };
+  }
 
   componentDidUpdate() {
     this.showValidation();

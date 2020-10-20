@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
 
+import { useStore } from 'stores/connect';
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
@@ -13,8 +14,10 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
+import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
+const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 type Props = {
   params: {
@@ -25,6 +28,7 @@ type Props = {
 const ViewEventDefinitionPage = ({ params }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const [eventDefinition, setEventDefinition] = useState();
+  const { all: notifications } = useStore(EventNotificationsStore);
 
   useEffect(() => {
     if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`)) {
@@ -45,10 +49,12 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
             }
           },
         );
+
+      EventNotificationsActions.listAll();
     }
   }, [currentUser, params]);
 
-  if (!eventDefinition) {
+  if (!eventDefinition || !notifications) {
     return (
       <DocumentTitle title="Edit Event Definition">
         <span>
@@ -89,6 +95,9 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
 
         <Row className="content">
           <Col md={12}>
+            <EventDefinitionSummary eventDefinition={eventDefinition}
+                                    currentUser={currentUser}
+                                    notifications={notifications} />
           </Col>
         </Row>
       </span>
