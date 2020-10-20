@@ -10,19 +10,10 @@ type Props = {
   stepKey: string,
 };
 
-const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => {
-  const editLink = {
-    pathname: Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId),
-    query: {
-      initialStepKey: stepKey,
-    },
-  };
-
-  return (
-    <LinkContainer to={editLink}>
-      <Button bsStyle="success" bsSize="small">Edit</Button>
-    </LinkContainer>
-  );
-};
+const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => (
+  <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId, stepKey)}>
+    <Button bsStyle="success" bsSize="small">Edit</Button>
+  </LinkContainer>
+);
 
 export default EditLinkButton;

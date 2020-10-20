@@ -75,7 +75,13 @@ const Routes = {
         CREATE: '/system/authentication/services/create',
         createBackend: (name) => `/system/authentication/services/create/${name}`,
         show: (id) => `/system/authentication/services/${id}`,
-        edit: (id) => `/system/authentication/services/edit/${id}`,
+        edit: (id, initialStepKey) => {
+          const editUrl = `/system/authentication/services/edit/${id}`;
+
+          if (initialStepKey) return `${editUrl}?initialStepKey=${initialStepKey}`;
+
+          return editUrl;
+        },
       },
     },
     USERS: {
