@@ -174,6 +174,36 @@ public class UsersResource extends RestResource {
     }
 
     @GET
+    @Path("id/{userId}")
+    @ApiOperation(value = "Get user details by userId", notes = "The user's permissions are only included if a user asks for his " +
+            "own account or for users with the necessary permissions to edit permissions.")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "The user could not be found.")
+    })
+    public UserSummary getbyId(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+                           @PathParam("userId") String userId,
+                           @Context UserContext userContext) {
+
+        final User user = userService.loadById(userId);
+        if (user == null) {
+            throw new NotFoundException("Couldn't find userId " + userId);
+        }
+
+        final String username = user.getName();
+        // If a user has permissions to edit another user's profile, it should be able to see it.
+        // Reader users always have permissions to edit their own profile.
+        if (!isPermitted(USERS_EDIT, username)) {
+            throw new ForbiddenException("Not allowed to view userId " + userId);
+        }
+
+        final String requestingUser = userContext.getUser().getId();
+        final boolean isSelf = requestingUser.equals(userId);
+        final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
+
+        return toUserResponse(user, isSelf || canEditUserPermissions, Optional.empty());
+    }
+
+    @GET
     @Deprecated
     @RequiresPermissions(RestPermissions.USERS_LIST)
     @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
