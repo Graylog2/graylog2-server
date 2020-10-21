@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
@@ -180,6 +181,7 @@ if (TARGET === 'start') {
       }),
       new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
       new webpack.HotModuleReplacementPlugin(),
+      new ForkTsCheckerWebpackPlugin(),
     ],
   });
 }
