@@ -123,10 +123,10 @@ class EventNotifications extends React.Component {
                 {isTestLoading ? 'Testing...' : 'Test Notification'}
               </MenuItem>
             </IfPermitted>
-            <HasOwnership type="dashboard" id={notification.id}>
+            <HasOwnership type="notification" id={notification.id}>
               {({ disabled }) => (
                 <MenuItem disabled={disabled} onSelect={() => setNotificationToShare(notification)}>
-                  Share {disabled && <SharingDisabledPopover type="dashboard" />}
+                  Share {disabled && <SharingDisabledPopover type="notification" />}
                 </MenuItem>
               )}
             </HasOwnership>
