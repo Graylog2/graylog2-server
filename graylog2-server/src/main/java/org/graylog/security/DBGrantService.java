@@ -18,7 +18,6 @@ package org.graylog.security;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -33,6 +32,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
 
@@ -57,17 +57,17 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     public static final String COLLECTION_NAME = "grants";
 
     private final GRNRegistry grnRegistry;
-    private final EventBus serverEventBus;
+    private final ClusterEventBus clusterEventBus;
     private final MongoCollection<Document> dbCollection;
 
     @Inject
     public DBGrantService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
                           GRNRegistry grnRegistry,
-                          EventBus serverEventBus) {
+                          ClusterEventBus clusterEventBus) {
         super(mongoConnection, mapper, GrantDTO.class, COLLECTION_NAME);
         this.grnRegistry = grnRegistry;
-        this.serverEventBus = serverEventBus;
+        this.clusterEventBus = clusterEventBus;
         this.dbCollection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
 
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1));
@@ -102,14 +102,14 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     @Override
     public GrantDTO save(GrantDTO grantDTO) {
         final GrantDTO savedGrantDTO = super.save(grantDTO);
-        serverEventBus.post(GrantChangedEvent.create(savedGrantDTO.id()));
+        clusterEventBus.post(GrantChangedEvent.create(savedGrantDTO.id()));
         return savedGrantDTO;
     }
 
     @Override
     public int delete(String id) {
         final int delete = super.delete(id);
-        serverEventBus.post(GrantChangedEvent.create(id));
+        clusterEventBus.post(GrantChangedEvent.create(id));
         return delete;
     }
 
@@ -225,7 +225,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
         final long deletedCount = deleteResult.getDeletedCount();
         if (deletedCount > 0) {
-            serverEventBus.post(GrantChangedEvent.create(deletedIds));
+            clusterEventBus.post(GrantChangedEvent.create(deletedIds));
         }
         return deletedCount;
     }

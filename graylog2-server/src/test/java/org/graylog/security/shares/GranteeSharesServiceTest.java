@@ -16,7 +16,6 @@
  */
 package org.graylog.security.shares;
 
-import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
@@ -31,6 +30,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.PaginationParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,7 +60,7 @@ class GranteeSharesServiceTest {
                GRNRegistry grnRegistry,
                @Mock GRNDescriptorService grnDescriptorService) {
         this.grnDescriptorService = grnDescriptorService;
-        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(EventBus.class));
+        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(ClusterEventBus.class));
         this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService);
     }
 

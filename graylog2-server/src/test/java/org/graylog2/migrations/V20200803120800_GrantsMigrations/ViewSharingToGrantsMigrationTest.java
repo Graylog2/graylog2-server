@@ -18,7 +18,6 @@
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -39,6 +38,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;
@@ -84,7 +84,7 @@ class ViewSharingToGrantsMigrationTest {
         this.dbCollection = mongodb.mongoCollection("view_sharings");
         this.userService = userService;
         this.roleService = roleService;
-        this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry, mock(EventBus.class));
+        this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry, mock(ClusterEventBus.class));
 
         when(userService.load(anyString())).thenAnswer(a -> {
             final String argument = a.getArgument(0);
