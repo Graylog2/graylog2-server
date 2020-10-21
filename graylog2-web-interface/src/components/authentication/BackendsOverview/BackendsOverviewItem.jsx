@@ -63,7 +63,7 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
 
   const _deleteBackend = () => {
     if (window.confirm(confirmMessage(title, 'delete'))) {
-      AuthenticationDomain.delete(id, title);
+      AuthenticationDomain.delete()(id, title);
     }
   };
 

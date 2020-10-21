@@ -8,7 +8,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 
-import type { WizardFormValues } from '../BackendWizard/BackendWizardContext';
+import type { WizardFormValues, AuthBackendMeta } from '../BackendWizard/BackendWizardContext';
 import BackendWizard from '../BackendWizard';
 
 export const AUTH_BACKEND_META = {
@@ -20,8 +20,8 @@ export const HELP = {
   // server config help
   systemUserDn: (
     <span>
-      The username for the initial connection to the LDAP server, e.g. <code>ldapbind@some.domain</code>.
-      This needs to match the <code>userPrincipalName</code> of that user.
+      The username for the initial connection to the LDAP server, e.g. <code>cn=admin,dc=example,dc=com</code>,
+      this might be optional depending on your LDAP server.
     </span>
   ),
   systemUserPassword: 'The password for the initial connection to the LDAP server.',
@@ -33,54 +33,58 @@ export const HELP = {
   ),
   userSearchPattern: (
     <span>
-      For example <code className="text-nowrap">{'(&(objectClass=user)(sAMAccountName={0}))'}</code>.{' '}
+      For example <code className="text-nowrap">{'(&(uid={0})(objectClass=inetOrgPerson))'}</code>.{' '}
       The string <code>{'{0}'}</code> will be replaced by the entered username.
     </span>
   ),
   userNameAttribute: (
     <span>
-      Which LDAP attribute to use for the username of the user in Graylog.<br />
-      Try to load a test user using the sidebar form, if you are unsure which attribute to use.
+      Which LDAP attribute to use for the username of the user in Graylog, e.g <code>uid</code>.<br />
+      Try to load a test user in the sidebar section <i>User Login Test</i>, if you are unsure which attribute to use.
     </span>
   ),
   userFullNameAttribute: (
     <span>
-      Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.<br />
+      Which LDAP attribute to use for the full name of a synchronized Graylog user, e.g. <code>cn</code>.<br />
+    </span>
+  ),
+  userUniqueIdAttribute: (
+    <span>
+      Which LDAP attribute to use for the ID of a synchronized Graylog user, e.g. <code>entryUUID</code>.<br />
     </span>
   ),
   defaultRoles: (
-    'The default Graylog roles determine whether a user created via LDAP can access the entire system, or has limited access.'
+    <span>The default Graylog roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the Graylog web interface</span>
   ),
 };
 
-export const prepareInitialValues = () => {
-  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  let initialValues = {
-    serverHost: 'localhost',
-    serverPort: 636,
-    transportSecurity: 'tls',
-    userFullNameAttribute: 'cn',
-    userNameAttribute: 'uid',
-    verifyCertificates: true,
-  };
-
-  if (enterpriseGroupSyncPlugin) {
-    const {
-      initialValues: initialGroupSyncValues,
-    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues();
-
-    initialValues = { ...initialValues, ...initialGroupSyncValues };
-  }
-
-  return initialValues;
+const INITIAL_VALUES = {
+  serverHost: 'localhost',
+  serverPort: 636,
+  transportSecurity: 'tls',
+  userFullNameAttribute: 'cn',
+  userNameAttribute: 'uid',
+  userUniqueIdAttribute: 'entryUUID',
+  verifyCertificates: true,
 };
 
-export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, licenseIsValid?: boolean = true) => {
+export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, licenseIsValid?: boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
+  const shouldCreateGroupSync = formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid;
+  const backendCreateNotificationSettings = {
+    notifyOnSuccess: !shouldCreateGroupSync,
+  };
 
-  return AuthenticationDomain.create(payload).then((result) => {
-    if (result && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
+  return AuthenticationDomain.create(backendCreateNotificationSettings)(payload).then((result) => {
+    if (result && shouldCreateGroupSync) {
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, serviceType).catch((error) => {
+        const backendDeleteNotificationSettings = {
+          notifyOnSuccess: false,
+        };
+        // clean up created auth backend if
+        AuthenticationDomain.delete(backendDeleteNotificationSettings)(result.backend.id, result.backend.titel);
+        throw error;
+      });
     }
 
     return result;
@@ -89,9 +93,12 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
 
 const BackendCreate = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.ldap ?? {};
-  const help = { ...HELP, ...groupSyncFormHelp };
-  const initialValues = prepareInitialValues();
+  const {
+    help: groupSyncHelp = {},
+    initialValues: initialGroupSyncValues = {},
+  } = enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
+  const help = { ...HELP, ...groupSyncHelp };
+  const initialValues = { ...INITIAL_VALUES, ...initialGroupSyncValues };
 
   return (
     <DocumentTitle title="Create LDAP Authentication Service">
