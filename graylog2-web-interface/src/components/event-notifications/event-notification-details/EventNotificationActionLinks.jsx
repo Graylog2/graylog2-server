@@ -8,7 +8,7 @@ import Routes from 'routing/Routes';
 
 const EventNotificationActionLinks = ({ notificationId }) => (
   <ButtonToolbar>
-    <IfPermitted permissions={`eventnotifications:view:${notificationId}`}>
+    <IfPermitted permissions={`eventnotifications:read:${notificationId}`}>
       <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.show(notificationId)}>
         <Button bsStyle="success">View Details</Button>
       </LinkContainer>

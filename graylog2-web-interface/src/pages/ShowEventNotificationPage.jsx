@@ -37,7 +37,7 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
     );
   }, [notificationId]);
 
-  if (!isPermitted(currentUser.permissions, `eventnotifications:view:${notificationId}`)) {
+  if (!isPermitted(currentUser.permissions, `eventnotifications:read:${notificationId}`)) {
     history.push(Routes.NOTFOUND);
   }
 
