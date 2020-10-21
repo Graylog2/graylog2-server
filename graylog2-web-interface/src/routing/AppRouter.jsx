@@ -88,6 +88,7 @@ import {
   UserEditPage,
   UserTokensEditPage,
   UsersOverviewPage,
+  ViewEventDefinitionPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'views/logic/usePluginEntities';
@@ -155,6 +156,9 @@ const AppRouter = () => {
                         <Route exact
                                path={Routes.ALERTS.DEFINITIONS.edit(':definitionId')}
                                component={EditEventDefinitionPage} />
+                        <Route exact
+                               path={Routes.ALERTS.DEFINITIONS.view(':definitionId')}
+                               component={ViewEventDefinitionPage} />
                         <Route exact path={Routes.ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
                         <Route exact path={Routes.ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
                         <Route exact

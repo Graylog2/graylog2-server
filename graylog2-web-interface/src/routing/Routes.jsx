@@ -22,6 +22,7 @@ const Routes = {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
       edit: (definitionId) => `/alerts/definitions/${definitionId}/edit`,
+      view: (definitionId) => `/alerts/definitions/${definitionId}`,
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',

@@ -11,7 +11,7 @@ class EventDefinitionValidationSummary extends React.Component {
   };
 
   render() {
-    const { validation } = this.props;
+    const { validation = {} } = this.props;
     const fieldsWithErrors = Object.keys(validation.errors);
 
     if (fieldsWithErrors.length === 0) {

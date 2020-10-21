@@ -83,6 +83,7 @@ const UserDetailsPage = loadAsync(() => import('./UserDetailsPage'));
 const UserEditPage = loadAsync(() => import('./UserEditPage'));
 const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
+const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
 
 export {
   AlertConditionsPage,
@@ -168,4 +169,5 @@ export {
   UserDetailsPage,
   UserEditPage,
   UserTokensEditPage,
+  ViewEventDefinitionPage,
 };

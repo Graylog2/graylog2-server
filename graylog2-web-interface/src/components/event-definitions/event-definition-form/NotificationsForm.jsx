@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { LinkContainer } from 'components/graylog/router';
-import { Col, Row, Button } from 'components/graylog';
+import { Alert, Col, Row, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
@@ -58,7 +58,22 @@ class NotificationsForm extends React.Component {
     const { eventDefinition, notifications, defaults, currentUser, onChange } = this.props;
     const { showAddNotificationForm } = this.state;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:read')) {
+    const notificationIds = eventDefinition.notifications.map((n) => n.notification_id);
+    const missingPermissions = notificationIds.filter((id) => !isPermitted(currentUser.permissions, `eventnotifications:read${id}`));
+
+    if (missingPermissions.length > 0) {
+      return (
+        <Row>
+          <Col md={6} lg={5}>
+            <Alert bsStyle="warning">
+              Missing Notifications Permissions for: <br /> {missingPermissions.join(', ')}
+            </Alert>
+          </Col>
+        </Row>
+      );
+    }
+
+    if (!isPermitted(currentUser.permissions, 'eventnotifications:read')) {
       return (
         <Row>
           <Col md={6} lg={5}>
@@ -74,7 +89,7 @@ class NotificationsForm extends React.Component {
                              onChange={this.handleAssignNotification}
                              onCancel={this.toggleAddNotificationForm}
                              hasCreationPermissions={
-                               PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')
+                               isPermitted(currentUser.permissions, 'eventnotifications:create')
                              } />
       );
     }
