@@ -350,16 +350,20 @@ public abstract class GIMMapping extends IndexMapping {
         ));
     }
 
+    private Map<String, Object> textField() {
+        return typeField("text");
+    }
+
     private Map<String, Object> typeField(String type) {
         return Collections.singletonMap("type", type);
     }
 
-    private Map<String, Object> analyzedString(String analyzer) {
-        return super.analyzedString(analyzer, true);
-    }
-
     private Map<String, Object> copyTo(Map<String, Object> source, String newField) {
         return merge(source, Collections.singletonMap("copy_to", newField));
+    }
+
+    private Map<String, Object> withAnalyzer(Map<String, Object> source, String analyzer) {
+        return merge(source, Collections.singletonMap("analyzer", analyzer));
     }
 
     private Map<String, Object> merge(Map<String, Object> type1, Map<String, Object> type2) {
@@ -404,12 +408,12 @@ public abstract class GIMMapping extends IndexMapping {
                 .put("session_id", copyTo(notAnalyzedString(), "associated_session_id"))
                 .put("user_session_id", copyTo(notAnalyzedString(), "associated_session_id"))
                 .put("http_headers", ImmutableMap.<String, Object>builder()
-                        .putAll(analyzedString("standard"))
+                        .putAll(withAnalyzer(textField(), "standard"))
                         .put("norms", false)
                         .put("index_options", "freqs")
                         .build())
-                .put("http_user_agent_analyzed", analyzedString("standard"))
-                .put("http_url_analyzed", analyzedString("standard"))
+                .put("http_user_agent_analyzed", withAnalyzer(textField(), "standard"))
+                .put("http_url_analyzed", withAnalyzer(textField(), "standard"))
                 .build();
     }
 

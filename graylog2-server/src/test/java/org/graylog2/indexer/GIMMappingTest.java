@@ -16,27 +16,33 @@
  */
 package org.graylog2.indexer;
 
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Resources;
+import org.glassfish.grizzly.utils.Charsets;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-class GIMMappingTest {
-    static class GIMMappingImpl extends GIMMapping {
-        @Override
-        protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
-            return Collections.emptyList();
-        }
+abstract class GIMMappingTest {
+    private static final ObjectMapper mapper = new ObjectMapperProvider().get();
 
-        @Override
-        Map<String, Object> dynamicStrings() {
-            return Collections.
-        }
+    String json(Object object) throws JsonProcessingException {
+        return mapper.writeValueAsString(object);
     }
-    @Test
-    void matchesJsonSource() {
+
+    IndexSetConfig mockIndexSetConfig() {
+        final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+        when(indexSetConfig.indexAnalyzer()).thenReturn("standard");
+
+        return indexSetConfig;
+    }
+
+    String resource(String filename) throws IOException {
+        return Resources.toString(Resources.getResource(this.getClass(), filename), Charsets.UTF8_CHARSET);
     }
 }
