@@ -103,7 +103,7 @@ public class GrantsOverviewResource extends RestResource {
         }
 
         public static Builder builder() {
-            return new AutoValue_GrantsResource_GrantSummary.Builder();
+            return new AutoValue_GrantsOverviewResource_GrantSummary.Builder();
         }
 
         @AutoValue.Builder
