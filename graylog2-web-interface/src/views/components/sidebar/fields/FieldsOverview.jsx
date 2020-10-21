@@ -30,9 +30,9 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
   display: grid;
   display: -ms-grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: max-content 1fr;
   -ms-grid-columns: 1fr;
-  -ms-grid-rows: auto 1fr;
+  -ms-grid-rows: max-content 1fr;
 
   > *:nth-child(1) {
     grid-column: 1;
