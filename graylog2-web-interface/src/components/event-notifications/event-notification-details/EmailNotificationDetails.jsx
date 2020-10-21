@@ -17,7 +17,7 @@ const EmailNotificationDetails = ({ notification }) => (
                          <Well bsSize="small" className={styles.bodyPreview}>
                            {notification.config.body_template || <em>Empty body</em>}
                          </Well>
-                         )} />
+                       )} />
   </>
 );
 
