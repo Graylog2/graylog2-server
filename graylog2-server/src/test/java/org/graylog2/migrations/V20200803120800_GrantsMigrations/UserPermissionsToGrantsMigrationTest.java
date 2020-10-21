@@ -30,6 +30,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
@@ -43,6 +44,7 @@ import javax.validation.Validator;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -75,9 +77,9 @@ class UserPermissionsToGrantsMigrationTest {
 
         this.userSelfEditPermissionCount = new Permissions(ImmutableSet.of()).userSelfEditPermissions("dummy").size();
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(ClusterEventBus.class));
         this.userService = userService;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(ClusterEventBus.class));
         migration = new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, "admin");
     }
 

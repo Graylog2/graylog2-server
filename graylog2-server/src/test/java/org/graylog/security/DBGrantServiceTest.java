@@ -23,6 +23,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class DBGrantServiceTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        this.dbService = new DBGrantService(mongodb.mongoConnection(), mapper, grnRegistry);
+        this.dbService = new DBGrantService(mongodb.mongoConnection(), mapper, grnRegistry, mock(ClusterEventBus.class));
     }
 
     @Test

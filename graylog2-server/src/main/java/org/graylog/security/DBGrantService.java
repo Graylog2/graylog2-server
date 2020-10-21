@@ -21,13 +21,18 @@ import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
 
@@ -38,9 +43,11 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -50,13 +57,18 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     public static final String COLLECTION_NAME = "grants";
 
     private final GRNRegistry grnRegistry;
+    private final ClusterEventBus clusterEventBus;
+    private final MongoCollection<Document> dbCollection;
 
     @Inject
     public DBGrantService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
-                          GRNRegistry grnRegistry) {
+                          GRNRegistry grnRegistry,
+                          ClusterEventBus clusterEventBus) {
         super(mongoConnection, mapper, GrantDTO.class, COLLECTION_NAME);
         this.grnRegistry = grnRegistry;
+        this.clusterEventBus = clusterEventBus;
+        this.dbCollection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
 
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1));
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_TARGET, 1));
@@ -85,6 +97,20 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                 Filters.eq(GrantDTO.FIELD_CAPABILITY, "grn::::capability:54e3deadbeefdeadbeef0002"),
                 Updates.set(GrantDTO.FIELD_CAPABILITY, Capability.OWN.toId())
         );
+    }
+
+    @Override
+    public GrantDTO save(GrantDTO grantDTO) {
+        final GrantDTO savedGrantDTO = super.save(grantDTO);
+        clusterEventBus.post(GrantChangedEvent.create(savedGrantDTO.id()));
+        return savedGrantDTO;
+    }
+
+    @Override
+    public int delete(String id) {
+        final int delete = super.delete(id);
+        clusterEventBus.post(GrantChangedEvent.create(id));
+        return delete;
     }
 
     public ImmutableSet<GrantDTO> getForGranteesOrGlobal(Set<GRN> grantees) {
@@ -124,7 +150,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         checkArgument(isNotBlank(creatorUsername), "creatorUsername cannot be null or empty");
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-        return super.save(grantDTO.toBuilder()
+        return save(grantDTO.toBuilder()
                 .createdBy(creatorUsername)
                 .createdAt(now)
                 .updatedBy(creatorUsername)
@@ -166,7 +192,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         final GrantDTO existingGrant = get(updatedGrant.id())
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find grant with ID " + updatedGrant.id()));
 
-        return super.save(existingGrant.toBuilder()
+        return save(existingGrant.toBuilder()
                 .grantee(updatedGrant.grantee())
                 .capability(updatedGrant.capability())
                 .target(updatedGrant.target())
@@ -185,8 +211,23 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         return db.find(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).toArray();
     }
 
-    public int deleteForTarget(GRN target) {
-        return db.remove(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).getN();
+    public long deleteForTarget(GRN target) {
+        final Bson filter = Filters.eq(GrantDTO.FIELD_TARGET, target.toString());
+        final Set<String> deletedIds = StreamSupport.stream(dbCollection.find(filter).projection(Projections.include()).spliterator(), false)
+                .map(doc -> {
+                    final Object o = doc.get("_id");
+                    if (o instanceof ObjectId) {
+                        return ((ObjectId) o).toHexString();
+                    }
+                    return null;
+                }).filter(Objects::nonNull).collect(Collectors.toSet());
+        final DeleteResult deleteResult = dbCollection.deleteMany(filter);
+
+        final long deletedCount = deleteResult.getDeletedCount();
+        if (deletedCount > 0) {
+            clusterEventBus.post(GrantChangedEvent.create(deletedIds));
+        }
+        return deletedCount;
     }
 
     public List<GrantDTO> getForTargetExcludingGrantee(GRN target, GRN grantee) {

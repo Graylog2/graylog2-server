@@ -31,6 +31,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
+import org.graylog.security.GrantChangedEvent;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.MongoDbAuthorizationCacheManager;
@@ -141,6 +142,11 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
     @Subscribe
     public void handleUserSave(UserChangedEvent event) {
+        getAuthorizationCache().clear();
+    }
+
+    @Subscribe
+    public void handleGrantChange(GrantChangedEvent event) {
         getAuthorizationCache().clear();
     }
 }
