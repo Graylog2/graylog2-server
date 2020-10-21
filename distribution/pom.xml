@@ -15,7 +15,10 @@
     <packaging>pom</packaging>
 
     <properties>
-        <!-- We don't need to sign anything in this module. This fixes a release build error. -->
+        <!--
+           We don't need to sign anything in this module. This fixes a release build error related to setting
+           the <outputDirectory> to a different path: https://issues.apache.org/jira/browse/MGPG-44
+        -->
         <gpg.skip>true</gpg.skip>
         <maven.source.skip>true</maven.source.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
