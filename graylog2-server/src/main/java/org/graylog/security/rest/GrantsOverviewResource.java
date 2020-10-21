@@ -18,6 +18,8 @@ package org.graylog.security.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.grn.GRN;
@@ -42,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Api(value = "Permissions/GrantsOverview", description = "Grants overview")
 @Path("/authz/grants-overview")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -58,6 +61,7 @@ public class GrantsOverviewResource extends RestResource {
     }
 
     @GET
+    @ApiOperation("Return an overview of all grants in the system")
     @RequiresPermissions(RestPermissions.GRANTS_OVERVIEW_READ)
     public Response getOverview() {
         final Set<GrantSummary> grants = grantService.getAll().stream()
