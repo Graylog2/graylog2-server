@@ -305,7 +305,7 @@ public abstract class GIMMapping extends IndexMapping {
     private static final Set<String> DATE_FIELDS = ImmutableSet.<String>builder()
             .add("event_created")
             .add("event_start")
-            .add("event_recieved_time")
+            .add("event_received_time")
             .add("file_created_date")
             .build();
 
