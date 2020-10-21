@@ -17,6 +17,7 @@
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
@@ -43,6 +44,7 @@ import javax.validation.Validator;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -75,9 +77,9 @@ class UserPermissionsToGrantsMigrationTest {
 
         this.userSelfEditPermissionCount = new Permissions(ImmutableSet.of()).userSelfEditPermissions("dummy").size();
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(EventBus.class));
         this.userService = userService;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(EventBus.class));
         migration = new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, "admin");
     }
 
