@@ -10,7 +10,7 @@ import FormsUtils from 'util/FormsUtils';
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
-    action: PropTypes.oneOf(['create', 'edit']),
+    action: PropTypes.oneOf(['create', 'edit', 'view']),
     notification: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     testResult: PropTypes.shape({

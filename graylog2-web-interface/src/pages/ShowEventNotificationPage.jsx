@@ -1,4 +1,3 @@
-// @flow strict
 import * as React from 'react';
 import { useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -6,24 +5,25 @@ import PropTypes from 'prop-types';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { LinkContainer } from 'components/graylog/router';
-import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
+import { ButtonToolbar, Button } from 'components/graylog';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import CombinedProvider from 'injection/CombinedProvider';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
-import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import withParams from 'routing/withParams';
+import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
+import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
+
+import {} from 'components/event-notifications/event-notification-types';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
-const { isPermitted } = PermissionsMixin;
-
-const ShowEventDefinitionPage = ({ params: { notificationId } }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
+  const currentUser = useContext(CurrentUserContext) || {};
   const [notification, setNotification] = useState();
 
   useEffect(() => {
@@ -37,15 +37,15 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }: Props) => {
     );
   }, [notificationId]);
 
-  if (!isPermitted(currentUser.permissions, `eventnotifications:view:${params.notificationId}`)) {
+  if (!isPermitted(currentUser.permissions, `eventnotifications:view:${notificationId}`)) {
     history.push(Routes.NOTFOUND);
   }
 
   if (!notification) {
     return (
-      <DocumentTitle title="Edit Notification">
+      <DocumentTitle title="Notification Details">
         <span>
-          <PageHeader title="Edit Notification">
+          <PageHeader title="Notification Details">
             <Spinner text="Loading Notification information..." />
           </PageHeader>
         </span>
@@ -54,9 +54,9 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }: Props) => {
   }
 
   return (
-    <DocumentTitle title={`Edit "${notification.title}" Notification`}>
+    <DocumentTitle title={`View "${notification.title}" Notification`}>
       <span>
-        <PageHeader title={`Edit "${notification.title}" Notification`}>
+        <PageHeader title={`View "${notification.title}" Notification`} subactions={notification && <EventNotificationActionLinks notificationId={notification.id} />}>
           <span>
             Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
             to you or to other systems you use for that purpose.
@@ -85,14 +85,15 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }: Props) => {
           </ButtonToolbar>
         </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            <EventNotificationFormContainer action="edit" notification={notification} />
-          </Col>
-        </Row>
+        <EventNotificationDetails notification={notification} />
+
       </span>
     </DocumentTitle>
   );
+};
+
+ShowEventDefinitionPage.propTypes = {
+  params: PropTypes.object.isRequired,
 };
 
 export default withParams(ShowEventDefinitionPage);

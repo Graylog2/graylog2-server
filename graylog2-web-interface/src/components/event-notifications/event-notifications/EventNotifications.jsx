@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/graylog/router';
 import { Col, DropdownButton, MenuItem, Row, Button } from 'components/graylog';
 import {
   EmptyEntity,
@@ -82,9 +82,11 @@ class EventNotifications extends React.Component {
         </Col>
       ) : null;
 
+      const title = <Link to={Routes.ALERTS.NOTIFICATIONS.show(notification.id)}>{notification.title}</Link>;
+
       return (
         <EntityListItem key={`event-definition-${notification.id}`}
-                        title={notification.title}
+                        title={title}
                         titleSuffix={plugin.displayName || notification.config.type}
                         description={notification.description || <em>No description given</em>}
                         actions={actions}

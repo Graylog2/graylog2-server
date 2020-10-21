@@ -12,6 +12,7 @@ import connect from 'stores/connect';
 import PermissionsMixin from 'util/PermissionsMixin';
 import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import withParams from 'routing/withParams';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
@@ -72,7 +73,7 @@ class EditEventDefinitionPage extends React.Component {
     return (
       <DocumentTitle title={`Edit "${notification.title}" Notification`}>
         <span>
-          <PageHeader title={`Edit "${notification.title}" Notification`}>
+          <PageHeader title={`Edit "${notification.title}" Notification`} subactions={<EventNotificationActionLinks notificationId={notification.id} />}>
             <span>
               Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
               to you or to other systems you use for that purpose.
