@@ -32,7 +32,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.security.GrantPermissionResolver;
+import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
@@ -76,7 +76,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
     private final EventBus serverEventBus;
     private final GRNRegistry grnRegistry;
-    private final GrantPermissionResolver grantPermissionResolver;
+    private final PermissionAndRoleResolver permissionAndRoleResolver;
 
     @Inject
     public UserServiceImpl(final MongoConnection mongoConnection,
@@ -87,7 +87,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                            final EventBus serverEventBus,
                            final GRNRegistry grnRegistry,
-                           final GrantPermissionResolver grantPermissionResolver
+                           final PermissionAndRoleResolver permissionAndRoleResolver
     ) {
         super(mongoConnection);
         this.configuration = configuration;
@@ -97,7 +97,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
         this.serverEventBus = serverEventBus;
         this.grnRegistry = grnRegistry;
-        this.grantPermissionResolver = grantPermissionResolver;
+        this.permissionAndRoleResolver = permissionAndRoleResolver;
 
         // ensure that the users' roles array is indexed
         collection(UserImpl.class).createIndex(UserImpl.ROLES);
@@ -334,7 +334,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         final GRN principal = grnRegistry.ofUser(user);
         final ImmutableSet.Builder<Permission> permSet = ImmutableSet.<Permission>builder()
                 .addAll(user.getPermissions().stream().map(WildcardPermission::new).collect(Collectors.toSet()))
-                .addAll(grantPermissionResolver.resolvePermissionsForPrincipal(principal))
+                .addAll(permissionAndRoleResolver.resolvePermissionsForPrincipal(principal))
                 .addAll(getUserPermissionsFromRoles(user).stream().map(WildcardPermission::new).collect(Collectors.toSet()));
 
         return permSet.build().asList();
@@ -359,7 +359,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         for (String roleId : user.getRoleIds()) {
             permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId));
         }
-        grantPermissionResolver.resolveRolesForPrincipal(grnRegistry.ofUser(user)).forEach(roleId ->
+        permissionAndRoleResolver.resolveRolesForPrincipal(grnRegistry.ofUser(user)).forEach(roleId ->
                 permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId))
         );
 

@@ -27,7 +27,7 @@ import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
-import org.graylog.security.GrantPermissionResolver;
+import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -83,7 +83,7 @@ public class UserServiceImplTest {
     @Mock
     private EventBus serverEventBus;
     @Mock
-    private GrantPermissionResolver grantPermissionResolver;
+    private PermissionAndRoleResolver permissionAndRoleResolver;
 
     @Before
     public void setUp() throws Exception {
@@ -92,7 +92,7 @@ public class UserServiceImplTest {
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
         this.userFactory = new UserImplFactory(configuration, permissions);
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
-                userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), grantPermissionResolver);
+                userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -265,7 +265,7 @@ public class UserServiceImplTest {
         final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
         final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService,
                 accessTokenService, userFactory, permissionResolver,
-                serverEventBus, grnRegistry, grantPermissionResolver);
+                serverEventBus, grnRegistry, permissionAndRoleResolver);
 
         final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions);
         final UserImpl user = factory.create(new HashMap<>());
@@ -278,13 +278,13 @@ public class UserServiceImplTest {
         when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
         final GRNPermission ownerShipPermission = GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"));
         final GRN userGRN = grnRegistry.ofUser(user);
-        when(grantPermissionResolver.resolvePermissionsForPrincipal(userGRN))
+        when(permissionAndRoleResolver.resolvePermissionsForPrincipal(userGRN))
                 .thenReturn(ImmutableSet.of(
                         new WildcardPermission("perm:from:grant"),
                         ownerShipPermission));
 
         final String roleId = "12345";
-        when(grantPermissionResolver.resolveRolesForPrincipal(userGRN)).thenReturn(ImmutableSet.of(roleId));
+        when(permissionAndRoleResolver.resolveRolesForPrincipal(userGRN)).thenReturn(ImmutableSet.of(roleId));
         when(permissionResolver.resolveStringPermission(roleId)).thenReturn(ImmutableSet.of("perm:from:role"));
 
         assertThat(userService.getPermissionsForUser(user).stream().map(p -> p instanceof WildcardPermission ? p.toString() : p).collect(Collectors.toSet()))
