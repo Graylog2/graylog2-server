@@ -585,7 +585,7 @@
       "event_outcome": {
         "type": "keyword"
       },
-      "event_recieved_time": {
+      "event_received_time": {
         "type": "date",
         "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
       },
