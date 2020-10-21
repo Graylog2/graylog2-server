@@ -14,8 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of Graylog.
+ * <p>
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -294,8 +311,9 @@ public abstract class GIMMapping extends IndexMapping {
 
     @Override
     protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
-        return Collections.singletonList(
-                Collections.singletonMap(
+        return ImmutableList.<Map<String, Map<String, Object>>>builder()
+                .addAll(super.dynamicTemplate())
+                .add(Collections.singletonMap(
                         "winlogbeat_fields",
                         ImmutableMap.of(
                                 "match", "winlogbeat_*",
@@ -304,8 +322,8 @@ public abstract class GIMMapping extends IndexMapping {
                                         "type", "keyword"
                                 )
                         )
-                )
-        );
+                ))
+                .build();
     }
 
     private Map<String, Object> notAnalyzedString(Map<String, Object> settings) {
@@ -391,7 +409,7 @@ public abstract class GIMMapping extends IndexMapping {
     @Override
     protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
-                .put("message", analyzedString(analyzer, false))
+                .putAll(super.fieldProperties(analyzer))
                 .putAll(toMapping(KEYWORD_FIELDS, this::notAnalyzedString))
                 .putAll(toMapping(LOWERCASE_KEYWORD_FIELDS, this::notAnalyzedStringWithLowercaseNormalizer))
                 .putAll(toMapping(BYTE_FIELDS, this::byteField))
@@ -420,11 +438,5 @@ public abstract class GIMMapping extends IndexMapping {
     @Override
     public Map<String, Object> messageTemplate(String template, String analyzer, int order) {
         return createTemplate(template, order, settings(), mapping(analyzer));
-    }
-
-    @Override
-    Map<String, Object> dynamicStrings() {
-        // Not needed for GIM mapping
-        return Collections.emptyMap();
     }
 }
