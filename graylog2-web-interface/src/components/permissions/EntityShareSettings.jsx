@@ -125,7 +125,7 @@ const EntityShareSettings = ({
       {missingDependencies?.size > 0 && (
         <Section>
           <DependenciesWarning missingDependencies={missingDependencies}
-                               selectedGrantees={selectedGrantees} />
+                               availableGrantees={availableGrantees} />
         </Section>
       )}
       <Section>

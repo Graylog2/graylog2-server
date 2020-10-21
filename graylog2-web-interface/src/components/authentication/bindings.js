@@ -1,4 +1,5 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import ConfigParser from 'logic/authentication/directoryServices/BackendConfigParser';
 
 import BackendCreateLDAP from './directoryServices/ldap/BackendCreate';

@@ -28,21 +28,26 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const groupSyncFormHelp = enterpriseGroupSyncPlugin?.help?.activeDirectory ?? {};
-  const help = { ...HELP, ...groupSyncFormHelp };
+  const {
+    help: groupSyncHelp = {},
+    excludedFields: groupSyncExcludedFields = {},
+    initialValues: initialGroupSyncValues = {},
+  } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
+  const help = { ...HELP, ...groupSyncHelp };
+  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
   let initialValues = prepareInitialValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
     const {
-      initialValues: initialGroupSyncValues,
+      formValues: groupFormValues,
       finishedLoading,
-    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id);
+    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id, initialGroupSyncValues);
 
     if (!finishedLoading) {
       return <Spinner />;
     }
 
-    initialValues = { ...initialValues, ...initialGroupSyncValues };
+    initialValues = { ...initialValues, ...groupFormValues };
   }
 
   const authBackendMeta = {
@@ -51,13 +56,14 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
     backendGroupSyncIsActive: !!initialValues.synchronizeGroups,
   };
-  const _handleSubmit = (payload, formValues) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, authBackendMeta.serviceType);
+  const _handleSubmit = (payload, formValues, serviceType, licenseIsValid) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, serviceType, licenseIsValid);
 
   return (
     <DocumentTitle title="Edit Active Directory Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {..._optionalWizardProps(initialStepKey)}
                      authBackendMeta={authBackendMeta}
+                     excludedFields={excludedFields}
                      help={help}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit} />

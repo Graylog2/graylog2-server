@@ -16,6 +16,12 @@ describe('EntityShareState', () => {
   it('should import from json', () => {
     const entityShareState = EntityShareState.fromJSON(readFixture('EntityShareState.fixtures.json'));
 
+    expect(entityShareState.availableGrantees.size).not.toBe(undefined);
+    expect(entityShareState.availableCapabilities.size).not.toBe(undefined);
+    expect(entityShareState.activeShares.size).not.toBe(undefined);
+    expect(entityShareState.selectedGranteeCapabilities.size).not.toBe(undefined);
+    expect(entityShareState.missingDependencies.size).not.toBe(undefined);
+
     expect(entityShareState).toMatchSnapshot();
   });
 
