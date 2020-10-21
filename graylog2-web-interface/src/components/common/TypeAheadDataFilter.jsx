@@ -55,7 +55,8 @@ class TypeAheadDataFilter extends React.Component {
     label: PropTypes.string,
     /**
      * Function that will be called when the user changes the filter.
-     * The function receives an array of data that matches the filter.
+     * The function receives an array of data that matches the filter
+     * and filter input value.
      */
     onDataFiltered: PropTypes.func,
     /**
@@ -175,6 +176,7 @@ class TypeAheadDataFilter extends React.Component {
 
   filterData = () => {
     const { filterData, data, onDataFiltered } = this.props;
+    const { filterText } = this.state;
 
     if (typeof filterData === 'function') {
       return filterData(data);
@@ -184,7 +186,7 @@ class TypeAheadDataFilter extends React.Component {
       return this._matchFilters(datum) && this._matchStringSearch(datum);
     }, this);
 
-    onDataFiltered(filteredData);
+    onDataFiltered(filteredData, filterText);
 
     return true;
   };
