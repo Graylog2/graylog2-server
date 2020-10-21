@@ -27,6 +27,7 @@ const Routes = {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',
       edit: (notificationId) => `/alerts/notifications/${notificationId}/edit`,
+      show: (notificationId) => `/alerts/notifications/${notificationId}`,
     },
   },
   SOURCES: '/sources',
