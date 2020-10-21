@@ -56,9 +56,9 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
 
   if (!eventDefinition || !notifications) {
     return (
-      <DocumentTitle title="Edit Event Definition">
+      <DocumentTitle title="View Event Definition">
         <span>
-          <PageHeader title="Edit Event Definition">
+          <PageHeader title="View Event Definition">
             <Spinner text="Loading Event Definition..." />
           </PageHeader>
         </span>
@@ -67,9 +67,9 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
   }
 
   return (
-    <DocumentTitle title={`Edit "${eventDefinition.title}" Event Definition`}>
+    <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
       <span>
-        <PageHeader title={`Edit "${eventDefinition.title}" Event Definition`}>
+        <PageHeader title={`View "${eventDefinition.title}" Event Definition`}>
           <span>
             Event Definitions allow you to create Events from different Conditions and alert on them.
           </span>
