@@ -167,7 +167,7 @@ const SearchesConfig = createReactClass({
   render() {
     const { config } = this.state;
     const duration = moment.duration(config.query_time_range_limit);
-    const limit = this._isEnabled() ? `${config.query_time_range_limit} (${duration.format()})` : 'disabled';
+    const limit = this._isEnabled() ? `${config.query_time_range_limit} (${duration.humanize()})` : 'disabled';
 
     let filterFields;
     let filterFieldsString;
@@ -198,19 +198,17 @@ const SearchesConfig = createReactClass({
         </dl>
 
         <Row>
-          <Col md={6}>
-            <strong>Relative time range options</strong>
-            <TimeRangeOptionsSummary options={this.state.config.relative_timerange_options} />
-          </Col>
-          <Col md={6}>
+          <Col md={4}>
             <strong>Surrounding time range options</strong>
             <TimeRangeOptionsSummary options={this.state.config.surrounding_timerange_options} />
-
+          </Col>
+          <Col md={4}>
             <strong>Surrounding search filter fields</strong>
             <ul>
               {filterFields}
             </ul>
-
+          </Col>
+          <Col md={4}>
             <strong>UI analysis disabled for fields</strong>
             <ul>
               {analysisDisabledFields}
@@ -227,6 +225,7 @@ const SearchesConfig = createReactClass({
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
+            <label>Relative Timerange Options</label>
             <Input id="query-limit-checkbox"
                    type="checkbox"
                    label="Enable query limit"
@@ -243,12 +242,6 @@ const SearchesConfig = createReactClass({
                               validator={this.queryTimeRangeLimitValidator}
                               required />
             )}
-
-            <TimeRangeOptionsForm options={this.state.relativeTimeRangeOptionsUpdate || this._buildTimeRangeOptions(this.state.config.relative_timerange_options)}
-                                  update={this._onRelativeTimeRangeOptionsUpdate}
-                                  validator={this.relativeTimeRangeValidator}
-                                  title="Relative Timerange Options"
-                                  help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
 
             <TimeRangeOptionsForm options={this.state.surroundingTimeRangeOptionsUpdate || this._buildTimeRangeOptions(this.state.config.surrounding_timerange_options)}
                                   update={this._onSurroundingTimeRangeOptionsUpdate}
