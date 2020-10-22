@@ -129,8 +129,6 @@ const Search = ({ location }: Props) => {
   useEffect(() => {
     SearchConfigActions.refresh();
 
-    FieldTypesActions.all();
-
     StreamsActions.refresh();
 
     let storeListenersUnsubscribes = Immutable.List();

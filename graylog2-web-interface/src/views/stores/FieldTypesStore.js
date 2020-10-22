@@ -49,14 +49,16 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
     },
 
     onQueryFiltersUpdate(newFilters) {
-      const promises = newFilters
-        .filter((filter) => filter !== undefined && filter !== null)
-        .map((filter) => filter.get('filters', Immutable.List()).filter((f) => f.get('type') === 'stream').map((f) => f.get('id')))
-        .filter((streamFilters) => streamFilters.size > 0)
-        .map((filters, queryId) => this.forStreams(filters.toArray()).then((response) => ({
-          queryId,
-          response,
-        })))
+      const streamIds = newFilters
+        .map((filter) => filter.get('filters', Immutable.List()).filter((f) => f.get('type') === 'stream').map((f) => f.get('id')));
+      const promises = streamIds
+        .map((filters, queryId) => (filters.size > 0
+          ? this.forStreams(filters.toArray())
+          : Promise.resolve(this._all))
+          .then((response) => ({
+            queryId,
+            response,
+          })))
         .valueSeq()
         .toJS();
 
