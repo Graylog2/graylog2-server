@@ -198,22 +198,27 @@ const SearchesConfig = createReactClass({
         </dl>
 
         <Row>
-          <Col md={4}>
+          <Col md={5}>
             <strong>Surrounding time range options</strong>
             <TimeRangeOptionsSummary options={this.state.config.surrounding_timerange_options} />
           </Col>
-          <Col md={4}>
-            <strong>Surrounding search filter fields</strong>
-            <ul>
-              {filterFields}
-            </ul>
+          <Col md={7}>
+            <Row>
+              <Col lg={6} md={12}>
+                <strong>Surrounding search filter fields</strong>
+                <ul>
+                  {filterFields}
+                </ul>
+              </Col>
+              <Col lg={6} md={12}>
+                <strong>UI analysis disabled for fields</strong>
+                <ul>
+                  {analysisDisabledFields}
+                </ul>
+              </Col>
+            </Row>
           </Col>
-          <Col md={4}>
-            <strong>UI analysis disabled for fields</strong>
-            <ul>
-              {analysisDisabledFields}
-            </ul>
-          </Col>
+
         </Row>
         <IfPermitted permissions="clusterconfigentry:edit">
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
