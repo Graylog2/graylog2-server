@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useField } from 'formik';
@@ -168,18 +168,18 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
     rangeAllTime: originalTimeRange.range === 0,
   }, initialRangeType);
 
+  const typeDurationSeconds = useMemo(() => moment.duration(state.rangeValue, state.rangeType).asSeconds(), [state.rangeValue, state.rangeType]);
+  const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
+
   const availableRangeTypes = buildRangeTypes(config);
 
   useEffect(() => {
-    const typeDuration = moment.duration(state.rangeValue, state.rangeType).asSeconds();
-    const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
-
-    if (typeDuration <= limitDuration) {
+    if (typeDurationSeconds <= limitDuration && limitDuration !== 0) {
       nextRangeHelpers.setValue({ ...nextRangeProps.value, ...state });
     } else {
       console.log('Nuh uh uh - you went over the limit!');
     }
-  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [limitDuration, state, typeDurationSeconds]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAllTime = (event) => dispatch({
     type: 'rangeAllTime',
@@ -191,12 +191,16 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
     <RelativeWrapper>
       <RangeWrapper>
         <RangeTitle>From:</RangeTitle>
-        <RangeCheck htmlFor="relative-all-time">
+        <RangeCheck htmlFor="relative-all-time"
+                    title={limitDuration !== 0
+                      ? `Admin has limited searching to ${moment.duration(-limitDuration, 'seconds').humanize(true)}`
+                      : 'Search All Messages'}>
           <input type="checkbox"
                  id="relative-all-time"
                  value="0"
                  checked={state.rangeAllTime}
-                 onChange={handleAllTime} />All Time
+                 onChange={handleAllTime}
+                 disabled={limitDuration !== 0} />All Time
         </RangeCheck>
         <InputWrap>
           <Input id="relative-timerange-from-value"
