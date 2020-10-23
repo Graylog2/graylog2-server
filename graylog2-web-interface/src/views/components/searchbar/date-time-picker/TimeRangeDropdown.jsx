@@ -34,6 +34,10 @@ const StyledPopover: StyledComponent<{}, void, typeof Popover> = styled(Popover)
   min-width: 745px;
 `;
 
+const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
+  margin-top: 1px;
+`;
+
 const timeRangeTypeTabs = (config, activeKey) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
@@ -90,25 +94,21 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
       <Row>
         <Col md={12}>
           <TimeRangeLivePreview timerange={nextRangeProps.value || originalTimerange.value} />
-        </Col>
-      </Row>
 
-      <Row>
-        <Col md={12}>
-          <Tabs id="dateTimeTypes"
-                defaultActiveKey={availableTimeRangeTypes[0].type}
-                activeKey={activeKey}
-                onSelect={onSelect}
-                animation={false}>
+          <StyledTabs id="dateTimeTypes"
+                      defaultActiveKey={availableTimeRangeTypes[0].type}
+                      activeKey={activeKey}
+                      onSelect={onSelect}
+                      animation={false}>
             {noOverride && (
-            <Tab title="No Override"
-                 key="time-range-type-selector-disabled"
-                 eventKey="disabled">
-              <p>No Override to Date.</p>
-            </Tab>
+              <Tab title="No Override"
+                   key="time-range-type-selector-disabled"
+                   eventKey="disabled">
+                <p>No Override to Date.</p>
+              </Tab>
             )}
             {timeRangeTypeTabs(config, activeKey)}
-          </Tabs>
+          </StyledTabs>
         </Col>
       </Row>
 
