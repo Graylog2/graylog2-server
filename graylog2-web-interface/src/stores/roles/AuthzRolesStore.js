@@ -85,7 +85,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    addMembers(roleId: string, usernames: Immutable.Set<string>): Promise<?Role> {
+    addMembers(roleId: string, usernames: Immutable.Set<string>): Promise<Role> {
       const { url } = ApiRoutes.AuthzRolesController.addMembers(roleId);
       const promise = fetch('PUT', qualifyUrl(url), usernames.toArray());
 
@@ -125,7 +125,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadRolesPaginated(page: number, perPage: number, query: string): Promise<?PaginatedListType> {
+    loadRolesPaginated(page: number, perPage: number, query: string): Promise<PaginatedListType> {
       const url = PaginationURL(ApiRoutes.AuthzRolesController.list().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))

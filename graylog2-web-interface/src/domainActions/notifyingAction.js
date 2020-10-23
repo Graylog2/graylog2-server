@@ -9,6 +9,22 @@ type Notification = {
   message?: string,
 };
 
+const _displaySuccessNotification = <T, Args: Array<T>>(successNotification: (...Args) => Notification, ...args: Args) => {
+  const { message, title } = successNotification(...args);
+  UserNotification.success(message, title || 'Success');
+};
+
+const _displayErrorNotification = <T, Args: Array<T>>(errorNotification: (error: string, ...Args) => Notification, error, ...args: Args) => {
+  let errorMessage = String(error);
+
+  if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
+    errorMessage = `${error.additional.body.message} - ${error.message}`;
+  }
+
+  const { message, title } = errorNotification(errorMessage, ...args);
+  UserNotification.error(message, title || 'Error');
+};
+
 type Props<Args, ActionResult> = {
   action: ListenableAction<(...Args) => ActionResult>,
   success?: (...Args) => Notification,
@@ -16,34 +32,23 @@ type Props<Args, ActionResult> = {
   notFoundRedirect?: boolean,
 };
 
-const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result | void>>({
+const notifyingAction = <T, Args: Array<T>, Result, ActionResult: Promise<Result>>({
   action,
   success: successNotification,
   error: errorNotification,
   notFoundRedirect,
 }: Props<Args, ActionResult>): (...Args) => ActionResult => {
   return (...args: Args): ActionResult => action(...args).then((result) => {
-    if (successNotification) {
-      const { message, title } = successNotification(...args);
-      UserNotification.success(message, title || 'Success');
-    }
+    if (successNotification) _displaySuccessNotification(successNotification, ...args);
 
     return result;
   }).catch((error) => {
-    let readableError = String(error);
-
     if (notFoundRedirect && error?.status === 404) {
       ErrorsActions.report(createNotFoundError(error));
-
-      return;
+      throw error;
     }
 
-    if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
-      readableError = `${error.additional.body.message} - ${error.message}`;
-    }
-
-    const { message, title } = errorNotification(readableError, ...args);
-    UserNotification.error(message, title || 'Error');
+    _displayErrorNotification(errorNotification, error, ...args);
 
     throw error;
   });

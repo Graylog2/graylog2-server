@@ -11,10 +11,7 @@ const useActiveBackend = <T>(listenableActions: Array<ListenableAction<T>> = [])
   const [finishedLoading, setFinishedLoading] = useState(false);
   const _loadActive = () => AuthenticationDomain.loadActive().then((response) => {
     setFinishedLoading(true);
-
-    if (response) {
-      setLoadActiveResponse(response);
-    }
+    setLoadActiveResponse(response);
   });
 
   useEffect(() => {

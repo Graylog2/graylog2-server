@@ -49,8 +49,7 @@ const SyncedUsersSection = ({ roles }: Props) => {
   const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthenticationDomain.loadUsersPaginated(newPage, newPerPage, newQuery)
-      .then((newPaginatedUsers) => newPaginatedUsers && setPaginatedUsers(newPaginatedUsers));
+    return AuthenticationDomain.loadUsersPaginated(newPage, newPerPage, newQuery).then(setPaginatedUsers);
   };
 
   const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);

@@ -56,8 +56,7 @@ const BackendsOverview = () => {
   const _isActive = (authBackend) => authBackend.id === context?.activeBackend?.id;
 
   const _loadBackends = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthenticationDomain.loadBackendsPaginated(newPage, newPerPage, newQuery)
-      .then((newPaginatedBackends) => newPaginatedBackends && setPaginatedBackends(newPaginatedBackends));
+    return AuthenticationDomain.loadBackendsPaginated(newPage, newPerPage, newQuery).then(setPaginatedBackends);
   };
 
   const _handleSearch = (newQuery) => _loadBackends(DEFAULT_PAGINATION.page, undefined, newQuery);
@@ -65,7 +64,7 @@ const BackendsOverview = () => {
 
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((newPaginatedRoles) => newPaginatedRoles && setPaginatedRoles(newPaginatedRoles));
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then(setPaginatedRoles);
     _loadBackends(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
     const unlistenDisableBackend = AuthenticationActions.disableUser.completed.listen(_refreshOverview);

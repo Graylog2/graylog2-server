@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import { type PaginatedListType } from 'stores/roles/AuthzRolesStore';
 import Role from 'logic/roles/Role';
 import { Button } from 'components/graylog';
 import { Select } from 'components/common';
@@ -78,7 +77,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
-      .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(Immutable.Set(paginatedRoles.list)));
+      .then((paginatedRoles) => setRoles(Immutable.Set(paginatedRoles.list)));
   }, [assignedRolesIds]);
 
   return (

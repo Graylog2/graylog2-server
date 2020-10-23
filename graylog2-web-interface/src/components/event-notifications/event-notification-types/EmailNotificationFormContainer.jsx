@@ -36,7 +36,7 @@ class EmailNotificationFormContainer extends React.Component {
     const { currentUser } = this.props;
 
     if (isPermitted(currentUser.permissions, 'users:list')) {
-      UsersDomain.loadUsers().then((users) => users && this.setState({ users }));
+      UsersDomain.loadUsers().then((users) => this.setState({ users }));
     } else {
       this.setState({ users: Immutable.List() });
     }
