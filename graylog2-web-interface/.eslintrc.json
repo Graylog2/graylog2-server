@@ -16,6 +16,9 @@
   "env": {
     "browser": true,
     "jest": true
-  }
+  },
+  "ignorePatterns": [
+    "flow-typed/npm/*"
+  ]
 }
 
