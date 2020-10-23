@@ -26,11 +26,11 @@ const TimeRangeWrapper: StyledComponent<{}, ThemeInterface, HTMLParagraphElement
   background-color: ${theme.colors.variant.lightest.primary};
   align-items: center;
   border-radius: 4px;
-  
+
   > span {
     flex: 1;
   }
-  
+
   code {
     color: ${theme.colors.variant.dark.primary};
     background: transparent;
