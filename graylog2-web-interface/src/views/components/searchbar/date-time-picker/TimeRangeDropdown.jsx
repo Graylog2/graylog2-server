@@ -13,7 +13,6 @@ import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from './RelativeTimeRangeSelector';
 import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
-import TimeRangeLivePreview from './TimeRangeLivePreview';
 
 const timeRangeTypes = {
   absolute: AbsoluteTimeRangeSelector,
@@ -34,11 +33,7 @@ const StyledPopover: StyledComponent<{}, void, typeof Popover> = styled(Popover)
   min-width: 745px;
 `;
 
-const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
-  margin-top: 1px;
-`;
-
-const timeRangeTypeTabs = (config, activeKey, originalRangeValue) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+const timeRangeTypeTabs = (config, activeKey) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
@@ -47,8 +42,7 @@ const timeRangeTypeTabs = (config, activeKey, originalRangeValue) => availableTi
          eventKey={type}>
       {type === activeKey && (
         <RangeComponent config={config}
-                        disabled={false}
-                        originalTimeRange={originalRangeValue} />
+                        disabled={false} />
       )}
     </Tab>
   );
@@ -94,22 +88,20 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                    arrowOffsetLeft={34}>
       <Row>
         <Col md={12}>
-          <TimeRangeLivePreview timerange={nextRangeProps.value || originalTimerange.value} />
-
-          <StyledTabs id="dateTimeTypes"
-                      defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeKey}
-                      onSelect={onSelect}
-                      animation={false}>
+          <Tabs id="dateTimeTypes"
+                defaultActiveKey={availableTimeRangeTypes[0].type}
+                activeKey={activeKey}
+                onSelect={onSelect}
+                animation={false}>
             {noOverride && (
-              <Tab title="No Override"
-                   key="time-range-type-selector-disabled"
-                   eventKey="disabled">
-                <p>No Override to Date.</p>
-              </Tab>
+            <Tab title="No Override"
+                 key="time-range-type-selector-disabled"
+                 eventKey="disabled">
+              <p>No Override to Date.</p>
+            </Tab>
             )}
-            {timeRangeTypeTabs(config, activeKey, originalRangeValue)}
-          </StyledTabs>
+            {timeRangeTypeTabs(config, activeKey)}
+          </Tabs>
         </Col>
       </Row>
 
