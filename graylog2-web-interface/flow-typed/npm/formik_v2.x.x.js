@@ -214,9 +214,15 @@ declare module 'formik/@Field' {
     ...
   };
 
+  declare export type FieldHelperProps<Value> = $ReadOnly<{|
+    setValue: (any, ?boolean) => void,
+    setTouched:(any, ?boolean) => void,
+    setError: (any) => void,
+  |}>;
+
   declare export function useField<Value>(
     propsOrFieldName: string | UseFieldConfig<Value>
-  ): [FieldInputProps<Value>, FieldMetaProps<Value>];
+  ): [FieldInputProps<Value>, FieldMetaProps<Value>, FieldHelperProps<Value>];
 
   declare export var Field: { <Props, Value>(props: FieldAttributes<Props, Value>): React$Node, ... };
 
@@ -436,15 +442,15 @@ declare module 'formik/@connect' {
 }
 
 declare module 'formik' {
-  declare export * from 'formik/@connect'
-  declare export * from 'formik/@ErrorMessage'
-  declare export * from 'formik/@Field'
-  declare export * from 'formik/@FieldArray'
-  declare export * from 'formik/@flow-typed'
-  declare export * from 'formik/@flow-typed'
-  declare export * from 'formik/@Form'
-  declare export * from 'formik/@Formik'
-  declare export * from 'formik/@FormikContext'
-  declare export * from 'formik/@utils'
-  declare export * from 'formik/@withFormik'
+    declare export * from 'formik/@connect'
+    declare export * from 'formik/@ErrorMessage'
+    declare export * from 'formik/@Field'
+    declare export * from 'formik/@FieldArray'
+    declare export * from 'formik/@flow-typed'
+    declare export * from 'formik/@flow-typed'
+    declare export * from 'formik/@Form'
+    declare export * from 'formik/@Formik'
+    declare export * from 'formik/@FormikContext'
+    declare export * from 'formik/@utils'
+    declare export * from 'formik/@withFormik'
 }
