@@ -20,7 +20,7 @@ import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import SearchBarForm from './SearchBarForm';
-import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
+import AbsoluteTimeRangeSelector from './date-time-picker/AbsoluteTimeRangeSelector';
 
 const changeInput = async (input, value) => {
   const { name } = asElement(input, HTMLInputElement);

@@ -33,16 +33,22 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
 
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<any>,
   config: any,
   globalOverride: ?GlobalOverride,
 };
+
+const FlexCol = styled(Col)`
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+`;
 
 const BlurredWrapper = styled.div`
   filter: blur(4px);
@@ -83,7 +89,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {} }: 
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
-  const { dirty, isValid, isSubmitting, handleSubmit } = useFormikContext();
+  const { dirty, isValid, isSubmitting, handleSubmit, values } = useFormikContext();
 
   return (
     <>
@@ -91,10 +97,11 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {} }: 
       <Wrapper>
         <>
           <TopRow>
-            <Col md={4}>
-              <TimeRangeTypeSelector disabled={isGloballyOverridden} />
-              <TimeRangeInput disabled={isGloballyOverridden} config={config} />
-            </Col>
+            <FlexCol md={4}>
+              <TimeRangeTypeSelector disabled={isGloballyOverridden}
+                                     config={config} />
+              <TimeRangeDisplay timerange={globalOverride?.timerange || values?.timerange} />
+            </FlexCol>
 
             <Col md={8}>
               <Field name="streams">

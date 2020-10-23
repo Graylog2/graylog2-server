@@ -16,7 +16,6 @@
  */
 // @flow strict
 import * as React from 'react';
-import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Field } from 'formik';
@@ -66,16 +65,16 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
   }
 
   return (
-    <Field name="timerange.range">
+    <Field name="tempTimeRange.range">
       {({ field: { name, value, onChange } }) => {
-        const _onChange = useCallback((e) => {
+        const _onChange = (e) => {
           const { target: { value: newValue } } = e;
 
           onChange({ target: { name, value: Number.parseInt(newValue, 10) } });
-        }, [onChange]);
+        };
 
         return (
-          <TimerangeSelector className="relative" style={{ marginLeft: 50 }}>
+          <TimerangeSelector className="relative">
             <Input id="relative-timerange-selector"
                    disabled={disabled}
                    type="select"

@@ -16,13 +16,13 @@
  */
 // @flow strict
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
-import { trim } from 'lodash';
-import { connect, Field, useFormikContext } from 'formik';
+import trim from 'lodash/trim';
+import isEqual from 'lodash/isEqual';
+import { Field, useField } from 'formik';
 
 import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
@@ -31,16 +31,16 @@ import type { ThemeInterface } from 'theme';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
+const KeywordPreview: StyledComponent<{}, void, typeof Alert> = styled(Alert)`
   display: flex;
   align-items: center;
   min-height: 34px;
   padding-top: 5px;
   padding-bottom: 5px;
-  margin-top: 0 !important;  /* Would be overwritten by graylog.less */
+  margin-top: 0;
 `;
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => css`
+const KeywordInput: StyledComponent<{}, ThemeInterface, typeof FormControl> = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);
@@ -53,10 +53,11 @@ const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();
   const to = DateTime.fromUTCDateTime(data.to).toString();
 
-  return Immutable.Map({ from, to });
+  return { from, to };
 };
 
 type Props = {
+  defaultValue: string,
   disabled: boolean,
 };
 
@@ -75,46 +76,62 @@ const _validateKeyword = (
       .then(_setSuccessfullPreview, _setFailedPreview);
 };
 
-const KeywordTimeRangeSelector = ({ disabled }: Props) => {
-  const [keywordPreview, setKeywordPreview] = useState(Immutable.Map());
+const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
+  const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+  const keywordRef = useRef();
+  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
+
   const _setSuccessfullPreview = useCallback(
     (response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)),
-    [setKeywordPreview],
+    [],
   );
+
   const _setFailedPreview = useCallback(() => {
-    setKeywordPreview(Immutable.Map());
+    setKeywordPreview({ from: '', to: '' });
 
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
-
-  const formik = useFormikContext();
 
   const _validate = useCallback(
     (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
     [_setSuccessfullPreview, _setFailedPreview],
   );
 
-  useEffect(() => {
-    const { values: { timerange: { keyword } } } = formik;
-
-    ToolsStore.testNaturalDate(keyword)
-      .then(_setSuccessfullPreview, _setFailedPreview);
-
-    return () => formik.unregisterField('timerange.keyword');
-  }, []);
-
-  const { from, to } = keywordPreview.toObject();
-  const keywordPreviewElement = !keywordPreview.isEmpty() && (
+  const keywordPreviewElement = (keywordPreview.from && keywordPreview.to) && (
     <KeywordPreview bsStyle="info">
       <strong style={{ marginRight: 8 }}>Preview:</strong>
-      {from} to {to}
+      {keywordPreview.from} to {keywordPreview.to}
     </KeywordPreview>
   );
+
+  useEffect(() => {
+    if (keywordRef.current !== nextRangeProps?.value?.keyword) {
+      keywordRef.current = nextRangeProps.value.keyword;
+
+      ToolsStore.testNaturalDate(keywordRef.current)
+        .then(_setSuccessfullPreview, _setFailedPreview);
+    }
+  });
+
+  useEffect(() => {
+    if (nextRangeProps?.value) {
+      const { type, keyword, ...restPreview } = nextRangeProps?.value;
+
+      if (!isEqual(restPreview, keywordPreview)) {
+        nextRangeHelpers.setValue({
+          type,
+          keyword,
+          ...restPreview,
+          ...keywordPreview,
+        });
+      }
+    }
+  }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
 
   return (
     <Row className="no-bm" style={{ marginLeft: 50 }}>
       <Col xs={3} style={{ padding: 0 }}>
-        <Field name="timerange.keyword" validate={_validate}>
+        <Field name="tempTimeRange.keyword" validate={_validate}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
@@ -132,7 +149,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
                               placeholder="Last week"
                               onChange={onChange}
                               required
-                              value={value} />
+                              value={value || defaultValue} />
               </InputGroup>
             </FormGroup>
           )}
@@ -146,11 +163,13 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
 };
 
 KeywordTimeRangeSelector.propTypes = {
+  defaultValue: PropTypes.string,
   disabled: PropTypes.bool,
 };
 
 KeywordTimeRangeSelector.defaultProps = {
+  defaultValue: '',
   disabled: false,
 };
 
-export default connect(KeywordTimeRangeSelector);
+export default KeywordTimeRangeSelector;

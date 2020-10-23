@@ -103,7 +103,9 @@ export type AbsoluteTimeRange = {
 export type KeywordTimeRange = {
   type: 'keyword',
   keyword: string,
-};
+  from?: string,
+  to?: string,
+|};
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 

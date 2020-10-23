@@ -23,7 +23,7 @@ import { act } from 'react-dom/test-utils';
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 
 const renderWithForm = (element) => render((
-  <Formik initialValues={{ timerange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-16 12:04:30.329' } }}
+  <Formik initialValues={{ tempTimeRange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-16 12:04:30.329' } }}
           onSubmit={() => {}}>
     <Form>
       {element}

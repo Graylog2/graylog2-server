@@ -63,7 +63,7 @@ export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
 const migrationStrategies = {
   absolute: (oldTimerange: ?TimeRange) => ({
     type: 'absolute',
-    from: formatDatetime(new DateTime(moment().subtract((oldTimerange && oldTimerange.type === 'relative') ? oldTimerange.range : 300, 'seconds'))),
+    from: formatDatetime(new DateTime(moment().subtract((oldTimerange?.type === 'relative') ? oldTimerange.range : 300, 'seconds'))),
     to: formatDatetime(new DateTime(moment())),
   }),
   relative: () => ({ type: 'relative', range: 300 }),

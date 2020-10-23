@@ -27,8 +27,8 @@ import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
-const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => (
-  <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }}
+const KeywordTimeRangeSelector = ({ defaultValue, ...props }: { defaultValue: string }) => (
+  <Formik initialValues={{ tempTimeRange: { type: 'keyword', keyword: defaultValue } }}
           onSubmit={() => {}}
           validateOnMount>
     <Form>
@@ -74,13 +74,13 @@ describe('KeywordTimeRangeSelector', () => {
   };
 
   it('renders value passed to it', async () => {
-    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
+    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector defaultValue="Last hour" />);
 
     expect(getByDisplayValue('Last hour')).not.toBeNull();
   });
 
   it('calls onChange if value changes', async () => {
-    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
+    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector defaultValue="Last hour" />);
     const input = getByDisplayValue('Last hour');
 
     await changeInput(input, 'last year');
@@ -89,13 +89,13 @@ describe('KeywordTimeRangeSelector', () => {
   it('calls testNaturalDate', async () => {
     expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
 
-    await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
+    await asyncRender(<KeywordTimeRangeSelector defaultValue="Last hour" />);
 
     expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour');
   });
 
   it('sets validation state to error if initial value is empty', async () => {
-    const { container } = render(<KeywordTimeRangeSelector value="" />);
+    const { container } = render(<KeywordTimeRangeSelector defaultValue=" " />);
 
     await waitFor(() => expect(findValidationState(container)).toEqual('error'));
   });
@@ -103,7 +103,7 @@ describe('KeywordTimeRangeSelector', () => {
   it('sets validation state to error if parsing fails initially', async () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
 
-    const { container } = render(<KeywordTimeRangeSelector value="invalid" />);
+    const { container } = render(<KeywordTimeRangeSelector defaultValue="invalid" />);
 
     await waitFor(() => expect(findValidationState(container)).toEqual('error'));
   });
@@ -111,7 +111,7 @@ describe('KeywordTimeRangeSelector', () => {
   it('sets validation state to error if parsing fails after changing input', async () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
 
-    const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector value="last week" />);
+    const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector defaultValue="last week" />);
     const input = getByDisplayValue('last week');
 
     await changeInput(input, 'invalid');
@@ -120,7 +120,7 @@ describe('KeywordTimeRangeSelector', () => {
   });
 
   it('resets validation state if parsing succeeds after changing input', async () => {
-    const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector value="last week" />);
+    const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector defaultValue="last week" />);
     const input = getByDisplayValue('last week');
 
     await changeInput(input, 'last hour');
@@ -129,20 +129,20 @@ describe('KeywordTimeRangeSelector', () => {
   });
 
   it('shows keyword preview if parsing succeeded', async () => {
-    const { queryByText } = render(<KeywordTimeRangeSelector value="last five minutes" />);
+    const { queryByText } = render(<KeywordTimeRangeSelector defaultValue="last five minutes" />);
 
     await waitFor(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
   it('does not show keyword preview if parsing fails', async () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
-    const { queryByText } = await asyncRender(<KeywordTimeRangeSelector value="invalid" />);
+    const { queryByText } = await asyncRender(<KeywordTimeRangeSelector defaultValue="invalid" />);
 
     expect(queryByText('Preview:')).toBeNull();
   });
 
   it('shows keyword preview if parsing succeeded after changing input', async () => {
-    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="" />);
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector defaultValue="" />);
     const input = getByDisplayValue('');
 
     await changeInput(input, 'last hour');
@@ -151,7 +151,7 @@ describe('KeywordTimeRangeSelector', () => {
   });
 
   it('does not show keyword preview if parsing fails after changing input', async () => {
-    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="last week" />);
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector defaultValue="last week" />);
 
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
     const input = getByDisplayValue('last week');
@@ -162,7 +162,7 @@ describe('KeywordTimeRangeSelector', () => {
   });
 
   it('shows error message if parsing fails after changing input', async () => {
-    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="last week" />);
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector defaultValue="last week" />);
 
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
     const input = getByDisplayValue('last week');
