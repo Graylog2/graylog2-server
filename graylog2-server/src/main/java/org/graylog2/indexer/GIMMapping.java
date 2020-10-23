@@ -401,7 +401,8 @@ public abstract class GIMMapping extends IndexMapping {
                                         "char_filter", Collections.emptyList(),
                                         "filter", Collections.singleton("lowercase")
                                 )
-                        )
+                        ),
+                        "analyzer", analyzerKeyword()
                 )
         );
     }

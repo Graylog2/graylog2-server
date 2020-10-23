@@ -22,6 +22,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +38,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
     }
 
-    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
-        final Map<String, Object> analyzerKeyword = ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
+    protected Map<String, Object> analyzerKeyword() {
+        return ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
                 "tokenizer", "keyword",
                 "filter", "lowercase"));
-        final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
-        final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
+    }
+
+    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
+        final Map<String, Object> settings = Collections.singletonMap(
+                "analysis", Collections.singletonMap("analyzer", analyzerKeyword())
+                );
         final Map<String, Object> mappings = mapping(analyzer);
 
         return createTemplate(template, order, settings, mappings);
