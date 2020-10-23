@@ -38,7 +38,7 @@ public class IndexMappingFactory {
         switch (templateType) {
             case MESSAGES: return indexMappingFor(elasticsearchVersion);
             case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
-            case GENERIC: return gimMappingFor(elasticsearchVersion);
+            case GIM_V1: return gimMappingFor(elasticsearchVersion);
             default: throw new IllegalStateException("Invalid index template type: " + templateType);
         }
     }
