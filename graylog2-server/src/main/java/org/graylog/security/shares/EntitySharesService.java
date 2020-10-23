@@ -106,7 +106,7 @@ public class EntitySharesService {
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
                 .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, activeShares, request))
-                .validationResult(validateRequest(ownedEntity, request, sharingUserGRN))
+                .validationResult(validateRequest(ownedEntity, request, sharingUser, availableGranteeGRNs))
                 .build();
     }
 
@@ -147,7 +147,7 @@ public class EntitySharesService {
                 .entity(ownedEntity);
 
         // Abort if validation fails, but try to return a complete EntityShareResponse
-        final ValidationResult validationResult = validateRequest(ownedEntity, request, sharingUserGRN);
+        final ValidationResult validationResult = validateRequest(ownedEntity, request, sharingUser, availableGranteeGRNs);
         if (validationResult.failed()) {
             final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser, availableGranteeGRNs);
             return responseBuilder
@@ -206,11 +206,11 @@ public class EntitySharesService {
         this.serverEventBus.post(updateEvent);
     }
 
-    private ValidationResult validateRequest(GRN ownedEntity, EntityShareRequest request, GRN sharingUserGRN) {
+    private ValidationResult validateRequest(GRN ownedEntity, EntityShareRequest request, User sharingUser, Set<GRN> availableGranteeGRNs) {
         final ValidationResult validationResult = new ValidationResult();
 
         final List<GrantDTO> allEntityGrants = grantService.getForTarget(ownedEntity);
-        final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, sharingUserGRN);
+        final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, grnRegistry.ofUser(sharingUser));
 
         // The initial request doesn't submit a grantee selection. Just return.
         if (!request.selectedGranteeCapabilities().isPresent()) {
@@ -231,11 +231,14 @@ public class EntitySharesService {
         // Iterate over all existing owner grants and find modifications
         ArrayList<GRN> removedOwners = new ArrayList<>();
         existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach((g) -> {
+            // owner got removed
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
-                // owner got removed
-                removedOwners.add(g.grantee());
+                // Ignore owners that were invisible to the requesting user
+                if (availableGranteeGRNs.contains(g.grantee())) {
+                    removedOwners.add(g.grantee());
+                }
+            // owner capability got changed
             } else if (!selectedGranteeCapabilities.get(g.grantee()).equals(Capability.OWN)) {
-                // owner capability got changed
                 removedOwners.add(g.grantee());
             }
         });

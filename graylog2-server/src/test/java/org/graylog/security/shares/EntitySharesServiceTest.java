@@ -27,6 +27,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
+import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDependencyPermissionChecker;
 import org.graylog.security.entities.EntityDependencyResolver;
 import org.graylog.testing.GRNExtension;
@@ -43,6 +44,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,6 +73,7 @@ public class EntitySharesServiceTest {
     private GranteeService granteeService;
 
     private GRNRegistry grnRegistry;
+    private DBGrantService dbGrantService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
@@ -76,7 +81,7 @@ public class EntitySharesServiceTest {
                GRNRegistry grnRegistry) {
         this.grnRegistry = grnRegistry;
 
-        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, this.grnRegistry, mock(ClusterEventBus.class));
+        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, this.grnRegistry, mock(ClusterEventBus.class));
 
         lenient().when(entityDependencyResolver.resolve(any())).thenReturn(ImmutableSet.of());
         lenient().when(entityDependencyPermissionChecker.check(any(), any(), any())).thenReturn(ImmutableMultimap.of());
@@ -97,32 +102,62 @@ public class EntitySharesServiceTest {
         final GRN entity = grnRegistry.newGRN(GRNTypes.STREAM, "54e3deadbeefdeadbeefaffe");
         final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of());
 
+        // This test can also see the "invisible user"
+        final Set<GRN> allGrantees = dbGrantService.getAll().stream().map(GrantDTO::grantee).collect(Collectors.toSet());
+        lenient().when(granteeService.getAvailableGrantees(any())).thenReturn(
+                allGrantees.stream().map(g -> EntityShareResponse.AvailableGrantee.create(g, "user", g.entity())).collect(Collectors.toSet())
+        );
+
         final User user = createMockUser("hans");
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isTrue();
             assertThat(validationResult.getErrors()).isNotEmpty();
-            assertThat(validationResult.getErrors().get(EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES))
-                    .contains("Removing the following owners <[grn::::user:jane]> will leave the entity ownerless.");
+            assertThat(validationResult.getErrors().get(EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES).toString())
+                    .contains("Removing the following owners")
+                    .contains("grn::::user:jane")
+                    .contains("grn::::user:invisible");
+        });
+    }
+
+    @DisplayName("The validation should ignore invisble owners")
+    @Test
+    void ignoreInvisibleOwners() {
+        final GRN entity = grnRegistry.newGRN(GRNTypes.STREAM, "54e3deadbeefdeadbeefaffe");
+        final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of());
+
+        final Set<GRN> allGrantees = dbGrantService.getAll().stream().map(GrantDTO::grantee).collect(Collectors.toSet());
+        lenient().when(granteeService.getAvailableGrantees(any())).thenReturn(
+                allGrantees.stream()
+                        .filter(g -> g.toString().equals("grn::::user:invisible"))
+                        .map(g -> EntityShareResponse.AvailableGrantee.create(g, "user", g.entity())).collect(Collectors.toSet())
+        );
+
+        final User user = createMockUser("hans");
+        final Subject subject = mock(Subject.class);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
+            assertThat(validationResult.failed()).isFalse();
         });
     }
 
     @DisplayName("Validates we cannot remove the last owner by changing the own capability")
     @Test
     void validateLastOwnerCannotBeRemovedByChangingCapability() {
-        final GRN entity = grnRegistry.newGRN(GRNTypes.STREAM, "54e3deadbeefdeadbeefaffe");
-        final GRN jane = grnRegistry.newGRN(GRNTypes.USER, "jane");
-        final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(jane, Capability.VIEW));
+        final GRN entity = grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, "54e3deadbeefdeadbeefaffe");
+        final GRN bob = grnRegistry.newGRN(GRNTypes.USER, "bob");
+        final EntityShareRequest shareRequest = EntityShareRequest.create(ImmutableMap.of(bob, Capability.VIEW));
 
-        final User user = createMockUser("hans");
+        final User user = createMockUser("requestingUser");
+        when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(EntityShareResponse.AvailableGrantee.create(bob, "user", "bob")));
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isTrue();
             assertThat(validationResult.getErrors()).isNotEmpty();
             assertThat(validationResult.getErrors().get(EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES))
-                    .contains("Removing the following owners <[grn::::user:jane]> will leave the entity ownerless.");
+                    .contains("Removing the following owners <[grn::::user:bob]> will leave the entity ownerless.");
         });
     }
 
@@ -180,8 +215,6 @@ public class EntitySharesServiceTest {
         final EntityShareRequest shareRequest = EntityShareRequest.create(null);
 
         final User user = createMockUser("hans");
-        //final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
-        //when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(EntityShareResponse.AvailableGrantee.create(janeGRN, "user", "jane")));
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
