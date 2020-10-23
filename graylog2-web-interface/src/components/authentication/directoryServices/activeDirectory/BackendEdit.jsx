@@ -56,7 +56,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
     backendGroupSyncIsActive: !!initialValues.synchronizeGroups,
   };
-  const _handleSubmit = (payload, formValues, serviceType, licenseIsValid) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, serviceType, licenseIsValid);
+  const _handleSubmit = (payload, formValues, serviceType, shouldUpdateGroupSync) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, serviceType, shouldUpdateGroupSync);
 
   return (
     <DocumentTitle title="Edit Active Directory Authentication Service">

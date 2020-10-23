@@ -16,7 +16,7 @@ type Props = {
     [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
   },
   excludedFields: { [inputName: string]: boolean },
-  handleSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
+  handleSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
   help: { [inputName: string]: ?React.Node },
   invalidStepKeys: Array<string>,
   prepareSubmitPayload: () => WizardSubmitPayload,

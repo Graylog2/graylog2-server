@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Formik } from 'formik';
 
+import { Row, Col, Button, ButtonToolbar } from 'components/graylog';
 import Role from 'logic/roles/Role';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
@@ -13,7 +14,7 @@ export const STEP_KEY: StepKeyType = 'group-synchronization';
 
 export type Props = {
   formRef: React.Ref<typeof Formik>,
-  onSubmitAll: (licenseIsValid?: boolean) => Promise<void>,
+  onSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
   help: { [inputName: string]: ?React.Node },
   excludedFields: { [inputName: string]: boolean },
   prepareSubmitPayload: () => WizardSubmitPayload,
@@ -27,7 +28,21 @@ const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllEr
   const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
 
   if (!GroupSyncForm) {
-    return <EnterprisePluginNotFound featureName="group synchronization" />;
+    return (
+      <>
+        <Row>
+          <Col xs={12}>
+            <EnterprisePluginNotFound featureName="group synchronization" />
+          </Col>
+        </Row>
+        <ButtonToolbar className="pull-right">
+          <Button bsStyle="primary"
+                  onClick={() => onSubmitAll(false)}>
+            Finish & Save Service
+          </Button>
+        </ButtonToolbar>
+      </>
+    );
   }
 
   return (
