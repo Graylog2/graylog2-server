@@ -24,14 +24,21 @@ import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
 import { Field, useField } from 'formik';
 
-import { Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
+import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 import type { ThemeInterface } from 'theme';
 
-import { EMPTY_RANGE } from '../TimeRangeDisplay';
-
 const ToolsStore = StoreProvider.getStore('Tools');
+
+const KeywordPreview: StyledComponent<{}, void, typeof Alert> = styled(Alert)`
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 0;
+`;
 
 const KeywordInput: StyledComponent<{}, ThemeInterface, typeof FormControl> = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
@@ -80,7 +87,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   );
 
   const _setFailedPreview = useCallback(() => {
-    setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE });
+    setKeywordPreview({ from: '', to: '' });
 
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
@@ -88,6 +95,13 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   const _validate = useCallback(
     (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
     [_setSuccessfullPreview, _setFailedPreview],
+  );
+
+  const keywordPreviewElement = (keywordPreview.from && keywordPreview.to) && (
+    <KeywordPreview bsStyle="info">
+      <strong style={{ marginRight: 8 }}>Preview:</strong>
+      {keywordPreview.from} to {keywordPreview.to}
+    </KeywordPreview>
   );
 
   useEffect(() => {
@@ -140,6 +154,9 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
             </FormGroup>
           )}
         </Field>
+      </Col>
+      <Col xs={8} style={{ paddingRight: 0 }}>
+        {keywordPreviewElement}
       </Col>
     </Row>
   );

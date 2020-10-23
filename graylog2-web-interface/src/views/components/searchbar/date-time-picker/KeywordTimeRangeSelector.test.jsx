@@ -128,11 +128,26 @@ describe('KeywordTimeRangeSelector', () => {
     await waitFor(() => expect(findValidationState(container)).toEqual(null));
   });
 
+  it('shows keyword preview if parsing succeeded', async () => {
+    const { queryByText } = render(<KeywordTimeRangeSelector defaultValue="last five minutes" />);
+
+    await waitFor(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
+  });
+
   it('does not show keyword preview if parsing fails', async () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
     const { queryByText } = await asyncRender(<KeywordTimeRangeSelector defaultValue="invalid" />);
 
     expect(queryByText('Preview:')).toBeNull();
+  });
+
+  it('shows keyword preview if parsing succeeded after changing input', async () => {
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector defaultValue="" />);
+    const input = getByDisplayValue('');
+
+    await changeInput(input, 'last hour');
+
+    await waitFor(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
   it('does not show keyword preview if parsing fails after changing input', async () => {
