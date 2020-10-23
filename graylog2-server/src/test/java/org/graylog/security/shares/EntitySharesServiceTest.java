@@ -48,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -169,6 +170,39 @@ public class EntitySharesServiceTest {
         assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
             assertThat(validationResult.failed()).isFalse();
             assertThat(validationResult.getErrors()).isEmpty();
+        });
+    }
+
+    @DisplayName("Only show shares for visible grantees")
+    @Test
+    void noSharesforInvisibleGrantees() {
+        final GRN entity = grnRegistry.newGRN(GRNTypes.STREAM, "54e3deadbeefdeadbeefaffe");
+        final EntityShareRequest shareRequest = EntityShareRequest.create(null);
+
+        final User user = createMockUser("hans");
+        //final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
+        //when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(EntityShareResponse.AvailableGrantee.create(janeGRN, "user", "jane")));
+        final Subject subject = mock(Subject.class);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
+            assertThat(activeShares).isEmpty();;
+        });
+
+    }
+    @DisplayName("Only show shares for visible grantees")
+    @Test
+    void showShareForVisibleGrantee() {
+        final GRN entity = grnRegistry.newGRN(GRNTypes.STREAM, "54e3deadbeefdeadbeefaffe");
+        final EntityShareRequest shareRequest = EntityShareRequest.create(null);
+
+        final User user = createMockUser("hans");
+        final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
+        when(granteeService.getAvailableGrantees(user)).thenReturn(ImmutableSet.of(EntityShareResponse.AvailableGrantee.create(janeGRN, "user", "jane")));
+        final Subject subject = mock(Subject.class);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
+            assertThat(activeShares).hasSize(1);
+            assertThat(activeShares.iterator().next().grantee()).isEqualTo(janeGRN);
         });
     }
 

@@ -94,12 +94,14 @@ public class EntitySharesService {
         requireNonNull(sharingUser, "sharingUser cannot be null");
         requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
-        final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
+        final Set<EntityShareResponse.AvailableGrantee> availableGrantees = granteeService.getAvailableGrantees(sharingUser);
+        final Set<GRN> availableGranteeGRNs = availableGrantees.stream().map(EntityShareResponse.AvailableGrantee::grn).collect(Collectors.toSet());
+        final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser, availableGranteeGRNs);
         return EntityShareResponse.builder()
                 .entity(ownedEntity.toString())
                 .sharingUser(sharingUserGRN)
-                .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
+                .availableGrantees(availableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
@@ -126,12 +128,16 @@ public class EntitySharesService {
 
         final String userName = sharingUser.getName();
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
+
+        final Set<EntityShareResponse.AvailableGrantee> availableGrantees = granteeService.getAvailableGrantees(sharingUser);
+        final Set<GRN> availableGranteeGRNs = availableGrantees.stream().map(EntityShareResponse.AvailableGrantee::grn).collect(Collectors.toSet());
         final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, sharingUserGRN);
+        existingGrants.removeIf(grant -> !availableGranteeGRNs.contains(grant.grantee()));
 
         final EntityShareResponse.Builder responseBuilder = EntityShareResponse.builder()
                 .entity(ownedEntity.toString())
                 .sharingUser(sharingUserGRN)
-                .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
+                .availableGrantees(availableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
                 .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, ImmutableSet.of(), request))
                 ;
@@ -143,7 +149,7 @@ public class EntitySharesService {
         // Abort if validation fails, but try to return a complete EntityShareResponse
         final ValidationResult validationResult = validateRequest(ownedEntity, request, sharingUserGRN);
         if (validationResult.failed()) {
-            final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
+            final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser, availableGranteeGRNs);
             return responseBuilder
                     .activeShares(activeShares)
                     .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
@@ -189,7 +195,7 @@ public class EntitySharesService {
 
         postUpdateEvent(updateEventBuilder.build());
 
-        final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
+        final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser, availableGranteeGRNs);
         return responseBuilder
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
@@ -261,10 +267,11 @@ public class EntitySharesService {
         return shareRequest.selectedGranteeCapabilities().get();
     }
 
-    private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser) {
+    private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser, Set<GRN> avialableGranteeGRNs) {
         final List<GrantDTO> activeGrants = grantService.getForTargetExcludingGrantee(ownedEntity, grnRegistry.ofUser(sharingUser));
 
         return activeGrants.stream()
+                .filter(grant -> avialableGranteeGRNs.contains(grant.grantee()))
                 .map(grant -> ActiveShare.create(grnRegistry.newGRN("grant", grant.id()).toString(), grant.grantee(), grant.capability()))
                 .collect(ImmutableSet.toImmutableSet());
     }
