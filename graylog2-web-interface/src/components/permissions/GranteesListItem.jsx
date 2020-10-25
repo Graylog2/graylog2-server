@@ -33,7 +33,7 @@ const Container: StyledComponent<{ currentState: CurrentGranteeState }, ThemeInt
   border-left: 5px solid ${currentStateColor(theme, currentState)};
 `);
 
-const GranteeeInfo = styled.div`
+const GranteeInfo = styled.div`
   display: flex;
   align-items: center;
   flex: 1;
@@ -88,10 +88,10 @@ const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee:
     <Formik initialValues={{ capabilityId }} onSubmit={() => {}}>
       <Form>
         <Container currentState={currentGranteeState}>
-          <GranteeeInfo>
+          <GranteeInfo>
             <StyledGranteeIcon type={type} />
             <Title>{title}</Title>
-          </GranteeeInfo>
+          </GranteeInfo>
           <StyledCapabilitySelect onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
                                   capabilities={availableCapabilities}
                                   title={`Change the capability for ${title}`} />

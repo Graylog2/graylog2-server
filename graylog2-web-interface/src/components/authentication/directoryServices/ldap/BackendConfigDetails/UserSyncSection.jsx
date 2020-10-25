@@ -34,7 +34,7 @@ const UserSyncSection = ({ authenticationBackend, roles }: Props) => {
   } = authenticationBackend;
 
   return (
-    <SectionComponent title="User Synchronisation" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={USER_SYNC_KEY} />}>
+    <SectionComponent title="User Synchronization" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={USER_SYNC_KEY} />}>
       <ReadOnlyFormGroup label="Search Base DN" value={userSearchBase} />
       <ReadOnlyFormGroup label="Search Pattern" value={userSearchPattern} />
       <ReadOnlyFormGroup label="Name Attribute" value={userNameAttribute} />

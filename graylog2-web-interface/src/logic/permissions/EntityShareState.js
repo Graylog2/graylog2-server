@@ -25,11 +25,11 @@ export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
-const _missingDependeciesFromJSON = (missingDependeciesJSON) => {
+const _missingDependenciesFromJSON = (missingDependenciesJSON) => {
   let missingDependencies = Immutable.Map();
 
-  Object.keys(missingDependeciesJSON).forEach((granteeGRN) => {
-    const dependencyList = missingDependeciesJSON[granteeGRN];
+  Object.keys(missingDependenciesJSON).forEach((granteeGRN) => {
+    const dependencyList = missingDependenciesJSON[granteeGRN];
     missingDependencies = missingDependencies.set(granteeGRN, dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)));
   });
 
@@ -199,7 +199,7 @@ export default class EntityShareState {
     const availableCapabilities = Immutable.fromJS(available_capabilities.map((ar) => Capability.fromJSON(ar)));
     const activeShares = Immutable.fromJS(active_shares.map((as) => ActiveShare.fromJSON(as)));
     const selectedGranteeCapabilities = Immutable.fromJS(selected_grantee_capabilities);
-    const missingDependencies = _missingDependeciesFromJSON(missing_permissions_on_dependencies);
+    const missingDependencies = _missingDependenciesFromJSON(missing_permissions_on_dependencies);
     const validationResults = ValidationResult.fromJSON(validation_result);
 
     /* eslint-enable camelcase */

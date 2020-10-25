@@ -30,22 +30,22 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
-  }, [entityGRN]);
+  }, [entityType, entityTitle, entityGRN]);
 
   const _handleSave = () => {
     setDisableSubmit(true);
     const granteesSelect = granteesSelectRef?.current;
-    const garnteesSelectValue = granteesSelect?.state?.value;
+    const granteesSelectValue = granteesSelect?.state?.value;
     const granteesSelectOptions = granteesSelect?.props?.options;
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: entityShareState.selectedGranteeCapabilities,
     };
 
-    if (garnteesSelectValue) {
-      const selectedOption = granteesSelectOptions?.find((option) => option.value === garnteesSelectValue);
+    if (granteesSelectValue) {
+      const selectedOption = granteesSelectOptions?.find((option) => option.value === granteesSelectValue);
 
       if (!selectedOption) {
-        throw Error(`Can't find ${garnteesSelectValue} in grantees select options on save`);
+        throw Error(`Can't find ${granteesSelectValue} in grantees select options on save`);
       }
 
       // eslint-disable-next-line no-alert

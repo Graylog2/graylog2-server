@@ -22,7 +22,7 @@ const GroupSyncSection = ({ authenticationBackend, roles }: Props) => {
   const GroupSyncDetails = enterpriseGroupSyncPlugin?.components.GroupSyncDetails;
 
   return (
-    <SectionComponent title="Group Synchronisation"
+    <SectionComponent title="Group Synchronization"
                       headerActions={(
                         <EditLinkButton authenticationBackendId={authenticationBackend.id}
                                         stepKey={GROUP_SYNC_KEY} />

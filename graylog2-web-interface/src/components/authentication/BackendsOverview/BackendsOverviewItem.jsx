@@ -49,7 +49,7 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
   const { title, id } = authenticationBackend;
   const _setActiveBackend = (backendId) => AuthenticationDomain.setActiveBackend(backendId, title);
 
-  const _deactiveBackend = () => {
+  const _deactivateBackend = () => {
     if (window.confirm(confirmMessage(title, 'deactivate'))) {
       _setActiveBackend(null);
     }
@@ -72,7 +72,7 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
       <StyledButtonToolbar>
         {isActive ? (
           <>
-            <Button onClick={_deactiveBackend} bsStyle="warning" bsSize="xs" type="button">
+            <Button onClick={_deactivateBackend} bsStyle="warning" bsSize="xs" type="button">
               Deactivate
             </Button>
             <EditButton authenticationBackend={authenticationBackend} />

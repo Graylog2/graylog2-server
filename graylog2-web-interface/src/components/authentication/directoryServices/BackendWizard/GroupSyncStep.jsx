@@ -8,8 +8,8 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { EnterprisePluginNotFound } from 'components/common';
 
-export type StepKeyType = 'group-synchronisation';
-export const STEP_KEY: StepKeyType = 'group-synchronisation';
+export type StepKeyType = 'group-synchronization';
+export const STEP_KEY: StepKeyType = 'group-synchronization';
 
 export type Props = {
   formRef: React.Ref<typeof Formik>,

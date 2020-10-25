@@ -16,7 +16,7 @@ type Props = {
   roleName: $PropertyType<Role, 'name'>,
 };
 
-const ActtionsWrapper = styled.div`
+const ActionsWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
@@ -47,7 +47,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
 
   return (
     <td>
-      <ActtionsWrapper>
+      <ActionsWrapper>
         <IfPermitted permissions={[`roles:edit:${roleName}`]}>
           <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(encodeURIComponent(roleId))}>
             <Button id={`edit-role-${roleId}`} bsStyle="info" bsSize="xs" title={`Edit role ${roleName}`} type="button">
@@ -63,7 +63,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
             </Button>
           </IfPermitted>
         )}
-      </ActtionsWrapper>
+      </ActionsWrapper>
     </td>
   );
 };

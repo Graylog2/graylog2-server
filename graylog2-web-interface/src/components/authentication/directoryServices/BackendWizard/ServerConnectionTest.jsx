@@ -11,17 +11,17 @@ import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
 import BackendWizardContext from './BackendWizardContext';
 
 const _addRequiredRequestPayload = (formValues) => {
-  const neccessaryAttributes = { ...formValues };
+  const necessaryAttributes = { ...formValues };
 
-  if (!neccessaryAttributes.config.user_search_base) {
-    neccessaryAttributes.config.user_search_base = '';
+  if (!necessaryAttributes.config.user_search_base) {
+    necessaryAttributes.config.user_search_base = '';
   }
 
-  if (!neccessaryAttributes.config.user_search_pattern) {
-    neccessaryAttributes.config.user_search_pattern = '';
+  if (!necessaryAttributes.config.user_search_pattern) {
+    necessaryAttributes.config.user_search_pattern = '';
   }
 
-  return neccessaryAttributes;
+  return necessaryAttributes;
 };
 
 type Props = {

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
-import { render, waitFor, fireEvent, act, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { paginatedUsers } from 'fixtures/userOverviews';
 import { viewsManager } from 'fixtures/users';
 

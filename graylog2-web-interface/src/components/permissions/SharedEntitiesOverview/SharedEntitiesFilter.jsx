@@ -44,7 +44,7 @@ const StyledSelect = styled(Select)`
   margin-left: 10px;
 `;
 
-const entityTypeOptions = Object.entries(mockedPermissions.availabeEntityTypes).map(([key, value]) => ({ label: value, value: key }));
+const entityTypeOptions = Object.entries(mockedPermissions.availableEntityTypes).map(([key, value]) => ({ label: value, value: key }));
 const capabilityOptions = Object.entries(mockedPermissions.availableCapabilities).map(([key, value]) => ({ label: value, value: key }));
 
 const SharedEntitiesFilter = ({ onSearch, onFilter }: Props) => (

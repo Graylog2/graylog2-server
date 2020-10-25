@@ -37,7 +37,7 @@ const _cap = StringUtils.capitalizeFirstLetter;
 const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) => {
   return (
     <Container bsStyle="danger">
-      <Headline>There are missing dependecies for the current set of collaborators</Headline>
+      <Headline>There are missing dependencies for the current set of collaborators</Headline>
 
       <List>
         {missingDependencies.entrySeq().map(([granteeGRN, dependencyList]) => {
@@ -46,14 +46,14 @@ const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) 
           return (grantee && (
             <li key={grantee.id}>
               {_cap(grantee.type)} <i>{grantee.title}</i> needs access to
-              {dependencyList.map((dependecy) => (
-                <List key={dependecy.id}>
+              {dependencyList.map((dependency) => (
+                <List key={dependency.id}>
                   <li>
-                    {_cap(dependecy.type)}: <i>{dependecy.title}</i><br />
-                    Owners: {dependecy.owners.map((owner, key) => (
+                    {_cap(dependency.type)}: <i>{dependency.title}</i><br />
+                    Owners: {dependency.owners.map((owner, key) => (
                       <span key={owner.id}>
                         {_cap(owner.type)} <i>{owner.title}</i>
-                        {key !== dependecy.owners.size - 1 && ', '}
+                        {key !== dependency.owners.size - 1 && ', '}
                       </span>
                     ))}
                   </li>

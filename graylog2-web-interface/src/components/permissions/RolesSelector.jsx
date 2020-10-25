@@ -56,7 +56,7 @@ const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, set
   })));
 
   if (selectedRoles.size <= 0) {
-    throw Error(`Role assigment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
+    throw Error(`Role assignment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
   }
 
   setIsSubmitting(true);
