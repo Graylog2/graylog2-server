@@ -34,10 +34,12 @@ export type PaginatedListJSON = {
   count: number,
 };
 
-export type PaginatedList<ItemType> = {
-  list: Immutable.List<ItemType>,
-  pagination: Pagination & {
+export type ListPagination = Pagination & {
     total: number,
     count: number,
-  },
+};
+
+export type PaginatedList<ItemType> = {
+  list: Immutable.List<ItemType>,
+  pagination: ListPagination,
 };

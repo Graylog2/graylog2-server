@@ -14,9 +14,9 @@ const loadRolesPaginatedResponse = {
     page: 1,
     perPage: 10,
     query: '',
+    count: mockRoles.size,
+    total: mockRoles.size,
   },
-  count: mockRoles.size,
-  total: mockRoles.size,
 };
 
 const mockLoadRolesPaginatedPromise = Promise.resolve(loadRolesPaginatedResponse);

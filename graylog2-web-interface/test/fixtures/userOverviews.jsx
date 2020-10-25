@@ -59,8 +59,8 @@ export const paginatedUsers = {
     page: 1,
     perPage: 10,
     query: '',
+    count: userList.size,
+    total: userList.size,
   },
-  count: userList.size,
-  total: userList.size,
   adminUser: undefined,
 };

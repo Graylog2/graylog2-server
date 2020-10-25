@@ -12,8 +12,8 @@ const paginatedUsers = {
   pagination: {
     page: 1,
     perPage: 10,
+    total: 1,
   },
-  total: 1,
 };
 
 const mockLoadUsersPromise = Promise.resolve(paginatedUsers);

@@ -9,17 +9,16 @@ const pagination = {
   page: 1,
   perPage: 10,
   query: '',
+  total: userOverviewList.size,
+  count: 10,
 };
 
 const paginationJSON = {
   page: pagination.page,
   per_page: pagination.perPage,
   query: pagination.query,
-};
-
-const listSizeInfo = {
-  total: userOverviewList.size,
-  count: pagination.perPage,
+  total: pagination.total,
+  count: pagination.count,
 };
 
 describe('UsersStore', () => {
@@ -49,12 +48,11 @@ describe('UsersStore', () => {
           admin_user: admin.toJSON(),
         },
         users: jsonList,
-        ...listSizeInfo,
         ...paginationJSON,
       }));
 
       UsersActions.loadUsersPaginated(pagination).then((result) => {
-        expect(result).toStrictEqual({ list: userOverviewList, adminUser: admin, pagination, ...listSizeInfo });
+        expect(result).toStrictEqual({ list: userOverviewList, adminUser: admin, pagination });
 
         done();
       });
@@ -68,12 +66,11 @@ describe('UsersStore', () => {
           admin_user: null,
         },
         users: jsonList,
-        ...listSizeInfo,
         ...paginationJSON,
       }));
 
       UsersActions.loadUsersPaginated(pagination).then((result) => {
-        expect(result).toStrictEqual({ list: userOverviewList, adminUser: undefined, pagination, ...listSizeInfo });
+        expect(result).toStrictEqual({ list: userOverviewList, adminUser: undefined, pagination });
 
         done();
       });

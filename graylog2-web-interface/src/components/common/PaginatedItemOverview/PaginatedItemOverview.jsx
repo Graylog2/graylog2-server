@@ -7,7 +7,7 @@ import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
 import SearchForm from 'components/common/SearchForm';
 import Spinner from 'components/common/Spinner';
 import EmptyResult from 'components/common/EmptyResult';
-import type { Pagination } from 'stores/PaginationTypes';
+import type { ListPagination, Pagination } from 'stores/PaginationTypes';
 
 import PaginatedItem from './PaginatedItem';
 
@@ -19,9 +19,7 @@ export type DescriptiveItem = {
 
 export type PaginatedListType = {
   list: Immutable.List<DescriptiveItem>,
-  pagination: Pagination,
-  total: number,
-  count: number,
+  pagination: ListPagination,
 };
 
 type Props = {
@@ -65,7 +63,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
   return (
     <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
                    pageSize={pagination.perPage}
-                   totalItems={paginatedList.total}
+                   totalItems={paginatedList.pagination.total}
                    pageSizes={pageSizes}
                    activePage={pagination.page}>
       <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}

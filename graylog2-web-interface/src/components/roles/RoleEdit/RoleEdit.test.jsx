@@ -17,8 +17,8 @@ const paginatedUsersForRole = {
   pagination: {
     page: 1,
     perPage: 10,
+    total: 1,
   },
-  total: 1,
 };
 const mockLoadUsersForRolePromise = Promise.resolve(paginatedUsersForRole);
 

@@ -20,10 +20,10 @@ export const paginatedShares = ({ page, perPage, query, additionalQueries }: Pag
     .title('Security Data')
     .owners(Immutable.List([entityOwner]))
     .build();
-  const sharedEnitites = new Array(perPage).fill(sharedEntity);
+  const sharedEntities = new Array(perPage).fill(sharedEntity);
 
   return {
-    list: Immutable.List<SharedEntity>(sharedEnitites),
+    list: Immutable.List<SharedEntity>(sharedEntities),
     context: {
       granteeCapabilities: { 'grn::::stream:57bc9188e62a2373778d9e03': 'view' },
     },
@@ -32,8 +32,8 @@ export const paginatedShares = ({ page, perPage, query, additionalQueries }: Pag
       page: page || 1,
       perPage: perPage || 10,
       query: query || '',
+      count: Math.round(230 / perPage),
+      total: 230,
     },
-    count: Math.round(230 / perPage),
-    total: 230,
   };
 };
