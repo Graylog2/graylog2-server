@@ -25,6 +25,17 @@ export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
+const _missingDependeciesFromJSON = (missingDependeciesJSON) => {
+  let missingDependencies = Immutable.Map();
+
+  Object.keys(missingDependeciesJSON).forEach((granteeGRN) => {
+    const dependencyList = missingDependeciesJSON[granteeGRN];
+    missingDependencies = missingDependencies.set(granteeGRN, dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)));
+  });
+
+  return missingDependencies;
+};
+
 const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>): Immutable.List<T> => {
   const granteesByType = grantees
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
@@ -142,9 +153,9 @@ export default class EntityShareState {
     return new Builder(Immutable.Map({
       entity,
       availableGrantees,
-      availableCapabilities: availableCapabilities,
+      availableCapabilities,
       activeShares,
-      selectedGranteeCapabilities: selectedGranteeCapabilities,
+      selectedGranteeCapabilities,
       missingDependencies,
       validationResults,
     }));
@@ -153,21 +164,21 @@ export default class EntityShareState {
   toJSON() {
     const {
       entity,
-      availableGrantees,
-      availableCapabilities,
-      activeShares,
-      selectedGranteeCapabilities,
-      missingDependencies,
+      availableGrantees = Immutable.List(),
+      availableCapabilities = Immutable.List(),
+      activeShares = Immutable.List(),
+      selectedGranteeCapabilities = Immutable.Map(),
+      missingDependencies = Immutable.Map(),
       validationResults,
     } = this._value;
 
     return {
       entity,
-      available_grantees: availableGrantees,
-      available_capabilities: availableCapabilities,
-      active_shares: activeShares,
-      selected_grantee_capabilities: selectedGranteeCapabilities,
-      missing_permissions_on_dependencies: missingDependencies,
+      available_grantees: availableGrantees.toJS(),
+      available_capabilities: availableCapabilities.toJS(),
+      active_shares: activeShares.toJS(),
+      selected_grantee_capabilities: selectedGranteeCapabilities.toJS(),
+      missing_permissions_on_dependencies: missingDependencies.toJS(),
       validation_result: validationResults,
     };
   }
@@ -188,14 +199,7 @@ export default class EntityShareState {
     const availableCapabilities = Immutable.fromJS(available_capabilities.map((ar) => Capability.fromJSON(ar)));
     const activeShares = Immutable.fromJS(active_shares.map((as) => ActiveShare.fromJSON(as)));
     const selectedGranteeCapabilities = Immutable.fromJS(selected_grantee_capabilities);
-    const missingDependencies = Immutable.fromJS(
-      Object.entries(missing_permissions_on_dependencies).map(
-        ([granteeGRN, dependencyList]) => ({
-          // $FlowFixMe: Object entries returns mixed value
-          [granteeGRN]: dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)),
-        }),
-      ),
-    );
+    const missingDependencies = _missingDependeciesFromJSON(missing_permissions_on_dependencies);
     const validationResults = ValidationResult.fromJSON(validation_result);
 
     /* eslint-enable camelcase */

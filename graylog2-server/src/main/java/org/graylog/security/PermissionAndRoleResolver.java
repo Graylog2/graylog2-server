@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Resolves a principal to specific permissions based on grants.
  */
-public interface GrantPermissionResolver {
+public interface PermissionAndRoleResolver {
     /**
      * Returns resolved permissions for the given principal.
      *

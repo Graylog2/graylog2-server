@@ -12,6 +12,7 @@ const toJson = ({
   userNameAttribute,
   userSearchBase,
   userSearchPattern,
+  userUniqueIdAttribute,
   verifyCertificates,
 }: DirectoryServiceBackendConfig): DirectoryServiceBackendConfigJson => ({
   servers,
@@ -23,6 +24,7 @@ const toJson = ({
   user_name_attribute: userNameAttribute,
   user_search_base: userSearchBase,
   user_search_pattern: userSearchPattern,
+  user_unique_id_attribute: userUniqueIdAttribute,
   verify_certificates: verifyCertificates,
 });
 
@@ -36,6 +38,7 @@ const fromJson = ({
   user_name_attribute,
   user_search_base,
   user_search_pattern,
+  user_unique_id_attribute,
   verify_certificates,
 }: DirectoryServiceBackendConfigJson): DirectoryServiceBackendConfig => ({
   servers,
@@ -47,6 +50,7 @@ const fromJson = ({
   userNameAttribute: user_name_attribute,
   userSearchBase: user_search_base,
   userSearchPattern: user_search_pattern,
+  userUniqueIdAttribute: user_unique_id_attribute,
   verifyCertificates: verify_certificates,
 });
 

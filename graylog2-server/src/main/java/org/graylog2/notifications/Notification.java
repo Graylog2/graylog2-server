@@ -52,6 +52,7 @@ public interface Notification extends Persisted {
         ES_UNAVAILABLE,
         NO_INPUT_RUNNING,
         INPUT_FAILED_TO_START,
+        INPUT_FAILURE_SHUTDOWN,
         CHECK_SERVER_CLOCKS,
         OUTDATED_VERSION,
         EMAIL_TRANSPORT_CONFIGURATION_INVALID,

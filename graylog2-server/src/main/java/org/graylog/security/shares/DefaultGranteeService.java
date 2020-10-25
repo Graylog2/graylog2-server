@@ -18,20 +18,25 @@ package org.graylog.security.shares;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.security.GranteeAuthorizer;
 import org.graylog.security.shares.EntityShareResponse.AvailableGrantee;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
+import java.util.Set;
 
 public class DefaultGranteeService implements GranteeService {
-    private final UserService userService;
+    protected final UserService userService;
     protected final GRNRegistry grnRegistry;
+    protected final GranteeAuthorizer.Factory granteeAuthorizerFactory;
 
     @Inject
-    public DefaultGranteeService(UserService userService, GRNRegistry grnRegistry) {
+    public DefaultGranteeService(UserService userService, GRNRegistry grnRegistry, GranteeAuthorizer.Factory granteeAuthorizerFactory) {
         this.userService = userService;
         this.grnRegistry = grnRegistry;
+        this.granteeAuthorizerFactory = granteeAuthorizerFactory;
     }
 
     @Override
@@ -42,10 +47,21 @@ public class DefaultGranteeService implements GranteeService {
                 .build();
     }
 
+    @Override
+    public Set<User> getVisibleUsers(User requestingUser) {
+        final GranteeAuthorizer userAuthorizer = granteeAuthorizerFactory.create(requestingUser);
+
+        if (userAuthorizer.isPermitted(RestPermissions.USERS_LIST)) {
+            return userService.loadAll().stream().collect(ImmutableSet.toImmutableSet());
+        } else {
+            return userService.loadAll().stream()
+                    .filter(u -> userAuthorizer.isPermitted(RestPermissions.USERS_READ, u.getName()))
+                    .collect(ImmutableSet.toImmutableSet());
+        }
+    }
+
     private ImmutableSet<AvailableGrantee> getAvailableUserGrantees(User sharingUser) {
-        // TODO: We can only expose users that are in the same teams as the sharing user by default. There should
-        //       also be a global config setting to allow exposing all existing users in the system.
-        return userService.loadAll().stream()
+        return getVisibleUsers(sharingUser).stream()
                 // Don't return the sharing user in available grantees until we want to support that sharing users
                 // can remove themselves from an entity.
                 .filter(user -> !sharingUser.getId().equals(user.getId()))

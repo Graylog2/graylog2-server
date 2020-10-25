@@ -25,6 +25,8 @@ import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
 import org.graylog.security.authservice.ProvisionerAction;
+import org.graylog.security.authservice.backend.ADAuthServiceBackend;
+import org.graylog.security.authservice.backend.ADAuthServiceBackendConfig;
 import org.graylog.security.authservice.backend.LDAPAuthServiceBackend;
 import org.graylog.security.authservice.backend.LDAPAuthServiceBackendConfig;
 import org.graylog.security.authservice.backend.MongoDBAuthServiceBackend;
@@ -49,8 +51,8 @@ public class SecurityModule extends PluginModule {
 
         install(new FactoryModuleBuilder().implement(GranteeAuthorizer.class, GranteeAuthorizer.class).build(GranteeAuthorizer.Factory.class));
 
-        OptionalBinder.newOptionalBinder(binder(), GrantPermissionResolver.class)
-                .setDefault().to(DefaultGrantPermissionResolver.class);
+        OptionalBinder.newOptionalBinder(binder(), PermissionAndRoleResolver.class)
+                .setDefault().to(DefaultPermissionAndRoleResolver.class);
 
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
@@ -68,6 +70,10 @@ public class SecurityModule extends PluginModule {
                 LDAPAuthServiceBackend.class,
                 LDAPAuthServiceBackend.Factory.class,
                 LDAPAuthServiceBackendConfig.class);
+        addAuthServiceBackend(ADAuthServiceBackend.TYPE_NAME,
+                ADAuthServiceBackend.class,
+                ADAuthServiceBackend.Factory.class,
+                ADAuthServiceBackendConfig.class);
     }
 
     private MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {

@@ -72,6 +72,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String EVENT_NOTIFICATIONS_EDIT = "eventnotifications:edit";
     public static final String EVENT_NOTIFICATIONS_READ = "eventnotifications:read";
     public static final String FIELDNAMES_READ = "fieldnames:read";
+    public static final String GRANTS_OVERVIEW_READ = "grantsoverview:read";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
@@ -146,6 +147,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
+    public static final String USERS_READ = "users:read";
     public static final String USERS_LIST = "users:list";
     public static final String USERS_PASSWORDCHANGE = "users:passwordchange";
     public static final String USERS_PERMISSIONSEDIT = "users:permissionsedit";
@@ -198,6 +200,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
             .add(create(EVENT_NOTIFICATIONS_READ, ""))
             .add(create(FIELDNAMES_READ, ""))
+            .add(create(GRANTS_OVERVIEW_READ, ""))
             .add(create(INDEXERCLUSTER_READ, ""))
             .add(create(INDEXRANGES_READ, ""))
             .add(create(INDEXRANGES_REBUILD, ""))
@@ -272,6 +275,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(URL_WHITELIST_WRITE, ""))
             .add(create(USERS_CREATE, ""))
             .add(create(USERS_EDIT, ""))
+            .add(create(USERS_READ, ""))
             .add(create(USERS_LIST, ""))
             .add(create(USERS_PASSWORDCHANGE, ""))
             .add(create(USERS_PERMISSIONSEDIT, ""))
@@ -312,6 +316,9 @@ public class RestPermissions implements PluginPermissions {
             )),
             BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE
+            )),
+            BuiltinRole.create("User Inspector", "Allows listing all user accounts (built-in)", ImmutableSet.of(
+                    RestPermissions.USERS_READ
             ))
     ).build();
 

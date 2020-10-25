@@ -128,6 +128,18 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'input_failure_shutdown':
+        return {
+          title: 'An input has shut down due to failures',
+          description: (
+            <span>
+              Input {notification.details.input_title} has shut down on node {notification.node_id} for this reason:
+              »{notification.details.reason}«. This means that you are unable to receive any messages from this input.
+              This is often an indication of persistent network failures.
+              You can click {' '} <Link to={Routes.SYSTEM.INPUTS}>here</Link> to see the input.
+            </span>
+          ),
+        };
       case 'journal_uncommitted_messages_deleted':
         return {
           title: 'Uncommited messages deleted from journal',

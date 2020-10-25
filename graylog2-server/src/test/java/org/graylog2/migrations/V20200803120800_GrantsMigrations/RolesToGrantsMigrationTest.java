@@ -23,12 +23,15 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.testing.GRNExtension;
+import org.graylog.testing.TestUserService;
+import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
@@ -46,12 +49,14 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GRNExtension.class)
+@ExtendWith(TestUserServiceExtension.class)
 @MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
 class RolesToGrantsMigrationTest {
     private RolesToGrantsMigration migration;
@@ -70,7 +75,8 @@ class RolesToGrantsMigrationTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-               GRNRegistry grnRegistry) {
+               GRNRegistry grnRegistry,
+               TestUserService userService) {
         when(permissions.readerBasePermissions()).thenReturn(ImmutableSet.of());
         when(validator.validate(any())).thenReturn(ImmutableSet.of());
 
@@ -78,9 +84,9 @@ class RolesToGrantsMigrationTest {
 
         roleService = new RoleServiceImpl(mongodb.mongoConnection(), mongoJackObjectMapperProvider, permissions, validator);
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
-        userService = new TestUserService(mongodb.mongoConnection());
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(ClusterEventBus.class));
+        this.userService = userService;
+        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(ClusterEventBus.class));
         migration = new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, "admin");
     }
 

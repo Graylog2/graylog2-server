@@ -184,7 +184,7 @@
     "url-loader": "^4.0.0",
     "webpack": "^4.39.3",
     "webpack-bundle-analyzer": "^3.5.2",
-    "webpack-cli": "^4.0.0",
+    "webpack-cli": "3.3.12",
     "webpack-dev-middleware": "^3.7.1",
     "webpack-dev-server": "^3.8.0",
     "webpack-hot-middleware": "^2.25.0",
@@ -192,7 +192,7 @@
     "yargs": "^15.3.1"
   },
   "resolutions": {
-    "jquery": "3.4.1",
+    "jquery": "3.5.1",
     "jsdom": "15.2.1",
     "upath": "1.0.5",
     "ace-builds": "1.4.12"

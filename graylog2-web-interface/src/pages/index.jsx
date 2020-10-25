@@ -56,6 +56,7 @@ const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
 const ShowAlertPage = loadAsync(() => import('./ShowAlertPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
+const ShowEventNotificationPage = loadAsync(() => import('./ShowEventNotificationPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
 const ShowMetricsPage = loadAsync(() => import('./ShowMetricsPage'));
 const ShowNodePage = loadAsync(() => import('./ShowNodePage'));
@@ -82,6 +83,7 @@ const UserDetailsPage = loadAsync(() => import('./UserDetailsPage'));
 const UserEditPage = loadAsync(() => import('./UserEditPage'));
 const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
+const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
 
 export {
   AlertConditionsPage,
@@ -141,6 +143,7 @@ export {
   RulesPage,
   ShowAlertPage,
   ShowContentPackPage,
+  ShowEventNotificationPage,
   ShowMessagePage,
   ShowMetricsPage,
   ShowNodePage,
@@ -166,4 +169,5 @@ export {
   UserDetailsPage,
   UserEditPage,
   UserTokensEditPage,
+  ViewEventDefinitionPage,
 };

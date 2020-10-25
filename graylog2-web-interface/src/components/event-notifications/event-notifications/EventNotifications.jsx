@@ -2,17 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/graylog/router';
+import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Col, DropdownButton, MenuItem, Row, Button } from 'components/graylog';
 import {
   EmptyEntity,
   EntityList,
   EntityListItem,
+  HasOwnership,
   IfPermitted,
   PaginatedList,
   SearchForm,
   Spinner,
 } from 'components/common';
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';
@@ -33,6 +36,14 @@ class EventNotifications extends React.Component {
     onDelete: PropTypes.func.isRequired,
     onTest: PropTypes.func.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      notificationToShare: undefined,
+    };
+  }
 
   renderEmptyContent = () => {
     return (
@@ -62,12 +73,12 @@ class EventNotifications extends React.Component {
     return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
-  formatNotification = (notifications) => {
+  formatNotification = (notifications, setNotificationToShare) => {
     const { testResult } = this.props;
 
     return notifications.map((notification) => {
       const isTestLoading = testResult.id === notification.id && testResult.isLoading;
-      const actions = this.formatActions(notification, isTestLoading);
+      const actions = this.formatActions(notification, isTestLoading, setNotificationToShare);
 
       const plugin = this.getNotificationPlugin(notification.config.type);
       const content = testResult.id === notification.id ? (
@@ -82,9 +93,11 @@ class EventNotifications extends React.Component {
         </Col>
       ) : null;
 
+      const title = <Link to={Routes.ALERTS.NOTIFICATIONS.show(notification.id)}>{notification.title}</Link>;
+
       return (
         <EntityListItem key={`event-definition-${notification.id}`}
-                        title={notification.title}
+                        title={title}
                         titleSuffix={plugin.displayName || notification.config.type}
                         description={notification.description || <em>No description given</em>}
                         actions={actions}
@@ -93,7 +106,7 @@ class EventNotifications extends React.Component {
     });
   };
 
-  formatActions(notification, isTestLoading) {
+  formatActions(notification, isTestLoading, setNotificationToShare) {
     const { onDelete, onTest } = this.props;
 
     return (
@@ -110,6 +123,13 @@ class EventNotifications extends React.Component {
                 {isTestLoading ? 'Testing...' : 'Test Notification'}
               </MenuItem>
             </IfPermitted>
+            <HasOwnership type="notification" id={notification.id}>
+              {({ disabled }) => (
+                <MenuItem disabled={disabled} onSelect={() => setNotificationToShare(notification)}>
+                  Share {disabled && <SharingDisabledPopover type="notification" />}
+                </MenuItem>
+              )}
+            </HasOwnership>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
               <MenuItem onClick={onDelete(notification)}>Delete</MenuItem>
@@ -122,41 +142,53 @@ class EventNotifications extends React.Component {
 
   render() {
     const { notifications, pagination, query, onPageChange, onQueryChange } = this.props;
+    const { notificationToShare } = this.state;
+
+    const setNotificationToShare = (notification) => this.setState({ notificationToShare: notification });
 
     if (pagination.grandTotal === 0) {
       return this.renderEmptyContent();
     }
 
     return (
-      <Row>
-        <Col md={12}>
-          <SearchForm query={query}
-                      onSearch={onQueryChange}
-                      onReset={onQueryChange}
-                      searchButtonLabel="Find"
-                      placeholder="Find Notifications"
-                      wrapperClass={styles.inline}
-                      queryWidth={200}
-                      topMargin={0}
-                      useLoadingState>
-            <IfPermitted permissions="eventnotifications:create">
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                <Button bsStyle="success" className={styles.createButton}>Create Notification</Button>
-              </LinkContainer>
-            </IfPermitted>
-          </SearchForm>
+      <>
+        <Row>
+          <Col md={12}>
+            <SearchForm query={query}
+                        onSearch={onQueryChange}
+                        onReset={onQueryChange}
+                        searchButtonLabel="Find"
+                        placeholder="Find Notifications"
+                        wrapperClass={styles.inline}
+                        queryWidth={200}
+                        topMargin={0}
+                        useLoadingState>
+              <IfPermitted permissions="eventnotifications:create">
+                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                  <Button bsStyle="success" className={styles.createButton}>Create Notification</Button>
+                </LinkContainer>
+              </IfPermitted>
+            </SearchForm>
 
-          <PaginatedList activePage={pagination.page}
-                         pageSize={pagination.pageSize}
-                         pageSizes={[10, 25, 50]}
-                         totalItems={pagination.total}
-                         onChange={onPageChange}>
-            <div className={styles.notificationList}>
-              <EntityList items={this.formatNotification(notifications)} />
-            </div>
-          </PaginatedList>
-        </Col>
-      </Row>
+            <PaginatedList activePage={pagination.page}
+                           pageSize={pagination.pageSize}
+                           pageSizes={[10, 25, 50]}
+                           totalItems={pagination.total}
+                           onChange={onPageChange}>
+              <div className={styles.notificationList}>
+                <EntityList items={this.formatNotification(notifications, setNotificationToShare)} />
+              </div>
+            </PaginatedList>
+          </Col>
+        </Row>
+        {notificationToShare && (
+          <EntityShareModal entityId={notificationToShare.id}
+                            entityType="notification"
+                            description="Search for a User or Team to add as collaborator on this notification."
+                            entityTitle={notificationToShare.title}
+                            onClose={() => setNotificationToShare(undefined)} />
+        )}
+      </>
     );
   }
 }

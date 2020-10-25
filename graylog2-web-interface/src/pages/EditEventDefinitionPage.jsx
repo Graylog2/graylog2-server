@@ -11,14 +11,14 @@ import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import withParams from 'routing/withParams';
 
+import StreamPermissionErrorPage from './StreamPermissionErrorPage';
+
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-const { isPermitted } = PermissionsMixin;
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
@@ -58,12 +58,24 @@ class EditEventDefinitionPage extends React.Component {
     }
   }
 
+  _streamsWithMissingPermissions(eventDefinition, currentUser) {
+    const streams = eventDefinition?.config?.streams || [];
+
+    return streams.filter((streamId) => !isPermitted(currentUser.permissions, `streams:read:${streamId}`));
+  }
+
   render() {
     const { params, currentUser } = this.props;
     const { eventDefinition } = this.state;
 
     if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       history.push(Routes.NOTFOUND);
+    }
+
+    const missingStreams = this._streamsWithMissingPermissions(eventDefinition, currentUser);
+
+    if (missingStreams.length > 0) {
+      return <StreamPermissionErrorPage error={{}} missingStreamIds={missingStreams} />;
     }
 
     if (!eventDefinition) {

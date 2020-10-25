@@ -14,6 +14,7 @@ export type DirectoryServiceBackendConfig = {
   userNameAttribute: string,
   userSearchBase: string,
   userSearchPattern: string,
+  userUniqueIdAttribute: string,
   verifyCertificates: boolean,
 };
 
@@ -27,6 +28,7 @@ export type DirectoryServiceBackendConfigJson = {
   user_name_attribute: string,
   user_search_base: string,
   user_search_pattern: string,
+  user_unique_id_attribute: string,
   verify_certificates: boolean,
 };
 

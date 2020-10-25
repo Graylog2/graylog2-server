@@ -30,22 +30,22 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultGrantPermissionResolver.class);
+public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolver {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultPermissionAndRoleResolver.class);
 
     private final Logger logger;
     private final BuiltinCapabilities builtinCapabilities;
     private final DBGrantService grantService;
 
     @Inject
-    public DefaultGrantPermissionResolver(BuiltinCapabilities builtinCapabilities,
-                                          DBGrantService grantService) {
+    public DefaultPermissionAndRoleResolver(BuiltinCapabilities builtinCapabilities,
+                                            DBGrantService grantService) {
         this(LOG, builtinCapabilities, grantService);
     }
 
-    public DefaultGrantPermissionResolver(Logger logger,
-                                          BuiltinCapabilities builtinCapabilities,
-                                          DBGrantService grantService) {
+    public DefaultPermissionAndRoleResolver(Logger logger,
+                                            BuiltinCapabilities builtinCapabilities,
+                                            DBGrantService grantService) {
         this.logger = logger;
         this.builtinCapabilities = builtinCapabilities;
         this.grantService = grantService;

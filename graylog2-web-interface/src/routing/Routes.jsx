@@ -22,11 +22,13 @@ const Routes = {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
       edit: (definitionId) => `/alerts/definitions/${definitionId}/edit`,
+      view: (definitionId) => `/alerts/definitions/${definitionId}`,
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',
       edit: (notificationId) => `/alerts/notifications/${notificationId}/edit`,
+      show: (notificationId) => `/alerts/notifications/${notificationId}`,
     },
   },
   SOURCES: '/sources',

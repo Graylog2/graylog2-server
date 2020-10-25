@@ -49,7 +49,7 @@ export const QueryFiltersStore = singletonStore(
     },
 
     _state() {
-      return this.queries.map((q) => q.filter).filter((f) => f !== undefined);
+      return this.queries.map((q) => q.filter ?? Immutable.Map());
     },
     _trigger() {
       this.trigger(this._state());

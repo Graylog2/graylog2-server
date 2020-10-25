@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.migrations.V20200803120800_GrantsMigrations;
+package org.graylog.testing;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -46,11 +46,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-// An incomplete UserService implementation, that needs fewer dependencies
+/**
+ * Provides an incomplete UserService implementation for tests.
+ * It uses fewer dependencies than a full UserServiceImpl
+ */
 public class TestUserService extends PersistedServiceImpl implements UserService {
     final UserImpl.Factory userFactory;
 
-    protected TestUserService(MongoConnection mongoConnection) {
+    public TestUserService(MongoConnection mongoConnection) {
         super(mongoConnection);
         final Permissions permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
         userFactory = new UserServiceImplTest.UserImplFactory(new Configuration(), permissions);
@@ -59,7 +62,12 @@ public class TestUserService extends PersistedServiceImpl implements UserService
     @Override
     @Nullable
     public User loadById(String id) {
-        return null;
+        final DBObject userObject = get(UserImpl.class, id);
+        if (userObject == null) {
+            return null;
+        }
+        final Object userId = userObject.get("_id");
+        return userFactory.create((ObjectId) userId, userObject.toMap());
     }
 
     @Nullable
@@ -91,12 +99,12 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
     @Override
     public int delete(String username) {
-        return 0;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public User create() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -114,22 +122,22 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
     @Override
     public User getAdminUser() {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Optional<User> getRootUser() {
-        return Optional.empty();
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public long count() {
-        return 0;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public List<User> loadAllForAuthServiceBackend(String authServiceBackendId) {
-        return Collections.emptyList();
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -151,27 +159,27 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
     @Override
     public Set<String> getRoleNames(User user) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public List<Permission> getPermissionsForUser(User user) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public List<WildcardPermission> getWildcardPermissionsForUser(User user) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public List<GRNPermission> getGRNPermissionsForUser(User user) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Set<String> getUserPermissionsFromRoles(User user) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

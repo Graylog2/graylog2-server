@@ -31,7 +31,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
-import org.graylog.security.GrantPermissionResolver;
+import org.graylog.security.GrantChangedEvent;
+import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.MongoDbAuthorizationCacheManager;
 import org.graylog2.shared.users.UserService;
@@ -50,17 +51,17 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
     public static final String NAME = "mongodb-authorization-realm";
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbAuthorizationRealm.class);
     private final UserService userService;
-    private final GrantPermissionResolver grantPermissionResolver;
+    private final PermissionAndRoleResolver permissionAndRoleResolver;
     private final GRNRegistry grnRegistry;
 
     @Inject
     MongoDbAuthorizationRealm(UserService userService,
                               MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager,
-                              GrantPermissionResolver grantPermissionResolver,
+                              PermissionAndRoleResolver permissionAndRoleResolver,
                               GRNRegistry grnRegistry,
                               EventBus serverEventBus) {
         this.userService = userService;
-        this.grantPermissionResolver = grantPermissionResolver;
+        this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.grnRegistry = grnRegistry;
         setCachingEnabled(true);
         setCacheManager(mongoDbAuthorizationCacheManager);
@@ -83,8 +84,8 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
         final ImmutableSet.Builder<String> rolesBuilder = ImmutableSet.builder();
 
         // Resolve grant permissions and roles for the GRN
-        permissionsBuilder.addAll(grantPermissionResolver.resolvePermissionsForPrincipal(principal));
-        rolesBuilder.addAll(grantPermissionResolver.resolveRolesForPrincipal(principal));
+        permissionsBuilder.addAll(permissionAndRoleResolver.resolvePermissionsForPrincipal(principal));
+        rolesBuilder.addAll(permissionAndRoleResolver.resolveRolesForPrincipal(principal));
 
         if (GRNTypes.USER.equals(principal.grnType())) {
             // If the principal is a user, we also need to load permissions and roles from the user object
@@ -141,6 +142,11 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
     @Subscribe
     public void handleUserSave(UserChangedEvent event) {
+        getAuthorizationCache().clear();
+    }
+
+    @Subscribe
+    public void handleGrantChange(GrantChangedEvent event) {
         getAuthorizationCache().clear();
     }
 }
