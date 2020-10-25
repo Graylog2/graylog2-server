@@ -41,9 +41,9 @@ const formatPaginatedSharesResponse = ({
     page,
     perPage,
     query,
+    count,
+    total,
   },
-  count,
-  total,
 });
 
 const EntityShareStore: EntityShareStoreType = singletonStore(

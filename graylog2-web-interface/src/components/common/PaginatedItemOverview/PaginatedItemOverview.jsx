@@ -63,7 +63,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
   return (
     <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
                    pageSize={pagination.perPage}
-                   totalItems={paginatedList.pagination.total}
+                   totalItems={paginatedList?.pagination?.total ?? 0}
                    pageSizes={pageSizes}
                    activePage={pagination.page}>
       <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
