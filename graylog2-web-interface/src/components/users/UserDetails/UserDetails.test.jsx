@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 // import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { render, act } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { paginatedShares } from 'fixtures/sharedEntities';
 // import selectEvent from 'react-select-event';
 import { reader as assignedRole } from 'fixtures/roles';
@@ -53,57 +53,54 @@ describe('<UserDetails />', () => {
   });
 
   it('user profile should display profile information', async () => {
-    const { getByText } = render(<SutComponent user={user} />);
-    await act(() => mockAuthzRolesPromise);
+    render(<SutComponent user={user} />);
 
-    expect(getByText(user.username)).not.toBeNull();
-    expect(getByText(user.fullName)).not.toBeNull();
-    expect(getByText(user.email)).not.toBeNull();
-    expect(getByText(user.clientAddress)).not.toBeNull();
+    await screen.findByText(user.username);
+
+    expect(screen.getByText(user.fullName)).toBeInTheDocument();
+    expect(screen.getByText(user.email)).toBeInTheDocument();
+    expect(screen.getByText(user.clientAddress)).toBeInTheDocument();
 
     if (!user.lastActivity) throw Error('lastActivity must be defined for provided user');
 
-    expect(getByText(user.lastActivity)).not.toBeNull();
+    expect(screen.getByText(user.lastActivity)).toBeInTheDocument();
   });
 
   describe('user settings', () => {
     it('should display timezone', async () => {
-      const { getByText } = render(<SutComponent user={user} />);
-      await act(() => mockAuthzRolesPromise);
+      render(<SutComponent user={user} />);
 
-      if (!user.timezone) throw Error('timezone must be defined for provided user');
+      await waitFor(() => {
+        if (!user.timezone) throw Error('timezone must be defined for provided user');
 
-      expect(getByText(user.timezone)).not.toBeNull();
+        return expect(screen.getByText(user.timezone)).toBeInTheDocument();
+      });
     });
 
     describe('should display session timeout in a readable format', () => {
       it('for seconds', async () => {
         const test = user.toBuilder().sessionTimeoutMs(10000).build();
-        const { getByText } = render(<SutComponent user={test} />);
-        await act(() => mockAuthzRolesPromise);
+        render(<SutComponent user={test} />);
 
-        expect(getByText('10 Seconds')).not.toBeNull();
+        await waitFor(() => expect(screen.getByText('10 Seconds')).toBeInTheDocument());
       });
 
       it('for minutes', async () => {
-        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
-        await act(() => mockAuthzRolesPromise);
+        render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
 
-        expect(getByText('10 Minutes')).not.toBeNull();
+        await waitFor(() => expect(screen.getByText('10 Minutes')).toBeInTheDocument());
       });
 
       it('for hours', async () => {
-        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
-        await act(() => mockAuthzRolesPromise);
+        render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
 
-        expect(getByText('10 Hours')).not.toBeNull();
+        await waitFor(() => expect(screen.getByText('10 Hours')).toBeInTheDocument());
       });
 
       it('for days', async () => {
-        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
-        await act(() => mockAuthzRolesPromise);
+        render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
 
-        expect(getByText('10 Days')).not.toBeNull();
+        await waitFor(() => expect(screen.getByText('10 Days')).toBeInTheDocument());
       });
     });
 
@@ -112,7 +109,7 @@ describe('<UserDetails />', () => {
     //     const { getAllByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
     //     await act(() => mockAuthzRolesPromise);
 
-    //     expect(getAllByText(mockPaginatedUserShares.list.first().title)).not.toBeNull();
+    //     expect(getAllByText(mockPaginatedUserShares.list.first().title)).toBeInTheDocument();
     //   });
 
     //   it('should fetch paginated user shares when using search', async () => {
@@ -120,7 +117,7 @@ describe('<UserDetails />', () => {
     //     await act(() => mockAuthzRolesPromise);
 
     //     const searchInput = getByPlaceholderText('Enter search query...');
-    //     const searchSubmitButton = getByText('Search');
+    //     const searchSubmitButton = screen.getByText('Search');
 
     //     fireEvent.change(searchInput, { target: { value: 'the username' } });
     //     fireEvent.click(searchSubmitButton);
@@ -156,20 +153,17 @@ describe('<UserDetails />', () => {
 
   describe('roles section', () => {
     it('should display assigned roles', async () => {
-      const { queryByText, queryByRole } = render(<SutComponent user={user} />);
-      await act(() => mockAuthzRolesPromise);
+      render(<SutComponent user={user} />);
 
-      expect(queryByRole('heading', { level: 2, name: 'Roles' })).not.toBeNull();
-      expect(queryByText(assignedRole.name)).not.toBeNull();
+      await waitFor(() => expect(screen.getByText(assignedRole.name)).toBeInTheDocument());
     });
   });
 
   describe('teams section', () => {
     it('should display info if license is not present', async () => {
-      const { getByText } = render(<SutComponent user={user} />);
-      await act(() => mockAuthzRolesPromise);
+      render(<SutComponent user={user} />);
 
-      expect(getByText(/Enterprise Feature/)).not.toBeNull();
+      await waitFor(() => expect(screen.getByText(/Enterprise Feature/)).toBeInTheDocument());
     });
   });
 });
