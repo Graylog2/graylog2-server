@@ -1,22 +1,20 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, act } from 'wrappedTestingLibrary';
+import { render, act, screen } from 'wrappedTestingLibrary';
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice as assignedUser } from 'fixtures/userOverviews';
 
 import RoleDetails from './RoleDetails';
 
-const paginatedUsers = {
+const mockLoadUsersPromise = Promise.resolve({
   list: Immutable.List([assignedUser]),
   pagination: {
     page: 1,
     perPage: 10,
     total: 1,
   },
-};
-
-const mockLoadUsersPromise = Promise.resolve(paginatedUsers);
+});
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesStore: {},
@@ -33,28 +31,26 @@ describe('RoleDetails', () => {
   });
 
   it('should display loading indicator, if no role is provided', async () => {
-    const { queryByText } = render(<RoleDetails role={undefined} />);
+    render(<RoleDetails role={undefined} />);
 
     act(() => {
       jest.advanceTimersByTime(200);
     });
 
-    expect(queryByText('Loading...')).not.toBeNull();
+    await screen.findByText('Loading...');
   });
 
   it('should display role profile', async () => {
-    const { queryByText } = render(<RoleDetails role={exampleRole} />);
-    await act(() => mockLoadUsersPromise);
+    render(<RoleDetails role={exampleRole} />);
 
-    expect(queryByText(exampleRole.name)).not.toBeNull();
-    expect(queryByText(exampleRole.description)).not.toBeNull();
+    await screen.findByText(exampleRole.name);
+    await screen.findByText(exampleRole.description);
   });
 
   it('should display assigned users', async () => {
-    const { queryByText, queryByRole } = render(<RoleDetails role={exampleRole} />);
-    await act(() => mockLoadUsersPromise);
+    render(<RoleDetails role={exampleRole} />);
 
-    expect(queryByRole('heading', { level: 2, name: 'Users' })).not.toBeNull();
-    expect(queryByText(assignedUser.fullName)).not.toBeNull();
+    await screen.findByRole('heading', { level: 2, name: 'Users' });
+    await screen.findByText(assignedUser.fullName);
   });
 });
