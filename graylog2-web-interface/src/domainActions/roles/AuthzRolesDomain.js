@@ -38,7 +38,7 @@ const removeMember: $PropertyType<ActionsType, 'removeMember'> = notifyingAction
     message: `User "${username}" was unassigned successfully`,
   }),
   error: (error, roleId, username) => ({
-    message: `Unassigning user "${username}" failed with status: ${error}`,
+    message: `Unassign user "${username}" failed with status: ${error}`,
   }),
 });
 
