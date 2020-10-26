@@ -42,6 +42,14 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?s
 );
 
 export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string) => {
+  const _formatPayload = (password) => {
+    if (password) {
+      return undefined;
+    }
+
+    return password;
+  };
+
   // Only update password on edit if necessary,
   // if a users resets the previously defined password its form value is an empty string
   if (backendId) {
@@ -53,10 +61,10 @@ export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string
       return { delete_value: true };
     }
 
-    return { set_value: systemUserPassword };
+    return { set_value: _formatPayload(systemUserPassword) };
   }
 
-  return systemUserPassword;
+  return _formatPayload(systemUserPassword);
 };
 
 const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues): WizardSubmitPayload => {
