@@ -12,6 +12,12 @@
             "lowercase"
           ]
         }
+      },
+      "analyzer": {
+        "analyzer_keyword": {
+          "filter": "lowercase",
+          "tokenizer": "keyword"
+        }
       }
     }
   },
