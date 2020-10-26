@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
-import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { render } from 'wrappedTestingLibrary';
+// import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
-import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+// import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
@@ -33,7 +33,7 @@ describe('DashboardSearchBar', () => {
   const onExecute = jest.fn();
 
   it('defaults to no override being selected', () => {
-    const { container, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    const { container } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
     expect(container).not.toBeNull();
     // expect(getByTitle('There is no override for the timerange currently selected')).toBeVisible();

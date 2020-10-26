@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, fireEvent, render, waitFor, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, waitFor, screen } from 'wrappedTestingLibrary';
 // import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';

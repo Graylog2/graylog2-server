@@ -197,6 +197,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
     if (limitDuration === 0 || (typeDurationSeconds <= limitDuration && limitDuration !== 0)) {
       nextRangeHelpers.setValue({ ...nextRangeProps.value, ...state });
     } else {
+      // eslint-disable-next-line no-console
       console.log('Nuh uh uh - you went over the limit!');
     }
   }, [limitDuration, state, typeDurationSeconds]); // eslint-disable-line react-hooks/exhaustive-deps
