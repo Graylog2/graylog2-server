@@ -3,7 +3,6 @@ import * as React from 'react';
 import { useRef } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import withLocation from 'routing/withLocation';
 import { ClipboardButton, Icon } from 'components/common';
 import { Alert, FormGroup, InputGroup, FormControl } from 'components/graylog';
 import { type ThemeInterface } from 'theme';
