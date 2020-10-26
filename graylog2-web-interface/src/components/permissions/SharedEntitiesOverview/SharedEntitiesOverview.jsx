@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import type { Pagination } from 'stores/PaginationTypes';
 import mockedPermissions from 'logic/permissions/mocked';
 import type { PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
-import { DataTable, PaginatedList, Spinner } from 'components/common';
+import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';
 import SharedEntitiesOverviewItem from './SharedEntitiesOverviewItem';
@@ -76,6 +76,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
                    )}
                    dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
                    filterKeys={[]}
+                   noDataText={<EmptyResult>No shared entities have been found.</EmptyResult>}
                    headers={TABLE_HEADERS}
                    id="shared-entities"
                    rowClassName="no-bm"
