@@ -94,7 +94,7 @@ public class MongoDbSession extends PersistedImpl {
         }
     }
 
-    public Optional<String> getUsernameAttribute() {
+    public Optional<String> getUserIdAttribute() {
         final Map<Object, Object> attributes = getAttributes();
         if (attributes == null) {
             return Optional.empty();
@@ -108,7 +108,9 @@ public class MongoDbSession extends PersistedImpl {
 
     public long getTimeout() {
         final Object timeout = fields.get("timeout");
-        if (timeout == null) return 0;
+        if (timeout == null) {
+            return 0;
+        }
         return ((Number) timeout).longValue();
     }
 
