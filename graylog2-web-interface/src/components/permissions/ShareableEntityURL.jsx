@@ -42,7 +42,7 @@ type Props = {
   entityURL?: string,
 };
 
-const ShareableEnityURL = ({ entityURL }: Props) => {
+const ShareableEntityURL = ({ entityURL }: Props) => {
   const container = useRef();
 
   return (
@@ -74,8 +74,8 @@ const ShareableEnityURL = ({ entityURL }: Props) => {
   );
 };
 
-ShareableEnityURL.defaultProps = {
+ShareableEntityURL.defaultProps = {
   entityURL: window.location.href,
 };
 
-export default ShareableEnityURL;
+export default ShareableEntityURL;

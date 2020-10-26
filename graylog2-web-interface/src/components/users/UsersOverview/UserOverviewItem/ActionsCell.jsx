@@ -14,7 +14,7 @@ type Props = {
   username: $PropertyType<UserOverview, 'username'>,
 };
 
-const ActtionsWrapper = styled.div`
+const ActionsWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
@@ -87,13 +87,13 @@ const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> 
 const ActionsCell = ({ username, readOnly }: Props) => {
   return (
     <td>
-      <ActtionsWrapper>
+      <ActionsWrapper>
         {readOnly ? (
           <ReadOnlyActions username={username} />
         ) : (
           <EditActions username={username} />
         )}
-      </ActtionsWrapper>
+      </ActionsWrapper>
     </td>
   );
 };

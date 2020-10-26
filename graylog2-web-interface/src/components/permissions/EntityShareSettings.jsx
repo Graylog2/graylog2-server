@@ -15,7 +15,7 @@ import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
 import DependenciesWarning from './DependenciesWarning';
 import ValidationError from './ValidationError';
-import ShareableEntityURL from './ShareableEnityURL';
+import ShareableEntityURL from './ShareableEntityURL';
 
 type Props = {
   description: $PropertyType<Props, 'description'>,
@@ -66,7 +66,7 @@ const EntityShareSettings = ({
 
   useEffect(() => {
     setDisableSubmit(validationResults?.failed);
-  }, [validationResults]);
+  }, [validationResults, setDisableSubmit]);
 
   const _handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
     const newSelectedCapabilities = selectedGranteeCapabilities.merge({ [granteeId]: capabilityId });

@@ -1,5 +1,5 @@
 // @flow strict
 
-import SharedEntitesOverviewItem from './SharedEntitiesOverviewItem';
+import SharedEntitiesOverviewItem from './SharedEntitiesOverviewItem';
 
-export default SharedEntitesOverviewItem;
+export default SharedEntitiesOverviewItem;

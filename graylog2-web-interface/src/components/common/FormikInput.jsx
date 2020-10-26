@@ -30,7 +30,7 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
   return (
     <Field name={name} validate={validate}>
       {({ field: { value, onChange, onBlur }, meta: { error, touched } }) => {
-        const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
+        const typeSpecificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
         const displayError = validateOnChange ? !!(error && touched) : !!error;
 
         const _handleChange = (e) => {
@@ -43,7 +43,7 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
 
         return (
           <Input {...rest}
-                 {...typeSepcificProps}
+                 {...typeSpecificProps}
                  onBlur={onBlur}
                  help={help}
                  id={name}

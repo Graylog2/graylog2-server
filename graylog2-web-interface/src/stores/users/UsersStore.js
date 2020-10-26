@@ -13,9 +13,9 @@ import UserOverview from 'logic/users/UserOverview';
 import User from 'logic/users/User';
 import UsersActions from 'actions/users/UsersActions';
 import type { ChangePasswordRequest, Token, PaginatedUsers, UserCreate, UserUpdate } from 'actions/users/UsersActions';
-import type { PaginatedResponseType } from 'stores/PaginationTypes';
+import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
-type PaginatedResponse = PaginatedResponseType & {
+export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>,
   context: {
     admin_user: UserOverviewJSON,
@@ -104,19 +104,19 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadUsersPaginated(page: number, perPage: number, query: string): Promise<PaginatedUsers> {
+    loadUsersPaginated({ page, perPage, query }: Pagination): Promise<PaginatedUsers> {
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
-        .then((response: PaginatedResponse) => ({
+        .then((response: PaginatedUsersResponse) => ({
           adminUser: response.context.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
           list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
           pagination: {
-            count: response.count,
-            total: response.total,
             page: response.page,
             perPage: response.per_page,
             query: response.query,
+            count: response.count,
+            total: response.total,
           },
         }));
 

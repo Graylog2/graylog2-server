@@ -1,17 +1,12 @@
 // @flow strict
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import UserOverview from 'logic/users/UserOverview';
-import {
-  defaultPageInfo,
-  type PaginationInfo,
-  type PaginatedListType,
-  type DescriptiveItem,
-} from 'components/common/PaginatedItemOverview';
+import { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
 import { PaginatedItemOverview } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import Role from 'logic/roles/Role';
@@ -23,34 +18,32 @@ type Props = {
 };
 
 const Container = styled.div`
-  margin-top 15px;
-  margin-bottom 15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 `;
 
 const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState();
+  const [paginatedUsers, setPaginatedUsers] = useState();
 
-  const _onLoad = ({ page, perPage, query }: PaginationInfo): Promise<?PaginatedListType> => {
+  const _onLoad = useCallback((pagination) => {
     setLoading(true);
 
-    return AuthzRolesDomain.loadUsersForRole(id, name, page, perPage, query)
-      .then((response) => {
+    return AuthzRolesDomain.loadUsersForRole(id, name, pagination)
+      .then((paginatedRoles) => {
         setLoading(false);
 
-        // $FlowFixMe UserOverview is a DescriptiveItem!!!
-        return response;
+        return paginatedRoles;
       });
-  };
+  }, [id, name]);
 
-  const _loadUsers = (u) => u && setUsers(u);
   const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => AuthzRolesDomain.addMembers(id,
-    newUsers.map((u) => u.username)).then(() => _onLoad(defaultPageInfo)
-    .then(_loadUsers));
+    newUsers.map((u) => u.username)).then(() => _onLoad(DEFAULT_PAGINATION)
+    .then(setPaginatedUsers));
 
-  const _onUnassignUser = (user: DescriptiveItem) => {
+  const _onUnassignUser = (user) => {
     AuthzRolesDomain.removeMember(id, user.name).then(() => {
-      _onLoad(defaultPageInfo).then(_loadUsers);
+      _onLoad(DEFAULT_PAGINATION).then(setPaginatedUsers);
     });
   };
 
@@ -62,7 +55,10 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       </Container>
       <h3>Selected Users</h3>
       <Container>
-        <PaginatedItemOverview noDataText="No selected users have been found." onLoad={_onLoad} overrideList={users} onDeleteItem={_onUnassignUser} />
+        <PaginatedItemOverview noDataText="No selected users have been found."
+                               onLoad={_onLoad}
+                               overrideList={paginatedUsers}
+                               onDeleteItem={_onUnassignUser} />
       </Container>
     </SectionComponent>
   );

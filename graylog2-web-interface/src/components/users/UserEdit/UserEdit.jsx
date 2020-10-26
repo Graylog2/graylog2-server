@@ -44,34 +44,33 @@ const UserEdit = ({ user }: Props) => {
   }
 
   return (
-    <>
-      <SectionGrid>
-        <IfPermitted permissions={`users:edit:${user.username}`}>
-          <div>
-            <ProfileSection user={user}
-                            onSubmit={(data) => _updateUser(data, currentUser, user)} />
-            <IfPermitted permissions="*">
-              <SettingsSection user={user}
-                               onSubmit={(data) => _updateUser(data, currentUser, user)} />
-            </IfPermitted>
-            <IfPermitted permissions={`users:passwordchange:${user.username}`}>
-              <PasswordSection user={user} />
-            </IfPermitted>
-            <PreferencesSection user={user} />
-          </div>
-          <div>
-            <IfPermitted permissions="users:rolesedit">
-              <RolesSection user={user}
-                            onSubmit={(data) => _updateUser(data, currentUser, user)} />
-            </IfPermitted>
-            <IfPermitted permissions="teams:edit">
-              <TeamsSection user={user}
-                            onSubmit={(data) => _updateUser(data, currentUser, user)} />
-            </IfPermitted>
-          </div>
-        </IfPermitted>
-      </SectionGrid>
-    </>
+    <SectionGrid>
+      <IfPermitted permissions={`users:edit:${user.username}`}>
+        <div>
+          <ProfileSection user={user}
+                          onSubmit={(data) => _updateUser(data, currentUser, user)} />
+          <IfPermitted permissions="*">
+            <SettingsSection user={user}
+                             onSubmit={(data) => _updateUser(data, currentUser, user)} />
+          </IfPermitted>
+          <IfPermitted permissions={`users:passwordchange:${user.username}`}>
+            <PasswordSection user={user} />
+          </IfPermitted>
+          <PreferencesSection user={user} />
+        </div>
+        <div>
+          <IfPermitted permissions="users:rolesedit">
+            <RolesSection user={user}
+                          onSubmit={(data) => _updateUser(data, currentUser, user)} />
+          </IfPermitted>
+          <IfPermitted permissions="teams:edit">
+            <TeamsSection user={user}
+                          onSubmit={(data) => _updateUser(data, currentUser, user)} />
+          </IfPermitted>
+        </div>
+      </IfPermitted>
+    </SectionGrid>
+
   );
 };
 

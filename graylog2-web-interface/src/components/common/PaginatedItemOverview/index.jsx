@@ -1,17 +1,15 @@
 // @flow strict
 import PaginatedItemOverview, {
-  defaultPageInfo,
-  type PaginationInfo,
+  DEFAULT_PAGINATION,
   type PaginatedListType,
   type DescriptiveItem,
 } from './PaginatedItemOverview';
 
 export type {
-  PaginationInfo,
   PaginatedListType,
   DescriptiveItem,
 };
 
-export { defaultPageInfo };
+export { DEFAULT_PAGINATION };
 
 export default PaginatedItemOverview;

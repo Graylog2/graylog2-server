@@ -6,10 +6,11 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Role from 'logic/roles/Role';
 import { Button } from 'components/graylog';
-import { Select } from 'components/common';
+import { Select, Spinner } from 'components/common';
 
 type Props = {
   assignedRolesIds: Immutable.Set<string>,
@@ -38,7 +39,7 @@ const _renderRoleOption = ({ label }: { label: string }) => (
   <RoleSelectOption>{label}</RoleSelectOption>
 );
 
-const _options = (roles: Immutable.Set<Role>, assignedRolesIds, identifier) => roles
+const _options = (roles, assignedRolesIds, identifier) => roles
   .filter((role) => !assignedRolesIds.includes(identifier(role)))
   .toArray()
   .map((r) => ({ label: r.name, value: r.name, role: r }));
@@ -55,7 +56,7 @@ const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, set
   })));
 
   if (selectedRoles.size <= 0) {
-    throw Error(`Role assigment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
+    throw Error(`Role assignment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
   }
 
   setIsSubmitting(true);
@@ -66,19 +67,25 @@ const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, set
   });
 };
 
+const _loadRoles = (setPaginatedRoles) => {
+  const getUnlimited = { page: 1, perPage: 0, query: '' };
+
+  AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
+};
+
 const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
-  const [roles, setRoles] = useState(Immutable.Set());
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [selectedRoleName, setSelectedRoleName] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const _onSubmit = () => _assignRole(selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting);
-  const options = _options(roles, assignedRolesIds, identifier);
 
-  useEffect(() => {
-    const getUnlimited = [1, 0, ''];
+  useEffect(() => _loadRoles(setPaginatedRoles), []);
 
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
-      .then((paginatedRoles) => setRoles(Immutable.Set(paginatedRoles.list)));
-  }, [assignedRolesIds]);
+  if (!paginatedRoles) {
+    return <Spinner />;
+  }
+
+  const _onSubmit = () => _assignRole(selectedRoleName, paginatedRoles.list, onSubmit, setSelectedRoleName, setIsSubmitting);
+  const options = _options(paginatedRoles.list, assignedRolesIds, identifier);
 
   return (
     <div>

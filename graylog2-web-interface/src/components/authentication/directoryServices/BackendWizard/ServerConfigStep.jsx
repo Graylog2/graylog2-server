@@ -200,7 +200,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             <Button bsStyle="primary"
                     disabled={isSubmitting}
                     type="submit">
-              Next: User Synchronisation
+              Next: User Synchronization
             </Button>
           </ButtonToolbar>
         </Form>

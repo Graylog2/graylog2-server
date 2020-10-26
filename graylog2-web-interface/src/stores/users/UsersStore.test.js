@@ -6,19 +6,19 @@ import { UsersActions } from 'stores/users/UsersStore';
 import fetch from 'logic/rest/FetchProvider';
 
 const pagination = {
-  count: 10,
-  total: 100,
   page: 1,
   perPage: 10,
   query: '',
+  total: userOverviewList.size,
+  count: 10,
 };
 
 const paginationJSON = {
-  count: pagination.count,
-  total: pagination.total,
   page: pagination.page,
   per_page: pagination.perPage,
   query: pagination.query,
+  total: pagination.total,
+  count: pagination.count,
 };
 
 describe('UsersStore', () => {
@@ -51,7 +51,7 @@ describe('UsersStore', () => {
         ...paginationJSON,
       }));
 
-      UsersActions.loadUsersPaginated(pagination.page, pagination.perPage, pagination.query).then((result) => {
+      UsersActions.loadUsersPaginated(pagination).then((result) => {
         expect(result).toStrictEqual({ list: userOverviewList, adminUser: admin, pagination });
 
         done();
@@ -69,7 +69,7 @@ describe('UsersStore', () => {
         ...paginationJSON,
       }));
 
-      UsersActions.loadUsersPaginated(pagination.page, pagination.perPage, pagination.query).then((result) => {
+      UsersActions.loadUsersPaginated(pagination).then((result) => {
         expect(result).toStrictEqual({ list: userOverviewList, adminUser: undefined, pagination });
 
         done();

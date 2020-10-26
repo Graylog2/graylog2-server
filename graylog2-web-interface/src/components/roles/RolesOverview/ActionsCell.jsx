@@ -16,18 +16,18 @@ type Props = {
   roleName: $PropertyType<Role, 'name'>,
 };
 
-const ActtionsWrapper = styled.div`
+const ActionsWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
 
 const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<Role, 'name'>, setDeleting: boolean => void) => {
   let confirmMessage = `Do you really want to delete role "${roleName}"?`;
-  const getOneUser = [1, 1, ''];
+  const getOneUser = { page: 1, perPage: 1, query: '' };
   setDeleting(true);
 
-  AuthzRolesDomain.loadUsersForRole(roleId, roleName, ...getOneUser).then((paginatedUsers) => {
-    if (paginatedUsers && paginatedUsers.pagination.total >= 1) {
+  AuthzRolesDomain.loadUsersForRole(roleId, roleName, getOneUser).then((paginatedUsers) => {
+    if (paginatedUsers.pagination.total >= 1) {
       confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.pagination.total} users.`;
     }
 
@@ -47,7 +47,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
 
   return (
     <td>
-      <ActtionsWrapper>
+      <ActionsWrapper>
         <IfPermitted permissions={[`roles:edit:${roleName}`]}>
           <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(encodeURIComponent(roleId))}>
             <Button id={`edit-role-${roleId}`} bsStyle="info" bsSize="xs" title={`Edit role ${roleName}`} type="button">
@@ -63,7 +63,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
             </Button>
           </IfPermitted>
         )}
-      </ActtionsWrapper>
+      </ActionsWrapper>
     </td>
   );
 };

@@ -3,33 +3,36 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
-import SectionGrid from 'components/common/Section/SectionGrid';
-import { Spinner } from 'components/common';
+import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { Spinner } from 'components/common';
+import SectionGrid from 'components/common/Section/SectionGrid';
 
 import SyncedUsersSection from './SyncedUsersSection';
 import SyncedTeamsSection from './SyncedTeamsSection';
+
+const _loadRoles = (setPaginatedRoles) => {
+  const getUnlimited = { page: 1, perPage: 0, query: '' };
+
+  AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
+};
 
 type Props = {
   authenticationBackend: AuthenticationBackend,
 };
 
 const BackendDetailsActive = ({ authenticationBackend }: Props) => {
-  const [{ list: roles }, setPaginatedRoles] = useState({ list: undefined });
   const authService = getAuthServicePlugin(authenticationBackend.config.type);
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
 
-  useEffect(() => {
-    const getUnlimited = [1, 0, ''];
-
-    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then(setPaginatedRoles);
-  }, []);
+  useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   if (!authService) {
     return `No authentication service plugin configured for type "${authenticationBackend.config.type}"`;
   }
 
-  if (!roles) {
+  if (!paginatedRoles) {
     return <Spinner />;
   }
 
@@ -38,11 +41,11 @@ const BackendDetailsActive = ({ authenticationBackend }: Props) => {
   return (
     <SectionGrid>
       <div>
-        <BackendConfigDetails authenticationBackend={authenticationBackend} roles={roles} />
+        <BackendConfigDetails authenticationBackend={authenticationBackend} roles={paginatedRoles.list} />
       </div>
       <div>
-        <SyncedUsersSection roles={roles} />
-        <SyncedTeamsSection roles={roles} />
+        <SyncedUsersSection roles={paginatedRoles.list} />
+        <SyncedTeamsSection roles={paginatedRoles.list} />
       </div>
     </SectionGrid>
   );

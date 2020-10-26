@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, act, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { admin } from 'fixtures/users';
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
@@ -27,7 +27,7 @@ describe('UsersOverview', () => {
   });
 
   it('should display table header', async () => {
-    const { queryByText } = render(<UsersOverview />);
+    render(<UsersOverview />);
     const headers = [
       'Username',
       'Full name',
@@ -36,34 +36,36 @@ describe('UsersOverview', () => {
       'Role',
       'Actions',
     ];
-    await act(() => mockLoadUsersPaginatedPromise);
+
+    // wait until list is displayed
+    await screen.findByText('Users');
 
     headers.forEach((header) => {
-      expect(queryByText(header)).not.toBeNull();
+      expect(screen.getByText(header)).toBeInTheDocument();
     });
   });
 
-  // it('should search users', async () => {
-  //   const { getByPlaceholderText, getByRole } = render(<UsersOverview />);
-  //   await act(() => mockLoadUsersPaginatedPromise);
-  //   const searchInput = getByPlaceholderText('Enter search query...');
-  //   const searchSubmitButton = getByRole('button', { name: 'Search' });
+  it('should search users', async () => {
+    render(<UsersOverview />);
+    const searchInput = await screen.findByPlaceholderText('Enter search query...');
+    const searchSubmitButton = screen.getByRole('button', { name: 'Search' });
 
-  //   fireEvent.change(searchInput, { target: { value: 'username:bob' } });
-  //   fireEvent.click(searchSubmitButton);
+    fireEvent.change(searchInput, { target: { value: 'username:bob' } });
+    fireEvent.click(searchSubmitButton);
 
-  //   await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith(1, 10, 'username:bob'));
-  // });
+    await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'username:bob' }));
+  });
 
   describe('should display user', () => {
     const displaysUserAttributes = async ({ user }) => {
-      const { queryByText } = render(<UsersOverview />);
+      render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
-      await act(() => mockLoadUsersPaginatedPromise);
+      // wait until list is displayed
+      await screen.findByText('Users');
 
       attributes.forEach(async (attribute) => {
         if (user[attribute]) {
-          expect(queryByText(user[attribute])).not.toBeNull();
+          expect(screen.getByText(user[attribute])).toBeInTheDocument();
         }
       });
     };
@@ -101,10 +103,10 @@ describe('UsersOverview', () => {
     it('be able to delete a modifiable user', async () => {
       const loadUsersPaginatedPromise = Promise.resolve({ ...paginatedUsers, list: modifiableUsersList });
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(loadUsersPaginatedPromise);
-      const { getByTitle } = render(<UsersOverviewAsAdmin />);
-      await act(() => loadUsersPaginatedPromise);
+      render(<UsersOverviewAsAdmin />);
 
-      fireEvent.click(getByTitle(`Delete user ${modifiableUser.username}`));
+      const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.username}`);
+      fireEvent.click(deleteButton);
 
       expect(window.confirm).toHaveBeenCalledTimes(1);
       expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete user ${modifiableUser.username}?`);
@@ -114,33 +116,32 @@ describe('UsersOverview', () => {
 
     it('not be able to delete a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      const { queryByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await waitFor(() => expect(queryByTitle(`Delete user ${readOnlyUser.username}`)).toBeNull());
+      await waitFor(() => expect(screen.queryByTitle(`Delete user ${readOnlyUser.username}`)).not.toBeInTheDocument());
     });
 
     it('see edit and edit tokens link for a modifiable user ', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }));
-      const { queryByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await waitFor(() => {
-        expect(queryByTitle(`Edit user ${modifiableUser.username}`)).not.toBeNull();
-        expect(queryByTitle(`Edit tokens of user ${modifiableUser.username}`)).not.toBeNull();
-      });
+      await screen.findByTitle(`Edit user ${modifiableUser.username}`);
+
+      expect(screen.getByTitle(`Edit tokens of user ${modifiableUser.username}`)).toBeInTheDocument();
     });
 
     it('not see edit link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      const { queryByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await waitFor(() => expect(queryByTitle(`Edit user ${readOnlyUser.username}`)).toBeNull());
+      await waitFor(() => expect(screen.queryByTitle(`Edit user ${readOnlyUser.username}`)).not.toBeInTheDocument());
     });
 
     it('see edit tokens link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
-      const { queryByTitle } = render(<UsersOverviewAsAdmin />);
+      render(<UsersOverviewAsAdmin />);
 
-      await waitFor(() => expect(queryByTitle(`Edit tokens for user ${readOnlyUser.username}`)).toBeNull());
+      await screen.findByTitle(`Edit tokens of user ${readOnlyUser.username}`);
     });
   });
 });

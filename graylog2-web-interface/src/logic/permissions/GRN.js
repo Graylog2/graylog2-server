@@ -32,6 +32,6 @@ export const getShowRouteFromGRN = (grn: string) => {
     case 'stream':
       return Routes.stream_search(id);
     default:
-      throw new Error(`Can't finde route for grn ${grn} of type: ${type ?? '(undefiend)'}`);
+      throw new Error(`Can't find route for grn ${grn} of type: ${type ?? '(undefined)'}`);
   }
 };

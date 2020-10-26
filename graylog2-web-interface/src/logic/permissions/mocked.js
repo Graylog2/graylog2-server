@@ -49,7 +49,7 @@ const searchPaginatedEntitySharesResponse = (page: number, perPage: number, quer
   });
 };
 
-const availabeEntityTypes = {
+const availableEntityTypes = {
   stream: 'Stream',
   dashboard: 'Dashboard',
   saved_search: 'Saved Search',
@@ -62,4 +62,4 @@ const availableCapabilities = {
   manage: 'Manager',
 };
 
-export default { searchPaginatedEntitySharesResponse, availabeEntityTypes, availableCapabilities };
+export default { searchPaginatedEntitySharesResponse, availableEntityTypes, availableCapabilities };

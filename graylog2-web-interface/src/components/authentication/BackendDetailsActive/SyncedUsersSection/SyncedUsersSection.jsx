@@ -4,28 +4,20 @@ import { useState, useEffect } from 'react';
 import * as Immutable from 'immutable';
 
 import Role from 'logic/roles/Role';
+import type { PaginatedUsers } from 'actions/users/UsersActions';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
-import ServiceUsersFilter from './SyncedUsersFilter';
+import SyncedUsersFilter from './SyncedUsersFilter';
 
+const TABLE_HEADERS = ['Username', 'Full Name', 'Roles', 'Actions'];
 const DEFAULT_PAGINATION = {
-  count: undefined,
   page: 1,
   perPage: 10,
   query: '',
-  total: undefined,
-};
-
-const TABLE_HEADERS = ['Username', 'Full Name', 'Roles', 'Actions'];
-
-const _onPageChange = (loadUsers, setLoading) => (page, perPage) => {
-  setLoading(true);
-
-  return loadUsers(page, perPage).then(() => setLoading(false));
 };
 
 const _headerCellFormatter = (header) => {
@@ -37,48 +29,47 @@ const _headerCellFormatter = (header) => {
   }
 };
 
+const _loadSyncedTeams = (pagination, setLoading, setPaginatedUsers) => {
+  setLoading(true);
+
+  AuthenticationDomain.loadUsersPaginated(pagination).then((paginatedUsers) => {
+    setPaginatedUsers(paginatedUsers);
+    setLoading(false);
+  });
+};
+
+const _updateListOnUserDisable = (perPage, query, setPagination) => AuthenticationActions.disableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+const _updateListOnUserEnable = (perPage, query, setPagination) => AuthenticationActions.enableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+
 type Props = {
   roles: Immutable.List<Role>,
 };
 
 const SyncedUsersSection = ({ roles }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [paginatedUsers, setPaginatedUsers] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION });
-  const { list: users, pagination: { page, perPage, query, total } } = paginatedUsers;
+  const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const { list: users } = paginatedUsers || {};
+  const { page, perPage, query } = pagination;
 
-  const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
+  useEffect(() => _loadSyncedTeams(pagination, setLoading, setPaginatedUsers), [pagination]);
+  useEffect(() => _updateListOnUserDisable(perPage, query, setPagination), [perPage, query]);
+  useEffect(() => _updateListOnUserEnable(perPage, query, setPagination), [perPage, query]);
 
-  const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthenticationDomain.loadUsersPaginated(newPage, newPerPage, newQuery).then(setPaginatedUsers);
-  };
-
-  const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);
-  const _refreshList = () => _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-
-  useEffect(() => {
-    _loadUsers(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
-
-    const unlistenDisableUser = AuthenticationActions.disableUser.completed.listen(_refreshList);
-    const unlistenEnableUser = AuthenticationActions.enableUser.completed.listen(_refreshList);
-
-    return () => {
-      unlistenDisableUser();
-      unlistenEnableUser();
-    };
-  }, []);
-
-  if (!users) {
+  if (!paginatedUsers) {
     return <Spinner />;
   }
+
+  const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
   return (
     <SectionComponent title="Synchronized Users" showLoading={loading}>
       <p className="description">
-        Found {total} synchronized users.
+        Found {paginatedUsers.pagination.total} synchronized users.
       </p>
-      <PaginatedList activePage={page} totalItems={total} onChange={_onPageChange(_loadUsers, setLoading)}>
+      <PaginatedList activePage={page} totalItems={paginatedUsers.pagination.total} onChange={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })}>
         <DataTable className="table-hover"
-                   customFilter={<ServiceUsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
+                   customFilter={<SyncedUsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />}
                    dataRowFormatter={_userOverviewItem}
                    filterKeys={[]}
                    filterLabel="Filter Users"

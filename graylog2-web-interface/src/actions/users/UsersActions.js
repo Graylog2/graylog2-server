@@ -4,9 +4,9 @@ import * as Immutable from 'immutable';
 
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
+import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import User, { type UserJSON } from 'logic/users/User';
 import UserOverview from 'logic/users/UserOverview';
-import type { PaginationType } from 'stores/PaginationTypes';
 
 export type UserCreate = {
   email: $PropertyType<UserJSON, 'email'>,
@@ -34,10 +34,8 @@ export type ChangePasswordRequest = {
   password: string,
 };
 
-export type PaginatedUsers = {
+export type PaginatedUsers = PaginatedList<UserOverview> & {
   adminUser: ?UserOverview,
-  list: Immutable.List<UserOverview>,
-  pagination: PaginationType,
 };
 
 export type ActionsType = {
@@ -50,7 +48,7 @@ export type ActionsType = {
   loadTokens: (username: string) => Promise<Token[]>,
   deleteToken: (username: string, tokenId: string, tokenName: string) => Promise<void>,
   loadUsers: () => Promise<Immutable.List<User>>,
-  loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedUsers>,
+  loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>,
 };
 
 const UsersActions: RefluxActions<ActionsType> = singletonActions(

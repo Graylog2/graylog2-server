@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
+import type { PaginatedUsers } from 'actions/users/UsersActions';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import { type ThemeInterface } from 'theme';
@@ -16,8 +17,6 @@ import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
 
 const DEFAULT_PAGINATION = {
-  count: undefined,
-  total: undefined,
   page: 1,
   perPage: 10,
   query: '',
@@ -58,48 +57,40 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _onPageChange = (loadUsers, setLoading) => (page, perPage) => {
+const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
   setLoading(true);
 
-  return loadUsers(page, perPage).then(() => setLoading(false));
+  UsersDomain.loadUsersPaginated(pagination).then((paginatedUsers) => {
+    setPaginatedUsers(paginatedUsers);
+    setLoading(false);
+  });
 };
+
+const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 
 const UsersOverview = () => {
   const currentUser = useContext(CurrentUserContext);
+  const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [loading, setLoading] = useState(false);
-  const [paginatedUsers, setPaginatedUsers] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION });
-  const { adminUser, list: users, pagination: { page, perPage, query, total } } = paginatedUsers;
-  const _isActiveItem = (user) => currentUser?.username === user.username;
-  const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const { list: users, adminUser, pagination: { total } = {} } = paginatedUsers || {};
+  const { page, query, perPage } = pagination;
 
-  const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return UsersDomain.loadUsersPaginated(newPage, newPerPage, newQuery)
-      .then((newPaginatedUsers) => newPaginatedUsers && setPaginatedUsers(newPaginatedUsers));
-  };
-
-  const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);
-
-  useEffect(() => {
-    _loadUsers(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
-
-    const unlistenDeleteUser = UsersActions.delete.completed.listen(() => {
-      _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
-    });
-
-    return () => {
-      unlistenDeleteUser();
-    };
-  }, []);
+  useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);
+  useEffect(() => _updateListOnUserDelete(perPage, query, setPagination), [perPage, query]);
 
   if (!users) {
     return <Spinner />;
   }
 
+  const searchFilter = <UsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
+  const _usersOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.username === user.username)} />;
+
   return (
     <Container>
       {adminUser && (
         <SystemAdministrator adminUser={adminUser}
-                             dataRowFormatter={_userOverviewItem}
+                             dataRowFormatter={_usersOverviewItem}
                              headerCellFormatter={_headerCellFormatter}
                              headers={TABLE_HEADERS} />
       )}
@@ -112,7 +103,9 @@ const UsersOverview = () => {
           <p className="description">
             Found {total} registered users on the system.
           </p>
-          <StyledPaginatedList onChange={_onPageChange(_loadUsers, setLoading)} totalItems={total} activePage={page}>
+          <StyledPaginatedList activePage={page}
+                               totalItems={total}
+                               onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}>
             <DataTable id="users-overview"
                        className="table-hover"
                        rowClassName="no-bm"
@@ -121,8 +114,8 @@ const UsersOverview = () => {
                        sortByKey="fullName"
                        noDataText={<EmptyResult>No users have been found.</EmptyResult>}
                        rows={users.toJS()}
-                       customFilter={<UsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
-                       dataRowFormatter={_userOverviewItem}
+                       customFilter={searchFilter}
+                       dataRowFormatter={_usersOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Users" />
           </StyledPaginatedList>

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useCallback } from 'react';
 
 import withParams from 'routing/withParams';
 import { Row, Col } from 'components/graylog';
@@ -69,7 +69,7 @@ const UserEditPage = ({ params }: Props) => {
   const [creatingToken, setCreatingToken] = useState(false);
 
   const username = params?.username;
-  const loadTokens = () => _loadTokens(params?.username, currentUser, setTokens);
+  const loadTokens = useCallback(() => _loadTokens(params?.username, currentUser, setTokens), [params?.username, currentUser]);
 
   const _handleTokenDelete = (tokenId, tokenName) => _deleteToken(tokenId, tokenName, username, loadTokens, setDeletingTokenId);
   const _handleTokenCreate = (tokenName) => _createToken(tokenName, username, loadTokens, setCreatingToken);
@@ -78,7 +78,7 @@ const UserEditPage = ({ params }: Props) => {
     loadTokens();
 
     UsersDomain.load(username).then((newLoadedUser) => newLoadedUser && setLoadedUser(newLoadedUser));
-  }, [currentUser, username]);
+  }, [currentUser, username, loadTokens]);
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>

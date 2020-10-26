@@ -103,7 +103,7 @@ describe('EntityShareModal', () => {
       expect(getByText('Save')).toBeDisabled();
     });
 
-    it('necessary informations', () => {
+    it('necessary information', () => {
       const { getByText, getByDisplayValue } = render(<SimpleEntityShareModal />);
 
       // provided description
@@ -112,8 +112,8 @@ describe('EntityShareModal', () => {
       expect(getByText('The title')).not.toBeNull();
       // sharable urls
       expect(getByDisplayValue('http://localhost/')).not.toBeNull();
-      // missing dependecies warning
-      expect(getByText('There are missing dependecies for the current set of collaborators')).not.toBeNull();
+      // missing dependencies warning
+      expect(getByText('There are missing dependencies for the current set of collaborators')).not.toBeNull();
       expect(getByText(/needs access to/)).not.toBeNull();
     });
   });
@@ -242,14 +242,14 @@ describe('EntityShareModal', () => {
         [securityIsManager.grantee]: securityIsManager.capability,
         [everyoneIsViewer.grantee]: everyoneIsViewer.capability,
       });
-      const enitityShareState = mockEntityShareState
+      const entityShareState = mockEntityShareState
         .toBuilder()
         .activeShares(activeShares)
         .selectedGranteeCapabilities(selectedGranteeCapabilities)
         .build();
 
       beforeEach(() => {
-        asMock(EntityShareStore.getInitialState).mockReturnValueOnce({ state: enitityShareState });
+        asMock(EntityShareStore.getInitialState).mockReturnValueOnce({ state: entityShareState });
       });
 
       const deleteGrantee = async ({ grantee }) => {

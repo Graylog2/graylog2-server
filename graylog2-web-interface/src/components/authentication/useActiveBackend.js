@@ -21,7 +21,7 @@ const useActiveBackend = <T>(listenableActions: Array<ListenableAction<T>> = [])
     return () => {
       unlistenActions.forEach((unlistenAction) => unlistenAction());
     };
-  }, []);
+  }, [listenableActions]);
 
   return {
     finishedLoading,

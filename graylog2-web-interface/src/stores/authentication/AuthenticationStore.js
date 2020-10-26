@@ -18,10 +18,10 @@ import type {
   LoadResponse,
   LoginTestPayload,
   LoginTestResult,
-  PaginatedAuthUsers,
   PaginatedBackends,
 } from 'actions/authentication/AuthenticationActions';
-import type { PaginatedResponseType } from 'stores/PaginationTypes';
+import type { PaginatedUsers } from 'actions/users/UsersActions';
+import type { PaginatedResponseType, Pagination } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserOverview, { type UserOverviewJSON } from 'logic/users/UserOverview';
@@ -140,7 +140,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    loadBackendsPaginated(page: number, perPage: number, query: string): Promise<PaginatedBackends> {
+    loadBackendsPaginated({ page, perPage, query }: Pagination): Promise<PaginatedBackends> {
       const url = PaginationURL(ApiRoutes.AuthenticationController.servicesPaginated().url, page, perPage, query);
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedBackendsResponse) => ({
@@ -149,11 +149,11 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
           },
           list: Immutable.List(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
           pagination: {
-            count: response.count,
-            total: response.total,
             page: response.page,
             perPage: response.per_page,
             query: response.query,
+            count: response.count,
+            total: response.total,
           },
         }));
 
@@ -162,18 +162,18 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    loadUsersPaginated(page: number, perPage: number, query: string): Promise<PaginatedAuthUsers> {
+    loadUsersPaginated({ page, perPage, query }: Pagination): Promise<PaginatedUsers> {
       const url = PaginationURL(ApiRoutes.AuthenticationController.loadUsersPaginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedUsersResponse) => ({
           list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
           pagination: {
-            count: response.count,
-            total: response.total,
             page: response.page,
             perPage: response.per_page,
             query: response.query,
+            count: response.count,
+            total: response.total,
           },
         }));
 

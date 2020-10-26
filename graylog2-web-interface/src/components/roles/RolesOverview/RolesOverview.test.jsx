@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, act, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';
 
@@ -13,6 +13,8 @@ const loadRolesPaginatedResponse = {
   pagination: {
     page: 1,
     perPage: 10,
+    query: '',
+    count: mockRoles.size,
     total: mockRoles.size,
   },
 };
@@ -34,57 +36,56 @@ describe('RolesOverview', () => {
     jest.clearAllMocks();
   });
 
-  describe('should display table headers', () => {
-    const displaysHeader = async ({ header }) => {
-      const { queryByText } = render(<RolesOverview />);
-      await act(() => mockLoadRolesPaginatedPromise);
+  it('should display table header', async () => {
+    render(<RolesOverview />);
+    const headers = [
+      'Name',
+      'Description',
+      'Actions',
+    ];
 
-      expect(queryByText(header)).not.toBeNull();
-    };
+    // wait until list is displayed
+    await screen.findByText('Roles');
 
-    it.each`
-      header
-      ${'Name'}
-      ${'Description'}
-      ${'Actions'}
-    `('$header', displaysHeader);
+    headers.forEach((header) => {
+      expect(screen.getByText(header)).toBeInTheDocument();
+    });
   });
 
   it('should fetch and list roles with name and description', async () => {
-    const { queryByText } = render(<RolesOverview />);
-    await act(() => mockLoadRolesPaginatedPromise);
+    render(<RolesOverview />);
 
-    expect(queryByText(mockRoles.first().name)).not.toBeNull();
-    expect(queryByText(mockRoles.first().description)).not.toBeNull();
+    await screen.findByText(mockRoles.first().name);
+
+    expect(screen.queryByText(mockRoles.first().description)).toBeInTheDocument();
   });
 
   it('should allow searching for roles', async () => {
-    const { getByPlaceholderText, getByRole } = render(<RolesOverview />);
-    await act(() => mockLoadRolesPaginatedPromise);
+    render(<RolesOverview />);
 
-    const searchInput = getByPlaceholderText('Enter search query...');
-    const searchSubmitButton = getByRole('button', { name: 'Search' });
+    const searchInput = await screen.findByPlaceholderText('Enter search query...');
+    const searchSubmitButton = screen.getByRole('button', { name: 'Search' });
 
     fireEvent.change(searchInput, { target: { value: 'name:manager' } });
     fireEvent.click(searchSubmitButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, 'name:manager'));
+    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
   });
 
-  // it('should reset search', async () => {
-  //   const { getByPlaceholderText, getByRole } = render(<RolesOverview />);
-  //   await act(() => mockLoadRolesPaginatedPromise);
-  //   const searchSubmitButton = getByRole('button', { name: 'Search' });
-  //   const resetSearchButton = getByRole('button', { name: 'Reset' });
-  //   const searchInput = getByPlaceholderText('Enter search query...');
+  it('should reset search', async () => {
+    render(<RolesOverview />);
 
-  //   fireEvent.change(searchInput, { target: { value: 'name:manager' } });
-  //   fireEvent.click(searchSubmitButton);
+    const searchSubmitButton = await screen.findByRole('button', { name: 'Search' });
+    const resetSearchButton = screen.getByRole('button', { name: 'Reset' });
+    const searchInput = screen.getByPlaceholderText('Enter search query...');
 
-  //   await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, 'name:manager'));
+    fireEvent.change(searchInput, { target: { value: 'name:manager' } });
+    fireEvent.click(searchSubmitButton);
 
-  //   fireEvent.click(resetSearchButton);
+    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
 
-  //   await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, ''));
-  // });
+    fireEvent.click(resetSearchButton);
+
+    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }));
+  });
 });

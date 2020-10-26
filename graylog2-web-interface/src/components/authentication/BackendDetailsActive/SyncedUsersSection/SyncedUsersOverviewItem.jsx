@@ -16,7 +16,7 @@ type Props = {
   roles: Immutable.List<Role>,
 };
 
-const ActtionsWrapper = styled(ButtonToolbar)`
+const ActionsWrapper = styled(ButtonToolbar)`
   display: flex;
   justify-content: flex-end;
 `;
@@ -45,7 +45,7 @@ const SyncedUsersOverviewItem = ({
       <td className="limited">{fullName}</td>
       <RolesCell roles={userRolesNames} />
       <td className="limited">
-        <ActtionsWrapper>
+        <ActionsWrapper>
           {enabled
             ? (
               <Button type="button" bsStyle="info" bsSize="xs" onClick={() => AuthenticationDomain.disableUser(id, username)}>
@@ -61,7 +61,7 @@ const SyncedUsersOverviewItem = ({
               Edit
             </Button>
           </LinkContainer>
-        </ActtionsWrapper>
+        </ActionsWrapper>
       </td>
     </tr>
   );
