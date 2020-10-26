@@ -76,6 +76,15 @@ class ESVersionCheckPeriodicalTest {
     }
 
     @Test
+    void createsNotificationIfCurrentVersionIncompatiblyOlderThanInitialOne() {
+        returnProbedVersion(Version.from(6, 8, 1));
+
+        createPeriodical(Version.from(8, 1, 2)).doRun();
+
+        assertNotificationWasRaised();
+    }
+
+    @Test
     void fixesNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
         returnProbedVersion(Version.from(8, 2, 3));
 
