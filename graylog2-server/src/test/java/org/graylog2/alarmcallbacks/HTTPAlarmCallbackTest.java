@@ -268,7 +268,7 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void getNameReturnsNameOfHTTPAlarmCallback() throws Exception {
-        assertThat(alarmCallback.getName()).isEqualTo("HTTP Alarm Callback");
+        assertThat(alarmCallback.getName()).isEqualTo("HTTP Alarm Callback [Deprecated]");
     }
 
     @Test
