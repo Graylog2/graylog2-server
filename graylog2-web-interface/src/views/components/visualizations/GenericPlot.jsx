@@ -209,6 +209,10 @@ class GenericPlot extends React.Component<Props, State> {
             return chart;
           });
 
+          if (newChartData[0].type === 'pie') {
+            newChartData[0].outsidetextfont = { color: theme.colors.global.textDefault };
+          }
+
           return (
             <InteractiveContext.Consumer>
               {(interactive) => (
