@@ -106,7 +106,8 @@ public class ESVersionCheckPeriodical extends Periodical {
             if (compatible(this.initialElasticsearchVersion, version)) {
                 notificationService.fixed(Notification.Type.ES_VERSION_MISMATCH);
             } else {
-                LOG.warn("Elasticsearch version currently running (8.2.1) is incompatible with one Graylog was started with (7.9.1)" +
+                LOG.warn("Elasticsearch version currently running (" + version.toString() + ") is incompatible with the " +
+                        "one Graylog was started with (" + initialElasticsearchVersion.toString() + ")" +
                         " - a restart is required!");
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_VERSION_MISMATCH)
