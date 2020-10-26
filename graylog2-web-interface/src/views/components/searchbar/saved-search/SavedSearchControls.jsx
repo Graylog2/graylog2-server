@@ -236,7 +236,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                                        saveSearch={this.saveSearch}
                                        saveAsSearch={this.saveAsSearch}
                                        disableCreateNew={newTitle === view.title}
-                                       isCreateNew={!view.id}
+                                       isCreateNew={!view.id || !isAllowedToEdit}
                                        toggleModal={this.toggleFormModal}
                                        value={newTitle} />
                       )}

@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useRef } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
@@ -41,26 +42,37 @@ type Props = {
   entityURL?: string,
 };
 
-const ShareableEntityURL = ({ entityURL }: Props) => (
-  <Container>
-    <VerticalCenter>
-      <b>Sharable URL:</b>
-    </VerticalCenter>
-    <URLColumn>
-      <FormGroup>
-        <InputGroup>
-          <StyledFormControl type="text" value={entityURL} readOnly />
-          <InputGroupAddon>
-            <StyledClipboardButton text={entityURL} title={<Icon name="copy" fixedWidth />} />
-          </InputGroupAddon>
-        </InputGroup>
-      </FormGroup>
-      <div>
-        You or anyone authorized to view can access this link.
-      </div>
-    </URLColumn>
-  </Container>
-);
+const ShareableEntityURL = ({ entityURL }: Props) => {
+  const container = useRef();
+
+  return (
+    <Container>
+      <VerticalCenter>
+        <b>Sharable URL:</b>
+      </VerticalCenter>
+      <URLColumn>
+        <FormGroup>
+          <InputGroup>
+            <StyledFormControl type="text" value={entityURL} readOnly />
+            <InputGroupAddon>
+              <span ref={container}>
+                {container.current && (
+                  <StyledClipboardButton text={entityURL}
+                                         container={container.current}
+                                         buttonTitle="Copy parameter to clipboard"
+                                         title={<Icon name="copy" fixedWidth />} />
+                )}
+              </span>
+            </InputGroupAddon>
+          </InputGroup>
+        </FormGroup>
+        <div>
+          You or anyone authorized to view can access this link.
+        </div>
+      </URLColumn>
+    </Container>
+  );
+};
 
 ShareableEntityURL.defaultProps = {
   entityURL: window.location.href,
