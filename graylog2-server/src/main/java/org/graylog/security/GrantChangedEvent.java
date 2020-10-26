@@ -17,7 +17,6 @@
 package org.graylog.security;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
@@ -34,12 +33,11 @@ public abstract class GrantChangedEvent {
     @JsonProperty(FIELD_GRANT_IDS)
     public abstract Set<String> grantIds();
 
-    @JsonCreator
-    public static GrantChangedEvent create(@JsonProperty(FIELD_GRANT_IDS) Set<String> grantIds) {
+    public static GrantChangedEvent create(Set<String> grantIds) {
         return new AutoValue_GrantChangedEvent(grantIds);
     }
 
     public static GrantChangedEvent create(String grantId) {
-        return create(ImmutableSet.of(grantId));
+        return new AutoValue_GrantChangedEvent(ImmutableSet.of(grantId));
     }
 }
