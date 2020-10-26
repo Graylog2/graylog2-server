@@ -16,7 +16,6 @@
  */
 package org.graylog.security.shares;
 
-import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
@@ -44,7 +43,6 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -60,7 +58,7 @@ class GranteeSharesServiceTest {
                GRNRegistry grnRegistry,
                @Mock GRNDescriptorService grnDescriptorService) {
         this.grnDescriptorService = grnDescriptorService;
-        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(EventBus.class));
+        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService);
     }
 

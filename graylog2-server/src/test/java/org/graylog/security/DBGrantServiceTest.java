@@ -17,7 +17,6 @@
 package org.graylog.security;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
@@ -54,7 +53,7 @@ public class DBGrantServiceTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        this.dbService = new DBGrantService(mongodb.mongoConnection(), mapper, grnRegistry, mock(EventBus.class));
+        this.dbService = new DBGrantService(mongodb.mongoConnection(), mapper, grnRegistry);
     }
 
     @Test

@@ -74,7 +74,7 @@ public class EntitySharesServiceTest {
                GRNRegistry grnRegistry) {
         this.grnRegistry = grnRegistry;
 
-        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, this.grnRegistry, mock(EventBus.class));
+        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, this.grnRegistry);
 
         lenient().when(entityDependencyResolver.resolve(any())).thenReturn(ImmutableSet.of());
         lenient().when(entityDependencyPermissionChecker.check(any(), any(), any())).thenReturn(ImmutableMultimap.of());

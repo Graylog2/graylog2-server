@@ -18,7 +18,6 @@ package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
@@ -49,7 +48,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
@@ -84,9 +82,9 @@ class RolesToGrantsMigrationTest {
 
         roleService = new RoleServiceImpl(mongodb.mongoConnection(), mongoJackObjectMapperProvider, permissions, validator);
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(EventBus.class));
+        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         this.userService = userService;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry, mock(EventBus.class));
+        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         migration = new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, "admin");
     }
 
