@@ -1,15 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-// import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { paginatedShares } from 'fixtures/sharedEntities';
-// import selectEvent from 'react-select-event';
 import { reader as assignedRole } from 'fixtures/roles';
 import { admin as currentUser } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
-// import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import User from 'logic/users/User';
 
 import UserDetails from './UserDetails';
@@ -103,52 +100,6 @@ describe('<UserDetails />', () => {
         await waitFor(() => expect(screen.getByText('10 Days')).toBeInTheDocument());
       });
     });
-
-    // describe('shared entities section', () => {
-    //   it('should list provided paginated user shares', async () => {
-    //     const { getAllByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
-    //     await act(() => mockAuthzRolesPromise);
-
-    //     expect(getAllByText(mockPaginatedUserShares.list.first().title)).toBeInTheDocument();
-    //   });
-
-    //   it('should fetch paginated user shares when using search', async () => {
-    //     const { getByPlaceholderText, getByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
-    //     await act(() => mockAuthzRolesPromise);
-
-    //     const searchInput = getByPlaceholderText('Enter search query...');
-    //     const searchSubmitButton = screen.getByText('Search');
-
-    //     fireEvent.change(searchInput, { target: { value: 'the username' } });
-    //     fireEvent.click(searchSubmitButton);
-
-    //     await waitFor(() => expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 10, 'the username', undefined));
-    //   });
-
-    //   it('should fetch user shares when filtering by entity type', async () => {
-    //     const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 1, perPage: 50, query: 'existing query' } };
-    //     const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
-    //     await act(() => mockAuthzRolesPromise);
-
-    //     const entityTypeSelect = getByLabelText('Entity Type');
-    //     await selectEvent.openMenu(entityTypeSelect);
-    //     await act(async () => { await selectEvent.select(entityTypeSelect, 'Dashboard'); });
-
-    //     expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { entity_type: 'dashboard' });
-    //   });
-
-    //   it('should fetch user shares when filtering by capability', async () => {
-    //     const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 1, perPage: 50, query: 'existing query' } };
-    //     const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
-    //     await act(() => mockAuthzRolesPromise);
-
-    //     const capabilitySelect = getByLabelText('Capability');
-    //     await selectEvent.openMenu(capabilitySelect);
-    //     await act(async () => { await selectEvent.select(capabilitySelect, 'Manager'); });
-
-    //     expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { capability: 'manage' });
-    //   });
-    // });
   });
 
   describe('roles section', () => {
