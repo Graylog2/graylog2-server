@@ -82,6 +82,35 @@ describe('<UserCreate />', () => {
     }));
   });
 
+  it('should trim the username', async () => {
+    const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
+
+    const usernameInput = await findByLabelText('Username');
+    const fullNameInput = await findByLabelText('Full Name');
+    const emailInput = await findByLabelText('E-Mail Address');
+    const passwordInput = await findByPlaceholderText('Password');
+    const passwordRepeatInput = await findByPlaceholderText('Repeat password');
+    const submitButton = await findByText('Create User');
+
+    fireEvent.change(usernameInput, { target: { value: '   username   ' } });
+    fireEvent.change(fullNameInput, { target: { value: 'The full name' } });
+    fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
+    fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
+    fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
+
+    fireEvent.click(submitButton);
+
+    await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
+      username: 'username',
+      full_name: 'The full name',
+      roles: ['Reader'],
+      email: 'username@example.org',
+      permissions: [],
+      session_timeout_ms: 3600000,
+      password: 'thepassword',
+    }));
+  });
+
   // The following tests will work when we use @testing-library/user-event instead of fireEvent
   // it('should display warning if username is already taken', async () => {
   //   const { findByLabelText, findByText } = render(<UserCreate />);
