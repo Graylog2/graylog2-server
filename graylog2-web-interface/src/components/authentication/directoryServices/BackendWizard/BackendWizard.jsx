@@ -43,7 +43,7 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?s
 
 export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string) => {
   const _formatPayload = (password) => {
-    if (password) {
+    if (!password) {
       return undefined;
     }
 
