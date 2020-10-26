@@ -12,8 +12,8 @@ type Props = {|
   timerange: ?TimeRange,
 |};
 
-const EMPTY_RANGE = '----/--/-- --:--:--.---';
-const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
+export const EMPTY_RANGE = '----/--/-- --:--:--.---';
+export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
@@ -38,7 +38,7 @@ const TimeRangeWrapper: StyledComponent<{}, ThemeInterface, HTMLParagraphElement
   }
 `);
 
-const dateOutput = (timerange: TimeRange) => {
+export const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
 
   switch (timerange.type) {
