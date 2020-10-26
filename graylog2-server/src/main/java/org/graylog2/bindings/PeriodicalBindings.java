@@ -28,6 +28,7 @@ import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ClusterIdGeneratorPeriodical;
 import org.graylog2.periodical.ConfigurationManagementPeriodical;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
+import org.graylog2.periodical.ESVersionCheckPeriodical;
 import org.graylog2.periodical.GarbageCollectionWarningThread;
 import org.graylog2.periodical.IndexFailuresPeriodical;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
@@ -70,5 +71,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(TrafficCounterCalculator.class);
         periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class);
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
+        periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
     }
 }
