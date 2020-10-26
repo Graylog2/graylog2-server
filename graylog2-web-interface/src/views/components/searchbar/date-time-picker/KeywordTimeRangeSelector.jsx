@@ -114,30 +114,6 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
     }
   }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
 
-  useEffect(() => {
-    if (keywordRef.current !== nextRangeProps?.value?.keyword) {
-      keywordRef.current = nextRangeProps.value.keyword;
-
-      ToolsStore.testNaturalDate(keywordRef.current)
-        .then(_setSuccessfullPreview, _setFailedPreview);
-    }
-  });
-
-  useEffect(() => {
-    if (nextRangeProps?.value) {
-      const { type, keyword, ...restPreview } = nextRangeProps?.value;
-
-      if (!isEqual(restPreview, keywordPreview)) {
-        nextRangeHelpers.setValue({
-          type,
-          keyword,
-          ...restPreview,
-          ...keywordPreview,
-        });
-      }
-    }
-  }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
-
   return (
     <Row className="no-bm" style={{ marginLeft: 50 }}>
       <Col xs={3} style={{ padding: 0 }}>
