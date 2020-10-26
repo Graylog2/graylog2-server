@@ -88,13 +88,33 @@ const Ago: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({
 
 const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.label(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
-  grid-area: 1 / 2 / 2 / 7;
+  grid-area: 1 / 2 / 2 / 8;
   margin-left: 15px;
   font-weight: normal;
   align-self: self-end;
   
+  &.shortened {
+    grid-area: 1 / 2 / 2 / 3;
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+  
   input {
     margin-right: 6px;
+  }
+`);
+
+const RangeLimitNotice: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.span(({ theme }) => css`
+  font-style: italic;
+  font-size: ${theme.fonts.size.small};
+  color: ${theme.colors.variant.darker.warning};
+  grid-area: 1 / 3 / 2 / 8;
+  text-align: right;
+  align-self: self-end;
+  margin-bottom: 5px;
+  
+  > svg {
+    margin-right: 3px;
   }
 `);
 
@@ -174,7 +194,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
   const availableRangeTypes = buildRangeTypes(config);
 
   useEffect(() => {
-    if (typeDurationSeconds <= limitDuration && limitDuration !== 0) {
+    if (limitDuration === 0 || (typeDurationSeconds <= limitDuration && limitDuration !== 0)) {
       nextRangeHelpers.setValue({ ...nextRangeProps.value, ...state });
     } else {
       console.log('Nuh uh uh - you went over the limit!');
@@ -191,10 +211,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
     <RelativeWrapper>
       <RangeWrapper>
         <RangeTitle>From:</RangeTitle>
-        <RangeCheck htmlFor="relative-all-time"
-                    title={limitDuration !== 0
-                      ? `Admin has limited searching to ${moment.duration(-limitDuration, 'seconds').humanize(true)}`
-                      : 'Search All Messages'}>
+        <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
           <input type="checkbox"
                  id="relative-all-time"
                  value="0"
@@ -202,6 +219,10 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
                  onChange={handleAllTime}
                  disabled={limitDuration !== 0} />All Time
         </RangeCheck>
+        {limitDuration !== 0
+          && (
+            <RangeLimitNotice><Icon name="exclamation-triangle" />Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</RangeLimitNotice>
+          )}
         <InputWrap>
           <Input id="relative-timerange-from-value"
                  disabled={disabled || state.rangeAllTime}

@@ -7,7 +7,7 @@ import OriginalRelativeTimeRangeSelector from './RelativeTimeRangeSelector';
 
 const defaultProps = {
   config: {
-    query_time_range_limit: 'PT24H',
+    query_time_range_limit: '0',
   },
   disabled: false,
   originalTimeRange: {
@@ -53,7 +53,7 @@ describe('RelativeTimeRangeSelector', () => {
   it('Clicking All Time disables input', () => {
     render(<RelativeTimeRangeSelector {...defaultProps} />);
 
-    const allTimeCheckbox = screen.getByRole('checkbox', { name: /all time/i });
+    const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
     const rangeValue = screen.getByRole('spinbutton', { name: /set the range value/i });
 
     expect(rangeValue).not.toBeDisabled();
@@ -61,5 +61,15 @@ describe('RelativeTimeRangeSelector', () => {
     fireEvent.click(allTimeCheckbox);
 
     expect(rangeValue).toBeDisabled();
+  });
+
+  it('All Time checkbox is disabled * notice shown if timerange limit is set', () => {
+    render(<RelativeTimeRangeSelector {...defaultProps} config={{ query_time_range_limit: 'PT24H' }} />);
+
+    const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
+    const limitWarning = screen.getByText(/Admin has limited searching to a day ago/i);
+
+    expect(allTimeCheckbox).toBeDisabled();
+    expect(limitWarning).not.toBeNull();
   });
 });
