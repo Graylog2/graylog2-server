@@ -285,6 +285,24 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'es_version_mismatch':
+        const { initial_version: initialVersion, current_version: currentVersion } = notification.details;
+        return {
+          title: 'Elasticsearch version is incompatible',
+          description:(
+            <span>
+              The Elasticsearch version which is currently running ({currentVersion}) has a different major version than
+              the one the Graylog master node was started with ({initialVersion}).{' '}
+              This will most probably result in errors during indexing or searching. Graylog requires a full restart after an
+              Elasticsearch upgrade from one major version to another.
+              <br />
+              For details, please see our notes about{' '}
+              <DocumentationLink page={DocsHelper.PAGES.ROLLING_ES_UPGRADE}
+                                 text="rolling Elasticsearch upgrades." />
+
+            </span>
+          ),
+        }
       default:
         return { title: `unknown (${notification.type})`, description: 'unknown' };
     }

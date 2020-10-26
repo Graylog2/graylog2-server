@@ -67,7 +67,8 @@ public interface Notification extends Persisted {
         GENERIC,
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
-        ES_NODE_DISK_WATERMARK_FLOOD_STAGE
+        ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
+        ES_VERSION_MISMATCH
     }
 
     enum Severity {
