@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 import * as Immutable from 'immutable';
-import { screen, render, fireEvent, waitFor, act } from 'wrappedTestingLibrary';
+import { screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { reader as assignedRole, reportCreator as notAssignedRole } from 'fixtures/roles';
 import { admin as currentUser } from 'fixtures/users';

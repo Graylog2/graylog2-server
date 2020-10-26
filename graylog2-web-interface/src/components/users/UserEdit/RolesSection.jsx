@@ -41,7 +41,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     });
   }, [username]);
 
-  const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
+  const onRolesUpdate = (data: { roles: Array<string> }) => onSubmit(data).then(() => {
     _onLoad().then(setPaginatedRoles);
     UsersDomain.load(username);
   });
