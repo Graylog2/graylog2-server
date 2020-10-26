@@ -8,12 +8,12 @@ import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  username: $PropertyType<User, 'username'>,
+  userId: $PropertyType<User, 'id'>,
 };
 
-const SharedEntitiesSection = ({ username }: Props) => {
+const SharedEntitiesSection = ({ userId }: Props) => {
   const [loading, setLoading] = useState(false);
-  const _searchPaginated = useCallback((pagination) => EntityShareDomain.loadUserSharesPaginated(username, pagination), [username]);
+  const _searchPaginated = useCallback((pagination) => EntityShareDomain.loadUserSharesPaginated(userId, pagination), [userId]);
 
   return (
     <SectionComponent title="Shared Entities" showLoading={loading}>

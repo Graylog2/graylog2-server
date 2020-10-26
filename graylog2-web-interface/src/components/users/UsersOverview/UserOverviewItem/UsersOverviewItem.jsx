@@ -15,14 +15,15 @@ type Props = {
 };
 
 const UsersOverviewItem = ({
+  user,
   user: {
+    id,
     clientAddress,
     email,
     fullName,
     lastActivity,
     sessionActive,
     username,
-    readOnly,
     roles,
   },
   isActive,
@@ -33,7 +34,7 @@ const UsersOverviewItem = ({
                     sessionActive={sessionActive}
                     clientAddress={clientAddress} />
       <td className="limited">
-        <Link to={Routes.SYSTEM.USERS.show(username)}>
+        <Link to={Routes.SYSTEM.USERS.show(id)}>
           {fullName}
         </Link>
       </td>
@@ -41,7 +42,7 @@ const UsersOverviewItem = ({
       <td className="limited">{email}</td>
       <td className="limited">{clientAddress}</td>
       <RolesCell roles={roles} />
-      <ActionsCell username={username} readOnly={readOnly} />
+      <ActionsCell user={user} />
     </tr>
   );
 };

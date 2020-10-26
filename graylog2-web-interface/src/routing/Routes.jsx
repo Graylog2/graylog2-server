@@ -88,12 +88,12 @@ const Routes = {
     },
     USERS: {
       CREATE: '/system/users/new',
-      edit: (username) => `/system/users/edit/${username}`,
+      edit: (userId) => `/system/users/edit/${userId}`,
       TOKENS: {
-        edit: (username) => `/system/users/tokens/${username}`,
+        edit: (userId) => `/system/users/tokens/${userId}`,
       },
       OVERVIEW: '/system/users',
-      show: (username) => `/system/users/${username}`,
+      show: (userId) => `/system/users/${userId}`,
     },
     AUTHZROLES: {
       OVERVIEW: '/system/roles',

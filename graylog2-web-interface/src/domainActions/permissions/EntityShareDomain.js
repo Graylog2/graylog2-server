@@ -23,8 +23,8 @@ const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
 
 const loadUserSharesPaginated: $PropertyType<ActionsType, 'loadUserSharesPaginated'> = notifyingAction({
   action: EntityShareActions.loadUserSharesPaginated,
-  error: (error, username) => ({
-    message: `Loading entities which got shared with user "${username}" failed with status: ${error}`,
+  error: (error, userId) => ({
+    message: `Loading entities which got shared for user with id "${userId}" failed with status: ${error}`,
   }),
 });
 

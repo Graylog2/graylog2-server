@@ -7,75 +7,83 @@ import notifyingAction from '../notifyingAction';
 const create: $PropertyType<ActionsType, 'create'> = notifyingAction({
   action: UsersActions.create,
   success: (user) => ({
-    message: `User "${user?.username}" was created successfully`,
+    message: `User "${user?.full_name}" was created successfully`,
   }),
   error: (error, user) => ({
-    message: `Creating user "${user?.username}" failed with status: ${error}`,
+    message: `Creating user "${user?.full_name}" failed with status: ${error}`,
   }),
 });
 
 const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
   action: UsersActions.load,
+  error: (error, userId) => ({
+    message: `Loading user with id "${userId}" failed with status: ${error}`,
+  }),
+  notFoundRedirect: true,
+});
+
+const loadByUsername: $PropertyType<ActionsType, 'loadByUsername'> = notifyingAction({
+  action: UsersActions.loadByUsername,
   error: (error, username) => ({
-    message: `Loading user "${username}" failed with status: ${error}`,
+    message: `Loading user with username "${username}" failed with status: ${error}`,
   }),
   notFoundRedirect: true,
 });
 
 const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   action: UsersActions.update,
-  success: (username) => ({
-    message: `User "${username}" was updated successfully`,
+  success: (userId, payload) => ({
+    message: `User "${payload.full_name}" was updated successfully`,
   }),
-  error: (error, username) => ({
-    message: `Updating user "${username}" failed with status: ${error}`,
+  error: (error, userId, payload) => ({
+    message: `Updating user "${payload.full_name}" failed with status: ${error}`,
   }),
 });
 
 const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   action: UsersActions.delete,
-  success: (username) => ({
-    message: `User "${username}" was deleted successfully`,
+  success: (username, fullName) => ({
+    message: `User "${fullName}" was deleted successfully`,
   }),
-  error: (error, username) => ({
-    message: `Deleting user "${username}" failed with status: ${error}`,
+  error: (error, username, fullName) => ({
+    message: `Deleting user "${fullName}" failed with status: ${error}`,
   }),
 });
 
 const changePassword: $PropertyType<ActionsType, 'changePassword'> = notifyingAction({
   action: UsersActions.changePassword,
-  success: (username) => ({
-    message: `Password was changed successfully for user "${username}"`,
+  success: () => ({
+    message: 'Password was changed successfully ',
   }),
-  error: (error, username) => ({
-    message: `Changing password for user "${username}" failed with status: ${error}`,
+  error: (error, userId) => ({
+    message: `Changing password for user with id "${userId}" failed with status: ${error}`,
   }),
 });
 
 const createToken: $PropertyType<ActionsType, 'createToken'> = notifyingAction({
   action: UsersActions.createToken,
-  success: (username, tokenName) => ({
-    message: `Token "${tokenName}" created successfully for user "${username}"`,
+  success: (userId, tokenName) => ({
+    message: `Token "${tokenName}" created successfully`,
   }),
-  error: (error, username, tokenName) => ({
-    message: `Creating token "${tokenName}" for user "${username}" failed with status: ${error}`,
+  error: (error, userId, tokenName) => ({
+    message: `Creating token "${tokenName}" for user with id "${userId}" failed with status: ${error}`,
   }),
 });
 
 const loadTokens: $PropertyType<ActionsType, 'loadTokens'> = notifyingAction({
   action: UsersActions.loadTokens,
-  error: (error, username) => ({
-    message: `Loading tokens for user "${username}" failed with status: ${error}`,
+  error: (error, userId) => ({
+    message: `Loading tokens for user with id "${userId}" failed with status: ${error}`,
   }),
 });
 
 const deleteToken: $PropertyType<ActionsType, 'deleteToken'> = notifyingAction({
   action: UsersActions.deleteToken,
-  success: (username, tokenId, tokenName) => ({
-    message: `Token "${tokenName}" deleted successfully for user "${username}"`,
+  success: (userId, tokenId, tokenName) => ({
+    message: `Token "${tokenName}" deleted successfully`,
   }),
-  error: (error, username, tokenId, tokenName) => ({
-    message: `Deleting token "${tokenName}" for user "${username}" failed with status: ${error}`,
+  error: (error, userId, tokenId, tokenName) => ({
+    message: `Deleting token "${tokenName}" for user with id "${userId}" failed with status: ${error}`,
   }),
 });
 
@@ -96,6 +104,7 @@ const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = not
 export default {
   create,
   load,
+  loadByUsername,
   update,
   delete: deleteAction,
   changePassword,

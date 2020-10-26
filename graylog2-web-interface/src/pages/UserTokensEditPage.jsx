@@ -17,7 +17,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
   params: {
-    username: string,
+    userId: string,
   },
 };
 
@@ -31,16 +31,16 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
   </>
 );
 
-const _loadTokens = (username, currentUser, setTokens) => {
-  if (isPermitted(currentUser?.permissions, [`users:tokenlist:${username}`])) {
-    UsersDomain.loadTokens(username).then(setTokens);
+const _loadTokens = (userId, currentUser, setTokens) => {
+  if (isPermitted(currentUser?.permissions, [`users:tokenlist:${userId}`])) {
+    UsersDomain.loadTokens(userId).then(setTokens);
   } else {
     setTokens([]);
   }
 };
 
-const _deleteToken = (tokenId, tokenName, username, loadTokens, setDeletingTokenId) => {
-  const promise = UsersDomain.deleteToken(username, tokenId, tokenName);
+const _deleteToken = (tokenId, tokenName, userId, loadTokens, setDeletingTokenId) => {
+  const promise = UsersDomain.deleteToken(userId, tokenId, tokenName);
 
   setDeletingTokenId(tokenId);
 
@@ -50,8 +50,8 @@ const _deleteToken = (tokenId, tokenName, username, loadTokens, setDeletingToken
   });
 };
 
-const _createToken = (tokenName, username, loadTokens, setCreatingToken) => {
-  const promise = UsersDomain.createToken(username, tokenName);
+const _createToken = (tokenName, userId, loadTokens, setCreatingToken) => {
+  const promise = UsersDomain.createToken(userId, tokenName);
 
   setCreatingToken(true);
 
@@ -68,23 +68,23 @@ const UserEditPage = ({ params }: Props) => {
   const [deletingTokenId, setDeletingTokenId] = useState();
   const [creatingToken, setCreatingToken] = useState(false);
 
-  const username = params?.username;
-  const loadTokens = useCallback(() => _loadTokens(params?.username, currentUser, setTokens), [params?.username, currentUser]);
+  const userId = params?.userId;
+  const loadTokens = useCallback(() => _loadTokens(userId, currentUser, setTokens), [userId, currentUser]);
 
-  const _handleTokenDelete = (tokenId, tokenName) => _deleteToken(tokenId, tokenName, username, loadTokens, setDeletingTokenId);
-  const _handleTokenCreate = (tokenName) => _createToken(tokenName, username, loadTokens, setCreatingToken);
+  const _handleTokenDelete = (tokenId, tokenName) => _deleteToken(tokenId, tokenName, userId, loadTokens, setDeletingTokenId);
+  const _handleTokenCreate = (tokenName) => _createToken(tokenName, userId, loadTokens, setCreatingToken);
 
   useEffect(() => {
     loadTokens();
 
-    UsersDomain.load(username).then((newLoadedUser) => newLoadedUser && setLoadedUser(newLoadedUser));
-  }, [currentUser, username, loadTokens]);
+    UsersDomain.load(userId).then((newLoadedUser) => newLoadedUser && setLoadedUser(newLoadedUser));
+  }, [currentUser, userId, loadTokens]);
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
                   subactions={(
-                    <UserActionLinks username={username}
+                    <UserActionLinks userId={userId}
                                      userIsReadOnly={loadedUser?.readOnly ?? false} />
                   )}>
         <span>

@@ -42,7 +42,7 @@ const UserDetails = ({ user }: Props) => {
           </div>
         </IfPermitted>
       </SectionGrid>
-      <SharedEntitiesSection username={user.username} />
+      <SharedEntitiesSection userId={user.id} />
     </>
   );
 };

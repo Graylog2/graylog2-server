@@ -25,25 +25,25 @@ const _validate = (values) => {
   return errors;
 };
 
-const _onSubmit = (formData, username) => {
+const _onSubmit = (formData, userId) => {
   const data = { ...formData };
   delete data.password_repeat;
 
-  return UsersDomain.changePassword(username, data);
+  return UsersDomain.changePassword(userId, data);
 };
 
-const PasswordSection = ({ user: { username } }: Props) => {
+const PasswordSection = ({ user: { id } }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   let requiresOldPassword = true;
 
   if (isPermitted(currentUser?.permissions, 'users:passwordchange:*')) {
     // Ask for old password if user is editing their own account
-    requiresOldPassword = username === currentUser?.username;
+    requiresOldPassword = id === currentUser?.id;
   }
 
   return (
     <SectionComponent title="Password">
-      <Formik onSubmit={(formData) => _onSubmit(formData, username)}
+      <Formik onSubmit={(formData) => _onSubmit(formData, id)}
               validate={_validate}
               initialValues={{}}>
         {({ isSubmitting, isValid }) => (

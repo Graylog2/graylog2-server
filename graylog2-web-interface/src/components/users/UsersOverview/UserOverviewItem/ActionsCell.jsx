@@ -10,8 +10,7 @@ import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'compo
 import { IfPermitted } from 'components/common';
 
 type Props = {
-  readOnly: boolean,
-  username: $PropertyType<UserOverview, 'username'>,
+  user: UserOverview,
 };
 
 const ActionsWrapper = styled.div`
@@ -20,23 +19,23 @@ const ActionsWrapper = styled.div`
 `;
 
 const EditTokensAction = ({
-  username,
+  user: { fullName, id },
   wrapperComponent: WrapperComponent,
 }: {
-  username: $PropertyType<Props, 'username'>,
+  user: UserOverview,
   wrapperComponent: Button | MenuItem,
 }) => (
-  <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(encodeURIComponent(username))}>
-    <WrapperComponent id={`edit-tokens-${username}`}
+  <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(encodeURIComponent(id))}>
+    <WrapperComponent id={`edit-tokens-${id}`}
                       bsStyle="info"
                       bsSize="xs"
-                      title={`Edit tokens of user ${username}`}>
+                      title={`Edit tokens of user ${fullName}`}>
       Edit tokens
     </WrapperComponent>
   </LinkContainer>
 );
 
-const ReadOnlyActions = ({ username }: { username: $PropertyType<Props, 'username'> }) => {
+const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
   const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
 
   return (
@@ -45,36 +44,36 @@ const ReadOnlyActions = ({ username }: { username: $PropertyType<Props, 'usernam
         <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
       </OverlayTrigger>
       &nbsp;
-      <EditTokensAction username={username} wrapperComponent={Button} />
+      <EditTokensAction user={user} wrapperComponent={Button} />
     </>
   );
 };
 
-const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> }) => {
+const EditActions = ({ user, user: { username, id, fullName } }: { user: UserOverview }) => {
   const _deleteUser = () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to delete user ${username}?`)) {
-      UsersDomain.delete(username);
+    if (window.confirm(`Do you really want to delete user ${fullName}?`)) {
+      UsersDomain.delete(username, fullName);
     }
   };
 
   return (
     <>
       <IfPermitted permissions={[`users:edit:${username}`]}>
-        <LinkContainer to={Routes.SYSTEM.USERS.edit(encodeURIComponent(username))}>
-          <Button id={`edit-user-${username}`} bsStyle="info" bsSize="xs" title={`Edit user ${username}`}>
+        <LinkContainer to={Routes.SYSTEM.USERS.edit(encodeURIComponent(id))}>
+          <Button id={`edit-user-${id}`} bsStyle="info" bsSize="xs" title={`Edit user ${fullName}`}>
             Edit
           </Button>
         </LinkContainer>
       </IfPermitted>
       &nbsp;
-      <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${username}`}>
-        <EditTokensAction username={username} wrapperComponent={MenuItem} />
+      <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
+        <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
-          <MenuItem id={`delete-user-${username}`}
+          <MenuItem id={`delete-user-${id}`}
                     bsStyle="primary"
                     bsSize="xs"
-                    title={`Delete user ${username}`}
+                    title={`Delete user ${fullName}`}
                     onClick={_deleteUser}>
             Delete
           </MenuItem>
@@ -84,18 +83,16 @@ const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> 
   );
 };
 
-const ActionsCell = ({ username, readOnly }: Props) => {
-  return (
-    <td>
-      <ActionsWrapper>
-        {readOnly ? (
-          <ReadOnlyActions username={username} />
-        ) : (
-          <EditActions username={username} />
-        )}
-      </ActionsWrapper>
-    </td>
-  );
-};
+const ActionsCell = ({ user }: Props) => (
+  <td>
+    <ActionsWrapper>
+      {user.readOnly ? (
+        <ReadOnlyActions user={user} />
+      ) : (
+        <EditActions user={user} />
+      )}
+    </ActionsWrapper>
+  </td>
+);
 
 export default ActionsCell;

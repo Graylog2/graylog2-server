@@ -35,8 +35,8 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    load(username: string): Promise<User> {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
+    load(id: string): Promise<User> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(id)).url);
       const promise = fetch('GET', url).then(User.fromJSON);
 
       UsersActions.load.promise(promise);
@@ -44,8 +44,17 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    update(username: string, user: UserUpdate): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
+    loadByUsername(userId: string): Promise<User> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(userId)).url);
+      const promise = fetch('GET', url).then(User.fromJSON);
+
+      UsersActions.loadByUsername.promise(promise);
+
+      return promise;
+    },
+
+    update(userId: string, user: UserUpdate): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(userId)).url);
       const promise = fetch('PUT', url, user);
       UsersActions.update.promise(promise);
 
@@ -61,16 +70,16 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    changePassword(username: string, request: ChangePasswordRequest): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(username)).url);
+    changePassword(userId: string, request: ChangePasswordRequest): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(userId)).url);
       const promise = fetch('PUT', url, request);
       UsersActions.changePassword.promise(promise);
 
       return promise;
     },
 
-    createToken(username: string, tokenName: string): Promise<Token> {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(username),
+    createToken(userId: string, tokenName: string): Promise<Token> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(userId),
         encodeURIComponent(tokenName)).url);
       const promise = fetch('POST', url);
       UsersActions.createToken.promise(promise);
@@ -78,16 +87,16 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadTokens(username: string): Promise<Token[]> {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
+    loadTokens(userId: string): Promise<Token[]> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(userId)).url);
       const promise = fetch('GET', url).then((response) => response.tokens);
       UsersActions.loadTokens.promise(promise);
 
       return promise;
     },
 
-    deleteToken(username: string, tokenId: string): Promise<string[]> {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
+    deleteToken(userId: string, tokenId: string): Promise<string[]> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(userId),
         encodeURIComponent(tokenId)).url, {});
       const promise = fetch('DELETE', url);
       UsersActions.deleteToken.promise(promise);

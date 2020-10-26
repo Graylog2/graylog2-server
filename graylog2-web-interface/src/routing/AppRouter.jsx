@@ -257,9 +257,9 @@ const AppRouter = () => {
 
                         <Route exact path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
                         <Route exact path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />
-                        <Route exact path={Routes.SYSTEM.USERS.show(':username')} component={UserDetailsPage} />
-                        <Route exact path={Routes.SYSTEM.USERS.edit(':username')} component={UserEditPage} />
-                        <Route exact path={Routes.SYSTEM.USERS.TOKENS.edit(':username')} component={UserTokensEditPage} />
+                        <Route exact path={Routes.SYSTEM.USERS.show(':userId')} component={UserDetailsPage} />
+                        <Route exact path={Routes.SYSTEM.USERS.edit(':userId')} component={UserEditPage} />
+                        <Route exact path={Routes.SYSTEM.USERS.TOKENS.edit(':userId')} component={UserTokensEditPage} />
 
                         <Route exact path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} component={RolesOverviewPage} />
                         <Route exact path={Routes.SYSTEM.AUTHZROLES.show(':roleId')} component={RoleDetailsPage} />

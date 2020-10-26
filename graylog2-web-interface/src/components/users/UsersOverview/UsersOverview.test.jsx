@@ -105,43 +105,43 @@ describe('UsersOverview', () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(loadUsersPaginatedPromise);
       render(<UsersOverviewAsAdmin />);
 
-      const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.username}`);
+      const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.fullName}`);
       fireEvent.click(deleteButton);
 
       expect(window.confirm).toHaveBeenCalledTimes(1);
-      expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete user ${modifiableUser.username}?`);
+      expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete user ${modifiableUser.fullName}?`);
       expect(UsersActions.delete).toHaveBeenCalledTimes(1);
-      expect(UsersActions.delete).toHaveBeenCalledWith(alice.username);
+      expect(UsersActions.delete).toHaveBeenCalledWith(modifiableUser.username, modifiableUser.fullName);
     });
 
     it('not be able to delete a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       render(<UsersOverviewAsAdmin />);
 
-      await waitFor(() => expect(screen.queryByTitle(`Delete user ${readOnlyUser.username}`)).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByTitle(`Delete user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
 
     it('see edit and edit tokens link for a modifiable user ', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }));
       render(<UsersOverviewAsAdmin />);
 
-      await screen.findByTitle(`Edit user ${modifiableUser.username}`);
+      await screen.findByTitle(`Edit user ${modifiableUser.fullName}`);
 
-      expect(screen.getByTitle(`Edit tokens of user ${modifiableUser.username}`)).toBeInTheDocument();
+      expect(screen.getByTitle(`Edit tokens of user ${modifiableUser.fullName}`)).toBeInTheDocument();
     });
 
     it('not see edit link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       render(<UsersOverviewAsAdmin />);
 
-      await waitFor(() => expect(screen.queryByTitle(`Edit user ${readOnlyUser.username}`)).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByTitle(`Edit user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
 
     it('see edit tokens link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       render(<UsersOverviewAsAdmin />);
 
-      await screen.findByTitle(`Edit tokens of user ${readOnlyUser.username}`);
+      await screen.findByTitle(`Edit tokens of user ${readOnlyUser.fullName}`);
     });
   });
 });

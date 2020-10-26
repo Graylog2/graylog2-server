@@ -25,6 +25,7 @@ const mockRolesForUserPromise = Promise.resolve({ list: Immutable.List([assigned
 const mockLoadRolesPromise = Promise.resolve({ list: Immutable.List([notAssignedRole]), pagination: { page: 1, perPage: 10, total: 1 } });
 const user = User
   .builder()
+  .id('user-id')
   .fullName('The full name')
   .username('The username')
   .roles(Immutable.Set([assignedRole.name]))
@@ -67,7 +68,7 @@ describe('<UserEdit />', () => {
 
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, {
+      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.id, {
         full_name: user.fullName,
         email: user.email,
       }));
@@ -85,7 +86,7 @@ describe('<UserEdit />', () => {
 
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, {
+      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.id, {
         full_name: 'New full name',
         email: 'newemail@example.org',
       }));
@@ -100,7 +101,7 @@ describe('<UserEdit />', () => {
 
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, {
+      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.id, {
         session_timeout_ms: user.sessionTimeoutMs,
         timezone: user.timezone,
       }));
@@ -118,7 +119,7 @@ describe('<UserEdit />', () => {
       await selectEvent.select(timezoneSelect, 'Vancouver');
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, {
+      await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.id, {
         session_timeout_ms: 144000000,
         timezone: 'America/Vancouver',
       }));
@@ -137,7 +138,7 @@ describe('<UserEdit />', () => {
       fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(user.username, {
+      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(user.id, {
         password: 'newpassword',
       }));
     });
@@ -156,7 +157,7 @@ describe('<UserEdit />', () => {
       fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(newCurrentUser.username, {
+      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(newCurrentUser.id, {
         old_password: 'oldpassword',
         password: 'newpassword',
       }));
@@ -190,7 +191,7 @@ describe('<UserEdit />', () => {
     //   await selectEvent.select(rolesSelector, notAssignedRole.name);
     //   fireEvent.click(assignRoleButton);
 
-    //   await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, { roles: [assignedRole.name, notAssignedRole.name] }));
+    //   await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.id, { roles: [assignedRole.name, notAssignedRole.name] }));
     // });
 
     // it('should filter assigned roles', async () => {
@@ -203,7 +204,7 @@ describe('<UserEdit />', () => {
     //   fireEvent.change(filterInput, { target: { value: 'name of an assigned role' } });
     //   fireEvent.click(filterSubmitButton);
 
-    //   await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledWith(user.username, 1, 10, 'name of an assigned role'));
+    //   await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledWith(user.id, 1, 10, 'name of an assigned role'));
     // });
 
     // it('should unassign a role', async () => {
@@ -214,7 +215,7 @@ describe('<UserEdit />', () => {
     //   const assignRoleButton = getByRole('button', { name: `Remove ${assignedRole.name}` });
     //   fireEvent.click(assignRoleButton);
 
-    //   await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, { roles: [] }));
+    //   await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.id, { roles: [] }));
     // });
   });
 

@@ -40,13 +40,14 @@ export type PaginatedUsers = PaginatedList<UserOverview> & {
 
 export type ActionsType = {
   create: (user: UserCreate) => Promise<void>,
-  load: (username: string) => Promise<User>,
-  update: (username: string, request: any) => Promise<void>,
-  delete: (username: string) => Promise<void>,
-  changePassword: (username: string, request: ChangePasswordRequest) => Promise<void>,
-  createToken: (username: string, tokenName: string) => Promise<Token>,
-  loadTokens: (username: string) => Promise<Token[]>,
-  deleteToken: (username: string, tokenId: string, tokenName: string) => Promise<void>,
+  load: (userId: string) => Promise<User>,
+  loadByUsername: (username: string) => Promise<User>,
+  update: (userId: string, request: any) => Promise<void>,
+  delete: (username: string, fullName: string) => Promise<void>,
+  changePassword: (userId: string, request: ChangePasswordRequest) => Promise<void>,
+  createToken: (userId: string, tokenName: string) => Promise<Token>,
+  loadTokens: (userId: string) => Promise<Token[]>,
+  deleteToken: (userId: string, tokenId: string, tokenName: string) => Promise<void>,
   loadUsers: () => Promise<Immutable.List<User>>,
   loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>,
 };
@@ -56,6 +57,7 @@ const UsersActions: RefluxActions<ActionsType> = singletonActions(
   () => Reflux.createActions({
     create: { asyncResult: true },
     load: { asyncResult: true },
+    loadByUsername: { asyncResult: true },
     update: { asyncResult: true },
     delete: { asyncResult: true },
     changePassword: { asyncResult: true },

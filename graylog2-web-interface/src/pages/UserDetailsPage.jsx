@@ -13,7 +13,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
   params: {
-    username: string,
+    userId: string,
   },
 };
 
@@ -29,17 +29,17 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const UserDetailsPage = ({ params }: Props) => {
   const [loadedUser, setLoadedUser] = useState();
-  const username = params?.username;
+  const userId = params?.userId;
 
   useEffect(() => {
-    UsersDomain.load(username).then(setLoadedUser);
-  }, [username]);
+    UsersDomain.load(userId).then(setLoadedUser);
+  }, [userId]);
 
   return (
-    <DocumentTitle title={`User Details ${username ?? ''}`}>
+    <DocumentTitle title={`User Details ${loadedUser?.fullName ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
                   subactions={(
-                    <UserActionLinks username={username}
+                    <UserActionLinks userId={userId}
                                      userIsReadOnly={loadedUser?.readOnly ?? false} />
                   )}>
         <span>
@@ -55,7 +55,7 @@ const UserDetailsPage = ({ params }: Props) => {
         <UserOverviewLinks />
       </PageHeader>
 
-      <UserDetails user={username === loadedUser?.username ? loadedUser : undefined} />
+      <UserDetails user={userId === loadedUser?.id ? loadedUser : undefined} />
     </DocumentTitle>
   );
 };
