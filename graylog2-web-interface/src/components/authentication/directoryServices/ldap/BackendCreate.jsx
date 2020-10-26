@@ -68,15 +68,15 @@ const INITIAL_VALUES = {
   verifyCertificates: true,
 };
 
-export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, licenseIsValid?: boolean = true) => {
+export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const shouldCreateGroupSync = formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid;
+  const shouldCreateGroupSync = formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync;
   const backendCreateNotificationSettings = {
     notifyOnSuccess: !shouldCreateGroupSync,
   };
 
   return AuthenticationDomain.create(backendCreateNotificationSettings)(payload).then((result) => {
-    if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && licenseIsValid) {
+    if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
       return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
     }
 

@@ -125,7 +125,7 @@ const _getInvalidStepKeys = (formValues, excludedFields) => {
   return compact(invalidStepKeys);
 };
 
-const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps, licenseIsValid) => {
+const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps, shouldUpdateGroupSync) => {
   const formValues = getUpdatedFormsValues();
   const invalidStepKeys = validateSteps(formValues);
 
@@ -138,7 +138,7 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
   setSubmitAllError(null);
 
   const payload = getSubmitPayload(formValues);
-  const _submit = () => onSubmit(payload, formValues, stepsState.authBackendMeta.serviceType, licenseIsValid).then(() => {
+  const _submit = () => onSubmit(payload, formValues, stepsState.authBackendMeta.serviceType, shouldUpdateGroupSync).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
@@ -170,7 +170,7 @@ type Props = {
   initialValues: WizardFormValues,
   excludedFields: {[ inputName: string ]: boolean },
   help: { [inputName: string]: ?React.Node },
-  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, licenseIsValid?: boolean) => Promise<LoadBackendResponse>,
+  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
 
 const _loadRoles = (setPaginatedRoles) => {
@@ -249,14 +249,14 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     });
   };
 
-  const _handleSubmitAll = (licenseIsValid?: boolean) => _onSubmitAll(
+  const _handleSubmitAll = (shouldUpdateGroupSync?: boolean) => _onSubmitAll(
     stepsState,
     setSubmitAllError,
     onSubmit,
     _getUpdatedFormsValues,
     _getSubmitPayload,
     _validateSteps,
-    licenseIsValid,
+    shouldUpdateGroupSync,
   );
 
   const steps = wizardSteps({
