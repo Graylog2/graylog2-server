@@ -23,7 +23,9 @@
     "lint:styles:path": "stylelint --syntax css-in-js --",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
-    "check-production-build": "node checkProductionBuild.js"
+    "check-production-build": "node checkProductionBuild.js",
+    "dev:services": "cd ../../../graylog-project-internal && graylog-project run dev:services",
+    "dev:server": "cd ../../../graylog-project-internal && graylog-project run dev:server"
   },
   "eslintConfig": {
     "extends": "graylog"
