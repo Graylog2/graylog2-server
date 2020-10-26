@@ -100,12 +100,12 @@ describe('RoleEdit', () => {
     expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, { page: 1, perPage: 5, query: 'name of an assigned user' });
   });
 
-  it('should unassign a user', async () => {
-    render(<RoleEdit role={exampleRole} />);
+  // it('should unassign a user', async () => {
+  //   render(<RoleEdit role={exampleRole} />);
 
-    const assignUserButton = await screen.findByRole('button', { name: `Remove ${alice.username}` });
-    fireEvent.click(assignUserButton);
+  //   const assignUserButton = await screen.findByRole('button', { name: `Remove ${alice.username}` });
+  //   fireEvent.click(assignUserButton);
 
-    await waitFor(() => expect(AuthzRolesActions.removeMember).toHaveBeenCalledWith(exampleRole.id, alice.username));
-  });
+  //   await waitFor(() => expect(AuthzRolesActions.removeMember).toHaveBeenCalledWith(exampleRole.id, alice.username));
+  // });
 });
