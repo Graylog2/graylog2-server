@@ -18,18 +18,18 @@
 import { Map } from 'immutable';
 import uuid from 'uuid/v4';
 
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import { QueryString, TimeRange } from 'views/logic/queries/Query';
 
 import { singleton } from '../singleton';
 
 export type WidgetState = {
-  id: string,
-  type: string,
-  config: any,
-  filter: ?string;
-  timerange: ?TimeRange,
-  query: ?QueryString,
-  streams: Array<string>,
+  id: string;
+  type: string;
+  config: any;
+  filter: string | null | undefined;
+  timerange: TimeRange | null | undefined;
+  query: QueryString | null | undefined;
+  streams: Array<string>;
 };
 
 class Widget {
@@ -38,7 +38,7 @@ class Widget {
   // eslint-disable-next-line no-use-before-define
   static Builder: typeof Builder;
 
-  constructor(id: string, type: string, config: any, filter: ?string, timerange: ?TimeRange, query: ?QueryString, streams: Array<string> = []) {
+  constructor(id: string, type: string, config: any, filter: string | null | undefined, timerange: TimeRange | null | undefined, query: QueryString | null | undefined, streams: Array<string> = []) {
     this._value = { id, type, config, filter: filter === null ? undefined : filter, timerange, query, streams };
   }
 
@@ -54,15 +54,15 @@ class Widget {
     return this._value.config;
   }
 
-  get filter(): ?string {
+  get filter(): string | null | undefined {
     return this._value.filter;
   }
 
-  get timerange(): ?TimeRange {
+  get timerange(): TimeRange | null | undefined {
     return this._value.timerange;
   }
 
-  get query(): ?QueryString {
+  get query(): QueryString | null | undefined {
     return this._value.query;
   }
 
@@ -76,20 +76,44 @@ class Widget {
 
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
-    const { id, type, config, filter, timerange, query, streams } = this._value;
+    const {
+      id,
+      type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+    } = this._value;
 
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({ id, type, config, filter, timerange, query, streams }));
   }
 
   toJSON() {
-    const { id, type, config, filter, timerange, query, streams } = this._value;
+    const {
+      id,
+      type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+    } = this._value;
 
     return { id, type: type.toLocaleLowerCase(), config, filter, timerange, query, streams };
   }
 
   static fromJSON(value: WidgetState): Widget {
-    const { id, type, config, filter, timerange, query, streams } = value;
+    const {
+      id,
+      type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+    } = value;
     const implementingClass = Widget.__registrations[type.toLocaleLowerCase()];
 
     if (implementingClass) {
@@ -108,7 +132,9 @@ class Widget {
     return new Builder();
   }
 
-  static __registrations: { [string]: typeof Widget } = {};
+  static __registrations: {
+    [key: string]: typeof Widget;
+  } = {};
 
   static registerSubtype(type: string, implementingClass: typeof Widget) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
@@ -169,7 +195,15 @@ class Builder {
   }
 
   build(): Widget {
-    const { id, type, config, filter, timerange, query, streams } = this.value.toObject();
+    const {
+      id,
+      type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+    } = this.value.toObject();
 
     return new Widget(id, type, config, filter, timerange, query, streams);
   }
@@ -177,4 +211,7 @@ class Builder {
 
 Widget.Builder = Builder;
 
-export default singleton('views.logic.widgets.Widget', () => Widget);
+const SingletonWidget = singleton('views.logic.widgets.Widget', () => Widget);
+type SingletonWidget = InstanceType<typeof Widget>;
+
+export default SingletonWidget;
