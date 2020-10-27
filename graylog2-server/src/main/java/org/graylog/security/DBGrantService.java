@@ -124,7 +124,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         checkArgument(isNotBlank(creatorUsername), "creatorUsername cannot be null or empty");
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-        return super.save(grantDTO.toBuilder()
+        return save(grantDTO.toBuilder()
                 .createdBy(creatorUsername)
                 .createdAt(now)
                 .updatedBy(creatorUsername)
@@ -166,7 +166,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         final GrantDTO existingGrant = get(updatedGrant.id())
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find grant with ID " + updatedGrant.id()));
 
-        return super.save(existingGrant.toBuilder()
+        return save(existingGrant.toBuilder()
                 .grantee(updatedGrant.grantee())
                 .capability(updatedGrant.capability())
                 .target(updatedGrant.target())
