@@ -59,7 +59,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                 </TopRow>
 
                 <Row className="no-bm">
-                  <Col md={9} xs={8}>
+                  <Col md={8} lg={9}>
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                          title="Search query syntax documentation"
@@ -83,7 +83,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                       )}
                     </Field>
                   </Col>
-                  <Col md={3} xs={4}>
+                  <Col md={4} lg={3}>
                     <div className="pull-right">
                       <ViewActionsMenu />
                     </div>
