@@ -4,7 +4,6 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import Routes from 'routing/Routes';
 import { Link, LinkContainer } from 'components/graylog/router';
 import {
@@ -16,7 +15,8 @@ import {
 import {
   EntityListItem,
   IfPermitted,
-  HasOwnership,
+  Icon,
+  ShareButton,
 } from 'components/common';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
@@ -75,21 +75,17 @@ const EventDefinitionEntry = ({
     <React.Fragment key={`actions-${eventDefinition.id}`}>
       <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
         <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-          <Button bsStyle="info">Edit</Button>
+          <Button bsStyle="info">
+            <Icon name="edit" /> Edit
+          </Button>
         </LinkContainer>
       </IfPermitted>
+      <ShareButton entryId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
           {toggle}
           <MenuItem divider />
           <MenuItem onClick={onDelete(eventDefinition)}>Delete</MenuItem>
-          <HasOwnership id={eventDefinition.id} type="event_definition">
-            {({ disabled }) => (
-              <MenuItem key={`share-${eventDefinition.id}`} onSelect={() => setShowEntityShareModal(true)} disabled={disabled}>
-                Share {disabled && <SharingDisabledPopover type="stream" />}
-              </MenuItem>
-            )}
-          </HasOwnership>
         </DropdownButton>
       </IfPermitted>
     </React.Fragment>
@@ -102,7 +98,7 @@ const EventDefinitionEntry = ({
     titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
   }
 
-  const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.view(eventDefinition.id)}>{eventDefinition.title}</Link>;
+  const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>;
 
   return (
     <>

@@ -157,7 +157,7 @@ const AppRouter = () => {
                                path={Routes.ALERTS.DEFINITIONS.edit(':definitionId')}
                                component={EditEventDefinitionPage} />
                         <Route exact
-                               path={Routes.ALERTS.DEFINITIONS.view(':definitionId')}
+                               path={Routes.ALERTS.DEFINITIONS.show(':definitionId')}
                                component={ViewEventDefinitionPage} />
                         <Route exact path={Routes.ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
                         <Route exact path={Routes.ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />

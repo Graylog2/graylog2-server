@@ -169,7 +169,7 @@ class Stream extends React.Component {
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
           <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
             <Button bsStyle="info">
-              <Icon name="inbox" /> Manage Rules
+              <Icon name="stream" /> Manage Rules
             </Button>
           </LinkContainer>
         </OverlayElement>
