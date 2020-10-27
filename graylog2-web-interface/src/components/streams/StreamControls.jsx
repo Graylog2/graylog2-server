@@ -22,7 +22,6 @@ const StreamControls = createReactClass({
     indexSets: PropTypes.array.isRequired,
     onDelete: PropTypes.func.isRequired,
     onClone: PropTypes.func.isRequired,
-    onShare: PropTypes.func.isRequired,
     onQuickAdd: PropTypes.func.isRequired,
     onUpdate: PropTypes.func.isRequired,
     isDefaultStream: PropTypes.bool,
@@ -65,7 +64,7 @@ const StreamControls = createReactClass({
   },
 
   render() {
-    const { stream, isDefaultStream, user, onShare, onUpdate, indexSets } = this.props;
+    const { stream, isDefaultStream, user, onUpdate, indexSets } = this.props;
 
     return (
       <span>
