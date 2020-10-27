@@ -11,6 +11,11 @@ Prior to v3.3.3, the certificates of LDAP servers which are connected to using a
 
 A `CVE <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-15813>`_ is tracked for this issue.
 
+Change of API endpoint for user retrieval and modification
+==========================================================
+
+In 4.0 we changed most of the user API endpoint `/system/users` to expect user IDs instead of names.
+
 Deprecation of API endpoint for unpaginated listing of grok patterns
 ====================================================================
 
