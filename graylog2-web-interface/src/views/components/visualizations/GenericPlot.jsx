@@ -44,6 +44,9 @@ export type ColorMap = {
 export type ChartColor = {
   line?: ChartMarker,
   marker?: ChartMarker,
+  outsidetextfont?: {
+    color: string,
+  },
 };
 
 type Props = {
@@ -199,6 +202,10 @@ class GenericPlot extends React.Component<Props, State> {
             if (setChartColor && colors) {
               const conf = setChartColor(chart, colors);
 
+              if (chart.type === 'pie') {
+                conf.outsidetextfont = { color: theme.colors.global.textDefault };
+              }
+
               if (conf.line || conf.marker) {
                 return merge(chart, conf);
               }
@@ -208,10 +215,6 @@ class GenericPlot extends React.Component<Props, State> {
 
             return chart;
           });
-
-          if (newChartData[0].type === 'pie') {
-            newChartData[0].outsidetextfont = { color: theme.colors.global.textDefault };
-          }
 
           return (
             <InteractiveContext.Consumer>
