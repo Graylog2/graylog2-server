@@ -199,7 +199,7 @@ class TypeAheadDataFilter extends React.Component {
         <li key={`li-${filter}`}>
           <span className="pill label label-default">
             {filterBy}: {filter}
-            <button type="button" className="tag-remove" data-target={filter} onClick={this._onFilterRemoved} />
+            <button type="button" className="tag-remove" data-target={filter} onClick={this._onFilterRemoved} aria-label={`Remove filter ${filter}`} />
           </span>
         </li>
       );

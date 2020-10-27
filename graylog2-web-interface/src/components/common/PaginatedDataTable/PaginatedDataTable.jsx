@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import type { Pagination } from 'stores/PaginationTypes';
-import { PaginatedList, DataTable } from 'components/common';
+import DataTable from 'components/common/DataTable';
+import PaginatedList from 'components/common/PaginatedList';
 
 import Filter from './Filter';
 
