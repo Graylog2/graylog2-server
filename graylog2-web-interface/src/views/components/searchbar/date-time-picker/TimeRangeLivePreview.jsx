@@ -9,7 +9,13 @@ import { Icon } from 'components/common';
 import { EMPTY_OUTPUT, dateOutput } from '../TimeRangeDisplay';
 
 type Props = {
-  timerange: any,
+  timerange: {
+    type: string,
+    keyword?: string,
+    range?: number,
+    from?: string,
+    to?: string,
+  },
 };
 
 const PreviewWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
