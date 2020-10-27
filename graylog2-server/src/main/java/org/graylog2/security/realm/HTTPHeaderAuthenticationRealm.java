@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -142,7 +143,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
         if (headerName == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(headers.getFirst(headerName.toLowerCase()));
+        return Optional.ofNullable(headers.getFirst(headerName.toLowerCase(Locale.US)));
     }
 
     private boolean inTrustedSubnets(String remoteAddr) {
