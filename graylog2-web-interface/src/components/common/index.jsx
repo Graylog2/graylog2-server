@@ -44,6 +44,7 @@ export { default as PageErrorOverview } from './PageErrorOverview';
 export { default as PageHeader } from './PageHeader';
 export { default as Pagination } from './Pagination';
 export { default as PageSizeSelect } from './PageSizeSelect';
+export { default as PaginatedDataTable } from './PaginatedDataTable';
 export { default as PaginatedList } from './PaginatedList';
 export { default as PaginatedItemOverview } from './PaginatedItemOverview/PaginatedItemOverview';
 export { default as Pluralize } from './Pluralize';
