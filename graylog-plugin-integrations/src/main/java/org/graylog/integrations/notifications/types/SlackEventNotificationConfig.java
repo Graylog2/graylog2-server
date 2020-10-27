@@ -31,32 +31,30 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @AutoValue
 @JsonTypeName(SlackEventNotificationConfig.TYPE_NAME)
 @JsonDeserialize(builder = SlackEventNotificationConfig.Builder.class)
 public abstract class SlackEventNotificationConfig implements EventNotificationConfig {
+
+	private final String regex = "https:\\/\\/hooks.slack.com\\/services\\/";
+	private final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 	public static final String TYPE_NAME = "slack-notification-v1";
 
 	static final String FIELD_COLOR = "color";
 	static final String FIELD_WEBHOOK_URL = "webhook_url";
 	static final String FIELD_CHANNEL = "channel";
 	static final String FIELD_CUSTOM_MESSAGE = "custom_message";
-	static final String FIELD_BACKLOG_ITEM_MESSAGE = "backlog_item_message";
 	static final String FIELD_USER_NAME = "user_name";
 	static final String FIELD_NOTIFY_CHANNEL = "notify_channel";
 	static final String FIELD_LINK_NAMES = "link_names";
 	static final String FIELD_ICON_URL = "icon_url";
 	static final String FIELD_ICON_EMOJI = "icon_emoji";
-	static final String FIELD_GRAYLOG_URL = "graylog_url";
 
-
-    // TODO: 9/8/20
-	//See my comment in the SlackClient. We should use the pre-configured okhttp client so we automatically get
-    // the correct proxy configuration.
-    // The proxy setting can be removed once we switched to okhttp.
-	static final String FIELD_PROXY = "proxy";
 
 	@JsonProperty(FIELD_COLOR)
 	@NotBlank
@@ -73,10 +71,8 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 	@JsonProperty(FIELD_CUSTOM_MESSAGE)
 	public abstract String customMessage();
 
-	@JsonProperty(FIELD_BACKLOG_ITEM_MESSAGE)
-	public abstract String backlogItemMessage();
-
 	@JsonProperty(FIELD_USER_NAME)
+	@Nullable
 	public abstract String userName();
 
 	@JsonProperty(FIELD_NOTIFY_CHANNEL)
@@ -86,16 +82,13 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 	public abstract boolean linkNames();
 
 	@JsonProperty(FIELD_ICON_URL)
+	@Nullable
 	public abstract String iconUrl();
 
 	@JsonProperty(FIELD_ICON_EMOJI)
+	@Nullable
 	public abstract String iconEmoji();
 
-	@JsonProperty(FIELD_GRAYLOG_URL)
-	public abstract String graylogUrl();
-
-	@JsonProperty(FIELD_PROXY)
-	public abstract String proxy();
 
 	@Override
 	@JsonIgnore
@@ -110,15 +103,33 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 	@Override
 	@JsonIgnore
 	public ValidationResult validate() {
-		return new ValidationResult();
+		ValidationResult validation =  new ValidationResult();
+		final Matcher matcher = pattern.matcher(webhookUrl());
+
+		if (channel().isEmpty()) {
+			validation.addError(FIELD_CHANNEL, "Channel cannot be empty.");
+		}
+
+		if(matcher.find() == false) {
+			validation.addError(FIELD_WEBHOOK_URL, "please specify a valid webhook url");
+		}
+		return validation;
+
 	}
 
 	@AutoValue.Builder
 	public static abstract class Builder implements EventNotificationConfig.Builder<SlackEventNotificationConfig.Builder> {
 		@JsonCreator
 		public static SlackEventNotificationConfig.Builder create() {
+
 			return new AutoValue_SlackEventNotificationConfig.Builder()
-					.type(TYPE_NAME);
+					.type(TYPE_NAME)
+					.color("#ff0500")
+					.webhookUrl("https://hooks.slack.com/services/xxx/xxxx/xxxxxxxxxxxxxxxxxxx")
+					.channel("slacktest2")
+					.customMessage("hello World")
+					.notifyChannel(false)
+					.linkNames(false);
 		}
 
 		@JsonProperty(FIELD_COLOR)
@@ -132,9 +143,6 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 
 		@JsonProperty(FIELD_CUSTOM_MESSAGE)
 		public abstract SlackEventNotificationConfig.Builder customMessage(String customMessage);
-
-		@JsonProperty(FIELD_BACKLOG_ITEM_MESSAGE)
-		public abstract SlackEventNotificationConfig.Builder backlogItemMessage(String backlogItemMessage);
 
 		@JsonProperty(FIELD_USER_NAME)
 		public abstract SlackEventNotificationConfig.Builder userName(String userName);
@@ -151,11 +159,6 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 		@JsonProperty(FIELD_ICON_EMOJI)
 		public abstract SlackEventNotificationConfig.Builder iconEmoji(String iconEmoji);
 
-		@JsonProperty(FIELD_GRAYLOG_URL)
-		public abstract SlackEventNotificationConfig.Builder graylogUrl(String graylogUrl);
-
-		@JsonProperty(FIELD_PROXY)
-		public abstract SlackEventNotificationConfig.Builder proxy(String proxy);
 
 		public abstract SlackEventNotificationConfig build();
 	}
@@ -167,14 +170,11 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 				.webhookUrl(ValueReference.of(webhookUrl()))
 				.channel(ValueReference.of(channel()))
 				.customMessage(ValueReference.of(customMessage()))
-				.backlogItemMessage(ValueReference.of(backlogItemMessage()))
 				.userName(ValueReference.of(userName()))
 				.notifyChannel(ValueReference.of(notifyChannel()))
 				.linkNames(ValueReference.of(linkNames()))
 				.iconUrl(ValueReference.of(iconUrl()))
 				.iconEmoji(ValueReference.of(iconEmoji()))
-				.graylogUrl(ValueReference.of(graylogUrl()))
-				.proxy(ValueReference.of(proxy()))
 				.build();
 	}
 }

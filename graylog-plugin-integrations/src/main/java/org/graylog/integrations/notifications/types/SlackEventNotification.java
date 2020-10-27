@@ -18,112 +18,115 @@ package org.graylog.integrations.notifications.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
+import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
-import org.graylog.integrations.notifications.modeldata.BacklogItemModelData;
-import org.graylog.integrations.notifications.modeldata.CustomMessageModelData;
-import org.graylog.integrations.notifications.modeldata.StreamModelData;
-import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
-import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 
 public class SlackEventNotification implements EventNotification {
-
-	private static final String UNKNOWN_VALUE = "<unknown>";
 
 	public interface Factory extends EventNotification.Factory {
 		@Override
         SlackEventNotification create();
 	}
 
+
 	private static final Logger LOG = LoggerFactory.getLogger(SlackEventNotification.class);
 
 	private final EventNotificationService notificationCallbackService;
-	private final StreamService streamService;
-	private final Engine templateEngine;
-	private final NotificationService notificationService;
-	private final ObjectMapper objectMapper;
-	private final NodeId nodeId;
+	private final Engine templateEngine ;
+	private final NotificationService notificationService ;
+	private final ObjectMapper objectMapper ;
+	private final NodeId nodeId ;
+	private final SlackClient slackClient;
 
 	@Inject
 	public SlackEventNotification(EventNotificationService notificationCallbackService,
-                                  StreamService streamService,
-                                  Engine templateEngine,
-                                  NotificationService notificationService,
-                                  ObjectMapper objectMapper,
-                                  NodeId nodeId) {
+								  ObjectMapper objectMapper,
+								  Engine templateEngine,
+								  NotificationService notificationService,
+								  NodeId nodeId, SlackClient slackCLient){
 		this.notificationCallbackService = notificationCallbackService;
-		this.streamService = streamService;
-		this.templateEngine = templateEngine;
-		this.notificationService = notificationService;
-		this.objectMapper = objectMapper;
-		this.nodeId = nodeId;
-
-
+		this.objectMapper = requireNonNull(objectMapper);
+		this.templateEngine = requireNonNull(templateEngine);
+		this.notificationService = requireNonNull(notificationService);
+		this.nodeId = requireNonNull(nodeId);
+		this.slackClient = requireNonNull(slackCLient);
 	}
 
+	/**
+	 *
+	 * @param ctx
+	 * @throws PermanentEventNotificationException is thrown with bad webhook url, authentication error type issues
+	 * @throws TemporaryEventNotificationException is thrown for network or timeout type issues
+	 */
 	@Override
-	public void execute(EventNotificationContext ctx) throws PermanentEventNotificationException {
+	public void execute(EventNotificationContext ctx) throws PermanentEventNotificationException,TemporaryEventNotificationException {
 		final SlackEventNotificationConfig config = (SlackEventNotificationConfig) ctx.notificationConfig();
-		// TODO: 9/8/20  - use this.slackClient
-        //
-        SlackClient slackClient = new SlackClient(config);
+		ValidationResult  result = config.validate();
+		result.getErrors().entrySet().stream().forEach(e -> LOG.error("Invalid configuration for key [{}] and value [{}]",e.getKey() , e.getValue()));
+
+		if(result.failed()){
+			throw new PermanentEventNotificationException("Please verify your Slack Event Configuration");
+		}
 
 		try {
 			SlackMessage slackMessage = createSlackMessage(ctx, config);
-			slackClient.send(slackMessage);
+			slackClient.send(slackMessage,config.webhookUrl());
 		} catch (Exception e) {
-			String exceptionDetail = e.toString();
-			if (e.getCause() != null) {
-				exceptionDetail += " (" + e.getCause() + ")";
-			}
 
+			LOG.error("SlackEventNotification send error for id {} : {}", ctx.notificationId(), e.toString());
 			final Notification systemNotification = notificationService.buildNow()
 					.addNode(nodeId.toString())
 					.addType(Notification.Type.GENERIC)
 					.addSeverity(Notification.Severity.NORMAL)
-					.addDetail("exception", exceptionDetail);
-			notificationService.publishIfFirst(systemNotification);
+					.addDetail("SlackEventNotification send error ", e.toString());
 
-			throw new PermanentEventNotificationException("Slack notification is triggered, but sending failed. " + e.getMessage(), e);
+			notificationService.publishIfFirst(systemNotification);
+			throw new TemporaryEventNotificationException("Slack notification is triggered, but sending failed. " + e.getMessage(), e);
+
 		}
+
 	}
 
-	private SlackMessage createSlackMessage(EventNotificationContext ctx, SlackEventNotificationConfig config) {
+	/**
+	 *
+	 * @param ctx
+	 * @param config
+	 * @return
+	 * @throws PermanentEventNotificationException - throws this exception when the custom message template is invalid
+	 */
+	SlackMessage createSlackMessage(EventNotificationContext ctx, SlackEventNotificationConfig config) throws PermanentEventNotificationException {
 		//Note: Link names if notify channel or else the channel tag will be plain text.
 		boolean linkNames = config.linkNames() || config.notifyChannel();
 		String message = buildDefaultMessage(ctx, config);
 
 		String customMessage = null;
 		String template = config.customMessage();
-		boolean hasTemplate = !isNullOrEmpty(template);
-		if (hasTemplate) {
+		if (!isNullOrEmpty(template)) {
 			customMessage = buildCustomMessage(ctx, config, template);
-		}
-
-		List<String> backlogItemMessages = Collections.emptyList();
-		String backlogItemTemplate = config.backlogItemMessage();
-		boolean hasBacklogItemTemplate = !isNullOrEmpty(backlogItemTemplate);
-		if(hasBacklogItemTemplate) {
-			backlogItemMessages = buildBacklogItemMessages(ctx, config, backlogItemTemplate);
 		}
 
 		return new SlackMessage(
@@ -134,12 +137,12 @@ public class SlackEventNotification implements EventNotification {
 				config.channel(),
 				linkNames,
 				message,
-				customMessage,
-				backlogItemMessages);
+				customMessage
+				);
 	}
 
-	private String buildDefaultMessage(EventNotificationContext ctx, SlackEventNotificationConfig config) {
-		String title = buildMessageTitle(ctx, config);
+	String buildDefaultMessage(EventNotificationContext ctx, SlackEventNotificationConfig config) {
+		String title = buildMessageTitle(ctx);
 
 		// Build custom message
 		String audience = config.notifyChannel() ? "@channel " : "";
@@ -147,130 +150,36 @@ public class SlackEventNotification implements EventNotification {
 		return String.format(Locale.ROOT,"%s*Alert %s* triggered:\n> %s \n", audience, title, description);
 	}
 
-	private String buildMessageTitle(EventNotificationContext ctx, SlackEventNotificationConfig config) {
-		String graylogUrl = config.graylogUrl();
+	private String buildMessageTitle(EventNotificationContext ctx) {
 		String eventDefinitionName = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Unnamed");
-		if(!isNullOrEmpty(graylogUrl)) {
-			return "<" + graylogUrl + "|" + eventDefinitionName + ">";
-		} else {
-			return "_" + eventDefinitionName + "_";
-		}
+		return "_" + eventDefinitionName + "_";
 	}
 
-	private String buildCustomMessage(EventNotificationContext ctx, SlackEventNotificationConfig config, String template) {
+	String buildCustomMessage(EventNotificationContext ctx, SlackEventNotificationConfig config, String template) throws PermanentEventNotificationException {
 		List<MessageSummary> backlog = getAlarmBacklog(ctx);
 		Map<String, Object> model = getCustomMessageModel(ctx, config, backlog);
 		try {
+			LOG.debug("template = {} model = {}" ,template, model);
 			return templateEngine.transform(template, model);
 		} catch (Exception e) {
-			LOG.error("Exception during templating", e);
-			return e.toString();
+			LOG.error("Exception during templating [{}]", e.toString());
+			throw new PermanentEventNotificationException(e.toString(),e.getCause());
 		}
 	}
 
-	private List<String> buildBacklogItemMessages(EventNotificationContext ctx, SlackEventNotificationConfig config, String template) {
-		return getAlarmBacklog(ctx).stream()
-				.map(backlogItem -> {
-					Map<String, Object> model = getBacklogItemModel(ctx, config, backlogItem);
-					try {
-						return templateEngine.transform(template, model);
-					} catch (Exception e) {
-						LOG.error("Exception during templating", e);
-						return e.toString();
-					}
-				}).collect(Collectors.toList());
-	}
 
-	private List<MessageSummary> getAlarmBacklog(EventNotificationContext ctx) {
+	List<MessageSummary> getAlarmBacklog(EventNotificationContext ctx) {
 		return notificationCallbackService.getBacklogForEvent(ctx);
 	}
 
-	private Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, SlackEventNotificationConfig config, List<MessageSummary> backlog) {
-		Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
+	Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, SlackEventNotificationConfig config, List<MessageSummary> backlog) {
+		EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
 
-		List<StreamModelData> streams = streamService.loadByIds(ctx.event().sourceStreams())
-				.stream()
-				.map(stream -> buildStreamWithUrl(stream, ctx, config))
-				.collect(Collectors.toList());
-
-		// TODO: 9/8/20
-        /**
-         *
-         It looks like we are duplicating a lot of code from EventNotificationModelData in the CustomMessageModelData
-         and BacklogItemModelData value objects to expose some more attributes to the slack message template.
-         Both objects then get converted into a Map<String, Object> immediately. wink
-
-         How about using the regular EventNotificationModelData,
-         convert that into a Map<String, Object> and then manually add the additional attributes we need?
-         That way we would save a lot of duplicated code.
-
-         Also, if we add additional attributes here that would also be useful for all notifications,
-         we can think about extending EventNotificationModelData.
-         */
-
-		CustomMessageModelData modelData = CustomMessageModelData.builder()
-				.eventDefinition(definitionDto)
-				.eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN_VALUE))
-				.eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN_VALUE))
-				.eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN_VALUE))
-				.eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN_VALUE))
-				.jobDefinitionId(ctx.jobTrigger().map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN_VALUE))
-				.jobTriggerId(ctx.jobTrigger().map(JobTriggerDto::id).orElse(UNKNOWN_VALUE))
-				.event(ctx.event())
-				.backlog(backlog)
-				.backlogSize(backlog.size())
-				.graylogUrl(isNullOrEmpty(config.graylogUrl()) ? UNKNOWN_VALUE : config.graylogUrl())
-				.streams(streams)
-				.build();
-
-		return objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+		LOG.debug("the custom message model data is {}",modelData.toString());
+		Map<String, Object> objectMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+		objectMap.put("type",config.type());
+		return objectMap;
 	}
 
-	private Map<String, Object> getBacklogItemModel(EventNotificationContext ctx, SlackEventNotificationConfig config, MessageSummary backlogItem) {
-		Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
 
-		List<StreamModelData> streams = streamService.loadByIds(ctx.event().sourceStreams())
-				.stream()
-				.map(stream -> buildStreamWithUrl(stream, ctx, config))
-				.collect(Collectors.toList());
-
-		BacklogItemModelData modelData = BacklogItemModelData.builder()
-				.eventDefinition(definitionDto)
-				.eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN_VALUE))
-				.eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN_VALUE))
-				.eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN_VALUE))
-				.eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN_VALUE))
-				.jobDefinitionId(ctx.jobTrigger().map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN_VALUE))
-				.jobTriggerId(ctx.jobTrigger().map(JobTriggerDto::id).orElse(UNKNOWN_VALUE))
-				.event(ctx.event())
-				.backlogItem(backlogItem)
-				.graylogUrl(isNullOrEmpty(config.graylogUrl()) ? UNKNOWN_VALUE : config.graylogUrl())
-				.streams(streams)
-				.build();
-
-		return objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
-	}
-
-	private StreamModelData buildStreamWithUrl(Stream stream, EventNotificationContext ctx, SlackEventNotificationConfig config) {
-		String graylogUrl = config.graylogUrl();
-		String streamUrl = null;
-		if(!isNullOrEmpty(graylogUrl)) {
-			streamUrl = StringUtils.appendIfMissing(graylogUrl, "/") + "streams/" + stream.getId() + "/search";
-
-			if(ctx.eventDefinition().isPresent()) {
-				EventDefinitionDto eventDefinitionDto = ctx.eventDefinition().get();
-				if(eventDefinitionDto.config() instanceof AggregationEventProcessorConfig) {
-					String query = ((AggregationEventProcessorConfig) eventDefinitionDto.config()).query();
-					streamUrl += "?q=" + query;
-				}
-			}
-		}
-
-		return StreamModelData.builder()
-				.id(stream.getId())
-				.title(stream.getTitle())
-				.description(stream.getDescription())
-				.url(Optional.ofNullable(streamUrl).orElse(UNKNOWN_VALUE))
-				.build();
-	}
 }

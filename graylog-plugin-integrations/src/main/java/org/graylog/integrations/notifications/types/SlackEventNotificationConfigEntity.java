@@ -47,9 +47,6 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
 	@JsonProperty(SlackEventNotificationConfig.FIELD_CUSTOM_MESSAGE)
 	public abstract ValueReference customMessage();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_BACKLOG_ITEM_MESSAGE)
-	public abstract ValueReference backlogItemMessage();
-
 	@JsonProperty(SlackEventNotificationConfig.FIELD_USER_NAME)
 	public abstract ValueReference userName();
 
@@ -64,12 +61,6 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
 
 	@JsonProperty(SlackEventNotificationConfig.FIELD_ICON_EMOJI)
 	public abstract ValueReference iconEmoji();
-
-	@JsonProperty(SlackEventNotificationConfig.FIELD_GRAYLOG_URL)
-	public abstract ValueReference graylogUrl();
-
-	@JsonProperty(SlackEventNotificationConfig.FIELD_PROXY)
-	public abstract ValueReference proxy();
 
 	public static Builder builder() {
 		return Builder.create();
@@ -98,9 +89,6 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
 		@JsonProperty(SlackEventNotificationConfig.FIELD_CUSTOM_MESSAGE)
 		public abstract Builder customMessage(ValueReference customMessage);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_BACKLOG_ITEM_MESSAGE)
-		public abstract Builder backlogItemMessage(ValueReference backlogItemMessage);
-
 		@JsonProperty(SlackEventNotificationConfig.FIELD_USER_NAME)
 		public abstract Builder userName(ValueReference userName);
 
@@ -116,12 +104,6 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
 		@JsonProperty(SlackEventNotificationConfig.FIELD_ICON_EMOJI)
 		public abstract Builder iconEmoji(ValueReference iconEmoji);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_GRAYLOG_URL)
-		public abstract Builder graylogUrl(ValueReference graylogUrl);
-
-		@JsonProperty(SlackEventNotificationConfig.FIELD_PROXY)
-		public abstract Builder proxy(ValueReference proxy);
-
 		public abstract SlackEventNotificationConfigEntity build();
 	}
 
@@ -132,14 +114,11 @@ public abstract class SlackEventNotificationConfigEntity implements EventNotific
 				.webhookUrl(webhookUrl().asString(parameters))
 				.channel(channel().asString(parameters))
 				.customMessage(customMessage().asString(parameters))
-				.backlogItemMessage(backlogItemMessage().asString(parameters))
 				.userName(userName().asString(parameters))
 				.notifyChannel(notifyChannel().asBoolean(parameters))
 				.linkNames(linkNames().asBoolean(parameters))
 				.iconUrl(iconUrl().asString(parameters))
 				.iconEmoji(iconEmoji().asString(parameters))
-				.graylogUrl(graylogUrl().asString(parameters))
-				.proxy(proxy().asString(parameters))
 				.build();
 	}
 }
