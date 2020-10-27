@@ -7,19 +7,26 @@ import HasOwnership from 'components/common/HasOwnership';
 import Icon from 'components/common/Icon';
 
 type Props = {
+  disabled?: boolean,
   entityId: string,
   entityType: string,
   onClick: () => void,
+  bsStyle?: string,
 };
 
-const ShareButton = ({ entityId, entityType, onClick }: Props) => (
+const ShareButton = ({ bsStyle, entityId, entityType, onClick, disabled }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
-    {({ disabled }) => (
-      <Button bsStyle="info" onClick={onClick} disabled={disabled}>
-        <Icon name="user-plus" /> Share {disabled && <SharingDisabledPopover type={entityType} />}
+    {({ disabled: missingPermissions }) => (
+      <Button bsStyle={bsStyle} onClick={onClick} disabled={disabled || missingPermissions}>
+        <Icon name="user-plus" /> Share {(!disabled && missingPermissions) && <SharingDisabledPopover type={entityType} />}
       </Button>
     )}
   </HasOwnership>
 );
+
+ShareButton.defaultProps = {
+  bsStyle: 'info',
+  disabled: false,
+};
 
 export default ShareButton;
