@@ -1,17 +1,16 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import type { LocationShape } from 'react-router';
 
-import withLocation, { type Location } from 'routing/withLocation';
 import history from 'util/History';
 
 export type HistoryElement = LocationShape;
 
-const _setActiveClassName = (location, to, currentClassName, displayName) => {
+const _setActiveClassName = (pathname, to, currentClassName, displayName) => {
   const props = {};
-  const isActive = to === location.pathname;
+  const isActive = to === pathname;
 
   if (displayName === 'Button' && isActive) {
     let className = 'active';
@@ -30,11 +29,12 @@ type Props = {
   children: React.Node,
   onClick?: () => mixed,
   to: string | HistoryElement,
-  location: Location,
 };
 
-const LinkContainer = withLocation(({ children, onClick, to, location, ...rest }: Props) => {
+const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
+  const { pathname } = useLocation();
   const { props: { onClick: childrenOnClick, className }, type: { displayName } } = React.Children.only(children);
+  const childrenClassName = _setActiveClassName(pathname, to, className, displayName);
   const _onClick = useCallback(() => {
     if (childrenOnClick) {
       childrenOnClick();
@@ -46,10 +46,9 @@ const LinkContainer = withLocation(({ children, onClick, to, location, ...rest }
 
     history.push(to);
   }, [childrenOnClick, onClick, to]);
-  const childrenClassName = _setActiveClassName(location, to, className, displayName);
 
   return React.cloneElement(React.Children.only(children), { ...rest, ...childrenClassName, onClick: _onClick });
-});
+};
 
 export {
   Link,
