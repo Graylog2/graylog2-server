@@ -2,8 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
-import { IfPermitted, HasOwnership, PaginatedList, SearchForm, Spinner, EntityList } from 'components/common';
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
+import { IfPermitted, PaginatedList, SearchForm, Spinner, EntityList, ShareButton } from 'components/common';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 
 import View from './View';
@@ -13,14 +12,8 @@ import ViewTypeLabel from '../ViewTypeLabel';
 const itemActionsFactory = (view, onViewDelete, setViewToShare) => {
   return (
     <ButtonToolbar>
-      <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} bsSize="small" pullRight>
-        <HasOwnership type="dashboard" id={view.id}>
-          {({ disabled }) => (
-            <MenuItem disabled={disabled} onSelect={() => setViewToShare(view)}>
-              Share {disabled && <SharingDisabledPopover type="dashboard" />}
-            </MenuItem>
-          )}
-        </HasOwnership>
+      <ShareButton entityId={view.id} entityType="dashboard" onClick={() => setViewToShare(view)} />
+      <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} pullRight>
         <IfPermitted permissions={[`view:edit:${view.id}`, 'view:edit']} anyPermissions>
           <MenuItem onSelect={onViewDelete(view)}>Delete</MenuItem>
         </IfPermitted>
