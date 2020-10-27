@@ -28,7 +28,6 @@
     </parent>
 
     <artifactId>full-backend-tests</artifactId>
-    <packaging>pom</packaging>
 
     <name>full-backend-tests</name>
     <description>Graylog REST API integration tests</description>
@@ -191,6 +190,11 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
             </plugin>
         </plugins>
     </build>

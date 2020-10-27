@@ -18,8 +18,6 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
-import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.Test;
 
@@ -27,10 +25,8 @@ import java.util.Arrays;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
-class MessagesResourceIT {
+abstract class MessagesResourceIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
@@ -41,7 +37,7 @@ class MessagesResourceIT {
 
     @Test
     void canDownloadCsv() {
-        sut.importElasticsearchFixture("messages-for-export.json", getClass());
+        sut.importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
 
         String allMessagesTimeRange = "{\"timerange\": {\"type\": \"absolute\", \"from\": \"2015-01-01T00:00:00\", \"to\": \"2015-01-01T23:59:59\"}}";
 
