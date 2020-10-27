@@ -12,7 +12,6 @@ const Wrapper = styled.div`
 
 const Filter = ({
   children,
-  customFilter,
   displayKey,
   filterBy,
   filterKeys,
@@ -22,10 +21,6 @@ const Filter = ({
   onDataFiltered,
   rows,
 }) => {
-  if (customFilter) {
-    return customFilter;
-  }
-
   if (filterKeys.length !== 0) {
     return (
       <Wrapper className="row">
@@ -53,7 +48,6 @@ const Filter = ({
 
 Filter.propTypes = {
   children: PropTypes.node,
-  customFilter: PropTypes.node,
   displayKey: PropTypes.string,
   filterBy: PropTypes.string,
   filterKeys: PropTypes.array,
@@ -66,7 +60,6 @@ Filter.propTypes = {
 
 Filter.defaultProps = {
   children: undefined,
-  customFilter: undefined,
   displayKey: undefined,
   filterBy: undefined,
   filterKeys: undefined,
