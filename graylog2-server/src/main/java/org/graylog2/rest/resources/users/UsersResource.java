@@ -197,7 +197,7 @@ public class UsersResource extends RestResource {
         final boolean isSelf = requestingUser.equals(userId);
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
 
-        return toUserResponse(user, isSelf || canEditUserPermissions, Optional.empty());
+        return toUserResponse(user, isSelf || canEditUserPermissions, AllUserSessions.create(sessionService));
     }
 
     @GET
