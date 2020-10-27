@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { createGRN } from 'logic/permissions/GRN';
 import { useStore } from 'stores/connect';
-import { Spinner, Icon } from 'components/common';
+import { Spinner } from 'components/common';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import SharedEntity from 'logic/permissions/SharedEntity';
@@ -70,7 +70,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
                            onConfirm={_handleSave}
                            onModalClose={onClose}
                            showModal
-                           title={<><Icon name="user-plus" /> Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i></>}>
+                           title={<>Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i></>}>
       <>
         {(entityShareState && entityShareState.entity === entityGRN) ? (
           <EntityShareSettings description={description}
