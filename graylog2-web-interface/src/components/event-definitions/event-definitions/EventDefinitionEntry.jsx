@@ -111,6 +111,7 @@ const EventDefinitionEntry = ({
       { showEntityShareModal && (
         <EntityShareModal entityId={eventDefinition.id}
                           entityType="event_definition"
+                          entityTypeTitle="event definition"
                           entityTitle={eventDefinition.title}
                           description="Search for a User or Team to add as collaborator on this event definition."
                           onClose={() => setShowEntityShareModal(false)} />
