@@ -146,6 +146,7 @@ public class UsersResource extends RestResource {
     }
 
     @GET
+    @Deprecated
     @Path("{username}")
     @ApiOperation(value = "Get user details", notes = "The user's permissions are only included if a user asks for his " +
             "own account or for users with the necessary permissions to edit permissions.")
@@ -184,11 +185,7 @@ public class UsersResource extends RestResource {
                            @PathParam("userId") String userId,
                            @Context UserContext userContext) {
 
-        final User user = userService.loadById(userId);
-        if (user == null) {
-            throw new NotFoundException("Couldn't find userId " + userId);
-        }
-
+        final User user = loadUserById(userId);
         final String username = user.getName();
         // If a user has permissions to edit another user's profile, it should be able to see it.
         // Reader users always have permissions to edit their own profile.
@@ -341,20 +338,21 @@ public class UsersResource extends RestResource {
     }
 
     @PUT
-    @Path("{username}")
+    @Path("{userId}")
     @ApiOperation("Modify user details.")
     @ApiResponses({
                           @ApiResponse(code = 400, message = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
                           @ApiResponse(code = 400, message = "Missing or invalid user details.")
                   })
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
-    public void changeUser(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
-                           @PathParam("username") String username,
+    public void changeUser(@ApiParam(name = "userId", value = "The ID of the user to modify.", required = true)
+                           @PathParam("userId") String userId,
                            @ApiParam(name = "JSON body", value = "Updated user information.", required = true)
                            @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
-        checkPermission(USERS_EDIT, username);
 
-        final User user = loadUser(username);
+        final User user = loadUserById(userId);
+        final String username = user.getName();
+        checkPermission(USERS_EDIT, username);
 
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
@@ -480,7 +478,7 @@ public class UsersResource extends RestResource {
     }
 
     @PUT
-    @Path("{username}/password")
+    @Path("{userId}/password")
     @ApiOperation("Update the password for a user.")
     @ApiResponses({
                           @ApiResponse(code = 204, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
@@ -490,17 +488,15 @@ public class UsersResource extends RestResource {
                   })
     @AuditEvent(type = AuditEventTypes.USER_PASSWORD_UPDATE)
     public void changePassword(
-            @ApiParam(name = "username", value = "The name of the user whose password to change.", required = true)
-            @PathParam("username") String username,
+            @ApiParam(name = "userId", value = "The id of the user whose password to change.", required = true)
+            @PathParam("userId") String userId,
             @ApiParam(name = "JSON body", value = "The old and new passwords.", required = true)
             @Valid ChangePasswordRequest cr) throws ValidationException {
 
-        final User user = userService.load(username);
-        if (user == null) {
-            throw new NotFoundException("Couldn't find user " + username);
-        }
+        final User user = loadUserById(userId);
+        final String username = user.getName();
 
-        if (!getSubject().isPermitted(RestPermissions.USERS_PASSWORDCHANGE + ":" + user.getName())) {
+        if (!getSubject().isPermitted(RestPermissions.USERS_PASSWORDCHANGE + ":" + username)) {
             throw new ForbiddenException("Not allowed to change password for user " + username);
         }
         if (user.isExternalUser()) {
@@ -540,15 +536,16 @@ public class UsersResource extends RestResource {
     }
 
     @GET
-    @Path("{username}/tokens")
+    @Path("{userId}/tokens")
     @ApiOperation("Retrieves the list of access tokens for a user")
-    public TokenList listTokens(@ApiParam(name = "username", required = true)
-                                @PathParam("username") String username) {
+    public TokenList listTokens(@ApiParam(name = "userId", required = true)
+                                @PathParam("userId") String userId) {
+        final User user = loadUserById(userId);
+        final String username = user.getName();
+
         if (!isPermitted(USERS_TOKENLIST, username)) {
             throw new ForbiddenException("Not allowed to list tokens for user " + username);
         }
-
-        final User user = loadUser(username);
 
         final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
@@ -559,32 +556,32 @@ public class UsersResource extends RestResource {
     }
 
     @POST
-    @Path("{username}/tokens/{name}")
+    @Path("{userId}/tokens/{name}")
     @ApiOperation("Generates a new access token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_CREATE)
     public Token generateNewToken(
-            @ApiParam(name = "username", required = true) @PathParam("username") String username,
+            @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
             @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
+        final User user = loadUserById(userId);
+        final String username = user.getName();
         if (!isPermitted(USERS_TOKENCREATE, username)) {
             throw new ForbiddenException("Not allowed to create tokens for user " + username);
         }
-
-        final User user = loadUser(username);
-
-
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
 
     @DELETE
-    @Path("{username}/tokens/{idOrToken}")
+    @Path("{userId}/tokens/{idOrToken}")
     @ApiOperation("Removes a token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_DELETE)
     public void revokeToken(
-            @ApiParam(name = "username", required = true) @PathParam("username") String username,
+            @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "idOrToken", required = true) @PathParam("idOrToken") String idOrToken) {
+        final User user = loadUserById(userId);
+        final String username = user.getName();
         if (!isPermitted(USERS_TOKENREMOVE, username)) {
             throw new ForbiddenException("Not allowed to remove tokens for user " + username);
         }
@@ -603,10 +600,10 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private User loadUser(String username) {
-        final User user = userService.load(username);
+    private User loadUserById(String userId) {
+        final User user = userService.loadById(userId);
         if (user == null) {
-            throw new NotFoundException("Unknown user " + username);
+            throw new NotFoundException("Couldn't find user with ID <" + userId + ">");
         }
         return user;
     }
