@@ -3,9 +3,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import EntityShareModal from 'components/permissions/EntityShareModal';
+import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import { Link, LinkContainer } from 'components/graylog/router';
 import { Button, Tooltip } from 'components/graylog';
-import { OverlayElement, Icon } from 'components/common';
+import { OverlayElement, Icon, HasOwnership } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
@@ -226,7 +227,6 @@ class Stream extends React.Component {
                         onDelete={this._onDelete}
                         onUpdate={this._onUpdate}
                         onClone={this._onClone}
-                        onShare={this._openEntityShareModal}
                         onQuickAdd={this._openStreamRuleForm}
                         indexSets={indexSets}
                         isDefaultStream={isDefaultStream} />
@@ -242,6 +242,13 @@ class Stream extends React.Component {
           {editRulesLink}{' '}
           {manageOutputsLink}{' '}
           {manageAlertsLink}{' '}
+          <HasOwnership id={stream.id} type="stream">
+            {({ disabled }) => (
+              <Button bsStyle="info" onClick={this._openEntityShareModal} disabled={disabled}>
+                <Icon name="user-plus" /> Share {disabled && <SharingDisabledPopover type="stream" />}
+              </Button>
+            )}
+          </HasOwnership>
           {toggleStreamLink}{' '}
 
           {streamControls}

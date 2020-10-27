@@ -10,11 +10,11 @@ type Props = {
 };
 
 const StyledHoverForHelp: StyledComponent<{}, ThemeInterface, HoverForHelp> = styled(HoverForHelp)`
-  margin-top: 3px;
+  margin-left: 8px;
 `;
 
 const SharingDisabledPopover = ({ type }: Props) => (
-  <StyledHoverForHelp title="Sharing not possible">
+  <StyledHoverForHelp title="Sharing not possible" pullRight={false}>
     Only owners of this {type} are allowed to share it.
   </StyledHoverForHelp>
 );

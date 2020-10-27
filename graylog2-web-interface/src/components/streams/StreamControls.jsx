@@ -5,7 +5,7 @@ import createReactClass from 'create-react-class';
 
 import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import { DropdownButton, MenuItem } from 'components/graylog';
-import { IfPermitted, HasOwnership } from 'components/common';
+import { IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -85,14 +85,6 @@ const StreamControls = createReactClass({
           <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={user.read_only}>
             Set as startpage
           </MenuItem>
-
-          <HasOwnership id={stream.id} type="stream">
-            {({ disabled }) => (
-              <MenuItem key={`share-${stream.id}`} onSelect={onShare} disabled={disabled}>
-                Share {disabled && <SharingDisabledPopover type="stream" />}
-              </MenuItem>
-            )}
-          </HasOwnership>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`divider-${stream.id}`} divider />
           </IfPermitted>
