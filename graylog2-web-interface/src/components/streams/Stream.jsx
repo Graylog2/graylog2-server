@@ -62,7 +62,7 @@ const StreamListItem = styled.li(({ theme }) => css`
 `);
 
 const ToggleButton = styled(Button)`
-  width: 8.5em;
+  min-width: 8.8em;
 `;
 
 class Stream extends React.Component {
@@ -169,14 +169,18 @@ class Stream extends React.Component {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
           <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
-            <Button bsStyle="info">Manage Rules</Button>
+            <Button bsStyle="info">
+              <Icon name="inbox" /> Manage Rules
+            </Button>
           </LinkContainer>
         </OverlayElement>
       );
 
       manageAlertsLink = (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info">Manage Alerts</Button>
+          <Button bsStyle="info">
+            <Icon name="bell" /> Manage Alerts
+          </Button>
         </LinkContainer>
       );
     }
@@ -190,7 +194,7 @@ class Stream extends React.Component {
             <ToggleButton bsStyle="success"
                           onClick={this._onResume}
                           disabled={isDefaultStream || loading}>
-              {loading ? 'Starting...' : 'Start Stream'}
+              <Icon name="play" /> {loading ? 'Starting...' : 'Start Stream'}
             </ToggleButton>
           </OverlayElement>
         );
@@ -200,7 +204,7 @@ class Stream extends React.Component {
             <ToggleButton bsStyle="primary"
                           onClick={this._onPause}
                           disabled={isDefaultStream || loading}>
-              {loading ? 'Pausing...' : 'Pause Stream'}
+              <Icon name="pause" /> {loading ? 'Pausing...' : 'Pause Stream'}
             </ToggleButton>
           </OverlayElement>
         );
