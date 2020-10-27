@@ -22,6 +22,8 @@ const _paginatedRows = (rows: Array<mixed>, perPage: number, currentPage: number
 };
 
 type Props = {
+  /** Element id to use in the table container */
+  id: string,
   /** Array of objects to be rendered in the table. The render of those values is controlled by `dataRowFormatter`. */
   rows: Array<mixed>,
   /** Initial pagination. */
@@ -40,7 +42,7 @@ type Props = {
  * Component that renders a paginated data table. Should only be used for lists which are not already paginated.
  * If you want to display a lists which gets paginated by the backend, wrap use the DataTable in combination with the PaginatedList.
  */
-const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKeys, filterLabel, displayKey, filterBy, ...rest }: Props) => {
+const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKeys, filterLabel, displayKey, filterBy, id, ...rest }: Props) => {
   const [{ perPage, page }, setPagination] = useState(initialPagination);
   const [filteredRows, setFilteredRows] = useState(rows);
   const paginatedRows = _paginatedRows(filteredRows, perPage, page);
@@ -65,8 +67,10 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKe
                    onChange={_onPageChange}
                    showPageSizeSelect>
       <DataTable {...rest}
+                 id={id}
                  customFilter={(
-                   <Filter filterKeys={filterKeys}
+                   <Filter id={id}
+                           filterKeys={filterKeys}
                            setFilteredRows={setFilteredRows}
                            rows={rows}
                            resetPagination={_resetPagination}
