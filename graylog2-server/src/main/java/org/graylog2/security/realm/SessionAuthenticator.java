@@ -27,13 +27,13 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.SessionIdToken;
-import org.graylog2.shared.security.ShiroSecurityContextFilter;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.MultivaluedMap;
+import java.util.Optional;
 
 public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SessionAuthenticator.class);
@@ -72,11 +72,8 @@ public class SessionAuthenticator extends AuthenticatingRealm {
             LOG.debug("Found session {} for userId {}", session.getId(), userId);
         }
 
-        @SuppressWarnings("unchecked")
-        final MultivaluedMap<String, String> requestHeaders = (MultivaluedMap<String, String>) ThreadContext.get(
-                ShiroSecurityContextFilter.REQUEST_HEADERS);
-        // extend session unless the relevant header was passed.
-        if (requestHeaders != null && !"true".equalsIgnoreCase(requestHeaders.getFirst(X_GRAYLOG_NO_SESSION_EXTENSION))) {
+        final Optional<String> noSessionExtension = ShiroRequestHeadersBinder.getHeaderFromThreadContext(X_GRAYLOG_NO_SESSION_EXTENSION);
+        if (noSessionExtension.isPresent() && !"true".equalsIgnoreCase(noSessionExtension.get())) {
             session.touch();
         } else {
             LOG.debug("Not extending session because the request indicated not to.");
