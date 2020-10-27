@@ -57,6 +57,7 @@ export { default as Select } from './Select';
 export { default as SelectableList } from './SelectableList';
 export { default as SelectPopover } from './SelectPopover';
 export { default as SortableList } from './SortableList';
+export { default as ShareButton } from './ShareButton';
 export { default as SortableListItem } from './SortableListItem';
 export { SourceCodeEditor };
 export { default as Spinner } from './Spinner';
