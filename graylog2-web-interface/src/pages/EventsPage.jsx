@@ -29,7 +29,7 @@ const EventsPage = ({ location }) => {
 
           <ButtonToolbar>
             <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info" className="active">Alerts &amp; Events</Button>
+              <Button bsStyle="info">Alerts &amp; Events</Button>
             </LinkContainer>
             <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
               <Button bsStyle="info">Event Definitions</Button>

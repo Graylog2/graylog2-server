@@ -25,7 +25,7 @@ class SidecarsPage extends React.Component {
 
             <ButtonToolbar>
               <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-                <Button bsStyle="info" className="active">Overview</Button>
+                <Button bsStyle="info">Overview</Button>
               </LinkContainer>
               <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
                 <Button bsStyle="info">Administration</Button>

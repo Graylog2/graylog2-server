@@ -28,7 +28,7 @@ const SidecarAdministrationPage = ({ location: { query: { node_id: nodeId } } })
             <Button bsStyle="info">Overview</Button>
           </LinkContainer>
           <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-            <Button bsStyle="info" className="active">Administration</Button>
+            <Button bsStyle="info">Administration</Button>
           </LinkContainer>
           <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
             <Button bsStyle="info">Configuration</Button>
