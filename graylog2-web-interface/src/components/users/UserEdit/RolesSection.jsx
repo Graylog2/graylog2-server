@@ -6,6 +6,8 @@ import styled from 'styled-components';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import { Alert, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import User from 'logic/users/User';
 import PaginatedItemOverview, {
   DEFAULT_PAGINATION,
@@ -30,6 +32,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   const { username } = user;
   const [loading, setLoading] = useState(false);
   const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
+  const [errors, setErrors] = useState();
 
   const _onLoad = useCallback((pagination = DEFAULT_PAGINATION) => {
     setLoading(true);
@@ -51,13 +54,25 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     const newRoleNames = newRoles.map((r) => r.name);
     const newUserRoles = userRoles.union(newRoleNames).toJS();
 
+    setErrors();
+
     return onRolesUpdate({ roles: newUserRoles });
+  };
+
+  const ensureReaderOrAdminRole = (newRoles) => {
+    return newRoles.includes('Reader') || newRoles.includes('Admin');
   };
 
   const onDeleteRole = (role: DescriptiveItem) => {
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();
 
-    onRolesUpdate({ roles: newUserRoles });
+    if (ensureReaderOrAdminRole(newUserRoles)) {
+      onRolesUpdate({ roles: newUserRoles });
+      setErrors();
+    } else {
+      setErrors('Roles must at least contain Admin or Reader role.');
+      _onLoad().then(setPaginatedRoles);
+    }
   };
 
   return (
@@ -67,6 +82,17 @@ const RolesSection = ({ user, onSubmit }: Props) => {
         { /* $FlowFixMe: assignRole has DescriptiveItem */}
         <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
       </Container>
+
+      { errors && (
+        <Container>
+          <Alert bsStyle="warning">
+            {errors}
+            <Button bsSize="xsmall" bsStyle="warning" className="pull-right" onClick={() => setErrors()}>
+              <Icon name="times" />
+            </Button>
+          </Alert>
+        </Container>
+      )}
       <h3>Selected Roles</h3>
       <Container>
         <PaginatedItemOverview noDataText="No selected roles have been found."
