@@ -56,8 +56,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 
@@ -150,7 +153,18 @@ public class AuthzRolesResource extends RestResource {
 
         final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(
                 searchQuery, page, perPage,sort, order, roleId);
-        return PaginatedResponse.create("users", result, query);
+        final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
+        final Map<String, String> rolesMap = authzRolesService.findPaginatedByIds(
+                new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, "asc", roleIds)
+                .stream().collect(Collectors.toMap(AuthzRoleDTO::id, AuthzRoleDTO::name));
+        final List<UserOverviewDTO> users = result.stream().map(u -> {
+            final Set<String> roleNames = u.roles().stream().map(rolesMap::get).collect(Collectors.toSet());
+            return u.toBuilder().roles(roleNames).build();
+        }).collect(Collectors.toList());
+
+        final PaginatedList<UserOverviewDTO> enrichedResult = new PaginatedList<>(users, result.pagination().total(),
+                result.pagination().page(), result.pagination().perPage());
+        return PaginatedResponse.create("users", enrichedResult, query);
     }
 
     @GET
