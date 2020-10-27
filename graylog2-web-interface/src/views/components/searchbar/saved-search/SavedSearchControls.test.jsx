@@ -86,17 +86,17 @@ describe('SavedSearchControls', () => {
       });
     });
 
-    describe('has "Share search" option', () => {
+    describe('has "Share" option', () => {
       it('includes the option to share the current search', () => {
         const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        expect(wrapper.find('MenuItem[title="Share search"]')).toExist();
+        expect(wrapper.find('button[title="Share"]')).toExist();
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
         const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).toBeDisabled();
       });
@@ -109,7 +109,7 @@ describe('SavedSearchControls', () => {
           grn_permissions: ['entity:own:grn::::search:user-id-1'],
         };
         const wrapper = mount(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
@@ -124,7 +124,7 @@ describe('SavedSearchControls', () => {
 
         const wrapper = mount(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
@@ -132,7 +132,7 @@ describe('SavedSearchControls', () => {
       it('which should be enabled if current user is admin', () => {
         const wrapper = mount(<SimpleSavedSearchControls currentUser={admin} viewStoreState={createViewStoreState(false, admin.id)} />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
@@ -140,7 +140,7 @@ describe('SavedSearchControls', () => {
       it('which should be hidden if search is unsaved', () => {
         const wrapper = mount(<SimpleSavedSearchControls />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).toMatchSnapshot();
       });
