@@ -75,7 +75,7 @@ public class ESVersionCheckPeriodical extends Periodical {
 
     @Override
     public boolean isDaemon() {
-        return false;
+        return true;
     }
 
     @Override
@@ -106,9 +106,8 @@ public class ESVersionCheckPeriodical extends Periodical {
             if (compatible(this.initialElasticsearchVersion, version)) {
                 notificationService.fixed(Notification.Type.ES_VERSION_MISMATCH);
             } else {
-                LOG.warn("Elasticsearch version currently running (" + version.toString() + ") is incompatible with the " +
-                        "one Graylog was started with (" + initialElasticsearchVersion.toString() + ")" +
-                        " - a restart is required!");
+                LOG.warn("Elasticsearch version currently running ({}) is incompatible with the one Graylog was started " +
+                        "with ({}) - a restart is required!", version, initialElasticsearchVersion);
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_VERSION_MISMATCH)
                         .addSeverity(Notification.Severity.URGENT)
