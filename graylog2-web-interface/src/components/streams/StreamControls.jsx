@@ -3,7 +3,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
+import Routes from 'routing/Routes';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -82,9 +82,15 @@ const StreamControls = createReactClass({
           <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
             <MenuItem key={`cloneStream-${stream.id}`} onSelect={this._onClone}>Clone this stream</MenuItem>
           </IfPermitted>
+          <IfPermitted permissions="stream_outputs:read">
+            <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
+              Manage Outputs
+            </MenuItem>
+          </IfPermitted>
           <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={user.read_only}>
             Set as startpage
           </MenuItem>
+
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`divider-${stream.id}`} divider />
           </IfPermitted>

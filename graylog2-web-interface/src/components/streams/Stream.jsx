@@ -163,7 +163,6 @@ class Stream extends React.Component {
       ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
     let editRulesLink;
-    let manageOutputsLink;
     let manageAlertsLink;
 
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
@@ -180,14 +179,6 @@ class Stream extends React.Component {
           <Button bsStyle="info">Manage Alerts</Button>
         </LinkContainer>
       );
-
-      if (isPermitted(permissions, ['stream_outputs:read'])) {
-        manageOutputsLink = (
-          <LinkContainer to={Routes.stream_outputs(stream.id)}>
-            <Button bsStyle="info">Manage Outputs</Button>
-          </LinkContainer>
-        );
-      }
     }
 
     let toggleStreamLink;
@@ -240,7 +231,6 @@ class Stream extends React.Component {
       <StreamListItem>
         <div className="stream-actions pull-right">
           {editRulesLink}{' '}
-          {manageOutputsLink}{' '}
           {manageAlertsLink}{' '}
           <HasOwnership id={stream.id} type="stream">
             {({ disabled }) => (
