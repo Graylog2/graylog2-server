@@ -8,9 +8,17 @@ import history from 'util/History';
 
 export type HistoryElement = LocationShape;
 
+const _targetPathname = (to) => {
+  const target = typeof to?.pathname === 'string' ? to.pathname : to;
+  const targetWithoutQuery = String(target).split(/[?#]/)[0];
+
+  return targetWithoutQuery;
+};
+
 const _setActiveClassName = (pathname, to, currentClassName, displayName) => {
   const props = {};
-  const isActive = to === pathname;
+  const targetPathname = _targetPathname(to);
+  const isActive = targetPathname === pathname;
 
   if (displayName === 'Button' && isActive) {
     let className = 'active';
