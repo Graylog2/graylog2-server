@@ -6,6 +6,7 @@ import styled, { type StyledComponent } from 'styled-components';
 import { ClipboardButton, Icon } from 'components/common';
 import { Alert, FormGroup, InputGroup, FormControl } from 'components/graylog';
 import { type ThemeInterface } from 'theme';
+import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
 const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
   display: flex;
@@ -39,11 +40,13 @@ const StyledClipboardButton = styled(ClipboardButton)`
 `;
 
 type Props = {
-  entityURL?: string,
+  entityGRN: string,
 };
 
-const ShareableEntityURL = ({ entityURL }: Props) => {
+const ShareableEntityURL = ({ entityGRN }: Props) => {
   const container = useRef();
+  const entityRoute = getShowRouteFromGRN(entityGRN);
+  const entityUrl = `${window.location.origin.toString()}${entityRoute}`;
 
   return (
     <Container>
@@ -53,11 +56,11 @@ const ShareableEntityURL = ({ entityURL }: Props) => {
       <URLColumn>
         <FormGroup>
           <InputGroup>
-            <StyledFormControl type="text" value={entityURL} readOnly />
+            <StyledFormControl type="text" value={entityUrl} readOnly />
             <InputGroupAddon>
               <span ref={container}>
                 {container.current && (
-                  <StyledClipboardButton text={entityURL}
+                  <StyledClipboardButton text={entityUrl}
                                          container={container.current}
                                          buttonTitle="Copy parameter to clipboard"
                                          title={<Icon name="copy" fixedWidth />} />
@@ -72,10 +75,6 @@ const ShareableEntityURL = ({ entityURL }: Props) => {
       </URLColumn>
     </Container>
   );
-};
-
-ShareableEntityURL.defaultProps = {
-  entityURL: window.location.href,
 };
 
 export default ShareableEntityURL;
