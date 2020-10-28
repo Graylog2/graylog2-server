@@ -19,6 +19,7 @@ package org.graylog.security.shares;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Ints;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
@@ -41,7 +42,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -69,7 +72,7 @@ public class GranteeSharesService {
 
         final Map<GRN, Set<EntityDescriptor.Owner>> targetOwners = getTargetOwners(targets);
 
-        final List<EntityDescriptor> entityDescriptors = targets.stream()
+        final Supplier<Stream<EntityDescriptor>> filteredStream = () -> targets.stream()
                 .map(descriptorService::getDescriptor)
                 .filter(queryPredicate(paginationParameters))
                 .filter(entityTypeFilterPredicate(entityTypeFilterString))
@@ -79,7 +82,11 @@ public class GranteeSharesService {
                         return t2.compareTo(t1);
                     }
                     return t1.compareTo(t2);
-                }))
+                }));
+
+        final int filteredResultCount = Ints.saturatedCast(filteredStream.get().count());
+
+        final List<EntityDescriptor> entityDescriptors = filteredStream.get()
                 .skip(paginationParameters.getPerPage() * (paginationParameters.getPage() - 1))
                 .limit(paginationParameters.getPerPage())
                 .collect(Collectors.toList());
@@ -94,9 +101,10 @@ public class GranteeSharesService {
 
         final PaginatedList<EntityDescriptor> paginatedList = new PaginatedList<>(
                 entityDescriptors,
-                targets.size(),
+                filteredResultCount,
                 paginationParameters.getPage(),
-                paginationParameters.getPerPage()
+                paginationParameters.getPerPage(),
+                (long) targets.size()
         );
 
         return SharesResponse.create(paginatedList, granteeCapabilities);
