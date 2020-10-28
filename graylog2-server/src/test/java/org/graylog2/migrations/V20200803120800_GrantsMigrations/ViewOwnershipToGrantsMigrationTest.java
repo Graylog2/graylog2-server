@@ -31,7 +31,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
@@ -67,7 +66,7 @@ class ViewOwnershipToGrantsMigrationTest {
                @Mock UserService userService) {
 
         this.userService = userService;
-        this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry, mock(ClusterEventBus.class));
+        this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService);

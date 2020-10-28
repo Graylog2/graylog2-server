@@ -36,7 +36,6 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,7 +80,7 @@ public class EntitySharesServiceTest {
                GRNRegistry grnRegistry) {
         this.grnRegistry = grnRegistry;
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, this.grnRegistry, mock(ClusterEventBus.class));
+        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, this.grnRegistry);
 
         lenient().when(entityDependencyResolver.resolve(any())).thenReturn(ImmutableSet.of());
         lenient().when(entityDependencyPermissionChecker.check(any(), any(), any())).thenReturn(ImmutableMultimap.of());
@@ -218,7 +217,7 @@ public class EntitySharesServiceTest {
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
         assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
-            assertThat(activeShares).isEmpty();;
+            assertThat(activeShares).isEmpty();
         });
 
     }

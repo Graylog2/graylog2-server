@@ -31,10 +31,10 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
-import org.graylog.security.GrantChangedEvent;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.MongoDbAuthorizationCacheManager;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.events.UserChangedEvent;
 import org.slf4j.Logger;
@@ -45,6 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.graylog2.shared.rest.RequestIdFilter.X_REQUEST_ID;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
@@ -66,6 +67,17 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
         setCachingEnabled(true);
         setCacheManager(mongoDbAuthorizationCacheManager);
         serverEventBus.register(this);
+    }
+
+    @Override
+    protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
+        final Optional<String> requestId = ShiroRequestHeadersBinder.getHeaderFromThreadContext(X_REQUEST_ID);
+
+        if (requestId.isPresent()) {
+            return ImmutableSet.builder().addAll(principals).add(requestId.get()).build();
+        }
+        LOG.warn("Could not find X-Request-Id header. This is not supposed to happen.");
+        return principals.asSet();
     }
 
     @Override
@@ -142,11 +154,6 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
     @Subscribe
     public void handleUserSave(UserChangedEvent event) {
-        getAuthorizationCache().clear();
-    }
-
-    @Subscribe
-    public void handleGrantChange(GrantChangedEvent event) {
         getAuthorizationCache().clear();
     }
 }
