@@ -51,8 +51,8 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: grid;
   grid-template-columns: max-content repeat(5, 1fr) max-content;
   grid-template-rows: repeat(2, 1fr);
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
   
 `;
 
@@ -144,7 +144,7 @@ const initialRangeType = ({ range, ...restRange }) => {
   }).filter(Boolean).pop();
 };
 
-function reducer(state, action) {
+const reducer = (state, action) => {
   switch (action.type) {
     case 'rangeValue':
       return {
@@ -167,7 +167,7 @@ function reducer(state, action) {
     default:
       throw new Error();
   }
-}
+};
 
 const buildRangeTypes = (config) => RANGE_VALUES.map(({ label, value }) => {
   const typeDuration = moment.duration(1, value).asSeconds();
@@ -180,7 +180,7 @@ const buildRangeTypes = (config) => RANGE_VALUES.map(({ label, value }) => {
   return null;
 }).filter(Boolean);
 
-export default function RelativeTimeRangeSelector({ config, disabled, originalTimeRange }: Props) {
+const RelativeTimeRangeSelector = ({ config, disabled, originalTimeRange }: Props) => {
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
 
   const [state, dispatch] = useReducer(reducer, {
@@ -283,7 +283,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, originalTi
       </RangeWrapper>
     </RelativeWrapper>
   );
-}
+};
 
 RelativeTimeRangeSelector.propTypes = {
   config: PropTypes.shape({
@@ -298,3 +298,5 @@ RelativeTimeRangeSelector.propTypes = {
 RelativeTimeRangeSelector.defaultProps = {
   disabled: false,
 };
+
+export default RelativeTimeRangeSelector;
