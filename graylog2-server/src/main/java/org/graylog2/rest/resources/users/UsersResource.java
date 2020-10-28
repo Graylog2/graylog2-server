@@ -166,12 +166,7 @@ public class UsersResource extends RestResource {
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
-
-        final String requestingUser = userContext.getUser().getName();
-        final boolean isSelf = requestingUser.equals(username);
-        final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
-
-        return toUserResponse(user, isSelf || canEditUserPermissions, AllUserSessions.create(sessionService));
+        return returnSummary(userContext, user);
     }
 
     @GET
@@ -192,10 +187,13 @@ public class UsersResource extends RestResource {
         if (!isPermitted(USERS_EDIT, username)) {
             throw new ForbiddenException("Not allowed to view userId " + userId);
         }
+        return returnSummary(userContext, user);
+    }
 
+    private UserSummary returnSummary(UserContext userContext, User user) {
         final String requestingUser = userContext.getUser().getId();
-        final boolean isSelf = requestingUser.equals(userId);
-        final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
+        final boolean isSelf = requestingUser.equals(user.getId());
+        final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
 
         return toUserResponse(user, isSelf || canEditUserPermissions, AllUserSessions.create(sessionService));
     }
