@@ -21,6 +21,7 @@ class DocsHelper {
     LOOKUPTABLES: 'lookuptables.html',
     PAGE_FLEXIBLE_DATE_CONVERTER: 'extractors.html#the-flexible-date-converter',
     PAGE_STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',
+    PERMISSIONS: 'users_and_roles/permission_system.html',
     PIPELINE_FUNCTIONS: 'pipelines/functions.html',
     PIPELINE_RULES: 'pipelines/rules.html',
     PIPELINES: 'pipelines.html',

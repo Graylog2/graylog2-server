@@ -16,6 +16,7 @@ import PreferencesSection from './PreferencesSection';
 import RolesSection from './RolesSection';
 import TeamsSection from './TeamsSection';
 
+import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 import SectionGrid from '../../common/Section/SectionGrid';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
@@ -59,6 +60,7 @@ const UserEdit = ({ user }: Props) => {
           <PreferencesSection user={user} />
         </div>
         <div>
+          <PermissionsUpdateInfo />
           <IfPermitted permissions="users:rolesedit">
             <RolesSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user)} />
