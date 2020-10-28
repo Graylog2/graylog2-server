@@ -55,7 +55,7 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
 };
 
 UserMenu.propTypes = {
-  loginName: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
 };
 

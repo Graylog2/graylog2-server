@@ -36,6 +36,7 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore(
   'get',
   ['getInitialState', () => ({
     currentUser: {
+      id: 'user-betty-id',
       full_name: 'Betty Holberton',
       username: 'betty',
       permissions: ['dashboards:create'],
