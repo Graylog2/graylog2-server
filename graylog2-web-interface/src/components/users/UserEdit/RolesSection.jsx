@@ -46,7 +46,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
 
   const onRolesUpdate = (data: { roles: Array<string> }) => onSubmit(data).then(() => {
     _onLoad().then(setPaginatedRoles);
-    UsersDomain.load(username);
+    UsersDomain.loadByUsername(username);
   });
 
   const _onAssignRole = (newRoles: Immutable.Set<DescriptiveItem>) => {

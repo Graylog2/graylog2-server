@@ -7,25 +7,25 @@ import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/graylog';
 
 type Props = {
-  username: $PropertyType<User, 'username'>,
+  userId: $PropertyType<User, 'id'>,
   userIsReadOnly: boolean,
 };
 
-const UserActionLinks = ({ username, userIsReadOnly }: Props) => (
+const UserActionLinks = ({ userId, userIsReadOnly }: Props) => (
   <ButtonToolbar>
-    <LinkContainer to={Routes.SYSTEM.USERS.show(username)}>
+    <LinkContainer to={Routes.SYSTEM.USERS.show(userId)}>
       <Button bsStyle="success">
         View Details
       </Button>
     </LinkContainer>
     {!userIsReadOnly && (
-      <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
+      <LinkContainer to={Routes.SYSTEM.USERS.edit(userId)}>
         <Button bsStyle="success">
           Edit User
         </Button>
       </LinkContainer>
     )}
-    <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(username)}>
+    <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(userId)}>
       <Button bsStyle="success">
         Edit Tokens
       </Button>

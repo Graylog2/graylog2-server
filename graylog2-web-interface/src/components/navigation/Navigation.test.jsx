@@ -65,10 +65,10 @@ describe('Navigation', () => {
       expect(brand.find('NavigationBrand')).toExist();
     });
 
-    it('contains user menu including correct username', () => {
+    it('contains user menu including correct user details', () => {
       const usermenu = wrapper.find('UserMenu');
 
-      expect(usermenu).toHaveProp('loginName', currentUser.username);
+      expect(usermenu).toHaveProp('userId', currentUser.id);
       expect(usermenu).toHaveProp('fullName', currentUser.full_name);
     });
 

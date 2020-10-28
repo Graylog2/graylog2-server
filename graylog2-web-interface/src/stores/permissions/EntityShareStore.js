@@ -75,8 +75,8 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    loadUserSharesPaginated(username: string, { page, perPage, query, additionalQueries }: Pagination): Promise<PaginatedEntityShares> {
-      const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
+    loadUserSharesPaginated(userId: string, { page, perPage, query, additionalQueries }: Pagination): Promise<PaginatedEntityShares> {
+      const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(userId).url, page, perPage, query, additionalQueries);
       const promise = fetch('GET', qualifyUrl(url)).then(formatPaginatedSharesResponse);
 
       EntityShareActions.loadUserSharesPaginated.promise(promise);

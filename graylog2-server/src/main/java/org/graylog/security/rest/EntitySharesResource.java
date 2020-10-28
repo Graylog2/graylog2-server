@@ -90,18 +90,19 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
 
     @GET
     @ApiOperation(value = "Return shares for a user")
-    @Path("user/{username}")
+    @Path("user/{userId}")
     public PaginatedResponse<EntityDescriptor> get(@ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParameters,
-                                                   @ApiParam(name = "username", required = true) @PathParam("username") @NotBlank String username,
+                                                   @ApiParam(name = "userId", required = true) @PathParam("userId") @NotBlank String userId,
                                                    @ApiParam(name = "capability") @QueryParam("capability") @DefaultValue("") String capabilityFilter,
                                                    @ApiParam(name = "entity_type") @QueryParam("entity_type") @DefaultValue("") String entityTypeFilter) {
-        if (!isPermitted(USERS_EDIT, username)) {
-            throw new ForbiddenException("Couldn't access user " + username);
+
+        final User user = userService.loadById(userId);
+        if (user == null) {
+            throw new NotFoundException("Couldn't find user <" + userId + ">");
         }
 
-        final User user = userService.load(username);
-        if (user == null) {
-            throw new NotFoundException("Couldn't find user " + username);
+        if (!isPermitted(USERS_EDIT, user.getName())) {
+            throw new ForbiddenException("Couldn't access user <" + userId + ">");
         }
 
         final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(grnRegistry.ofUser(user), paginationParameters, capabilityFilter, entityTypeFilter);

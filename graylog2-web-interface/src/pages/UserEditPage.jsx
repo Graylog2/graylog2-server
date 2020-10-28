@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import withParams from 'routing/withParams';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -14,7 +13,7 @@ import UserActionLinks from 'components/users/navigation/UserActionLinks';
 
 type Props = {
   params: {
-    username: string,
+    userId: string,
   },
 };
 
@@ -30,21 +29,17 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const UserEditPage = ({ params }: Props) => {
   const [loadedUser, setLoadedUser] = useState();
-  const username = params?.username;
+  const userId = params?.userId;
 
   useEffect(() => {
-    UsersDomain.load(username);
-
-    const unlistenLoadUser = UsersActions.load.completed.listen(setLoadedUser);
-
-    return () => { unlistenLoadUser(); };
-  }, [username]);
+    UsersDomain.load(userId).then(setLoadedUser);
+  }, [userId]);
 
   return (
     <DocumentTitle title={`Edit User ${loadedUser?.fullName ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
                   subactions={(
-                    <UserActionLinks username={username}
+                    <UserActionLinks userId={userId}
                                      userIsReadOnly={loadedUser?.readOnly ?? false} />
                   )}>
         <span>
@@ -59,7 +54,7 @@ const UserEditPage = ({ params }: Props) => {
 
         <UserOverviewLinks />
       </PageHeader>
-      <UserEdit user={username === loadedUser?.username ? loadedUser : undefined} />
+      <UserEdit user={userId === loadedUser?.id ? loadedUser : undefined} />
     </DocumentTitle>
   );
 };

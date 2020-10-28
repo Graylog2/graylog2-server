@@ -84,7 +84,7 @@ const UsersOverview = () => {
   }
 
   const searchFilter = <UsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
-  const _usersOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.username === user.username)} />;
+  const _usersOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.id === user.id)} />;
 
   return (
     <Container>

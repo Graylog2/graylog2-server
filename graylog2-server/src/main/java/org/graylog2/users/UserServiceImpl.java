@@ -216,6 +216,20 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    public int deleteById(final String userId) {
+        final User user = loadById(userId);
+        if (user == null) {
+            return 0;
+        }
+        DBObject query = new BasicDBObject();
+        query.put("_id", new ObjectId(userId));
+        final int deleteCount = destroy(query, UserImpl.COLLECTION_NAME);
+        accesstokenService.deleteAllForUser(user.getName());
+        serverEventBus.post(UserDeletedEvent.create(userId, user.getName()));
+        return deleteCount;
+    }
+
+    @Override
     public User create() {
         final Map<String, Object> fields = new HashMap<>();
 
