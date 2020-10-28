@@ -30,7 +30,7 @@ const _onSubmit = (formData, roles, setSubmitError) => {
 
   setSubmitError(null);
 
-  UsersDomain.create(data).then(() => {
+  return UsersDomain.create(data).then(() => {
     history.push(Routes.SYSTEM.USERS.OVERVIEW);
   }, (error) => setSubmitError(error));
 };
