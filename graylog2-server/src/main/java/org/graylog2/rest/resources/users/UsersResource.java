@@ -150,8 +150,8 @@ public class UsersResource extends RestResource {
     @ApiOperation(value = "Get user details", notes = "The user's permissions are only included if a user asks for his " +
             "own account or for users with the necessary permissions to edit permissions.")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The user could not be found.")
-    })
+                          @ApiResponse(code = 404, message = "The user could not be found.")
+                  })
     public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
                            @PathParam("username") String username,
                            @Context UserContext userContext) {
@@ -170,7 +170,7 @@ public class UsersResource extends RestResource {
         final boolean isSelf = requestingUser.equals(username);
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
 
-        return toUserResponse(user, isSelf || canEditUserPermissions, Optional.empty());
+        return toUserResponse(user, isSelf || canEditUserPermissions, AllUserSessions.create(sessionService));
     }
 
     @GET
@@ -179,19 +179,15 @@ public class UsersResource extends RestResource {
     @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
     public UserList listUsers() {
         final List<User> users = userService.loadAll();
-        final Collection<MongoDbSession> sessions = sessionService.loadAll();
+        final AllUserSessions sessions = AllUserSessions.create(sessionService);
 
-        // among all active sessions, find the last recently used for each user
-        final Map<String, Optional<MongoDbSession>> lastSessionForUser = getLastSessionForUser(sessions);
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         userService.getRootUser().ifPresent(adminUser ->
-            resultUsers.add(
-                    toUserResponse(adminUser, lastSessionForUser.getOrDefault(adminUser.getName(), Optional.empty()))
-            )
+                resultUsers.add(toUserResponse(adminUser, sessions))
         );
 
         for (User user : users) {
-            resultUsers.add(toUserResponse(user, lastSessionForUser.getOrDefault(user.getName(), Optional.empty())));
+            resultUsers.add(toUserResponse(user, sessions));
         }
 
         return UserList.create(resultUsers);
@@ -207,16 +203,15 @@ public class UsersResource extends RestResource {
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                       @ApiParam(name = "sort",
-                                                value = "The field to sort the result on",
-                                                required = true,
-                                                allowableValues = "title,description")
-                                            @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
+                                                                value = "The field to sort the result on",
+                                                                required = true,
+                                                                allowableValues = "title,description")
+                                                      @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                            @DefaultValue("asc") @QueryParam("order") String order) {
+                                                      @DefaultValue("asc") @QueryParam("order") String order) {
 
         SearchQuery searchQuery;
-        final Collection<MongoDbSession> sessions = sessionService.loadAll();
-        final Map<String, Optional<MongoDbSession>> lastSessionForUser = getLastSessionForUser(sessions);
+        final AllUserSessions sessions = AllUserSessions.create(sessionService);
         try {
             searchQuery = searchQueryParser.parse(query);
         } catch (IllegalArgumentException e) {
@@ -239,11 +234,11 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find roles: " + e.getMessage());
         }
 
-        final UserOverviewDTO adminUser = getAdminUserDTO(lastSessionForUser);
+        final UserOverviewDTO adminUser = getAdminUserDTO(sessions);
 
         List<UserOverviewDTO> users = result.stream().map(userDTO -> {
             UserOverviewDTO.Builder builder = userDTO.toBuilder()
-                    .fillSession(lastSessionForUser.getOrDefault(userDTO.username(), Optional.empty()));
+                    .fillSession(sessions.forUser(userDTO));
             if (userDTO.roles() != null) {
                 builder.roles(userDTO.roles().stream().map(roleNameMap::get).collect(Collectors.toSet()));
             }
@@ -259,8 +254,8 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_CREATE)
     @ApiOperation("Create a new user account.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Missing or invalid user details.")
-    })
+                          @ApiResponse(code = 400, message = "Missing or invalid user details.")
+                  })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
                            @Valid @NotNull CreateUserRequest cr) throws ValidationException {
@@ -319,9 +314,9 @@ public class UsersResource extends RestResource {
     @Path("{username}")
     @ApiOperation("Modify user details.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
-            @ApiResponse(code = 400, message = "Missing or invalid user details.")
-    })
+                          @ApiResponse(code = 400, message = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
+                          @ApiResponse(code = 400, message = "Missing or invalid user details.")
+                  })
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
     public void changeUser(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                            @PathParam("username") String username,
@@ -398,8 +393,8 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
     @ApiOperation("Update a user's permission set.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Missing or invalid permission data.")
-    })
+                          @ApiResponse(code = 400, message = "Missing or invalid permission data.")
+                  })
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_UPDATE)
     public void editPermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
@@ -418,13 +413,13 @@ public class UsersResource extends RestResource {
     @Path("{username}/preferences")
     @ApiOperation("Update a user's preferences set.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Missing or invalid permission data.")
-    })
+                          @ApiResponse(code = 400, message = "Missing or invalid permission data.")
+                  })
     @AuditEvent(type = AuditEventTypes.USER_PREFERENCES_UPDATE)
     public void savePreferences(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
-                                UpdateUserPreferences preferencesRequest) throws ValidationException {
+                                        UpdateUserPreferences preferencesRequest) throws ValidationException {
         final User user = userService.load(username);
         checkPermission(RestPermissions.USERS_EDIT, username);
 
@@ -441,8 +436,8 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
     @ApiOperation("Revoke all permissions for a user without deleting the account.")
     @ApiResponses({
-            @ApiResponse(code = 500, message = "When saving the user failed.")
-    })
+                          @ApiResponse(code = 500, message = "When saving the user failed.")
+                  })
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_DELETE)
     public void deletePermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                   @PathParam("username") String username) throws ValidationException {
@@ -458,11 +453,11 @@ public class UsersResource extends RestResource {
     @Path("{username}/password")
     @ApiOperation("Update the password for a user.")
     @ApiResponses({
-            @ApiResponse(code = 204, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
-            @ApiResponse(code = 400, message = "The new password is missing, or the old password is missing or incorrect."),
-            @ApiResponse(code = 403, message = "The requesting user has insufficient privileges to update the password for the given user."),
-            @ApiResponse(code = 404, message = "User does not exist.")
-    })
+                          @ApiResponse(code = 204, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
+                          @ApiResponse(code = 400, message = "The new password is missing, or the old password is missing or incorrect."),
+                          @ApiResponse(code = 403, message = "The requesting user has insufficient privileges to update the password for the given user."),
+                          @ApiResponse(code = 404, message = "User does not exist.")
+                  })
     @AuditEvent(type = AuditEventTypes.USER_PASSWORD_UPDATE)
     public void changePassword(
             @ApiParam(name = "username", value = "The name of the user whose password to change.", required = true)
@@ -586,14 +581,11 @@ public class UsersResource extends RestResource {
         return user;
     }
 
-    private UserSummary toUserResponse(User user,
-                                       @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<MongoDbSession> mongoDbSession) {
-        return toUserResponse(user, true, mongoDbSession);
+    private UserSummary toUserResponse(User user, AllUserSessions sessions) {
+        return toUserResponse(user, true, sessions);
     }
 
-    private UserSummary toUserResponse(User user,
-                                       boolean includePermissions,
-                                       @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<MongoDbSession> mongoDbSession) {
+    private UserSummary toUserResponse(User user, boolean includePermissions, AllUserSessions sessions) {
         final Set<String> roleIds = user.getRoleIds();
         Set<String> roleNames = Collections.emptySet();
 
@@ -608,6 +600,7 @@ public class UsersResource extends RestResource {
         boolean sessionActive = false;
         Date lastActivity = null;
         String clientAddress = null;
+        final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
         if (mongoDbSession.isPresent()) {
             final MongoDbSession session = mongoDbSession.get();
             sessionActive = true;
@@ -651,14 +644,6 @@ public class UsersResource extends RestResource {
         return effectivePermissions;
     }
 
-    private Map<String, Optional<MongoDbSession>> getLastSessionForUser(Collection<MongoDbSession> sessions) {
-        //noinspection OptionalGetWithoutIsPresent
-        return sessions.stream()
-                .filter(s -> s.getUsernameAttribute().isPresent())
-                .collect(groupingBy(s -> s.getUsernameAttribute().get(),
-                        maxBy(Comparator.comparing(MongoDbSession::getLastAccessTime))));
-    }
-
     private Map<String, String> getRoleNameMap(Set<String> roleIds) throws org.graylog2.database.NotFoundException {
         final Map<String, Role> roleMap = roleService.findIdMap(roleIds);
         final Map<String, String> result = new HashMap<>(roleMap.size());
@@ -666,14 +651,14 @@ public class UsersResource extends RestResource {
         return result;
     }
 
-    private UserOverviewDTO getAdminUserDTO(Map<String, Optional<MongoDbSession>> lastSessionMap) {
+    private UserOverviewDTO getAdminUserDTO(AllUserSessions sessions) {
         final Optional<User> optionalAdmin = userService.getRootUser();
         if (!optionalAdmin.isPresent()) {
             return null;
         }
         final User admin = optionalAdmin.get();
         final Set<String> adminRoles = userService.getRoleNames(admin);
-        final Optional<MongoDbSession> lastSession = lastSessionMap.getOrDefault(admin.getName(), Optional.empty());
+        final Optional<MongoDbSession> lastSession = sessions.forUser(admin);
         return UserOverviewDTO.builder()
                 .username(admin.getName())
                 .fullName(admin.getFullName())
@@ -684,5 +669,34 @@ public class UsersResource extends RestResource {
                 .fillSession(lastSession)
                 .roles(adminRoles)
                 .build();
+    }
+
+    private static class AllUserSessions {
+        private final Map<String, Optional<MongoDbSession>> sessions;
+
+        public static AllUserSessions create(MongoDBSessionService sessionService) {
+            return new AllUserSessions(sessionService.loadAll());
+        }
+
+        private AllUserSessions(Collection<MongoDbSession> sessions) {
+            this.sessions = getLastSessionForUser(sessions);
+        }
+
+        public Optional<MongoDbSession> forUser(User user) {
+            return sessions.getOrDefault(user.getId(), Optional.empty());
+        }
+
+        public Optional<MongoDbSession> forUser(UserOverviewDTO user) {
+            return sessions.getOrDefault(user.id(), Optional.empty());
+        }
+
+        // Among all active sessions, find the last recently used for each user
+        private Map<String, Optional<MongoDbSession>> getLastSessionForUser(Collection<MongoDbSession> sessions) {
+            //noinspection OptionalGetWithoutIsPresent
+            return sessions.stream()
+                    .filter(s -> s.getUserIdAttribute().isPresent())
+                    .collect(groupingBy(s -> s.getUserIdAttribute().get(),
+                            maxBy(Comparator.comparing(MongoDbSession::getLastAccessTime))));
+        }
     }
 }

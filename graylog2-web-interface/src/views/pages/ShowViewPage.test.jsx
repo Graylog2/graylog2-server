@@ -5,6 +5,7 @@ import { mount } from 'wrappedEnzyme';
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 
+import StreamsContext from 'contexts/StreamsContext';
 import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewDeserializer from 'views/logic/views/ViewDeserializer';
@@ -65,9 +66,11 @@ describe('ShowViewPage', () => {
     requires: {},
   };
   const SimpleShowViewPage = (props) => (
-    <ShowViewPage location={{ query: {} }}
-                  params={{ viewId: 'foo' }}
-                  {...props} />
+    <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
+      <ShowViewPage location={{ query: {} }}
+                    params={{ viewId: 'foo' }}
+                    {...props} />
+    </StreamsContext.Provider>
   );
 
   beforeEach(() => {

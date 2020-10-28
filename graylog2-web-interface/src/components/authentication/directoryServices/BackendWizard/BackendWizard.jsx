@@ -42,6 +42,14 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?s
 );
 
 export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string) => {
+  const _formatPayload = (password) => {
+    if (!password) {
+      return undefined;
+    }
+
+    return password;
+  };
+
   // Only update password on edit if necessary,
   // if a users resets the previously defined password its form value is an empty string
   if (backendId) {
@@ -53,10 +61,10 @@ export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string
       return { delete_value: true };
     }
 
-    return { set_value: systemUserPassword };
+    return { set_value: _formatPayload(systemUserPassword) };
   }
 
-  return systemUserPassword;
+  return _formatPayload(systemUserPassword);
 };
 
 const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues): WizardSubmitPayload => {
@@ -125,7 +133,7 @@ const _getInvalidStepKeys = (formValues, excludedFields) => {
   return compact(invalidStepKeys);
 };
 
-const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps, licenseIsValid) => {
+const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsValues, getSubmitPayload, validateSteps, shouldUpdateGroupSync) => {
   const formValues = getUpdatedFormsValues();
   const invalidStepKeys = validateSteps(formValues);
 
@@ -138,7 +146,7 @@ const _onSubmitAll = (stepsState, setSubmitAllError, onSubmit, getUpdatedFormsVa
   setSubmitAllError(null);
 
   const payload = getSubmitPayload(formValues);
-  const _submit = () => onSubmit(payload, formValues, stepsState.authBackendMeta.serviceType, licenseIsValid).then(() => {
+  const _submit = () => onSubmit(payload, formValues, stepsState.authBackendMeta.serviceType, shouldUpdateGroupSync).then(() => {
     history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
   }).catch((error) => {
     setSubmitAllError(error);
@@ -170,7 +178,7 @@ type Props = {
   initialValues: WizardFormValues,
   excludedFields: {[ inputName: string ]: boolean },
   help: { [inputName: string]: ?React.Node },
-  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, licenseIsValid?: boolean) => Promise<LoadBackendResponse>,
+  onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
 
 const _loadRoles = (setPaginatedRoles) => {
@@ -249,14 +257,14 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     });
   };
 
-  const _handleSubmitAll = (licenseIsValid?: boolean) => _onSubmitAll(
+  const _handleSubmitAll = (shouldUpdateGroupSync?: boolean) => _onSubmitAll(
     stepsState,
     setSubmitAllError,
     onSubmit,
     _getUpdatedFormsValues,
     _getSubmitPayload,
     _validateSteps,
-    licenseIsValid,
+    shouldUpdateGroupSync,
   );
 
   const steps = wizardSteps({

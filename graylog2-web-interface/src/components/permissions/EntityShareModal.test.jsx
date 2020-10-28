@@ -111,7 +111,7 @@ describe('EntityShareModal', () => {
       // Provided title
       expect(getByText('The title')).not.toBeNull();
       // sharable urls
-      expect(getByDisplayValue('http://localhost/')).not.toBeNull();
+      expect(getByDisplayValue('http://localhost/dashboards/dashboard-id')).not.toBeNull();
       // missing dependencies warning
       expect(getByText('There are missing dependencies for the current set of collaborators')).not.toBeNull();
       expect(getByText(/needs access to/)).not.toBeNull();

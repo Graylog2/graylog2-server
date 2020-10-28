@@ -129,7 +129,7 @@ const EntityShareSettings = ({
         </Section>
       )}
       <Section>
-        <ShareableEntityURL />
+        <ShareableEntityURL entityGRN={entityGRN} />
       </Section>
     </>
   );

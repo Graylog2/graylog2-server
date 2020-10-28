@@ -118,7 +118,7 @@ public class HTTPAlarmCallback implements AlarmCallback {
 
     @Override
     public String getName() {
-        return "HTTP Alarm Callback";
+        return "HTTP Alarm Callback [Deprecated]";
     }
 
     @Override

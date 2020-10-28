@@ -26,6 +26,24 @@
       "capability": "view",
       "target": "grn::::dashboard:54e3deadbeefdeadbeefaffe",
       "created_by": "grn::::user:admin"
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000006"
+      },
+      "grantee": "grn::::user:invisible",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000007"
+      },
+      "grantee": "grn::::user:bob",
+      "capability": "own",
+      "target": "grn::::event_definition:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
     }
   ],
 

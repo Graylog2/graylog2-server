@@ -197,17 +197,18 @@ class DataTable extends React.Component {
 
     return (
       <div>
-        <Filter customFilter={customFilter}
-                label={filterLabel}
-                id={id}
-                rows={rows}
-                displayKey={displayKey}
-                filterBy={filterBy}
-                filterSuggestions={filterSuggestions}
-                filterKeys={filterKeys}
-                onDataFiltered={this.filterDataRows}>
-          {children}
-        </Filter>
+        {customFilter || (
+          <Filter label={filterLabel}
+                  rows={rows}
+                  id={id}
+                  displayKey={displayKey}
+                  filterBy={filterBy}
+                  filterSuggestions={filterSuggestions}
+                  filterKeys={filterKeys}
+                  onDataFiltered={this.filterDataRows}>
+            {children}
+          </Filter>
+        )}
         <div className={`row ${rowClassName}`}>
           <div className="col-md-12">
             <div id={id} className={`data-table ${useResponsiveTable ? 'table-responsive' : ''}`}>
