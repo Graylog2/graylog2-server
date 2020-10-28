@@ -36,9 +36,9 @@ const SyncedUsersOverviewItem = ({
   });
 
   return (
-    <tr key={username}>
+    <tr key={id}>
       <td className="limited">
-        <Link to={Routes.SYSTEM.USERS.show(username)}>
+        <Link to={Routes.SYSTEM.USERS.show(id)}>
           {username}
         </Link>
       </td>
