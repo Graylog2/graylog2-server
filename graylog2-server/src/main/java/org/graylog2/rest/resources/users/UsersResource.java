@@ -422,7 +422,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUserById(@ApiParam(name = "userId", value = "The id of the user to delete.", required = true)
                            @PathParam("userId") String userId) {
-        if (userService.delete(userId) == 0) {
+        if (userService.deleteById(userId) == 0) {
             throw new NotFoundException("Couldn't find user " + userId);
         }
     }
