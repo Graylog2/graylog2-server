@@ -22,7 +22,6 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.security.DefaultX509TrustManager;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +31,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.net.ssl.TrustManager;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
