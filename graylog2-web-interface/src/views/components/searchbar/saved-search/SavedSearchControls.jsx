@@ -7,7 +7,7 @@ import connect from 'stores/connect';
 import type { ThemeInterface } from 'theme';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-import { Icon, HasOwnership } from 'components/common';
+import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -24,7 +24,6 @@ import * as Permissions from 'views/Permissions';
 import type { UserJSON } from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
@@ -250,6 +249,11 @@ class SavedSearchControls extends React.Component<Props, State> {
                                        deleteSavedSearch={this.deleteSavedSearch}
                                        toggleModal={this.toggleListModal} />
                     )}
+                    <ShareButton entityType="search"
+                                 entityId={view.id}
+                                 onClick={this.toggleShareSearch}
+                                 bsStyle="default"
+                                 disabled={!isAllowedToEdit} />
                     <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                       <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
                         <Icon name="edit" /> Edit metadata
@@ -260,13 +264,6 @@ class SavedSearchControls extends React.Component<Props, State> {
                         <Icon name="eraser" /> Reset search
                       </MenuItem>
                       <MenuItem divider />
-                      <HasOwnership id={view.id} type="search">
-                        {({ disabled }) => (
-                          <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit || disabled}>
-                            <Icon name="share-alt" /> Share {disabled && <SharingDisabledPopover type="search" />}
-                          </MenuItem>
-                        )}
-                      </HasOwnership>
                     </DropdownButton>
                     {showCSVExport && (
                       <CSVExportModal view={view} closeModal={this.toggleCSVExport} />

@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Link, LinkContainer } from 'components/graylog/router';
 import { Button, Tooltip } from 'components/graylog';
-import { OverlayElement, Icon } from 'components/common';
+import { OverlayElement, Icon, ShareButton } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
@@ -61,7 +61,7 @@ const StreamListItem = styled.li(({ theme }) => css`
 `);
 
 const ToggleButton = styled(Button)`
-  width: 8.5em;
+  min-width: 8.8em;
 `;
 
 class Stream extends React.Component {
@@ -162,31 +162,26 @@ class Stream extends React.Component {
       ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
     let editRulesLink;
-    let manageOutputsLink;
     let manageAlertsLink;
 
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
           <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
-            <Button bsStyle="info">Manage Rules</Button>
+            <Button bsStyle="info">
+              <Icon name="stream" /> Manage Rules
+            </Button>
           </LinkContainer>
         </OverlayElement>
       );
 
       manageAlertsLink = (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info">Manage Alerts</Button>
+          <Button bsStyle="info">
+            <Icon name="bell" /> Manage Alerts
+          </Button>
         </LinkContainer>
       );
-
-      if (isPermitted(permissions, ['stream_outputs:read'])) {
-        manageOutputsLink = (
-          <LinkContainer to={Routes.stream_outputs(stream.id)}>
-            <Button bsStyle="info">Manage Outputs</Button>
-          </LinkContainer>
-        );
-      }
     }
 
     let toggleStreamLink;
@@ -198,7 +193,7 @@ class Stream extends React.Component {
             <ToggleButton bsStyle="success"
                           onClick={this._onResume}
                           disabled={isDefaultStream || loading}>
-              {loading ? 'Starting...' : 'Start Stream'}
+              <Icon name="play" /> {loading ? 'Starting...' : 'Start Stream'}
             </ToggleButton>
           </OverlayElement>
         );
@@ -208,7 +203,7 @@ class Stream extends React.Component {
             <ToggleButton bsStyle="primary"
                           onClick={this._onPause}
                           disabled={isDefaultStream || loading}>
-              {loading ? 'Pausing...' : 'Pause Stream'}
+              <Icon name="pause" /> {loading ? 'Pausing...' : 'Pause Stream'}
             </ToggleButton>
           </OverlayElement>
         );
@@ -226,7 +221,6 @@ class Stream extends React.Component {
                         onDelete={this._onDelete}
                         onUpdate={this._onUpdate}
                         onClone={this._onClone}
-                        onShare={this._openEntityShareModal}
                         onQuickAdd={this._openStreamRuleForm}
                         indexSets={indexSets}
                         isDefaultStream={isDefaultStream} />
@@ -240,8 +234,8 @@ class Stream extends React.Component {
       <StreamListItem>
         <div className="stream-actions pull-right">
           {editRulesLink}{' '}
-          {manageOutputsLink}{' '}
           {manageAlertsLink}{' '}
+          <ShareButton entityId={stream.id} entityType="stream" onClick={this._openEntityShareModal} />
           {toggleStreamLink}{' '}
 
           {streamControls}

@@ -19,10 +19,11 @@ type Props = {
   entityId: $PropertyType<SharedEntity, 'id'>,
   entityTitle: $PropertyType<SharedEntity, 'title'>,
   entityType: $PropertyType<SharedEntity, 'type'>,
+  entityTypeTitle: ?string,
   onClose: () => void,
 };
 
-const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose }: Props) => {
+const EntityShareModal = ({ description, entityId, entityType, entityTitle, entityTypeTitle, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResult?.failed);
   const entityGRN = createGRN(entityType, entityId);
@@ -69,13 +70,14 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
                            onConfirm={_handleSave}
                            onModalClose={onClose}
                            showModal
-                           title={<>Sharing {entityType}: <i>{entityTitle}</i></>}>
+                           title={<>Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i></>}>
       <>
         {(entityShareState && entityShareState.entity === entityGRN) ? (
           <EntityShareSettings description={description}
                                entityGRN={entityGRN}
                                entityType={entityType}
                                entityTitle={entityTitle}
+                               entityTypeTitle={entityTypeTitle}
                                entityShareState={entityShareState}
                                granteesSelectRef={granteesSelectRef}
                                setDisableSubmit={setDisableSubmit} />
@@ -92,7 +94,12 @@ EntityShareModal.propTypes = {
   entityId: PropTypes.string.isRequired,
   entityTitle: PropTypes.string.isRequired,
   entityType: PropTypes.string.isRequired,
+  entityTypeTitle: PropTypes.string,
   onClose: PropTypes.func.isRequired,
+};
+
+EntityShareModal.defaultProps = {
+  entityTypeTitle: undefined,
 };
 
 export default EntityShareModal;

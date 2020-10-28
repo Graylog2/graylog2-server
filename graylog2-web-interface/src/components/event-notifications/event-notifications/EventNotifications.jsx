@@ -9,13 +9,13 @@ import {
   EmptyEntity,
   EntityList,
   EntityListItem,
-  HasOwnership,
+  ShareButton,
   IfPermitted,
   PaginatedList,
   SearchForm,
   Spinner,
+  Icon,
 } from 'components/common';
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';
@@ -113,9 +113,12 @@ class EventNotifications extends React.Component {
       <>
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
-            <Button bsStyle="info">Edit</Button>
+            <Button bsStyle="info">
+              <Icon name="edit" /> Edit
+            </Button>
           </IfPermitted>
         </LinkContainer>
+        <ShareButton entityType="notification" entityId={notification.id} onClick={() => setNotificationToShare(notification)} />
         <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]} anyPermissions>
           <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
@@ -123,13 +126,6 @@ class EventNotifications extends React.Component {
                 {isTestLoading ? 'Testing...' : 'Test Notification'}
               </MenuItem>
             </IfPermitted>
-            <HasOwnership type="notification" id={notification.id}>
-              {({ disabled }) => (
-                <MenuItem disabled={disabled} onSelect={() => setNotificationToShare(notification)}>
-                  Share {disabled && <SharingDisabledPopover type="notification" />}
-                </MenuItem>
-              )}
-            </HasOwnership>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
               <MenuItem onClick={onDelete(notification)}>Delete</MenuItem>

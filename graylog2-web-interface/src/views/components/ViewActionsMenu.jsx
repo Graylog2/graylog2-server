@@ -7,7 +7,7 @@ import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
-import { Icon, HasOwnership } from 'components/common';
+import { Icon, ShareButton } from 'components/common';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -21,7 +21,6 @@ import type { UserJSON } from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
@@ -63,17 +62,15 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
               data-testid="dashboard-save-as-button">
         <Icon name="copy" /> Save as
       </Button>
+      <ShareButton entityType="dashboard"
+                   entityId={view.id}
+                   onClick={() => setShareViewOpen(true)}
+                   bsStyle="default"
+                   disabled={isNewView || !allowedToEdit} />
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit metadata
         </MenuItem>
-        <HasOwnership id={view.id} type="dashboard">
-          {({ disabled }) => (
-            <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit || disabled}>
-              <Icon name="share-alt" /> Share {disabled && <SharingDisabledPopover type="dashboard" />}
-            </MenuItem>
-          )}
-        </HasOwnership>
         <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
         {debugOverlay}
         <IfDashboard>

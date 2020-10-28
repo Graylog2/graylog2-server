@@ -10,9 +10,10 @@ type Props = {
   id?: string,
   title: string,
   className: string,
+  pullRight: boolean,
 };
 
-const HoverForHelp = ({ children, className, title, id }: Props) => (
+const HoverForHelp = ({ children, className, title, id, pullRight }: Props) => (
   <OverlayTrigger trigger={['hover', 'focus']}
                   placement="bottom"
                   overlay={(
@@ -20,7 +21,7 @@ const HoverForHelp = ({ children, className, title, id }: Props) => (
                       {children}
                     </Popover>
                   )}>
-    <Icon className={`${className} pull-right`} name="question-circle" />
+    <Icon className={`${className} ${pullRight ? 'pull-right' : ''}`} name="question-circle" />
   </OverlayTrigger>
 );
 
@@ -29,11 +30,13 @@ HoverForHelp.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string.isRequired,
   id: PropTypes.string,
+  pullRight: PropTypes.bool,
 };
 
 HoverForHelp.defaultProps = {
   id: 'help-popover',
   className: '',
+  pullRight: true,
 };
 
 export default HoverForHelp;
