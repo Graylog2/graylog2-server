@@ -568,6 +568,33 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
+        List<JournalReadEntry> messages = doRead(readOffset, requestedMaximumCount);
+
+        if (messages.isEmpty()) {
+            // If we got an empty result BUT we know that there are more messages in the log, we bump the readOffset
+            // by 1 and try to read again. We continue until we either get an non-empty result or we reached the
+            // end of the log.
+            // This can happen when a log segment is truncated at the end but later segments have valid messages again.
+            long failedReadOffset = readOffset;
+            long retryReadOffset = failedReadOffset + 1;
+
+            while (messages.isEmpty() && failedReadOffset < (getLogEndOffset() - 1)) {
+                LOG.warn("Couldn't read any messages from offset <{}> but journal has more messages. Skipping and trying to read from offset <{}>",
+                        failedReadOffset, retryReadOffset);
+
+                // Retry the read with an increased offset to skip corrupt segments
+                messages = doRead(retryReadOffset, requestedMaximumCount);
+
+                // Bump offsets in case we still read an empty result
+                failedReadOffset++;
+                retryReadOffset++;
+            }
+        }
+
+        return messages;
+    }
+
+    private List<JournalReadEntry> doRead(long readOffset, long requestedMaximumCount) {
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);
         long maxOffset = readOffset + maximumCount;
