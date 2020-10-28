@@ -63,7 +63,7 @@ class SimulatorPage extends React.Component {
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
-                <Button bsStyle="info" className="active">Simulator</Button>
+                <Button bsStyle="info">Simulator</Button>
               </LinkContainer>
             </span>
           </PageHeader>

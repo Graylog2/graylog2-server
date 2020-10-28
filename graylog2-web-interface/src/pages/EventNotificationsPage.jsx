@@ -28,7 +28,7 @@ const EventNotificationsPage = () => {
               <Button bsStyle="info">Event Definitions</Button>
             </LinkContainer>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-              <Button bsStyle="info" className="active">Notifications</Button>
+              <Button bsStyle="info">Notifications</Button>
             </LinkContainer>
           </ButtonToolbar>
         </PageHeader>

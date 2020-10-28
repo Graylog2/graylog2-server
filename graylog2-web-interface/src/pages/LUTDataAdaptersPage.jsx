@@ -161,7 +161,7 @@ class LUTDataAdaptersPage extends React.Component {
                   <Button bsStyle="info">Caches</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                  <Button bsStyle="info" className="active">Data Adapters</Button>
+                  <Button bsStyle="info">Data Adapters</Button>
                 </LinkContainer>
               </ButtonToolbar>
             </span>

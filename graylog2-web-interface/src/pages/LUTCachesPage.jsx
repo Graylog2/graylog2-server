@@ -119,7 +119,7 @@ class LUTCachesPage extends React.Component {
                   <Button bsStyle="info">Lookup Tables</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                  <Button bsStyle="info" className="active">Caches</Button>
+                  <Button bsStyle="info">Caches</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
                   <Button bsStyle="info">Data Adapters</Button>

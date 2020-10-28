@@ -158,7 +158,7 @@ class LUTTablesPage extends React.Component {
             <span>
               <ButtonToolbar>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info" className="active">Lookup Tables</Button>
+                  <Button bsStyle="info">Lookup Tables</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
                   <Button bsStyle="info">Caches</Button>
