@@ -43,7 +43,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -239,7 +239,7 @@ public class SessionCreatorTest {
         when(userService.load("username")).thenReturn(user);
     }
 
-    @NotNull
+    @Nonnull
     private SimpleAccountRealm throwingRealm() {
         return new SimpleAccountRealm() {
             @Override

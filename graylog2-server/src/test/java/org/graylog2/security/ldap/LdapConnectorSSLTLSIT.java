@@ -31,7 +31,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.net.ssl.TrustManager;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -159,12 +159,12 @@ public class LdapConnectorSSLTLSIT {
         assertConnectionSuccess(request);
     }
 
-    @NotNull
+    @Nonnull
     private LdapTestConfigRequest createTLSTestRequest(boolean trustAllCertificates) {
         return createRequest(internalSSLUri(), true, trustAllCertificates);
     }
 
-    @NotNull
+    @Nonnull
     private LdapTestConfigRequest createSSLTestRequest(boolean trustAllCertificates) {
         return createRequest(internalSSLUri(), false, trustAllCertificates);
     }
