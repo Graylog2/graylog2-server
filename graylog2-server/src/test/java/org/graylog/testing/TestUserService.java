@@ -103,6 +103,11 @@ public class TestUserService extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    public int deleteById(String userId) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public User create() {
         throw new UnsupportedOperationException("Not implemented");
     }

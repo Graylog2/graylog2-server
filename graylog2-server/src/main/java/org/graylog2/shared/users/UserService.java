@@ -46,6 +46,8 @@ public interface UserService extends PersistedService {
 
     int delete(String username);
 
+    int deleteById(String userId);
+
     User create();
 
     List<User> loadAll();

@@ -414,6 +414,19 @@ public class UsersResource extends RestResource {
         }
     }
 
+    @DELETE
+    @Path("id/{userId}")
+    @RequiresPermissions(USERS_EDIT)
+    @ApiOperation("Removes a user account.")
+    @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
+    @AuditEvent(type = AuditEventTypes.USER_DELETE)
+    public void deleteUserById(@ApiParam(name = "userId", value = "The id of the user to delete.", required = true)
+                           @PathParam("userId") String userId) {
+        if (userService.delete(userId) == 0) {
+            throw new NotFoundException("Couldn't find user " + userId);
+        }
+    }
+
     @PUT
     @Path("{username}/permissions")
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
