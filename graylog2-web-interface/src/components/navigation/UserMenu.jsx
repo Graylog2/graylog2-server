@@ -17,14 +17,14 @@ const SessionActions = ActionsProvider.getActions('Session');
 
 type Props = {
   fullName: string,
-  loginName: string,
+  userId: string,
   readOnly: boolean,
 };
 
-const UserMenu = ({ fullName, loginName, readOnly = true }: Props) => {
+const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
   const route = readOnly
-    ? Routes.SYSTEM.USERS.show(encodeURIComponent(loginName))
-    : Routes.SYSTEM.USERS.edit(encodeURIComponent(loginName));
+    ? Routes.SYSTEM.USERS.show(userId)
+    : Routes.SYSTEM.USERS.edit(userId);
   const label = readOnly
     ? 'Show profile'
     : 'Edit profile';

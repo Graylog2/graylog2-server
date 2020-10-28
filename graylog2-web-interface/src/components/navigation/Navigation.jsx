@@ -68,7 +68,7 @@ type Props = {
 
 const Navigation = ({ location }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const { permissions, username, full_name: fullName, read_only: readOnly } = currentUser || {};
+  const { permissions, username, full_name: fullName, read_only: readOnly, id: userId } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
 
@@ -140,7 +140,7 @@ const Navigation = ({ location }: Props) => {
 
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
 
-          <UserMenu fullName={fullName} loginName={username} readOnly={readOnly} />
+          <UserMenu fullName={fullName} readOnly={readOnly} userId={userId} />
         </Nav>
       </Navbar.Collapse>
     </StyledNavbar>
