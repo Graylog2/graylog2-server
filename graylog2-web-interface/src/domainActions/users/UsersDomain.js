@@ -42,10 +42,10 @@ const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
 
 const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   action: UsersActions.delete,
-  success: (username, fullName) => ({
+  success: (userId, fullName) => ({
     message: `User "${fullName}" was deleted successfully`,
   }),
-  error: (error, username, fullName) => ({
+  error: (error, userId, fullName) => ({
     message: `Deleting user "${fullName}" failed with status: ${error}`,
   }),
 });

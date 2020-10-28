@@ -61,8 +61,8 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    delete(username: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(username)).url);
+    delete(userId: string): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(userId)).url);
       const promise = fetch('DELETE', url);
 
       UsersActions.delete.promise(promise);

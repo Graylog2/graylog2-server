@@ -111,7 +111,7 @@ describe('UsersOverview', () => {
       expect(window.confirm).toHaveBeenCalledTimes(1);
       expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete user ${modifiableUser.fullName}?`);
       expect(UsersActions.delete).toHaveBeenCalledTimes(1);
-      expect(UsersActions.delete).toHaveBeenCalledWith(modifiableUser.username, modifiableUser.fullName);
+      expect(UsersActions.delete).toHaveBeenCalledWith(modifiableUser.id, modifiableUser.fullName);
     });
 
     it('not be able to delete a "read only" user', async () => {
