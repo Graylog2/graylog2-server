@@ -104,7 +104,7 @@ const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled
   }
 `);
 
-const RangeLimitNotice: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.span(({ theme }) => css`
+const RangeLimitNotice: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   font-style: italic;
   font-size: ${theme.fonts.size.small};
   color: ${theme.colors.variant.darker.warning};
@@ -124,6 +124,7 @@ const initialRangeType = ({ range, ...restRange }) => {
       ...restRange,
       rangeValue: 1,
       rangeType: 'seconds',
+      rangeAllTime: false,
       range,
     };
   }
@@ -136,6 +137,7 @@ const initialRangeType = ({ range, ...restRange }) => {
         ...restRange,
         rangeValue: diff || 1,
         rangeType: value || 'seconds',
+        rangeAllTime: false,
         range,
       };
     }
@@ -242,7 +244,6 @@ const RelativeTimeRangeSelector = ({ config, disabled, originalTimeRange }: Prop
                       value={state.rangeType}
                       options={availableRangeTypes}
                       placeholder="Select a range type"
-                      data-testid="select-from-range"
                       name="relative-timerange-from-length"
                       onChange={(event) => dispatch({
                         type: 'rangeType',
