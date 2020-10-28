@@ -211,8 +211,17 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         return db.find(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).toArray();
     }
 
+    public long deleteForGrantee(GRN grantee) {
+        final Bson filter = Filters.eq(GrantDTO.FIELD_GRANTEE, grantee.toString());
+        return deleteForFilter(filter);
+    }
+
     public long deleteForTarget(GRN target) {
         final Bson filter = Filters.eq(GrantDTO.FIELD_TARGET, target.toString());
+        return deleteForFilter(filter);
+    }
+
+    private long deleteForFilter(Bson filter) {
         final Set<String> deletedIds = StreamSupport.stream(dbCollection.find(filter).projection(Projections.include()).spliterator(), false)
                 .map(doc -> {
                     final Object o = doc.get("_id");
