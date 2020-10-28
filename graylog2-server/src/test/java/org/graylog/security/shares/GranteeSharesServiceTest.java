@@ -168,6 +168,8 @@ class GranteeSharesServiceTest {
                 assertThat(response.capabilities()).doesNotContainKey(dashboard0);
                 assertThat(response.capabilities()).doesNotContainKey(dashboard1);
                 assertThat(response.capabilities()).doesNotContainKey(stream0);
+
+                assertThat(response.paginatedEntities().pagination().total()).isEqualTo(3);
             }
 
             @DisplayName("paginated shares with reverse order")
