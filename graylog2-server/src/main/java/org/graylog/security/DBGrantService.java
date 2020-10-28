@@ -185,6 +185,10 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         return db.find(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).toArray();
     }
 
+    public int deleteForGrantee(GRN grantee) {
+        return db.remove(DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee.toString())).getN();
+    }
+
     public int deleteForTarget(GRN target) {
         return db.remove(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).getN();
     }
