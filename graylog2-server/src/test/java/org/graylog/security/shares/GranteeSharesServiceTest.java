@@ -56,10 +56,11 @@ class GranteeSharesServiceTest {
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                GRNRegistry grnRegistry,
-               @Mock GRNDescriptorService grnDescriptorService) {
+               @Mock GRNDescriptorService grnDescriptorService,
+               @Mock GranteeService granteeService) {
         this.grnDescriptorService = grnDescriptorService;
         final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
-        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService);
+        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService);
     }
 
     @DisplayName("Paginated shares for a user")
@@ -119,19 +120,35 @@ class GranteeSharesServiceTest {
                 assertThat(response.capabilities()).doesNotContainKey(stream1);
             }
 
-            @DisplayName("paginated shares with capability filter")
+            @DisplayName("paginated shares with view capability filter")
             @Test
-            void getPaginatedSharesForUserWithCapabilityFilter() {
+            void getPaginatedSharesForUserWithViewCapabilityFilter() {
                 final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "viEw", "");
 
-                assertThat(response.paginatedEntities()).hasSize(1);
+                assertThat(response.paginatedEntities()).hasSize(2);
                 assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(stream0, "Stream 0", Collections.emptySet()));
+                assertThat(response.paginatedEntities().get(1)).isEqualTo(EntityDescriptor.create(stream1, "Stream 1", Collections.emptySet()));
 
-                assertThat(response.capabilities()).hasSize(1);
+                assertThat(response.capabilities()).hasSize(2);
                 assertThat(response.capabilities().get(stream0)).isEqualTo(Capability.VIEW);
+                assertThat(response.capabilities().get(stream1)).isEqualTo(Capability.VIEW);
                 assertThat(response.capabilities()).doesNotContainKey(dashboard0);
                 assertThat(response.capabilities()).doesNotContainKey(dashboard1);
-                assertThat(response.capabilities()).doesNotContainKey(stream1);
+            }
+
+            @DisplayName("paginated shares with manage capability filter")
+            @Test
+            void getPaginatedSharesForUserWithManageCapabilityFilter() {
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "manage", "");
+
+                assertThat(response.paginatedEntities()).hasSize(1);
+                assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(stream1, "Stream 1", Collections.emptySet()));
+
+                assertThat(response.capabilities()).hasSize(1);
+                assertThat(response.capabilities().get(stream1)).isEqualTo(Capability.MANAGE);
+                assertThat(response.capabilities()).doesNotContainKey(stream0);
+                assertThat(response.capabilities()).doesNotContainKey(dashboard0);
+                assertThat(response.capabilities()).doesNotContainKey(dashboard1);
             }
 
             @DisplayName("paginated shares with entity type filter")
