@@ -25,6 +25,12 @@ public abstract class AuthServiceCredentials {
 
     public abstract EncryptedValue password();
 
+    /**
+     * Returns true if the subject is already authenticated and the authentication service backend doesn't need
+     * to authenticate anymore.
+     *
+     * @return true if already authenticated, false otherwise
+     */
     public abstract boolean isAuthenticated();
 
     public static AuthServiceCredentials create(String username, EncryptedValue password) {

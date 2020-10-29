@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.validation.constraints.NotBlank;
+
 @AutoValue
 @JsonDeserialize(builder = HTTPHeaderAuthConfig.Builder.class)
 public abstract class HTTPHeaderAuthConfig {
@@ -33,6 +35,7 @@ public abstract class HTTPHeaderAuthConfig {
     public abstract boolean enabled();
 
     @JsonProperty(FIELD_USERNAME_HEADER)
+    @NotBlank
     public abstract String usernameHeader();
 
     public static HTTPHeaderAuthConfig createDisabled() {
