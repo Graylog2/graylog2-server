@@ -16,7 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { fireEvent, render, waitFor, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 // import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
@@ -65,9 +65,9 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', () => {
-    render(<SearchBar config={config} onExecute={() => {}} />);
+    const { asFragment } = render(<SearchBar config={config} onExecute={() => {}} />);
 
-    expect(screen).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('should update query when search is performed', async () => {
