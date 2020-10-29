@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import SearchBarForm from './SearchBarForm';
 import AbsoluteTimeRangeSelector from './date-time-picker/AbsoluteTimeRangeSelector';
@@ -14,14 +14,14 @@ describe('SearchBarForm', () => {
         streams: [],
       };
 
-      render(
+      const { asFragment } = render(
         <SearchBarForm onSubmit={() => {}}
                        initialValues={initialValues}>
           <AbsoluteTimeRangeSelector />
         </SearchBarForm>,
       );
 
-      expect(screen).toMatchSnapshot();
+      expect(asFragment()).toMatchSnapshot();
     });
   });
 });
