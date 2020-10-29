@@ -45,6 +45,7 @@ import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import SearchBarForm from './searchbar/SearchBarForm';
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<*>,
@@ -57,14 +58,8 @@ type Props = {
 
 const FlexCol = styled(Col)`
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-`;
-
-const StyledTimeRange = styled.input`
-  width: 100%;
-  padding: 3px 9px;
-  margin: 0 12px;
 `;
 
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
@@ -106,9 +101,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                   <FlexCol md={6}>
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            config={config} />
-                    <StyledTimeRange type="text"
-                                     value={JSON.stringify(values?.timerange)}
-                                     disabled />
+                    <TimeRangeDisplay timerange={values?.timerange} />
                     <RefreshControls />
                   </FlexCol>
 
