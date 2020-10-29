@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import styled, { StyledComponent } from 'styled-components';
 
 import { Alert, Button, Col, Row } from 'components/graylog';
@@ -46,6 +47,26 @@ const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 
       </Alert>
     </Container>
   );
+};
+
+ErrorAlert.propTypes = {
+  bsStyle: PropTypes.string,
+  runtimeError: PropTypes.bool,
+  marginTopBottom: PropTypes.number,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element,
+    PropTypes.string,
+  ]),
+  onClose: PropTypes.func,
+};
+
+ErrorAlert.defaultProps = {
+  bsStyle: 'warning',
+  runtimeError: false,
+  marginTopBottom: 15,
+  children: null,
+  onClose: () => {},
 };
 
 export default ErrorAlert;
