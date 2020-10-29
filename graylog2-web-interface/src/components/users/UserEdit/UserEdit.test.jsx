@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 import * as Immutable from 'immutable';
-import { screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { act, screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { reader as assignedRole, reportCreator as notAssignedRole } from 'fixtures/roles';
 import { admin as currentUser } from 'fixtures/users';
@@ -113,10 +113,12 @@ describe('<UserEdit />', () => {
       const timezoneSelect = screen.getByLabelText('Time Zone');
       const submitButton = screen.getByText('Update Settings');
 
-      fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
-      await selectEvent.openMenu(timezoneSelect);
-      await selectEvent.select(timezoneSelect, 'Vancouver');
-      fireEvent.click(submitButton);
+      act(() => {
+        fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
+        selectEvent.openMenu(timezoneSelect);
+        selectEvent.select(timezoneSelect, 'Vancouver');
+        fireEvent.click(submitButton);
+      });
 
       await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, {
         session_timeout_ms: 144000000,
