@@ -16,7 +16,11 @@
  */
 // @flow strict
 import * as React from 'react';
+<<<<<<< HEAD
 import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+=======
+import { fireEvent, render, waitFor, screen } from 'wrappedTestingLibrary';
+>>>>>>> 102928966f... DateTimePicker Relative Time Range (#9162)
 // import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
@@ -65,9 +69,15 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', () => {
+<<<<<<< HEAD
     const { asFragment } = render(<SearchBar config={config} onExecute={() => {}} />);
 
     expect(asFragment()).toMatchSnapshot();
+=======
+    render(<SearchBar config={config} onExecute={() => {}} />);
+
+    expect(screen).toMatchSnapshot();
+>>>>>>> 102928966f... DateTimePicker Relative Time Range (#9162)
   });
 
   it('should update query when search is performed', async () => {
