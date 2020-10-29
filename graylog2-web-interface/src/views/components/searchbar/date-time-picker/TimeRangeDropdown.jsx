@@ -38,7 +38,7 @@ const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
   margin-top: 1px;
 `;
 
-const timeRangeTypeTabs = (config, activeKey) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+const timeRangeTypeTabs = (config, activeKey, originalRangeValue) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
@@ -47,7 +47,8 @@ const timeRangeTypeTabs = (config, activeKey) => availableTimeRangeTypes.map<Ran
          eventKey={type}>
       {type === activeKey && (
         <RangeComponent config={config}
-                        disabled={false} />
+                        disabled={false}
+                        originalTimeRange={originalRangeValue} />
       )}
     </Tab>
   );
@@ -107,7 +108,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                 <p>No Override to Date.</p>
               </Tab>
             )}
-            {timeRangeTypeTabs(config, activeKey)}
+            {timeRangeTypeTabs(config, activeKey, originalRangeValue)}
           </StyledTabs>
         </Col>
       </Row>
