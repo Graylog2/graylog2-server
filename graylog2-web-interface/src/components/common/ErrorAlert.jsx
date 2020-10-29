@@ -1,16 +1,17 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import { Alert, Button, Col, Row } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
 const StyledRow = styled(Row)`
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 `;
 
-const Container: StyledComponent<{margin: number}, HTMLElement<'div'>> = styled.div(({ margin }) => `
+const Container: StyledComponent<{margin: number}, ThemeInterface, HTMLElement> = styled.div(({ margin }) => `
   margin-top: ${margin}px;
   margin-bottom: ${margin}px;
 `);
