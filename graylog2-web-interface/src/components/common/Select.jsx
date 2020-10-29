@@ -145,9 +145,9 @@ const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
   };
 };
 
-const valueContainer = (base) => ({
+const valueContainer = ({ size }) => (base) => ({
   ...base,
-  padding: '2px 12px',
+  padding: size === 'small' ? '0 12px' : '2px 12px',
 });
 
 type OverriddenComponents = {|
@@ -172,7 +172,7 @@ const _styles = ({ size, theme }) => ({
   singleValue: singleValueAndPlaceholder({ theme }),
   placeholder: placeholder({ theme }),
   control: controlFocus({ size, theme }),
-  valueContainer,
+  valueContainer: valueContainer({ size }),
 });
 
 type ComponentsProp = {|
