@@ -33,6 +33,9 @@
     "plugin.js",
     "README.md"
   ],
+  "eslintConfig": {
+    "extends": "graylog"
+  },
   "dependencies": {
     "@babel/preset-env": "7.12.1",
     "babel-eslint": "9.0.0",

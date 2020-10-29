@@ -25,6 +25,9 @@
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"
   },
+  "eslintConfig": {
+    "extends": "graylog"
+  },
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}"
