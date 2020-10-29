@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 import { fireEvent } from '@testing-library/dom';
 
 import history from 'util/History';
@@ -64,5 +64,26 @@ describe('LinkContainer', () => {
     const button = await findByText('Alerts');
 
     expect(button.href).toEqual('http://localhost/alerts');
+  });
+
+  it('should stop event in generated `onClick`', async () => {
+    const onClick = jest.fn();
+    const childOnClick = jest.fn();
+    const { findByText } = render((
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+      <div onClick={onClick}>
+        <LinkContainer to="/">
+          <Button bsStyle="info" onClick={childOnClick}>All Alerts</Button>
+        </LinkContainer>
+      </div>
+    ));
+
+    const button = await findByText('All Alerts');
+
+    fireEvent.click(button);
+
+    await waitFor(() => expect(childOnClick).toHaveBeenCalled());
+
+    expect(onClick).not.toHaveBeenCalled();
   });
 });
