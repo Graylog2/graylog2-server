@@ -49,7 +49,7 @@ const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
     history.push(to);
   }, [childrenOnClick, onClick, to]);
 
-  return React.cloneElement(React.Children.only(children), { ...rest, ...childrenClassName, onClick: _onClick, href: to });
+  return React.cloneElement(React.Children.only(children), { ...rest, className: childrenClassName, onClick: _onClick, href: to });
 };
 
 export {
