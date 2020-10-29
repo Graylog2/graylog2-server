@@ -14,7 +14,7 @@ import UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { type ThemeInterface } from 'theme';
 import { Button } from 'components/graylog';
-import { Select } from 'components/common';
+import { Select, ErrorAlert } from 'components/common';
 
 type Props = {
   onSubmit: (user: Immutable.Set<UserOverview>) => Promise<?PaginatedListType>,
@@ -61,6 +61,7 @@ const _isRequired = (field) => (value) => (!value ? `The ${field} is required` :
 const UsersSelector = ({ role, onSubmit }: Props) => {
   const [users, setUsers] = useState([]);
   const [options, setOptions] = useState([]);
+  const [error, setError] = useState();
 
   const _loadUsers = useCallback(() => {
     const getUnlimited = { page: 1, perPage: 0, query: '' };
@@ -88,7 +89,9 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
     })));
 
     if (!userOverview) {
-      throw new Error(`Unable to find user with name ${user} in ${users.map((u) => u.username).join(', ')}`);
+      setError(`This is an exceptional error! Unable to find user with name ${user} in ${users.map((u) => u.username).join(', ')}`);
+
+      return;
     }
 
     onSubmit(userOverview).then(() => { resetForm(); });
@@ -108,6 +111,9 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
 
   return (
     <div>
+      <ErrorAlert onClose={setError} runtimeError>
+        {error}
+      </ErrorAlert>
       <Formik onSubmit={onUpdate}
               initialValues={{ user: undefined }}>
         {({ isSubmitting, isValid, errors }) => (

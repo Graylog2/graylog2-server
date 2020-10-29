@@ -10,7 +10,7 @@ import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Role from 'logic/roles/Role';
 import { Button } from 'components/graylog';
-import { Select, Spinner } from 'components/common';
+import { Select, Spinner, ErrorAlert } from 'components/common';
 
 type Props = {
   assignedRolesIds: Immutable.Set<string>,
@@ -44,7 +44,7 @@ const _options = (roles, assignedRolesIds, identifier) => roles
   .toArray()
   .map((r) => ({ label: r.name, value: r.name, role: r }));
 
-const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting) => {
+const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting, setError) => {
   if (!selectedRoleName) {
     return;
   }
@@ -56,7 +56,9 @@ const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, set
   })));
 
   if (selectedRoles.size <= 0) {
-    throw Error(`Role assignment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
+    setError(`Role assignment failed, because the roles ${selectedRoleName ?? '(undefined)'} does not exist`);
+
+    return;
   }
 
   setIsSubmitting(true);
@@ -77,6 +79,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
   const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [selectedRoleName, setSelectedRoleName] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState();
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
@@ -84,7 +87,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
     return <Spinner />;
   }
 
-  const _onSubmit = () => _assignRole(selectedRoleName, paginatedRoles.list, onSubmit, setSelectedRoleName, setIsSubmitting);
+  const _onSubmit = () => _assignRole(selectedRoleName, paginatedRoles.list, onSubmit, setSelectedRoleName, setIsSubmitting, setError);
   const options = _options(paginatedRoles.list, assignedRolesIds, identifier);
 
   return (
@@ -105,6 +108,9 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
           Assign Role
         </SubmitButton>
       </FormElements>
+      <ErrorAlert runtimeError onClose={setError}>
+        {error}
+      </ErrorAlert>
     </div>
   );
 };

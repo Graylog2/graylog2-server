@@ -6,8 +6,7 @@ import styled from 'styled-components';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import { Alert, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { ErrorAlert } from 'components/common';
 import User from 'logic/users/User';
 import PaginatedItemOverview, {
   DEFAULT_PAGINATION,
@@ -83,16 +82,9 @@ const RolesSection = ({ user, onSubmit }: Props) => {
         <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
       </Container>
 
-      { errors && (
-        <Container>
-          <Alert bsStyle="warning">
-            {errors}
-            <Button bsSize="xsmall" bsStyle="warning" className="pull-right" onClick={() => setErrors()}>
-              <Icon name="times" />
-            </Button>
-          </Alert>
-        </Container>
-      )}
+      <ErrorAlert onClose={setErrors}>
+        {errors}
+      </ErrorAlert>
       <h3>Selected Roles</h3>
       <Container>
         <PaginatedItemOverview noDataText="No selected roles have been found."
