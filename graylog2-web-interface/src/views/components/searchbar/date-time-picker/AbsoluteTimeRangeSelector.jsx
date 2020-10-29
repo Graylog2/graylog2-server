@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -25,6 +26,11 @@ import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
+import {
+  FormGroup,
+  InputGroup,
+  FormControl,
+} from 'components/graylog';
 import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
 import type { ThemeInterface } from 'theme';
 
@@ -58,15 +64,19 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const Label: StyledComponent<{}, void, HTMLLabelElement> = styled.label`
+const StyledLabel: StyledComponent<{}, void, HTMLLabelElement> = styled.label`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 15px;
   font-weight: normal;
+  margin: 0 0 6px;
   
-  .form-group,
-  .radio { margin: 0; }
+  .form-group { margin: 0; }
+  
+  > input[type='radio'] {
+    margin: 0 3px 0 0;
+  }
 `;
 
 const LabelText: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
@@ -79,8 +89,27 @@ const SetTimeOption: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   align-items: center;
   justify-content: flex-end;
   flex: 1;
-  
+
   b { padding: 0 3px; }
+`;
+
+const FlexSelect: StyledComponent<{}, void, typeof Select> = styled(Select)`
+  flex: .75;
+`;
+
+const StyledInputAddon: StyledComponent<{}, ThemeInterface, typeof InputGroup.Addon> = styled(InputGroup.Addon)(({ theme }) => css`
+  padding: 0 9px;
+  background: ${theme.colors.variant.lightest.default};
+
+  &:not(:first-child):not(:last-child) {
+    border-right: 0;
+    border-left: 0;
+    padding: 0 3px;
+  }
+`);
+
+const StyledFormControl: StyledComponent<{}, void, typeof FormControl> = styled(FormControl)`
+  padding: 0 9px;
 `;
 
 const _isValidDateString = (dateString: string) => {
@@ -128,6 +157,17 @@ const _generateSetHours = () => {
 };
 
 const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
+  const [fromTimeOption, setFromTimeOption] = useState('set-time');
+  const [toTimeOption, setToTimeOption] = useState('set-time');
+
+  const _handleChangeFromOption = (event) => {
+    setFromTimeOption(event.target.value);
+  };
+
+  const _handleChangeToOption = (event) => {
+    setToTimeOption(event.target.value);
+  };
+
   return (
     <AbsoluteWrapper>
       <RangeWrapper>
@@ -199,62 +239,85 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
                                      error={error} />
 
                 <div>
-                  <Label>
-                    <Input type="radio"
+                  <StyledLabel htmlFor="absolute-from-time">
+                    <input type="radio"
                            id="absolute-from-time"
                            name="from-time-option"
                            value="set-time"
-                           checked />
-                    <SetTimeOption>
-                      <Input type="text"
-                             id="absolute-from-time-hours"
-                             value={newFromValue.hours}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={2} />
-                      <b>:</b>
-                      <Input type="text"
-                             id="absolute-from-time-minutes"
-                             value={newFromValue.minutes}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={2} />
-                      <b>:</b>
-                      <Input type="text"
-                             id="absolute-from-time-seconds"
-                             value={newFromValue.seconds}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={2} />
-                      <b>.</b>
-                      <Input type="text"
-                             id="absolute-from-time-milliseconds"
-                             value={newFromValue.milliseconds}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={3} />
-                    </SetTimeOption>
-                  </Label>
+                           checked={fromTimeOption === 'set-time'}
+                           onChange={_handleChangeFromOption} />
 
-                  <Label as="div">
-                    <Input type="radio" id="absolute-from-hour" name="from-time-option" value="set-hour" />
+                    <SetTimeOption>
+                      <FormGroup>
+                        <InputGroup>
+                          <StyledInputAddon><Icon name="hourglass-start" /></StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-from-time-hours"
+                                             value={newFromValue.hours}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={2}
+                                             bsSize="sm" />
+                          <StyledInputAddon>:</StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-from-time-minutes"
+                                             value={newFromValue.minutes}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={2}
+                                             bsSize="sm" />
+                          <StyledInputAddon>:</StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-from-time-seconds"
+                                             value={newFromValue.seconds}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={2}
+                                             bsSize="sm" />
+                          <StyledInputAddon>.</StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-from-time-milliseconds"
+                                             value={newFromValue.milliseconds}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={3}
+                                             bsSize="sm" />
+                          <StyledInputAddon><Icon name="magic" /></StyledInputAddon>
+                        </InputGroup>
+                      </FormGroup>
+                    </SetTimeOption>
+                  </StyledLabel>
+
+                  <StyledLabel htmlFor="absolute-from-hour">
+                    <input type="radio"
+                           id="absolute-from-hour"
+                           name="from-time-option"
+                           value="set-hour"
+                           checked={fromTimeOption === 'set-hour'}
+                           onChange={_handleChangeFromOption} />
                     <LabelText>Beginning of Hour</LabelText>
                     <SetTimeOption>
-                      <Select id="absolute-from-set-hour"
-                              onChange={_onChangeHour}
-                              options={_generateSetHours()}
-                              clearable={false}
-                              value={String(newFromValue.hours)} />
+                      <FlexSelect id="absolute-from-set-hour"
+                                  onChange={_onChangeHour}
+                                  options={_generateSetHours()}
+                                  clearable={false}
+                                  value={String(newFromValue.hours)}
+                                  size="small" />
                     </SetTimeOption>
-                  </Label>
+                  </StyledLabel>
 
-                  <Label>
-                    <Input type="radio" id="absolute-from-day" name="from-time-option" value="set-day" />
+                  <StyledLabel htmlFor="absolute-from-day">
+                    <input type="radio"
+                           id="absolute-from-day"
+                           name="from-time-option"
+                           value="set-day"
+                           checked={fromTimeOption === 'set-day'}
+                           onChange={_handleChangeFromOption} />
                     <LabelText>Beginning of Day</LabelText>
                     <SetTimeOption>
                       <code>00:00:00.000</code>
                     </SetTimeOption>
-                  </Label>
+                  </StyledLabel>
                 </div>
               </>
             );
@@ -336,67 +399,86 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
                                      error={error} />
 
                 <div>
-                  <Label>
-                    <Input type="radio"
+                  <StyledLabel htmlFor="absolute-to-time">
+                    <input type="radio"
                            id="absolute-to-time"
                            name="from-to-option"
                            value="set-time"
-                           checked />
+                           checked={toTimeOption === 'set-time'}
+                           onChange={_handleChangeToOption} />
 
                     <SetTimeOption>
-                      <Input type="text"
-                             id="absolute-to-time-hours"
-                             value={newToValue.hours}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={2} /><b>:</b>
-                      <Input type="text"
-                             id="absolute-to-time-minutes"
-                             value={newToValue.minutes}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={2} /><b>:</b>
-                      <Input type="text"
-                             id="absolute-to-time-seconds"
-                             value={newToValue.seconds}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={2} /><b>.</b>
-                      <Input type="text"
-                             id="absolute-to-time-milliseconds"
-                             value={newToValue.milliseconds}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSetTime}
-                             size={3} />
+                      <FormGroup>
+                        <InputGroup>
+                          <StyledInputAddon><Icon name="hourglass-start" /></StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-to-time-hours"
+                                             value={newToValue.hours}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={2}
+                                             bsSize="sm" />
+                          <StyledInputAddon>:</StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-to-time-minutes"
+                                             value={newToValue.minutes}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={2}
+                                             bsSize="sm" />
+                          <StyledInputAddon>:</StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-to-time-seconds"
+                                             value={newToValue.seconds}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={2}
+                                             bsSize="sm" />
+                          <StyledInputAddon>.</StyledInputAddon>
+                          <StyledFormControl type="text"
+                                             id="absolute-to-time-milliseconds"
+                                             value={newToValue.milliseconds}
+                                             onChange={_onChangeSetTime}
+                                             onFocus={_onFocusSetTime}
+                                             size={3}
+                                             bsSize="sm" />
+                          <StyledInputAddon><Icon name="magic" /></StyledInputAddon>
+                        </InputGroup>
+                      </FormGroup>
                     </SetTimeOption>
-                  </Label>
+                  </StyledLabel>
 
-                  <Label as="div">
-                    <Input type="radio"
+                  <StyledLabel htmlFor="absolute-to-hour">
+                    <input type="radio"
                            id="absolute-to-hour"
                            name="from-to-option"
-                           value="set-hour" />
+                           value="set-hour"
+                           checked={toTimeOption === 'set-hour'}
+                           onChange={_handleChangeToOption} />
 
                     <LabelText>End of Hour</LabelText>
                     <SetTimeOption>
-                      <Select id="absolute-to-set-hour"
-                              onChange={_onChangeHour}
-                              options={_generateSetHours()}
-                              clearable={false}
-                              value={newToValue.hours} />
+                      <FlexSelect id="absolute-to-set-hour"
+                                  onChange={_onChangeHour}
+                                  options={_generateSetHours()}
+                                  clearable={false}
+                                  value={newToValue.hours}
+                                  size="small" />
                     </SetTimeOption>
-                  </Label>
+                  </StyledLabel>
 
-                  <Label>
-                    <Input type="radio"
+                  <StyledLabel htmlFor="absolute-to-day">
+                    <input type="radio"
                            id="absolute-to-day"
                            name="from-to-option"
-                           value="set-day" />
+                           value="set-day"
+                           checked={toTimeOption === 'set-day'}
+                           onChange={_handleChangeToOption} />
                     <LabelText>End of Day</LabelText>
                     <SetTimeOption>
                       <code>23:59:59.999</code>
                     </SetTimeOption>
-                  </Label>
+                  </StyledLabel>
                 </div>
               </>
             );
