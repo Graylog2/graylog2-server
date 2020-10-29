@@ -1059,7 +1059,6 @@ exports[`SearchBar should render the SearchBar 1`] = `
                       >
                         Not updating
                       </div>
-
                       <span
                         class="caret"
                       />
