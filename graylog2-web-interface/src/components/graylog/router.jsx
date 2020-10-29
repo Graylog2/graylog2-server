@@ -43,7 +43,10 @@ const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
   const { pathname } = useLocation();
   const { props: { onClick: childrenOnClick, className }, type: { displayName } } = React.Children.only(children);
   const childrenClassName = _setActiveClassName(pathname, to, className, displayName);
-  const _onClick = useCallback(() => {
+  const _onClick = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (childrenOnClick) {
       childrenOnClick();
     }
@@ -55,7 +58,7 @@ const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
     history.push(to);
   }, [childrenOnClick, onClick, to]);
 
-  return React.cloneElement(React.Children.only(children), { ...rest, ...childrenClassName, onClick: _onClick });
+  return React.cloneElement(React.Children.only(children), { ...rest, ...childrenClassName, onClick: _onClick, href: to });
 };
 
 export {
