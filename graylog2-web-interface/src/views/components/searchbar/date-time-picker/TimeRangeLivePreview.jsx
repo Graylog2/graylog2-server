@@ -5,7 +5,6 @@ import styled, { css, type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
-<<<<<<< HEAD
 import { type TimeRange } from 'views/logic/queries/Query';
 
 import { EMPTY_OUTPUT, dateOutput } from '../TimeRangeDisplay';
@@ -13,14 +12,6 @@ import { EMPTY_OUTPUT, dateOutput } from '../TimeRangeDisplay';
 type Props = {|
   timerange: TimeRange,
 |};
-=======
-
-import { EMPTY_OUTPUT, dateOutput } from '../TimeRangeDisplay';
-
-type Props = {
-  timerange: any,
-};
->>>>>>> 14577fdfdd... DateTimePicker Live Preview (#9125)
 
 const PreviewWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;

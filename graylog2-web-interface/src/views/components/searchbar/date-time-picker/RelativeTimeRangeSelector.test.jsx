@@ -1,6 +1,10 @@
 // @flow strict
 import React from 'react';
+<<<<<<< HEAD
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+=======
+import { fireEvent, render, within, screen } from 'wrappedTestingLibrary';
+>>>>>>> 102928966f... DateTimePicker Relative Time Range (#9162)
 import { Formik, Form } from 'formik';
 
 import OriginalRelativeTimeRangeSelector from './RelativeTimeRangeSelector';
@@ -38,6 +42,7 @@ const RelativeTimeRangeSelector = (allProps: Props) => (
 
 describe('RelativeTimeRangeSelector', () => {
   it('renders originalTimeRange value', () => {
+<<<<<<< HEAD
     render(<RelativeTimeRangeSelector {...defaultProps} />);
 
     const spinbutton = screen.getByRole('spinbutton', { name: /set the range value/i });
@@ -50,6 +55,18 @@ describe('RelativeTimeRangeSelector', () => {
     render(<RelativeTimeRangeSelector {...defaultProps} />);
 
     expect(screen.getByText(/Hours/i)).toBeInTheDocument();
+=======
+    const { getByRole } = render(<RelativeTimeRangeSelector {...defaultProps} />);
+
+    expect(getByRole('spinbutton', { name: /set the range value/i }).value).toBe('1');
+  });
+
+  it('renders originalTimeRange type', () => {
+    const { container } = render(<RelativeTimeRangeSelector {...defaultProps} />);
+    const { getByText } = within(container.querySelector('#relative-timerange-from-length > div'));
+
+    expect(getByText('Hours')).toBeTruthy();
+>>>>>>> 102928966f... DateTimePicker Relative Time Range (#9162)
   });
 
   it('Clicking All Time disables input', () => {
