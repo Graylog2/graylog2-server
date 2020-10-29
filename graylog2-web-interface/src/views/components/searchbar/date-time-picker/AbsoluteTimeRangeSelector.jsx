@@ -26,15 +26,9 @@ import { Icon } from 'components/common';
 import type { ThemeInterface } from 'theme';
 import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
 
-import TimerangeSelector from './TimerangeSelector';
-
 type Props = {
   disabled: boolean,
 };
-
-const StyledTimerangeSelector: StyledComponent<{}, void, *> = styled(TimerangeSelector)`
-  display: flex;
-`;
 
 const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 200px;
@@ -60,7 +54,7 @@ const _isValidDateString = (dateString: string) => {
 
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
   return (
-    <StyledTimerangeSelector className="absolute">
+    <>
       <Field name="tempTimeRange.from" validate={_isValidDateString}>
         {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
           <InputWrap>
@@ -92,7 +86,7 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
           </InputWrap>
         )}
       </Field>
-    </StyledTimerangeSelector>
+    </>
   );
 };
 

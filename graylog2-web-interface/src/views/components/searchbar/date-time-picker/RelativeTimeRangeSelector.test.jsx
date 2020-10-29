@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, within, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 
 import OriginalRelativeTimeRangeSelector from './RelativeTimeRangeSelector';
@@ -38,18 +38,16 @@ const RelativeTimeRangeSelector = (allProps: Props) => (
 
 describe('RelativeTimeRangeSelector', () => {
   it('renders originalTimeRange value', () => {
-    render(<RelativeTimeRangeSelector {...defaultProps} />);
+    const { getByRole } = render(<RelativeTimeRangeSelector {...defaultProps} />);
 
-    const spinbutton = screen.getByRole('spinbutton', { name: /set the range value/i });
-
-    expect(spinbutton).toBeInTheDocument();
-    expect(spinbutton).toHaveValue(1);
+    expect(getByRole('spinbutton', { name: /set the range value/i }).value).toBe('1');
   });
 
   it('renders originalTimeRange type', () => {
-    render(<RelativeTimeRangeSelector {...defaultProps} />);
+    const { container } = render(<RelativeTimeRangeSelector {...defaultProps} />);
+    const { getByText } = within(container.querySelector('#relative-timerange-from-length > div'));
 
-    expect(screen.getByText(/Hours/i)).toBeInTheDocument();
+    expect(getByText('Hours')).toBeTruthy();
   });
 
   it('Clicking All Time disables input', () => {
