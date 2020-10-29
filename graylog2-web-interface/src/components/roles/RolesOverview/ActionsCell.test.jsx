@@ -114,8 +114,8 @@ describe('ActionsCell', () => {
       }));
 
       // Ensure that the component rendered correctly
-      expect(screen.queryByRole('button', { name: `Edit role ${builtInRoleName}` })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: `Delete role ${builtInRoleName}` })).not.toBeInTheDocument();
+      expect(screen.queryByTitle(`Edit role ${builtInRoleName}`)).toBeInTheDocument();
+      expect(screen.queryByTitle(`Delete role ${builtInRoleName}`)).not.toBeInTheDocument();
     });
 
     it('should not be possible if user does not have correct permissions', () => {

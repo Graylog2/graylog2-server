@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import type { LocationShape } from 'react-router';
 
@@ -10,27 +10,18 @@ export type HistoryElement = LocationShape;
 
 const _targetPathname = (to) => {
   const target = typeof to?.pathname === 'string' ? to.pathname : to;
-  const targetWithoutQuery = String(target).split(/[?#]/)[0];
 
-  return targetWithoutQuery;
+  return String(target).split(/[?#]/)[0];
 };
 
 const _setActiveClassName = (pathname, to, currentClassName, displayName) => {
-  const props = {};
   const targetPathname = _targetPathname(to);
   const isActive = targetPathname === pathname;
+  const isButton = displayName === 'Button';
 
-  if (displayName === 'Button' && isActive) {
-    let className = 'active';
-
-    if (currentClassName) {
-      className = `${className} ${currentClassName}`;
-    }
-
-    props.className = className;
-  }
-
-  return props;
+  return isButton && isActive
+    ? `active ${currentClassName ?? ''}`
+    : currentClassName;
 };
 
 type Props = {
@@ -42,8 +33,11 @@ type Props = {
 const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
   const { pathname } = useLocation();
   const { props: { onClick: childrenOnClick, className }, type: { displayName } } = React.Children.only(children);
-  const childrenClassName = _setActiveClassName(pathname, to, className, displayName);
-  const _onClick = useCallback(() => {
+  const childrenClassName = useMemo(() => _setActiveClassName(pathname, to, className, displayName), [pathname, to, className, displayName]);
+  const _onClick = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (childrenOnClick) {
       childrenOnClick();
     }
@@ -55,7 +49,7 @@ const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
     history.push(to);
   }, [childrenOnClick, onClick, to]);
 
-  return React.cloneElement(React.Children.only(children), { ...rest, ...childrenClassName, onClick: _onClick });
+  return React.cloneElement(React.Children.only(children), { ...rest, className: childrenClassName, onClick: _onClick, href: to });
 };
 
 export {
