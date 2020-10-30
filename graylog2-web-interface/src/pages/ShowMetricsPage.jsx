@@ -5,7 +5,8 @@ import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, Icon, PageHeader, Spinner } from 'components/common';
+import { Alert, Col, Row } from 'components/graylog';
 import { MetricsComponent } from 'components/metrics';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
@@ -57,10 +58,26 @@ const ShowMetricsPage = createReactClass({
               All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
               all metrics via JMX, too.
             </span>
-            <span>This node is reporting a total of {names.length} metrics.</span>
+            {names ? (
+              <span>This node is reporting a total of {names.length} metrics.</span>
+            ) : (
+              <span>Could not fetch metrics for this node.</span>
+            )}
+
           </PageHeader>
 
-          <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} />
+          {names ? (
+            <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} />
+          ) : (
+            <Row className="content">
+              <Col md={12}>
+                <Alert bsStyle="danger">
+                  <Icon name="exclamation-triangle" />&nbsp;
+                  There was a problem fetching node metrics. Graylog will keep trying to get them in the background.
+                </Alert>
+              </Col>
+            </Row>
+          )}
         </span>
       </DocumentTitle>
     );
