@@ -16,7 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { useState } from 'react';
+import { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -24,9 +24,9 @@ import type { StyledComponent } from 'styled-components';
 import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
-import { Icon, Select } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import {
+  Button,
   FormGroup,
   InputGroup,
   FormControl,
@@ -36,6 +36,10 @@ import type { ThemeInterface } from 'theme';
 
 type Props = {
   disabled: boolean,
+  originalTimeRange: {
+    from: string,
+    top: string,
+  },
 };
 
 const TIME_TYPES = [
@@ -64,41 +68,17 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const StyledLabel: StyledComponent<{}, void, HTMLLabelElement> = styled.label`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 15px;
-  font-weight: normal;
-  margin: 0 0 6px;
-  
-  .form-group { margin: 0; }
-  
-  > input[type='radio'] {
-    margin: 0 3px 0 0;
-  }
-`;
-
-const LabelText: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
-  flex: 1;
-  font-size: ${theme.fonts.size.small};
-`);
-
 const SetTimeOption: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   flex: 1;
 
   b { padding: 0 3px; }
 `;
 
-const FlexSelect: StyledComponent<{}, void, typeof Select> = styled(Select)`
-  flex: .75;
-`;
-
 const StyledInputAddon: StyledComponent<{}, ThemeInterface, typeof InputGroup.Addon> = styled(InputGroup.Addon)(({ theme }) => css`
-  padding: 0 9px;
+  padding: 0;
   background: ${theme.colors.variant.lightest.default};
 
   &:not(:first-child):not(:last-child) {
@@ -112,6 +92,11 @@ const StyledFormControl: StyledComponent<{}, void, typeof FormControl> = styled(
   padding: 0 9px;
 `;
 
+const StyledButton = styled(Button)`
+  padding: 6px 9px;
+  line-height: 1.1;
+`;
+
 const _isValidDateString = (dateString: string) => {
   if (dateString === undefined) {
     return undefined;
@@ -120,6 +105,10 @@ const _isValidDateString = (dateString: string) => {
   return DateTime.isValidDateString(dateString)
     ? undefined
     : 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]';
+};
+
+const _onFocusSelect = (event) => {
+  event.target.select();
 };
 
 const zeroPad = (data, pad = 2) => String(data).padStart(pad, '0');
@@ -138,186 +127,176 @@ const parseTimeValue = (value, type) => {
   return timeValue;
 };
 
-const _generateSetHours = () => {
-  let minHours = 0;
-  const maxHours = 23;
+const fieldUpdate = (value) => {
+  const initialDateTime = moment(value).toObject();
 
-  const setHours = [];
+  TIME_TYPES.forEach((type) => {
+    initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
+  });
 
-  while (minHours <= maxHours) {
-    setHours.push({
-      value: zeroPad(String(minHours)),
-      label: zeroPad(String(minHours)),
-    });
+  const handleChangeDate = (event) => {
+    const dateValue = moment(event.target.value, DateTime.Formats.DATE).toObject();
+    const { years, months, date, ...initialTime } = initialDateTime;
 
-    minHours += 1;
-  }
+    return moment({
+      years: dateValue.years,
+      months: dateValue.months,
+      date: dateValue.date,
+      ...initialTime,
+    }).format(DateTime.Formats.TIMESTAMP);
+  };
 
-  return setHours;
+  const handleChangeSetTime = (event) => {
+    const timeType = event.target.getAttribute('name').replace('time-', '');
+    const timeValue = parseTimeValue(event.target.value);
+
+    return moment({
+      ...initialDateTime,
+      [timeType]: timeValue,
+    }).format(DateTime.Formats.TIMESTAMP);
+  };
+
+  const handleClickTimeNow = () => {
+    const newTime = moment().toObject();
+
+    return moment({
+      ...initialDateTime,
+      hours: newTime.hours,
+      minutes: newTime.minutes,
+      seconds: newTime.seconds,
+      milliseconds: newTime.milliseconds,
+    }).format(DateTime.Formats.TIMESTAMP);
+  };
+
+  const handleTimeToggle = (eod = false) => {
+    return moment({
+      ...initialDateTime,
+      hours: eod ? 23 : 0,
+      minutes: eod ? 59 : 0,
+      seconds: eod ? 59 : 0,
+      milliseconds: eod ? 999 : 0,
+    }).format(DateTime.Formats.TIMESTAMP);
+  };
+
+  return {
+    initialDateTime,
+    handleChangeDate,
+    handleChangeSetTime,
+    handleClickTimeNow,
+    handleTimeToggle,
+  };
 };
 
 const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
-  const [fromTimeOption, setFromTimeOption] = useState('set-time');
-  const [toTimeOption, setToTimeOption] = useState('set-time');
-
-  const _handleChangeFromOption = (event) => {
-    setFromTimeOption(event.target.value);
-  };
-
-  const _handleChangeToOption = (event) => {
-    setToTimeOption(event.target.value);
-  };
+  const fromHourIcon = useRef('hourglass-half');
+  const toHourIcon = useRef('hourglass-half');
 
   return (
     <AbsoluteWrapper>
       <RangeWrapper>
         <Field name="tempTimeRange.from" validate={_isValidDateString}>
           {({ field: { value, onChange, name }, meta: { error } }) => {
-            const newFromValue = {};
-
-            TIME_TYPES.forEach((type) => {
-              newFromValue[type] = zeroPad(moment(value || originalTimeRange.from)[type](), type === 'milliseconds' ? 3 : 2);
-            });
-
-            const _onFocusSetTime = (event) => {
-              event.target.select();
-            };
-
             const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+            const fromDateTime = value || originalTimeRange.from;
+            const {
+              initialDateTime,
+              handleChangeDate,
+              handleChangeSetTime,
+              handleClickTimeNow,
+              handleTimeToggle,
+            } = fieldUpdate(fromDateTime);
 
-            const _onChangeDate = (event) => {
-              const dateValue = event.target.value.split(' ');
-              let newDate;
-
-              const currentTime = {};
-
-              Object.keys(newFromValue).forEach((type) => {
-                currentTime[type] = Number(newFromValue[type]);
-              });
-
-              if (dateValue[1]) {
-                newDate = moment(dateValue.join(' '))
-                  .format(DateTime.Formats.TIMESTAMP);
-              } else {
-                newDate = moment(dateValue[0])
-                  .hours(currentTime.hours)
-                  .minutes(currentTime.minutes)
-                  .seconds(currentTime.seconds)
-                  .milliseconds(currentTime.milliseconds)
-                  .format(DateTime.Formats.TIMESTAMP);
-              }
-
-              _onChange(newDate);
-            };
+            const _onChangeDate = (event) => _onChange(handleChangeDate(event));
 
             const _onChangeSetTime = (event) => {
-              const timeType = event.target.getAttribute('id').replace('absolute-from-time-', '');
-              const timeValue = parseTimeValue(event.target.value);
+              fromHourIcon.current = 'hourglass-half';
 
-              const currentTime = moment(value);
-              const updatedTime = currentTime[timeType](timeValue);
-              const formattedTime = updatedTime.format(DateTime.Formats.TIMESTAMP);
-
-              _onChange(formattedTime);
+              _onChange(handleChangeSetTime(event));
             };
 
-            const _onChangeHour = (hours) => {
-              const newDate = moment(value)
-                .set({ hours, minutes: 0, seconds: 0, milliseconds: 0 })
-                .format(DateTime.Formats.TIMESTAMP);
+            const _onClickTimeNow = () => {
+              fromHourIcon.current = 'hourglass-half';
 
-              _onChange(newDate);
+              _onChange(handleClickTimeNow());
+            };
+
+            const _onClickHourToggle = () => {
+              const endOfDay = fromHourIcon.current === 'hourglass-start';
+
+              if (endOfDay) {
+                fromHourIcon.current = 'hourglass-end';
+              } else {
+                fromHourIcon.current = 'hourglass-start';
+              }
+
+              _onChange(handleTimeToggle(endOfDay));
             };
 
             return (
               <>
                 <DateInputWithPicker disabled={disabled}
                                      onChange={_onChangeDate}
-                                     value={value}
+                                     value={fromDateTime}
                                      name={name}
                                      title="Search start date"
                                      error={error} />
 
                 <div>
-                  <StyledLabel htmlFor="absolute-from-time">
-                    <input type="radio"
-                           id="absolute-from-time"
-                           name="from-time-option"
-                           value="set-time"
-                           checked={fromTimeOption === 'set-time'}
-                           onChange={_handleChangeFromOption} />
-
-                    <SetTimeOption>
-                      <FormGroup>
-                        <InputGroup>
-                          <StyledInputAddon><Icon name="hourglass-start" /></StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-from-time-hours"
-                                             value={newFromValue.hours}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={2}
-                                             bsSize="sm" />
-                          <StyledInputAddon>:</StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-from-time-minutes"
-                                             value={newFromValue.minutes}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={2}
-                                             bsSize="sm" />
-                          <StyledInputAddon>:</StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-from-time-seconds"
-                                             value={newFromValue.seconds}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={2}
-                                             bsSize="sm" />
-                          <StyledInputAddon>.</StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-from-time-milliseconds"
-                                             value={newFromValue.milliseconds}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={3}
-                                             bsSize="sm" />
-                          <StyledInputAddon><Icon name="magic" /></StyledInputAddon>
-                        </InputGroup>
-                      </FormGroup>
-                    </SetTimeOption>
-                  </StyledLabel>
-
-                  <StyledLabel htmlFor="absolute-from-hour">
-                    <input type="radio"
-                           id="absolute-from-hour"
-                           name="from-time-option"
-                           value="set-hour"
-                           checked={fromTimeOption === 'set-hour'}
-                           onChange={_handleChangeFromOption} />
-                    <LabelText>Beginning of Hour</LabelText>
-                    <SetTimeOption>
-                      <FlexSelect id="absolute-from-set-hour"
-                                  onChange={_onChangeHour}
-                                  options={_generateSetHours()}
-                                  clearable={false}
-                                  value={String(newFromValue.hours)}
-                                  size="small" />
-                    </SetTimeOption>
-                  </StyledLabel>
-
-                  <StyledLabel htmlFor="absolute-from-day">
-                    <input type="radio"
-                           id="absolute-from-day"
-                           name="from-time-option"
-                           value="set-day"
-                           checked={fromTimeOption === 'set-day'}
-                           onChange={_handleChangeFromOption} />
-                    <LabelText>Beginning of Day</LabelText>
-                    <SetTimeOption>
-                      <code>00:00:00.000</code>
-                    </SetTimeOption>
-                  </StyledLabel>
+                  <SetTimeOption>
+                    <FormGroup>
+                      <InputGroup>
+                        <StyledInputAddon>
+                          <StyledButton bsStyle="link"
+                                        bsSize="small"
+                                        onClick={_onClickHourToggle}>
+                            <Icon name={fromHourIcon.current} />
+                          </StyledButton>
+                        </StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-from-time-hours"
+                                           name="time-hours"
+                                           value={initialDateTime.hours}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={2}
+                                           bsSize="sm" />
+                        <StyledInputAddon>:</StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-from-time-minutes"
+                                           name="time-minutes"
+                                           value={initialDateTime.minutes}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={2}
+                                           bsSize="sm" />
+                        <StyledInputAddon>:</StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-from-time-seconds"
+                                           name="time-seconds"
+                                           value={initialDateTime.seconds}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={2}
+                                           bsSize="sm" />
+                        <StyledInputAddon>.</StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-from-time-milliseconds"
+                                           name="time-milliseconds"
+                                           value={initialDateTime.milliseconds}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={3}
+                                           bsSize="sm" />
+                        <StyledInputAddon>
+                          <StyledButton bsStyle="link"
+                                        bsSize="small"
+                                        onClick={_onClickTimeNow}>
+                            <Icon name="magic" />
+                          </StyledButton>
+                        </StyledInputAddon>
+                      </InputGroup>
+                    </FormGroup>
+                  </SetTimeOption>
                 </div>
               </>
             );
@@ -332,60 +311,40 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
       <RangeWrapper>
         <Field name="tempTimeRange.to" validate={_isValidDateString}>
           {({ field: { value, onChange, onBlur, name }, meta: { error } }) => {
-            const newToValue = {};
-
-            TIME_TYPES.forEach((type) => {
-              newToValue[type] = zeroPad(moment(value || originalTimeRange.to)[type](), type === 'milliseconds' ? 3 : 2);
-            });
-
-            const _onFocusSetTime = (event) => {
-              event.target.select();
-            };
-
             const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+            const fromDateTime = value || originalTimeRange.from;
+            const {
+              initialDateTime,
+              handleChangeDate,
+              handleChangeSetTime,
+              handleClickTimeNow,
+              handleTimeToggle,
+            } = fieldUpdate(fromDateTime);
 
-            const _onChangeDate = (event) => {
-              const dateValue = event.target.value.split(' ');
-              let newDate;
-
-              const currentTime = {};
-
-              Object.keys(newToValue).forEach((type) => {
-                currentTime[type] = Number(newToValue[type]);
-              });
-
-              if (dateValue[1]) {
-                newDate = moment(dateValue.join(' '))
-                  .format(DateTime.Formats.TIMESTAMP);
-              } else {
-                newDate = moment(dateValue[0])
-                  .hours(currentTime.hours)
-                  .minutes(currentTime.minutes)
-                  .seconds(currentTime.seconds)
-                  .milliseconds(currentTime.milliseconds)
-                  .format(DateTime.Formats.TIMESTAMP);
-              }
-
-              _onChange(newDate);
-            };
+            const _onChangeDate = (event) => _onChange(handleChangeDate(event));
 
             const _onChangeSetTime = (event) => {
-              const timeType = event.target.getAttribute('id').replace('absolute-to-time-', '');
-              const timeValue = parseTimeValue(event.target.value);
+              toHourIcon.current = 'hourglass-half';
 
-              const currentTime = moment(value);
-              const updatedTime = currentTime[timeType](timeValue);
-              const formattedTime = updatedTime.format(DateTime.Formats.TIMESTAMP);
-
-              _onChange(formattedTime);
+              _onChange(handleChangeSetTime(event));
             };
 
-            const _onChangeHour = (hours) => {
-              const newDate = moment(value)
-                .set({ hours, minutes: 0, seconds: 0, milliseconds: 0 })
-                .format(DateTime.Formats.TIMESTAMP);
+            const _onClickTimeNow = () => {
+              toHourIcon.current = 'hourglass-half';
 
-              _onChange(newDate);
+              _onChange(handleClickTimeNow());
+            };
+
+            const _onClickHourToggle = () => {
+              const endOfDay = toHourIcon.current === 'hourglass-start';
+
+              if (endOfDay) {
+                toHourIcon.current = 'hourglass-end';
+              } else {
+                toHourIcon.current = 'hourglass-start';
+              }
+
+              _onChange(handleTimeToggle(endOfDay));
             };
 
             return (
@@ -393,92 +352,63 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
                 <DateInputWithPicker disabled={disabled}
                                      onChange={_onChangeDate}
                                      onBlur={onBlur}
-                                     value={value}
+                                     value={fromDateTime}
                                      name={name}
                                      title="Search end date"
                                      error={error} />
 
                 <div>
-                  <StyledLabel htmlFor="absolute-to-time">
-                    <input type="radio"
-                           id="absolute-to-time"
-                           name="from-to-option"
-                           value="set-time"
-                           checked={toTimeOption === 'set-time'}
-                           onChange={_handleChangeToOption} />
-
-                    <SetTimeOption>
-                      <FormGroup>
-                        <InputGroup>
-                          <StyledInputAddon><Icon name="hourglass-start" /></StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-to-time-hours"
-                                             value={newToValue.hours}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={2}
-                                             bsSize="sm" />
-                          <StyledInputAddon>:</StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-to-time-minutes"
-                                             value={newToValue.minutes}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={2}
-                                             bsSize="sm" />
-                          <StyledInputAddon>:</StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-to-time-seconds"
-                                             value={newToValue.seconds}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={2}
-                                             bsSize="sm" />
-                          <StyledInputAddon>.</StyledInputAddon>
-                          <StyledFormControl type="text"
-                                             id="absolute-to-time-milliseconds"
-                                             value={newToValue.milliseconds}
-                                             onChange={_onChangeSetTime}
-                                             onFocus={_onFocusSetTime}
-                                             size={3}
-                                             bsSize="sm" />
-                          <StyledInputAddon><Icon name="magic" /></StyledInputAddon>
-                        </InputGroup>
-                      </FormGroup>
-                    </SetTimeOption>
-                  </StyledLabel>
-
-                  <StyledLabel htmlFor="absolute-to-hour">
-                    <input type="radio"
-                           id="absolute-to-hour"
-                           name="from-to-option"
-                           value="set-hour"
-                           checked={toTimeOption === 'set-hour'}
-                           onChange={_handleChangeToOption} />
-
-                    <LabelText>End of Hour</LabelText>
-                    <SetTimeOption>
-                      <FlexSelect id="absolute-to-set-hour"
-                                  onChange={_onChangeHour}
-                                  options={_generateSetHours()}
-                                  clearable={false}
-                                  value={newToValue.hours}
-                                  size="small" />
-                    </SetTimeOption>
-                  </StyledLabel>
-
-                  <StyledLabel htmlFor="absolute-to-day">
-                    <input type="radio"
-                           id="absolute-to-day"
-                           name="from-to-option"
-                           value="set-day"
-                           checked={toTimeOption === 'set-day'}
-                           onChange={_handleChangeToOption} />
-                    <LabelText>End of Day</LabelText>
-                    <SetTimeOption>
-                      <code>23:59:59.999</code>
-                    </SetTimeOption>
-                  </StyledLabel>
+                  <SetTimeOption>
+                    <FormGroup>
+                      <InputGroup>
+                        <StyledInputAddon>
+                          <StyledButton bsStyle="link"
+                                        bsSize="small"
+                                        onClick={_onClickHourToggle}>
+                            <Icon name={toHourIcon.current} />
+                          </StyledButton>
+                        </StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-to-time-hours"
+                                           value={initialDateTime.hours}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={2}
+                                           bsSize="sm" />
+                        <StyledInputAddon>:</StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-to-time-minutes"
+                                           value={initialDateTime.minutes}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={2}
+                                           bsSize="sm" />
+                        <StyledInputAddon>:</StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-to-time-seconds"
+                                           value={initialDateTime.seconds}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={2}
+                                           bsSize="sm" />
+                        <StyledInputAddon>.</StyledInputAddon>
+                        <StyledFormControl type="text"
+                                           id="absolute-to-time-milliseconds"
+                                           value={initialDateTime.milliseconds}
+                                           onChange={_onChangeSetTime}
+                                           onFocus={_onFocusSelect}
+                                           size={3}
+                                           bsSize="sm" />
+                        <StyledInputAddon>
+                          <StyledButton bsStyle="link"
+                                        bsSize="small"
+                                        onClick={_onClickTimeNow}>
+                            <Icon name="magic" />
+                          </StyledButton>
+                        </StyledInputAddon>
+                      </InputGroup>
+                    </FormGroup>
+                  </SetTimeOption>
                 </div>
               </>
             );
