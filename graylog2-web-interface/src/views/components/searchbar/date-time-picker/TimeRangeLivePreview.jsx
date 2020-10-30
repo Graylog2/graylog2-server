@@ -5,12 +5,13 @@ import styled, { css, type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
+import { type TimeRange } from 'views/logic/queries/Query';
 
 import { EMPTY_OUTPUT, dateOutput } from '../TimeRangeDisplay';
 
-type Props = {
-  timerange: any,
-};
+type Props = {|
+  timerange: TimeRange,
+|};
 
 const PreviewWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;
