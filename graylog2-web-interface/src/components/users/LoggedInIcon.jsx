@@ -6,7 +6,7 @@ import { type ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 
 const Wrapper: StyledComponent<{active?: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, active }) => `
-  color: ${active ? theme.colors.variant.success : theme.colors.variant.danger};
+  color: ${active ? theme.colors.variant.success : theme.colors.variant.default};
 `);
 
 const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
