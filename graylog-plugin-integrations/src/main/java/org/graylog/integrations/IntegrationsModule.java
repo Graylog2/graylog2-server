@@ -34,6 +34,8 @@ import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
+import org.graylog.integrations.pagerduty.PagerDutyNotification;
+import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.notifications.types.SlackEventNotification;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfig;
 import org.graylog2.plugin.PluginConfigBean;
@@ -91,12 +93,18 @@ public class IntegrationsModule extends PluginModule {
 
         addAuditEventTypes(IntegrationsAuditEventTypes.class);
 
-
-       // bind(SlackEventNotificationConfig.class).toProvider(EventNotificationConfig.class);
+        // Slack Notification
         addNotificationType(SlackEventNotificationConfig.TYPE_NAME,
                 SlackEventNotificationConfig.class,
                 SlackEventNotification.class,
                 SlackEventNotification.Factory.class);
+
+        // Pager Duty Notification
+        addNotificationType(
+                PagerDutyNotificationConfig.TYPE_NAME,
+                PagerDutyNotificationConfig.class,
+                PagerDutyNotification.class,
+                PagerDutyNotification.Factory.class);
 
         // IPFIX
         addMessageInput(IpfixUdpInput.class);
