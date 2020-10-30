@@ -95,6 +95,20 @@ public class DBGrantServiceTest {
 
     @Test
     @MongoDBFixtures("grants.json")
+    public void getForGranteesOrGlobalWithCapability() {
+        final GRN jane = grnRegistry.newGRN("user", "jane");
+        final GRN john = grnRegistry.newGRN("user", "john");
+
+        assertThat(dbService.getForGranteesOrGlobalWithCapability(ImmutableSet.of(jane), Capability.MANAGE)).hasSize(1);
+        assertThat(dbService.getForGranteesOrGlobalWithCapability(ImmutableSet.of(jane), Capability.OWN)).hasSize(1);
+        assertThat(dbService.getForGranteesOrGlobalWithCapability(ImmutableSet.of(john), Capability.VIEW)).hasSize(2);
+        assertThat(dbService.getForGranteesOrGlobalWithCapability(ImmutableSet.of(jane, john), Capability.VIEW)).hasSize(3);
+        assertThat(dbService.getForGranteesOrGlobalWithCapability(ImmutableSet.of(jane, john), Capability.MANAGE)).hasSize(1);
+        assertThat(dbService.getForGranteesOrGlobalWithCapability(ImmutableSet.of(jane, john), Capability.OWN)).hasSize(2);
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
     public void getForTarget() {
         final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
         final GRN stream2 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");

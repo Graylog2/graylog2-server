@@ -106,6 +106,16 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         )).collect(ImmutableSet.toImmutableSet());
     }
 
+    public ImmutableSet<GrantDTO> getForGranteesOrGlobalWithCapability(Set<GRN> grantees, Capability capability) {
+        return streamQuery(DBQuery.and(
+                DBQuery.or(
+                        DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees),
+                        DBQuery.is(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
+                ),
+                DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability)
+        )).collect(ImmutableSet.toImmutableSet());
+    }
+
     public List<GrantDTO> getForTargetAndGrantee(GRN target, GRN grantee) {
         return getForTargetAndGrantees(target, ImmutableSet.of(grantee));
     }
