@@ -124,7 +124,7 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['inputs:read']}>
         <NavigationLink path={Routes.SYSTEM.GROKPATTERNS} description="Grok Patterns" />
       </IfPermitted>
       <IfPermitted permissions={['inputs:edit']}>
