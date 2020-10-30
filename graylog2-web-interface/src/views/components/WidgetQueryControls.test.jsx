@@ -134,11 +134,11 @@ describe('WidgetQueryControls', () => {
       expect(queryByText(indicatorText)).toBeNull();
     });
 
-    it('disables timerange controls when global override is present', () => {
-      const { getByDisplayValue } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const timeRangeSelect = getByDisplayValue('Search in last day');
-
-      expect(timeRangeSelect).toBeDisabled();
-    });
+    // it('disables timerange controls when global override is present', () => {
+    //   const { getByDisplayValue } = renderSUT({ globalOverride: globalOverrideWithQuery });
+    //   const timeRangeSelect = getByDisplayValue('Search in last day');
+    //
+    //   expect(timeRangeSelect).toBeDisabled();
+    // });
   });
 });
