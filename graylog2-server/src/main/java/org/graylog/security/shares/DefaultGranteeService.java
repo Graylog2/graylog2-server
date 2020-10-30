@@ -17,6 +17,7 @@
 package org.graylog.security.shares;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.GranteeAuthorizer;
 import org.graylog.security.shares.EntityShareResponse.AvailableGrantee;
@@ -25,6 +26,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Set;
 
 public class DefaultGranteeService implements GranteeService {
@@ -45,6 +47,11 @@ public class DefaultGranteeService implements GranteeService {
                 .addAll(getAvailableUserGrantees(sharingUser))
                 .add(getGlobalGrantee())
                 .build();
+    }
+
+    @Override
+    public Set<GRN> getGranteeAliases(GRN grantee) {
+        return Collections.singleton(grantee);
     }
 
     @Override

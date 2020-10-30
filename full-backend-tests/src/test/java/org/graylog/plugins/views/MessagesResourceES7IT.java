@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.shares;
+package org.graylog.plugins.views;
 
-import org.graylog.grn.GRN;
-import org.graylog.security.shares.EntityShareResponse.AvailableGrantee;
-import org.graylog2.plugin.database.users.User;
+import io.restassured.specification.RequestSpecification;
+import org.graylog.storage.elasticsearch7.ElasticsearchInstanceES7Factory;
+import org.graylog.testing.completebackend.ApiIntegrationTest;
+import org.graylog.testing.completebackend.GraylogBackend;
 
-import java.util.Set;
+import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-public interface GranteeService {
-    Set<AvailableGrantee> getAvailableGrantees(User sharingUser);
-
-    Set<User> getVisibleUsers(User requestingUser);
-
-    Set<GRN> getGranteeAliases(GRN grantee);
+@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES7Factory.class)
+class MessagesResourceES7IT extends MessagesResourceIT {
+    public MessagesResourceES7IT(GraylogBackend sut, RequestSpecification requestSpec) {
+        super(sut, requestSpec);
+    }
 }

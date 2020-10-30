@@ -27,6 +27,7 @@ import { Headline } from '../../common/Section/SectionComponent';
 const _onSubmit = (formData, roles, setSubmitError) => {
   const data = { ...formData, roles: roles.toJS(), permissions: [] };
   delete data.password_repeat;
+  data.username = data.username.trim();
 
   setSubmitError(null);
 

@@ -28,7 +28,7 @@
     </parent>
 
     <artifactId>full-backend-tests</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>full-backend-tests</name>
     <description>Graylog REST API integration tests</description>

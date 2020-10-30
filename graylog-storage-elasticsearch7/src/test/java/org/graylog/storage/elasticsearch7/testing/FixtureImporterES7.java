@@ -7,6 +7,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRespo
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.ActiveShardCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;
@@ -103,7 +104,11 @@ public class FixtureImporterES7 implements FixtureImporter {
             }
         }
 
-        createIndices(targetIndices);
+        for (String indexName : targetIndices) {
+            if (!indexExists(indexName)) {
+                createIndex(indexName);
+            }
+        }
 
         final BulkResponse result = client.execute((c, requestOptions) -> c.bulk(bulkRequest, requestOptions),
                 "Unable to import fixtures.");
@@ -112,11 +117,14 @@ public class FixtureImporterES7 implements FixtureImporter {
         }
     }
 
-    private void createIndices(Set<String> targetIndices) {
-        targetIndices.forEach(indexName -> {
-            final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
-                    .waitForActiveShards(ActiveShardCount.ONE);
-            client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
-        });
+    private void createIndex(String indexName) {
+        final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
+                .waitForActiveShards(ActiveShardCount.ONE);
+        client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
+    }
+
+    private boolean indexExists(String indexName) {
+        final GetIndexRequest indexExistsRequest = new GetIndexRequest(indexName);
+        return client.execute((c, requestOptions) -> c.indices().exists(indexExistsRequest, requestOptions));
     }
 }

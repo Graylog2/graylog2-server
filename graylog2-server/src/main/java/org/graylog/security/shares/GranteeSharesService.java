@@ -53,11 +53,14 @@ public class GranteeSharesService {
 
     private final DBGrantService grantService;
     private final GRNDescriptorService descriptorService;
+    private final GranteeService granteeService;
 
     @Inject
-    public GranteeSharesService(DBGrantService grantService, GRNDescriptorService descriptorService) {
+    public GranteeSharesService(DBGrantService grantService,
+                                GRNDescriptorService descriptorService, GranteeService granteeService) {
         this.grantService = grantService;
         this.descriptorService = descriptorService;
+        this.granteeService = granteeService;
     }
 
     public SharesResponse getPaginatedSharesFor(GRN grantee,
@@ -65,8 +68,11 @@ public class GranteeSharesService {
                                                 String capabilityFilterString,
                                                 String entityTypeFilterString) {
         final Optional<Capability> capability = parseCapabilityFilter(capabilityFilterString);
-        final ImmutableSet<GrantDTO> grants = capability.map(c -> grantService.getForGranteeWithCapability(grantee, c))
-                .orElseGet(() -> grantService.getForGrantee(grantee));
+        // Get all aliases for the grantee to make sure we find all entities the grantee has access to
+        final Set<GRN> granteeAliases = granteeService.getGranteeAliases(grantee);
+        final ImmutableSet<GrantDTO> grants = capability
+                .map(c -> grantService.getForGranteesOrGlobalWithCapability(granteeAliases, c))
+                .orElseGet(() -> grantService.getForGranteesOrGlobal(granteeAliases));
 
         final Set<GRN> targets = grants.stream().map(GrantDTO::target).collect(Collectors.toSet());
 
@@ -97,6 +103,14 @@ public class GranteeSharesService {
 
         final Map<GRN, Capability> granteeCapabilities = grants.stream()
                 .filter(grant -> entityDescriptorsGRNs.contains(grant.target()))
+                // Group grants by target so we can select the grant with the highest capability priority later
+                .collect(Collectors.groupingBy(GrantDTO::target))
+                .values()
+                .stream()
+                // Select the grant with the highest capability priority
+                .map(grantsList -> grantsList.stream().max(Comparator.comparing(grant -> grant.capability().priority())))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toMap(GrantDTO::target, GrantDTO::capability));
 
         final PaginatedList<EntityDescriptor> paginatedList = new PaginatedList<>(

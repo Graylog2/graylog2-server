@@ -14,18 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.shares;
+package org.graylog.storage.elasticsearch7;
 
-import org.graylog.grn.GRN;
-import org.graylog.security.shares.EntityShareResponse.AvailableGrantee;
-import org.graylog2.plugin.database.users.User;
+import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
+import org.graylog.testing.completebackend.ElasticsearchInstanceFactory;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.testcontainers.containers.Network;
 
-import java.util.Set;
+public class ElasticsearchInstanceES7Factory implements ElasticsearchInstanceFactory {
+    @Override
+    public ElasticsearchInstance create(Network network) {
+        return ElasticsearchInstanceES7.create(network);
+    }
 
-public interface GranteeService {
-    Set<AvailableGrantee> getAvailableGrantees(User sharingUser);
-
-    Set<User> getVisibleUsers(User requestingUser);
-
-    Set<GRN> getGranteeAliases(GRN grantee);
+    @Override
+    public String version() {
+        return "7";
+    }
 }
