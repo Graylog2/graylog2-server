@@ -6,6 +6,8 @@ import { last, sortBy } from 'lodash';
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 
+import formatNumber from './FormatNumber';
+
 export type HighlightRange = {|
   start: number,
   length: number,
@@ -28,7 +30,11 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   }
 
   if (!highlightRanges || !highlightRanges[field]) {
-    return value;
+    const parsedNumber = Number.parseFloat(value);
+
+    return Number.isNaN(parsedNumber)
+      ? value
+      : formatNumber(parsedNumber);
   }
 
   const style = {
