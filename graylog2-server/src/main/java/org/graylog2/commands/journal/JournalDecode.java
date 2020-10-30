@@ -25,6 +25,7 @@ import com.google.common.collect.Range;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import org.graylog.grn.GRNRegistry;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -54,6 +55,7 @@ public class JournalDecode extends AbstractJournalCommand {
                 .addAll(super.getCommandBindings())
                 .add(new CodecsModule())
                 .add(new ObjectMapperModule(getClass().getClassLoader()))
+                .add(binder -> binder.bind(GRNRegistry.class).toInstance(GRNRegistry.createEmpty()))
                 .build();
     }
 
