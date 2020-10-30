@@ -13,11 +13,11 @@ type Props = {
 const TeamsSection = ({ user }: Props) => {
   const teamsPlugin = PluginStore.exports('teams');
 
-  const TeamEditComponent = teamsPlugin?.[0]?.TeamEditComponent;
+  const UserTeamsAssignment = teamsPlugin?.[0]?.UserTeamsAssignment;
 
   return (
     <SectionComponent title="Teams">
-      {TeamEditComponent ? <TeamEditComponent user={user} readOnly /> : <EnterprisePluginNotFound featureName="teams" />}
+      {UserTeamsAssignment ? <UserTeamsAssignment user={user} readOnly /> : <EnterprisePluginNotFound featureName="teams" />}
     </SectionComponent>
   );
 };
