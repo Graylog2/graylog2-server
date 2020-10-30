@@ -42,7 +42,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -60,6 +62,7 @@ class GranteeSharesServiceTest {
                @Mock GranteeService granteeService) {
         this.grnDescriptorService = grnDescriptorService;
         final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        when(granteeService.getGranteeAliases(any(GRN.class))).thenAnswer(a -> Collections.singleton(a.getArgument(0)));
         this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService);
     }
 
