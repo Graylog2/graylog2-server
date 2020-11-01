@@ -5,13 +5,15 @@ import * as Immutable from 'immutable';
 import { EnterprisePluginNotFound } from 'components/common';
 import { getEnterpriseAuthenticationPlugin } from 'util/AuthenticationService';
 import Role from 'logic/roles/Role';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
+  authenticationBackend: AuthenticationBackend,
   roles: Immutable.List<Role>,
 };
 
-const SyncedTeamsSection = ({ roles }: Props) => {
+const SyncedTeamsSection = ({ roles, authenticationBackend }: Props) => {
   const enterpriseAuthenticationPlugin = getEnterpriseAuthenticationPlugin();
   const EnterpriseSyncedTeamsSection = enterpriseAuthenticationPlugin?.components.SyncedTeamsSection;
 
@@ -23,7 +25,7 @@ const SyncedTeamsSection = ({ roles }: Props) => {
     );
   }
 
-  return <EnterpriseSyncedTeamsSection roles={roles} />;
+  return <EnterpriseSyncedTeamsSection roles={roles} authenticationBackend={authenticationBackend} />;
 };
 
 export default SyncedTeamsSection;
