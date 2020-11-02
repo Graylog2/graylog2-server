@@ -226,9 +226,9 @@ class SearchForm extends React.Component {
           <FormContent buttonLeftMargin={buttonLeftMargin}>
             <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
               {label && (
-              <label htmlFor="common-search-form-query-input" className="control-label">
-                {label}
-              </label>
+                <label htmlFor="common-search-form-query-input" className="control-label">
+                  {label}
+                </label>
               )}
               <input id="common-search-form-query-input"
                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
@@ -242,7 +242,7 @@ class SearchForm extends React.Component {
                      autoComplete="off"
                      spellCheck="false" />
               {queryHelpComponent && (
-              <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
+                <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
               )}
             </div>
 
@@ -254,9 +254,9 @@ class SearchForm extends React.Component {
             </Button>
 
             {onReset && (
-            <Button type="reset" className="reset-button" onClick={this._onReset}>
-              {resetButtonLabel}
-            </Button>
+              <Button type="reset" className="reset-button" onClick={this._onReset}>
+                {resetButtonLabel}
+              </Button>
             )}
             {children}
           </FormContent>
