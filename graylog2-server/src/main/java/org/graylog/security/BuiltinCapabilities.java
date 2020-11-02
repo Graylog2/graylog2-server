@@ -29,11 +29,6 @@ import java.util.Optional;
 public class BuiltinCapabilities {
     private static ImmutableMap<Capability, CapabilityDescriptor> CAPABILITIES;
 
-    // TODO: Need to be migrated to roles
-    public final static String ROLE_COLLECTION_CREATOR = "grn::::role:54e3deadbeefdeadbeef1001";
-    public final static String ROLE_DASHBOARD_CREATOR = "grn::::role:54e3deadbeefdeadbeef1002";
-    public final static String ROLE_STREAM_CREATOR = "grn::::role:54e3deadbeefdeadbeef1003";
-
     @Inject
     public BuiltinCapabilities() {
         CAPABILITIES = ImmutableMap.<Capability, CapabilityDescriptor>builder()
@@ -46,7 +41,6 @@ public class BuiltinCapabilities {
                                 ViewsRestPermissions.VIEW_READ,
                                 RestPermissions.EVENT_DEFINITIONS_READ,
                                 RestPermissions.EVENT_NOTIFICATIONS_READ
-                                // TODO: Add missing collection permissions
                         )
                 ))
                 .put(Capability.MANAGE, CapabilityDescriptor.create(
@@ -64,7 +58,6 @@ public class BuiltinCapabilities {
                                 RestPermissions.EVENT_DEFINITIONS_EDIT,
                                 RestPermissions.EVENT_NOTIFICATIONS_READ,
                                 RestPermissions.EVENT_NOTIFICATIONS_EDIT
-                                // TODO: Add missing collection permissions
                         )
                 ))
                 .put(Capability.OWN, CapabilityDescriptor.create(
@@ -86,29 +79,8 @@ public class BuiltinCapabilities {
                                 RestPermissions.EVENT_NOTIFICATIONS_READ,
                                 RestPermissions.EVENT_NOTIFICATIONS_EDIT,
                                 RestPermissions.EVENT_NOTIFICATIONS_DELETE
-                                // TODO: Add missing collection permissions
                         )
                 ))
-                /* TODO: Needs to be moved to the actual roles registry
-                .put(ROLE_COLLECTION_CREATOR, CapabilityDTO.create(
-                        grnRegistry.parse(ROLE_COLLECTION_CREATOR).entity(),
-                        "Collection Creator",
-                        // TODO this is an enterprise role, do we want pluggable roles?
-                        // TODO or another solution?
-                        // ImmutableSet.of(AdditionalRestPermissions.COLLECTION_CREATE)
-                        ImmutableSet.of("collections:create")
-                ))
-                .put(ROLE_DASHBOARD_CREATOR, CapabilityDTO.create(
-                        grnRegistry.parse(ROLE_DASHBOARD_CREATOR).entity(),
-                        "Dashboard Creator",
-                        ImmutableSet.of(RestPermissions.DASHBOARDS_CREATE)
-                ))
-                .put(ROLE_STREAM_CREATOR, CapabilityDTO.create(
-                        grnRegistry.parse(ROLE_STREAM_CREATOR).entity(),
-                        "Stream Creator",
-                        ImmutableSet.of(RestPermissions.STREAMS_CREATE)
-                ))
-                 */
                 .build();
     }
 

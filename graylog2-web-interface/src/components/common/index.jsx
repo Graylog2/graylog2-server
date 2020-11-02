@@ -18,6 +18,7 @@ export { default as EmptyResult } from './EmptyResult';
 export { default as EnterprisePluginNotFound } from './EnterprisePluginNotFound';
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
+export { default as ErrorAlert } from './ErrorAlert';
 export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExternalLink } from './ExternalLink';
