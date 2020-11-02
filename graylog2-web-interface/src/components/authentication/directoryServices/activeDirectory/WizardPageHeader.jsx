@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
 
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import DocumentationLink from 'components/support/DocumentationLink';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
@@ -39,8 +39,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
         Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                            text="documentation" />.
       </span>
-      <BackendOverviewLinks activeBackend={activeBackend}
-                            finishedLoading={finishedLoading} />
+      <AuthenticationOverviewLinks />
     </PageHeader>
   );
 };

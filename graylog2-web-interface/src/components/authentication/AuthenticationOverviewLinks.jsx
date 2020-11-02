@@ -5,7 +5,7 @@ import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Button } from 'components/graylog';
 
-const BackendOverviewLinks = () => (
+const AuthenticationOverviewLinks = () => (
   <ButtonToolbar className="pull-right">
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW}>
       <Button bsStyle="info">
@@ -21,4 +21,4 @@ const BackendOverviewLinks = () => (
   </ButtonToolbar>
 );
 
-export default BackendOverviewLinks;
+export default AuthenticationOverviewLinks;

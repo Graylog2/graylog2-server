@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
 import StringUtils from 'util/StringUtils';
@@ -13,7 +14,6 @@ import useActiveBackend from 'components/authentication/useActiveBackend';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import BackendDetailsActive from 'components/authentication/BackendDetailsActive';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 const _pageTitle = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
@@ -65,8 +65,7 @@ const AuthenticationPage = () => {
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
-          <BackendOverviewLinks activeBackend={activeBackend}
-                                finishedLoading={finishedLoading} />
+          <AuthenticationOverviewLinks />
         </PageHeader>
 
         {finishedLoading && activeBackend && (
