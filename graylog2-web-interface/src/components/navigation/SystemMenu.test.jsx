@@ -63,7 +63,7 @@ describe('SystemMenu', () => {
     permissions                    | count | links
     ${[]}                          | ${2}  | ${['Overview', 'Nodes']}
     ${['clusterconfigentry:read']} | ${3}  | ${['Configurations']}
-    ${['inputs:read']}             | ${3}  | ${['Inputs']}
+    ${['inputs:read']}             | ${4}  | ${['Inputs', 'Grok Patterns']}
     ${['outputs:read']}            | ${3}  | ${['Outputs']}
     ${['indices:read']}            | ${3}  | ${['Indices']}
     ${['loggers:read']}            | ${3}  | ${['Logging']}
@@ -71,7 +71,7 @@ describe('SystemMenu', () => {
     ${['users:list']}              | ${3}  | ${['Users and Teams']}
     ${['roles:read']}              | ${3}  | ${['Roles']}
     ${['dashboards:create', 'inputs:create', 'streams:create']} | ${4}  | ${['Content Packs']}
-    ${['inputs:edit']}             | ${5}  | ${['Grok Patterns', 'Lookup Tables', 'Sidecars']}
+    ${['inputs:edit']}             | ${4}  | ${['Lookup Tables', 'Sidecars']}
     ${['inputs:create']}           | ${3}  | ${['Pipelines']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
