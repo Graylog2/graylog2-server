@@ -49,10 +49,19 @@ const changeInput = async (input, value) => {
   await act(async () => { fireEvent.change(input, { target: { value, name } }); });
 };
 
+const defaultProps = {
+  disabled: false,
+  originalTimeRange: {
+    type: 'absolute',
+    from: '1955-5-11 06:15:00.000',
+    to: '1985-25-10 08:18:00.000',
+  },
+};
+
 describe('AbsoluteTimeRangeSelector', () => {
   it('does not try to parse an empty date in from field', async () => {
     const { getByDisplayValue } = renderWithForm((
-      <AbsoluteTimeRangeSelector />
+      <AbsoluteTimeRangeSelector {...defaultProps} />
     ));
     const fromDate = getByDisplayValue('2020-01-16 10:04:30.329');
 
@@ -63,7 +72,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
   it('does not try to parse an empty date in to field', async () => {
     const { getByDisplayValue } = renderWithForm((
-      <AbsoluteTimeRangeSelector />
+      <AbsoluteTimeRangeSelector {...defaultProps} />
     ));
     const toDate = getByDisplayValue('2020-01-16 12:04:30.329');
 
@@ -74,7 +83,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
   it('shows error message for from date if parsing fails after changing input', async () => {
     const { getByDisplayValue, queryByText } = renderWithForm((
-      <AbsoluteTimeRangeSelector />
+      <AbsoluteTimeRangeSelector {...defaultProps} />
     ));
 
     const fromDate = getByDisplayValue('2020-01-16 10:04:30.329');
@@ -86,7 +95,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
   it('shows error message for to date if parsing fails after changing input', async () => {
     const { getByDisplayValue, queryByText } = renderWithForm((
-      <AbsoluteTimeRangeSelector />
+      <AbsoluteTimeRangeSelector {...defaultProps} />
     ));
 
     const fromDate = getByDisplayValue('2020-01-16 12:04:30.329');
