@@ -16,7 +16,7 @@ import BackendDetailsActive from 'components/authentication/BackendDetailsActive
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-const _pageTilte = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
+const _pageTitle = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
   const pageName = 'Active Authentication Service';
 
   if (activeBackend) {
@@ -54,9 +54,9 @@ const AuthenticationPage = () => {
   }
 
   return (
-    <DocumentTitle title={_pageTilte(activeBackend, true)}>
+    <DocumentTitle title={_pageTitle(activeBackend, true)}>
       <>
-        <PageHeader title={_pageTilte(activeBackend)}
+        <PageHeader title={_pageTitle(activeBackend)}
                     subactions={(
                       <BackendActionLinks activeBackend={activeBackend}
                                           finishedLoading={finishedLoading} />

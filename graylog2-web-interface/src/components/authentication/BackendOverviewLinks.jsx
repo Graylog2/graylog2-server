@@ -1,26 +1,21 @@
 // @flow strict
 import * as React from 'react';
 
-import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Button } from 'components/graylog';
 
-type Props = {
-  activeBackend: ?AuthenticationBackend,
-  finishedLoading: boolean,
-};
-
-const BackendOverviewLinks = ({ activeBackend, finishedLoading }: Props) => (
+const BackendOverviewLinks = () => (
   <ButtonToolbar className="pull-right">
-    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}>
-      <Button bsStyle="info" disabled={!finishedLoading || !activeBackend}>
-        Active Service
-      </Button>
-    </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW}>
       <Button bsStyle="info">
-        All Services
+        Authentication Services
+      </Button>
+    </LinkContainer>
+    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW}>
+      <Button bsStyle="info"
+              type="button">
+        Authenticators
       </Button>
     </LinkContainer>
   </ButtonToolbar>

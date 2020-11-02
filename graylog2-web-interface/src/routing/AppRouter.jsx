@@ -17,6 +17,8 @@ import {
   AuthenticationBackendEditPage,
   AuthenticationOverviewPage,
   AuthenticationPage,
+  AuthenticatorsPage,
+  AuthenticatorsEditPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateContentPackPage,
@@ -254,6 +256,9 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')} component={AuthenticationBackendDetailsPage} />
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')} component={AuthenticationBackendEditPage} />
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')} component={AuthenticationBackendCreatePage} />
+
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW} component={AuthenticatorsPage} />
+                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT} component={AuthenticatorsEditPage} />
 
                         <Route exact path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
                         <Route exact path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />

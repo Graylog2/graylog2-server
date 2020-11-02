@@ -3,6 +3,7 @@ import Version from 'util/Version';
 class DocsHelper {
   PAGES = {
     ALERTS: 'streams/alerts.html',
+    AUTHENTICATORS: 'users_and_roles/external_auth.html',
     CLUSTER_STATUS_EXPLAINED: 'configuration/elasticsearch.html#cluster-status-explained',
     COLLECTOR: 'collector.html',
     COLLECTOR_SIDECAR: 'sidecar.html',
