@@ -5,14 +5,19 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 import { Input } from 'components/bootstrap';
-import { Col } from 'components/graylog';
 
 const Wrapper: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+  margin-bottom: 5px;
+
   && .form-group {
     margin-bottom: 0
   }
   .control-label {
     padding-top: 0;
+  }
+  .page-size-select {
+    display: flex;
+    align-items: baseline;
   }
 `;
 
@@ -27,11 +32,15 @@ type Props = {
 
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (
   <Wrapper className={`${className ?? ''} form-inline page-size pull-right`}>
-    <Col xs={12}>
-      <Input id="page-size" type="select" bsSize="small" label="Show" value={pageSize} onChange={onChange}>
-        {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
-      </Input>
-    </Col>
+    <Input id="page-size"
+           type="select"
+           bsSize="small"
+           label="Show"
+           value={pageSize}
+           onChange={onChange}
+           formGroupClassName="page-size-select">
+      {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
+    </Input>
   </Wrapper>
 );
 
