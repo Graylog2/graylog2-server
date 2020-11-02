@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mongojack.DBQuery;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -125,6 +126,22 @@ class PaginatedAuthzRolesServiceTest {
             assertThat(paginationInfo.page()).isEqualTo(1);
             assertThat(paginationInfo.perPage()).isEqualTo(10);
         });
+    }
+
+    @Test
+    void findByIds() {
+        final List<AuthzRoleDTO> roles = service.findByIds(ImmutableSet.of(
+                "5d41bb973086a840541a3ed2",
+                "564c6707c8306e079f718980"
+        ));
+
+        assertThat(roles).hasSize(2);
+
+        assertThat(roles.get(0).id()).isEqualTo("564c6707c8306e079f718980");
+        assertThat(roles.get(0).name()).isEqualTo("Reader");
+
+        assertThat(roles.get(1).id()).isEqualTo("5d41bb973086a840541a3ed2");
+        assertThat(roles.get(1).name()).isEqualTo("Alerts Manager");
     }
 
     @Test

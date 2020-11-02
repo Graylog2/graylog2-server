@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -117,6 +118,34 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         }
         final Object userId = userObject.get("_id");
         return userFactory.create((ObjectId) userId, userObject.toMap());
+    }
+
+    @Override
+    public List<User> loadByIds(Collection<String> ids) {
+        final HashSet<String> userIds = new HashSet<>(ids);
+        final List<User> users = new ArrayList<>();
+
+        // special case for the locally defined user, we don't store that in MongoDB.
+        if (!configuration.isRootUserDisabled() && userIds.stream().anyMatch(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID::equals)) {
+            // The local admin ID is not a valid ObjectId so we have to remove it from the query
+            userIds.remove(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID);
+            users.add(userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId()));
+        }
+
+        final DBObject query = new BasicDBObject();
+        query.put("_id", new BasicDBObject("$in", userIds.stream().map(ObjectId::new).collect(Collectors.toSet())));
+
+        final List<DBObject> result = query(UserImpl.class, query);
+        if (result == null || result.isEmpty()) {
+            return users;
+        }
+
+        for (final DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+
+        return users;
     }
 
     @Override

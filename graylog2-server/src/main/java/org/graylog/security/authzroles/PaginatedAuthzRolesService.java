@@ -31,6 +31,8 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
@@ -58,6 +60,10 @@ public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO>
         return StreamSupport.stream(docs.spliterator(), false)
                 .map(doc -> doc.get("_id", ObjectId.class).toHexString())
                 .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public List<AuthzRoleDTO> findByIds(Collection<String> ids) {
+        return asImmutableList(db.find(DBQuery.in("_id", ids)));
     }
 
     public PaginatedList<AuthzRoleDTO> findPaginated(SearchQuery searchQuery, int page,

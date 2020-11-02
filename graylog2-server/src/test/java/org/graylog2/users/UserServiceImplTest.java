@@ -53,6 +53,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -114,6 +115,44 @@ public class UserServiceImplTest {
         assertThat(user.getId()).isEqualTo("54e3deadbeefdeadbeef0001");
         assertThat(user.getName()).isEqualTo("user1");
         assertThat(user.getEmail()).isEqualTo("user1@example.com");
+    }
+
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testLoadByUserIds() throws Exception {
+        final List<User> users = userService.loadByIds(ImmutableSet.of(
+                "54e3deadbeefdeadbeef0001",
+                "54e3deadbeefdeadbeef0002",
+                UserImpl.LocalAdminUser.LOCAL_ADMIN_ID
+        ));
+
+        assertThat(users).hasSize(3);
+
+        assertThat(users.get(0).getId()).isEqualTo("local:admin");
+        assertThat(users.get(0).getName()).isEqualTo("admin");
+        assertThat(users.get(0).getEmail()).isEmpty();
+
+        assertThat(users.get(1).getId()).isEqualTo("54e3deadbeefdeadbeef0001");
+        assertThat(users.get(1).getName()).isEqualTo("user1");
+        assertThat(users.get(1).getEmail()).isEqualTo("user1@example.com");
+
+        assertThat(users.get(2).getId()).isEqualTo("54e3deadbeefdeadbeef0002");
+        assertThat(users.get(2).getName()).isEqualTo("user2");
+        assertThat(users.get(2).getEmail()).isEqualTo("user2@example.com");
+    }
+
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testLoadByUserIdsWithAdminOnly() throws Exception {
+        final List<User> users = userService.loadByIds(ImmutableSet.of(
+                UserImpl.LocalAdminUser.LOCAL_ADMIN_ID
+        ));
+
+        assertThat(users).hasSize(1);
+
+        assertThat(users.get(0).getId()).isEqualTo("local:admin");
+        assertThat(users.get(0).getName()).isEqualTo("admin");
+        assertThat(users.get(0).getEmail()).isEmpty();
     }
 
     @Test(expected = RuntimeException.class)

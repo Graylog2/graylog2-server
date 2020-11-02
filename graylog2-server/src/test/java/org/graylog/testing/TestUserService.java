@@ -70,6 +70,20 @@ public class TestUserService extends PersistedServiceImpl implements UserService
         return userFactory.create((ObjectId) userId, userObject.toMap());
     }
 
+    @Override
+    public List<User> loadByIds(Collection<String> ids) {
+        final DBObject query = new BasicDBObject("_id", new BasicDBObject("$in", ids));
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        final List<User> users = Lists.newArrayList();
+        for (DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+
+        return users;
+    }
+
     @Nullable
     @Override
     public User load(String username) {
