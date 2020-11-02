@@ -20,6 +20,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.shared.security.RestPermissions;
@@ -56,6 +58,7 @@ public class HTTPHeaderAuthenticationConfigResource {
     @PUT
     @ApiOperation("Update HTTP header authentication config")
     @RequiresPermissions(RestPermissions.AUTH_HTTP_HEADER_CONFIG_EDIT)
+    @AuditEvent(type = AuditEventTypes.AUTHENTICATION_HTTP_HEADER_CONFIG_UPDATE)
     public HTTPHeaderAuthConfig updateConfig(@Valid HTTPHeaderAuthConfig config) {
         clusterConfigService.write(config);
         return loadConfig();
