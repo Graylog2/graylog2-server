@@ -27,7 +27,7 @@ import com.mongodb.MongoException;
 import org.graylog.events.EventsModule;
 import org.graylog.freeenterprise.FreeEnterpriseConfiguration;
 import org.graylog.freeenterprise.FreeEnterpriseModule;
-import org.graylog.grn.GRNModule;
+import org.graylog.grn.GRNTypesModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -163,7 +163,7 @@ public class Server extends ServerBootstrap {
                 new JobSchedulerModule(),
                 new EventsModule(),
                 new FreeEnterpriseModule(),
-                new GRNModule(),
+                new GRNTypesModule(),
                 new SecurityModule()
         );
 
