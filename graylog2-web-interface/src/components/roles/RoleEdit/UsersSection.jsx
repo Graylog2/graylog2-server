@@ -4,8 +4,7 @@ import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
-import { Alert, Button } from 'components/graylog';
-import { Icon, PaginatedItemOverview } from 'components/common';
+import { ErrorAlert, PaginatedItemOverview } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import UserOverview from 'logic/users/UserOverview';
 import { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
@@ -65,16 +64,9 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       <Container>
         <UsersSelector onSubmit={_onAssignUser} role={role} />
       </Container>
-      { errors && (
-        <Container>
-          <Alert bsStyle="warning">
-            {errors}
-            <Button bsSize="xsmall" bsStyle="warning" className="pull-right" onClick={() => setErrors()}>
-              <Icon name="times" />
-            </Button>
-          </Alert>
-        </Container>
-      )}
+      <ErrorAlert onClose={setErrors}>
+        {errors}
+      </ErrorAlert>
       <h3>Selected Users</h3>
       <Container>
         <PaginatedItemOverview noDataText="No selected users have been found."
