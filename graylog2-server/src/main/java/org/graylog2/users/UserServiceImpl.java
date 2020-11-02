@@ -137,7 +137,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         final List<DBObject> result = query(UserImpl.class, query);
         if (result == null || result.isEmpty()) {
-            return Collections.emptyList();
+            return users;
         }
 
         for (final DBObject dbObject : result) {

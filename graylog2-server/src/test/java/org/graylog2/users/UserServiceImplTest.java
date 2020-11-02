@@ -141,6 +141,20 @@ public class UserServiceImplTest {
         assertThat(users.get(2).getEmail()).isEqualTo("user2@example.com");
     }
 
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testLoadByUserIdsWithAdminOnly() throws Exception {
+        final List<User> users = userService.loadByIds(ImmutableSet.of(
+                UserImpl.LocalAdminUser.LOCAL_ADMIN_ID
+        ));
+
+        assertThat(users).hasSize(1);
+
+        assertThat(users.get(0).getId()).isEqualTo("local:admin");
+        assertThat(users.get(0).getName()).isEqualTo("admin");
+        assertThat(users.get(0).getEmail()).isEmpty();
+    }
+
     @Test(expected = RuntimeException.class)
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadDuplicateUser() throws Exception {
