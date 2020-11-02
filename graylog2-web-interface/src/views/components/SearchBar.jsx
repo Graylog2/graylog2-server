@@ -16,7 +16,6 @@
  */
 // @flow strict
 import * as React from 'react';
-import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
