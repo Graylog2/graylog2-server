@@ -7,6 +7,7 @@ import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 
 import formatNumber from './FormatNumber';
+import isNumeric from './IsNumeric';
 
 export type HighlightRange = {|
   start: number,
@@ -30,11 +31,9 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   }
 
   if (!highlightRanges || !highlightRanges[field]) {
-    const parsedNumber = Number.parseFloat(value);
-
-    return Number.isNaN(parsedNumber)
-      ? value
-      : formatNumber(parsedNumber);
+    return isNumeric(value)
+      ? formatNumber(value)
+      : value;
   }
 
   const style = {
