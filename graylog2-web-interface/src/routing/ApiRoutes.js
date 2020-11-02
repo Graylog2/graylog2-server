@@ -112,6 +112,10 @@ const ApiRoutes = {
     update: (entityGRN) => { return { url: `/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username) => { return { url: `/shares/user/${username}` }; },
   },
+  HTTPHeaderAuthConfigController: {
+    load: () => ({ url: '/system/authentication/http-header-auth-config' }),
+    update: () => ({ url: '/system/authentication/http-header-auth-config' }),
+  },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },
     name: () => { return { url: '/system/indexer/cluster/name' }; },
