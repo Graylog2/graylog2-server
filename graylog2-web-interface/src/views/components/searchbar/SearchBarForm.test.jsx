@@ -29,11 +29,12 @@ describe('SearchBarForm', () => {
         queryString: '*',
         streams: [],
       };
+      const originalTimeRange = { from: '1955-05-10 06:15:00.000', to: '1985-25-11 08:18:00.000' };
 
       const { asFragment } = render(
         <SearchBarForm onSubmit={() => {}}
                        initialValues={initialValues}>
-          <AbsoluteTimeRangeSelector />
+          <AbsoluteTimeRangeSelector originalTimeRange={originalTimeRange} />
         </SearchBarForm>,
       );
 
