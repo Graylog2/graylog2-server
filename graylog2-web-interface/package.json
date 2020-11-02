@@ -175,7 +175,7 @@
     "jest-styled-components": "7.0.2",
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
-    "less-loader": "^4.1.0",
+    "less-loader": "^7.0.2",
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^2.1.1",
     "react-select-event": "^5.0.0",
