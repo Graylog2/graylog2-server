@@ -5,6 +5,7 @@ import { last, sortBy } from 'lodash';
 
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
+import { isFunction } from 'views/logic/aggregationbuilder/Series';
 
 import formatNumber from './FormatNumber';
 import isNumeric from './IsNumeric';
@@ -25,13 +26,26 @@ type Props = {
   highlightRanges: Ranges,
 };
 
+function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
+  if (ranges.length !== 1) {
+    return false;
+  }
+
+  const { start, length } = ranges[0];
+  const stringifiedValue = StringUtils.stringify(value);
+
+  return start === 0 && length === stringifiedValue.length;
+}
+
+const shouldBeFormatted = (field, value) => isFunction(field) && isNumeric(value);
+
 const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {} }: Props) => {
   if (value === undefined || value == null) {
     return '';
   }
 
   if (!highlightRanges || !highlightRanges[field]) {
-    return isNumeric(value)
+    return shouldBeFormatted(field, value)
       ? formatNumber(value)
       : value;
   }
@@ -39,6 +53,14 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   const style = {
     backgroundColor: color,
   };
+
+  if (highlightCompleteValue(highlightRanges[field], value)) {
+    const formattedValue = shouldBeFormatted(field, value)
+      ? formatNumber(value)
+      : value;
+
+    return highlight(formattedValue, 0, style);
+  }
 
   // Ensure the field is a string for later processing
   const origValue = StringUtils.stringify(value);
