@@ -344,4 +344,25 @@ describe('<Sidebar />', () => {
 
     expect(wrapper.find('SearchResultOverview')).not.toExist();
   });
+
+  it('should close an active section when clicking on its navigation item', () => {
+    const wrapper = mount(
+      <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
+               toggleOpen={jest.fn}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>,
+    );
+
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    wrapper.find('div[aria-label="Create"]').simulate('click');
+
+    expect(wrapper.find('h2').text()).toBe('Create');
+
+    wrapper.find('div[aria-label="Create"]').simulate('click');
+
+    expect(wrapper.find('h2')).not.toExist();
+  });
 });

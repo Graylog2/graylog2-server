@@ -11,7 +11,7 @@ import { type SidebarSection } from './sidebarSections';
 type Props = {
   activeSection: ?SidebarSection,
   sections: Array<SidebarSection>,
-  setActiveSectionKey: (sectionKey: string) => void,
+  selectSidebarSection: (sectionKey: string) => void,
   sidebarIsPinned: boolean,
   toggleSidebar: () => void,
 };
@@ -58,7 +58,7 @@ const HorizontalRuleWrapper = styled.div`
   }
 `;
 
-const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, sidebarIsPinned, toggleSidebar }: Props) => {
+const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, sidebarIsPinned, toggleSidebar }: Props) => {
   const toggleIcon = activeSection ? 'chevron-left' : 'chevron-right';
   const activeSectionKey = activeSection?.key;
 
@@ -74,7 +74,7 @@ const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, sideb
         {sections.map(({ key, icon, title }) => (
           <NavItem isSelected={activeSectionKey === key}
                    icon={icon}
-                   onClick={() => setActiveSectionKey(key)}
+                   onClick={() => selectSidebarSection(key)}
                    key={key}
                    title={title}
                    sidebarIsPinned={sidebarIsPinned} />
