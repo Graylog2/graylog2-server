@@ -61,6 +61,7 @@ const _assignRole = (selectedRoleName, roles, onSubmit, setSelectedRoleName, set
     return;
   }
 
+  setError();
   setIsSubmitting(true);
 
   onSubmit(selectedRoles).then(() => {

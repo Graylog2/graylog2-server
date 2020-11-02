@@ -94,6 +94,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
       return;
     }
 
+    setError();
     onSubmit(userOverview).then(() => { resetForm(); });
   };
 
