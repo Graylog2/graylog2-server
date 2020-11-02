@@ -1,4 +1,9 @@
 module.exports = {
+  parser: 'babel-eslint',
+  env: {
+    browser: true,
+    jest: true,
+  },
   extends: [
     'eslint:recommended',
     'airbnb',
@@ -100,5 +105,12 @@ module.exports = {
       },
     ],
     'flowtype/semi': [2, 'always'],
+  },
+  settings: {
+    'import/resolver': {
+      webpack: {
+        config: './webpack.config.js',
+      },
+    },
   },
 };
