@@ -55,6 +55,7 @@ const CustomOption = (optionRenderer: (Option) => React.Node) => (
 /* eslint-enable react/prop-types */
 
 const CustomSingleValue = (valueRenderer: (Option) => React.Node) => (
+  // eslint-disable-next-line react/prop-types
   ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
 );
 
