@@ -9,7 +9,6 @@ import {} from 'components/authentication/bindings'; // Bind all authentication 
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import useActiveBackend from 'components/authentication/useActiveBackend';
 import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -22,7 +21,7 @@ type Props = {
   },
 };
 
-const _pageTilte = (authBackendTitle, returnString) => {
+const _pageTitle = (authBackendTitle, returnString) => {
   const pageName = 'Authentication Service Details';
   const backendTitle = StringUtils.truncateWithEllipses(authBackendTitle, 30);
 
@@ -35,7 +34,6 @@ const _pageTilte = (authBackendTitle, returnString) => {
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   const [authBackend, setAuthBackend] = useState();
-  const { finishedLoading, activeBackend } = useActiveBackend();
 
   useEffect(() => {
     AuthenticationDomain.load(backendId).then((response) => setAuthBackend(response.backend));
@@ -46,9 +44,9 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   }
 
   return (
-    <DocumentTitle title={_pageTilte(authBackend.title, true)}>
+    <DocumentTitle title={_pageTitle(authBackend.title, true)}>
       <>
-        <PageHeader title={_pageTilte(authBackend.title)}
+        <PageHeader title={_pageTitle(authBackend.title)}
                     subactions={(
                       <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
                         <Button bsStyle="success"

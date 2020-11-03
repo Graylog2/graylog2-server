@@ -20,7 +20,6 @@ const HTTPHeaderAuthConfigSection = () => {
     setSubmitError();
 
     return HTTPHeaderAuthConfigDomain.update(data).then(() => {
-      console.log('nable single sign-o');
       history.push(Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW);
     }).catch((error) => {
       setSubmitError(error.additional?.res?.text);
