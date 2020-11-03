@@ -8,7 +8,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 
 const HTTPHeaderAuthConfigSection = () => {
   const [loadedConfig, setLoadedConfig] = useState();
-  const sectionTitle = 'Single Sign-On';
+  const sectionTitle = 'Trusted Header Authentication';
 
   useEffect(() => {
     HTTPHeaderAuthConfigDomain.load().then(setLoadedConfig);
@@ -24,6 +24,7 @@ const HTTPHeaderAuthConfigSection = () => {
 
   return (
     <SectionComponent title={sectionTitle}>
+      <p>This authenticator enables you to login a user, based on a HTTP header without further interaction.</p>
       <ReadOnlyFormGroup label="Enabled" value={loadedConfig.enabled} />
       <ReadOnlyFormGroup label="Username header" value={loadedConfig.usernameHeader} />
     </SectionComponent>

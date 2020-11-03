@@ -14,7 +14,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 const HTTPHeaderAuthConfigSection = () => {
   const [submitError, setSubmitError] = useState<?string>();
   const [loadedConfig, setLoadedConfig] = useState();
-  const sectionTitle = 'Single Sign-On';
+  const sectionTitle = 'Trusted Header Authentication';
 
   const _onSubmit = (data) => {
     setSubmitError();
@@ -40,6 +40,7 @@ const HTTPHeaderAuthConfigSection = () => {
 
   return (
     <SectionComponent title={sectionTitle}>
+      <p>This authenticator enables you to login a user, based on a HTTP header without further interaction.</p>
       <Formik onSubmit={_onSubmit}
               initialValues={loadedConfig.toJSON()}>
         {({ isSubmitting, isValid }) => (

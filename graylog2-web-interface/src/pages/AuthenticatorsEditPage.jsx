@@ -12,7 +12,7 @@ const AuthenticatorsEditPage = () => (
   <DocumentTitle title="Edit Authenticators">
     <PageHeader title="Edit Authenticators" subactions={<AuthenticatorActionLinks />}>
       <span>
-        Configure the single sign-on authenticator.
+        Configure the trusted header authentication.
       </span>
 
       <span>
