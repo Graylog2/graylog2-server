@@ -3,6 +3,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Formik, Form } from 'formik';
 
+import Routes from 'routing/Routes';
+import history from 'util/History';
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 import { Input } from 'components/bootstrap';
 import { Button, Col, Row, Alert } from 'components/graylog';
@@ -17,7 +19,10 @@ const HTTPHeaderAuthConfigSection = () => {
   const _onSubmit = (data) => {
     setSubmitError();
 
-    return HTTPHeaderAuthConfigDomain.update(data).catch((error) => {
+    return HTTPHeaderAuthConfigDomain.update(data).then(() => {
+      console.log('nable single sign-o');
+      history.push(Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW);
+    }).catch((error) => {
       setSubmitError(error.additional?.res?.text);
     });
   };

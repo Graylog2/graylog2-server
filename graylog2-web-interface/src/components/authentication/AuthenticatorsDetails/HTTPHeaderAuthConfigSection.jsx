@@ -24,7 +24,7 @@ const HTTPHeaderAuthConfigSection = () => {
 
   return (
     <SectionComponent title={sectionTitle}>
-      <ReadOnlyFormGroup label="Enable single sign-on via HTTP header" value={loadedConfig.enabled} />
+      <ReadOnlyFormGroup label="Enabled" value={loadedConfig.enabled} />
       <ReadOnlyFormGroup label="Username header" value={loadedConfig.usernameHeader} />
     </SectionComponent>
   );
