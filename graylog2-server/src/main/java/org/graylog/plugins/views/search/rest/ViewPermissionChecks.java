@@ -38,20 +38,20 @@ public class ViewPermissionChecks {
         this.isViewSharedForUser = isViewSharedForUser;
     }
 
-    boolean allowedToSeeSavedSearch(User user, ViewDTO savedSearch, BiPredicate<String, String> isPermitted) {
+    public boolean allowedToSeeSavedSearch(User user, ViewDTO savedSearch, BiPredicate<String, String> isPermitted) {
         return isPermitted.test(ViewsRestPermissions.VIEW_READ, savedSearch.id())
                 || ownsView(user, savedSearch)
                 || isSharedWithUser(user, savedSearch);
     }
 
-    boolean allowedToSeeDashboard(User user, ViewDTO dashboard, BiPredicate<String, String> isPermitted) {
+    public boolean allowedToSeeDashboard(User user, ViewDTO dashboard, BiPredicate<String, String> isPermitted) {
         return isPermitted.test(ViewsRestPermissions.VIEW_READ, dashboard.id())
                 || isPermitted.test(RestPermissions.DASHBOARDS_READ, dashboard.id())
                 || ownsView(user, dashboard)
                 || isSharedWithUser(user, dashboard);
     }
 
-    boolean allowedToSeeView(User user, ViewDTO view, BiPredicate<String, String> isPermitted) {
+    public boolean allowedToSeeView(User user, ViewDTO view, BiPredicate<String, String> isPermitted) {
         return isDashboard(view)
                 ? allowedToSeeDashboard(user, view, isPermitted)
                 : allowedToSeeSavedSearch(user, view, isPermitted);
