@@ -16,29 +16,11 @@
  */
 package org.graylog.grn;
 
-import org.graylog.grn.providers.EventDefinitionGRNDescriptorProvider;
-import org.graylog.grn.providers.EventNotificationGRNDescriptorProvider;
-import org.graylog.grn.providers.ViewGRNDescriptorProvider;
-import org.graylog.grn.providers.FallbackGRNDescriptorProvider;
-import org.graylog.grn.providers.StreamGRNDescriptorProvider;
-import org.graylog.grn.providers.UserGRNDescriptorProvider;
 import org.graylog2.plugin.PluginModule;
 
 public class GRNModule extends PluginModule {
     @Override
     protected void configure() {
         bind(GRNRegistry.class).toInstance(GRNRegistry.createWithBuiltinTypes());
-
-        // TODO: Implement missing GRN descriptor providers
-        addGRNType(GRNTypes.BUILTIN_TEAM, FallbackGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.COLLECTION, FallbackGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.DASHBOARD, ViewGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.EVENT_DEFINITION, EventDefinitionGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.EVENT_NOTIFICATION, EventNotificationGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.GRANT, FallbackGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.ROLE, FallbackGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.SEARCH, ViewGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.STREAM, StreamGRNDescriptorProvider.class);
-        addGRNType(GRNTypes.USER, UserGRNDescriptorProvider.class);
     }
 }
