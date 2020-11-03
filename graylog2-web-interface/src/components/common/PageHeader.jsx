@@ -21,6 +21,16 @@ const H1 = styled.h1`
   margin-bottom: 0.2em;
 `;
 
+const ActionsSM = styled.div`
+  > * {
+    display: inline-block;
+    vertical-align: top;
+  }
+  > :not(:last-child) {
+    margin-right: 5px;
+  }
+`;
+
 const LIFECYCLE_DEFAULT_MESSAGES = {
   experimental: 'This Graylog feature is new and should be considered experimental.',
   legacy: 'This feature has been discontinued and will be removed in a future Graylog version.',
@@ -126,7 +136,7 @@ class PageHeader extends React.Component<Props> {
             )}
 
             {subactions && (
-              <div className="pull-right">
+              <div className="pull-right visible-lg visible-md">
                 {subactions}
               </div>
             )}
@@ -134,7 +144,9 @@ class PageHeader extends React.Component<Props> {
 
           {children[2] && (
             <Col sm={12} lgHidden mdHidden className="actions-sm">
-              {children[2]}
+              <ActionsSM>
+                {children[2]}{subactions}
+              </ActionsSM>
             </Col>
           )}
         </ContentHeadRow>
