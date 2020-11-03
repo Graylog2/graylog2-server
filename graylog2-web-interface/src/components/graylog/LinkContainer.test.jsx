@@ -2,8 +2,8 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { fireEvent } from '@testing-library/dom';
 
-import history from 'util/History';
 import { Button } from 'components/graylog';
+import history from 'util/History';
 
 import { LinkContainer } from './router';
 
@@ -52,6 +52,21 @@ describe('LinkContainer', () => {
     fireEvent.click(button);
 
     expect(onClick).toHaveBeenCalled();
+  });
+
+  it('should not call onClick of children for ctrl+click', async () => {
+    const onClick = jest.fn();
+    const { findByText } = render((
+      <LinkContainer to="/">
+        <Button bsStyle="info" onClick={onClick}>All Alerts</Button>
+      </LinkContainer>
+    ));
+
+    const button = await findByText('All Alerts');
+
+    fireEvent.click(button, { ctrlKey: true });
+
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it('should add target URL as href to children', async () => {
