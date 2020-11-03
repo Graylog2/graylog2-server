@@ -31,8 +31,6 @@ public class RestPermissions implements PluginPermissions {
      * These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
-    public static final String AUTHENTICATION_READ = "authentication:read";
-    public static final String AUTHENTICATION_EDIT = "authentication:edit";
     public static final String AUTH_SERVICE_BACKEND_CREATE = "authservicebackend:create";
     public static final String AUTH_SERVICE_BACKEND_DELETE = "authservicebackend:delete";
     public static final String AUTH_SERVICE_BACKEND_EDIT = "authservicebackend:edit";
@@ -93,9 +91,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String JOURNAL_READ = "journal:read";
     public static final String JVMSTATS_READ = "jvmstats:read";
     public static final String LBSTATUS_CHANGE = "lbstatus:change";
-    public static final String LDAP_EDIT = "ldap:edit";
-    public static final String LDAPGROUPS_EDIT = "ldapgroups:edit";
-    public static final String LDAPGROUPS_READ = "ldapgroups:read";
     public static final String LOOKUP_TABLES_CREATE = "lookuptables:create";
     public static final String LOOKUP_TABLES_DELETE = "lookuptables:delete";
     public static final String LOOKUP_TABLES_EDIT = "lookuptables:edit";
@@ -161,8 +156,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String ENTITY_OWN = "entity:own";
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
-            .add(create(AUTHENTICATION_EDIT, ""))
-            .add(create(AUTHENTICATION_READ, ""))
             .add(create(AUTH_SERVICE_BACKEND_CREATE, ""))
             .add(create(AUTH_SERVICE_BACKEND_DELETE, ""))
             .add(create(AUTH_SERVICE_BACKEND_EDIT, ""))
@@ -221,9 +214,6 @@ public class RestPermissions implements PluginPermissions {
             .add(create(JOURNAL_READ, ""))
             .add(create(JVMSTATS_READ, ""))
             .add(create(LBSTATUS_CHANGE, ""))
-            .add(create(LDAP_EDIT, ""))
-            .add(create(LDAPGROUPS_EDIT, ""))
-            .add(create(LDAPGROUPS_READ, ""))
             .add(create(LOOKUP_TABLES_CREATE, ""))
             .add(create(LOOKUP_TABLES_DELETE, ""))
             .add(create(LOOKUP_TABLES_EDIT, ""))

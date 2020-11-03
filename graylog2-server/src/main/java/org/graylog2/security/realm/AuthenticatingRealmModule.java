@@ -38,15 +38,10 @@ public class AuthenticatingRealmModule extends Graylog2Module {
     protected void configure() {
         final MapBinder<String, AuthenticatingRealm> auth = authenticationRealmBinder();
 
-        // TODO: Remove this before 4.0 - only kept to be able to test the old code
-        //bind(OrderedAuthenticatingRealms.class).to(DynamicOrderedAuthenticatingRealms.class).in(Scopes.SINGLETON);
         bind(OrderedAuthenticatingRealms.class).to(StaticOrderedAuthenticatingRealms.class).in(Scopes.SINGLETON);
 
         add(auth, AccessTokenAuthenticator.NAME, AccessTokenAuthenticator.class);
         add(auth, RootAccountRealm.NAME, RootAccountRealm.class);
-        // TODO: Remove this before 4.0 - only kept to be able to test the old code
-        //add(auth, LdapUserAuthenticator.NAME, LdapUserAuthenticator.class);
-        //add(auth, PasswordAuthenticator.NAME, PasswordAuthenticator.class);
         add(auth, SessionAuthenticator.NAME, SessionAuthenticator.class);
         add(auth, AuthServiceRealm.NAME, AuthServiceRealm.class);
     }
