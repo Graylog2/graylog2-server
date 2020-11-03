@@ -19,6 +19,8 @@ package org.graylog.security.authservice;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.eventbus.EventBus;
+import org.graylog.security.events.ActiveAuthServiceBackendChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import javax.annotation.Nullable;
@@ -30,16 +32,19 @@ import static java.util.Objects.requireNonNull;
 
 public class GlobalAuthServiceConfig {
     private final ClusterConfigService clusterConfigService;
+    private final EventBus eventBus;
     private final DBAuthServiceBackendService dbService;
     private final Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories;
     private final AuthServiceBackend defaultBackend;
 
     @Inject
     public GlobalAuthServiceConfig(ClusterConfigService clusterConfigService,
+                                   EventBus eventBus,
                                    DBAuthServiceBackendService dbService,
                                    Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories,
                                    @InternalAuthServiceBackend AuthServiceBackend defaultBackend) {
         this.clusterConfigService = clusterConfigService;
+        this.eventBus = eventBus;
         this.dbService = dbService;
         this.backendFactories = backendFactories;
         this.defaultBackend = requireNonNull(defaultBackend, "defaultBackend cannot be null");
@@ -76,7 +81,16 @@ public class GlobalAuthServiceConfig {
     }
 
     public Data updateConfiguration(Data updatedData) {
+        final String currentActiveBackend = getConfiguration().activeBackend().orElse(null);
+
         clusterConfigService.write(updatedData);
+
+        updatedData.activeBackend().ifPresent(newActiveBackend -> {
+            if (!newActiveBackend.equals(currentActiveBackend)) {
+                eventBus.post(ActiveAuthServiceBackendChangedEvent.create(newActiveBackend));
+            }
+        });
+
         return requireNonNull(clusterConfigService.get(Data.class), "updated configuration cannot be null");
     }
 
