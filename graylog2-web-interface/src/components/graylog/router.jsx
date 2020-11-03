@@ -30,11 +30,19 @@ type Props = {
   to: string | HistoryElement,
 };
 
+const isLeftClickEvent = (e) => (e.button === 0);
+
+const isModifiedEvent = (e) => !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
+
 const LinkContainer = ({ children, onClick, to, ...rest }: Props) => {
   const { pathname } = useLocation();
   const { props: { onClick: childrenOnClick, className }, type: { displayName } } = React.Children.only(children);
   const childrenClassName = useMemo(() => _setActiveClassName(pathname, to, className, displayName), [pathname, to, className, displayName]);
   const _onClick = useCallback((e) => {
+    if (!isLeftClickEvent(e) || isModifiedEvent(e)) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
 
