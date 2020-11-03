@@ -23,7 +23,6 @@ import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
 
 import type { CurrentViewType } from '../../CustomPropTypes';
-import AggregationWidgetConfig from '../../../logic/aggregationbuilder/AggregationWidgetConfig';
 
 const GridContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   display: grid;
