@@ -59,11 +59,11 @@ public class UserContext {
         public UserContext create() throws UserContextMissingException {
             try {
                 final Subject subject = SecurityUtils.getSubject();
-                final Object username = subject.getPrincipal();
-                if (!(username instanceof String)) {
-                    throw new UserContextMissingException("Unknown SecurityContext class <" + username + ">, cannot continue.");
+                final Object userId = subject.getPrincipal();
+                if (!(userId instanceof String)) {
+                    throw new UserContextMissingException("Unknown SecurityContext class <" + userId + ">, cannot continue.");
                 }
-                return new UserContext((String) username, subject, userService);
+                return new UserContext((String) userId, subject, userService);
             } catch (IllegalStateException | UnavailableSecurityManagerException e) {
                 throw new UserContextMissingException("Cannot retrieve current subject, SecurityContext isn't set.");
             }
