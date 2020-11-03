@@ -61,10 +61,10 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 
-@Path("shares")
+@Path("/authz/shares")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Permissions/Sharing", description = "Manage share permissions on entities")
+@Api(value = "Authorization/Shares", description = "Manage share permissions on entities")
 @RequiresAuthentication
 public class EntitySharesResource extends RestResourceWithOwnerCheck {
     private static final Logger LOG = LoggerFactory.getLogger(EntitySharesResource.class);
