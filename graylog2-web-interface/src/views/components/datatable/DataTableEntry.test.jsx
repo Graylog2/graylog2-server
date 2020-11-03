@@ -15,7 +15,9 @@ import EmptyValue from '../EmptyValue';
 
 jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
-const fields = OrderedSet(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
+const f = (source: string, field: string = source): {| field: string, source: string |} => ({ field, source });
+const createFields = (fields: Array<string>) => OrderedSet(fields.map((field) => f(field)));
+const fields = createFields(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
 const item = {
   nf_dst_address: '192.168.1.24',
   nf_proto_name: {
@@ -114,7 +116,7 @@ describe('DataTableEntry', () => {
   });
 
   it('does not render `Empty Value` for deduplicated values', () => {
-    const fieldsWithDeduplicatedValues = OrderedSet(['nf_dst_address', 'nf_dst_port']);
+    const fieldsWithDeduplicatedValues = createFields(['nf_dst_address', 'nf_dst_port']);
     const itemWithDeduplicatedValues = {
       nf_dst_port: 443,
     };
@@ -160,7 +162,7 @@ describe('DataTableEntry', () => {
       const itemWithRenamedSeries = {
         'Last Timestamp': 1554106041841,
       };
-      const fieldsWithRenamedSeries = OrderedSet(['Last Timestamp']);
+      const fieldsWithRenamedSeries = OrderedSet([f('max(timestamp)', 'Last Timestamp')]);
 
       const wrapper = mount((
         <table>
@@ -174,7 +176,7 @@ describe('DataTableEntry', () => {
                           valuePath={[]} />
         </table>
       ));
-      const valueFields = wrapper.find('Value[field="Last Timestamp"]');
+      const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
       expect(valueFields).toHaveLength(1);
 
@@ -197,7 +199,12 @@ describe('DataTableEntry', () => {
         'Last Timestamp': 1554106041841,
         'card(timestamp)': 20,
       };
-      const fieldsWithRenamedSeries = OrderedSet(['nf_dst_address', 'count()', 'Last Timestamp', 'card(timestamp)']);
+      const fieldsWithRenamedSeries = OrderedSet([
+        f('nf_dst_address'),
+        f('count()'),
+        f('max(timestamp)', 'Last Timestamp'),
+        f('card(timestamp)'),
+      ]);
 
       const wrapper = mount((
         <table>
@@ -211,7 +218,7 @@ describe('DataTableEntry', () => {
                           valuePath={valuePath} />
         </table>
       ));
-      const valueFields = wrapper.find('Value[field="Last Timestamp"]');
+      const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
       expect(valueFields).toHaveLength(3);
 

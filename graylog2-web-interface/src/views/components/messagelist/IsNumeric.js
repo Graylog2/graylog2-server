@@ -1,6 +1,6 @@
 // @flow strict
 
-const isNumeric = (str: any): %checks => {
+const isNumeric = (str: any) => {
   if (typeof str === 'number') return true;
   if (typeof str !== 'string') return false;
 

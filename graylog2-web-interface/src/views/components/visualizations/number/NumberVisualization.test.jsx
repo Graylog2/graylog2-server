@@ -6,10 +6,10 @@ import { List } from 'immutable';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Series from 'views/logic/aggregationbuilder/Series';
 
 import NumberVisualization from './NumberVisualization';
-
-import AggregationWidgetConfig from '../../../logic/aggregationbuilder/AggregationWidgetConfig';
 
 jest.mock('react-sizeme', () => ({
   SizeMe: ({ children: fn }) => fn({ size: { width: 320, height: 240 } }),
@@ -64,7 +64,9 @@ describe('NumberVisualization', () => {
                            to: '2020-01-10T14:23:42.000Z',
                            type: 'absolute',
                          }}
-                         config={AggregationWidgetConfig.builder().build()}
+                         config={AggregationWidgetConfig.builder()
+                           .series([Series.forFunction('count()')])
+                           .build()}
                          {...props} />
   );
 
