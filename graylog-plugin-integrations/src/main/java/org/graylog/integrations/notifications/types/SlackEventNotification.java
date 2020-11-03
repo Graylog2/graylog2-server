@@ -35,12 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
@@ -67,13 +64,13 @@ public class SlackEventNotification implements EventNotification {
 								  ObjectMapper objectMapper,
 								  Engine templateEngine,
 								  NotificationService notificationService,
-								  NodeId nodeId, SlackClient slackCLient){
+								  NodeId nodeId, SlackClient slackClient){
 		this.notificationCallbackService = notificationCallbackService;
 		this.objectMapper = requireNonNull(objectMapper);
 		this.templateEngine = requireNonNull(templateEngine);
 		this.notificationService = requireNonNull(notificationService);
 		this.nodeId = requireNonNull(nodeId);
-		this.slackClient = requireNonNull(slackCLient);
+		this.slackClient = requireNonNull(slackClient);
 	}
 
 	/**
