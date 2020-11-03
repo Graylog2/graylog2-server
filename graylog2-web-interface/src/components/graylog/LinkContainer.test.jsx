@@ -1,9 +1,9 @@
-import history from 'util/History';
-
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { fireEvent } from '@testing-library/dom';
+
 import { Button } from 'components/graylog';
+simport history from 'util/History';
 
 import { LinkContainer } from './router';
 
