@@ -24,7 +24,7 @@ const RuleForm = ({ create }) => {
   };
 
   const handleApply = () => {
-    handleSavePipelineRule();
+    handleSavePipelineRule((rule) => { history.push(Routes.SYSTEM.PIPELINES.RULE(rule.id)); });
   };
 
   const handleDescriptionChange = (event) => {

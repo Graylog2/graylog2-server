@@ -53,7 +53,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
       promise = RulesActions.save.triggerPromise(nextRule);
     }
 
-    promise.then(() => callback());
+    promise.then((response) => callback(response));
   };
 
   const handleSavePipelineRule = (callback = () => {}) => {
@@ -88,7 +88,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
         }, 500);
       });
     }
-  }, [ruleSourceRef.current]);
+  }, [validateNewRule]);
 
   return (
     <PipelineRulesContext.Provider value={{
