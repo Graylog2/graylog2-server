@@ -1,6 +1,6 @@
 // @flow strict
 
-import filterMenuItems, { filterCloudMenuItem } from './filterMenuItems';
+import filterMenuItems, { filterCloudMenuItems } from './filterMenuItems';
 
 describe('filterMenuItems', () => {
   it('should filter items by path', () => {
@@ -13,18 +13,6 @@ describe('filterMenuItems', () => {
       { path: 'something', name: 'something' },
     ]);
   });
-
-  it('should not filter items when specified', () => {
-    const items = [
-      { path: 'something', name: 'something' },
-      { path: 'delete-me', name: 'delete me' },
-    ];
-
-    expect(filterMenuItems(items, ['delete-me'], false)).toEqual([
-      { path: 'something', name: 'something' },
-      { path: 'delete-me', name: 'delete me' },
-    ]);
-  });
 });
 
 describe('filterCloudMenuItem', () => {
@@ -34,7 +22,7 @@ describe('filterCloudMenuItem', () => {
       { path: 'delete-me', name: 'delete me' },
     ];
 
-    expect(filterCloudMenuItem(items, ['delete-me'])).toEqual([
+    expect(filterCloudMenuItems(items, ['delete-me'])).toEqual([
       { path: 'something', name: 'something' },
       { path: 'delete-me', name: 'delete me' },
     ]);
@@ -48,7 +36,7 @@ describe('filterCloudMenuItem', () => {
       { path: 'delete-me', name: 'delete me' },
     ];
 
-    expect(filterCloudMenuItem(items, ['delete-me'])).toEqual([
+    expect(filterCloudMenuItems(items, ['delete-me'])).toEqual([
       { path: 'something', name: 'something' },
     ]);
 
