@@ -1,13 +1,13 @@
 // @flow strict
 import Reflux from 'reflux';
-import HTTPHeaderAuthConfigActions from 'actions/authentication/HTTPHeaderAuthConfigActions';
 
+import HTTPHeaderAuthConfigActions from 'actions/authentication/HTTPHeaderAuthConfigActions';
 import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'views/logic/singleton';
-import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
+import HTTPHeaderAuthConfig, { type HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 
 const HTTPHeaderAuthConfigStore: Store<{}> = singletonStore(
   'HTTPHeaderAuthConfig',
@@ -23,7 +23,7 @@ const HTTPHeaderAuthConfigStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    update(payload: HTTPHeaderAuthConfig): Promise<HTTPHeaderAuthConfig> {
+    update(payload: HTTPHeaderAuthConfigJSON): Promise<HTTPHeaderAuthConfig> {
       const url = qualifyUrl(ApiRoutes.HTTPHeaderAuthConfigController.update().url);
       const promise = fetch('PUT', url, payload).then(HTTPHeaderAuthConfig.fromJSON);
 

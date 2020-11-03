@@ -2,12 +2,12 @@
 import Reflux from 'reflux';
 
 import type { RefluxActions } from 'stores/StoreTypes';
-import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
+import HTTPHeaderAuthConfig, { type HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 import { singletonActions } from 'views/logic/singleton';
 
 export type ActionsType = {
   load: () => Promise<HTTPHeaderAuthConfig>,
-  update: (payload: HTTPHeaderAuthConfig) => Promise<HTTPHeaderAuthConfig>,
+  update: (payload: HTTPHeaderAuthConfigJSON) => Promise<HTTPHeaderAuthConfig>,
 };
 
 type HTTPHeaderAuthConfigActionsType = RefluxActions<ActionsType>;
