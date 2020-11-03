@@ -179,6 +179,7 @@ class Input extends React.Component {
       case 'email':
       case 'number':
       case 'file':
+      case 'tel':
         return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, error, help, this._renderFormControl('input', controlProps), addonAfter, buttonAfter);
       case 'textarea':
         return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, error, help, this._renderFormControl('textarea', controlProps));
