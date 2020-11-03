@@ -5,11 +5,11 @@ import { Formik, Form } from 'formik';
 
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 import { Input } from 'components/bootstrap';
-import { Button, Col, Row } from 'components/graylog';
-import { FormikFormGroup, ErrorAlert, Spinner } from 'components/common';
+import { Button, Col, Row, Alert } from 'components/graylog';
+import { FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-const HTTPHeaderAuthConfig = () => {
+const HTTPHeaderAuthConfigSection = () => {
   const [submitError, setSubmitError] = useState<?string>();
   const [loadedConfig, setLoadedConfig] = useState();
   const sectionTitle = 'Single Sign-On';
@@ -54,6 +54,13 @@ const HTTPHeaderAuthConfig = () => {
                              name="username_header"
                              required
                              help="HTTP header containing the implicitly trusted name of the Graylog user" />
+            <Row>
+              <Col mdOffset={3} md={9}>
+                <Alert bsStyle="info">
+                  <Icon name="info-circle" /> Please configure the <code>trusted_proxies</code> setting in the Graylog server configuration file.
+                </Alert>
+              </Col>
+            </Row>
             <ErrorAlert runtimeError>{submitError}</ErrorAlert>
             <Row className="no-bm">
               <Col xs={12}>
@@ -74,4 +81,4 @@ const HTTPHeaderAuthConfig = () => {
   );
 };
 
-export default HTTPHeaderAuthConfig;
+export default HTTPHeaderAuthConfigSection;

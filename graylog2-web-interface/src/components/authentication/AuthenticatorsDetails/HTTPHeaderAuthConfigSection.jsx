@@ -6,7 +6,7 @@ import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderA
 import { Spinner, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-const HTTPHeaderAuthConfig = () => {
+const HTTPHeaderAuthConfigSection = () => {
   const [loadedConfig, setLoadedConfig] = useState();
   const sectionTitle = 'Single Sign-On';
 
@@ -24,10 +24,10 @@ const HTTPHeaderAuthConfig = () => {
 
   return (
     <SectionComponent title={sectionTitle}>
-      <ReadOnlyFormGroup label="Enabled" value={loadedConfig.enabled} />
+      <ReadOnlyFormGroup label="Enable single sign-on via HTTP header" value={loadedConfig.enabled} />
       <ReadOnlyFormGroup label="Username header" value={loadedConfig.usernameHeader} />
     </SectionComponent>
   );
 };
 
-export default HTTPHeaderAuthConfig;
+export default HTTPHeaderAuthConfigSection;
