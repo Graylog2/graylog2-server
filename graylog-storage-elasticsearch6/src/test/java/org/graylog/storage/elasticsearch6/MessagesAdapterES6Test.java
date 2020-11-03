@@ -117,6 +117,38 @@ class MessagesAdapterES6Test {
     }
 
     @Test
+    public void bulkIndexingParsesPrimaryShardUnavailableErrors() throws Exception {
+        final String messageId = "BOOMID";
+
+        final BulkResult failedJestResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem bulkResultItem = new MockedBulkResult().createResultItem(
+                "index",
+                "someindex",
+                "message",
+                messageId,
+                400,
+                "{\"type\":\"unavailable_shards_exception\",\"reason\":\"primary shard is not active\"\"}}",
+                null,
+                "unavailable_shards_exception",
+                "primary shard is not active"
+        );
+        when(failedJestResult.isSucceeded()).thenReturn(false);
+        when(failedJestResult.getFailedItems()).thenReturn(ImmutableList.of(bulkResultItem));
+
+        when(jestClient.execute(any()))
+            .thenReturn(failedJestResult)
+            .thenThrow(new IllegalStateException("JestResult#execute should not be called twice."));
+
+        final List<IndexingRequest> messageList = messageListWith(messageWithId(messageId));
+
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messageList);
+
+        assertThat(result).hasSize(1)
+                .extracting(indexingError -> indexingError.message().getId(), Messages.IndexingError::errorType, Messages.IndexingError::errorMessage)
+                .containsExactly(tuple(messageId, Messages.IndexingError.ErrorType.IndexBlocked, "primary shard is not active"));
+    }
+
+    @Test
     public void bulkIndexPropagatesIOExceptions() throws Exception {
         when(jestClient.execute(any()))
                 .thenThrow(new IOException("Boom!"));
