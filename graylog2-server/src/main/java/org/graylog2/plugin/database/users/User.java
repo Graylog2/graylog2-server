@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.database.users;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.shiro.authz.Permission;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.rest.models.users.requests.Startpage;
@@ -102,4 +103,17 @@ public interface User extends Persisted {
     Set<String> getRoleIds();
 
     void setRoleIds(Set<String> roles);
+
+    void setAccountStatus(AccountStatus status);
+
+    AccountStatus getAccountStatus();
+
+    enum AccountStatus {
+        @JsonProperty("enabled")
+        ENABLED,
+        @JsonProperty("disabled")
+        DISABLED,
+        @JsonProperty("deleted")
+        DELETED
+    }
 }

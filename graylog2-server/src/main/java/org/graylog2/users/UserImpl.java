@@ -52,6 +52,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -94,6 +95,7 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
     public static final String STARTPAGE = "startpage";
     public static final String ROLES = "roles";
+    public static final String ACCOUNT_STATUS = "account_status";
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
@@ -371,6 +373,20 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     public void setAuthServiceUid(@Nullable String authServiceUid) {
         fields.put(AUTH_SERVICE_UID, authServiceUid);
+    }
+
+    @Override
+    public void setAccountStatus(AccountStatus status) {
+        fields.put(ACCOUNT_STATUS, status.toString().toLowerCase(Locale.US));
+    }
+
+    @Override
+    public AccountStatus getAccountStatus() {
+        final String status = (String) fields.get(ACCOUNT_STATUS);
+        if (status == null) {
+            return AccountStatus.ENABLED;
+        }
+        return AccountStatus.valueOf(status);
     }
 
     public static class LocalAdminUser extends UserImpl {

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.MongoDbSession;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -48,6 +49,7 @@ public abstract class UserOverviewDTO {
     private static final String FIELD_SESSION_ACTIVE = "session_active";
     private static final String FIELD_LAST_ACTIVITY = "last_activity";
     private static final String FIELD_CLIENT_ADDRESS = "client_address";
+    private static final String FIELD_ACCOUNT_STATUS = "account_status";
 
     @Id
     @ObjectId
@@ -94,6 +96,9 @@ public abstract class UserOverviewDTO {
     @JsonProperty(FIELD_CLIENT_ADDRESS)
     public abstract String clientAddress();
 
+    @JsonProperty(FIELD_ACCOUNT_STATUS)
+    public abstract User.AccountStatus accountStatus();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -107,6 +112,7 @@ public abstract class UserOverviewDTO {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_UserOverviewDTO.Builder()
+                    .accountStatus(User.AccountStatus.ENABLED)
                     .roles(Collections.emptySet());
         }
 
@@ -148,6 +154,9 @@ public abstract class UserOverviewDTO {
 
         @JsonProperty(FIELD_CLIENT_ADDRESS)
         public abstract Builder clientAddress(@Nullable String clientAddress);
+
+        @JsonProperty(FIELD_ACCOUNT_STATUS)
+        public abstract Builder accountStatus(User.AccountStatus accountStatus);
 
         @JsonIgnore
         public Builder fillSession(Optional<MongoDbSession> session) {

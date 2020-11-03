@@ -59,6 +59,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -267,6 +268,8 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         fields.put(UserImpl.AUTH_SERVICE_UID, null);
         // User objects are internal by default. Ensure that we set this fields on all user objects.
         fields.put(UserImpl.EXTERNAL_USER, false);
+        // New accounts are enabled by default
+        fields.put(UserImpl.ACCOUNT_STATUS, User.AccountStatus.ENABLED.toString().toLowerCase(Locale.US));
 
         return userFactory.create(fields);
     }
