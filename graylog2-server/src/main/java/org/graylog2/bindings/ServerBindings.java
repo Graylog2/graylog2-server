@@ -86,7 +86,6 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
-import org.graylog2.users.UserPermissionsCleanupListener;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -205,7 +204,6 @@ public class ServerBindings extends Graylog2Module {
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
-        bind(UserPermissionsCleanupListener.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {
