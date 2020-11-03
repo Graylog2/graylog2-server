@@ -61,7 +61,6 @@ const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElem
 
 const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
   height: 100%;
-  z-index: 1;
   overflow-y: auto;
 `;
 
