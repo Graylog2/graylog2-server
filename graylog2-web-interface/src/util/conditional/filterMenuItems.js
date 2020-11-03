@@ -1,6 +1,6 @@
 // @flow strict
 
-import isCloud from './isCloud';
+import AppConfig from '../AppConfig';
 
 type MenuItem = { path: string };
 
@@ -18,7 +18,7 @@ function filterMenuItems(
 }
 
 export function filterCloudMenuItem(menuItems: Array<MenuItem>, toFilter: Array<string>): Array<MenuItem> {
-  return filterMenuItems(menuItems, toFilter, isCloud());
+  return filterMenuItems(menuItems, toFilter, AppConfig.isCloud());
 }
 
 export default filterMenuItems;
