@@ -3,8 +3,8 @@ package org.graylog.storage.elasticsearch7.testing;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.elasticsearch.Client;
@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.net.URI;
-
-import static org.mockito.Mockito.mock;
 
 public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
@@ -31,14 +29,14 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     protected ElasticsearchInstanceES7(String image, Version version, Network network) {
         super(image, version, network);
         this.restHighLevelClient = buildRestClient();
-        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient);
+        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false);
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
     }
 
     private RestHighLevelClient buildRestClient() {
         return new RestHighLevelClientProvider(
-                mock(GracefulShutdownService.class),
+                new GracefulShutdownService(),
                 ImmutableList.of(URI.create("http://" + this.container.getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -50,7 +48,6 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
                 null,
                 Duration.seconds(60),
                 "http",
-                false,
                 false,
                 new BasicCredentialsProvider())
                 .get();

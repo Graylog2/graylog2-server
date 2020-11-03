@@ -8,8 +8,6 @@ import SelectExtractorType from './SelectExtractorType';
 
 import FieldType from '../fieldtypes/FieldType';
 
-jest.mock('logic/datetimes/DateTime', () => ({}));
-
 describe('SelectExtractorType', () => {
   const value = 'value of message';
   const field = 'value_field';

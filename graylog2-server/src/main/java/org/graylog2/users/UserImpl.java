@@ -22,6 +22,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.AllPermission;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
@@ -43,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.nullToEmpty;
@@ -76,6 +81,8 @@ public class UserImpl extends PersistedImpl implements User {
             .build();
 
     public static final String COLLECTION_NAME = "users";
+    public static final String AUTH_SERVICE_ID = "auth_service_id";
+    public static final String AUTH_SERVICE_UID = "auth_service_uid";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
@@ -91,6 +98,8 @@ public class UserImpl extends PersistedImpl implements User {
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
     public static final int MAX_FULL_NAME_LENGTH = 200;
+
+    public static final long DEFAULT_SESSION_TIMEOUT_MS = TimeUnit.HOURS.toMillis(8);
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
@@ -175,6 +184,18 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
+    public Set<Permission> getObjectPermissions() {
+        return getPermissions().stream().map(p -> {
+            if (p.equals("*")) {
+                return new AllPermission();
+            } else {
+                return new WildcardPermission(p);
+            }
+
+        }).collect(Collectors.toSet());
+    }
+
+    @Override
     public void setPermissions(final List<String> permissions) {
         final List<String> perms = Lists.newArrayList(permissions);
         // Do not store the dynamic user self edit permissions
@@ -217,7 +238,7 @@ public class UserImpl extends PersistedImpl implements User {
         if (o != null && o instanceof Long) {
             return (Long) o;
         }
-        return TimeUnit.HOURS.toMillis(8);
+        return DEFAULT_SESSION_TIMEOUT_MS;
     }
 
     @Override
@@ -330,7 +351,30 @@ public class UserImpl extends PersistedImpl implements User {
         this.fields.put(STARTPAGE, startpageMap);
     }
 
+    @Nullable
+    @Override
+    public String getAuthServiceId() {
+        return (String) fields.get(AUTH_SERVICE_ID);
+    }
+
+    @Nullable
+    @Override
+    public String getAuthServiceUid() {
+        return (String) fields.get(AUTH_SERVICE_UID);
+    }
+
+    @Override
+    public void setAuthServiceId(@Nullable String authServiceId) {
+        fields.put(AUTH_SERVICE_ID, authServiceId);
+    }
+
+    @Override
+    public void setAuthServiceUid(@Nullable String authServiceUid) {
+        fields.put(AUTH_SERVICE_UID, authServiceUid);
+    }
+
     public static class LocalAdminUser extends UserImpl {
+        public static final String LOCAL_ADMIN_ID = "local:admin";
         private final Configuration configuration;
         private final Set<String> roles;
 
@@ -345,7 +389,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public String getId() {
-            return "local:admin";
+            return LOCAL_ADMIN_ID;
         }
 
         @Override
@@ -379,13 +423,18 @@ public class UserImpl extends PersistedImpl implements User {
         }
 
         @Override
+        public Set<Permission> getObjectPermissions() {
+            return Collections.singleton(new AllPermission());
+        }
+
+        @Override
         public Map<String, Object> getPreferences() {
             return DEFAULT_PREFERENCES;
         }
 
         @Override
         public long getSessionTimeoutMs() {
-            return TimeUnit.HOURS.toMillis(8);
+            return DEFAULT_SESSION_TIMEOUT_MS;
         }
 
         @Override

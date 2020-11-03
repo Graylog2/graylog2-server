@@ -1,12 +1,9 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import { browserHistory } from 'react-router';
-// $FlowFixMe should be there
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 
-import Routes from 'routing/Routes';
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
 import connect from 'stores/connect';
@@ -97,9 +94,7 @@ class SavedSearchList extends React.Component<Props, State> {
       return;
     }
 
-    loadFunc(selectedSavedSearch).then(() => {
-      browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedSavedSearch));
-    });
+    loadFunc(selectedSavedSearch);
 
     toggleModal();
   };

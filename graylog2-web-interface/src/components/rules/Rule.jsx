@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
 import { PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -40,7 +40,7 @@ const Rule = ({ create, title }) => {
           </LinkContainer>
             &nbsp;
           <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
-            <Button bsStyle="info" className="active">Manage rules</Button>
+            <Button bsStyle="info">Manage rules</Button>
           </LinkContainer>
             &nbsp;
           <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>

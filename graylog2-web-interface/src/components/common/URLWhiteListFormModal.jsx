@@ -8,10 +8,10 @@ import { Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import CombinedProvider from 'injection/CombinedProvider';
-import PermissionsMixin from 'util/PermissionsMixin';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 // Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
@@ -57,7 +57,7 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     componentDidMount() {
       const { currentUser: { permissions } } = this.props;
 
-      if (PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read'])) {
+      if (isPermitted(permissions, ['urlwhitelist:read'])) {
         ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
       }
     }
@@ -70,7 +70,7 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
       if (urlwhitelistConfig && entries.length === 0) {
         this._setDefaultWhiteListState(urlwhitelistConfig);
       } else if (prevProps.newUrlEntry !== newUrlEntry) {
-        this._setDefaultWhiteListState(urlwhitelistConfig);
+        this._setDefaultWhiteListState({ entries: [], disabled: false });
       }
     }
 
@@ -82,14 +82,10 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     this._update(config, isValid);
   }
 
-  _getConfig = (configType: string): Object => {
+  _getConfig = (configType: string) => {
     const { configuration } = this.props;
 
-    if (configuration && configuration[configType]) {
-      return configuration[configType];
-    }
-
-    return null;
+    return configuration[configType];
   }
 
   _openModal = () => {

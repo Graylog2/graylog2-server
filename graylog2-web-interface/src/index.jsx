@@ -11,7 +11,7 @@ import AppFacade from 'routing/AppFacade';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
-import GlobalStylesProvider from 'contexts/GlobalStylesProvider';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 
@@ -22,9 +22,8 @@ function renderAppContainer(appContainer) {
   ReactDOM.render(
     <CustomizationProvider>
       <GraylogThemeProvider>
-        <GlobalStylesProvider>
-          <AppFacade />
-        </GlobalStylesProvider>
+        <GlobalThemeStyles />
+        <AppFacade />
       </GraylogThemeProvider>
     </CustomizationProvider>,
     appContainer,

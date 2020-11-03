@@ -1,6 +1,6 @@
 // @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 
 import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
@@ -9,6 +9,8 @@ import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import StoreProvider from 'injection/StoreProvider';
+import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
 
 const SystemStore = StoreProvider.getStore('System');
 
@@ -20,9 +22,7 @@ type Props = {
     operating_system: string,
     version: string,
   },
-  location: {
-    query: { [string]: any },
-  },
+  location: Location,
 };
 
 const GettingStartedPage = ({ system, location }: Props) => {
@@ -54,7 +54,7 @@ GettingStartedPage.propTypes = {
 };
 
 export default connect(
-  GettingStartedPage,
+  withLocation(GettingStartedPage),
   { systemStore: SystemStore },
   (props) => ({
     ...props,

@@ -32,6 +32,7 @@ type Props = {
   focusable?: boolean,
   title: string,
   onClick?: () => void,
+  className?: string,
 };
 
 const handleClick = (onClick) => {
@@ -40,18 +41,20 @@ const handleClick = (onClick) => {
   }
 };
 
-const IconButton = ({ title, onClick, focusable, ...rest }: Props) => (
-  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)}>
+const IconButton = ({ title, onClick, focusable, className, ...rest }: Props) => (
+  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button">
     <Icon {...rest} />
   </Wrapper>
 );
 
 IconButton.propTypes = {
+  className: PropTypes.string,
   title: PropTypes.string,
   onClick: PropTypes.func,
 };
 
 IconButton.defaultProps = {
+  className: undefined,
   focusable: true,
   onClick: undefined,
   title: undefined,

@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Button, Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
@@ -12,6 +12,7 @@ import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 const { RulesStore } = CombinedProvider.get('Rules');
@@ -164,7 +165,7 @@ const PipelineDetailsPage = createReactClass({
 
             <span>
               <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-                <Button bsStyle="info" className="active">Manage pipelines</Button>
+                <Button bsStyle="info">Manage pipelines</Button>
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
@@ -188,4 +189,4 @@ const PipelineDetailsPage = createReactClass({
   },
 });
 
-export default PipelineDetailsPage;
+export default withParams(PipelineDetailsPage);

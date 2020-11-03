@@ -197,7 +197,7 @@ public class Indices {
             indicesAdapter.ensureIndexTemplate(templateName, template);
             indicesAdapter.create(indexName, indexSettings, templateName, template);
         } catch (Exception e) {
-            LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage());
+            LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
             return false;
         }

@@ -1,6 +1,6 @@
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Button, Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -63,7 +63,7 @@ class SimulatorPage extends React.Component {
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
-                <Button bsStyle="info" className="active">Simulator</Button>
+                <Button bsStyle="info">Simulator</Button>
               </LinkContainer>
             </span>
           </PageHeader>

@@ -1,18 +1,16 @@
 // @flow strict
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
-import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
-const errorPageStyles = (backgroundImage) => css`
+const generateStyles = () => css`
   body {
-    background: url(${backgroundImage}) no-repeat center center fixed;
+    background: url(${(props) => props.backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;
@@ -40,34 +38,27 @@ type Props = {
   title: string,
 };
 
-const ErrorPage = ({ children, title, description, backgroundImage }: Props) => {
-  const { addGlobalStyles } = useContext(GlobalStylesContext);
+const ErrorPageStyles = createGlobalStyle`
+    ${generateStyles()}
+  `;
 
-  useEffect(() => {
-    addGlobalStyles(errorPageStyles(backgroundImage));
-
-    return () => {
-      addGlobalStyles(null);
-    };
-  }, [backgroundImage]);
-
-  return (
-    <AppContentGrid>
-      <div className="container-fluid">
-        <DocumentTitle title={title}>
-          <ErrorJumbotron title={title}>
-            {description}
-            {children && (
-              <ErrorMessage>
-                {children}
-              </ErrorMessage>
-            )}
-          </ErrorJumbotron>
-        </DocumentTitle>
-      </div>
-    </AppContentGrid>
-  );
-};
+const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
+  <AppContentGrid>
+    <ErrorPageStyles backgroundImage={backgroundImage} />
+    <div className="container-fluid">
+      <DocumentTitle title={title}>
+        <ErrorJumbotron title={title}>
+          {description}
+          {children && (
+          <ErrorMessage>
+            {children}
+          </ErrorMessage>
+          )}
+        </ErrorJumbotron>
+      </DocumentTitle>
+    </div>
+  </AppContentGrid>
+);
 
 ErrorPage.propTypes = {
   children: PropTypes.node,

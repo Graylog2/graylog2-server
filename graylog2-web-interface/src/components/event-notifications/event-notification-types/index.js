@@ -9,6 +9,10 @@ import LegacyNotificationForm from './LegacyNotificationForm';
 import LegacyNotificationFormContainer from './LegacyNotificationFormContainer';
 import LegacyNotificationSummaryContainer from './LegacyNotificationSummaryContainer';
 
+import EmailNotificationDetails from '../event-notification-details/EmailNotificationDetails';
+import HttpNotificationDetails from '../event-notification-details/HttpNotificationDetails';
+import LegacyNotificationDetails from '../event-notification-details/LegacyNotificationDetails';
+
 PluginStore.register(new PluginManifest({}, {
   eventNotificationTypes: [
     {
@@ -16,6 +20,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Email Notification',
       formComponent: EmailNotificationFormContainer,
       summaryComponent: EmailNotificationSummary,
+      detailsComponent: EmailNotificationDetails,
       defaultConfig: EmailNotificationForm.defaultConfig,
     },
     {
@@ -23,6 +28,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'HTTP Notification',
       formComponent: HttpNotificationForm,
       summaryComponent: HttpNotificationSummary,
+      detailsComponent: HttpNotificationDetails,
       defaultConfig: HttpNotificationForm.defaultConfig,
     },
     {
@@ -30,6 +36,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Legacy Alarm Callbacks',
       formComponent: LegacyNotificationFormContainer,
       summaryComponent: LegacyNotificationSummaryContainer,
+      detailsComponent: LegacyNotificationDetails,
       defaultConfig: LegacyNotificationForm.defaultConfig,
     },
   ],

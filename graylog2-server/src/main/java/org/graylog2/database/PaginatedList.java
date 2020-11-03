@@ -37,10 +37,25 @@ public class PaginatedList<E> extends ForwardingList<E> {
 
     private final Long grandTotal;
 
+    /**
+     * Creates a PaginatedList
+     * @param delegate the actual entries
+     * @param total the count of all entries (ignoring pagination)
+     * @param page  the page this PaginatedList represents
+     * @param perPage the size limit for each page
+     */
     public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage) {
         this(delegate, total, page, perPage, null);
     }
 
+    /**
+     * Creates a PaginatedList
+     * @param delegate the actual entries
+     * @param total the count of all entries (ignoring pagination)
+     * @param page  the page this PaginatedList represents
+     * @param perPage the size limit for each page
+     * @param grandTotal the count of all entries (ignoring query filters and pagination)
+     */
     public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage, Long grandTotal) {
         this.delegate = delegate;
         this.paginationInfo = PaginationInfo.create(total, delegate.size(), page, perPage);

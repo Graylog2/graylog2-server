@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -9,6 +9,8 @@ import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
@@ -81,8 +83,8 @@ class LUTTablesPage extends React.Component {
     history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   }
 
-  _isCreating = (props) => {
-    return props.route.action === 'create';
+  _isCreating = ({ action }) => {
+    return action === 'create';
   }
 
   _validateTable = (table) => {
@@ -91,7 +93,7 @@ class LUTTablesPage extends React.Component {
 
   render() {
     const {
-      route: { action },
+      action,
       table,
       validationErrors,
       dataAdapter,
@@ -156,7 +158,7 @@ class LUTTablesPage extends React.Component {
             <span>
               <ButtonToolbar>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info" className="active">Lookup Tables</Button>
+                  <Button bsStyle="info">Lookup Tables</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
                   <Button bsStyle="info">Caches</Button>
@@ -186,7 +188,7 @@ LUTTablesPage.propTypes = {
   pagination: PropTypes.object,
   location: PropTypes.object,
   errorStates: PropTypes.object,
-  route: PropTypes.object.isRequired,
+  action: PropTypes.string,
 };
 
 LUTTablesPage.defaultProps = {
@@ -200,9 +202,10 @@ LUTTablesPage.defaultProps = {
   location: null,
   pagination: null,
   dataAdapter: null,
+  action: undefined,
 };
 
-export default connect(LUTTablesPage, { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
+export default connect(withParams(withLocation(LUTTablesPage)), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
   ...otherProps,
   ...lookupTableStore,
 }));

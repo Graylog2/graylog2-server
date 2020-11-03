@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Link } from 'react-router';
 
+import { Link } from 'components/graylog/router';
 import { StyledBadge } from 'components/graylog/Badge';
 import Routes from 'routing/Routes';
 

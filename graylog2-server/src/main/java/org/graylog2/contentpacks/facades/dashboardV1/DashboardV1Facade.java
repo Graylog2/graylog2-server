@@ -33,9 +33,12 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class DashboardV1Facade extends ViewFacade {
@@ -47,8 +50,9 @@ public class DashboardV1Facade extends ViewFacade {
     public DashboardV1Facade(ObjectMapper objectMapper,
                              SearchDbService searchDbService,
                              EntityConverter entityConverter,
-                             ViewService viewService) {
-        super(objectMapper, searchDbService, viewService);
+                             ViewService viewService,
+                             UserService userService) {
+        super(objectMapper, searchDbService, viewService, userService);
         this.objectMapper = objectMapper;
         this.entityConverter = entityConverter;
     }
@@ -72,15 +76,16 @@ public class DashboardV1Facade extends ViewFacade {
     @Override
     public NativeEntity<ViewDTO> createNativeEntity(Entity entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities, String username) {
         ensureV1(entity);
-        return decode((EntityV1) entity, parameters, nativeEntities);
+        final User user = Optional.ofNullable(userService.load(username)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + username + "> from db"));
+        return decode((EntityV1) entity, parameters, nativeEntities, user);
     }
 
     @Override
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                            Map<String, ValueReference> parameters,
-                                           Map<EntityDescriptor, Object> nativeEntities) {
+                                           Map<EntityDescriptor, Object> nativeEntities, User user) {
         final EntityV1 convertedEntity = convertEntity(entityV1, parameters);
-        return super.decode(convertedEntity, parameters, nativeEntities);
+        return super.decode(convertedEntity, parameters, nativeEntities, user);
     }
 
     private EntityV1 convertEntity(EntityV1 entityV1,

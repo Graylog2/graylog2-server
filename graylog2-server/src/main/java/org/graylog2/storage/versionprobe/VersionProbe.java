@@ -108,11 +108,10 @@ public class VersionProbe {
             final int patch = Integer.parseUnsignedInt(versionParts[2]);
 
             final Version version = Version.from(major, minor, patch);
-            LOG.info("Elasticsearch cluster is running v" + version);
 
             return Optional.of(version);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Unable to parse version retrieved from Elasticsearch node: " + versionString, e);
+            throw new ElasticsearchProbeException("Unable to parse version retrieved from Elasticsearch node: " + versionString, e);
         }
     }
 

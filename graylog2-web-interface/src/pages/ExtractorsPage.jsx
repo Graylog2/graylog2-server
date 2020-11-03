@@ -1,9 +1,9 @@
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import Reflux from 'reflux';
 
+import { LinkContainer } from 'components/graylog/router';
 import { DocumentTitle, Spinner } from 'components/common';
 import PageHeader from 'components/common/PageHeader';
 import ExtractorsList from 'components/extractors/ExtractorsList';
@@ -13,6 +13,7 @@ import StoreProvider from 'injection/StoreProvider';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import withParams from 'routing/withParams';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -96,4 +97,4 @@ const ExtractorsPage = createReactClass({
   },
 });
 
-export default ExtractorsPage;
+export default withParams(ExtractorsPage);

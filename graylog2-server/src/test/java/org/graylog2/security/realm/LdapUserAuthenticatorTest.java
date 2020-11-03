@@ -33,6 +33,7 @@ import org.apache.directory.server.core.partition.impl.avl.AvlPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog2.ApacheDirectoryTestServiceFactory;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.database.users.User;
@@ -94,7 +95,7 @@ import static org.mockito.Mockito.when;
                 @LoadSchema(name = "nis", enabled = true)
         }
 )
-@ApplyLdifFiles("org/graylog2/security/ldap/base.ldif")
+@ApplyLdifFiles(LDAPTestUtils.BASE_LDIF)
 public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
     private static final Set<String> ENABLED_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2", "TLSv1.3");
     private static final String ADMIN_DN = "uid=admin,ou=system";
@@ -153,7 +154,9 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
 
         when(ldapSettingsService.load())
                 .thenReturn(ldapSettings);
-        doReturn(mock(User.class))
+        final User user = mock(User.class);
+        when(user.getId()).thenReturn("54e3deadbeefdeadbeef0001");
+        doReturn(user)
                 .when(authenticator)
                 .syncFromLdapEntry(any(LdapEntry.class),any(LdapSettings.class), anyString());
 

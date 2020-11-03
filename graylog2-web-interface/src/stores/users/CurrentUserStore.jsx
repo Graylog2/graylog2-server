@@ -47,7 +47,7 @@ const CurrentUserStore = Reflux.createStore({
   },
 
   update(username) {
-    return fetch('GET', qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url))
+    return fetch('GET', qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url))
       .then((resp) => {
         this.currentUser = resp;
         this.trigger({ currentUser: this.currentUser });

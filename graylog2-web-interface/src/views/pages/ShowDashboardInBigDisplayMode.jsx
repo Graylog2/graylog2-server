@@ -1,6 +1,5 @@
 // @flow strict
 import React, { useEffect } from 'react';
-import { withRouter } from 'react-router';
 import styled from 'styled-components';
 
 import connect from 'stores/connect';
@@ -12,6 +11,8 @@ import type { QueryId } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
+import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -26,7 +27,6 @@ type Props = {
     query: UntypedBigDisplayModeQuery,
   },
   params: any,
-  route: any,
   view: {
     view: ?View,
     activeQuery: ?QueryId,
@@ -44,7 +44,7 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, activeQuery } = {} }: Props) => {
+const ShowDashboardInBigDisplayMode = ({ location, params, view: { view, activeQuery } = {} }: Props) => {
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
 
@@ -62,10 +62,10 @@ const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, 
       <BodyPositioningWrapper>
         {view && activeQuery ? <CycleQueryTab interval={configuration.interval} view={view} activeQuery={activeQuery} tabs={configuration.tabs} /> : null}
         <BigDisplayModeHeader />
-        <ShowViewPage location={location} params={params} route={route} />
+        <ShowViewPage location={{ query }} params={params} />
       </BodyPositioningWrapper>
     </InteractiveContext.Provider>
   );
 };
 
-export default withRouter(connect(ShowDashboardInBigDisplayMode, { view: ViewStore }));
+export default withLocation(connect(withParams(ShowDashboardInBigDisplayMode), { view: ViewStore }));

@@ -42,8 +42,9 @@ public class DefaultSessionResponseFactory implements SessionResponseFactory {
     public JsonNode forSession(Session session) {
         Date validUntil = getValidUntil(session);
         String id = session.getId().toString();
-        String username = getSubjectFromSession(session).getPrincipal().toString();
-        return toJsonNode(DefaultSessionResponse.create(validUntil, id, username));
+        String userId = getSubjectFromSession(session).getPrincipal().toString();
+        String username = String.valueOf(session.getAttribute("username"));
+        return toJsonNode(DefaultSessionResponse.create(validUntil, id, username, userId));
     }
 
     protected Date getValidUntil(Session session) {

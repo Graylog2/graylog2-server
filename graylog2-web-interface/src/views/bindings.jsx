@@ -45,10 +45,6 @@ import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
-import ViewSharing from 'views/logic/views/sharing/ViewSharing';
-import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
-import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
-import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
@@ -56,11 +52,13 @@ import OperatorCompletion from 'views/components/searchbar/completions/OperatorC
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import {
-  dashboardsPath, dashboardsTvPath,
+  dashboardsPath,
+  dashboardsTvPath,
   extendedSearchPath,
   newDashboardsPath,
   showDashboardsPath,
   showViewsPath,
+  newSearchPath,
   showSearchPath,
   viewsPath,
 } from 'views/Constants';
@@ -80,6 +78,7 @@ import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
 import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
+import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -88,10 +87,6 @@ VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfi
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
-
-ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
-ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
-ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
@@ -104,12 +99,16 @@ export default {
   },
   routes: [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: AppWithExtendedSearchBar },
-    { path: showSearchPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
-    { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
+
+    { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
+    { path: showSearchPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
+    { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
+    { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
+
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
   ],

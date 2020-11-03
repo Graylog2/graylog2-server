@@ -32,6 +32,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @AutoValue
 @WithBeanGetter
@@ -101,6 +102,9 @@ public abstract class IndexSetSummary {
     @JsonProperty("field_type_refresh_interval")
     public abstract Duration fieldTypeRefreshInterval();
 
+    @JsonProperty("index_template_type")
+    public abstract Optional<IndexSetConfig.TemplateType> templateType();
+
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
                                          @JsonProperty("title") @NotBlank String title,
@@ -118,10 +122,12 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
                                          @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
-                                         @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval) {
+                                         @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
+                                         @JsonProperty("index_template_type") @Nullable IndexSetConfig.TemplateType templateType) {
         return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval);
+                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
+                Optional.ofNullable(templateType));
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -142,12 +148,13 @@ public abstract class IndexSetSummary {
                 indexSet.indexAnalyzer(),
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled(),
-                indexSet.fieldTypeRefreshInterval());
+                indexSet.fieldTypeRefreshInterval(),
+                indexSet.indexTemplateType().orElse(null));
 
     }
 
     public IndexSetConfig toIndexSetConfig() {
-        return IndexSetConfig.builder()
+        final IndexSetConfig.Builder builder = IndexSetConfig.builder()
                 .id(id())
                 .title(title())
                 .description(description())
@@ -164,7 +171,9 @@ public abstract class IndexSetSummary {
                 .indexTemplateName(indexPrefix() + "-template")
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
-                .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
-                .build();
+                .fieldTypeRefreshInterval(fieldTypeRefreshInterval());
+
+        final IndexSetConfig.Builder builderWithTemplateType = templateType().map(builder::indexTemplateType).orElse(builder);
+        return builderWithTemplateType.build();
     }
 }

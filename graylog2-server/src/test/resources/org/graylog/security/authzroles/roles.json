@@ -1,0 +1,243 @@
+{
+  "roles": [
+    {
+      "_id": {
+        "$oid": "564c6707c8306e079f718980"
+      },
+      "name": "Reader",
+      "permissions": [
+        "clusterconfigentry:read",
+        "indexercluster:read",
+        "messagecount:read",
+        "journal:read",
+        "messages:analyze",
+        "inputs:read",
+        "metrics:read",
+        "fieldnames:read",
+        "buffers:read",
+        "system:read",
+        "jvmstats:read",
+        "decorators:read",
+        "throughput:read",
+        "messages:read"
+      ],
+      "description": "Grants basic permissions for every Graylog user (built-in)",
+      "read_only": true,
+      "name_lower": "reader"
+    },
+    {
+      "_id": {
+        "$oid": "56701ac4c8302ff6bee2a65d"
+      },
+      "name": "Test Role",
+      "permissions": [
+        "*"
+      ],
+      "read_only": false,
+      "name_lower": "test role"
+    },
+    {
+      "_id": {
+        "$oid": "5b17d7c63f3ab8204eea0589"
+      },
+      "name": "Sidecar Node",
+      "permissions": [
+        "sidecars:read",
+        "configurations:read",
+        "sidecars:update",
+        "users:list"
+      ],
+      "description": "Grants access to register and pull configurations for a Sidecar node (built-in)",
+      "read_only": true,
+      "name_lower": "sidecar node"
+    },
+    {
+      "_id": {
+        "$oid": "58dbaa158ae4923256dc6266"
+      },
+      "name": "Archive Viewer",
+      "permissions": [
+        "archive:read",
+        "archivelicense:read"
+      ],
+      "description": "Grants read access to the archive catalog (built-in)",
+      "read_only": true,
+      "name_lower": "archive viewer"
+    },
+    {
+      "_id": {
+        "$oid": "564c6707c8306e079f71897f"
+      },
+      "name": "Admin",
+      "permissions": [
+        "*"
+      ],
+      "description": "Grants all permissions for Graylog administrators (built-in)",
+      "read_only": true,
+      "name_lower": "admin"
+    },
+    {
+      "_id": {
+        "$oid": "58dbaa158ae4923256dc6265"
+      },
+      "name": "Archive Manager",
+      "permissions": [
+        "archive:restore",
+        "archivelicense:read",
+        "archiveconfig:read",
+        "archive:create",
+        "archive:read",
+        "archiveconfig:update",
+        "archivecatalog:rebuild",
+        "archive:delete"
+      ],
+      "description": "Grants full control over the archive configuration and management (built-in)",
+      "read_only": true,
+      "name_lower": "archive manager"
+    },
+    {
+      "_id": {
+        "$oid": "59fc4b2b6e948411fadbd85d"
+      },
+      "name": "Report Manager",
+      "permissions": [
+        "dashboards:read",
+        "report:email",
+        "report:create",
+        "report:download",
+        "report:delete",
+        "users:list",
+        "report:read",
+        "report:update"
+      ],
+      "description": "Grants full control over report configurations and read access to dashboards and users (built-in)",
+      "read_only": true,
+      "name_lower": "report manager"
+    },
+    {
+      "_id": {
+        "$oid": "59fc4b2b6e948411fadbd85e"
+      },
+      "name": "Report Generator",
+      "permissions": [
+        "report:read",
+        "streams:read",
+        "dashboards:read",
+        "users:list"
+      ],
+      "description": "Internal role. Grants read access to streams and dashboards (built-in)",
+      "read_only": true,
+      "name_lower": "report generator"
+    },
+    {
+      "_id": {
+        "$oid": "5c2f6d3b3dd06601be176b85"
+      },
+      "name": "Views Manager",
+      "permissions": [
+        "view:read",
+        "view:edit"
+      ],
+      "description": "Allows reading and writing all views and extended searches (built-in)",
+      "read_only": true,
+      "name_lower": "views manager"
+    },
+    {
+      "_id": {
+        "$oid": "5c488b67e3f1420b4d9ae635"
+      },
+      "name": "Report System (Internal)",
+      "permissions": [
+        "report:read",
+        "streams:read",
+        "dashboards:read",
+        "users:list"
+      ],
+      "description": "Internal technical role. Grants Report System User necessary access to generate reports (built-in)",
+      "read_only": true,
+      "name_lower": "report system (internal)"
+    },
+    {
+      "_id": {
+        "$oid": "5c488f1de3f14219be1cb9f6"
+      },
+      "name": "Sidecar System (Internal)",
+      "permissions": [
+        "sidecar_collectors:read",
+        "sidecar_collector_configurations:read",
+        "sidecars:update"
+      ],
+      "description": "Internal technical role. Grants access to register and pull configurations for a Sidecar node (built-in)",
+      "read_only": true,
+      "name_lower": "sidecar system (internal)"
+    },
+    {
+      "_id": {
+        "$oid": "5d41bb973086a840541a3ed2"
+      },
+      "name": "Alerts Manager",
+      "permissions": [
+        "eventdefinitions:create",
+        "eventdefinitions:delete",
+        "eventdefinitions:edit",
+        "eventdefinitions:execute",
+        "eventdefinitions:read",
+        "eventnotifications:create",
+        "eventnotifications:delete",
+        "eventnotifications:edit",
+        "eventnotifications:read"
+      ],
+      "description": "Allows reading and writing all event definitions and event notifications (built-in)",
+      "read_only": true,
+      "name_lower": "alerts manager"
+    },
+    {
+      "_id": {
+        "$oid": "5f1f0d2a6f58d7c052d49775"
+      },
+      "name": "Dashboard Creator",
+      "permissions": [
+        "dashboards:create"
+      ],
+      "description": "Allows creation of Dashboards (built-in)",
+      "read_only": true,
+      "name_lower": "dashboard creator"
+    },
+    {
+      "_id": {
+        "$oid": "5f1f0d2a6f58d7c052d49778"
+      },
+      "name": "Event Definition Creator",
+      "permissions": [
+        "eventdefinitions:create"
+      ],
+      "description": "Allows creation of Event Definitions (built-in)",
+      "read_only": true,
+      "name_lower": "event definition creator"
+    },
+    {
+      "_id": {
+        "$oid": "5f1f0d2a6f58d7c052d4977b"
+      },
+      "name": "Event Notification Creator",
+      "permissions": [
+        "eventnotifications:create"
+      ],
+      "description": "Allows creation of Event Notifications (built-in)",
+      "read_only": true,
+      "name_lower": "event notification creator"
+    },
+    {
+      "_id": {
+        "$oid": "5f22792d6f58d7c0521edb23"
+      },
+      "name": "Report Creator",
+      "permissions": [
+        "report:create"
+      ],
+      "description": "Allows creation of Reports (built-in)",
+      "read_only": true,
+      "name_lower": "report creator"
+    }
+  ]
+}

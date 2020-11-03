@@ -68,7 +68,7 @@ public class PasswordAuthenticator extends AuthenticatingRealm {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found user {} to be authenticated with password.", user.getName());
         }
-        return new UserAccount(token.getPrincipal(),
+        return new UserAccount(user.getId(),
                                user.getHashedPassword(),
                                credentialsSalt,
                                "graylog2MongoDbRealm",

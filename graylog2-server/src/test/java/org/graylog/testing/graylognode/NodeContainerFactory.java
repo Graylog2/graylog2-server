@@ -81,6 +81,7 @@ public class NodeContainerFactory {
                 .withFileSystemBind(property("threatintel_plugin_jar"), graylogHome + "/plugin/graylog-plugin-threatintel.jar", BindMode.READ_ONLY)
                 .withFileSystemBind(property("collector_plugin_jar"), graylogHome + "/plugin/graylog-plugin-collector.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
+                .withEnv("DEVELOPMENT", "true")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion)

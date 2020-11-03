@@ -330,23 +330,18 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
             internal = Collections.emptyMap();
         } else {
             // we store ids internally but external users use the group names
-            try {
-                final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), Roles.roleToNameFunction());
+            final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), Roles.roleToNameFunction());
 
-                internal = Maps.newHashMap(Maps.transformValues(mapping, new Function<String, String>() {
-                    @Nullable
-                    @Override
-                    public String apply(@Nullable String groupName) {
-                        if (groupName == null || !nameToRole.containsKey(groupName)) {
-                            return null;
-                        }
-                        return nameToRole.get(groupName).getId();
+            internal = Maps.newHashMap(Maps.transformValues(mapping, new Function<String, String>() {
+                @Nullable
+                @Override
+                public String apply(@Nullable String groupName) {
+                    if (groupName == null || !nameToRole.containsKey(groupName)) {
+                        return null;
                     }
-                }));
-            } catch (NotFoundException e) {
-                LOG.error("Unable to convert group names to ids", e);
-                throw new IllegalStateException("Unable to convert group names to ids", e);
-            }
+                    return nameToRole.get(groupName).getId();
+                }
+            }));
         }
 
         // convert the group -> role_id map to a list of {"group" -> group, "role_id" -> roleid } maps
@@ -414,25 +409,20 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
 
     @Override
     public void setAdditionalDefaultGroups(Set<String> groupNames) {
-        try {
-            if (groupNames == null) return;
+        if (groupNames == null) return;
 
-            final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), Roles.roleToNameFunction());
-            final List<String> groupIds = Collections2.transform(groupNames, new Function<String, String>() {
-                @Nullable
-                @Override
-                public String apply(@Nullable String groupName) {
-                    if (groupName == null || !nameToRole.containsKey(groupName)) {
-                        return null;
-                    }
-                    return nameToRole.get(groupName).getId();
+        final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), Roles.roleToNameFunction());
+        final List<String> groupIds = Collections2.transform(groupNames, new Function<String, String>() {
+            @Nullable
+            @Override
+            public String apply(@Nullable String groupName) {
+                if (groupName == null || !nameToRole.containsKey(groupName)) {
+                    return null;
                 }
-            }).stream().filter(Objects::nonNull).collect(Collectors.toList());
-            fields.put(ADDITIONAL_DEFAULT_GROUPS, groupIds);
-        } catch (NotFoundException e) {
-            LOG.error("Unable to convert group names to ids", e);
-            throw new IllegalStateException("Unable to convert group names to ids", e);
-        }
+                return nameToRole.get(groupName).getId();
+            }
+        }).stream().filter(Objects::nonNull).collect(Collectors.toList());
+        fields.put(ADDITIONAL_DEFAULT_GROUPS, groupIds);
 
     }
 }

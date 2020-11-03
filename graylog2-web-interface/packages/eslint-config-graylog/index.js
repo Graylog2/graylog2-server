@@ -1,4 +1,9 @@
 module.exports = {
+  parser: 'babel-eslint',
+  env: {
+    browser: true,
+    jest: true,
+  },
   extends: [
     'eslint:recommended',
     'airbnb',
@@ -52,6 +57,9 @@ module.exports = {
     'react/prefer-stateless-function': 'warn',
     'react/static-property-placement': 'off',
 
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'error',
+
     'padding-line-between-statements': [
       'error',
       {
@@ -97,5 +105,12 @@ module.exports = {
       },
     ],
     'flowtype/semi': [2, 'always'],
+  },
+  settings: {
+    'import/resolver': {
+      webpack: {
+        config: './webpack.config.js',
+      },
+    },
   },
 };

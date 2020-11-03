@@ -6,6 +6,7 @@ import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
 import CombinedProvider from 'injection/CombinedProvider';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
+import withParams from 'routing/withParams';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
@@ -76,7 +77,7 @@ RuleDetailsPage.defaultProps = {
   pipelines: undefined,
 };
 
-export default connect(RuleDetailsPage, {
+export default connect(withParams(RuleDetailsPage), {
   rule: RulesStore,
   pipelines: PipelinesStore,
 },

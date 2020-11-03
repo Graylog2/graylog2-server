@@ -1,6 +1,6 @@
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
@@ -24,16 +24,12 @@ const EventNotificationsPage = () => {
             <LinkContainer to={Routes.ALERTS.LIST}>
               <Button bsStyle="info">Alerts & Events</Button>
             </LinkContainer>
-            <IfPermitted permissions="eventdefinitions:read">
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info">Event Definitions</Button>
-              </LinkContainer>
-            </IfPermitted>
-            <IfPermitted permissions="eventnotifications:read">
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-                <Button bsStyle="info" className="active">Notifications</Button>
-              </LinkContainer>
-            </IfPermitted>
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
+              <Button bsStyle="info">Event Definitions</Button>
+            </LinkContainer>
+            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
+              <Button bsStyle="info">Notifications</Button>
+            </LinkContainer>
           </ButtonToolbar>
         </PageHeader>
 

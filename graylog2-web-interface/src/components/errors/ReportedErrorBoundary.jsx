@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { withRouter } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
@@ -35,7 +35,11 @@ const ReportedErrorPage = ({ reportedError }: { reportedError: ReportedError }) 
   }
 };
 
-const ReportedErrorBoundary = ({ children, router }) => {
+type Props = {
+  children: React.Node,
+};
+
+const ReportedErrorBoundary = ({ children }: Props) => {
   const [reportedError, setReportedError] = useState<?ReportedError>();
 
   const report = (newError: ReportedError) => setReportedError(newError);
@@ -48,13 +52,15 @@ const ReportedErrorBoundary = ({ children, router }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const unlistenRouter = router.listen(() => reportedError && setReportedError(null));
+  const location = useLocation();
 
-    return () => {
-      unlistenRouter();
-    };
-  }, [reportedError]);
+  useEffect(() => {
+    if (reportedError) {
+      setReportedError(null);
+    }
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [location]);
 
   if (reportedError) {
     return <ReportedErrorPage reportedError={reportedError} />;
@@ -63,4 +69,4 @@ const ReportedErrorBoundary = ({ children, router }) => {
   return children;
 };
 
-export default withRouter(ReportedErrorBoundary);
+export default ReportedErrorBoundary;

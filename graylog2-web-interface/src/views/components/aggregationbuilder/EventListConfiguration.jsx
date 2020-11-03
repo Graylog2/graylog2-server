@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Checkbox, FormGroup } from 'components/graylog';
+import { Checkbox } from 'components/graylog';
 
 type Props = {
   enabled: boolean,
@@ -11,14 +11,10 @@ type Props = {
 
 const EventListConfiguration = ({ enabled, onChange }: Props) => {
   return (
-    <form>
-      <FormGroup>
-        {/* eslint-disable-next-line no-undef */}
-        <Checkbox onChange={(event: SyntheticInputEvent<HTMLInputElement>) => onChange(event.target.checked)} checked={enabled}>
-          Enable Event Annotation
-        </Checkbox>
-      </FormGroup>
-    </form>
+    <Checkbox onChange={(event: SyntheticInputEvent<HTMLInputElement>) => onChange(event.target.checked)}
+              checked={enabled}>
+      Enable Event Annotation
+    </Checkbox>
   );
 };
 

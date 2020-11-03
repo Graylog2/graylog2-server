@@ -38,6 +38,7 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.security.TrustAllX509TrustManager;
+import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -47,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -77,10 +77,6 @@ public class LdapConnector {
     private final Set<String> enabledTlsProtocols;
     private final LdapSettingsService ldapSettingsService;
     private final TrustManagerProvider trustManagerProvider;
-
-    public interface TrustManagerProvider {
-        TrustManager create(String host) throws KeyStoreException, NoSuchAlgorithmException;
-    }
 
     @Inject
     public LdapConnector(@Named("ldap_connection_timeout") int connectionTimeout,

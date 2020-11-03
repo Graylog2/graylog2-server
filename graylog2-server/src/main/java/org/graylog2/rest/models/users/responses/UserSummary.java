@@ -19,8 +19,12 @@ package org.graylog2.rest.models.users.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.auto.value.AutoValue;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.rest.models.users.requests.Startpage;
 
 import javax.annotation.Nullable;
@@ -48,7 +52,11 @@ public abstract class UserSummary {
     public abstract String fullName();
 
     @JsonProperty
-    public abstract List<String> permissions();
+    @JsonSerialize(contentUsing = ToStringSerializer.class)
+    public abstract List<WildcardPermission> permissions();
+
+    @JsonProperty
+    public abstract List<GRNPermission> grnPermissions();
 
     @JsonProperty
     @Nullable
@@ -92,7 +100,8 @@ public abstract class UserSummary {
                                      @JsonProperty("username") String username,
                                      @JsonProperty("email") String email,
                                      @JsonProperty("full_name") @Nullable String fullName,
-                                     @JsonProperty("permissions") @Nullable List<String> permissions,
+                                     @JsonProperty("permissions") @Nullable List<WildcardPermission> permissions,
+                                     @JsonProperty("grn_permissions") @Nullable List<GRNPermission> grnPermissions,
                                      @JsonProperty("preferences") @Nullable Map<String, Object> preferences,
                                      @JsonProperty("timezone") @Nullable String timezone,
                                      @JsonProperty("session_timeout_ms") @Nullable Long sessionTimeoutMs,
@@ -108,6 +117,7 @@ public abstract class UserSummary {
                                          email,
                                          fullName,
                                          permissions,
+                                         grnPermissions,
                                          preferences,
                                          timezone,
                                          sessionTimeoutMs,

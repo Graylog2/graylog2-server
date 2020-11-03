@@ -20,7 +20,6 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.rest.RestTools;
 import org.graylog2.utilities.IpSubnet;
@@ -46,7 +45,6 @@ import static java.util.Objects.requireNonNull;
 // Give this a higher priority so it's run before the authentication filter
 @Priority(Priorities.AUTHENTICATION - 10)
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
-    public static final String REQUEST_HEADERS = "REQUEST_HEADERS";
     private final DefaultSecurityManager securityManager;
     private Provider<Request> grizzlyRequestProvider;
     private final Set<IpSubnet> trustedProxies;
@@ -68,9 +66,6 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
 
         final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedProxies);
         final String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
-
-        // make headers available to authenticators, which otherwise have no access to them
-        ThreadContext.put(REQUEST_HEADERS, headers);
 
         final SecurityContext securityContext;
         if (authHeader != null && authHeader.startsWith("Basic")) {

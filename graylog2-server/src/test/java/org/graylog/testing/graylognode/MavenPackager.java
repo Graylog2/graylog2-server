@@ -72,7 +72,7 @@ public class MavenPackager {
 
     private static Process startProcess(String pomDir) {
         try {
-            return new ProcessBuilder().command("sh", "-c", MVN_COMMAND).directory(new File(pomDir)).start();
+            return new ProcessBuilder().command("sh", "-c", MVN_COMMAND).directory(new File(pomDir)).inheritIO().start();
         } catch (IOException e) {
             String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", MVN_COMMAND);
             throw new RuntimeException(msg, e);

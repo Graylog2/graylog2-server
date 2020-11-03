@@ -3,10 +3,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled, { css } from 'styled-components';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
 
+import { LinkContainer, Link } from 'components/graylog/router';
 import { Alert, Button } from 'components/graylog';
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
@@ -113,7 +112,8 @@ const ProcessingTimelineComponent = createReactClass({
     return (
       <tr key={pipeline.id}>
         <PipelineNameTD>
-          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>{pipeline.title}</Link><br />
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} title={pipeline.title}>{pipeline.title}</Link>
+          <br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>

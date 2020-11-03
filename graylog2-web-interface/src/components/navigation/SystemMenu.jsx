@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import naturalSort from 'javascript-natural-sort';
 
+import withLocation from 'routing/withLocation';
 import { NavDropdown } from 'components/graylog';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
-import URLUtils from 'util/URLUtils';
+import { appPrefixed } from 'util/URLUtils';
 
 import NavigationLink from './NavigationLink';
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
 
 const _systemTitle = (pathname) => {
@@ -83,7 +83,7 @@ const SystemMenu = ({ location }) => {
   const pluginSystemNavigations = PluginStore.exports('systemnavigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
-      const prefixedPath = URLUtils.appPrefixed(path);
+      const prefixedPath = appPrefixed(path);
       const link = <NavigationLink description={description} path={prefixedPath} />;
 
       if (permissions) {
@@ -112,13 +112,19 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['loggers:read']}>
         <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
       </IfPermitted>
-      <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
-        <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} description="Authentication" />
+      <IfPermitted permissions={['users:list']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.USERS.OVERVIEW} description="Users and Teams" />
+      </IfPermitted>
+      <IfPermitted permissions={['roles:read']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} description="Roles" />
+      </IfPermitted>
+      <IfPermitted permissions={['authentication:edit']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} description="Authentication" />
       </IfPermitted>
       <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['inputs:read']}>
         <NavigationLink path={Routes.SYSTEM.GROKPATTERNS} description="Grok Patterns" />
       </IfPermitted>
       <IfPermitted permissions={['inputs:edit']}>
@@ -141,4 +147,4 @@ SystemMenu.propTypes = {
   }).isRequired,
 };
 
-export default withRouter(SystemMenu);
+export default withLocation(SystemMenu);

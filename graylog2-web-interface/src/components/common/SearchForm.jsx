@@ -30,6 +30,8 @@ class SearchForm extends React.Component {
     onReset: PropTypes.func,
     /** Search field label. */
     label: PropTypes.string,
+    /** The className is needed to override the component style with styled-components  */
+    className: PropTypes.string,
     /** Search field placeholder. */
     placeholder: PropTypes.string,
     /** Class name for the search form container. */
@@ -79,6 +81,7 @@ class SearchForm extends React.Component {
 
   static defaultProps = {
     query: '',
+    className: '',
     onQueryChange: () => {},
     onReset: null,
     label: null,
@@ -182,6 +185,7 @@ class SearchForm extends React.Component {
       queryWidth,
       focusAfterMount,
       children,
+      className,
       placeholder,
       resetButtonLabel,
       buttonLeftMargin,
@@ -196,9 +200,9 @@ class SearchForm extends React.Component {
     const { query, isLoading } = this.state;
 
     return (
-      <div className={wrapperClass} style={{ marginTop: topMargin }}>
+      <div className={`${wrapperClass} ${className}`} style={{ marginTop: topMargin }}>
         <form className="form-inline" onSubmit={this._onSearch}>
-          <div className="form-group has-feedback">
+          <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
             {label && <label htmlFor="common-search-form-query-input" className="control-label">{label}</label>}
             <input id="common-search-form-query-input"
                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
@@ -220,7 +224,7 @@ class SearchForm extends React.Component {
                     type="submit"
                     disabled={isLoading}
                     className="submit-button">
-              {isLoading ? <Spinner text={loadingLabel} /> : searchButtonLabel}
+              {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
             </Button>
           </div>
           {onReset

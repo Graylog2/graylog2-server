@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
@@ -9,6 +9,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { StreamAlertsOverviewContainer } from 'components/alerts';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+import withParams from 'routing/withParams';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
 
@@ -71,4 +72,4 @@ class StreamAlertsOverviewPage extends React.Component {
   }
 }
 
-export default StreamAlertsOverviewPage;
+export default withParams(StreamAlertsOverviewPage);

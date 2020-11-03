@@ -11,6 +11,21 @@ Prior to v3.3.3, the certificates of LDAP servers which are connected to using a
 
 A `CVE <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-15813>`_ is tracked for this issue.
 
+Change of API endpoint for user retrieval and modification
+==========================================================
+
+In 4.0 we changed most of the user API endpoint `/users` to expect user IDs instead of names.
+
+Deprecation of API endpoint for unpaginated listing of grok patterns
+====================================================================
+
+In 3.0 we introduce a new API endpoint to retrieve grok patterns from the backend: '/system/grok/paginated' which allows
+to pass pagination parameters.
+We therefore mark '/system/grok' as deprecated. Users who use this endpoint for scripting purpose should change
+their scripts to the format of the new endpoint, so they only need to to change the URL when '/system/grok/paginated' will become
+'/system/grok'.
+
+
 Deprecation of API endpoint for unpaginated listing of streams
 ==============================================================
 
@@ -19,6 +34,15 @@ to pass pagination parameters.
 We therefore mark '/streams' as deprecated. Users who use this endpoint for scripting purpose should change
 their scripts to the format of the new endpoint, so they only need to to change the URL when '/streams/paginated' will become
 '/streams'.
+
+Deprecation of API endpoint for unpaginated listing of users
+==============================================================
+
+In 4.0 we introduce a new API endpoint to retrieve users from the backend: '/users/paginated' which allows
+to pass pagination parameters.
+We therefore mark '/users' as deprecated. Users who use this endpoint for scripting purpose should change
+their scripts to the format of the new endpoint, so they only need to to change the URL when '/users/paginated' will become
+'/users'.
 
 Removal of legacy Dashboard API
 ===============================

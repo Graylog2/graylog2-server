@@ -43,6 +43,8 @@ public class JestClientProviderTest {
                 Duration.seconds(5L),
                 "http",
                 false,
+                null,
+                null,
                 new ObjectMapper()
         );
 
@@ -65,6 +67,8 @@ public class JestClientProviderTest {
                 Duration.seconds(5L),
                 "http",
                 false,
+                null,
+                null,
                 new ObjectMapper()
         );
 
@@ -87,6 +91,8 @@ public class JestClientProviderTest {
                 Duration.seconds(5L),
                 "http",
                 false,
+                null,
+                null,
                 new ObjectMapper()
         );
 

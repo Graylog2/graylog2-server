@@ -30,8 +30,6 @@ import org.graylog.events.notifications.EventBacklogService;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.jackson.TypeReferences;
@@ -46,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -54,7 +51,6 @@ import static java.util.Objects.requireNonNull;
 
 public class EmailSender {
     private static final Logger LOG = LoggerFactory.getLogger(EmailSender.class);
-    private static final String UNKNOWN = "<unknown>";
 
     private final EmailConfiguration emailConfig;
     private final EmailRecipients.Factory emailRecipientsFactory;
@@ -109,21 +105,7 @@ public class EmailSender {
     }
 
     private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) {
-        final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
-        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
-
-        // TODO: This needs at search URL, event definition URL, anything else?
-        final EventNotificationModelData modelData = EventNotificationModelData.builder()
-                .eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN))
-                .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
-                .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
-                .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
-                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
-                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
-                .event(ctx.event())
-                .backlog(backlog)
-                .build();
-
+        final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
         return objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
     }
 

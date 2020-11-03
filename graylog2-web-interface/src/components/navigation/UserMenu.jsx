@@ -1,7 +1,8 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { NavDropdown, MenuItem } from 'components/graylog';
@@ -14,38 +15,47 @@ import ThemeModeToggle from './ThemeModeToggle';
 const SessionStore = StoreProvider.getStore('Session');
 const SessionActions = ActionsProvider.getActions('Session');
 
-class UserMenu extends React.Component {
-  onLogoutClicked = () => {
+type Props = {
+  fullName: string,
+  userId: string,
+  readOnly: boolean,
+};
+
+const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
+  const route = readOnly
+    ? Routes.SYSTEM.USERS.show(userId)
+    : Routes.SYSTEM.USERS.edit(userId);
+  const label = readOnly
+    ? 'Show profile'
+    : 'Edit profile';
+
+  const onLogoutClicked = () => {
     SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
       history.push(Routes.STARTPAGE);
     });
   };
 
-  render() {
-    const { fullName, loginName } = this.props;
-
-    return (
-      <NavDropdown title={<Icon name="user" size="lg" />}
-                   aria-label={fullName}
-                   id="user-menu-dropdown"
-                   noCaret>
-        <MenuItem header>{fullName}</MenuItem>
-        <MenuItem divider />
-        <MenuItem header>
-          <ThemeModeToggle />
-        </MenuItem>
-        <MenuItem divider />
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(loginName))}>
-          <MenuItem>Edit profile</MenuItem>
-        </LinkContainer>
-        <MenuItem onSelect={this.onLogoutClicked}><Icon name="sign-out-alt" /> Log out</MenuItem>
-      </NavDropdown>
-    );
-  }
-}
+  return (
+    <NavDropdown title={<Icon name="user" size="lg" />}
+                 aria-label={fullName}
+                 id="user-menu-dropdown"
+                 noCaret>
+      <MenuItem header>{fullName}</MenuItem>
+      <MenuItem divider />
+      <MenuItem header>
+        <ThemeModeToggle />
+      </MenuItem>
+      <MenuItem divider />
+      <LinkContainer to={route}>
+        <MenuItem>{label}</MenuItem>
+      </LinkContainer>
+      <MenuItem onSelect={onLogoutClicked}><Icon name="sign-out-alt" /> Log out</MenuItem>
+    </NavDropdown>
+  );
+};
 
 UserMenu.propTypes = {
-  loginName: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
 };
 

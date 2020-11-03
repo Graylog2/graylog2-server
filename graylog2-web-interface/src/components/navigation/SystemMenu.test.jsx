@@ -17,6 +17,8 @@ jest.mock('util/AppConfig', () => ({
   gl2DevMode: jest.fn(() => false),
 }));
 
+jest.mock('routing/withLocation', () => (x) => x);
+
 describe('SystemMenu', () => {
   let exports;
 
@@ -45,7 +47,7 @@ describe('SystemMenu', () => {
 
     beforeEach(() => {
       // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu');
+      SystemMenu = require('./SystemMenu').default;
     });
 
     const verifyPermissions = ({ permissions, count, links }) => {
@@ -61,14 +63,15 @@ describe('SystemMenu', () => {
     permissions                    | count | links
     ${[]}                          | ${2}  | ${['Overview', 'Nodes']}
     ${['clusterconfigentry:read']} | ${3}  | ${['Configurations']}
-    ${['inputs:read']}             | ${3}  | ${['Inputs']}
+    ${['inputs:read']}             | ${4}  | ${['Inputs', 'Grok Patterns']}
     ${['outputs:read']}            | ${3}  | ${['Outputs']}
     ${['indices:read']}            | ${3}  | ${['Indices']}
     ${['loggers:read']}            | ${3}  | ${['Logging']}
-    ${['users:list']}              | ${3}  | ${['Authentication']}
-    ${['roles:read']}              | ${3}  | ${['Authentication']}
+    ${['authentication:edit']}     | ${3}  | ${['Authentication']}
+    ${['users:list']}              | ${3}  | ${['Users and Teams']}
+    ${['roles:read']}              | ${3}  | ${['Roles']}
     ${['dashboards:create', 'inputs:create', 'streams:create']} | ${4}  | ${['Content Packs']}
-    ${['inputs:edit']}             | ${5}  | ${['Grok Patterns', 'Lookup Tables', 'Sidecars']}
+    ${['inputs:edit']}             | ${4}  | ${['Lookup Tables', 'Sidecars']}
     ${['inputs:create']}           | ${3}  | ${['Pipelines']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
@@ -83,7 +86,7 @@ describe('SystemMenu', () => {
       ];
 
       // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu');
+      SystemMenu = require('./SystemMenu').default;
     });
 
     afterEach(() => {
@@ -129,7 +132,7 @@ describe('SystemMenu', () => {
       ];
 
       // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu');
+      SystemMenu = require('./SystemMenu').default;
     });
 
     afterEach(() => {

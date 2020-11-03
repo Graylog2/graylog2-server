@@ -27,8 +27,8 @@ public class VersionAwareProvider<T> implements Provider<T> {
     private final Map<Version, Provider<T>> pluginBindings;
 
     @Inject
-    public VersionAwareProvider(@ElasticsearchVersion Version elasticsearchMajorVersion, Map<Version, Provider<T>> pluginBindings) {
-        this.elasticsearchMajorVersion = elasticsearchMajorVersion;
+    public VersionAwareProvider(@ElasticsearchVersion Version elasticsearchVersion, Map<Version, Provider<T>> pluginBindings) {
+        this.elasticsearchMajorVersion = majorVersionFrom(elasticsearchVersion);
         this.pluginBindings = pluginBindings;
     }
 
@@ -36,8 +36,12 @@ public class VersionAwareProvider<T> implements Provider<T> {
     public T get() {
         final Provider<T> provider = this.pluginBindings.get(elasticsearchMajorVersion);
         if (provider == null) {
-            throw new IllegalStateException("Incomplete Elasticsearch implementation for version \"" + elasticsearchMajorVersion + "\".");
+            throw new UnsupportedElasticsearchException(elasticsearchMajorVersion);
         }
         return provider.get();
+    }
+
+    private Version majorVersionFrom(Version version) {
+        return Version.from(version.getVersion().getMajorVersion(), 0, 0);
     }
 }

@@ -11,7 +11,7 @@ import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 jest.mock('components/graylog/Popover');
 
 // eslint-disable-next-line global-require
-jest.mock('views/components/visualizations/plotly/AsyncPlot', () => require('views/components/visualizations/plotly/Plot'));
+jest.mock('views/components/visualizations/plotly/AsyncPlot', () => require('views/components/visualizations/plotly/Plot').default);
 jest.mock('components/common/ColorPicker', () => 'color-picker');
 
 describe('GenericPlot', () => {

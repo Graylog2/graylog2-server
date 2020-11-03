@@ -52,6 +52,7 @@ import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.ElasticsearchExceptionMapper;
@@ -89,7 +90,6 @@ import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserPermissionsCleanupListener;
-import org.graylog2.utilities.GRNRegistry;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -111,7 +111,6 @@ public class ServerBindings extends Graylog2Module {
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
-        bindGRNRegistry();
         install(new AuthenticatingRealmModule(configuration));
         install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();
@@ -196,6 +195,7 @@ public class ServerBindings extends Graylog2Module {
         final Multibinder<Class<? extends ExceptionMapper>> exceptionMappers = jerseyExceptionMapperBinder();
         exceptionMappers.addBinding().toInstance(NotFoundExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ValidationExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(ValidationFailureExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ElasticsearchExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(QueryParsingExceptionMapper.class);
     }
@@ -217,9 +217,5 @@ public class ServerBindings extends Graylog2Module {
     private void bindSearchResponseDecorators() {
         // only triggering an initialize to make sure that the binding exists
         searchResponseDecoratorBinder();
-    }
-
-    private void bindGRNRegistry() {
-        bind(GRNRegistry.class).toInstance(GRNRegistry.createWithBuiltinTypes());
     }
 }

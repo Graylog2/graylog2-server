@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Select from 'components/common/Select';
+import { Select } from 'components/common';
 
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
@@ -18,13 +18,12 @@ class TimeoutUnitSelect extends React.Component {
   ];
 
   getValue = () => {
-    return this.session_timeout_unit.value;
+    return this.sessionTimeoutUnit.value;
   };
 
   render() {
     return (
-      <TimeoutSelect type="select"
-                     ref={(sessionTimeoutUnit) => { this.session_timeout_unit = sessionTimeoutUnit; }}
+      <TimeoutSelect ref={(sessionTimeoutUnit) => { this.session_timeout_unit = sessionTimeoutUnit; }}
                      options={this.options}
                      {...this.props} />
     );

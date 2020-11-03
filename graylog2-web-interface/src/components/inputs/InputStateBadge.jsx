@@ -39,6 +39,7 @@ const InputStateBadge = createReactClass({
       case 'RUNNING':
         return 'success';
       case 'FAILED':
+      case 'STOPPED':
         return 'danger';
       case 'STARTING':
         return 'info';
@@ -115,7 +116,7 @@ const InputStateBadge = createReactClass({
     const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
     return (
-      <Label bsStyle="danger" bsSize="xsmall">{text}</Label>
+      <Label bsStyle="warning" bsSize="xsmall">{text}</Label>
     );
   },
 });
