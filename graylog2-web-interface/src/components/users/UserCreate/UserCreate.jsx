@@ -134,7 +134,7 @@ const UserCreate = () => {
                 </Row>
               )}
               <Row>
-                <Col xs={9} xsOffset={3}>
+                <Col md={9} mdOffset={3}>
                   <ButtonToolbar>
                     <Button bsStyle="success"
                             disabled={isSubmitting || !isValid || !hasValidRole}
