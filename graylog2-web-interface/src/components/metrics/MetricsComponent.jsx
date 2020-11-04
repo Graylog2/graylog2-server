@@ -9,7 +9,7 @@ import { MetricsFilterInput, MetricsList } from 'components/metrics';
 const StyledWarningDiv = styled.div(({ theme }) => `
   height: 20px;
   margin-bottom: 5px;
-  color: ${theme.color.variant.dark.danger};
+  color: ${theme.colors.variant.dark.danger};
 `);
 
 class MetricsComponent extends React.Component {
