@@ -58,7 +58,7 @@ const HTTPHeaderAuthConfigSection = () => {
             <FormikFormGroup label="Username header"
                              name="username_header"
                              required
-                             help="HTTP header containing the implicitly trusted name of the Graylog user" />
+                             help="HTTP header containing the implicitly trusted name of the Graylog user. (The header match is ignoring case sensitivity)" />
             <Row>
               <Col mdOffset={3} md={9}>
                 <Alert bsStyle="info">
