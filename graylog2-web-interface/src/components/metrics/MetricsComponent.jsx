@@ -53,7 +53,15 @@ class MetricsComponent extends React.Component {
           <Col md={12}>
             <Alert bsStyle="danger">
               <Icon name="exclamation-triangle" />&nbsp;
-              There was a problem fetching node metrics. Graylog will keep trying to get them in the background.
+              {error ? (
+                <span>
+                  Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em>{' '}
+                  with a {error.status} status code.
+                </span>
+              ) : (
+                <span>There was a problem fetching node metrics.</span>
+              )}
+              {' '}Graylog will keep trying to get them in the background.
             </Alert>
           </Col>
         </Row>
@@ -77,8 +85,8 @@ class MetricsComponent extends React.Component {
             {error && (
               <>
                 <Icon name="exclamation-triangle" />&nbsp;
-                Fetching metrics from node returned {error.responseMessage || ''} with a {error.status} status code,{' '}
-                displaying last metrics available.
+                Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em>{' '}
+                with a {error.status} status code. Displaying last metrics available.
               </>
             )}
           </StyledWarningDiv>
