@@ -94,7 +94,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
                 return doAuthenticate(username);
             }
 
-            LOG.warn("Request with trusted HTTP header <{}={}> received from <{}> which is not in the trusted subnets: {}",
+            LOG.warn("Request with trusted HTTP header <{}={}> received from <{}> which is not in the trusted proxies: <{}>",
                     config.usernameHeader(),
                     username,
                     headersToken.getRemoteAddr(),
