@@ -91,7 +91,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
             }
 
             if (inTrustedSubnets(headersToken.getRemoteAddr())) {
-                return doAuthenticate(username);
+                return doAuthenticate(username, config);
             }
 
             LOG.warn("Request with trusted HTTP header <{}={}> received from <{}> which is not in the trusted proxies: <{}>",
@@ -105,7 +105,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
         return null;
     }
 
-    private AuthenticationInfo doAuthenticate(String username) {
+    private AuthenticationInfo doAuthenticate(String username, HTTPHeaderAuthConfig config) {
         LOG.debug("Attempting authentication for username <{}>", username);
         try {
             // Create already authenticated credentials to make sure the auth service backend doesn't try to
@@ -118,8 +118,8 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
                         result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
                 return toAuthenticationInfo(result);
             } else {
-                LOG.warn("Failed to authenticate username <{}> with backend <{}/{}/{}>",
-                        result.username(), result.backendTitle(), result.backendType(), result.backendId());
+                LOG.warn("Failed to authenticate username <{}> via trusted HTTP header <{}>",
+                        result.username(), config.usernameHeader());
                 return null;
             }
         } catch (AuthServiceException e) {
