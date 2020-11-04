@@ -16,6 +16,8 @@
  */
 package org.graylog.security.authservice;
 
+import com.google.common.eventbus.EventBus;
+import org.graylog.security.events.AuthServiceBackendDeletedEvent;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -29,22 +31,37 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceBackendDTO> {
     private final Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories;
+    private final EventBus eventBus;
 
     @Inject
     protected DBAuthServiceBackendService(MongoConnection mongoConnection,
                                           MongoJackObjectMapperProvider mapper,
-                                          Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories) {
+                                          Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories,
+                                          EventBus eventBus) {
         super(mongoConnection, mapper, AuthServiceBackendDTO.class, "auth_service_backends");
         this.backendFactories = backendFactories;
+        this.eventBus = eventBus;
     }
 
     @Override
     public AuthServiceBackendDTO save(AuthServiceBackendDTO newBackend) {
         return super.save(prepareUpdate(newBackend));
+    }
+
+    @Override
+    public int delete(String id) {
+        checkArgument(isNotBlank(id), "id cannot be blank");
+        final int delete = super.delete(id);
+        if (delete > 0) {
+            eventBus.post(AuthServiceBackendDeletedEvent.create(id));
+        }
+        return delete;
     }
 
     private AuthServiceBackendDTO prepareUpdate(AuthServiceBackendDTO newBackend) {

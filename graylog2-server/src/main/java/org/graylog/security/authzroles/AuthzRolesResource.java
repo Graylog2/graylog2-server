@@ -65,8 +65,8 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 
 @RequiresAuthentication
-@Api(value = "AuthzRoles", description = "Read Roles")
-@Path("/authzRoles")
+@Api(value = "Authorization/Roles", description = "Manage roles")
+@Path("/authz/roles")
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthzRolesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
@@ -179,7 +179,7 @@ public class AuthzRolesResource extends RestResource {
 
     @GET
     @ApiOperation(value = "Get a paginated list roles for a user")
-    @Path("/rolesForUser/{username}")
+    @Path("/user/{username}")
     @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getListForUser(
         @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
@@ -213,7 +213,7 @@ public class AuthzRolesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Add user to role")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
-    @Path("{roleId}/assignee")
+    @Path("{roleId}/assignees")
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "usernames") Set<String> usernames) throws ValidationException {
