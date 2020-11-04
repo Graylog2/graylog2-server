@@ -88,7 +88,7 @@ const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee:
     <Formik initialValues={{ capabilityId }} onSubmit={() => {}}>
       <Form>
         <Container currentState={currentGranteeState}>
-          <GranteeInfo>
+          <GranteeInfo title={title}>
             <StyledGranteeIcon type={type} />
             <Title>{title}</Title>
           </GranteeInfo>
