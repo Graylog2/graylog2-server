@@ -92,9 +92,11 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
 
             final LDAPUser userEntry = optionalUser.get();
 
-            if (!isAuthenticated(connection, userEntry, authCredentials)) {
-                LOG.debug("Invalid credentials for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
-                return Optional.empty();
+            if (!authCredentials.isAuthenticated()) {
+                if (!isAuthenticated(connection, userEntry, authCredentials)) {
+                    LOG.debug("Invalid credentials for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
+                    return Optional.empty();
+                }
             }
 
             final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
