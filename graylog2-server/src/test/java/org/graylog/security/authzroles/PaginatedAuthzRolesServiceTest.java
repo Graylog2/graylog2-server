@@ -24,6 +24,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,9 +33,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mongojack.DBQuery;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
@@ -43,11 +46,14 @@ import static org.mockito.Mockito.when;
 @MongoDBFixtures("roles.json")
 class PaginatedAuthzRolesServiceTest {
     private PaginatedAuthzRolesService service;
+    private UserService userService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoObjectMapperProvider) {
-        this.service = new PaginatedAuthzRolesService(mongodb.mongoConnection(), mongoObjectMapperProvider);
+               MongoJackObjectMapperProvider mongoObjectMapperProvider,
+               @Mock UserService userService) {
+        this.userService = userService;
+        this.service = new PaginatedAuthzRolesService(mongodb.mongoConnection(), userService, mongoObjectMapperProvider);
     }
 
     @Test
@@ -164,5 +170,17 @@ class PaginatedAuthzRolesServiceTest {
                 "5f1f0d2a6f58d7c052d4977b",
                 "5f22792d6f58d7c0521edb23"
         ));
+    }
+
+    @Test
+    void delete() {
+        final String roleId = "5d41bb973086a840541a3ed2";
+        final Optional<AuthzRoleDTO> role = service.get(roleId);
+
+        assertThat(role).isPresent();
+
+        service.delete(roleId);
+
+        verify(userService).dissociateAllUsersFromRole(role.get().toLegacyRole());
     }
 }

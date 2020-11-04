@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.shared.users.Role;
+import org.graylog2.users.RoleImpl;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -55,6 +57,16 @@ public abstract class AuthzRoleDTO {
 
     @JsonProperty(FIELD_READ_ONLY)
     public abstract boolean readOnly();
+
+    public Role toLegacyRole() {
+        final RoleImpl legacyRole = new RoleImpl();
+        legacyRole._id = id();
+        legacyRole.setName(name());
+        legacyRole.setDescription(description());
+        legacyRole.setPermissions(permissions());
+        legacyRole.setReadOnly(readOnly());
+        return legacyRole;
+    }
 
     public static Builder builder() {
         return Builder.create();
