@@ -90,14 +90,15 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
                 return null;
             }
 
-            if (inTrustedSubnets(headersToken.getRemoteAddr())) {
-                return doAuthenticate(username, config);
+            final String remoteAddr = headersToken.getRemoteAddr();
+            if (inTrustedSubnets(remoteAddr)) {
+                return doAuthenticate(username, config, remoteAddr);
             }
 
             LOG.warn("Request with trusted HTTP header <{}={}> received from <{}> which is not in the trusted proxies: <{}>",
                     config.usernameHeader(),
                     username,
-                    headersToken.getRemoteAddr(),
+                    remoteAddr,
                     JOINER.join(trustedProxies));
             return null;
         }
@@ -105,7 +106,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
         return null;
     }
 
-    private AuthenticationInfo doAuthenticate(String username, HTTPHeaderAuthConfig config) {
+    private AuthenticationInfo doAuthenticate(String username, HTTPHeaderAuthConfig config, String remoteAddr) {
         LOG.debug("Attempting authentication for username <{}>", username);
         try {
             // Create already authenticated credentials to make sure the auth service backend doesn't try to
@@ -118,8 +119,8 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
                         result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
                 return toAuthenticationInfo(result);
             } else {
-                LOG.warn("Failed to authenticate username <{}> via trusted HTTP header <{}>",
-                        result.username(), config.usernameHeader());
+                LOG.warn("Failed to authenticate username <{}> from trusted HTTP header <{}> via proxy <{}>",
+                        result.username(), config.usernameHeader(), remoteAddr);
                 return null;
             }
         } catch (AuthServiceException e) {
