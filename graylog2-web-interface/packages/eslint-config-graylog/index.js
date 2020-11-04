@@ -4,6 +4,11 @@ module.exports = {
     browser: true,
     jest: true,
   },
+  overrides: [
+    {
+      files: ['*.js', '*.jsx'],
+    },
+  ],
   extends: [
     'eslint:recommended',
     'airbnb',
