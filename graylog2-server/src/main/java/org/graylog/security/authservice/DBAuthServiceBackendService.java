@@ -57,8 +57,11 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
     @Override
     public int delete(String id) {
         checkArgument(isNotBlank(id), "id cannot be blank");
-        eventBus.post(AuthServiceBackendDeletedEvent.create(id));
-        return super.delete(id);
+        final int delete = super.delete(id);
+        if (delete > 0) {
+            eventBus.post(AuthServiceBackendDeletedEvent.create(id));
+        }
+        return delete;
     }
 
     private AuthServiceBackendDTO prepareUpdate(AuthServiceBackendDTO newBackend) {
