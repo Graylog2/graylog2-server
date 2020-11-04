@@ -85,6 +85,10 @@ const Routes = {
           return editUrl;
         },
       },
+      AUTHENTICATORS: {
+        SHOW: '/system/authentication/authenticator',
+        EDIT: '/system/authentication/authenticator/edit',
+      },
     },
     USERS: {
       CREATE: '/system/users/new',

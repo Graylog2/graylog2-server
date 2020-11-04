@@ -74,9 +74,11 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
             return Optional.empty();
         }
 
-        if (!isValidPassword(user, authCredentials.password())) {
-            LOG.warn("Failed to validate password for user <{}>", username);
-            return Optional.empty();
+        if (!authCredentials.isAuthenticated()) {
+            if (!isValidPassword(user, authCredentials.password())) {
+                LOG.warn("Failed to validate password for user <{}>", username);
+                return Optional.empty();
+            }
         }
 
         LOG.debug("Successfully validated password for user <{}>", username);

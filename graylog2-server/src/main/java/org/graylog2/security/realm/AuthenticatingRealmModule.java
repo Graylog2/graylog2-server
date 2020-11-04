@@ -48,6 +48,7 @@ public class AuthenticatingRealmModule extends Graylog2Module {
         //add(auth, LdapUserAuthenticator.NAME, LdapUserAuthenticator.class);
         //add(auth, PasswordAuthenticator.NAME, PasswordAuthenticator.class);
         add(auth, SessionAuthenticator.NAME, SessionAuthenticator.class);
+        add(auth, HTTPHeaderAuthenticationRealm.NAME, HTTPHeaderAuthenticationRealm.class);
         add(auth, AuthServiceRealm.NAME, AuthServiceRealm.class);
     }
 

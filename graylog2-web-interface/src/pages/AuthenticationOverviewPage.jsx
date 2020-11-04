@@ -8,7 +8,7 @@ import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendsOverview from 'components/authentication/BackendsOverview';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 
@@ -27,8 +27,7 @@ const AuthenticationOverviewPage = () => {
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
-          <BackendOverviewLinks activeBackend={activeBackend}
-                                finishedLoading={finishedLoading} />
+          <AuthenticationOverviewLinks />
         </PageHeader>
         {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">

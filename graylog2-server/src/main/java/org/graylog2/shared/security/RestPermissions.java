@@ -33,6 +33,8 @@ public class RestPermissions implements PluginPermissions {
      */
     public static final String AUTHENTICATION_READ = "authentication:read";
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
+    public static final String AUTH_HTTP_HEADER_CONFIG_EDIT = "authhttpheaderconfig:edit";
+    public static final String AUTH_HTTP_HEADER_CONFIG_READ = "authhttpheaderconfig:read";
     public static final String AUTH_SERVICE_BACKEND_CREATE = "authservicebackend:create";
     public static final String AUTH_SERVICE_BACKEND_DELETE = "authservicebackend:delete";
     public static final String AUTH_SERVICE_BACKEND_EDIT = "authservicebackend:edit";
@@ -163,6 +165,8 @@ public class RestPermissions implements PluginPermissions {
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(AUTHENTICATION_EDIT, ""))
             .add(create(AUTHENTICATION_READ, ""))
+            .add(create(AUTH_HTTP_HEADER_CONFIG_EDIT, ""))
+            .add(create(AUTH_HTTP_HEADER_CONFIG_READ, ""))
             .add(create(AUTH_SERVICE_BACKEND_CREATE, ""))
             .add(create(AUTH_SERVICE_BACKEND_DELETE, ""))
             .add(create(AUTH_SERVICE_BACKEND_EDIT, ""))

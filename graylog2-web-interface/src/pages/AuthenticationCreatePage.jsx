@@ -2,12 +2,12 @@
 import * as React from 'react';
 
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import { DocumentTitle, PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 
 const AuthenticationCreatePage = () => {
@@ -24,8 +24,7 @@ const AuthenticationCreatePage = () => {
         <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                  text="documentation" />.
         </span>
-        <BackendOverviewLinks activeBackend={activeBackend}
-                              finishedLoading={finishedLoading} />
+        <AuthenticationOverviewLinks />
       </PageHeader>
 
       <GettingStarted title="Create New Authentication Service" />
