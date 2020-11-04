@@ -2,7 +2,7 @@ import toastr from 'toastr';
 
 import './UserNotification.css';
 
-const genericSettings = {
+const defaultSettings = {
   debug: false,
   positionClass: 'toast-bottom-full-width',
   onclick: null,
@@ -12,7 +12,7 @@ const genericSettings = {
   extendedTimeOut: 1000,
   escapeHtml: true,
   closeButton: true,
-  closeHtml: '<button>Click to Close</button>',
+  closeHtml: '<button>Close</button>',
   progressBar: true,
   preventDuplicates: true,
 };
@@ -20,15 +20,15 @@ const genericSettings = {
 const UserNotification = {
   error(message, title) {
     toastr.error(message, title || 'Error', {
-      ...genericSettings,
+      ...defaultSettings,
       timeOut: 10000,
     });
   },
   warning(message, title) {
-    toastr.warning(message, title || 'Attention', genericSettings);
+    toastr.warning(message, title || 'Attention', defaultSettings);
   },
   success(message, title) {
-    toastr.success(message, title || 'Information', genericSettings);
+    toastr.success(message, title || 'Information', defaultSettings);
   },
 };
 
