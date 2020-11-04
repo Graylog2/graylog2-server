@@ -7,7 +7,6 @@ import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import TimeHelper from 'util/TimeHelper';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import UserNotification from 'util/UserNotification';
 
 const SessionStore = StoreProvider.getStore('Session');
 const NodesStore = StoreProvider.getStore('Nodes');
@@ -171,21 +170,20 @@ const MetricsStore = Reflux.createStore({
       return fetch('GET', url).then((response) => {
         return { nodeId: nodeId, names: response.metrics };
       }, (error) => {
-        UserNotification.error(`Fetching metrics for node [${nodeId}] failed with: ${error}.`,
-          'Could not fetch node metrics');
         // When fetching metrics fails, keep previous available metrics around, letting user see them
         return { nodeId: nodeId, names: this.metricsNames[nodeId], error: error };
       });
     })).then((responses) => {
       const metricsNames = {};
-
+      const metricsErrors = {};
       responses.forEach((response) => {
         if (response.nodeId) {
           metricsNames[response.nodeId] = response.names;
+          metricsErrors[response.nodeId] = response.error;
         }
       });
 
-      this.trigger({ metricsNames: metricsNames });
+      this.trigger({ metricsNames: metricsNames, metricsErrors: metricsErrors });
       this.metricsNames = metricsNames;
 
       return metricsNames;

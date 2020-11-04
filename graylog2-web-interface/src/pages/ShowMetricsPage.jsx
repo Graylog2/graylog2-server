@@ -5,8 +5,7 @@ import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import { DocumentTitle, Icon, PageHeader, Spinner } from 'components/common';
-import { Alert, Col, Row } from 'components/graylog';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
@@ -44,10 +43,13 @@ const ShowMetricsPage = createReactClass({
       nodeId = masterNodes[0] || nodeIDs[0];
     }
 
+    const { metricsNames, metricsErrors } = this.state;
+
     const node = this.state.nodes[nodeId];
     const title = <span>Metrics of node {node.short_node_id} / {node.hostname}</span>;
     const { namespace } = MetricsStore;
-    const names = this.state.metricsNames[nodeId];
+    const names = metricsNames[nodeId];
+    const error = metricsErrors ? metricsErrors[nodeId] : undefined;
     const { filter } = this.props.location.query;
 
     return (
@@ -63,21 +65,9 @@ const ShowMetricsPage = createReactClass({
             ) : (
               <span>Could not fetch metrics for this node.</span>
             )}
-
           </PageHeader>
 
-          {names ? (
-            <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} />
-          ) : (
-            <Row className="content">
-              <Col md={12}>
-                <Alert bsStyle="danger">
-                  <Icon name="exclamation-triangle" />&nbsp;
-                  There was a problem fetching node metrics. Graylog will keep trying to get them in the background.
-                </Alert>
-              </Col>
-            </Row>
-          )}
+          <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} error={error} />
         </span>
       </DocumentTitle>
     );
