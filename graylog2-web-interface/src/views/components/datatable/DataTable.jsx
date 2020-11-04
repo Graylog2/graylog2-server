@@ -86,7 +86,8 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
 
   const seriesToMerge = rollup ? series : [];
-  const effectiveFields = Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({ effectiveName }) => effectiveName));
+  const effectiveFields = Immutable.OrderedSet(rowFieldNames.map((field) => ({ field, source: field })))
+    .merge(seriesToMerge.map((s) => ({ field: s.effectiveName, source: s.function })));
 
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r) => r.source === 'leaf'));
 

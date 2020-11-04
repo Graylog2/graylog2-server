@@ -85,7 +85,11 @@ describe('XYPlot', () => {
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} config={emptyConfig} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', { yaxis: { fixedrange: true, rangemode: 'tozero' }, xaxis: { fixedrange: true } });
+    expect(genericPlot).toHaveProp('layout', {
+      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',g' },
+      xaxis: { fixedrange: true },
+    });
+
     expect(genericPlot).toHaveProp('chartData', chartData);
 
     genericPlot.get(0).props.onZoom('from', 'to');
@@ -99,10 +103,9 @@ describe('XYPlot', () => {
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero' },
+    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
       xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
-    });
+    }));
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
 
@@ -122,42 +125,35 @@ describe('XYPlot', () => {
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero' },
+    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
       xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
-    });
+    }));
   });
 
   it('sets correct plot legend position for small containers', () => {
     const wrapper = mount(<SimpleXYPlot height={140} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero' },
-      xaxis: { fixedrange: true },
+    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
       legend: { y: -0.6 },
-    });
+    }));
   });
 
   it('sets correct plot legend position for containers with medium height', () => {
     const wrapper = mount(<SimpleXYPlot height={350} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero' },
-      xaxis: { fixedrange: true },
+    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
       legend: { y: -0.2 },
-    });
+    }));
   });
 
   it('sets correct plot legend position for containers with huge height', () => {
     const wrapper = mount(<SimpleXYPlot height={700} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero' },
-      xaxis: { fixedrange: true },
+    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
       legend: { y: -0.14 },
-    });
+    }));
   });
 });
