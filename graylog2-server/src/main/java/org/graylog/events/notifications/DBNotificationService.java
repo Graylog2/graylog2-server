@@ -51,4 +51,10 @@ public class DBNotificationService extends PaginatedDbService<NotificationDto> {
         entityOwnerShipService.registerNewEventNotification(dto.id(), user);
         return dto;
     }
+
+    @Override
+    public int delete(String id) {
+        entityOwnerShipService.unregisterEventNotification(id);
+        return super.delete(id);
+    }
 }

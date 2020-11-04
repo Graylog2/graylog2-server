@@ -61,11 +61,11 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     }
 
     private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
-                                                  Predicate<ViewDTO> filter,
-                                                  String order,
-                                                  String sortField,
-                                                  int page,
-                                                  int perPage) {
+                                                   Predicate<ViewDTO> filter,
+                                                   String order,
+                                                   String sortField,
+                                                   int page,
+                                                   int perPage) {
         final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
@@ -83,7 +83,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         return searchPaginated(query.toDBQuery(), filter, order, sortField, page, perPage);
     }
 
-     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
+    public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
                                                         SearchQuery query,
                                                         Predicate<ViewDTO> filter,
                                                         String order,
@@ -161,9 +161,14 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     @Override
     public int delete(String id) {
-        final int delete = super.delete(id);
-        entityOwnerShipService.unregisterView(id);
-        return delete;
+        get(id).ifPresent(view -> {
+            if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
+                entityOwnerShipService.unregisterDashboard(id);
+            } else {
+                entityOwnerShipService.unregisterSearch(id);
+            }
+        });
+        return super.delete(id);
     }
 
     public ViewDTO update(ViewDTO viewDTO) {
