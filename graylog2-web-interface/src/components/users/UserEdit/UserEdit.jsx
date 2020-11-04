@@ -66,8 +66,7 @@ const UserEdit = ({ user }: Props) => {
                           onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
           </IfPermitted>
           <IfPermitted permissions="teams:edit">
-            <TeamsSection user={user}
-                          onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
+            <TeamsSection user={user} />
           </IfPermitted>
         </div>
       </IfPermitted>
