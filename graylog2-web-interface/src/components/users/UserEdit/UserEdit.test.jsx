@@ -67,5 +67,5 @@ describe('<UserEdit />', () => {
       expect(bob.external).toBeTruthy();
       expect(screen.queryByLabelText('Full Name')).not.toBeInTheDocument();
     });
-  })
+  });
 });
