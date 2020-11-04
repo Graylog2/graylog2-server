@@ -35,6 +35,8 @@ public abstract class LDAPEntry {
 
     public abstract String base64UniqueId();
 
+    public abstract ADUserAccountControl userAccountControl();
+
     public abstract ImmutableSet<String> objectClasses();
 
     public abstract ImmutableListMultimap<String, String> attributes();
@@ -85,6 +87,8 @@ public abstract class LDAPEntry {
         public abstract Builder base64UniqueId(String base64UniqueId);
 
         public abstract Builder objectClasses(Collection<String> objectClasses);
+
+        public abstract Builder userAccountControl(ADUserAccountControl adUserAccountControl);
 
         public abstract ImmutableListMultimap.Builder<String, String> attributesBuilder();
 

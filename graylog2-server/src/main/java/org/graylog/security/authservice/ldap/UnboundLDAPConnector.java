@@ -18,6 +18,7 @@ package org.graylog.security.authservice.ldap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.Ints;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.BindRequest;
 import com.unboundid.ldap.sdk.BindResult;
@@ -194,6 +195,7 @@ public class UnboundLDAPConnector {
                                           Filter filter) throws LDAPException {
         final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
                 .add("userPrincipalName") // TODO: This is ActiveDirectory specific - Do we need this here?
+                .add("userAccountControl")
                 .add("mail")
                 .add("rfc822Mailbox")
                 .add(config.userUniqueIdAttribute())
@@ -265,6 +267,15 @@ public class UnboundLDAPConnector {
             if (uniqueIdAttribute.equalsIgnoreCase(attribute.getBaseName())) {
                 continue;
             }
+            if ("userAccountControl".equalsIgnoreCase(attribute.getBaseName())) {
+                final Integer userAccountControl = Ints.tryParse(attribute.getValue());
+                if (userAccountControl == null) {
+                    LOG.warn("Ignoring non-parseable userAccountControl value");
+                    continue;
+                }
+                ldapEntryBuilder.userAccountControl(ADUserAccountControl.create(userAccountControl));
+                continue;
+            }
 
             if (attribute.needsBase64Encoding()) {
                 for (final byte[] value : attribute.getValueByteArrays()) {
@@ -291,6 +302,7 @@ public class UnboundLDAPConnector {
     public LDAPUser createLDAPUser(UnboundLDAPConfig config, LDAPEntry ldapEntry) {
         return LDAPUser.builder()
                 .base64UniqueId(ldapEntry.base64UniqueId())
+                .userAccountControl(ldapEntry.userAccountControl())
                 .username(ldapEntry.nonBlankAttribute(config.userNameAttribute()))
                 .fullName(ldapEntry.nonBlankAttribute(config.userFullNameAttribute()))
                 .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("")))

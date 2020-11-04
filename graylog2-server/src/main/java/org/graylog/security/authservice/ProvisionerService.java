@@ -111,6 +111,7 @@ public class ProvisionerService {
 
         // Only set fields that are okay to override by the authentication service here!
         user.setExternal(true);
+        user.setAccountStatus(userDetails.accountIsEnabled() ? User.AccountStatus.ENABLED : User.AccountStatus.DISABLED);
         user.setAuthServiceId(userDetails.authServiceId());
         user.setAuthServiceUid(userDetails.base64AuthServiceUid());
         user.setName(userDetails.username());

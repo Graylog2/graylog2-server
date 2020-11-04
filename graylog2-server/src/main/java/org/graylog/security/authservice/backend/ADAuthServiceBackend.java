@@ -104,6 +104,7 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                     .authServiceId(backendId())
                     .base64AuthServiceUid(userEntry.base64UniqueId())
                     .username(userEntry.username())
+                    .accountIsEnabled(!userEntry.userAccountControl().accountIsDisabled())
                     .fullName(userEntry.fullName())
                     .email(userEntry.email())
                     .defaultRoles(backend.defaultRoles())
@@ -257,13 +258,17 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                 .put("login_success", loginSuccess);
 
         if (user != null) {
-            userDetails.put("user_details", ImmutableMap.of(
-                    "dn", user.dn(),
-                    AD_OBJECT_GUID, user.base64UniqueId(),
-                    config.userNameAttribute(), user.username(),
-                    config.userFullNameAttribute(), user.fullName(),
-                    "email", user.email()
-            ));
+            userDetails.put("user_details", ImmutableMap.<String, String>builder()
+                    .put("dn", user.dn())
+                    .put("account_disabled", String.valueOf(user.userAccountControl().accountIsDisabled()))
+                    .put("normal_user_account", String.valueOf(user.userAccountControl().isUserAccount()))
+                    .put("password_expired", String.valueOf(user.userAccountControl().passwordExpired()))
+                    .put(AD_OBJECT_GUID, user.base64UniqueId())
+                    .put(config.userNameAttribute(), user.username())
+                    .put(config.userFullNameAttribute(), user.fullName())
+                    .put("email", user.email())
+                    .build()
+            );
         } else {
             userDetails.put("user_details", ImmutableMap.of());
         }

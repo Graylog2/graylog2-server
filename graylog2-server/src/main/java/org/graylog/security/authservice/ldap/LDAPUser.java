@@ -22,6 +22,8 @@ import com.google.auto.value.AutoValue;
 public abstract class LDAPUser {
     public abstract String base64UniqueId();
 
+    public abstract ADUserAccountControl userAccountControl();
+
     public abstract String username();
 
     public abstract String fullName();
@@ -45,6 +47,8 @@ public abstract class LDAPUser {
         }
 
         public abstract Builder base64UniqueId(String base64UniqueId);
+
+        public abstract Builder userAccountControl(ADUserAccountControl adUserAccountControl);
 
         public abstract Builder username(String username);
 
