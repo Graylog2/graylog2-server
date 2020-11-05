@@ -1335,8 +1335,9 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-from-time-hours"
+                  id="from-time-hours"
                   size="2"
+                  title="from hour"
                   type="text"
                   value="06"
                 />
@@ -1347,8 +1348,9 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-from-time-minutes"
+                  id="from-time-minutes"
                   size="2"
+                  title="from minutes"
                   type="text"
                   value="15"
                 />
@@ -1359,8 +1361,9 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-from-time-seconds"
+                  id="from-time-seconds"
                   size="2"
+                  title="from seconds"
                   type="text"
                   value="00"
                 />
@@ -1371,8 +1374,9 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-from-time-milliseconds"
+                  id="from-time-milliseconds"
                   size="3"
+                  title="from milliseconds"
                   type="text"
                   value="000"
                 />
@@ -1599,7 +1603,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Wed Nov 04 2020"
                         aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--today"
+                        class="DayPicker-Day"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1609,7 +1613,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Thu Nov 05 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--today"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1967,10 +1971,11 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-to-time-hours"
+                  id="to-time-hours"
                   size="2"
+                  title="to hour"
                   type="text"
-                  value="13"
+                  value="NaN"
                 />
                 <span
                   class="c6 input-group-addon c7"
@@ -1979,10 +1984,11 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-to-time-minutes"
+                  id="to-time-minutes"
                   size="2"
+                  title="to minutes"
                   type="text"
-                  value="55"
+                  value="NaN"
                 />
                 <span
                   class="c6 input-group-addon c7"
@@ -1991,10 +1997,11 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-to-time-seconds"
+                  id="to-time-seconds"
                   size="2"
+                  title="to seconds"
                   type="text"
-                  value="33"
+                  value="NaN"
                 />
                 <span
                   class="c6 input-group-addon c7"
@@ -2003,10 +2010,11 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 </span>
                 <input
                   class="c9 form-control input-sm"
-                  id="absolute-to-time-milliseconds"
+                  id="to-time-milliseconds"
                   size="3"
+                  title="to milliseconds"
                   type="text"
-                  value="996"
+                  value="NaN"
                 />
                 <span
                   class="c6 input-group-addon c7"
