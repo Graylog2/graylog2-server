@@ -73,7 +73,7 @@ class DateTime {
   }
 
   static getUserTimezone() {
-    if (currentUser && currentUser.timezone) {
+    if (currentUser?.timezone) {
       return currentUser.timezone;
     }
 
