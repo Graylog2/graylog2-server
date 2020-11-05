@@ -29,17 +29,14 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.validation.Validator;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,16 +50,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserPermissionsToGrantsMigrationTest {
     private UserPermissionsToGrantsMigration migration;
     private DBGrantService dbGrantService;
-
-    @Mock
-    private Permissions permissions;
-
-    @Mock
-    private Validator validator;
     private GRNRegistry grnRegistry;
-
     private UserService userService;
-
     private int userSelfEditPermissionCount;
 
     @BeforeEach
@@ -82,12 +71,12 @@ class UserPermissionsToGrantsMigrationTest {
     }
 
     @Test
-    void migrateAllUserPermissions() throws NotFoundException {
+    void migrateAllUserPermissions() {
 
         User testuser1 = userService.load("testuser1");
         assertThat(testuser1).isNotNull();
 
-        assertThat(testuser1.getPermissions().size()).isEqualTo(5 + userSelfEditPermissionCount);
+        assertThat(testuser1.getPermissions().size()).isEqualTo(10 + userSelfEditPermissionCount);
         assertThat(dbGrantService.getForGranteesOrGlobal(ImmutableSet.of(grnRegistry.ofUser(testuser1)))).isEmpty();
 
         migration.upgrade();
@@ -98,7 +87,10 @@ class UserPermissionsToGrantsMigrationTest {
         assertGrantInSet(grants, "grn::::dashboard:5e2afc66cd19517ec2dabadf", Capability.MANAGE);
         assertGrantInSet(grants, "grn::::stream:5c40ad603c034441a56942bd", Capability.VIEW);
         assertGrantInSet(grants, "grn::::stream:5e2f5cfb4868e67ad4da562d", Capability.VIEW);
-        assertThat(grants.size()).isEqualTo(4);
+        assertGrantInSet(grants, "grn::::search:5c40ad603c034441a56942be", Capability.MANAGE);
+        assertGrantInSet(grants, "grn::::event_definition:5c40ad603c034441a56942bf", Capability.MANAGE);
+        assertGrantInSet(grants, "grn::::event_definition:5c40ad603c034441a56942c0", Capability.VIEW);
+        assertThat(grants.size()).isEqualTo(7);
 
         // reload user and check that all migrated permissions have been removed
         testuser1 = userService.load("testuser1");
@@ -107,7 +99,7 @@ class UserPermissionsToGrantsMigrationTest {
     }
 
     @Test
-    void migrateSomeUserPermissions() throws NotFoundException {
+    void migrateSomeUserPermissions() {
 
         User testuser2 = userService.load("testuser2");
         assertThat(testuser2).isNotNull();
