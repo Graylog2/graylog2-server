@@ -232,6 +232,7 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
                     </StyledInputAddon>
                     <StyledFormControl type="text"
                                        id={`${range}-time-hours`}
+                                       title={`${range} hour`}
                                        value={initialDateTime.hours}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
@@ -240,6 +241,7 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
                     <StyledInputAddon>:</StyledInputAddon>
                     <StyledFormControl type="text"
                                        id={`${range}-time-minutes`}
+                                       title={`${range} minutes`}
                                        value={initialDateTime.minutes}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
@@ -248,6 +250,7 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
                     <StyledInputAddon>:</StyledInputAddon>
                     <StyledFormControl type="text"
                                        id={`${range}-time-seconds`}
+                                       title={`${range} seconds`}
                                        value={initialDateTime.seconds}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
@@ -256,6 +259,7 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
                     <StyledInputAddon>.</StyledInputAddon>
                     <StyledFormControl type="text"
                                        id={`${range}-time-milliseconds`}
+                                       title={`${range} milliseconds`}
                                        value={initialDateTime.milliseconds}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}

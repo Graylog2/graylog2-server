@@ -1,9 +1,7 @@
 // @flow strict
 import * as React from 'react';
-// import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { act, fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
-// import { act } from 'react-dom/test-utils';
 
 import AbsoluteRangeField from './AbsoluteRangeField';
 
@@ -28,28 +26,10 @@ const renderWithForm = (element) => render((
   </Formik>
 ));
 
-// const _findValidationState = (container) => {
-//   const formGroup = container?.matches('.form-group') ? container : container?.querySelector('.form-group');
-//
-//   return formGroup && formGroup.className.includes('has-error')
-//     ? 'error'
-//     : null;
-// };
-
-// const _findFormGroup = (element) => element.closest('.form-group');
-
-// const getValidationStateOfInput = (input) => _findValidationState(_findFormGroup(input));
-
-// const changeInput = async (input, value) => {
-//   const { name } = asElement(input, HTMLInputElement);
-//
-//   await act(async () => { fireEvent.change(input, { target: { value, name } }); });
-// };
-
 describe('AbsoluteRangeField', () => {
   it('renders', () => {
     const { asFragment } = renderWithForm((
-      <AbsoluteRangeField {...defaultProps} />
+      <AbsoluteRangeField {...defaultProps} from />
     ));
 
     expect(asFragment()).toMatchSnapshot();
@@ -63,46 +43,77 @@ describe('AbsoluteRangeField', () => {
     const toggleBtn = screen.getByRole('button', { name: /toggle between beginning and end of day/i });
     fireEvent.click(toggleBtn);
 
-    const bodHoursMinsSecs = screen.queryAllByDisplayValue('00');
-    const bodMillisecs = screen.queryAllByDisplayValue('000');
+    const inputHour = screen.getByRole('textbox', { name: /from hour/i });
+    const inputMinutes = screen.getByRole('textbox', { name: /from minutes/i });
+    const inputSeconds = screen.getByRole('textbox', { name: /from seconds/i });
+    const inputMillsecs = screen.getByRole('textbox', { name: /from milliseconds/i });
 
-    expect(bodHoursMinsSecs.length).toBe(3);
-    expect(bodMillisecs.length).toBe(1);
+    expect(inputHour).toHaveValue('00');
+    expect(inputMinutes).toHaveValue('00');
+    expect(inputSeconds).toHaveValue('00');
+    expect(inputMillsecs).toHaveValue('000');
 
     fireEvent.click(toggleBtn);
 
-    const eodHours = screen.queryAllByDisplayValue('23');
-    const eodMinsSecs = screen.queryAllByDisplayValue('59');
-    const eodMillisecs = screen.queryAllByDisplayValue('999');
-
-    expect(eodHours.length).toBe(1);
-    expect(eodMinsSecs.length).toBe(2);
-    expect(eodMillisecs.length).toBe(1);
+    expect(inputHour).toHaveValue('23');
+    expect(inputMinutes).toHaveValue('59');
+    expect(inputSeconds).toHaveValue('59');
+    expect(inputMillsecs).toHaveValue('999');
   });
 
-  // it('allows manually setting time', async () => {
-  // });
+  it('does not allow non-numeric characters', () => {
+    renderWithForm((
+      <AbsoluteRangeField {...defaultProps} from />
+    ));
 
-  // it('does not try to parse an empty date', async () => {
-  //   const { getByDisplayValue } = renderWithForm((
-  //     <AbsoluteRangeField {...defaultProps} />
-  //   ));
-  //   const fromDate = getByDisplayValue('2020-01-16 10:04:30.329');
-  //
-  //   await changeInput(fromDate, '');
-  //
-  //   await waitFor(() => expect(getValidationStateOfInput(fromDate)).toEqual('error'));
-  // });
+    const inputHour = screen.getByRole('textbox', { name: /from hour/i });
 
-  // it('shows error message for date if parsing fails after changing input', async () => {
-  //   const { getByDisplayValue, queryByText } = renderWithForm((
-  //     <AbsoluteRangeField {...defaultProps} />
-  //   ));
-  //
-  //   const fromDate = getByDisplayValue('2020-01-16 10:04:30.329');
-  //
-  //   await changeInput(fromDate, 'invalid');
-  //
-  //   await waitFor(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
-  // });
+    act(() => {
+      fireEvent.change(inputHour, { target: { value: '/w!' } });
+    });
+
+    expect(inputHour).toHaveValue('00');
+  });
+
+  it('does allow proper value', () => {
+    renderWithForm((
+      <AbsoluteRangeField {...defaultProps} from />
+    ));
+
+    const inputHour = screen.getByRole('textbox', { name: /from hour/i });
+
+    act(() => {
+      fireEvent.change(inputHour, { target: { value: '10' } });
+    });
+
+    expect(inputHour).toHaveValue('10');
+  });
+
+  it('does not allow numbers over their maximum', () => {
+    renderWithForm((
+      <AbsoluteRangeField {...defaultProps} from />
+    ));
+
+    const inputHour = screen.getByRole('textbox', { name: /from hour/i });
+
+    act(() => {
+      fireEvent.change(inputHour, { target: { value: '50' } });
+    });
+
+    expect(inputHour).toHaveValue('23');
+  });
+
+  it('does not try to parse an empty date', () => {
+    renderWithForm((
+      <AbsoluteRangeField {...defaultProps} from />
+    ));
+
+    const inputHour = screen.getByRole('textbox', { name: /from hour/i });
+
+    act(() => {
+      fireEvent.change(inputHour, { target: { value: '' } });
+    });
+
+    expect(inputHour).toHaveValue('00');
+  });
 });
