@@ -7,13 +7,13 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import TeamsSection from './TeamsSection';
 
 describe('<TeamsSection />', () => {
-  it('should display info if license is not present', async () => {
+  it('should display info if license is not present', () => {
     render(<TeamsSection user={exampleUser} />);
 
     expect(screen.getByText('Enterprise Feature')).toBeInTheDocument();
   });
 
-  it('should display enterprise user teams assignment plugin', async () => {
+  it('should display enterprise user teams assignment plugin', () => {
     PluginStore.register(new PluginManifest({}, {
       teams: {
         UserTeamsAssignment: () => <>UserTeamsAssignment</>,

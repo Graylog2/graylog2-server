@@ -34,7 +34,7 @@ describe('<PasswordSection />', () => {
   it('should allow password change', async () => {
     render(<SimplePasswordSection user={exampleUser} />);
 
-    const newPasswordInput = await screen.findByLabelText('New Password');
+    const newPasswordInput = screen.getByLabelText('New Password');
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
@@ -53,7 +53,7 @@ describe('<PasswordSection />', () => {
     const newCurrentUser = currentUser.toBuilder().readOnly(false).build();
     render(<PasswordSection user={newCurrentUser} />);
 
-    const passwordInput = await screen.findByLabelText('Old Password');
+    const passwordInput = screen.getByLabelText('Old Password');
     const newPasswordInput = screen.getByLabelText('New Password');
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
@@ -81,6 +81,6 @@ describe('<PasswordSection />', () => {
     fireEvent.change(newPasswordRepeatInput, { target: { value: 'notthepassword' } });
     fireEvent.blur(newPasswordRepeatInput);
 
-    await waitFor(() => expect(screen.getByText('Passwords do not match')).not.toBeNull());
+    await waitFor(() => expect(screen.getByText('Passwords do not match')).toBeInTheDocument());
   });
 });

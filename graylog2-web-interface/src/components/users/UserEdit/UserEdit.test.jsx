@@ -40,7 +40,7 @@ describe('<UserEdit />', () => {
     await screen.findByText('Loading...');
   });
 
-  it('should not allow editing a readOnly user', async () => {
+  it('should not allow editing a readOnly user', () => {
     const readOnlyUser = exampleUser.toBuilder()
       .readOnly(true)
       .fullName('Full name')
@@ -51,7 +51,7 @@ describe('<UserEdit />', () => {
     expect(screen.queryByText('Profile')).not.toBeInTheDocument();
   });
 
-  it('should display profile, settings and password section', async () => {
+  it('should display profile, settings and password section', () => {
     render(<SimpleUserEdit user={exampleUser} />);
 
     expect(screen.getByText('ProfileSection')).toBeInTheDocument();
