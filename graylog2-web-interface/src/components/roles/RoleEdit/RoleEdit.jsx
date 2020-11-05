@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 
-import { Spinner } from 'components/common';
+import { Spinner, IfPermitted } from 'components/common';
 import Role from 'logic/roles/Role';
 
 import UsersSection from './UsersSection';
+import TeamsSection from './TeamsSection';
 
 import ProfileSection from '../RoleDetails/ProfileSection';
 import SectionGrid from '../../common/Section/SectionGrid';
@@ -25,6 +26,9 @@ const RoleEdit = ({ role }: Props) => {
       </div>
       <div>
         <UsersSection role={role} />
+        <IfPermitted permissions="teams:edit">
+          <TeamsSection role={role} />
+        </IfPermitted>
       </div>
     </SectionGrid>
   );

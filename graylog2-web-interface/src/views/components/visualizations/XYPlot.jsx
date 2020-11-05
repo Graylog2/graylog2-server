@@ -1,11 +1,12 @@
 // @flow strict
+
 import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import { merge } from 'lodash';
 
-import connect from 'stores/connect';
 import AppConfig from 'util/AppConfig';
+import connect from 'stores/connect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
@@ -59,7 +60,7 @@ const XYPlot = ({
 }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
-  const yaxis = { fixedrange: true, rangemode: 'tozero' };
+  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',g' };
   const defaultLayout: {
     yaxis: { fixedrange?: boolean},
     legend?: {y?: number},
@@ -71,6 +72,7 @@ const XYPlot = ({
 
   const layout = merge({}, defaultLayout, plotLayout);
   const viewType = useContext(ViewTypeContext);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
     ? (from, to) => onZoom(currentQuery, from, to, viewType)
     : () => true, [config.isTimeline, onZoom]);

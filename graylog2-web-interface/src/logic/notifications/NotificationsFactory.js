@@ -303,6 +303,27 @@ class NotificationsFactory {
             </span>
           ),
         }
+      case 'legacy_ldap_config_migration':
+        const { auth_service_id: authServiceId } = notification.details;
+        const authServiceLink = <Link to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId)}>Authentication Service</Link>;
+        return {
+          title: 'Legacy LDAP/Active Directory configuration has been migrated to an Authentication Service',
+          description:(
+            <span>
+              The legacy LDAP/Active Directory configuration of this system has been upgraded to a new {authServiceLink}.
+              Since the new {authServiceLink} requires some information that is not present in the legacy
+              configuration, the {authServiceLink} <strong>requires a manual review</strong>!
+              <br />
+              <br />
+              <strong>After reviewing the {authServiceLink} it must be enabled to allow LDAP or Active Directory users
+              to log in again!</strong>
+              <br />
+              <br />
+              Please check the <DocumentationLink page={DocsHelper.PAGES.UPGRADE_GUIDE} text="upgrade guide" />
+              for more details.
+            </span>
+          ),
+        }
       default:
         return { title: `unknown (${notification.type})`, description: 'unknown' };
     }

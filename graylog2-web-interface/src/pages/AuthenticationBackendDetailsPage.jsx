@@ -2,16 +2,15 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/graylog/router';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import useActiveBackend from 'components/authentication/useActiveBackend';
 import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
@@ -22,7 +21,7 @@ type Props = {
   },
 };
 
-const _pageTilte = (authBackendTitle, returnString) => {
+const _pageTitle = (authBackendTitle, returnString) => {
   const pageName = 'Authentication Service Details';
   const backendTitle = StringUtils.truncateWithEllipses(authBackendTitle, 30);
 
@@ -35,7 +34,6 @@ const _pageTilte = (authBackendTitle, returnString) => {
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   const [authBackend, setAuthBackend] = useState();
-  const { finishedLoading, activeBackend } = useActiveBackend();
 
   useEffect(() => {
     AuthenticationDomain.load(backendId).then((response) => setAuthBackend(response.backend));
@@ -46,9 +44,9 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   }
 
   return (
-    <DocumentTitle title={_pageTilte(authBackend.title, true)}>
+    <DocumentTitle title={_pageTitle(authBackend.title, true)}>
       <>
-        <PageHeader title={_pageTilte(authBackend.title)}
+        <PageHeader title={_pageTitle(authBackend.title)}
                     subactions={(
                       <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
                         <Button bsStyle="success"
@@ -61,8 +59,7 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
-          <BackendOverviewLinks activeBackend={activeBackend}
-                                finishedLoading={finishedLoading} />
+          <AuthenticationOverviewLinks />
         </PageHeader>
         <BackendDetails authenticationBackend={authBackend} />
       </>

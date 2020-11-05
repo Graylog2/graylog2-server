@@ -1,13 +1,13 @@
 // @flow strict
 import * as React from 'react';
 
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
@@ -40,8 +40,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
                                                            text="documentation" />.
       </span>
 
-      <BackendOverviewLinks activeBackend={activeBackend}
-                            finishedLoading={finishedLoading} />
+      <AuthenticationOverviewLinks />
     </PageHeader>
   );
 };

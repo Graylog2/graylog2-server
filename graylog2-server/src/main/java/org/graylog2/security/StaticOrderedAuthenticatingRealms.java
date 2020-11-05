@@ -21,6 +21,7 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.Realm;
 import org.graylog2.security.realm.AccessTokenAuthenticator;
 import org.graylog2.security.realm.AuthServiceRealm;
+import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.security.realm.SessionAuthenticator;
 
@@ -43,6 +44,7 @@ public class StaticOrderedAuthenticatingRealms extends AbstractCollection<Realm>
     private static final ImmutableList<String> REALM_ORDER = ImmutableList.of(
             SessionAuthenticator.NAME,
             AccessTokenAuthenticator.NAME,
+            HTTPHeaderAuthenticationRealm.NAME,
             AuthServiceRealm.NAME,
             RootAccountRealm.NAME // Should come last because it's (hopefully) not used that often
     );

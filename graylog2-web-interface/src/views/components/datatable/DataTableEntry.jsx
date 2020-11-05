@@ -15,24 +15,28 @@ import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
+type Field = {|
+  field: string,
+  source: string,
+|};
 type Props = {
   columnPivots: Array<string>,
   columnPivotValues: Array<Array<string>>,
   currentView: CurrentViewType,
-  fields: Immutable.Set<string>,
+  fields: Immutable.Set<Field>,
   item: { [string]: * },
   series: Array<Series>,
   types: FieldTypeMappingsList,
   valuePath: ValuePath,
 };
 
-const _c = (field, value, path) => ({ field, value, path });
+const _c = (field, value, path, source) => ({ field, value, path, source });
 
-const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath) => (
+const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: ?string) => (
   <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
-      <CustomHighlighting field={field} value={value}>
-        {value !== null && value !== undefined ? <Value field={field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : null}
+      <CustomHighlighting field={source ?? field} value={value}>
+        {value !== null && value !== undefined ? <Value field={source ?? field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : null}
       </CustomHighlighting>
     </AdditionalContext.Provider>
   </td>
@@ -54,10 +58,11 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   const classes = 'message-group';
   const { activeQuery } = currentView;
 
-  const fieldColumns = fields.toSeq().toJS().map((fieldName, i) => _c(
+  const fieldColumns = fields.toSeq().toJS().map(({ field: fieldName, source }, i) => _c(
     fieldName,
     item[fieldName],
     fullValuePathForField(fieldName, valuePath).slice(0, i + 1),
+    source,
   ));
   const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
     const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
@@ -68,7 +73,7 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
       const fullPath = [].concat(translatedPath, [effectiveName]);
       const value = get(item, fullPath);
 
-      return _c(effectiveName, value, fullValuePathForField(fn, parentValuePath));
+      return _c(effectiveName, value, fullValuePathForField(fn, parentValuePath), fn);
     });
   }));
 
@@ -77,7 +82,7 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   return (
     <tbody className={classes}>
       <tr className="fields-row">
-        {columns.map(({ field, value, path }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(columnNameToField(field, series), types), path.slice()))}
+        {columns.map(({ field, value, path, source }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(columnNameToField(field, series), types), path.slice(), source))}
       </tr>
     </tbody>
   );

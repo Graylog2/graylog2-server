@@ -3,6 +3,7 @@ import Version from 'util/Version';
 class DocsHelper {
   PAGES = {
     ALERTS: 'streams/alerts.html',
+    AUTHENTICATORS: 'users_and_roles/external_auth.html',
     CLUSTER_STATUS_EXPLAINED: 'configuration/elasticsearch.html#cluster-status-explained',
     COLLECTOR: 'collector.html',
     COLLECTOR_SIDECAR: 'sidecar.html',
@@ -30,6 +31,7 @@ class DocsHelper {
     SEARCH_QUERY_LANGUAGE: 'queries.html',
     STREAMS: 'streams.html',
     STREAM_PROCESSING_RUNTIME_LIMITS: 'streams.html#stream-processing-runtime-limits',
+    UPGRADE_GUIDE: 'upgrade/graylog-%%version%%.html',
     USERS_ROLES: 'users_and_roles.html',
     WELCOME: '', // Welcome page to the documentation
   };
@@ -37,9 +39,10 @@ class DocsHelper {
   DOCS_URL = 'https://docs.graylog.org/en/';
 
   toString(path) {
-    const baseUrl = this.DOCS_URL + Version.getMajorAndMinorVersion();
+    const version = Version.getMajorAndMinorVersion();
+    const baseUrl = this.DOCS_URL + version;
 
-    return path === '' ? baseUrl : `${baseUrl}/pages/${path}`;
+    return path === '' ? baseUrl : `${baseUrl}/pages/${path.replace('%%version%%', version)}`;
   }
 
   toLink(path, title) {

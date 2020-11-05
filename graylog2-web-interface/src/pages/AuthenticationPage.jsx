@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
 import StringUtils from 'util/StringUtils';
@@ -13,10 +14,9 @@ import useActiveBackend from 'components/authentication/useActiveBackend';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import BackendDetailsActive from 'components/authentication/BackendDetailsActive';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-const _pageTilte = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
+const _pageTitle = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
   const pageName = 'Active Authentication Service';
 
   if (activeBackend) {
@@ -54,9 +54,9 @@ const AuthenticationPage = () => {
   }
 
   return (
-    <DocumentTitle title={_pageTilte(activeBackend, true)}>
+    <DocumentTitle title={_pageTitle(activeBackend, true)}>
       <>
-        <PageHeader title={_pageTilte(activeBackend)}
+        <PageHeader title={_pageTitle(activeBackend)}
                     subactions={(
                       <BackendActionLinks activeBackend={activeBackend}
                                           finishedLoading={finishedLoading} />
@@ -65,8 +65,7 @@ const AuthenticationPage = () => {
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
-          <BackendOverviewLinks activeBackend={activeBackend}
-                                finishedLoading={finishedLoading} />
+          <AuthenticationOverviewLinks />
         </PageHeader>
 
         {finishedLoading && activeBackend && (

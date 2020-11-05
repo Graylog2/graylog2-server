@@ -39,13 +39,13 @@ const ApiRoutes = {
     updateConfiguration: () => ({ url: '/system/authentication/services/configuration' }),
   },
   AuthzRolesController: {
-    load: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
-    delete: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
-    list: () => { return { url: '/authzRoles' }; },
-    removeMember: (roleId, username) => { return { url: `/authzRoles/${roleId}/assignee/${username}` }; },
-    addMembers: (roleId) => { return { url: `/authzRoles/${roleId}/assignee/` }; },
-    loadRolesForUser: (username) => { return { url: `/authzRoles/rolesForUser/${username}` }; },
-    loadUsersForRole: (roleId) => { return { url: `/authzRoles/${roleId}/assignees` }; },
+    load: (roleId) => { return { url: `/authz/roles/${roleId}` }; },
+    delete: (roleId) => { return { url: `/authz/roles/${roleId}` }; },
+    list: () => { return { url: '/authz/roles' }; },
+    removeMember: (roleId, username) => { return { url: `/authz/roles/${roleId}/assignee/${username}` }; },
+    addMembers: (roleId) => { return { url: `/authz/roles/${roleId}/assignees` }; },
+    loadRolesForUser: (username) => { return { url: `/authz/roles/user/${username}` }; },
+    loadUsersForRole: (roleId) => { return { url: `/authz/roles/${roleId}/assignees` }; },
   },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },
@@ -108,9 +108,13 @@ const ApiRoutes = {
     list: (indexSetId) => { return { url: `/system/deflector/${indexSetId}` }; },
   },
   EntityShareController: {
-    prepare: (entityGRN) => { return { url: `/shares/entities/${entityGRN}/prepare` }; },
-    update: (entityGRN) => { return { url: `/shares/entities/${entityGRN}` }; },
-    userSharesPaginated: (username) => { return { url: `/shares/user/${username}` }; },
+    prepare: (entityGRN) => { return { url: `/authz/shares/entities/${entityGRN}/prepare` }; },
+    update: (entityGRN) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
+    userSharesPaginated: (username) => { return { url: `/authz/shares/user/${username}` }; },
+  },
+  HTTPHeaderAuthConfigController: {
+    load: () => ({ url: '/system/authentication/http-header-auth-config' }),
+    update: () => ({ url: '/system/authentication/http-header-auth-config' }),
   },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },

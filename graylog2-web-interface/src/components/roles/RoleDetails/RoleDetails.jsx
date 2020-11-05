@@ -5,6 +5,7 @@ import { Spinner } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import Role from 'logic/roles/Role';
 
+import TeamsSection from './TeamsSection';
 import ProfileSection from './ProfileSection';
 import UsersSection from './UsersSection';
 
@@ -24,6 +25,7 @@ const RoleDetails = ({ role }: Props) => {
       </div>
       <div>
         <UsersSection role={role} />
+        <TeamsSection role={role} />
       </div>
     </SectionGrid>
   );
