@@ -124,7 +124,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
       <Row className="row-sm">
         <Col md={6}>
-          <Timezone>All timezones using: [{DateTime.getUserTimezone()}]</Timezone>
+          <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
         </Col>
         <Col md={6}>
           <div className="pull-right">
