@@ -80,14 +80,4 @@ describe('SearchBar', () => {
 
     await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
   });
-
-  it('changing the time range type does not execute a new search', async () => {
-    const onSubmit = jest.fn(() => Promise.resolve());
-    const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
-    const absoluteTimeRange = getByText('Absolute');
-
-    fireEvent.click(absoluteTimeRange);
-
-    await waitFor(() => expect(onSubmit).not.toHaveBeenCalled());
-  });
 });
