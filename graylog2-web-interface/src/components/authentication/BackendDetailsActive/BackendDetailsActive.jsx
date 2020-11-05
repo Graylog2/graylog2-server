@@ -45,7 +45,7 @@ const BackendDetailsActive = ({ authenticationBackend }: Props) => {
       </div>
       <div>
         <SyncedUsersSection roles={paginatedRoles.list} />
-        <SyncedTeamsSection roles={paginatedRoles.list} authenticationBackend={authenticationBackend} />
+        <SyncedTeamsSection />
       </div>
     </SectionGrid>
   );
