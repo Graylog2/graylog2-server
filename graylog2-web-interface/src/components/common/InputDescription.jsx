@@ -32,9 +32,9 @@ const InputDescription = ({ help, error }: Props) => {
       )}
       {(!!error && !!help) && <br />}
       {help && (
-        <HelpBlock>
+        <span>
           {help}
-        </HelpBlock>
+        </span>
       )}
     </HelpBlock>
   );
