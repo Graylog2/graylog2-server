@@ -13,7 +13,7 @@ export type CapabilityType = {|
 export type GranteeType = {|
   id: GRN,
   title: string,
-  type: 'global' | 'team' | 'user',
+  type: 'global' | 'team' | 'user' | 'error',
 |};
 
 export type ActiveShareType = {|

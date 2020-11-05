@@ -28,6 +28,8 @@ const _iconName = (type) => {
       return 'building';
     case 'team':
       return 'users';
+    case 'error':
+      return 'exclamation';
     case 'user':
     default:
       return 'user';

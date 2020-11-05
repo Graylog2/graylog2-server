@@ -42,6 +42,7 @@ const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>)
     .groupBy((grantee) => grantee.type);
 
   return Immutable.List().concat(
+    granteesByType.get('error'),
     granteesByType.get('global'),
     granteesByType.get('team'),
     granteesByType.get('user'),
@@ -128,7 +129,7 @@ export default class EntityShareState {
       const grantee = _userLookup(granteeId);
 
       if (!grantee) {
-        throw new Error(`Cannot find grantee with id ${granteeId} in available grantees`);
+        return SelectedGrantee.create(granteeId, `not found ${granteeId} (error)`, 'error', roleId);
       }
 
       return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
