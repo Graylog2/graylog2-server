@@ -94,7 +94,7 @@ const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled
   align-self: self-end;
   
   &.shortened {
-    grid-area: 1 / 2 / 2 / 3;
+    grid-area: 1 / 2 / 2 / 4;
     text-decoration: line-through;
     cursor: not-allowed;
   }
@@ -108,13 +108,19 @@ const RangeLimitNotice: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = s
   font-style: italic;
   font-size: ${theme.fonts.size.small};
   color: ${theme.colors.variant.darker.warning};
-  grid-area: 1 / 3 / 2 / 8;
-  text-align: right;
+  grid-area: 1 / 4 / 2 / 8;
   align-self: self-end;
   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  
+  > span {
+    flex: 1;
+    line-height: 1.1em
+  }
   
   > svg {
-    margin-right: 3px;
+    margin-right: 9px;
   }
 `);
 
@@ -224,7 +230,10 @@ const RelativeTimeRangeSelector = ({ config, disabled, originalTimeRange }: Prop
         </RangeCheck>
         {limitDuration !== 0
           && (
-            <RangeLimitNotice><Icon name="exclamation-triangle" />Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</RangeLimitNotice>
+            <RangeLimitNotice>
+              <Icon name="exclamation-triangle" />
+              <span>Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</span>
+            </RangeLimitNotice>
           )}
         <InputWrap>
           <Input id="relative-timerange-from-value"
