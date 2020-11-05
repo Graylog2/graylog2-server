@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
-
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner, IfPermitted } from 'components/common';
@@ -48,14 +47,16 @@ const UserEdit = ({ user }: Props) => {
     <SectionGrid>
       <IfPermitted permissions={`users:edit:${user.username}`}>
         <div>
+          { !user.external && (
           <ProfileSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
+          ) }
           <IfPermitted permissions="*">
             <SettingsSection user={user}
                              onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
           </IfPermitted>
           <IfPermitted permissions={`users:passwordchange:${user.username}`}>
-            <PasswordSection user={user} />
+            { !user.external && <PasswordSection user={user} /> }
           </IfPermitted>
           <PreferencesSection user={user} />
         </div>
@@ -71,7 +72,6 @@ const UserEdit = ({ user }: Props) => {
         </div>
       </IfPermitted>
     </SectionGrid>
-
   );
 };
 

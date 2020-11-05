@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 import { screen, render, act } from 'wrappedTestingLibrary';
-import { adminUser } from 'fixtures/users';
+import { adminUser, bob } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
@@ -9,6 +9,7 @@ import UserEdit from './UserEdit';
 
 const exampleUser = adminUser.toBuilder()
   .readOnly(false)
+  .external(false)
   .build();
 
 jest.mock('./ProfileSection', () => () => <div>ProfileSection</div>);
@@ -58,4 +59,13 @@ describe('<UserEdit />', () => {
     expect(screen.getByText('RolesSection')).toBeInTheDocument();
     expect(screen.getByText('PasswordSection')).toBeInTheDocument();
   });
+
+  describe('external user', () => {
+    it('should not render profile section for external user', () => {
+      render(<SimpleUserEdit user={bob} />);
+
+      expect(bob.external).toBeTruthy();
+      expect(screen.queryByLabelText('Full Name')).not.toBeInTheDocument();
+    });
+  })
 });
