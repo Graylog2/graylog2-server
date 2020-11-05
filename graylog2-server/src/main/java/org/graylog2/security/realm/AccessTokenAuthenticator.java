@@ -65,6 +65,10 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         if (user == null) {
             return null;
         }
+        if (!user.getAccountStatus().equals(User.AccountStatus.ENABLED)) {
+            LOG.warn("Account for user <{}> is disabled.", user.getName());
+            return null;
+        }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found user {} for access token.", user);
         }
