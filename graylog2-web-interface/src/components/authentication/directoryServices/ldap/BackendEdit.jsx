@@ -63,23 +63,21 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
   const notifyOnSuccess = () => UserNotification.success('Authentication service was updated successfully.');
   const notifyOnError = (error) => UserNotification.error(`Updating authentication service failed with status: ${error}`);
 
-  const onError = (error) => {
-    notifyOnError(error);
-    throw error;
-  };
-
   return AuthenticationActions.update(backendId, {
     ...payload,
     id: backendId,
   }).then((result) => {
     if (enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType).then(notifyOnSuccess).catch(onError);
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType).then(notifyOnSuccess);
     }
 
     notifyOnSuccess();
 
     return result;
-  }).catch(onError);
+  }).catch((error) => {
+    notifyOnError(error);
+    throw error;
+  });
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
