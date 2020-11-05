@@ -78,7 +78,7 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
     }
 
     @Override
-    public Optional<UserDetails> authenticateAndProvision(AuthServiceCredentials authCredentials, ProvisionerService provisionerService) {
+    public Optional<UserDetails> provisionAndAuthenticate(AuthServiceCredentials authCredentials, ProvisionerService provisionerService) {
         try (final LDAPConnection connection = ldapConnector.connect(config.getLDAPConnectorConfig())) {
             if (connection == null) {
                 return Optional.empty();
@@ -92,13 +92,6 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
 
             final LDAPUser userEntry = optionalUser.get();
 
-            if (!authCredentials.isAuthenticated()) {
-                if (!isAuthenticated(connection, userEntry, authCredentials)) {
-                    LOG.debug("Invalid credentials for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
-                    return Optional.empty();
-                }
-            }
-
             final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                     .authServiceType(backendType())
                     .authServiceId(backendId())
@@ -109,6 +102,13 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                     .email(userEntry.email())
                     .defaultRoles(backend.defaultRoles())
                     .build());
+
+            if (!authCredentials.isAuthenticated()) {
+                if (!isAuthenticated(connection, userEntry, authCredentials)) {
+                    LOG.debug("Invalid credentials for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
+                    return Optional.empty();
+                }
+            }
 
             return Optional.of(userDetails);
         } catch (GeneralSecurityException e) {

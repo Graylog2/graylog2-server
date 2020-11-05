@@ -62,7 +62,7 @@ public class AuthServiceAuthenticator {
     }
 
     private AuthServiceResult authenticate(AuthServiceCredentials authCredentials, AuthServiceBackend backend) {
-        final Optional<UserDetails> userDetails = backend.authenticateAndProvision(authCredentials, provisionerService);
+        final Optional<UserDetails> userDetails = backend.provisionAndAuthenticate(authCredentials, provisionerService);
 
         if (userDetails.isPresent()) {
             return AuthServiceResult.builder()
