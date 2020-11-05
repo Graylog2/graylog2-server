@@ -4,13 +4,11 @@ import { AuthenticationActions } from 'stores/authentication/AuthenticationStore
 
 import notifyingAction from '../notifyingAction';
 
-type OverrideSettings = { notifyOnSuccess: boolean };
-
-const create = ({ notifyOnSuccess }: OverrideSettings = { notifyOnSuccess: true }): $PropertyType<ActionsType, 'create'> => notifyingAction({
+const create: $PropertyType<ActionsType, 'create'> = notifyingAction({
   action: AuthenticationActions.create,
-  success: notifyOnSuccess ? (authBackend) => ({
+  success: (authBackend) => ({
     message: `Authentication service "${authBackend.title} was created successfully`,
-  }) : undefined,
+  }),
   error: (error, authBackend) => ({
     message: `Creating authentication service "${authBackend.title}" failed with status: ${error}`,
   }),
@@ -31,21 +29,21 @@ const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
   }),
 });
 
-const update = ({ notifyOnSuccess }: OverrideSettings = { notifyOnSuccess: true }): $PropertyType<ActionsType, 'update'> => notifyingAction({
+const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   action: AuthenticationActions.update,
-  success: notifyOnSuccess ? (authBackendId, authBackend) => ({
+  success: (authBackendId, authBackend) => ({
     message: `Authentication service "${authBackend.title} was updated successfully`,
-  }) : undefined,
+  }),
   error: (error, authBackendId, authBackend) => ({
     message: `Updating authentication service "${authBackend.title}" failed with status: ${error}`,
   }),
 });
 
-const deleteBackend = ({ notifyOnSuccess }: OverrideSettings = { notifyOnSuccess: true }): $PropertyType<ActionsType, 'delete'> => notifyingAction({
+const deleteBackend: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   action: AuthenticationActions.delete,
-  success: notifyOnSuccess ? (authBackendId, authBackendTitle) => ({
+  success: (authBackendId, authBackendTitle) => ({
     message: `Authentication service "${authBackendTitle} was deleted successfully`,
-  }) : undefined,
+  }),
   error: (error, authBackendId, authBackendTitle) => ({
     message: `Deleting authentication service "${authBackendTitle}" failed with status: ${error}`,
   }),

@@ -2,10 +2,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
+import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import type { DirectoryServiceBackend, WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DocumentTitle, Spinner } from 'components/common';
+import UserNotification from 'util/UserNotification';
 
 import { AUTH_BACKEND_META, HELP } from './BackendCreate';
 import WizardPageHeader from './WizardPageHeader';
@@ -59,20 +60,21 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string, shouldUpdateGroupSync: ?boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const backendUpdateNotificationSettings = {
-    notifyOnSuccess: !formValues.synchronizeGroups,
-  };
+  const notifyOnSuccess = () => UserNotification.success('Authentication service was updated successfully.');
+  const notifyOnError = (error) => UserNotification.error(`Updating authentication service failed with status: ${error}`);
 
-  return AuthenticationDomain.update(backendUpdateNotificationSettings)(backendId, {
+  return AuthenticationActions.update(backendId, {
     ...payload,
     id: backendId,
   }).then((result) => {
     if (enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType);
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType).then(notifyOnSuccess).catch(notifyOnError);
     }
 
+    notifyOnSuccess();
+
     return result;
-  });
+  }).catch(notifyOnError);
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
