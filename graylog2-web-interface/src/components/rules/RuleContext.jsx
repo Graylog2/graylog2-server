@@ -68,7 +68,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     if (descriptionRef.current) {
       descriptionRef.current.value = rule.description;
     }
-  }, [rule]);
+  });
 
   useEffect(() => {
     if (ruleSourceRef.current) {
