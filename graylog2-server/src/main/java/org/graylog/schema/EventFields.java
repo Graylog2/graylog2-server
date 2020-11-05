@@ -24,6 +24,7 @@ public class EventFields {
     public static final String EVENT_ERROR_DESCRIPTION = "event_error_description";
     public static final String EVENT_LOG_NAME = "event_log_name";
     public static final String EVENT_OBSERVER_HOSTNAME = "event_observer_hostname";
+    public static final String EVENT_OBSERVER_ID = "event_observer_id";
     public static final String EVENT_OBSERVER_IP = "event_observer_ip";
     public static final String EVENT_OBSERVER_UID = "event_observer_uid";
     public static final String EVENT_RECEIVED_TIME = "event_received_time";

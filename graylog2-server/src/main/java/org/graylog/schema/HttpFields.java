@@ -37,7 +37,7 @@ public class HttpFields {
     public static final String HTTP_USER_AGENT_NAME = "http_user_agent_name";
     public static final String HTTP_USER_AGENT_OS = "http_user_agent_os";
     public static final String HTTP_VERSION = "http_version";
-    public static final String HTTP_XFF = "http_version";
+    public static final String HTTP_XFF = "http_xff";
 
     // Derived and Enriched Fields
     public static final String HTTP_URL_ANALYZED = "http_url_analyzed";

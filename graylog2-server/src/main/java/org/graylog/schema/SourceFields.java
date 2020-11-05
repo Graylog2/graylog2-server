@@ -20,13 +20,19 @@ public class SourceFields {
     private static final String SOURCE_PREFIX = "source_";
 
     public static final String SOURCE_BYTES_SENT = "source_bytes_sent";
+    public static final String SOURCE_DEVICE_MODEL = "source_device_model";
+    public static final String SOURCE_DEVICE_VENDOR = "source_device_vendor";
     public static final String SOURCE_HOSTNAME = "source_hostname";
+    public static final String SOURCE_ID = "source_id";
     public static final String SOURCE_IP = "source_ip";
     public static final String SOURCE_IPV6 = "source_ipv6";
     public static final String SOURCE_NAT_IP = "source_nat_ip";
     public static final String SOURCE_NAT_PORT = "source_nat_port";
+    public static final String SOURCE_OS_NAME = "source_os_name";
+    public static final String SOURCE_OS_VERSION = "source_os_version";
     public static final String SOURCE_PACKETS_SENT = "source_packets_sent";
     public static final String SOURCE_PORT = "source_port";
+    public static final String SOURCE_USER_NAME = "source_user_name";
     public static final String SOURCE_VSYS_UUID = "source_vsys_uuid";
     public static final String SOURCE_ZONE = "source_zone";
 

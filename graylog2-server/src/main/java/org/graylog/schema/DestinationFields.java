@@ -21,12 +21,17 @@ public class DestinationFields {
 
     public static final String DESTINATION_APPLICATION_NAME = "destination_application_name";
     public static final String DESTINATION_BYTES_SENT = "destination_bytes_sent";
+    public static final String DESTINATION_DEVICE_MODEL = "destination_device_model";
+    public static final String DESTINATION_DEVICE_VENDOR = "destination_device_vendor";
     public static final String DESTINATION_HOSTNAME = "destination_hostname";
     public static final String DESTINATION_IP = "destination_ip";
     public static final String DESTINATION_NAT_IP = "destination_nat_ip";
     public static final String DESTINATION_NAT_PORT = "destination_nat_port";
+    public static final String DESTINATION_OS_NAME = "destination_os_name";
+    public static final String DESTINATION_OS_VERSION = "destination_os_version";
     public static final String DESTINATION_PACKETS_SENT = "destination_packets_sent";
     public static final String DESTINATION_PORT = "destination_port";
+    public static final String DESTINATION_USER_NAME = "destination_user_name";
     public static final String DESTINATION_VSYS_UUID = "destination_vsys_uuid";
     public static final String DESTINATION_ZONE = "destination_zone";
 

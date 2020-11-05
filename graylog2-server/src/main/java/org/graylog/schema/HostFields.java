@@ -22,6 +22,7 @@ public class HostFields {
     public static final String HOST_HOSTNAME = "host_hostname";
     public static final String HOST_ID = "host_id";
     public static final String HOST_IP = "host_ip";
+    public static final String HOST_IPV6 = "host_ipv6";
     public static final String HOST_REFERENCE = "host_reference";
     public static final String HOST_VIRTFW_HOSTNAME = "host_virtfw_hostname";
     public static final String HOST_VIRTFW_ID = "host_virtfw_id";
