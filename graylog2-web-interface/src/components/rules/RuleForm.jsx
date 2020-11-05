@@ -32,7 +32,7 @@ const RuleForm = ({ create }) => {
   };
 
   const handleCancel = () => {
-    history.goBack();
+    history.push(Routes.SYSTEM.PIPELINES.RULES);
   };
 
   return (
