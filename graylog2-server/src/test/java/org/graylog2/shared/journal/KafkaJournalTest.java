@@ -47,9 +47,13 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -491,5 +495,40 @@ public class KafkaJournalTest {
         journal.flushDirtyLogs();
         journal.cleanupLogs();
         assertThat(serverStatus.getLifecycle()).isEqualTo(Lifecycle.RUNNING);
+    }
+
+    @Test
+    public void truncatedSegment() throws Exception {
+        final Size segmentSize = Size.kilobytes(1L);
+        final KafkaJournal journal = new KafkaJournal(journalDirectory.toPath(),
+                scheduler,
+                segmentSize,
+                Duration.standardHours(1),
+                Size.kilobytes(10L),
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                100,
+                new MetricRegistry(),
+                serverStatus);
+
+        // this will create two segments, each containing 25 messages
+        createBulkChunks(journal, segmentSize, 2);
+
+        final Path firstSegmentPath =
+                Paths.get(journalDirectory.getAbsolutePath(), "messagejournal-0", "00000000000000000000.log");
+
+        assertThat(firstSegmentPath).isRegularFile();
+
+        // truncate the first segment so that the last message is cut off
+        final File firstSegment = firstSegmentPath.toFile();
+        try (FileChannel channel = new FileOutputStream(firstSegment, true).getChannel()) {
+            channel.truncate(firstSegment.length() - 1);
+        }
+
+        final List<Journal.JournalReadEntry> entriesFromFirstSegment = journal.read(25);
+        assertThat(entriesFromFirstSegment).hasSize(24);
+        final List<Journal.JournalReadEntry> entriesFromSecondSegment = journal.read(25);
+        assertThat(entriesFromSecondSegment).hasSize(25);
     }
 }
