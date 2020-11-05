@@ -386,7 +386,7 @@ public class UserImpl extends PersistedImpl implements User {
         if (status == null) {
             return AccountStatus.ENABLED;
         }
-        return AccountStatus.valueOf(status);
+        return AccountStatus.valueOf(status.toUpperCase(Locale.US));
     }
 
     public static class LocalAdminUser extends UserImpl {

@@ -671,7 +671,8 @@ public class UsersResource extends RestResource {
                 roleNames,
                 sessionActive,
                 lastActivity,
-                clientAddress
+                clientAddress,
+                user.getAccountStatus()
         );
     }
 
