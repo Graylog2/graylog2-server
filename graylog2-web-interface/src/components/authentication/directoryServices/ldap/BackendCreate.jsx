@@ -71,8 +71,8 @@ const INITIAL_VALUES = {
 
 export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.');
-  const notifyOnError = (error) => UserNotification.error(`Creating authentication service failed with status: ${error}`);
+  const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.', 'Success');
+  const notifyOnError = (error) => UserNotification.error(`Creating authentication service failed with status: ${error}`, 'Error');
 
   return AuthenticationActions.create(payload).then((result) => {
     if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {

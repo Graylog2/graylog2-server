@@ -60,8 +60,8 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 
 export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string, shouldUpdateGroupSync: ?boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const notifyOnSuccess = () => UserNotification.success('Authentication service was updated successfully.');
-  const notifyOnError = (error) => UserNotification.error(`Updating authentication service failed with status: ${error}`);
+  const notifyOnSuccess = () => UserNotification.success('Authentication service was updated successfully.', 'Success');
+  const notifyOnError = (error) => UserNotification.error(`Updating authentication service failed with status: ${error}`, 'Error');
 
   return AuthenticationActions.update(backendId, {
     ...payload,
