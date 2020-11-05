@@ -1,6 +1,5 @@
 // @flow strict
 import React from 'react';
-import * as Immutable from 'immutable';
 import { screen, render, act } from 'wrappedTestingLibrary';
 import { adminUser } from 'fixtures/users';
 
