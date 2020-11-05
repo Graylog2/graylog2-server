@@ -73,9 +73,6 @@ public abstract class ClusterStats {
     public abstract Map<Extractor.Type, Long> extractorCountByType();
 
     @JsonProperty
-    public abstract LdapStats ldapStats();
-
-    @JsonProperty
     public abstract AlarmStats alarmStats();
 
     public static ClusterStats create(ElasticsearchStats elasticsearchStats,
@@ -92,7 +89,6 @@ public abstract class ClusterStats {
                                       Map<String, Long> inputCountByType,
                                       long extractorCount,
                                       Map<Extractor.Type, Long> extractorCountByType,
-                                      LdapStats ldapStats,
                                       AlarmStats alarmStats) {
         return new AutoValue_ClusterStats(
                 elasticsearchStats,
@@ -109,7 +105,6 @@ public abstract class ClusterStats {
                 inputCountByType,
                 extractorCount,
                 extractorCountByType,
-                ldapStats,
                 alarmStats);
     }
 }

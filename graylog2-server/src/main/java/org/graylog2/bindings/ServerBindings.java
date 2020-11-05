@@ -62,11 +62,8 @@ import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.QueryParsingExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
-import org.graylog2.security.ldap.LdapConnector;
-import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
-import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.journal.JournalReaderModule;
@@ -89,7 +86,6 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
-import org.graylog2.users.UserPermissionsCleanupListener;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -138,7 +134,6 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
         install(new FactoryModuleBuilder().build(SetIndexReadOnlyAndCalculateRangeJob.Factory.class));
 
-        install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));
         install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
 
         install(new FactoryModuleBuilder().build(EmailRecipients.Factory.class));
@@ -159,8 +154,6 @@ public class ServerBindings extends Graylog2Module {
         }
 
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
-        bind(LdapConnector.class).in(Scopes.SINGLETON);
-        bind(LdapUserAuthenticator.class).in(Scopes.SINGLETON);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
@@ -211,7 +204,6 @@ public class ServerBindings extends Graylog2Module {
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
-        bind(UserPermissionsCleanupListener.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {

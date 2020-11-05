@@ -174,11 +174,11 @@ public class UsersResource extends RestResource {
     @ApiOperation(value = "Get user details by userId", notes = "The user's permissions are only included if a user asks for his " +
             "own account or for users with the necessary permissions to edit permissions.")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The user could not be found.")
-    })
+                          @ApiResponse(code = 404, message = "The user could not be found.")
+                  })
     public UserSummary getbyId(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
-                           @PathParam("userId") String userId,
-                           @Context UserContext userContext) {
+                               @PathParam("userId") String userId,
+                               @Context UserContext userContext) {
 
         final User user = loadUserById(userId);
         final String username = user.getName();
@@ -421,7 +421,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUserById(@ApiParam(name = "userId", value = "The id of the user to delete.", required = true)
-                           @PathParam("userId") String userId) {
+                               @PathParam("userId") String userId) {
         if (userService.deleteById(userId) == 0) {
             throw new NotFoundException("Couldn't find user " + userId);
         }
@@ -511,7 +511,7 @@ public class UsersResource extends RestResource {
             throw new ForbiddenException("Not allowed to change password for user " + username);
         }
         if (user.isExternalUser()) {
-            final String msg = "Cannot change password for LDAP user.";
+            final String msg = "Cannot change password for external user.";
             LOG.error(msg);
             throw new ForbiddenException(msg);
         }

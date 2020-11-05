@@ -21,8 +21,6 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.inputs.InputService;
-import org.graylog2.security.ldap.LdapSettingsService;
-import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamRuleService;
@@ -44,7 +42,6 @@ public class ClusterStatsService {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final OutputService outputService;
-    private final LdapSettingsService ldapSettingsService;
     private final RoleService roleService;
     private final AlertService alertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
@@ -58,7 +55,6 @@ public class ClusterStatsService {
                                StreamService streamService,
                                StreamRuleService streamRuleService,
                                OutputService outputService,
-                               LdapSettingsService ldapSettingsService,
                                RoleService roleService,
                                AlertService alertService,
                                AlarmCallbackConfigurationService alarmCallbackConfigurationService,
@@ -70,7 +66,6 @@ public class ClusterStatsService {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
-        this.ldapSettingsService = ldapSettingsService;
         this.roleService = roleService;
         this.alertService = alertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
@@ -94,7 +89,6 @@ public class ClusterStatsService {
                 inputService.totalCountByType(),
                 inputService.totalExtractorCount(),
                 inputService.totalExtractorCountByType(),
-                ldapStats(),
                 alarmStats()
         );
     }
@@ -109,23 +103,6 @@ public class ClusterStatsService {
 
     public MongoStats mongoStats() {
         return mongoProbe.mongoStats();
-    }
-
-    public LdapStats ldapStats() {
-        int numberOfRoles = roleService.loadAll().size();
-        LdapSettings ldapSettings = ldapSettingsService.load();
-        if (ldapSettings == null) {
-            return LdapStats.create(false,
-                                    false,
-                                    0,
-                                    numberOfRoles
-
-            );
-        }
-        return LdapStats.create(ldapSettings.isEnabled(),
-                                ldapSettings.isActiveDirectory(),
-                                ldapSettings.getGroupMapping().size(),
-                                numberOfRoles);
     }
 
     public AlarmStats alarmStats() {
