@@ -300,12 +300,13 @@ public class UnboundLDAPConnector {
     }
 
     public LDAPUser createLDAPUser(UnboundLDAPConfig config, LDAPEntry ldapEntry) {
+        final String username = ldapEntry.nonBlankAttribute(config.userNameAttribute());
         return LDAPUser.builder()
                 .base64UniqueId(ldapEntry.base64UniqueId())
                 .userAccountControl(ldapEntry.userAccountControl())
-                .username(ldapEntry.nonBlankAttribute(config.userNameAttribute()))
-                .fullName(ldapEntry.nonBlankAttribute(config.userFullNameAttribute()))
-                .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("")))
+                .username(username)
+                .fullName(ldapEntry.firstAttributeValue(config.userFullNameAttribute()).orElse(username))
+                .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("unknown@unknown.invalid")))
                 .entry(ldapEntry)
                 .build();
     }
