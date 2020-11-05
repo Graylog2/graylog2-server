@@ -1,8 +1,9 @@
 // @flow strict
 import * as React from 'react';
 
+import UserNotification from 'util/UserNotification';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
@@ -70,17 +71,20 @@ const INITIAL_VALUES = {
 
 export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const shouldCreateGroupSync = formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync;
-  const backendCreateNotificationSettings = {
-    notifyOnSuccess: !shouldCreateGroupSync,
-  };
+  const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.', 'Success');
+  const notifyOnError = (error) => UserNotification.error(`Creating authentication service failed with status: ${error}`, 'Error');
 
-  return AuthenticationDomain.create(backendCreateNotificationSettings)(payload).then((result) => {
+  return AuthenticationActions.create(payload).then((result) => {
     if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType);
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType).then(notifyOnSuccess);
     }
 
+    notifyOnSuccess();
+
     return result;
+  }).catch((error) => {
+    notifyOnError(error);
+    throw error;
   });
 };
 
