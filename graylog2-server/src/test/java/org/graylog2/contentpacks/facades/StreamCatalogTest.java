@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -94,6 +95,8 @@ public class StreamCatalogTest {
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     @Mock
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
+    @Mock
+    private EntityOwnershipService entityOwnershipService;
     private StreamFacade facade;
 
     @Before
@@ -110,6 +113,7 @@ public class StreamCatalogTest {
                 indexSetService,
                 mongoIndexSetFactory,
                 notificationService,
+                entityOwnershipService,
                 clusterEventBus,
                 alarmCallbackConfigurationService);
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(

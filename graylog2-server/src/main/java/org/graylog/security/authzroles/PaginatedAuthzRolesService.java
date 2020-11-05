@@ -27,12 +27,14 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.shared.users.UserService;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
@@ -41,12 +43,15 @@ public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO>
     private static final String COLLECTION_NAME = "roles";
 
     private final MongoCollection<Document> dbCollection;
+    private final UserService userService;
 
     @Inject
     public PaginatedAuthzRolesService(MongoConnection mongoConnection,
+                                      UserService userService,
                                       MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, AuthzRoleDTO.class, COLLECTION_NAME);
         this.dbCollection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        this.userService = userService;
     }
 
     public long count() {
@@ -96,6 +101,16 @@ public class PaginatedAuthzRolesService extends PaginatedDbService<AuthzRoleDTO>
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
 
         return findPaginatedWithQueryFilterAndSort(dbQuery, filter, sortBuilder, page, perPage);
+    }
+
+    @Override
+    public int delete(String id) {
+        final Optional<AuthzRoleDTO> role = get(id);
+        final int delete = super.delete(id);
+        if (delete > 0) {
+            role.ifPresent(r -> userService.dissociateAllUsersFromRole(r.toLegacyRole()));
+        }
+        return delete;
     }
 
     private DBQuery.Query buildRoleIdsQuery(SearchQuery searchQuery, Set<String> roleIds) {
