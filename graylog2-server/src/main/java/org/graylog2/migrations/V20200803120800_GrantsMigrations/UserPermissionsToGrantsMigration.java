@@ -18,8 +18,11 @@ package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog2.migrations.V20200803120800_GrantsMigrations.GrantsMetaMigration.GRNTypeCapability;
@@ -34,23 +37,30 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
+import static org.graylog.plugins.views.search.rest.ViewsRestPermissions.VIEW_READ;
 
 public class UserPermissionsToGrantsMigration {
     private static final Logger LOG = LoggerFactory.getLogger(UserPermissionsToGrantsMigration.class);
     private final UserService userService;
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
+    private final ViewService viewService;
     private final String rootUsername;
 
     public UserPermissionsToGrantsMigration(UserService userService,
                                             DBGrantService dbGrantService,
                                             GRNRegistry grnRegistry,
+                                            ViewService viewService,
                                             @Named("root_username") String rootUsername) {
         this.userService = userService;
         this.dbGrantService = dbGrantService;
         this.grnRegistry = grnRegistry;
+        this.viewService = viewService;
         this.rootUsername = rootUsername;
     }
 
@@ -65,6 +75,23 @@ public class UserPermissionsToGrantsMigration {
         }
     }
 
+    private Optional<GRNType> getViewGRNType(String viewId) {
+        return viewService.get(viewId).map(view -> {
+            final GRNType viewGrnType;
+            switch (view.type()) {
+                case SEARCH:
+                    viewGrnType = GRNTypes.SEARCH;
+                    break;
+                case DASHBOARD:
+                    viewGrnType = GRNTypes.DASHBOARD;
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + view.type());
+            }
+            return viewGrnType;
+        });
+    }
+
     private void migrateUserPermissions(User user, Map<String, Set<String>> migratableEntities) {
         migratableEntities.forEach((entityID, permissions) -> {
             final GRNTypeCapability grnTypeCapability = GrantsMetaMigration.MIGRATION_MAP.get(permissions);
@@ -72,8 +99,19 @@ public class UserPermissionsToGrantsMigration {
             // Permissions are mappable to a grant
             if (grnTypeCapability != null) {
                 final Capability capability = grnTypeCapability.capability;
-                final GRNType grnType = grnTypeCapability.grnType;
-                dbGrantService.ensure(grnRegistry.ofUser(user), capability, grnType.toGRN(entityID), rootUsername);
+
+                GRN targetGRN;
+                if (permissions.stream().anyMatch(p -> p.contains(VIEW_READ))) {
+                    // For views we need to load the database object to be able to determine if it's a
+                    // search or a dashboard.
+                    targetGRN = getViewGRNType(entityID).map(grnType -> grnType.toGRN(entityID)).orElse(null);
+                } else {
+                    targetGRN = requireNonNull(grnTypeCapability.grnType, "grnType cannot be null - this is a bug").toGRN(entityID);
+                }
+
+                if (targetGRN != null) {
+                    dbGrantService.ensure(grnRegistry.ofUser(user), capability, targetGRN, rootUsername);
+                }
 
                 final List<String> updatedPermissions = user.getPermissions();
                 updatedPermissions.removeAll(permissions.stream().map(p -> p + ":" + entityID).collect(Collectors.toSet()));
@@ -83,7 +121,7 @@ public class UserPermissionsToGrantsMigration {
                 } catch (ValidationException e) {
                     LOG.error("Failed to update permssions on user <{}>", user.getName(), e);
                 }
-                LOG.info("Migrating entity <{}> permissions <{}> to <{}> grant for user <{}>", grnType.toGRN(entityID), permissions, capability, user.getName());
+                LOG.info("Migrating entity <{}> permissions <{}> to <{}> grant for user <{}>", targetGRN, permissions, capability, user.getName());
             } else {
                 LOG.info("Skipping non-migratable entity <{}>. Permissions <{}> cannot be converted to a grant capability", entityID, permissions);
             }
