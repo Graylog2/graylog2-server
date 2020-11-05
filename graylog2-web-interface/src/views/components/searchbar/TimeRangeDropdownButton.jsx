@@ -26,7 +26,7 @@ type Props = {
   children: React.Node,
   disabled?: boolean,
   show?: boolean,
-  toggleShow: (void) => boolean,
+  toggleShow: (void) => void,
 };
 
 const TimeRangeDropdownButton = ({ children, disabled, show, toggleShow }: Props) => {

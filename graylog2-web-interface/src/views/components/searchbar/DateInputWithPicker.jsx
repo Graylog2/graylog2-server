@@ -42,7 +42,7 @@ type Props = {
 const _setDateTimeToNow = () => new DateTime();
 
 const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title }: Props) => {
-  const inputRef = useRef(value);
+  const inputRef = useRef({ input: { value } });
   const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [name, onChange]);
   const _onChangeInput = useCallback((event) => _onChange(event.target.value), [_onChange]);
   const _onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.DATE)), [_onChange]);
