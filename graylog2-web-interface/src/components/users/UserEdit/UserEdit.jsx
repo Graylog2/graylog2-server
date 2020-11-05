@@ -5,6 +5,8 @@ import { useContext } from 'react';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner, IfPermitted } from 'components/common';
+import SectionComponent from 'components/common/Section/SectionComponent';
+import { Alert } from 'components/graylog';
 import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -48,14 +50,24 @@ const UserEdit = ({ user }: Props) => {
     <SectionGrid>
       <IfPermitted permissions={`users:edit:${user.username}`}>
         <div>
+          { user.external && (
+            <SectionComponent title="External User">
+              <Alert bsStyle="warning">
+                This user was synced from an external server, therefore neither
+                the profile nor the password can be changed. Please contact your administrator for more information.
+              </Alert>
+            </SectionComponent>
+          ) }
+          { !user.external && (
           <ProfileSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
+          ) }
           <IfPermitted permissions="*">
             <SettingsSection user={user}
                              onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
           </IfPermitted>
           <IfPermitted permissions={`users:passwordchange:${user.username}`}>
-            <PasswordSection user={user} />
+            { !user.external && <PasswordSection user={user} /> }
           </IfPermitted>
           <PreferencesSection user={user} />
         </div>
@@ -71,7 +83,6 @@ const UserEdit = ({ user }: Props) => {
         </div>
       </IfPermitted>
     </SectionGrid>
-
   );
 };
 
