@@ -7,7 +7,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 
 import EditLinkButton from './EditLinkButton';
 
-import { STEP_KEY as SERVER_CONFIG_KEY } from '../../BackendWizard/ServerConfigStep';
+import { STEP_KEY as SERVER_CONFIG_KEY } from '../BackendWizard/ServerConfigStep';
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,

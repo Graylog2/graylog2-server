@@ -4,7 +4,7 @@ import ConfigParser from 'logic/authentication/directoryServices/BackendConfigPa
 
 import BackendCreateLDAP from './directoryServices/ldap/BackendCreate';
 import BackendEditLDAP from './directoryServices/ldap/BackendEdit';
-import BackendConfigDetails from './directoryServices/ldap/BackendConfigDetails';
+import BackendConfigDetails from './directoryServices/BackendConfigDetails';
 import BackendCreateAD from './directoryServices/activeDirectory/BackendCreate';
 import BackendEditAD from './directoryServices/activeDirectory/BackendEdit';
 
