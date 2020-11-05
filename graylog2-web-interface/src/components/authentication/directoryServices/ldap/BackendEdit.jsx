@@ -74,7 +74,10 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
     notifyOnSuccess();
 
     return result;
-  }).catch(notifyOnError);
+  }).catch((error) => {
+    notifyOnError(error);
+    throw error;
+  });
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
