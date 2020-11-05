@@ -551,6 +551,7 @@ public class UsersResource extends RestResource {
     @Path("{userId}/status/{newStatus}")
     @Consumes(MediaType.WILDCARD)
     @ApiOperation("Update the account status for a user")
+    @AuditEvent(type = AuditEventTypes.USER_UPDATE)
     public Response updateAccountStatus(
             @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
