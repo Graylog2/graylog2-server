@@ -24,6 +24,10 @@ module.exports = {
     {
       files: ['*.js', '*.jsx'],
     },
+    {
+      files: ['*.ts', '*.tsx'],
+      parser: '@typescript-eslint/parser',
+    },
   ],
   extends: [
     'eslint:recommended',
@@ -39,6 +43,7 @@ module.exports = {
     'react-hooks',
     'flowtype',
     'jest-formatting',
+    '@typescript-eslint/eslint-plugin',
   ],
   rules: {
     'arrow-body-style': 'off',
