@@ -75,7 +75,10 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   };
 
   const handleCancel = () => {
-    nextRangeHelpers.setValue(originalRangeValue);
+    formik.resetForm({
+      values: { timerange: originalRangeValue, tempTimeRange: null },
+    });
+
     toggleDropdownShow();
   };
 
