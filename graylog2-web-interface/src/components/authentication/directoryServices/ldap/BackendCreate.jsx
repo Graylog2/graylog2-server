@@ -74,18 +74,20 @@ export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFor
   const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.');
   const notifyOnError = (error) => UserNotification.error(`Creating authentication service failed with status: ${error}`);
 
+  const onError = (error) => {
+    notifyOnError(error);
+    throw error;
+  };
+
   return AuthenticationActions.create(payload).then((result) => {
     if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType).then(notifyOnSuccess).catch(notifyOnError);
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType).then(notifyOnSuccess).catch(onError);
     }
 
     notifyOnSuccess();
 
     return result;
-  }).catch((error) => {
-    notifyOnError(error);
-    throw error;
-  });
+  }).catch(onError);
 };
 
 const BackendCreate = () => {
