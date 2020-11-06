@@ -98,6 +98,10 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                     return Optional.empty();
                 }
             }
+            if (!userEntry.accountIsEnabled()) {
+                LOG.warn("Account disabled within Active Directory for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
+                return Optional.empty();
+            }
 
             final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                     .authServiceType(backendType())
