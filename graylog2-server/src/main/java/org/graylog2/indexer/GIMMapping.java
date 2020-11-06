@@ -92,7 +92,7 @@ public abstract class GIMMapping extends IndexMapping {
             .add("host_geo_city") // There is no HostFields.HOST_GEO_CITY, only HostFields.HOST_GEO_CITY_NAME
             .add("host_geo_country") // There is no HostFields.HOST_GEO_COUNTRY, only HostFields.HOST_GEO_COUNTRY_NAME
             .add("host_geo_name")
-            .add(HostFields.HOST_GEO_COUNTRY_ISO_CODE)
+            .add("host_geo_country_iso")
             .add(HostFields.HOST_GEO_COORDINATES)
             .add(HostFields.HOST_LOCATION_NAME)
             .add(HostFields.HOST_MAC)
