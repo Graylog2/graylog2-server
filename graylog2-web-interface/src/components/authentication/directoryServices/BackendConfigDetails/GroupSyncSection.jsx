@@ -10,7 +10,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 
 import EditLinkButton from './EditLinkButton';
 
-import { STEP_KEY as GROUP_SYNC_KEY } from '../../BackendWizard/GroupSyncStep';
+import { STEP_KEY as GROUP_SYNC_KEY } from '../BackendWizard/GroupSyncStep';
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
@@ -19,20 +19,20 @@ type Props = {
 
 const GroupSyncSection = ({ authenticationBackend, roles }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const GroupSyncDetails = enterpriseGroupSyncPlugin?.components.GroupSyncDetails;
+  const GroupSyncSectionPlugin = enterpriseGroupSyncPlugin?.components.GroupSyncSection;
 
-  return (
+  if (!GroupSyncSectionPlugin) {
     <SectionComponent title="Group Synchronization"
                       headerActions={(
                         <EditLinkButton authenticationBackendId={authenticationBackend.id}
                                         stepKey={GROUP_SYNC_KEY} />
                       )}>
-      {GroupSyncDetails ? (
-        <GroupSyncDetails authenticationBackend={authenticationBackend} roles={roles} />
-      ) : (
-        <EnterprisePluginNotFound featureName="group synchronization" />
-      )}
-    </SectionComponent>
+      <EnterprisePluginNotFound featureName="group synchronization" />
+    </SectionComponent>;
+  }
+
+  return (
+    <GroupSyncSectionPlugin authenticationBackend={authenticationBackend} roles={roles} />
   );
 };
 

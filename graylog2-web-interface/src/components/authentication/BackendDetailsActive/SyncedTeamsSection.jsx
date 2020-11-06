@@ -1,17 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import * as Immutable from 'immutable';
 
 import { EnterprisePluginNotFound } from 'components/common';
 import { getEnterpriseAuthenticationPlugin } from 'util/AuthenticationService';
-import Role from 'logic/roles/Role';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-type Props = {
-  roles: Immutable.List<Role>,
-};
-
-const SyncedTeamsSection = ({ roles }: Props) => {
+const SyncedTeamsSection = () => {
   const enterpriseAuthenticationPlugin = getEnterpriseAuthenticationPlugin();
   const EnterpriseSyncedTeamsSection = enterpriseAuthenticationPlugin?.components.SyncedTeamsSection;
 
@@ -23,7 +17,7 @@ const SyncedTeamsSection = ({ roles }: Props) => {
     );
   }
 
-  return <EnterpriseSyncedTeamsSection roles={roles} />;
+  return <EnterpriseSyncedTeamsSection />;
 };
 
 export default SyncedTeamsSection;
