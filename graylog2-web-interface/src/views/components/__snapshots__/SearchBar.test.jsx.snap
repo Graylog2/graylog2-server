@@ -1014,7 +1014,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
                   <strong>
                     From
                   </strong>
-                  :
+                  : 
                   <code>
                     5 minutes ago
                   </code>
@@ -1023,7 +1023,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
                   <strong>
                     Until
                   </strong>
-                  :
+                  : 
                   <code>
                     Now
                   </code>
@@ -1059,6 +1059,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
                       >
                         Not updating
                       </div>
+                       
                       <span
                         class="caret"
                       />
