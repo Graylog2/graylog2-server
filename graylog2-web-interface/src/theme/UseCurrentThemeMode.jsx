@@ -32,7 +32,7 @@ const useCurrentThemeMode = (overrideMode: ?string) => {
     } else {
       const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
 
-      PreferencesStore.saveUserPreferences(username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
+      PreferencesStore.saveUserPreferences(username, nextPreferences);
     }
   }, [userIsReadOnly, userPreferences, username]);
 
