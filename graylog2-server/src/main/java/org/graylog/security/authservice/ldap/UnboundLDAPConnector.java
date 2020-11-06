@@ -267,15 +267,6 @@ public class UnboundLDAPConnector {
             if (uniqueIdAttribute.equalsIgnoreCase(attribute.getBaseName())) {
                 continue;
             }
-            if ("userAccountControl".equalsIgnoreCase(attribute.getBaseName())) {
-                final Integer userAccountControl = Ints.tryParse(attribute.getValue());
-                if (userAccountControl == null) {
-                    LOG.warn("Ignoring non-parseable userAccountControl value");
-                    continue;
-                }
-                ldapEntryBuilder.userAccountControl(ADUserAccountControl.create(userAccountControl));
-                continue;
-            }
 
             if (attribute.needsBase64Encoding()) {
                 for (final byte[] value : attribute.getValueByteArrays()) {
@@ -303,11 +294,26 @@ public class UnboundLDAPConnector {
         final String username = ldapEntry.nonBlankAttribute(config.userNameAttribute());
         return LDAPUser.builder()
                 .base64UniqueId(ldapEntry.base64UniqueId())
-                .userAccountControl(ldapEntry.userAccountControl())
+                .accountIsEnabled(findAccountIsEnabled(ldapEntry))
                 .username(username)
                 .fullName(ldapEntry.firstAttributeValue(config.userFullNameAttribute()).orElse(username))
                 .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("unknown@unknown.invalid")))
                 .entry(ldapEntry)
                 .build();
+    }
+
+    private boolean findAccountIsEnabled(LDAPEntry ldapEntry) {
+        final Optional<String> control = ldapEntry.firstAttributeValue("userAccountControl");
+
+        // No field present. Assume account is enabled
+        if (!control.isPresent()) {
+            return true;
+        }
+        final Integer userAccountControl = Ints.tryParse(control.get());
+        if (userAccountControl == null) {
+            LOG.warn("Ignoring non-parseable userAccountControl value");
+            return true;
+        }
+        return !ADUserAccountControl.create(userAccountControl).accountIsDisabled();
     }
 }

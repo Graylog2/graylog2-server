@@ -92,12 +92,13 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
 
             final LDAPUser userEntry = optionalUser.get();
 
+            // Also provision users that failed to login
             final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                     .authServiceType(backendType())
                     .authServiceId(backendId())
                     .base64AuthServiceUid(userEntry.base64UniqueId())
                     .username(userEntry.username())
-                    .accountIsEnabled(!userEntry.userAccountControl().accountIsDisabled())
+                    .accountIsEnabled(userEntry.accountIsEnabled())
                     .fullName(userEntry.fullName())
                     .email(userEntry.email())
                     .defaultRoles(backend.defaultRoles())
@@ -260,7 +261,7 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
         if (user != null) {
             userDetails.put("user_details", ImmutableMap.<String, String>builder()
                     .put("dn", user.dn())
-                    .put("userAccountControl", user.userAccountControl().printFlags())
+                    .put("account_enabled", String.valueOf(user.accountIsEnabled()))
                     .put(AD_OBJECT_GUID, user.base64UniqueId())
                     .put(config.userNameAttribute(), user.username())
                     .put(config.userFullNameAttribute(), user.fullName())
