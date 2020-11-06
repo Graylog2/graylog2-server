@@ -19,6 +19,7 @@ package org.graylog.security.authservice.ldap;
 import com.google.auto.value.AutoValue;
 
 import java.util.EnumSet;
+import java.util.stream.Collectors;
 
 /**
  * Active Directory UserAccountControl flags.
@@ -53,6 +54,10 @@ public abstract class ADUserAccountControl {
         return flags().contains(Flags.PASSWORD_EXPIRED);
     }
 
+    public String printFlags() {
+        return flags().stream().sorted().map(Enum::toString).collect(Collectors.joining("|"));
+    }
+
     public enum Flags {
         /**
          * The user account is disabled.
@@ -68,6 +73,10 @@ public abstract class ADUserAccountControl {
          * The user password has expired. (This doesn't work with newer AD implementations)
          */
         PASSWORD_EXPIRED(0x800000);
+
+        public int getFlagValue() {
+            return flagValue;
+        }
 
         private final int flagValue;
 

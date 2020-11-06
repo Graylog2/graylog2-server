@@ -51,4 +51,14 @@ class ADUserAccountControlTest {
         assertThat(ADUserAccountControl.create(66050).isUserAccount()).isTrue();
         assertThat(ADUserAccountControl.create(532480).isUserAccount()).isFalse();
     }
+
+    @Test
+    void printFlags() {
+        ADUserAccountControl allFlagsAccountcontrol = ADUserAccountControl.create(
+                        ADUserAccountControl.Flags.NORMAL_ACCOUNT.getFlagValue() |
+                        ADUserAccountControl.Flags.ACCOUNTDISABLE.getFlagValue() |
+                        ADUserAccountControl.Flags.PASSWORD_EXPIRED.getFlagValue());
+
+        assertThat(allFlagsAccountcontrol.printFlags()).isEqualTo("ACCOUNTDISABLE|NORMAL_ACCOUNT|PASSWORD_EXPIRED");
+    }
 }

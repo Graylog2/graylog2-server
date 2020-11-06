@@ -260,9 +260,7 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
         if (user != null) {
             userDetails.put("user_details", ImmutableMap.<String, String>builder()
                     .put("dn", user.dn())
-                    .put("account_disabled", String.valueOf(user.userAccountControl().accountIsDisabled()))
-                    .put("normal_user_account", String.valueOf(user.userAccountControl().isUserAccount()))
-                    .put("password_expired", String.valueOf(user.userAccountControl().passwordExpired()))
+                    .put("userAccountControl", user.userAccountControl().printFlags())
                     .put(AD_OBJECT_GUID, user.base64UniqueId())
                     .put(config.userNameAttribute(), user.username())
                     .put(config.userFullNameAttribute(), user.fullName())
