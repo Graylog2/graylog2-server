@@ -105,7 +105,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
                       onClick={_onSubmit}
                       disabled={isSubmitting || !selectedRoleName}
                       title="Assign Role"
-                      type="submit">
+                      type="button">
           Assign Role
         </SubmitButton>
       </FormElements>
