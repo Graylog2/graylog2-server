@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
+
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { RulesActions } = CombinedProvider.get('Rules');
