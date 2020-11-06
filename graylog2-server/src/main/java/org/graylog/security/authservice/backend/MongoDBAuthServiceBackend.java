@@ -55,7 +55,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
     }
 
     @Override
-    public Optional<UserDetails> provisionAndAuthenticate(AuthServiceCredentials authCredentials,
+    public Optional<UserDetails> authenticateAndProvision(AuthServiceCredentials authCredentials,
                                                           ProvisionerService provisionerService) {
         final String username = authCredentials.username();
 

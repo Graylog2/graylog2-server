@@ -28,7 +28,7 @@ public interface AuthServiceBackend {
         TYPE create(AuthServiceBackendDTO backend);
     }
 
-    Optional<UserDetails> provisionAndAuthenticate(AuthServiceCredentials authCredentials,
+    Optional<UserDetails> authenticateAndProvision(AuthServiceCredentials authCredentials,
                                                    ProvisionerService provisionerService);
 
     String backendType();
