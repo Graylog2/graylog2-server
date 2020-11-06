@@ -36,12 +36,16 @@ const _missingDependenciesFromJSON = (missingDependenciesJSON) => {
   return missingDependencies;
 };
 
-const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>): Immutable.List<T> => {
+const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>, activeShares: ?ActiveShares): Immutable.List<T> => {
   const granteesByType = grantees
+    .filter((grantee) => !activeShares || activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) >= 0)
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
     .groupBy((grantee) => grantee.type);
+  const newGrantees = grantees
+    .filter((grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1);
 
   return Immutable.List().concat(
+    newGrantees,
     granteesByType.get('error'),
     granteesByType.get('global'),
     granteesByType.get('team'),
@@ -135,7 +139,7 @@ export default class EntityShareState {
       return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
     }).toList();
 
-    return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities);
+    return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities, this._value.activeShares);
   }
 
   // eslint-disable-next-line no-use-before-define
