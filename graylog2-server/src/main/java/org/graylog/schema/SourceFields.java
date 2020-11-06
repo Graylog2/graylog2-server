@@ -48,7 +48,7 @@ public class SourceFields {
     public static final String SOURCE_AS_DOMAIN = SOURCE_PREFIX + AutonomousSystemFields.AS_DOMAIN;
     public static final String SOURCE_AS_ISP = SOURCE_PREFIX + AutonomousSystemFields.AS_ISP;
     public static final String SOURCE_AS_NUMBER = SOURCE_PREFIX + AutonomousSystemFields.AS_NUMBER;
-    public static final String SOURCE_AS_ORGANIZATION_NAME = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
+    public static final String SOURCE_AS_ORGANIZATION = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 
     // Geo Fields
     public static final String SOURCE_GEO_CITY_ISO_CODE = SOURCE_PREFIX + GeoFields.GEO_CITY_ISO_CODE;
@@ -67,5 +67,7 @@ public class SourceFields {
     public static final String SOURCE_USER_EMAIL = "source_user_email";
     @Deprecated
     public static final String SOURCE_GEO_ISO_CODE = SOURCE_PREFIX + GeoFields.GEO_ISO_CODE;
+    @Deprecated
+    public static final String SOURCE_AS_ORGANIZATION_NAME = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 
 }

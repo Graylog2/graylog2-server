@@ -47,7 +47,7 @@ public class DestinationFields {
     public static final String DESTINATION_AS_DOMAIN = DESTINATION_PREFIX + AutonomousSystemFields.AS_DOMAIN;
     public static final String DESTINATION_AS_ISP = DESTINATION_PREFIX + AutonomousSystemFields.AS_ISP;
     public static final String DESTINATION_AS_NUMBER = DESTINATION_PREFIX + AutonomousSystemFields.AS_NUMBER;
-    public static final String DESTINATION_AS_ORGANIZATION_NAME = DESTINATION_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
+    public static final String DESTINATION_AS_ORGANIZATION = DESTINATION_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 
     // Geo Fields
     public static final String DESTINATION_GEO_CITY_ISO_CODE = DESTINATION_PREFIX + GeoFields.GEO_CITY_ISO_CODE;
@@ -60,6 +60,8 @@ public class DestinationFields {
     // To be removed
     @Deprecated
     public static final String DESTINATION_PACKETS = "destination_packets_sent";
+    @Deprecated
+    public static final String DESTINATION_AS_ORGANIZATION_NAME = DESTINATION_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
     @Deprecated
     public static final String DESTINATION_GEO_ISO_CODE = DESTINATION_PREFIX + GeoFields.GEO_ISO_CODE;
 }

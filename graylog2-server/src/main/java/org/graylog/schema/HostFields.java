@@ -41,7 +41,7 @@ public class HostFields {
     public static final String HOST_AS_DOMAIN = HOST_PREFIX + AutonomousSystemFields.AS_DOMAIN;
     public static final String HOST_AS_ISP = HOST_PREFIX + AutonomousSystemFields.AS_ISP;
     public static final String HOST_AS_NUMBER = HOST_PREFIX + AutonomousSystemFields.AS_NUMBER;
-    public static final String HOST_AS_ORGANIZATION_NAME = HOST_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
+    public static final String HOST_AS_ORGANIZATION = HOST_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 
     // Geo Fields
     public static final String HOST_GEO_CITY_ISO_CODE = HOST_PREFIX + GeoFields.GEO_CITY_ISO_CODE;
@@ -50,4 +50,8 @@ public class HostFields {
     public static final String HOST_GEO_COUNTRY_ISO_CODE = HOST_PREFIX + GeoFields.GEO_COUNTRY_ISO_CODE;
     public static final String HOST_GEO_COUNTRY_NAME = HOST_PREFIX + GeoFields.GEO_COUNTRY_NAME;
     public static final String HOST_GEO_COORDINATES = HOST_PREFIX + GeoFields.GEO_COORDINATES;
+
+    // To be removed
+    @Deprecated
+    public static final String HOST_AS_ORGANIZATION_NAME = HOST_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 }
