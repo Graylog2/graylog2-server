@@ -68,11 +68,12 @@ public class ClientES7 implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        for (String index : indices)
+        for (String index : indices) {
             if (indicesExists(index)) {
                 final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
                 client.execute((c, requestOptions) -> c.indices().delete(deleteIndexRequest, requestOptions));
             }
+        }
     }
 
     @Override
@@ -192,7 +193,7 @@ public class ClientES7 implements Client {
     }
 
     private String[] existingTemplates() {
-        final GetIndexTemplatesRequest getIndexTemplatesRequest = new GetIndexTemplatesRequest("*");
+        final GetIndexTemplatesRequest getIndexTemplatesRequest = new GetIndexTemplatesRequest();
         final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
         return result.getIndexTemplates().stream()
                 .map(IndexTemplateMetadata::name)
@@ -206,7 +207,7 @@ public class ClientES7 implements Client {
 
         final JsonNode jsonResponse = client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
-             final Response response = c.getLowLevelClient().performRequest(request);
+            final Response response = c.getLowLevelClient().performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         });
 

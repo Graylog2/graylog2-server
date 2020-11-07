@@ -46,10 +46,11 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     protected final ElasticsearchContainer container;
 
     protected abstract Client client();
+
     protected abstract FixtureImporter fixtureImporter();
 
     protected static String imageNameFrom(Version version) {
-        final String defaultImage = version.satisfies("^6.0.0")
+        final String defaultImage = version.satisfies(">=6.0.0")
                 // The OSS image only exists for 6.0.0 and later
                 ? DEFAULT_IMAGE_OSS
                 // For older versions do not use the official image because it contains x-pack stuff we don't want
@@ -77,7 +78,7 @@ public abstract class ElasticsearchInstance extends ExternalResource {
                 .withReuse(true)
                 .withEnv("ES_JAVA_OPTS", "-Xms2g -Xmx2g")
                 .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", ".watches,.triggered_watches,.watcher-history-*")
+                .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
@@ -104,7 +105,8 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     public void importFixtureResource(String resourcePath, Class<?> testClass) {
         boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;
 
-        @SuppressWarnings("UnstableApiUsage") final URL fixtureResource = isFullResourcePath
+        @SuppressWarnings("UnstableApiUsage")
+        final URL fixtureResource = isFullResourcePath
                 ? Resources.getResource(resourcePath)
                 : Resources.getResource(testClass, resourcePath);
 
