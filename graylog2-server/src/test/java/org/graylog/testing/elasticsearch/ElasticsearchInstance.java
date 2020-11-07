@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
  */
@@ -75,7 +77,8 @@ public abstract class ElasticsearchInstance extends ExternalResource {
 
     private ElasticsearchContainer buildContainer(String image, Network network) {
         return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
-                .withReuse(true)
+                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
+                .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("ES_JAVA_OPTS", "-Xms2g -Xmx2g")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
