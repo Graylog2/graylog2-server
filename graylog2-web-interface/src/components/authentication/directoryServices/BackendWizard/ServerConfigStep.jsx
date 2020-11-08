@@ -17,6 +17,9 @@ export const STEP_KEY: StepKeyType = 'server-configuration';
 // Form validation needs to include all input names
 // to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
+  title: {
+    required: true,
+  },
   serverHost: {
     required: true,
   },
@@ -25,6 +28,8 @@ export const FORM_VALIDATION = {
     min: 1,
     max: 65535,
   },
+  title: {},
+  description: {},
   transportSecurity: {},
   verifyCertificates: {},
   systemUserDn: {},
@@ -110,6 +115,17 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             validateOnMount={validateOnMount}>
       {({ isSubmitting, setFieldValue, values, validateForm }) => (
         <Form className="form form-horizontal">
+          <FormikFormGroup help={help.title}
+                           label="Title"
+                           name="title"
+                           placeholder="Title" />
+
+          <FormikFormGroup help={help.description}
+                           label={<>Description <Opt /></>}
+                           type="textarea"
+                           name="description"
+                           placeholder="Description" />
+
           <Input id="uri-host"
                  label="Server Address"
                  labelClassName="col-sm-3"

@@ -6,6 +6,8 @@ import type { DirectoryServiceBackend } from 'logic/authentication/directoryServ
 import type { WizardFormValues } from './BackendWizard/BackendWizardContext';
 
 export default ({
+  title,
+  description,
   defaultRoles = Immutable.List(),
   config: {
     servers = [],
@@ -19,6 +21,8 @@ export default ({
     verifyCertificates,
   },
 }: DirectoryServiceBackend): WizardFormValues => ({
+  title,
+  description,
   defaultRoles: defaultRoles.join(),
   serverHost: servers[0].host,
   serverPort: servers[0].port,

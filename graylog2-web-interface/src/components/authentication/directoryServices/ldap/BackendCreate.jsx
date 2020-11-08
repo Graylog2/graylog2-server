@@ -57,6 +57,7 @@ export const HELP = {
 };
 
 const INITIAL_VALUES = {
+  title: AUTH_BACKEND_META.serviceTitle,
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
