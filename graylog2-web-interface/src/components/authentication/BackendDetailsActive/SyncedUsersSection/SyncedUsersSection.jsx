@@ -54,7 +54,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
   const { list: users } = paginatedUsers || {};
   const { page, perPage, query } = pagination;
 
-  useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [pagination, authenticationBackend.id]);
+  useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [authenticationBackend.id, pagination]);
   useEffect(() => _updateListOnUserDisable(perPage, query, setPagination), [perPage, query]);
   useEffect(() => _updateListOnUserEnable(perPage, query, setPagination), [perPage, query]);
 
