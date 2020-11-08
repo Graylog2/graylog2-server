@@ -7,7 +7,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
-import { handleSubmit } from '../ldap/BackendCreate';
+import handleCreate from '../HandleCreate';
 
 export const HELP = {
   // server config help
@@ -79,7 +79,7 @@ const BackendCreate = () => {
                      help={help}
                      excludedFields={excludedFields}
                      initialValues={initialValues}
-                     onSubmit={handleSubmit} />
+                     onSubmit={handleCreate} />
     </DocumentTitle>
   );
 };
