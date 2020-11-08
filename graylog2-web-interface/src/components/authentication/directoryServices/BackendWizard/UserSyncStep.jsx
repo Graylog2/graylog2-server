@@ -5,7 +5,7 @@ import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
 import Role from 'logic/roles/Role';
-import { validateField, formHasErrors } from 'util/FormsUtils';
+import { validateField } from 'util/FormsUtils';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
 import { Icon, FormikFormGroup, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -41,12 +41,12 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
   const { backendValidationErrors } = stepsState;
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
 
-  const _onSubmitAll = (validateForm) => {
-    validateForm().then((errors) => {
-      if (!formHasErrors(errors)) {
-        onSubmitAll();
-      }
-    });
+  const _validateField = (fieldName) => {
+    if (backendValidationErrors?.[fieldName]) {
+      return () => backendValidationErrors[fieldName];
+    }
+
+    return validateField(FORM_VALIDATION[fieldName]);
   };
 
   return (
@@ -58,28 +58,28 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
             validateOnBlur={false}
             validateOnChange={false}
             validateOnMount={validateOnMount}>
-      {({ isSubmitting, validateForm }) => (
+      {({ isSubmitting }) => (
         <Form className="form form-horizontal">
           <FormikFormGroup help={help.userSearchBase}
                            label="Search Base DN"
                            error={backendValidationErrors?.userSearchBase}
                            name="userSearchBase"
                            placeholder="Search Base DN"
-                           validate={validateField(FORM_VALIDATION.userSearchBase)} />
+                           validate={_validateField('userSearchBase')} />
 
           <FormikFormGroup help={help.userSearchPattern}
                            label="Search Pattern"
                            name="userSearchPattern"
                            error={backendValidationErrors?.userSearchPattern}
                            placeholder="Search Pattern"
-                           validate={validateField(FORM_VALIDATION.userSearchPattern)} />
+                           validate={_validateField('userSearchPattern')} />
 
           <FormikFormGroup help={help.userNameAttribute}
                            label="Name Attribute"
                            name="userNameAttribute"
                            error={backendValidationErrors?.userNameAttribute}
                            placeholder="Name Attribute"
-                           validate={validateField(FORM_VALIDATION.userNameAttribute)} />
+                           validate={_validateField('userNameAttribute')} />
 
           <FormikFormGroup help={help.userFullNameAttribute}
                            label="Full Name Attribute"
@@ -106,7 +106,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
             </Col>
           </Row>
 
-          <Field name="defaultRoles" validate={validateField(FORM_VALIDATION.defaultRoles)}>
+          <Field name="defaultRoles" validate={_validateField('defaultRoles')}>
             {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
               <Input bsStyle={error ? 'error' : undefined}
                      help={help.defaultRoles}
@@ -139,7 +139,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
 
           <ButtonToolbar className="pull-right">
             <Button disabled={isSubmitting}
-                    onClick={() => _onSubmitAll(validateForm)}
+                    onClick={onSubmitAll}
                     type="button">
               Finish & Save Identity Service
             </Button>

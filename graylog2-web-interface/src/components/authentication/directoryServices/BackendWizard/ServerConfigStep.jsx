@@ -131,7 +131,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
               </ServerUrl>
 
               <ProtocolOptions>
-                <Field name="transportSecurity">
+                <Field name="transportSecurity" validate={validateField(FORM_VALIDATION.transportSecurity)}>
                   {({ field: { name, onChange, onBlur, value } }) => (
                     <>
                       <Input defaultChecked={value === 'none'}
