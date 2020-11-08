@@ -7,9 +7,10 @@ import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { Spinner } from 'components/common';
-import { Alert } from 'components/graylog';
 import SectionGrid from 'components/common/Section/SectionGrid';
-import SectionComponent from 'components/common/Section/SectionComponent';
+
+import SyncedUsersSection from './SyncedUsersSection';
+import SyncedTeamsSection from './SyncedTeamsSection';
 
 const _loadRoles = (setPaginatedRoles) => {
   const getUnlimited = { page: 1, perPage: 0, query: '' };
@@ -22,8 +23,8 @@ type Props = {
 };
 
 const BackendDetails = ({ authenticationBackend }: Props) => {
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const authService = getAuthServicePlugin(authenticationBackend.config.type);
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
@@ -43,16 +44,8 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
         <BackendConfigDetails authenticationBackend={authenticationBackend} roles={paginatedRoles.list} />
       </div>
       <div>
-        <SectionComponent title="Synchronized Users">
-          <Alert>
-            Managing synchronized users is only possible for the active authentication service.
-          </Alert>
-        </SectionComponent>
-        <SectionComponent title="Synchronized Teams">
-          <Alert>
-            Managing synchronized teams is only possible for the active authentication service.
-          </Alert>
-        </SectionComponent>
+        <SyncedUsersSection authenticationBackend={authenticationBackend} roles={paginatedRoles.list} />
+        <SyncedTeamsSection authenticationBackend={authenticationBackend} />
       </div>
     </SectionGrid>
   );
