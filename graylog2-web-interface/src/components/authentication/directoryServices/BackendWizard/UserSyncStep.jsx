@@ -90,7 +90,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the static role assignment will only affect to new users created via LDAP/LDAP!<br />
+                Changing the static role assignment will only affect new users created via {stepsState.authBackendMeta.serviceTitle}!
                 Existing user accounts will be updated on their next login, or if you edit their roles manually.
               </Panel>
             </Col>
