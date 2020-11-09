@@ -47,6 +47,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
@@ -97,6 +98,8 @@ public class StreamCatalogTest {
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
     @Mock
     private EntityOwnershipService entityOwnershipService;
+    @Mock
+    private UserService userService;
     private StreamFacade facade;
 
     @Before
@@ -120,7 +123,7 @@ public class StreamCatalogTest {
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService);
     }
 
     @Test

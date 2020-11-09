@@ -56,6 +56,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
@@ -169,7 +170,7 @@ public class ConfigurationStateUpdaterTest {
         }
 
         @Override
-        public String saveWithRules(Stream stream, Collection<StreamRule> streamRules) throws ValidationException {
+        public String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException {
             return save(stream);
         }
 
