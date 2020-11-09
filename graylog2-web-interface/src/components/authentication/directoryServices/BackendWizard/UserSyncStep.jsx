@@ -85,6 +85,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                            label="Full Name Attribute"
                            name="userFullNameAttribute"
                            placeholder="Full Name Attribute"
+                           error={backendValidationErrors?.userFullNameAttribute}
                            validate={validateField(FORM_VALIDATION.userFullNameAttribute)} />
 
           {!excludedFields.userUniqueIdAttribute && (
@@ -92,6 +93,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                              label="ID Attribute"
                              name="userUniqueIdAttribute"
                              placeholder="ID Attribute"
+                             error={backendValidationErrors?.userUniqueIdAttribute}
                              validate={validateField(FORM_VALIDATION.userUniqueIdAttribute)} />
           )}
 
