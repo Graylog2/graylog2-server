@@ -70,6 +70,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -95,6 +96,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -546,6 +548,30 @@ public class UsersResource extends RestResource {
         }
     }
 
+    @PUT
+    @Path("{userId}/status/{newStatus}")
+    @Consumes(MediaType.WILDCARD)
+    @ApiOperation("Update the account status for a user")
+    @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+    public Response updateAccountStatus(
+            @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true) @PathParam("userId") String userId,
+            @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
+                    defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
+            @PathParam("newStatus") @NotBlank String newStatusString) throws ValidationException {
+
+        final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
+        final User user = loadUserById(userId);
+        final User.AccountStatus oldStatus = user.getAccountStatus();
+
+        if (oldStatus.equals(newStatus)) {
+            return Response.notModified().build();
+        }
+
+        user.setAccountStatus(newStatus);
+        userService.save(user);
+        return Response.ok().build();
+    }
+
     @GET
     @Path("{userId}/tokens")
     @ApiOperation("Retrieves the list of access tokens for a user")
@@ -671,7 +697,8 @@ public class UsersResource extends RestResource {
                 roleNames,
                 sessionActive,
                 lastActivity,
-                clientAddress
+                clientAddress,
+                user.getAccountStatus()
         );
     }
 

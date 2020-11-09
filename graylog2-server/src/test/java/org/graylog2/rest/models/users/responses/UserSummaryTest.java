@@ -23,6 +23,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.permissions.GRNPermission;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,8 @@ class UserSummaryTest {
             null,
             true,
             null,
-            null
+            null,
+            User.AccountStatus.ENABLED
     );
 
     @Test

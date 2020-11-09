@@ -87,6 +87,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
             final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                     .authServiceType(backendType())
                     .authServiceId(backendId())
+                    .accountIsEnabled(true)
                     .base64AuthServiceUid(userEntry.base64UniqueId())
                     .username(userEntry.username())
                     .fullName(userEntry.fullName())
@@ -241,13 +242,14 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
                 .put("login_success", loginSuccess);
 
         if (user != null) {
-            userDetails.put("user_details", ImmutableMap.of(
-                    "dn", user.dn(),
-                    config.userUniqueIdAttribute(), user.base64UniqueId(),
-                    config.userNameAttribute(), user.username(),
-                    config.userFullNameAttribute(), user.fullName(),
-                    "email", user.email()
-            ));
+            userDetails.put("user_details", ImmutableMap.<String, String>builder()
+                    .put("dn", user.dn())
+                    .put(config.userUniqueIdAttribute(), user.base64UniqueId())
+                    .put(config.userNameAttribute(), user.username())
+                    .put(config.userFullNameAttribute(), user.fullName())
+                    .put("email", user.email())
+                    .build()
+            );
         } else {
             userDetails.put("user_details", ImmutableMap.of());
         }

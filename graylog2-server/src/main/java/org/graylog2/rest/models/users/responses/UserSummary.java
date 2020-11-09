@@ -25,6 +25,7 @@ import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.security.permissions.GRNPermission;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.users.requests.Startpage;
 
 import javax.annotation.Nullable;
@@ -95,6 +96,9 @@ public abstract class UserSummary {
     @Nullable
     public abstract String clientAddress();
 
+    @JsonProperty("account_status")
+    public abstract User.AccountStatus accountStatus();
+
     @JsonCreator
     public static UserSummary create(@JsonProperty("id") @Nullable String id,
                                      @JsonProperty("username") String username,
@@ -111,7 +115,8 @@ public abstract class UserSummary {
                                      @JsonProperty("roles") @Nullable Set<String> roles,
                                      @JsonProperty("session_active") boolean sessionActive,
                                      @JsonProperty("last_activity") @Nullable Date lastActivity,
-                                     @JsonProperty("client_address") @Nullable String clientAddress) {
+                                     @JsonProperty("client_address") @Nullable String clientAddress,
+                                     @JsonProperty("account_status") User.AccountStatus accountStatus) {
         return new AutoValue_UserSummary(id,
                                          username,
                                          email,
@@ -127,6 +132,7 @@ public abstract class UserSummary {
                                          roles,
                                          sessionActive,
                                          lastActivity,
-                                         clientAddress);
+                                         clientAddress,
+                                         accountStatus);
     }
 }
