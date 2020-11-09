@@ -10,18 +10,19 @@ import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
-import type { RoleJSON } from 'logic/roles/Role';
+import type { RoleJSON, RoleContext } from 'logic/roles/Role';
 import AuthzRolesActions, { type PaginatedRoles, type PaginatedUsers } from 'actions/roles/AuthzRolesActions';
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
 export type PaginatedRolesResponse = PaginatedListJSON & {
   roles: Array<RoleJSON>,
+  context?: RoleContext,
 };
 
 // eslint-disable-next-line camelcase
-const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [] }: PaginatedRolesResponse) => ({
-  list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
+const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [], context = {} }: PaginatedRolesResponse) => ({
+  list: Immutable.List(roles.map((r) => Role.fromJSON(r, context?.users && context.users[r.id]))),
   pagination: {
     query,
     page,
