@@ -357,12 +357,14 @@ public class UsersResource extends RestResource {
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
         }
-        // we only allow setting a subset of the fields in CreateStreamRuleRequest
-        if (cr.email() != null) {
-            user.setEmail(cr.email());
-        }
-        if (cr.fullName() != null) {
-            user.setFullName(cr.fullName());
+        // We only allow setting a subset of the fields in ChangeUserRequest
+        if (!user.isExternalUser()) {
+            if (cr.email() != null) {
+                user.setEmail(cr.email());
+            }
+            if (cr.fullName() != null) {
+                user.setFullName(cr.fullName());
+            }
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
