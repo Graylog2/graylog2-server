@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';
