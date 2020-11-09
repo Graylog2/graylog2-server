@@ -32,7 +32,6 @@ const GroupSyncStep = ({
   roles,
   help,
   excludedFields,
-  validateSteps,
 }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
@@ -63,8 +62,7 @@ const GroupSyncStep = ({
                    prepareSubmitPayload={prepareSubmitPayload}
                    roles={roles}
                    submitAllError={submitAllError}
-                   validateOnMount={validateOnMount}
-                   validateSteps={validateSteps} />
+                   validateOnMount={validateOnMount} />
   );
 };
 
