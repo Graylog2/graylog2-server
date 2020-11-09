@@ -14,7 +14,7 @@ import { Col, Row } from 'components/graylog';
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
 
-const TABLE_HEADERS = ['Title', 'Default Roles'];
+const TABLE_HEADERS = ['Title', 'Description', 'Default Roles', 'Actions'];
 
 const DEFAULT_PAGINATION = {
   page: 1,
