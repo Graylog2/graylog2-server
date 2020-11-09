@@ -66,7 +66,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
                    entityId={view.id}
                    onClick={() => setShareViewOpen(true)}
                    bsStyle="default"
-                   disabled={isNewView || !allowedToEdit} />
+                   disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit metadata

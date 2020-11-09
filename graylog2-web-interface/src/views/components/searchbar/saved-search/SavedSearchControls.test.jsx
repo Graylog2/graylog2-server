@@ -94,7 +94,13 @@ describe('SavedSearchControls', () => {
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
-        const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const notOwningUser = {
+          ...viewsManager,
+          username: 'notOwningUser',
+          permissions: [],
+          grn_permissions: [],
+        };
+        const wrapper = mount(<SimpleSavedSearchControls currentUser={notOwningUser} viewStoreState={createViewStoreState(false, 'some-id')} />);
 
         const shareSearch = wrapper.find('button[title="Share"]');
 

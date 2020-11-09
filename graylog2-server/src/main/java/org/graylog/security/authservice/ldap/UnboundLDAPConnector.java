@@ -18,6 +18,7 @@ package org.graylog.security.authservice.ldap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.Ints;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.BindRequest;
 import com.unboundid.ldap.sdk.BindResult;
@@ -194,6 +195,7 @@ public class UnboundLDAPConnector {
                                           Filter filter) throws LDAPException {
         final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
                 .add("userPrincipalName") // TODO: This is ActiveDirectory specific - Do we need this here?
+                .add("userAccountControl")
                 .add("mail")
                 .add("rfc822Mailbox")
                 .add(config.userUniqueIdAttribute())
@@ -289,12 +291,29 @@ public class UnboundLDAPConnector {
     }
 
     public LDAPUser createLDAPUser(UnboundLDAPConfig config, LDAPEntry ldapEntry) {
+        final String username = ldapEntry.nonBlankAttribute(config.userNameAttribute());
         return LDAPUser.builder()
                 .base64UniqueId(ldapEntry.base64UniqueId())
-                .username(ldapEntry.nonBlankAttribute(config.userNameAttribute()))
-                .fullName(ldapEntry.nonBlankAttribute(config.userFullNameAttribute()))
-                .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("")))
+                .accountIsEnabled(findAccountIsEnabled(ldapEntry))
+                .username(username)
+                .fullName(ldapEntry.firstAttributeValue(config.userFullNameAttribute()).orElse(username))
+                .email(ldapEntry.firstAttributeValue("mail").orElse(ldapEntry.firstAttributeValue("rfc822Mailbox").orElse("unknown@unknown.invalid")))
                 .entry(ldapEntry)
                 .build();
+    }
+
+    private boolean findAccountIsEnabled(LDAPEntry ldapEntry) {
+        final Optional<String> control = ldapEntry.firstAttributeValue("userAccountControl");
+
+        // No field present. Assume account is enabled
+        if (!control.isPresent()) {
+            return true;
+        }
+        final Integer userAccountControl = Ints.tryParse(control.get());
+        if (userAccountControl == null) {
+            LOG.warn("Ignoring non-parseable userAccountControl value");
+            return true;
+        }
+        return !ADUserAccountControl.create(userAccountControl).accountIsDisabled();
     }
 }

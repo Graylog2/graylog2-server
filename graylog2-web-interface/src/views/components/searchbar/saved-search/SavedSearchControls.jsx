@@ -253,7 +253,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                                  entityId={view.id}
                                  onClick={this.toggleShareSearch}
                                  bsStyle="default"
-                                 disabled={!isAllowedToEdit} />
+                                 disabledInfo={!view.id && 'Only saved searches can be shared.'} />
                     <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                       <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
                         <Icon name="edit" /> Edit metadata

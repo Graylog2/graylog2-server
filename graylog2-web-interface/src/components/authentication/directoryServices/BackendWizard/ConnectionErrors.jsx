@@ -11,7 +11,7 @@ export const NotificationContainer: StyledComponent<{}, ThemeInterface, Alert> =
   word-break: break-word;
 `;
 
-const ErrorsTitle = styled.div`
+export const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   font-weight: bold;
   margin-bottom: 5px;
 `;
@@ -29,7 +29,7 @@ type Props = {
 
 const ConnectionErrors = ({ errors, message }: Props) => (
   <NotificationContainer bsStyle="danger">
-    <ErrorsTitle>{message}</ErrorsTitle>
+    <Title>{message}</Title>
     <ErrorsList>
       {errors.map((error) => {
         return <li key={String(error)}>{String(error)}</li>;

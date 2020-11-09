@@ -37,6 +37,8 @@ public abstract class UserDetails {
 
     public abstract String username();
 
+    public abstract boolean accountIsEnabled();
+
     public abstract String email();
 
     public abstract String fullName();
@@ -70,6 +72,8 @@ public abstract class UserDetails {
         public abstract Builder base64AuthServiceUid(String base64AuthServiceUid);
 
         public abstract Builder username(String username);
+
+        public abstract Builder accountIsEnabled(boolean isEnabled);
 
         public abstract Builder email(String email);
 

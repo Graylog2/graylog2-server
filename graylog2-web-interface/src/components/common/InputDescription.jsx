@@ -9,10 +9,6 @@ const ErrorMessage = styled.span(({ theme }) => `
   color: ${theme.colors.variant.danger};
 `);
 
-const HelpMessage = styled.span(({ theme }) => `
-  color: ${theme.colors.gray[50]};
-`);
-
 type Props = {
   help?: React.Node,
   error?: React.Node,
@@ -36,9 +32,9 @@ const InputDescription = ({ help, error }: Props) => {
       )}
       {(!!error && !!help) && <br />}
       {help && (
-        <HelpMessage>
+        <span>
           {help}
-        </HelpMessage>
+        </span>
       )}
     </HelpBlock>
   );

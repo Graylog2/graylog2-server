@@ -38,9 +38,9 @@ describe('<ShareButton />', () => {
     expect(onClickStub).not.toHaveBeenCalled();
   });
 
-  it('should not be clickable if button is disabled', async () => {
+  it('should not be clickable if disabledInfo is provided', async () => {
     const onClickStub = jest.fn();
-    render(<SimpleShareButton onClick={onClickStub} grnPermissions={[`entity:own:${entityGRN}`]} disabled />);
+    render(<SimpleShareButton onClick={onClickStub} grnPermissions={[`entity:own:${entityGRN}`]} disabledInfo="Only saved entities can be shared" />);
 
     const button = screen.getByRole('button', { name: /Share/ });
     fireEvent.click(button);
