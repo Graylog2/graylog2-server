@@ -28,7 +28,6 @@ export const FORM_VALIDATION = {
     min: 1,
     max: 65535,
   },
-  title: {},
   description: {},
   transportSecurity: {},
   verifyCertificates: {},
