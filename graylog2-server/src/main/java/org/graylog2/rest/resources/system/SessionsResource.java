@@ -154,7 +154,11 @@ public class SessionsResource extends RestResource {
             return SessionValidationResponse.invalid();
         }
 
-        // there's no valid session, but the authenticator would like us to create one
+        // There's no valid session, but the authenticator would like us to create one.
+        // This is the "Trusted Header Authentication" scenario, where the browser performs this request to check if a
+        // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
+        // user based on the trusted header and request a session to be created transparently. The UI will take the
+        // session information from the response to perform subsequent requests to the backend using this session.
         if (subject.getSession(false) == null && ShiroSecurityContext.isSessionCreationRequested()) {
             final Session session = subject.getSession();
             LOG.debug("Session created {}", session.getId());
