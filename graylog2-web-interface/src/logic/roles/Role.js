@@ -131,7 +131,7 @@ export default class Role {
     };
   }
 
-  static fromJSON(value: RoleJSON, userContext: UserContext[]) {
+  static fromJSON(value: RoleJSON, userContext: Array<UserContext> = []) {
     const users = Immutable.Set(userContext || []);
 
     const {
