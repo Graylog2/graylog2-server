@@ -94,6 +94,7 @@ import {
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import HelloFromTypeScriptPage from 'pages/HelloFromTypeScriptPage';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
   const ParentComponent = parentComponent ?? React.Fragment;
@@ -288,6 +289,7 @@ const AppRouter = () => {
                                path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
                                component={SidecarEditCollectorPage} />
                         {standardPluginRoutes}
+                        <Route exact path="/typescript" component={HelloFromTypeScriptPage} />
                         <Route path="*" component={WrappedNotFoundPage} />
                       </Switch>
                     </AppWithoutSearchBar>
