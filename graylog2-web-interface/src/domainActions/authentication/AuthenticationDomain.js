@@ -32,7 +32,7 @@ const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
 const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   action: AuthenticationActions.update,
   success: (authBackendId, authBackend) => ({
-    message: `Authentication service "${authBackend.title} was updated successfully`,
+    message: `Authentication service "${authBackend.title}" was updated successfully`,
   }),
   error: (error, authBackendId, authBackend) => ({
     message: `Updating authentication service "${authBackend.title}" failed with status: ${error}`,
