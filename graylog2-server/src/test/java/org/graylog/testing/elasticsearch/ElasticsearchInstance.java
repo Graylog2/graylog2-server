@@ -39,7 +39,6 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
-    private static final String DEFAULT_IMAGE = "elasticsearch";
 
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
@@ -52,12 +51,7 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     protected abstract FixtureImporter fixtureImporter();
 
     protected static String imageNameFrom(Version version) {
-        final String defaultImage = version.satisfies(">=6.0.0")
-                // The OSS image only exists for 6.0.0 and later
-                ? DEFAULT_IMAGE_OSS
-                // For older versions do not use the official image because it contains x-pack stuff we don't want
-                : DEFAULT_IMAGE;
-        return defaultImage + ":" + version.toString();
+        return DEFAULT_IMAGE_OSS + ":" + version.toString();
     }
 
     protected ElasticsearchInstance(String image, Version version, Network network) {
