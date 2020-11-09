@@ -8,8 +8,9 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import WizardPageHeader from './WizardPageHeader';
 import { HELP, AUTH_BACKEND_META } from './BackendCreate';
 
-import { prepareInitialValues, handleSubmit } from '../ldap/BackendEdit';
+import prepareInitialWizardValues from '../PrepareInitialWizardValues';
 import BackendWizard from '../BackendWizard';
+import handleUpdate from '../HandleUpdate';
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
@@ -35,7 +36,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
   const help = { ...HELP, ...groupSyncHelp };
   const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
-  let initialValues = prepareInitialValues(authenticationBackend);
+  let initialValues = prepareInitialWizardValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
     const {
@@ -56,7 +57,19 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
     backendGroupSyncIsActive: !!initialValues.synchronizeGroups,
   };
-  const _handleSubmit = (payload, formValues, serviceType, shouldUpdateGroupSync) => handleSubmit(payload, formValues, authenticationBackend.id, !!initialValues.synchronizeGroups, serviceType, shouldUpdateGroupSync);
+  const _handleSubmit = (
+    payload,
+    formValues,
+    serviceType,
+    shouldUpdateGroupSync,
+  ) => handleUpdate(
+    payload,
+    formValues,
+    authenticationBackend.id,
+    !!initialValues.synchronizeGroups,
+    serviceType,
+    shouldUpdateGroupSync,
+  );
 
   return (
     <DocumentTitle title="Edit Active Directory Authentication Service">
