@@ -44,13 +44,6 @@ const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
   return userPreferences[sidebarPinningPrefKey];
 };
 
-const _createUserPreferencesArray = (userPreferences) => {
-  return Object.entries(userPreferences).map(([name, value]) => ({
-    name,
-    value,
-  }));
-};
-
 const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, newIsPinned) => {
   const sidebarPinningPrefKey: string = _getPinningPreferenceKey(viewType);
 
@@ -62,7 +55,7 @@ const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, n
       ...userPreferences,
       [sidebarPinningPrefKey]: newIsPinned,
     };
-    PreferencesActions.saveUserPreferences(currentUser?.username, _createUserPreferencesArray(newUserPreferences), undefined, false);
+    PreferencesActions.saveUserPreferences(currentUser?.username, newUserPreferences, undefined, false);
   }
 };
 
