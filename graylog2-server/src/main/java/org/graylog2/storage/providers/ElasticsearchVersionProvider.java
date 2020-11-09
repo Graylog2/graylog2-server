@@ -64,15 +64,14 @@ public class ElasticsearchVersionProvider implements Provider<Version> {
         }
 
         try {
-            return this.cachedVersion.get(() -> this.versionProbe.probe(this.elasticsearchHosts))
-                    .map(this::majorVersionFrom)
+            return this.cachedVersion.get(() -> {
+                final Optional<Version> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
+                probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running v" + version));
+                return probedVersion;
+            })
                     .orElseThrow(() -> new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + "!"));
         } catch (ExecutionException | InterruptedException e) {
             throw new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + ": ", e);
         }
-    }
-
-    private Version majorVersionFrom(Version version) {
-        return Version.from(version.getVersion().getMajorVersion(), 0, 0);
     }
 }

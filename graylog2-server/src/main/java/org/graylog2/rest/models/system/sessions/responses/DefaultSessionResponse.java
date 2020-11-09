@@ -37,10 +37,14 @@ public abstract class DefaultSessionResponse {
     @JsonProperty("username")
     public abstract String username();
 
+    @JsonProperty("user_id")
+    public abstract String userId();
+
     @JsonCreator
     public static DefaultSessionResponse create(@JsonProperty("valid_until") Date validUntil,
-                                         @JsonProperty("session_id") String sessionId,
-                                         @JsonProperty("username") String username) {
-        return new AutoValue_DefaultSessionResponse(validUntil, sessionId, username);
+                                                @JsonProperty("session_id") String sessionId,
+                                                @JsonProperty("username") String username,
+                                                @JsonProperty("user_id") String userId) {
+        return new AutoValue_DefaultSessionResponse(validUntil, sessionId, username, userId);
     }
 }

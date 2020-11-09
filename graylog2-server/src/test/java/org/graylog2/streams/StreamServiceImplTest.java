@@ -18,6 +18,7 @@ package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -63,13 +64,15 @@ public class StreamServiceImplTest {
     private NotificationService notificationService;
     @Mock
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    @Mock
+    private EntityOwnershipService entityOwnershipService;
 
     private StreamService streamService;
 
     @Before
     public void setUp() throws Exception {
         this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService, alertService,
-            outputService, indexSetService, factory, notificationService, new ClusterEventBus(), alarmCallbackConfigurationService);
+                outputService, indexSetService, factory, notificationService, entityOwnershipService, new ClusterEventBus(), alarmCallbackConfigurationService);
     }
 
     @Test
@@ -77,8 +80,8 @@ public class StreamServiceImplTest {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
         assertThat(alertableStreams)
-            .isNotNull()
-            .isEmpty();
+                .isNotNull()
+                .isEmpty();
     }
 
     @Test
@@ -87,7 +90,7 @@ public class StreamServiceImplTest {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
         assertThat(alertableStreams)
-            .isEmpty();
+                .isEmpty();
     }
 
     @Test
@@ -96,8 +99,8 @@ public class StreamServiceImplTest {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
         assertThat(alertableStreams)
-            .isNotEmpty()
-            .hasSize(2);
+                .isNotEmpty()
+                .hasSize(2);
     }
 
     @Test

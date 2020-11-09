@@ -169,17 +169,21 @@ const MetricsStore = Reflux.createStore({
 
       return fetch('GET', url).then((response) => {
         return { nodeId: nodeId, names: response.metrics };
+      }, (error) => {
+        // When fetching metrics fails, keep previous available metrics around, letting user see them
+        return { nodeId: nodeId, names: this.metricsNames[nodeId], error: error };
       });
     })).then((responses) => {
       const metricsNames = {};
-
+      const metricsErrors = {};
       responses.forEach((response) => {
         if (response.nodeId) {
           metricsNames[response.nodeId] = response.names;
+          metricsErrors[response.nodeId] = response.error;
         }
       });
 
-      this.trigger({ metricsNames: metricsNames });
+      this.trigger({ metricsNames: metricsNames, metricsErrors: metricsErrors });
       this.metricsNames = metricsNames;
 
       return metricsNames;

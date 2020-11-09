@@ -5,11 +5,15 @@ import StringUtils from 'util/StringUtils';
 import type { ViewType } from 'views/logic/views/View';
 
 type Props = {
-  type: ViewType,
+  type: ?ViewType,
   capitalize?: boolean,
 };
 
 const ViewTypeLabel = ({ type, capitalize }: Props) => {
+  if (!type) {
+    return '';
+  }
+
   const typeLabel = type.toLowerCase();
 
   return capitalize ? StringUtils.capitalizeFirstLetter(typeLabel) : typeLabel;

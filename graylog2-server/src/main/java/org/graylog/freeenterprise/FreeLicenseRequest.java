@@ -30,6 +30,7 @@ public abstract class FreeLicenseRequest {
     public static final String FIELD_FIRST_NAME = "first_name";
     public static final String FIELD_LAST_NAME = "last_name";
     public static final String FIELD_EMAIL = "email";
+    public static final String FIELD_PHONE = "phone";
     public static final String FIELD_COMPANY = "company";
 
     @JsonProperty(FIELD_FIRST_NAME)
@@ -44,6 +45,10 @@ public abstract class FreeLicenseRequest {
     @NotBlank
     @Email
     public abstract String email();
+
+    @JsonProperty(FIELD_PHONE)
+    @NotBlank
+    public abstract String phone();
 
     @JsonProperty(FIELD_COMPANY)
     @NotBlank
@@ -68,6 +73,9 @@ public abstract class FreeLicenseRequest {
 
         @JsonProperty(FIELD_EMAIL)
         public abstract Builder email(@NotBlank @Email String email);
+
+        @JsonProperty(FIELD_PHONE)
+        public abstract Builder phone(@NotBlank String phone);
 
         @JsonProperty(FIELD_COMPANY)
         public abstract Builder company(@NotBlank String company);

@@ -72,12 +72,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
-import org.graylog.plugins.views.search.views.sharing.AllUsersOfInstance;
-import org.graylog.plugins.views.search.views.sharing.AllUsersOfInstanceStrategy;
-import org.graylog.plugins.views.search.views.sharing.SpecificRoles;
-import org.graylog.plugins.views.search.views.sharing.SpecificRolesStrategy;
-import org.graylog.plugins.views.search.views.sharing.SpecificUsers;
-import org.graylog.plugins.views.search.views.sharing.SpecificUsersStrategy;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
@@ -168,8 +162,6 @@ public class ViewsBindings extends ViewsModule {
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 
-        registerViewSharingSubtypes();
-        registerSharingStrategies();
         registerSortConfigSubclasses();
         registerParameterSubtypes();
 
@@ -215,20 +207,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AreaVisualizationConfigDTO.class);
     }
 
-    private void registerViewSharingSubtypes() {
-        registerJacksonSubtype(AllUsersOfInstance.class);
-        registerJacksonSubtype(SpecificRoles.class);
-        registerJacksonSubtype(SpecificUsers.class);
-    }
-
     private void registerParameterSubtypes() {
         registerJacksonSubtype(ValueParameter.class);
-    }
-
-    private void registerSharingStrategies() {
-        registerSharingStrategy(AllUsersOfInstance.TYPE, AllUsersOfInstanceStrategy.class);
-        registerSharingStrategy(SpecificRoles.TYPE, SpecificRolesStrategy.class);
-        registerSharingStrategy(SpecificUsers.TYPE, SpecificUsersStrategy.class);
     }
 
     private void registerExceptionMappers() {

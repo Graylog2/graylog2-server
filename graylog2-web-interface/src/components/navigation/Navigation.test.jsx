@@ -12,7 +12,6 @@ jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 
@@ -22,6 +21,8 @@ jest.mock('util/AppConfig', () => ({
   gl2DevMode: jest.fn(() => false),
   isFeatureEnabled: jest.fn(() => false),
 }));
+
+jest.mock('routing/withLocation', () => (x) => x);
 
 const currentUser = viewsManager;
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
@@ -64,10 +65,10 @@ describe('Navigation', () => {
       expect(brand.find('NavigationBrand')).toExist();
     });
 
-    it('contains user menu including correct username', () => {
+    it('contains user menu including correct user details', () => {
       const usermenu = wrapper.find('UserMenu');
 
-      expect(usermenu).toHaveProp('loginName', currentUser.username);
+      expect(usermenu).toHaveProp('userId', currentUser.id);
       expect(usermenu).toHaveProp('fullName', currentUser.full_name);
     });
 

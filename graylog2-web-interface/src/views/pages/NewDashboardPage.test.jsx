@@ -28,8 +28,10 @@ jest.mock('views/logic/views/ViewLoader', () => ({
   processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
+jest.mock('routing/withLocation', () => (x) => x);
+
 describe('NewDashboardPage', () => {
-  const SimpleNewDashboardPage = (props) => <NewDashboardPage route={{}} location={{}} {...props} />;
+  const SimpleNewDashboardPage = (props) => <NewDashboardPage location={{}} {...props} />;
 
   beforeAll(() => {
     jest.useFakeTimers();
@@ -57,7 +59,7 @@ describe('NewDashboardPage', () => {
   });
 
   it('should render transform search view to dashboard view, if view is defined in location state', async () => {
-    const loedViewMock = asMock(ViewActions.load);
+    const loadViewMock = asMock(ViewActions.load);
     const view = View.create().toBuilder().type(View.Type.Search).search(Search.builder().build())
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
@@ -68,8 +70,8 @@ describe('NewDashboardPage', () => {
 
     await findByText('Extended search page');
 
-    expect(loedViewMock).toHaveBeenCalledTimes(1);
-    expect(loedViewMock.mock.calls[0][0].type).toStrictEqual(View.Type.Dashboard);
+    expect(loadViewMock).toHaveBeenCalled();
+    expect(loadViewMock).toHaveBeenCalledWith(expect.objectContaining({ type: View.Type.Dashboard }), expect.anything());
   });
 
   it('should process hooks with provided location query when transforming search view to dashboard view', async () => {
@@ -91,8 +93,8 @@ describe('NewDashboardPage', () => {
 
     await findByText('Extended search page');
 
-    expect(processHooksAction).toBeCalledTimes(1);
-    expect(processHooksAction.mock.calls[0][3]).toStrictEqual({ q: '', rangetype: 'relative', relative: '300' });
+    expect(processHooksAction).toHaveBeenCalled();
+    expect(processHooksAction).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), { q: '', rangetype: 'relative', relative: '300' }, expect.anything());
   });
 
   it('should not render transform search view to dashboard view if view search is in JSON format', async () => {

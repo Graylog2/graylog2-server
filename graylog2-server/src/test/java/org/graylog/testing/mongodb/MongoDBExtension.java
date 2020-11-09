@@ -57,7 +57,7 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBExtension.class);
-    private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(MongoDBExtension.class);
+    public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(MongoDBExtension.class);
 
     /**
      * Create new extension instance using the {@link MongoDBTestService#DEFAULT_VERSION default version}.

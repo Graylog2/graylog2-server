@@ -3,32 +3,17 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-import { Input } from 'components/bootstrap';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 
 import Pagination from './Pagination';
+import PageSizeSelect from './PageSizeSelect';
 
 const DEFAULT_PAGE_SIZES = [10, 50, 100];
-const INITIAL_PAGE = 1;
-
-type PageSizeSelectProps = {
-  pageSize: number,
-  pageSizes: Array<number>,
-  onChange: (event: SyntheticInputEvent<HTMLLinkElement>) => void,
-};
-
-const pageFormStyle = { float: 'right' /* stylelint-disable-line declaration-colon-space-after */ };
-
-const PageSizeSelect = ({ pageSizes, pageSize, onChange }: PageSizeSelectProps) => (
-  <div className="form-inline page-size" style={pageFormStyle}>
-    <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={onChange}>
-      {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
-    </Input>
-  </div>
-);
+export const INITIAL_PAGE = 1;
 
 type Props = {
   children: React.Node,
+  className?: string,
   onChange: (currentPage: number, pageSize: number) => void,
   activePage: number,
   pageSize: number,
@@ -46,6 +31,7 @@ type Props = {
 const PaginatedList = ({
   activePage,
   children,
+  className,
   onChange,
   pageSize: propsPageSize,
   pageSizes,
@@ -55,7 +41,7 @@ const PaginatedList = ({
   const initialPage = activePage > 0 ? activePage : INITIAL_PAGE;
   const [pageSize, setPageSize] = useState(propsPageSize);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const numberPages = Math.ceil(totalItems / pageSize);
+  const numberPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
 
   useEffect(() => {
     if (activePage > 0) {
@@ -90,7 +76,7 @@ const PaginatedList = ({
       {children}
 
       <IfInteractive>
-        <div className="text-center pagination-wrapper">
+        <div className={`text-center pagination-wrapper ${className ?? ''}`}>
           <Pagination totalPages={numberPages}
                       currentPage={currentPage}
                       onChange={_onChangePage} />
@@ -122,6 +108,7 @@ PaginatedList.propTypes = {
 
 PaginatedList.defaultProps = {
   activePage: 0,
+  className: undefined,
   pageSizes: DEFAULT_PAGE_SIZES,
   pageSize: DEFAULT_PAGE_SIZES[0],
   showPageSizeSelect: true,

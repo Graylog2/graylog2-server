@@ -27,6 +27,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -84,6 +85,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
     private final NotificationService notificationService;
+    private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
@@ -95,6 +97,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
                              NotificationService notificationService,
+                             EntityOwnershipService entityOwnershipService,
                              ClusterEventBus clusterEventBus,
                              AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
         super(mongoConnection);
@@ -104,6 +107,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.notificationService = notificationService;
+        this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
@@ -222,7 +226,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                     .map(outputId -> {
                         final Output output = outputsById.get(outputId);
                         if (output == null) {
-                            final String streamTitle = Strings.nullToEmpty((String)o.get(StreamImpl.FIELD_TITLE));
+                            final String streamTitle = Strings.nullToEmpty((String) o.get(StreamImpl.FIELD_TITLE));
                             LOG.warn("Stream \"" + streamTitle + "\" <" + id + "> references missing output <" + outputId + "> - ignoring output.");
                         }
                         return output;
@@ -233,7 +237,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             @SuppressWarnings("unchecked")
             final Map<String, Object> fields = o.toMap();
 
-            final String indexSetId = (String)fields.get(StreamImpl.FIELD_INDEX_SET_ID);
+            final String indexSetId = (String) fields.get(StreamImpl.FIELD_INDEX_SET_ID);
 
             streams.add(new StreamImpl(objectId, fields, streamRules, outputs, indexSets.get(indexSetId)));
         }
@@ -248,7 +252,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     private Map<String, IndexSet> indexSetsForStreams(List<DBObject> streams) {
         final Set<String> indexSetIds = streams.stream()
-                .map(stream -> (String)stream.get(StreamImpl.FIELD_INDEX_SET_ID))
+                .map(stream -> (String) stream.get(StreamImpl.FIELD_INDEX_SET_ID))
                 .filter(s -> !isNullOrEmpty(s))
                 .collect(Collectors.toSet());
         return indexSetService.findByIds(indexSetIds)
@@ -281,8 +285,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public List<Stream> loadAllWithConfiguredAlertConditions() {
         final DBObject query = QueryBuilder.start().and(
-            QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
-            QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).not().size(0).get()
+                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
+                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).not().size(0).get()
         ).get();
 
         return loadAll(query);
@@ -292,13 +296,15 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         List<ObjectId> outputIds = outputIdsForRawStream(stream);
 
         Set<Output> result = new HashSet<>();
-        if (outputIds != null)
-            for (ObjectId outputId : outputIds)
+        if (outputIds != null) {
+            for (ObjectId outputId : outputIds) {
                 try {
                     result.add(outputService.load(outputId.toHexString()));
                 } catch (NotFoundException e) {
                     LOG.warn("Non-existing output <{}> referenced from stream <{}>!", outputId.toHexString(), stream.get("_id"));
                 }
+            }
+        }
 
         return result;
     }
@@ -326,6 +332,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
         clusterEventBus.post(StreamDeletedEvent.create(streamId));
+        entityOwnershipService.unregisterStream(streamId);
     }
 
     public void update(Stream stream, String title, String description) throws ValidationException {

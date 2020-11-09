@@ -23,6 +23,7 @@ describe('SavedSearchControls', () => {
       // $FlowFixMe: allowing `undefined` on purpose
       .id(id)
       .title('title')
+      .type(View.Type.Search)
       .description('description')
       .search(Search.create().toBuilder().id('id-beef').build())
       .owner('owningUser')
@@ -85,17 +86,23 @@ describe('SavedSearchControls', () => {
       });
     });
 
-    describe('has "Share search" option', () => {
+    describe('has "Share" option', () => {
       it('includes the option to share the current search', () => {
         const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        expect(wrapper.find('MenuItem[title="Share search"]')).toExist();
+        expect(wrapper.find('button[title="Share"]')).toExist();
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
-        const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const notOwningUser = {
+          ...viewsManager,
+          username: 'notOwningUser',
+          permissions: [],
+          grn_permissions: [],
+        };
+        const wrapper = mount(<SimpleSavedSearchControls currentUser={notOwningUser} viewStoreState={createViewStoreState(false, 'some-id')} />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).toBeDisabled();
       });
@@ -105,9 +112,10 @@ describe('SavedSearchControls', () => {
           ...viewsManager,
           username: 'owningUser',
           permissions: [],
+          grn_permissions: ['entity:own:grn::::search:user-id-1'],
         };
         const wrapper = mount(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
@@ -117,11 +125,12 @@ describe('SavedSearchControls', () => {
           ...viewsManager,
           username: 'powerfulUser',
           permissions: [Permissions.View.Edit(viewsManager.id)],
+          grn_permissions: ['entity:own:grn::::search:user-id-1'],
         };
 
         const wrapper = mount(<SimpleSavedSearchControls currentUser={owningUser} viewStoreState={createViewStoreState(false, owningUser.id)} />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
@@ -129,17 +138,17 @@ describe('SavedSearchControls', () => {
       it('which should be enabled if current user is admin', () => {
         const wrapper = mount(<SimpleSavedSearchControls currentUser={admin} viewStoreState={createViewStoreState(false, admin.id)} />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
 
-      it('which should be disabled if search is unsaved', () => {
+      it('which should be hidden if search is unsaved', () => {
         const wrapper = mount(<SimpleSavedSearchControls />);
 
-        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+        const shareSearch = wrapper.find('button[title="Share"]');
 
-        expect(shareSearch).toBeDisabled();
+        expect(shareSearch).toMatchSnapshot();
       });
     });
   });
@@ -159,6 +168,7 @@ describe('SavedSearchControls', () => {
         view: View.builder()
           .title('title')
           .description('description')
+          .type(View.Type.Search)
           .search(Search.create().toBuilder().id('id-beef').build())
           .id('id-beef')
           .build(),
@@ -174,6 +184,7 @@ describe('SavedSearchControls', () => {
     it('should render dirty', () => {
       const view = View.builder()
         .title('title')
+        .type(View.Type.Search)
         .description('description')
         .search(Search.create().toBuilder().id('id-beef').build())
         .id('id-beef')

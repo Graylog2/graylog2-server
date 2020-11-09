@@ -40,7 +40,7 @@ import java.util.Set;
 public class RestTools {
 
     @Nullable
-    public static String getUserNameFromRequest(ContainerRequestContext requestContext) {
+    public static String getUserIdFromRequest(ContainerRequestContext requestContext) {
         final SecurityContext securityContext = requestContext.getSecurityContext();
 
         if (!(securityContext instanceof ShiroSecurityContext)) {

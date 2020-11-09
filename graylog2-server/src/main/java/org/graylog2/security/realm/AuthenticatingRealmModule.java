@@ -21,6 +21,8 @@ import com.google.inject.multibindings.MapBinder;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.security.OrderedAuthenticatingRealms;
+import org.graylog2.security.StaticOrderedAuthenticatingRealms;
 
 import java.util.Set;
 
@@ -36,11 +38,13 @@ public class AuthenticatingRealmModule extends Graylog2Module {
     protected void configure() {
         final MapBinder<String, AuthenticatingRealm> auth = authenticationRealmBinder();
 
+        bind(OrderedAuthenticatingRealms.class).to(StaticOrderedAuthenticatingRealms.class).in(Scopes.SINGLETON);
+
         add(auth, AccessTokenAuthenticator.NAME, AccessTokenAuthenticator.class);
         add(auth, RootAccountRealm.NAME, RootAccountRealm.class);
-        add(auth, LdapUserAuthenticator.NAME, LdapUserAuthenticator.class);
-        add(auth, PasswordAuthenticator.NAME, PasswordAuthenticator.class);
         add(auth, SessionAuthenticator.NAME, SessionAuthenticator.class);
+        add(auth, HTTPHeaderAuthenticationRealm.NAME, HTTPHeaderAuthenticationRealm.class);
+        add(auth, AuthServiceRealm.NAME, AuthServiceRealm.class);
     }
 
     private void add(MapBinder<String, AuthenticatingRealm> auth, String name,

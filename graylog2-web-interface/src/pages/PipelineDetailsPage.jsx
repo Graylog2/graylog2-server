@@ -165,7 +165,7 @@ const PipelineDetailsPage = createReactClass({
 
             <span>
               <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-                <Button bsStyle="info" className="active">Manage pipelines</Button>
+                <Button bsStyle="info">Manage pipelines</Button>
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>

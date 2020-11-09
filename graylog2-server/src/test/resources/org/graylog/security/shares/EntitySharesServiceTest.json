@@ -1,0 +1,64 @@
+{
+  "grants": [
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000003"
+      },
+      "grantee": "grn::::user:john",
+      "capability": "manage",
+      "target": "grn::::stream:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000004"
+      },
+      "grantee": "grn::::user:jane",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000005"
+      },
+      "grantee": "grn::::team:55e0261a0cc6980000000008",
+      "capability": "view",
+      "target": "grn::::dashboard:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000006"
+      },
+      "grantee": "grn::::user:invisible",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000007"
+      },
+      "grantee": "grn::::user:bob",
+      "capability": "own",
+      "target": "grn::::event_definition:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    }
+  ],
+
+  "teams": [
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000008"
+      },
+      "name": "The A-Team",
+      "description": "They are the best, and they specialize in the ridiculous",
+      "users": [
+        "hannibal",
+        "murdock",
+        "B.A. Baracus"
+      ]
+    }
+  ]
+}

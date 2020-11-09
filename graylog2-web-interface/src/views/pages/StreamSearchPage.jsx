@@ -6,26 +6,30 @@ import Spinner from 'components/common/Spinner';
 import withParams from 'routing/withParams';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
+import withLocation from 'routing/withLocation';
+import type { Location } from 'routing/withLocation';
+import { loadNewViewForStream } from 'views/logic/views/Actions';
 
 import SearchPage from './SearchPage';
 
-import { loadNewViewForStream } from '../logic/views/Actions';
-
 type Props = {
-  location: {
-    query: { [string]: any },
-  },
+  location: Location,
   params: {
-    streamId: string,
+    streamId: ?string,
   },
-  route: {},
 };
 
-const StreamSearchPage = ({ params: { streamId }, route, location: { query } }: Props) => {
+const StreamSearchPage = ({ params: { streamId }, location: { query } }: Props) => {
   const newView = useCreateSavedSearch(streamId);
   const [loaded, HookComponent] = useLoadView(newView, query);
 
-  const _loadNewView = useCallback(() => loadNewViewForStream(streamId), [streamId]);
+  const _loadNewView = useCallback(() => {
+    if (streamId) {
+      return loadNewViewForStream(streamId);
+    }
+
+    throw new Error('No stream id specified!');
+  }, [streamId]);
 
   if (HookComponent) {
     return HookComponent;
@@ -35,7 +39,7 @@ const StreamSearchPage = ({ params: { streamId }, route, location: { query } }: 
     return <Spinner />;
   }
 
-  return <SearchPage route={route} loadNewView={_loadNewView} />;
+  return <SearchPage loadNewView={_loadNewView} />;
 };
 
-export default withParams(StreamSearchPage);
+export default withParams(withLocation(StreamSearchPage));

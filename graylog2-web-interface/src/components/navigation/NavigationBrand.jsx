@@ -8,7 +8,7 @@ import { themePropTypes } from 'theme';
 // eslint-disable-next-line no-unused-vars
 function BrandComponent({ active, theme, ...props }) {
   return (
-    <a {...props}>
+    <a {...props} className="navbar-brand">
       <svg height="26" width="90" viewBox="0 0 891 260" role="img" aria-labelledby="logoTitleId">
         <title id="logoTitleId">Graylog Logo</title>
         <g fill={theme.colors.variant.darker.default}>

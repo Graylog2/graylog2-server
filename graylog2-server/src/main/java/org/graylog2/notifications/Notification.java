@@ -52,6 +52,7 @@ public interface Notification extends Persisted {
         ES_UNAVAILABLE,
         NO_INPUT_RUNNING,
         INPUT_FAILED_TO_START,
+        INPUT_FAILURE_SHUTDOWN,
         CHECK_SERVER_CLOCKS,
         OUTDATED_VERSION,
         EMAIL_TRANSPORT_CONFIGURATION_INVALID,
@@ -66,7 +67,9 @@ public interface Notification extends Persisted {
         GENERIC,
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
-        ES_NODE_DISK_WATERMARK_FLOOD_STAGE
+        ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
+        ES_VERSION_MISMATCH,
+        LEGACY_LDAP_CONFIG_MIGRATION
     }
 
     enum Severity {

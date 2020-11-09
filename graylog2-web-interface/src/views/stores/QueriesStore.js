@@ -53,6 +53,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
       if (!isEqual(newQueries, this.queries)) {
         this.queries = newQueries;
+
         this._trigger();
       }
     },

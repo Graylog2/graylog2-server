@@ -11,25 +11,28 @@ import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
 import withParams from 'routing/withParams';
 
+import StreamPermissionErrorPage from './StreamPermissionErrorPage';
+
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-const { isPermitted } = PermissionsMixin;
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
   };
 
-  state = {
-    eventDefinition: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      eventDefinition: undefined,
+    };
+  }
 
   componentDidMount() {
     const { params, currentUser } = this.props;
@@ -55,12 +58,24 @@ class EditEventDefinitionPage extends React.Component {
     }
   }
 
+  _streamsWithMissingPermissions(eventDefinition, currentUser) {
+    const streams = eventDefinition?.config?.streams || [];
+
+    return streams.filter((streamId) => !isPermitted(currentUser.permissions, `streams:read:${streamId}`));
+  }
+
   render() {
-    const { params, currentUser, route } = this.props;
+    const { params, currentUser } = this.props;
     const { eventDefinition } = this.state;
 
     if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       history.push(Routes.NOTFOUND);
+    }
+
+    const missingStreams = this._streamsWithMissingPermissions(eventDefinition, currentUser);
+
+    if (missingStreams.length > 0) {
+      return <StreamPermissionErrorPage error={{}} missingStreamIds={missingStreams} />;
     }
 
     if (!eventDefinition) {
@@ -108,7 +123,7 @@ class EditEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} route={route} />
+              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
             </Col>
           </Row>
         </span>

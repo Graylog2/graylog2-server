@@ -3,6 +3,8 @@
 exports[`<Pagination /> should display Pagination 1`] = `
 .c0.pagination {
   font-size: 0.889rem;
+  margin-top: 10px;
+  margin-bottom: 0;
 }
 
 .c0.pagination > li > a,

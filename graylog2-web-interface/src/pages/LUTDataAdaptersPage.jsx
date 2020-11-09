@@ -10,6 +10,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
   'LookupTableDataAdapters',
@@ -82,8 +83,8 @@ class LUTDataAdaptersPage extends React.Component {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
   }
 
-  _isCreating = (props) => {
-    return props.route.action === 'create';
+  _isCreating = ({ action }) => {
+    return action === 'create';
   }
 
   _validateAdapter = (adapter) => {
@@ -92,7 +93,7 @@ class LUTDataAdaptersPage extends React.Component {
 
   render() {
     const {
-      route: { action },
+      action,
       errorStates,
       dataAdapter,
       validationErrors,
@@ -160,7 +161,7 @@ class LUTDataAdaptersPage extends React.Component {
                   <Button bsStyle="info">Caches</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
-                  <Button bsStyle="info" className="active">Data Adapters</Button>
+                  <Button bsStyle="info">Data Adapters</Button>
                 </LinkContainer>
               </ButtonToolbar>
             </span>
@@ -181,7 +182,7 @@ LUTDataAdaptersPage.propTypes = {
   pagination: PropTypes.object,
   dataAdapters: PropTypes.array,
   location: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
+  action: PropTypes.string,
 };
 
 LUTDataAdaptersPage.defaultProps = {
@@ -191,9 +192,10 @@ LUTDataAdaptersPage.defaultProps = {
   types: null,
   pagination: null,
   dataAdapter: null,
+  action: undefined,
 };
 
-export default connect(withParams(LUTDataAdaptersPage), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+export default connect(withParams(withLocation(LUTDataAdaptersPage)), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
   ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
     ...otherProps,
     ...dataAdaptersStore,

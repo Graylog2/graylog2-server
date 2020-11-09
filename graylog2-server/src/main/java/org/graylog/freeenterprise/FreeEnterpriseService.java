@@ -98,6 +98,7 @@ public class FreeEnterpriseService {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .email(request.email())
+                .phone(request.phone())
                 .company(request.company())
                 .build();
         try {

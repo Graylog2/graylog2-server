@@ -12,10 +12,9 @@ import ViewActionsMenu from './ViewActionsMenu';
 
 const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)
   .search(Search.builder().build())
+  .title('View title')
   .createdAt(new Date('2019-10-16T14:38:44.681Z'))
   .build();
-
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: {
@@ -53,12 +52,14 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
-jest.mock('views/stores/ViewSharingStore', () => ({
-  ViewSharingActions: {
-    create: jest.fn(() => Promise.resolve()),
-    get: jest.fn(() => Promise.resolve()),
-    remove: jest.fn(() => Promise.resolve()),
-    users: jest.fn(() => Promise.resolve()),
+jest.mock('stores/permissions/EntityShareStore', () => ({
+  EntityShareActions: {
+    prepare: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
+  },
+  EntityShareStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(() => ({ state: undefined })),
   },
 }));
 
@@ -93,10 +94,10 @@ describe('ViewActionsMenu', () => {
 
   it('should dashboard share modal', () => {
     const { getByText } = render(<SimpleViewActionMenu />);
-    const editMenuItem = getByText(/Share/i);
+    const openShareButton = getByText(/Share/i);
 
-    fireEvent.click(editMenuItem);
+    fireEvent.click(openShareButton);
 
-    expect(getByText(/Who is supposed to access the dashboard/i)).not.toBeNull();
+    expect(getByText(/Sharing/i)).not.toBeNull();
   });
 });

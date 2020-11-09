@@ -1,49 +1,79 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
+// @flow strict
+import * as React from 'react';
+import { useEffect } from 'react';
+import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 
-import { Row, Col } from 'components/graylog';
+import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import DocsHelper from 'util/DocsHelper';
-import PermissionsMixin from 'util/PermissionsMixin';
 import withParams from 'routing/withParams';
-
-import {} from 'components/authentication'; // Make sure to load all auth config plugins!
-
-import PageHeader from 'components/common/PageHeader';
+import StringUtils from 'util/StringUtils';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import history from 'util/History';
+import Routes from 'routing/Routes';
+import useActiveBackend from 'components/authentication/useActiveBackend';
+import { PageHeader, Spinner, DocumentTitle } from 'components/common';
+import BackendActionLinks from 'components/authentication/BackendActionLinks';
+import BackendDetailsActive from 'components/authentication/BackendDetailsActive';
 import DocumentationLink from 'components/support/DocumentationLink';
-import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
 
-const AuthenticationPage = createReactClass({
-  displayName: 'AuthenticationPage',
+const _pageTitle = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
+  const pageName = 'Active Authentication Service';
 
-  propTypes: {
-    children: PropTypes.object,
-    location: PropTypes.object.isRequired,
-    params: PropTypes.object.isRequired,
-  },
+  if (activeBackend) {
+    const backendTitle = StringUtils.truncateWithEllipses(activeBackend.title, 30);
 
-  mixins: [PermissionsMixin],
+    if (returnString) {
+      return `${pageName} - ${backendTitle}`;
+    }
 
-  render() {
-    return (
-      <span>
-        <PageHeader title="Authentication Management">
-          <span>Configure Graylog's authentication providers and manage the active users of this Graylog cluster.</span>
+    return <>{pageName} - <i>{backendTitle}</i></>;
+  }
+
+  return pageName;
+};
+
+const useRedirectToAppropriatePage = (finishedLoading, activeBackend, backendsTotal) => {
+  useEffect(() => {
+    if (finishedLoading && !activeBackend && backendsTotal === 0) {
+      history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE);
+    } else if (finishedLoading && !activeBackend && backendsTotal) {
+      history.push(Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW);
+    }
+  }, [finishedLoading, activeBackend, backendsTotal]);
+};
+
+const AuthenticationPage = () => {
+  const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend();
+
+  // Only display this page if there is an active backend
+  // Otherwise redirect to correct page
+  useRedirectToAppropriatePage(finishedLoading, activeBackend, backendsTotal);
+
+  if (!finishedLoading) {
+    return <Spinner />;
+  }
+
+  return (
+    <DocumentTitle title={_pageTitle(activeBackend, true)}>
+      <>
+        <PageHeader title={_pageTitle(activeBackend)}
+                    subactions={(
+                      <BackendActionLinks activeBackend={activeBackend}
+                                          finishedLoading={finishedLoading} />
+                    )}>
+          <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
+          <AuthenticationOverviewLinks />
         </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            <AuthenticationComponent location={this.props.location} params={this.props.params}>
-              {this.props.children}
-            </AuthenticationComponent>
-          </Col>
-        </Row>
-      </span>
-    );
-  },
-});
+        {finishedLoading && activeBackend && (
+          <BackendDetailsActive authenticationBackend={activeBackend} />
+        )}
+      </>
+    </DocumentTitle>
+  );
+};
 
 export default withParams(AuthenticationPage);

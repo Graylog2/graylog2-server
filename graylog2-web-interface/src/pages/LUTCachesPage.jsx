@@ -10,6 +10,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
   'LookupTableCaches',
@@ -45,8 +46,8 @@ class LUTCachesPage extends React.Component {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   }
 
-  _isCreating = (props) => {
-    return props.route.action === 'create';
+  _isCreating = ({ action }) => {
+    return action === 'create';
   }
 
   _validateCache = (adapter) => {
@@ -55,7 +56,7 @@ class LUTCachesPage extends React.Component {
 
   render() {
     const {
-      route: { action },
+      action,
       cache,
       validationErrors,
       types,
@@ -118,7 +119,7 @@ class LUTCachesPage extends React.Component {
                   <Button bsStyle="info">Lookup Tables</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
-                  <Button bsStyle="info" className="active">Caches</Button>
+                  <Button bsStyle="info">Caches</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
                   <Button bsStyle="info">Data Adapters</Button>
@@ -141,7 +142,7 @@ LUTCachesPage.propTypes = {
   caches: PropTypes.array,
   location: PropTypes.object.isRequired,
   pagination: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
+  action: PropTypes.string,
 };
 
 LUTCachesPage.defaultProps = {
@@ -149,9 +150,14 @@ LUTCachesPage.defaultProps = {
   validationErrors: {},
   types: null,
   caches: null,
+  action: undefined,
 };
 
-export default connect(withParams(LUTCachesPage), { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
-  ...otherProps,
-  ...cachesStore,
-}));
+export default connect(
+  withParams(withLocation(LUTCachesPage)),
+  { cachesStore: LookupTableCachesStore },
+  ({ cachesStore, ...otherProps }) => ({
+    ...otherProps,
+    ...cachesStore,
+  }),
+);

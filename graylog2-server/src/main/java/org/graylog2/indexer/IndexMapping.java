@@ -22,6 +22,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +38,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
     }
 
-    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
-        final Map<String, Object> analyzerKeyword = ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
+    protected Map<String, Object> analyzerKeyword() {
+        return ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
                 "tokenizer", "keyword",
                 "filter", "lowercase"));
-        final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
-        final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
+    }
+
+    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
+        final Map<String, Object> settings = Collections.singletonMap(
+                "analysis", Collections.singletonMap("analyzer", analyzerKeyword())
+                );
         final Map<String, Object> mappings = mapping(analyzer);
 
         return createTemplate(template, order, settings, mappings);
@@ -77,7 +82,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         );
     }
 
-    private List<Map<String, Map<String, Object>>> dynamicTemplate() {
+    protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
         final Map<String, Map<String, Object>> templateInternal = internalFieldsMapping();
 
         final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", dynamicStrings());
@@ -87,7 +92,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     abstract Map<String, Object> dynamicStrings();
 
-    private Map<String, Map<String, Object>> fieldProperties(String analyzer) {
+    protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
                 .put("message", analyzedString(analyzer, false))
                 .put("full_message", analyzedString(analyzer, false))

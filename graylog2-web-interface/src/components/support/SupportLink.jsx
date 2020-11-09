@@ -27,7 +27,7 @@ const IconStack: StyledComponent<{small: boolean}, ThemeInterface, HTMLDivElemen
 
 const SupportLink = ({ small, children }: Props) => {
   return (
-    <table className="description-tooltips" style={{ marginBottom: '10px' }}>
+    <table className="description-tooltips" style={{ marginBottom: '10px', display: 'inline' }}>
       <tbody>
         <tr>
           <td style={{ width: '40px' }}>

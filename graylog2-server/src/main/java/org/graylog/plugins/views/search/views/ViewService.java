@@ -18,11 +18,13 @@ package org.graylog.plugins.views.search.views;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
@@ -44,23 +46,26 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;
+    private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
                           ClusterConfigService clusterConfigService,
-                          ViewRequirements.Factory viewRequirementsFactory) {
+                          ViewRequirements.Factory viewRequirementsFactory,
+                          EntityOwnershipService entityOwnerShipService) {
         super(mongoConnection, mapper, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
+        this.entityOwnerShipService = entityOwnerShipService;
     }
 
     private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
-                                                  Predicate<ViewDTO> filter,
-                                                  String order,
-                                                  String sortField,
-                                                  int page,
-                                                  int perPage) {
+                                                   Predicate<ViewDTO> filter,
+                                                   String order,
+                                                   String sortField,
+                                                   int page,
+                                                   int perPage) {
         final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
@@ -78,7 +83,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         return searchPaginated(query.toDBQuery(), filter, order, sortField, page, perPage);
     }
 
-     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
+    public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
                                                         SearchQuery query,
                                                         Predicate<ViewDTO> filter,
                                                         String order,
@@ -134,6 +139,16 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         return super.streamByIds(idSet).map(this::requirementsForView);
     }
 
+    public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
+        final ViewDTO savedObject = save(viewDTO);
+        if (viewDTO.type().equals(ViewDTO.Type.DASHBOARD)) {
+            entityOwnerShipService.registerNewDashboard(savedObject.id(), user);
+        } else {
+            entityOwnerShipService.registerNewSearch(savedObject.id(), user);
+        }
+        return savedObject;
+    }
+
     @Override
     public ViewDTO save(ViewDTO viewDTO) {
         try {
@@ -142,6 +157,18 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");
         }
+    }
+
+    @Override
+    public int delete(String id) {
+        get(id).ifPresent(view -> {
+            if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
+                entityOwnerShipService.unregisterDashboard(id);
+            } else {
+                entityOwnerShipService.unregisterSearch(id);
+            }
+        });
+        return super.delete(id);
     }
 
     public ViewDTO update(ViewDTO viewDTO) {

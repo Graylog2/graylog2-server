@@ -16,11 +16,10 @@
  */
 package org.graylog2.audit.formatter;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventType;
 
-import java.util.Map;
-
 public interface AuditEventFormatter {
-    FormattedAuditEvent format(AuditActor actor, AuditEventType type, Map<String, Object> context);
+    FormattedAuditEvent format(AuditActor actor, AuditEventType type, JsonNode jsonNodeContext);
 }

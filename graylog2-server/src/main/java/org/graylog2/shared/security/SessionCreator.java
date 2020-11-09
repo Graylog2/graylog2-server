@@ -28,6 +28,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.SESSION_CREATE;
 
@@ -79,15 +79,16 @@ public class SessionCreator {
 
             subject.login(authToken);
 
-            String username = subject.getPrincipal().toString();
-            final User user = userService.load(username);
+            String userId = subject.getPrincipal().toString();
+            final User user = userService.loadById(userId);
 
             if (user != null) {
                 long timeoutInMillis = user.getSessionTimeoutMs();
                 session.setTimeout(timeoutInMillis);
+                session.setAttribute("username", user.getName());
             } else {
                 // set a sane default. really we should be able to load the user from above.
-                session.setTimeout(TimeUnit.HOURS.toMillis(8));
+                session.setTimeout(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
             }
             session.touch();
 
@@ -98,7 +99,7 @@ public class SessionCreator {
                     "session_id", session.getId(),
                     "remote_address", host
             );
-            auditEventSender.success(AuditActor.user(username), SESSION_CREATE, auditEventContext);
+            auditEventSender.success(AuditActor.user(user.getName()), SESSION_CREATE, auditEventContext);
 
             return Optional.of(session);
         } catch (AuthenticationServiceUnavailableException e) {

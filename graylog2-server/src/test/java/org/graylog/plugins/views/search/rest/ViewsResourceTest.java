@@ -16,14 +16,20 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,9 +78,6 @@ public class ViewsResourceTest {
     private ViewDTO view;
 
     @Mock
-    private ViewPermissionChecks permissionChecks;
-
-    @Mock
     private ClusterEventBus clusterEventBus;
 
     @Mock
@@ -83,8 +86,8 @@ public class ViewsResourceTest {
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, ViewPermissionChecks permissionChecks) {
-            super(viewService, clusterEventBus, permissionChecks);
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService) {
+            super(viewService, clusterEventBus);
             this.userService = userService;
         }
 
@@ -102,7 +105,7 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, permissionChecks);
+        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService);
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
     }
 
@@ -115,24 +118,28 @@ public class ViewsResourceTest {
         when(builder.owner(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);
 
-        when(currentUser.getName()).thenReturn("basti");
+        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+
+        final UserContext userContext = mock(UserContext.class);
+        when(userContext.getUser()).thenReturn(testUser);
+        when(userContext.getUserId()).thenReturn("testuser");
+        when(currentUser.getName()).thenReturn("testuser");
         when(currentUser.isLocalAdmin()).thenReturn(true);
 
-        this.viewsResource.create(view);
+        this.viewsResource.create(view, userContext);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
-        assertThat(ownerCaptor.getValue()).isEqualTo("basti");
+        assertThat(ownerCaptor.getValue()).isEqualTo("testuser");
     }
 
     @Test
-    public void shouldNotCreateADashboardWithoutPermission() throws Exception {
+    public void shouldNotCreateADashboardWithoutPermission() {
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
-        when(permissionChecks.isDashboard(view)).thenReturn(true);
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 
-        assertThatThrownBy(() -> this.viewsResource.create(view))
+        assertThatThrownBy(() -> this.viewsResource.create(view, null))
                 .isInstanceOf(ForbiddenException.class);
     }
 

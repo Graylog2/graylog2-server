@@ -18,14 +18,14 @@ class SidecarsPage extends React.Component {
 
             <span>
               Do you need an API token for a sidecar?&ensp;
-              <Link to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit('graylog-sidecar')}>
+              <Link to={Routes.SYSTEM.USERS.TOKENS.edit('graylog-sidecar')}>
                 Create or reuse a token for the <em>graylog-sidecar</em> user
               </Link>.
             </span>
 
             <ButtonToolbar>
               <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-                <Button bsStyle="info" className="active">Overview</Button>
+                <Button bsStyle="info">Overview</Button>
               </LinkContainer>
               <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
                 <Button bsStyle="info">Administration</Button>

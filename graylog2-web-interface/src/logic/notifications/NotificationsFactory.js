@@ -128,6 +128,18 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'input_failure_shutdown':
+        return {
+          title: 'An input has shut down due to failures',
+          description: (
+            <span>
+              Input {notification.details.input_title} has shut down on node {notification.node_id} for this reason:
+              »{notification.details.reason}«. This means that you are unable to receive any messages from this input.
+              This is often an indication of persistent network failures.
+              You can click {' '} <Link to={Routes.SYSTEM.INPUTS}>here</Link> to see the input.
+            </span>
+          ),
+        };
       case 'journal_uncommitted_messages_deleted':
         return {
           title: 'Uncommited messages deleted from journal',
@@ -273,6 +285,45 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'es_version_mismatch':
+        const { initial_version: initialVersion, current_version: currentVersion } = notification.details;
+        return {
+          title: 'Elasticsearch version is incompatible',
+          description:(
+            <span>
+              The Elasticsearch version which is currently running ({currentVersion}) has a different major version than
+              the one the Graylog master node was started with ({initialVersion}).{' '}
+              This will most probably result in errors during indexing or searching. Graylog requires a full restart after an
+              Elasticsearch upgrade from one major version to another.
+              <br />
+              For details, please see our notes about{' '}
+              <DocumentationLink page={DocsHelper.PAGES.ROLLING_ES_UPGRADE}
+                                 text="rolling Elasticsearch upgrades." />
+
+            </span>
+          ),
+        }
+      case 'legacy_ldap_config_migration':
+        const { auth_service_id: authServiceId } = notification.details;
+        const authServiceLink = <Link to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId)}>Authentication Service</Link>;
+        return {
+          title: 'Legacy LDAP/Active Directory configuration has been migrated to an Authentication Service',
+          description:(
+            <span>
+              The legacy LDAP/Active Directory configuration of this system has been upgraded to a new {authServiceLink}.
+              Since the new {authServiceLink} requires some information that is not present in the legacy
+              configuration, the {authServiceLink} <strong>requires a manual review</strong>!
+              <br />
+              <br />
+              <strong>After reviewing the {authServiceLink} it must be enabled to allow LDAP or Active Directory users
+              to log in again!</strong>
+              <br />
+              <br />
+              Please check the <DocumentationLink page={DocsHelper.PAGES.UPGRADE_GUIDE} text="upgrade guide" />
+              for more details.
+            </span>
+          ),
+        }
       default:
         return { title: `unknown (${notification.type})`, description: 'unknown' };
     }

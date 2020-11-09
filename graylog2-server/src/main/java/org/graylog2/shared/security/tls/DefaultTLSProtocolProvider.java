@@ -39,7 +39,7 @@ public abstract class DefaultTLSProtocolProvider {
 
         final Set<String> tlsProtocols = Sets.newHashSet(DEFAULT_TLS_PROTOCOLS);
         try {
-            final Set<String> supportedProtocols = ImmutableSet.copyOf(SSLContext.getDefault().createSSLEngine().getEnabledProtocols());
+            final Set<String> supportedProtocols = ImmutableSet.copyOf(SSLContext.getDefault().createSSLEngine().getSupportedProtocols());
             if (tlsProtocols.retainAll(supportedProtocols)) {
                 LOG.warn("JRE doesn't support all default TLS protocols. Changing <{}> to <{}>", DEFAULT_TLS_PROTOCOLS, tlsProtocols);
             }

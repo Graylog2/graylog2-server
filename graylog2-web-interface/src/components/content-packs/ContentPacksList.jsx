@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
 
-import { Link, LinkContainer } from 'components/graylog/router';
+import { LinkContainer, Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import {
   Button,
@@ -13,7 +12,7 @@ import {
   Modal,
   Row,
 } from 'components/graylog';
-import { Pagination, Select } from 'components/common';
+import { Pagination, PageSizeSelect } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -21,20 +20,6 @@ import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
 import ContentPackInstall from './ContentPackInstall';
-
-const PageSizeSelector = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-
-  span {
-    margin-right: 3px;
-  }
-`;
-
-const StyledSizeSelect = styled(Select)`
-  width: 75px;
-`;
 
 class ContentPacksList extends React.Component {
   static propTypes = {
@@ -194,22 +179,7 @@ class ContentPacksList extends React.Component {
                   onChange={this._onChangePage} />
     );
 
-    const pageSizeOptions = [
-      { value: '10', label: '10' },
-      { value: '25', label: '25' },
-      { value: '50', label: '50' },
-      { value: '100', label: '100' },
-    ];
-
-    const pageSizeSelector = (
-      <PageSizeSelector>
-        <span>Show:</span>
-        <StyledSizeSelect onChange={this._itemsShownChange}
-                          value={String(pageSize)}
-                          clearable={false}
-                          options={pageSizeOptions} />
-      </PageSizeSelector>
-    );
+    const pageSizeSelect = <PageSizeSelect onChange={this._itemsShownChange} pageSize={pageSize} pageSizes={[10, 25, 50, 100]} />;
 
     const noContentMessage = contentPacks.length <= 0
       ? 'No content packs found. Please create or upload one'
@@ -239,7 +209,7 @@ class ContentPacksList extends React.Component {
             {pagination}
           </Col>
           <Col md={2} className="text-right">
-            {pageSizeSelector}
+            {pageSizeSelect}
           </Col>
         </Row>
         {content}
@@ -249,7 +219,7 @@ class ContentPacksList extends React.Component {
             {pagination}
           </Col>
           <Col md={2} className="text-right">
-            {pageSizeSelector}
+            {pageSizeSelect}
           </Col>
         </Row>
       </div>

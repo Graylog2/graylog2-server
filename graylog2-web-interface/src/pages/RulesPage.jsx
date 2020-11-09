@@ -45,7 +45,7 @@ const RulesPage = createReactClass({
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
-                <Button bsStyle="info" className="active">Manage rules</Button>
+                <Button bsStyle="info">Manage rules</Button>
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>

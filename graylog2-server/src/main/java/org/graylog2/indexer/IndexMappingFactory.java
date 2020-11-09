@@ -35,11 +35,22 @@ public class IndexMappingFactory {
     public IndexMappingTemplate createIndexMapping(IndexSetConfig.TemplateType templateType) {
         final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 
-        if (IndexSetConfig.TemplateType.EVENTS.equals(templateType)) {
-            return eventsIndexMappingFor(elasticsearchVersion);
+        switch (templateType) {
+            case MESSAGES: return indexMappingFor(elasticsearchVersion);
+            case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
+            case GIM_V1: return gimMappingFor(elasticsearchVersion);
+            default: throw new IllegalStateException("Invalid index template type: " + templateType);
         }
+    }
 
-        return indexMappingFor(elasticsearchVersion);
+    private IndexMapping gimMappingFor(Version elasticsearchVersion) {
+        if (elasticsearchVersion.satisfies("^6.0.0")) {
+            return new GIMMapping6();
+        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
+            return new GIMMapping7();
+        } else {
+            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+        }
     }
 
     public static IndexMapping indexMappingFor(Version elasticsearchVersion) {

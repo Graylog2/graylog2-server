@@ -79,20 +79,34 @@ const _extractValueAndField = (rows: Rows) => {
 
 type Props = {
   currentView: CurrentViewType,
-  config: {
-    visualizationConfig: NumberVisualizationConfig,
-  },
 } & VisualizationComponentProps;
 
-const NumberVisualization = ({ config: { visualizationConfig = NumberVisualizationConfig.create() } = {}, currentView, fields, data }: Props) => {
+const _extractFirstSeriesName = (config) => {
+  const { series = [] } = config;
+
+  return series.length === 0
+    ? undefined
+    : series[0].function;
+};
+
+type NumberVisualizationConfigType = {
+  +visualizationConfig: NumberVisualizationConfig,
+};
+
+const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
+  // $FlowFixMe: We know it is the correct subclass
+  const numberVisualizationConfig = (config: NumberVisualizationConfigType);
+  const { visualizationConfig = NumberVisualizationConfig.create() } = numberVisualizationConfig;
+
+  const field = _extractFirstSeriesName(config);
 
   useEffect(onRenderComplete, [onRenderComplete]);
   const { activeQuery } = currentView;
   const chartRows = data.chart || Object.values(data)[0];
   const trendRows = data.trend;
-  const { value, field } = _extractValueAndField(chartRows);
+  const { value } = _extractValueAndField(chartRows);
   const { value: previousValue } = _extractValueAndField(trendRows || []);
 
   if (!field || (value !== 0 && !value)) {

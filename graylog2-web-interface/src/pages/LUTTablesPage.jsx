@@ -10,6 +10,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 import CombinedProvider from 'injection/CombinedProvider';
 import withParams from 'routing/withParams';
+import withLocation from 'routing/withLocation';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
@@ -82,8 +83,8 @@ class LUTTablesPage extends React.Component {
     history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   }
 
-  _isCreating = (props) => {
-    return props.route.action === 'create';
+  _isCreating = ({ action }) => {
+    return action === 'create';
   }
 
   _validateTable = (table) => {
@@ -92,7 +93,7 @@ class LUTTablesPage extends React.Component {
 
   render() {
     const {
-      route: { action },
+      action,
       table,
       validationErrors,
       dataAdapter,
@@ -157,7 +158,7 @@ class LUTTablesPage extends React.Component {
             <span>
               <ButtonToolbar>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
-                  <Button bsStyle="info" className="active">Lookup Tables</Button>
+                  <Button bsStyle="info">Lookup Tables</Button>
                 </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
                   <Button bsStyle="info">Caches</Button>
@@ -187,7 +188,7 @@ LUTTablesPage.propTypes = {
   pagination: PropTypes.object,
   location: PropTypes.object,
   errorStates: PropTypes.object,
-  route: PropTypes.object.isRequired,
+  action: PropTypes.string,
 };
 
 LUTTablesPage.defaultProps = {
@@ -201,9 +202,10 @@ LUTTablesPage.defaultProps = {
   location: null,
   pagination: null,
   dataAdapter: null,
+  action: undefined,
 };
 
-export default connect(withParams(LUTTablesPage), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
+export default connect(withParams(withLocation(LUTTablesPage)), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
   ...otherProps,
   ...lookupTableStore,
 }));
