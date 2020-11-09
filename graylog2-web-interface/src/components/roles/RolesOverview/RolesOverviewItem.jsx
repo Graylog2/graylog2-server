@@ -6,6 +6,7 @@ import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 
 import ActionsCell from './ActionsCell';
+import UsersCell from './UsersCell';
 
 type Props = {
   role: Role,
@@ -17,6 +18,7 @@ const RolesOverviewItem = ({
     name,
     description,
     readOnly,
+    users,
   },
 }: Props) => {
   return (
@@ -26,7 +28,8 @@ const RolesOverviewItem = ({
           {name}
         </Link>
       </td>
-      <td className="limited">{description}</td>
+      <td>{description}</td>
+      <UsersCell users={users} />
       <ActionsCell roleId={id} roleName={name} readOnly={readOnly} />
     </tr>
   );

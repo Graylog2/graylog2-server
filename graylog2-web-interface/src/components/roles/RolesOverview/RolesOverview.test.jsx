@@ -1,5 +1,7 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
+
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';
@@ -16,6 +18,12 @@ const loadRolesPaginatedResponse = {
     query: '',
     count: mockRoles.size,
     total: mockRoles.size,
+  },
+  context: {
+    users: {
+      'manager-id': Immutable.Set.of({ id: 'first-id', username: 'bob' }),
+      'reader-id': Immutable.Set.of({ id: 'first-id', username: 'bob' }),
+    },
   },
 };
 

@@ -13,7 +13,7 @@ import { Col, Row } from 'components/graylog';
 import RolesOverviewItem from './RolesOverviewItem';
 import RolesFilter from './RolesFilter';
 
-const TABLE_HEADERS = ['Name', 'Description', 'Actions'];
+const TABLE_HEADERS = ['Name', 'Description', 'Users', 'Actions'];
 const DEFAULT_PAGINATION = {
   page: 1,
   perPage: 10,
