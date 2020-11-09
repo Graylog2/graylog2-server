@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
-import { formHasErrors, validateField } from 'util/FormsUtils';
+import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Button, ButtonToolbar } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -14,6 +14,8 @@ import BackendWizardContext from './BackendWizardContext';
 
 export type StepKeyType = 'server-configuration';
 export const STEP_KEY: StepKeyType = 'server-configuration';
+// Form validation needs to include all input names
+// to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
   serverHost: {
     required: true,
@@ -23,6 +25,10 @@ export const FORM_VALIDATION = {
     min: 1,
     max: 65535,
   },
+  transportSecurity: {},
+  verifyCertificates: {},
+  systemUserDn: {},
+  systemUserPassword: {},
 };
 
 const ServerUrl = styled.div`
@@ -66,15 +72,7 @@ type Props = {
 
 const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
-  const { backendHasPassword } = stepsState.authBackendMeta;
-
-  const _onSubmitAll = (validateForm) => {
-    validateForm().then((errors) => {
-      if (!formHasErrors(errors)) {
-        onSubmitAll();
-      }
-    });
-  };
+  const { backendValidationErrors, authBackendMeta: { backendHasPassword } } = stepsState;
 
   const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
     const currentValue = values.transportSecurity;
@@ -93,10 +91,19 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
     onChange(event);
   };
 
+  const _onSubmitAll = (validateForm) => {
+    validateForm().then((errors) => {
+      if (!formHasErrors(errors)) {
+        onSubmitAll();
+      }
+    });
+  };
+
   return (
     // $FlowFixMe innerRef works as expected
     <Formik initialValues={stepsState.formValues}
             innerRef={formRef}
+            initialErrors={backendValidationErrors}
             onSubmit={onSubmit}
             validateOnBlur={false}
             validateOnChange={false}
@@ -111,11 +118,13 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
               <ServerUrl className="input-group">
                 <FormikInput formGroupClassName=""
                              name="serverHost"
+                             error={backendValidationErrors?.serverHost}
                              placeholder="Hostname"
-                             validate={validateField(FORM_VALIDATION.serverPort)} />
+                             validate={validateField(FORM_VALIDATION.serverHost)} />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikInput formGroupClassName=""
                              name="serverPort"
+                             error={backendValidationErrors?.serverPort}
                              placeholder="Port"
                              type="number"
                              validate={validateField(FORM_VALIDATION.serverPort)} />
@@ -162,8 +171,10 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             </>
           </Input>
           <FormikFormGroup help={help.systemUserDn}
+                           error={backendValidationErrors?.systemUserDn}
                            label={<>System User DN <Opt /></>}
                            name="systemUserDn"
+                           validate={validateField(FORM_VALIDATION.systemUserDn)}
                            placeholder="System User DN" />
 
           {(backendHasPassword && values.systemUserPassword === undefined) ? (
@@ -185,7 +196,9 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                              help={help.systemUserPassword}
                              label={<>System Password <Opt /></>}
                              name="systemUserPassword"
+                             error={backendValidationErrors?.systemUserPassword}
                              placeholder="System Password"
+                             validate={validateField(FORM_VALIDATION.systemUserPassword)}
                              type="password" />
           )}
 
