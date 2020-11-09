@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
-import styled, { css, ThemeContext } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 
 const arrowSize = 10;
 const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
@@ -66,10 +66,8 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
 `);
 
 const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft }) => {
-  const theme = useContext(ThemeContext);
-
   return (
-    <GraylogThemeProvider overrideMode={theme?.mode}>
+    <ThemeAndUserProvider>
       <StyledTooltip className={className}
                      id={id}
                      placement={placement}
@@ -79,7 +77,7 @@ const Tooltip = ({ children, className, id, placement, positionTop, positionLeft
                      arrowOffsetLeft={arrowOffsetLeft}>
         {children}
       </StyledTooltip>
-    </GraylogThemeProvider>
+    </ThemeAndUserProvider>
   );
 };
 
