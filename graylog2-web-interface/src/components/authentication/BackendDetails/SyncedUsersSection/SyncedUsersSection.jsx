@@ -9,6 +9,7 @@ import AuthenticationDomain from 'domainActions/authentication/AuthenticationDom
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
@@ -29,10 +30,10 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _loadSyncedTeams = (pagination, setLoading, setPaginatedUsers) => {
+const _loadSyncedTeams = (authBackendId, pagination, setLoading, setPaginatedUsers) => {
   setLoading(true);
 
-  AuthenticationDomain.loadUsersPaginated(pagination).then((paginatedUsers) => {
+  AuthenticationDomain.loadUsersPaginated(authBackendId, pagination).then((paginatedUsers) => {
     setPaginatedUsers(paginatedUsers);
     setLoading(false);
   });
@@ -43,16 +44,17 @@ const _updateListOnUserEnable = (perPage, query, setPagination) => Authenticatio
 
 type Props = {
   roles: Immutable.List<Role>,
+  authenticationBackend: AuthenticationBackend,
 };
 
-const SyncedUsersSection = ({ roles }: Props) => {
+const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: users } = paginatedUsers || {};
   const { page, perPage, query } = pagination;
 
-  useEffect(() => _loadSyncedTeams(pagination, setLoading, setPaginatedUsers), [pagination]);
+  useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [authenticationBackend.id, pagination]);
   useEffect(() => _updateListOnUserDisable(perPage, query, setPagination), [perPage, query]);
   useEffect(() => _updateListOnUserEnable(perPage, query, setPagination), [perPage, query]);
 

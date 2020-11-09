@@ -56,7 +56,7 @@ const SyncedUsersOverviewItem = ({
                 Enable
               </Button>
             )}
-          <LinkContainer to={Routes.SYSTEM.USERS.edit(encodeURIComponent(username))}>
+          <LinkContainer to={Routes.SYSTEM.USERS.edit(id)}>
             <Button type="button" bsStyle="info" bsSize="xs">
               Edit
             </Button>
