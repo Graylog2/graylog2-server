@@ -48,6 +48,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -554,13 +555,14 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public String saveWithRules(Stream stream, Collection<StreamRule> streamRules) throws ValidationException {
+    public String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException {
         final String savedStreamId = super.save(stream);
         final Set<StreamRule> rules = streamRules.stream()
                 .map(rule -> streamRuleService.copy(savedStreamId, rule))
                 .collect(Collectors.toSet());
         streamRuleService.save(rules);
 
+        entityOwnershipService.registerNewStream(savedStreamId, user);
         clusterEventBus.post(StreamsChangedEvent.create(savedStreamId));
 
         return savedStreamId;

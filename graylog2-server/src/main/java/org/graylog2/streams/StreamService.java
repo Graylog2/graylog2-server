@@ -21,6 +21,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -38,7 +39,7 @@ public interface StreamService extends PersistedService {
 
     String save(Stream stream) throws ValidationException;
 
-    String saveWithRules(Stream stream, Collection<StreamRule> streamRules) throws ValidationException;
+    String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException;
 
     Stream load(String id) throws NotFoundException;
 

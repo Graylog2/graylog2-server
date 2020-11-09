@@ -64,6 +64,11 @@ public class EntityOwnershipService {
         registerNewEntity(grn, user);
     }
 
+    public void registerNewStream(String id, User user) {
+        final GRN grn = grnRegistry.newGRN(GRNTypes.STREAM, id);
+        registerNewEntity(grn, user);
+    }
+
     private void registerNewEntity(GRN entity, User user) {
         // Don't create ownership grants for the admin user.
         // They can access anything anyhow
