@@ -42,7 +42,8 @@ const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>,
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
     .groupBy((grantee) => grantee.type);
   const newGrantees = grantees
-    .filter((grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1);
+    .filter((grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1)
+    .reverse();
 
   return Immutable.List().concat(
     newGrantees,
