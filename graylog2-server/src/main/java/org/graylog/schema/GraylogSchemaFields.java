@@ -64,5 +64,9 @@ public class GraylogSchemaFields {
     public static final String FIELD_VENDOR_TRANSACTION_ID = "vendor_transaction_id";
     public static final String FIELD_VENDOR_USER_TYPE = "vendor_user_type";
 
-
+    public static final String FIELD_ILLUMINATE_EVENT_CATEGORY = "gl2_event_category";
+    public static final String FIELD_ILLUMINATE_EVENT_SUBCATEGORY = "gl2_event_subcategory";
+    public static final String FIELD_ILLUMINATE_EVENT_TYPE = "gl2_event_type";
+    public static final String FIELD_ILLUMINATE_EVENT_TYPE_CODE = "gl2_event_type_code";
+    public static final String FIELD_ILLUMINATE_TAGS = "gl2_tags";
 }

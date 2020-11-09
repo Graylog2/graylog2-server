@@ -63,6 +63,11 @@ import java.util.regex.Pattern;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE_CODE;
+import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
@@ -203,6 +208,15 @@ public class Message implements Messages, Indexable {
         FIELD_GL2_SOURCE_NODE,
         FIELD_GL2_SOURCE_RADIO,
         FIELD_GL2_SOURCE_RADIO_INPUT
+    );
+
+    // Graylog Illuminate Fields
+    private static final Set<String> ILLUMINATE_FIELDS = ImmutableSet.of(
+            FIELD_ILLUMINATE_EVENT_CATEGORY,
+            FIELD_ILLUMINATE_EVENT_SUBCATEGORY,
+            FIELD_ILLUMINATE_EVENT_TYPE,
+            FIELD_ILLUMINATE_EVENT_TYPE_CODE,
+            FIELD_ILLUMINATE_TAGS
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -545,7 +559,7 @@ public class Message implements Messages, Indexable {
 
     private void updateSize(String fieldName, Object newValue, Object previousValue) {
         // don't count internal fields
-        if (GRAYLOG_FIELDS.contains(fieldName)) {
+        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName)) {
             return;
         }
         long newValueSize = 0;
