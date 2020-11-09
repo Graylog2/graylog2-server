@@ -8,7 +8,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import WizardPageHeader from './WizardPageHeader';
 import { HELP, AUTH_BACKEND_META } from './BackendCreate';
 
-import { prepareInitialValues } from '../ldap/BackendEdit';
+import prepareInitialWizardValues from '../PrepareInitialWizardValues';
 import BackendWizard from '../BackendWizard';
 import handleUpdate from '../HandleUpdate';
 
@@ -36,7 +36,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
   const help = { ...HELP, ...groupSyncHelp };
   const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
-  let initialValues = prepareInitialValues(authenticationBackend);
+  let initialValues = prepareInitialWizardValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
     const {
