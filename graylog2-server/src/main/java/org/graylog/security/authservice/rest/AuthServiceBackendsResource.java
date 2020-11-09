@@ -168,8 +168,8 @@ public class AuthServiceBackendsResource extends RestResource {
 
     @GET
     @Path("{backendId}/users")
-    @ApiOperation("Get paginated users for active authentication service backend")
-    @RequiresPermissions({RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_READ, RestPermissions.USERS_LIST})
+    @ApiOperation("Get paginated users for an authentication service backend")
+    @RequiresPermissions({RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_READ, RestPermissions.USERS_READ})
     public PaginatedResponse<UserOverviewDTO> getUsers(
             @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -200,7 +200,10 @@ public class AuthServiceBackendsResource extends RestResource {
         try {
             return roleService.findIdMap(roleIds).values()
                     .stream()
-                    .map(role -> Maps.immutableEntry(role.getId(), Collections.singletonMap("title", role.getName())))
+                    .map(role -> {
+                        final String roleName = isPermitted(RestPermissions.ROLES_READ, role.getId()) ? role.getName() : "unknown";
+                        return Maps.immutableEntry(role.getId(), Collections.singletonMap("title", roleName));
+                    })
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         } catch (org.graylog2.database.NotFoundException e) {
             throw new NotFoundException("Couldn't find roles: " + roleIds);
