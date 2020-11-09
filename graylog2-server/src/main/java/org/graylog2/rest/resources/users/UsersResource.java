@@ -70,6 +70,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -556,16 +557,18 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
                     defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
-            @PathParam("newStatus") String newStatus) throws ValidationException {
+            @PathParam("newStatus") @NotBlank String newStatusString) throws ValidationException {
 
+        final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
         final User user = loadUserById(userId);
         final User.AccountStatus oldStatus = user.getAccountStatus();
-        user.setAccountStatus(User.AccountStatus.valueOf(newStatus.toUpperCase(Locale.US)));
-        userService.save(user);
 
-        if (oldStatus.equals(user.getAccountStatus())) {
+        if (oldStatus.equals(newStatus)) {
             return Response.notModified().build();
         }
+
+        user.setAccountStatus(newStatus);
+        userService.save(user);
         return Response.ok().build();
     }
 
