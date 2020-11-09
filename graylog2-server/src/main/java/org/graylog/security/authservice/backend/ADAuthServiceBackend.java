@@ -92,6 +92,10 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
 
             final LDAPUser userEntry = optionalUser.get();
 
+            if (!userEntry.accountIsEnabled()) {
+                LOG.warn("Account disabled within Active Directory for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
+                return Optional.empty();
+            }
             if (!authCredentials.isAuthenticated()) {
                 if (!isAuthenticated(connection, userEntry, authCredentials)) {
                     LOG.debug("Invalid credentials for user <{}> (DN: {})", authCredentials.username(), userEntry.dn());
@@ -104,6 +108,7 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                     .authServiceId(backendId())
                     .base64AuthServiceUid(userEntry.base64UniqueId())
                     .username(userEntry.username())
+                    .accountIsEnabled(userEntry.accountIsEnabled())
                     .fullName(userEntry.fullName())
                     .email(userEntry.email())
                     .defaultRoles(backend.defaultRoles())
@@ -257,13 +262,15 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                 .put("login_success", loginSuccess);
 
         if (user != null) {
-            userDetails.put("user_details", ImmutableMap.of(
-                    "dn", user.dn(),
-                    AD_OBJECT_GUID, user.base64UniqueId(),
-                    config.userNameAttribute(), user.username(),
-                    config.userFullNameAttribute(), user.fullName(),
-                    "email", user.email()
-            ));
+            userDetails.put("user_details", ImmutableMap.<String, String>builder()
+                    .put("dn", user.dn())
+                    .put("account_enabled", String.valueOf(user.accountIsEnabled()))
+                    .put(AD_OBJECT_GUID, user.base64UniqueId())
+                    .put(config.userNameAttribute(), user.username())
+                    .put(config.userFullNameAttribute(), user.fullName())
+                    .put("email", user.email())
+                    .build()
+            );
         } else {
             userDetails.put("user_details", ImmutableMap.of());
         }

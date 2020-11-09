@@ -220,7 +220,8 @@ public class RolesResource extends RestResource {
                     // there is no session information available in this call, so we set it to null
                     false,
                     null,
-                    null));
+                    null,
+                    user.getAccountStatus()));
         }
 
         return RoleMembershipResponse.create(role.getName(), userSummaries);

@@ -68,6 +68,10 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
         if (user.isLocalAdmin()) {
             throw new IllegalStateException("Local admin user should have been handled earlier and not reach the authentication service authenticator");
         }
+        if (!user.getAccountStatus().equals(User.AccountStatus.ENABLED)) {
+            LOG.warn("Account for user <{}> is disabled.", user.getName());
+            return Optional.empty();
+        }
         if (user.isExternalUser()) {
             // We don't store passwords for users synced from an authentication service, so we can't handle them here.
             LOG.trace("Skipping mongodb-based password check for external user {}", authCredentials.username());
@@ -86,6 +90,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
         final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails(this)
                 .databaseId(user.getId())
                 .username(user.getName())
+                .accountIsEnabled(user.getAccountStatus().equals(User.AccountStatus.ENABLED))
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 // No need to set default roles because MongoDB users will not be provisioned by the provisioner

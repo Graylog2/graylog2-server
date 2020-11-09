@@ -30,6 +30,7 @@ import org.graylog.security.authservice.AuthServiceResult;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.shared.security.HttpHeadersToken;
+import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,6 +118,9 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
             if (result.isSuccess()) {
                 LOG.debug("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}/{}>",
                         result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
+                // Setting this, will let the SessionResource know, that when a non-existing session is validated, it
+                // should in fact create a session.
+                ShiroSecurityContext.requestSessionCreation(true);
                 return toAuthenticationInfo(result);
             } else {
                 LOG.warn("Failed to authenticate username <{}> from trusted HTTP header <{}> via proxy <{}>",

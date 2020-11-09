@@ -1,15 +1,12 @@
 // @flow strict
 import * as React from 'react';
 
-import UserNotification from 'util/UserNotification';
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 
-import type { WizardFormValues, AuthBackendMeta } from '../BackendWizard/BackendWizardContext';
+import handleCreate from '../HandleCreate';
 import BackendWizard from '../BackendWizard';
 
 export const AUTH_BACKEND_META = {
@@ -69,25 +66,6 @@ const INITIAL_VALUES = {
   verifyCertificates: true,
 };
 
-export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean = true) => {
-  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.', 'Success');
-  const notifyOnError = (error) => UserNotification.error(`Creating authentication service failed with status: ${error}`, 'Error');
-
-  return AuthenticationActions.create(payload).then((result) => {
-    if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType).then(notifyOnSuccess);
-    }
-
-    notifyOnSuccess();
-
-    return result;
-  }).catch((error) => {
-    notifyOnError(error);
-    throw error;
-  });
-};
-
 const BackendCreate = () => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const {
@@ -100,7 +78,7 @@ const BackendCreate = () => {
   return (
     <DocumentTitle title="Create LDAP Authentication Service">
       <WizardPageHeader />
-      <BackendWizard onSubmit={handleSubmit}
+      <BackendWizard onSubmit={handleCreate}
                      help={help}
                      authBackendMeta={AUTH_BACKEND_META}
                      initialValues={initialValues} />
