@@ -4,6 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 
 import { Col, Row, Button } from 'components/graylog';
+import withHideOnCloud from 'util/conditional/withHideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { DocumentationLink } from 'components/support';
@@ -48,4 +49,4 @@ class IndicesPage extends React.Component {
   }
 }
 
-export default IndicesPage;
+export default withHideOnCloud(IndicesPage);
