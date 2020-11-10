@@ -8,7 +8,18 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 
-export type PaginatedRoles = PaginatedList<Role>;
+export type UserContext = {
+  id: string,
+  username: string,
+};
+
+export type RoleContext = {
+  users: { [string]: UserContext[] },
+};
+
+export type PaginatedRoles = PaginatedList<Role> & {
+  context: RoleContext,
+};
 export type PaginatedUsers = PaginatedList<UserOverview>;
 
 export type ActionsType = {

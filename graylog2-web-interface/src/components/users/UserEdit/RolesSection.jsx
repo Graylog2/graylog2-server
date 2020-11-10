@@ -87,10 +87,11 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       </ErrorAlert>
       <h3>Selected Roles</h3>
       <Container>
+        {/* $FlowFixMe Role is a DescriptiveItem! */}
         <PaginatedItemOverview noDataText="No selected roles have been found."
-                               // $FlowFixMe Role is a DescriptiveItem!
+                               /* $FlowFixMe Role is a DescriptiveItem! */
                                onLoad={_onLoad}
-                               // $FlowFixMe Role is a DescriptiveItem!
+                               /* $FlowFixMe Role is a DescriptiveItem! */
                                overrideList={paginatedRoles}
                                onDeleteItem={onDeleteRole}
                                queryHelper={<RolesQueryHelp />} />

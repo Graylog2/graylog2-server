@@ -1,0 +1,6 @@
+// this should fail to parse, because NOT has higher precedence than ==, and the type checker did not catch it
+rule "notExpressionTypeCheck"
+when
+    NOT to_string($message.facility) == "mail"
+then
+end
