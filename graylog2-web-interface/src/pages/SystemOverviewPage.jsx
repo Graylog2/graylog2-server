@@ -7,6 +7,7 @@ import { SystemJobsComponent } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import { GraylogClusterOverview } from 'components/cluster';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 class SystemOverviewPage extends React.Component {
   render() {
@@ -27,9 +28,11 @@ class SystemOverviewPage extends React.Component {
             <IndexerClusterHealth />
           </IfPermitted>
 
-          <IfPermitted permissions="indices:failures">
-            <IndexerFailuresComponent />
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="indices:failures">
+              <IndexerFailuresComponent />
+            </IfPermitted>
+          </HideOnCloud>
 
           <TimesList />
 
