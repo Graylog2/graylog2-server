@@ -16,19 +16,14 @@
  */
 // @flow strict
 import * as React from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import { Input } from 'components/bootstrap';
-
-const _onDateSelected = (date) => {
-  const midnightDate = date.setHours(0);
-
-  return DateTime.ignoreTZ(midnightDate);
-};
 
 type Props = {
   disabled: ?boolean,
@@ -37,16 +32,33 @@ type Props = {
   onChange: ({ target: { name: string, value: string } }) => void,
   name: string,
   title: ?string,
+  initialDateTimeObject: {
+    years: string | number,
+    months: string | number,
+    date: string | number,
+    hours: string | number,
+    minutes: string | number,
+    seconds: string | number,
+    milliseconds: string | number,
+  },
 };
 
-const _setDateTimeToNow = () => new DateTime();
-
-const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title }: Props) => {
+const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title, initialDateTimeObject }: Props) => {
   const inputRef = useRef({ input: { value } });
-  const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [name, onChange]);
-  const _onChangeInput = useCallback((event) => _onChange(event.target.value), [_onChange]);
-  const _onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.DATE)), [_onChange]);
-  const _onSetTimeToNow = () => _onChange(_setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP));
+
+  const _onDatePicked = (date) => {
+    const newDate = moment(date).toObject();
+
+    return onChange(moment({
+      ...initialDateTimeObject,
+      years: newDate.years,
+      months: newDate.months,
+      date: newDate.date,
+    }).format(DateTime.Formats.TIMESTAMP));
+  };
+
+  const _onChangeInput = (event) => onChange(event.target.value);
+  const _onSetTimeToNow = () => onChange(moment().format(DateTime.Formats.TIMESTAMP));
 
   useEffect(() => {
     inputRef.current.input.value = value;
@@ -93,6 +105,15 @@ DateInputWithPicker.propTypes = {
   onChange: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   title: PropTypes.string,
+  initialDateTimeObject: PropTypes.shape({
+    years: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    months: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    date: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    hours: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    minutes: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    seconds: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    milliseconds: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }).isRequired,
 };
 
 DateInputWithPicker.defaultProps = {

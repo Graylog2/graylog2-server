@@ -6,6 +6,7 @@ import styled, { css, type StyledComponent } from 'styled-components';
 import { type ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 import { type TimeRange } from 'views/logic/queries/Query';
+import DateTime from 'logic/datetimes/DateTime';
 
 import { EMPTY_OUTPUT, dateOutput } from '../TimeRangeDisplay';
 
@@ -49,6 +50,8 @@ const MiddleIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   padding: 0 15px;
 `);
 
+const dateTimeString = (value) => (DateTime.isValidDateString(value) ? value : 'Incorrect Date Format');
+
 const TimeRangeLivePreview = ({ timerange }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
@@ -60,7 +63,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
     <PreviewWrapper>
       <FromWrapper>
         <Title>From</Title>
-        <Date>{from}</Date>
+        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{dateTimeString(from)}</Date>
       </FromWrapper>
 
       <MiddleIcon>
@@ -69,7 +72,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
 
       <UntilWrapper>
         <Title>Until</Title>
-        <Date>{until}</Date>
+        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{dateTimeString(until)}</Date>
       </UntilWrapper>
     </PreviewWrapper>
   );
