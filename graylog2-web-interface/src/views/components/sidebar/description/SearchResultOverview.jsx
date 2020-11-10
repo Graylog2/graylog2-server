@@ -20,7 +20,7 @@ const SearchResultOverview = ({ results: { timestamp, duration } }: Props) => {
   const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
 
   if (!timestamp || !duration) {
-    return <Spinner />;
+    return <i>No query executed yet.</i>;
   }
 
   return (

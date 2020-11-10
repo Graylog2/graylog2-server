@@ -56,10 +56,10 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
         Search
       </SectionSubheadline>
       <p>
-        {viewMetadata.summary || <>This {viewTypeLabel} has no summary.</>}
+        {viewMetadata.summary || <i>This {viewTypeLabel} has no summary.</i>}
       </p>
       <p>
-        {viewMetadata.description || <>This {viewTypeLabel} has no description.</>}
+        {viewMetadata.description || <i>This {viewTypeLabel} has no description.</i>}
       </p>
     </>
   );
