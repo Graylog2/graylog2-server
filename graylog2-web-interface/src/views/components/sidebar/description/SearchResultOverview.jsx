@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import numeral from 'numeral';
 
 import AppConfig from 'util/AppConfig';
-import { Timestamp, Spinner } from 'components/common';
+import { Timestamp } from 'components/common';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -20,7 +20,7 @@ const SearchResultOverview = ({ results: { timestamp, duration } }: Props) => {
   const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
 
   if (!timestamp || !duration) {
-    return <Spinner />;
+    return <i>No query executed yet.</i>;
   }
 
   return (
