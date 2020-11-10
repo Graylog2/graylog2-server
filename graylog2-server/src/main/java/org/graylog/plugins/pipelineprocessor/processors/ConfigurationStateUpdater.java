@@ -136,6 +136,7 @@ public class ConfigurationStateUpdater {
             try {
                 rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false, commonClassLoader);
             } catch (ParseException e) {
+                log.warn("Ignoring non parseable rule <{}/{}> with errors <{}>", ruleDao.title(), ruleDao.id(), e.getErrors());
                 rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
             }
             ruleNameMap.put(rule.name(), rule);

@@ -759,6 +759,15 @@ public class PipelineRuleParser {
         }
 
         @Override
+        public void exitNot(RuleLangParser.NotContext ctx) {
+            final Expression expression = parseContext.expressions().get(ctx.expression());
+            Class type = expression.getType();
+            if (!Boolean.class.isAssignableFrom(type)) {
+                parseContext.addError(new IncompatibleType(ctx, Boolean.class, type));
+            }
+        }
+
+        @Override
         public void exitComparison(RuleLangParser.ComparisonContext ctx) {
             checkBinaryExpression(ctx);
         }

@@ -23,7 +23,7 @@ public class IncompatibleType extends ParseError {
     private final Class<?> expected;
     private final Class<?> actual;
 
-    public IncompatibleType(RuleLangParser.MessageRefContext ctx, Class<?> expected, Class<?> actual) {
+    public IncompatibleType(RuleLangParser.ExpressionContext ctx, Class<?> expected, Class<?> actual) {
         super("incompatible_type", ctx);
         this.expected = expected;
         this.actual = actual;
