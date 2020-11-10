@@ -110,18 +110,6 @@ const fieldUpdate = (value) => {
     initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
   });
 
-  const handleChangeDate = (event) => {
-    const dateValue = moment(event.target.value, DateTime.Formats.DATE).toObject();
-    const { years, months, date, ...initialTime } = initialDateTime;
-
-    return moment({
-      years: dateValue.years,
-      months: dateValue.months,
-      date: dateValue.date,
-      ...initialTime,
-    }).format(DateTime.Formats.TIMESTAMP);
-  };
-
   const handleChangeSetTime = (event) => {
     const timeType = event.target.getAttribute('id').split('-').pop();
     const timeValue = parseTimeValue(event.target.value, timeType);
@@ -158,7 +146,6 @@ const fieldUpdate = (value) => {
 
   return {
     initialDateTime,
-    handleChangeDate,
     handleChangeSetTime,
     handleClickTimeNow,
     handleTimeToggle,
@@ -173,16 +160,14 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
     <Field name={`tempTimeRange[${range}]`} validate={_isValidDateString}>
       {({ field: { value, onChange, onBlur, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const fromDateTime = value || originalTimeRange[range];
+
+        const fromDateTime = error ? originalTimeRange[range] : value || originalTimeRange[range];
         const {
           initialDateTime,
-          handleChangeDate,
           handleChangeSetTime,
           handleClickTimeNow,
           handleTimeToggle,
         } = fieldUpdate(fromDateTime);
-
-        const _onChangeDate = (event) => _onChange(handleChangeDate(event));
 
         const _onChangeSetTime = (event) => {
           hourIcon.current = TIME_ICON_MID;
@@ -211,9 +196,10 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
         return (
           <>
             <DateInputWithPicker disabled={disabled}
-                                 onChange={_onChangeDate}
+                                 onChange={_onChange}
                                  onBlur={onBlur}
-                                 value={fromDateTime}
+                                 value={value || originalTimeRange[range]}
+                                 initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
                                  error={error} />
