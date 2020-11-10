@@ -23,6 +23,16 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
+const DescriptionCell = styled.td`
+  max-width: 300px;
+`;
+
+const TextOverflowEllipsis = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
   const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found');
 
@@ -94,7 +104,7 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
 };
 
 const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props) => {
-  const { title, defaultRoles, id } = authenticationBackend;
+  const { title, description, defaultRoles, id } = authenticationBackend;
   const detailsLink = isActive ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE : Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id);
 
   return (
@@ -104,6 +114,11 @@ const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props)
           {title}
         </Link>
       </td>
+      <DescriptionCell>
+        <TextOverflowEllipsis>
+          {description}
+        </TextOverflowEllipsis>
+      </DescriptionCell>
       <td className="limited">
         <RolesList defaultRolesIds={defaultRoles} roles={roles} />
       </td>

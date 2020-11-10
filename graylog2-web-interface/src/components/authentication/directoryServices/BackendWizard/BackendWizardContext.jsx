@@ -6,6 +6,8 @@ import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
 export type WizardFormValues = {
+  title?: string,
+  description?: string,
   defaultRoles?: string,
   groupSearchBase?: string,
   groupSearchPattern?: string,

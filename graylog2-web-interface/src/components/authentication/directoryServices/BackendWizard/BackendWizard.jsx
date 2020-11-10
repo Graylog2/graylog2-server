@@ -89,10 +89,12 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
   const {
     defaultRoles = '',
+    description,
     serverHost,
     serverPort,
     systemUserDn,
     systemUserPassword,
+    title,
     transportSecurity,
     userUniqueIdAttribute,
     userFullNameAttribute,
@@ -102,16 +104,14 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
     verifyCertificates,
   } = formValues;
   const {
-    serviceTitle,
     serviceType,
     backendId,
   } = stepsState.authBackendMeta;
-  const serverUrl = `${serverHost}:${serverPort}`;
 
   return {
+    title,
+    description,
     default_roles: defaultRoles.split(','),
-    description: '',
-    title: `${serviceTitle} ${serverUrl}`,
     config: {
       servers: [{ host: serverHost, port: serverPort }],
       system_user_dn: systemUserDn,
