@@ -19,7 +19,7 @@ type Props = {
  * The parent component needs a concrete width.
  */
 const TextOverflowEllipsis = ({ children }: Props) => (
-  <Wrapper>
+  <Wrapper title={children}>
     {children}
   </Wrapper>
 );
