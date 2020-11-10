@@ -44,7 +44,7 @@ public class AuthenticatingRealmModule extends Graylog2Module {
         add(auth, RootAccountRealm.NAME, RootAccountRealm.class);
         add(auth, SessionAuthenticator.NAME, SessionAuthenticator.class);
         add(auth, HTTPHeaderAuthenticationRealm.NAME, HTTPHeaderAuthenticationRealm.class);
-        add(auth, AuthServiceRealm.NAME, AuthServiceRealm.class);
+        add(auth, UsernamePasswordRealm.NAME, UsernamePasswordRealm.class);
     }
 
     private void add(MapBinder<String, AuthenticatingRealm> auth, String name,

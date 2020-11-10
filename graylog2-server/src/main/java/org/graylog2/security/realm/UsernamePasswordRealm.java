@@ -39,17 +39,17 @@ import javax.inject.Named;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-public class AuthServiceRealm extends AuthenticatingRealm {
-    private static final Logger LOG = LoggerFactory.getLogger(AuthServiceRealm.class);
+public class UsernamePasswordRealm extends AuthenticatingRealm {
+    private static final Logger LOG = LoggerFactory.getLogger(UsernamePasswordRealm.class);
 
-    public static final String NAME = "auth-service";
+    public static final String NAME = "username-password";
 
     private final AuthServiceAuthenticator authenticator;
     private final EncryptedValueService encryptedValueService;
     private final String rootUsername;
 
     @Inject
-    public AuthServiceRealm(AuthServiceAuthenticator authenticator,
+    public UsernamePasswordRealm(AuthServiceAuthenticator authenticator,
                             EncryptedValueService encryptedValueService,
                             @Named("root_username") String rootUsername) {
         checkArgument(!isBlank(rootUsername), "root_username cannot be null or blank");
