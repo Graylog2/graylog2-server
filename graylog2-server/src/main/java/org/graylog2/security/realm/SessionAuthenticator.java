@@ -73,10 +73,10 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         }
 
         final Optional<String> noSessionExtension = ShiroRequestHeadersBinder.getHeaderFromThreadContext(X_GRAYLOG_NO_SESSION_EXTENSION);
-        if (noSessionExtension.isPresent() && !"true".equalsIgnoreCase(noSessionExtension.get())) {
-            session.touch();
-        } else {
+        if (noSessionExtension.isPresent() && "true".equalsIgnoreCase(noSessionExtension.get())) {
             LOG.debug("Not extending session because the request indicated not to.");
+        } else {
+            session.touch();
         }
         ThreadContext.bind(subject);
 
