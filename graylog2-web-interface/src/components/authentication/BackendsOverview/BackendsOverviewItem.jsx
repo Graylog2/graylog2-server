@@ -10,6 +10,7 @@ import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { TextOverflowEllipsis } from 'components/common';
 import { Button, ButtonToolbar } from 'components/graylog';
 
 type Props = {
@@ -25,12 +26,6 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
 
 const DescriptionCell = styled.td`
   max-width: 300px;
-`;
-
-const TextOverflowEllipsis = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;
 
 const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
