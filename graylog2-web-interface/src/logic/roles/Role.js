@@ -1,22 +1,12 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-export type UserContext = {
-  id: string,
-  username: string,
-};
-
 type InternalState = {
   id: string,
   name: string,
   description: string,
   permissions: Immutable.Set<string>,
   readOnly: boolean,
-  users: Immutable.Set<UserContext>,
-};
-
-export type RoleContext = {
-  users: { [string]: UserContext[] },
 };
 
 export type RoleJSON = {
@@ -37,7 +27,6 @@ export default class Role {
     description: $PropertyType<InternalState, 'description'>,
     permissions: $PropertyType<InternalState, 'permissions'>,
     readOnly: $PropertyType<InternalState, 'readOnly'>,
-    users: $PropertyType<InternalState, 'users'>,
   ) {
     this._value = {
       id,
@@ -45,7 +34,6 @@ export default class Role {
       description,
       permissions,
       readOnly,
-      users,
     };
   }
 
@@ -69,10 +57,6 @@ export default class Role {
     return this._value.readOnly;
   }
 
-  get users() {
-    return this._value.users;
-  }
-
   toBuilder() {
     const {
       id,
@@ -80,7 +64,6 @@ export default class Role {
       description,
       permissions,
       readOnly,
-      users,
     } = this._value;
 
     // eslint-disable-next-line no-use-before-define
@@ -90,7 +73,6 @@ export default class Role {
       description,
       permissions,
       readOnly,
-      users,
     }));
   }
 
@@ -101,7 +83,6 @@ export default class Role {
     description: $PropertyType<InternalState, 'description'>,
     permissions: $PropertyType<InternalState, 'permissions'>,
     readOnly: $PropertyType<InternalState, 'readOnly'>,
-    users: $PropertyType<InternalState, 'users'>,
   ) {
     return new Role(
       id,
@@ -109,7 +90,6 @@ export default class Role {
       description,
       permissions,
       readOnly,
-      users,
     );
   }
 
@@ -131,9 +111,7 @@ export default class Role {
     };
   }
 
-  static fromJSON(value: RoleJSON, userContext: Array<UserContext> = []) {
-    const users = Immutable.Set(userContext || []);
-
+  static fromJSON(value: RoleJSON) {
     const {
       id,
       name,
@@ -148,7 +126,6 @@ export default class Role {
       description,
       permissions,
       readOnly,
-      users,
     );
   }
 
@@ -188,10 +165,6 @@ class Builder {
     return new Builder(this.value.set('readOnly', value));
   }
 
-  users(value: $PropertyType<InternalState, 'users'>) {
-    return new Builder(this.value.set('users', value));
-  }
-
   build() {
     const {
       id,
@@ -199,7 +172,6 @@ class Builder {
       description,
       permissions,
       readOnly,
-      users,
     } = this.value.toObject();
 
     return new Role(
@@ -208,7 +180,6 @@ class Builder {
       description,
       permissions,
       readOnly,
-      users,
     );
   }
 }

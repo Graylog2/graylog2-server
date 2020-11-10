@@ -20,7 +20,7 @@ type RoleMembership = {
 
 const RolesStore = Reflux.createStore({
   loadRoles(): Promise<string[]> {
-    const promise = fetch('GET', qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
+    return fetch('GET', qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
       .then(
         (response) => response.roles,
         (error) => {
@@ -30,8 +30,6 @@ const RolesStore = Reflux.createStore({
           }
         },
       );
-
-    return promise;
   },
 
   createRole(role: Role): Promise<Role> {

@@ -54,8 +54,8 @@ const _headerCellFormatter = (header) => {
 const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
   setLoading(true);
 
-  AuthzRolesDomain.loadRolesPaginated(pagination).then((paginatedUsers) => {
-    setPaginatedRoles(paginatedUsers);
+  AuthzRolesDomain.loadRolesPaginated(pagination).then((paginatedRoles) => {
+    setPaginatedRoles(paginatedRoles);
     setLoading(false);
   });
 };
@@ -77,7 +77,7 @@ const RolesOverview = () => {
   }
 
   const searchFilter = <RolesFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
-  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;
+  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} users={paginatedRoles?.context?.users[role.id]} />;
 
   return (
     <Container>
