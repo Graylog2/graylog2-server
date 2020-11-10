@@ -40,8 +40,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Api(value = "Authorization/GrantsOverview", description = "Grants overview")
@@ -64,9 +64,9 @@ public class GrantsOverviewResource extends RestResource {
     @ApiOperation("Return an overview of all grants in the system")
     @RequiresPermissions(RestPermissions.GRANTS_OVERVIEW_READ)
     public Response getOverview() {
-        final Set<GrantSummary> grants = grantService.getAll().stream()
+        final List<GrantSummary> grants = grantService.getAll().stream()
                 .map(grant -> GrantSummary.of(grant, descriptorService))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         return Response.ok(Collections.singletonMap("grants", grants)).build();
     }
