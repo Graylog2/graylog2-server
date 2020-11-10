@@ -39,9 +39,6 @@ const _loadSyncedTeams = (authBackendId, pagination, setLoading, setPaginatedUse
   });
 };
 
-const _updateListOnUserDisable = (perPage, query, setPagination) => AuthenticationActions.disableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
-const _updateListOnUserEnable = (perPage, query, setPagination) => AuthenticationActions.enableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
-
 type Props = {
   roles: Immutable.List<Role>,
   authenticationBackend: AuthenticationBackend,
@@ -55,8 +52,6 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
   const { page, perPage, query } = pagination;
 
   useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [authenticationBackend.id, pagination]);
-  useEffect(() => _updateListOnUserDisable(perPage, query, setPagination), [perPage, query]);
-  useEffect(() => _updateListOnUserEnable(perPage, query, setPagination), [perPage, query]);
 
   if (!paginatedUsers) {
     return <Spinner />;
