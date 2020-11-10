@@ -67,7 +67,7 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
   return (
     <div>
       {error && (
-        <Tooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
+        <Tooltip placement="top" className="in" id="tooltip-top" positionTop="20px">
           {error}
         </Tooltip>
       )}
