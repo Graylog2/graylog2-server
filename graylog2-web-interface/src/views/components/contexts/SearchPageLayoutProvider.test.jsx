@@ -35,7 +35,7 @@ jest.mock('logic/local-storage/Store', () => ({
   set: jest.fn(),
 }));
 
-describe('CurrentUserPreferencesProvider', () => {
+describe('SearchPageLayoutProvider', () => {
   const SimpleProvider = ({ children }: { children: any }) => (
     <CurrentUserProvider>
       <CurrentUserPreferencesProvider>
@@ -144,13 +144,13 @@ describe('CurrentUserPreferencesProvider', () => {
 
     expect(PreferencesActions.saveUserPreferences).toHaveBeenCalledWith(
       'alice',
-      [
-        { name: 'enableSmartSearch', value: true },
-        { name: 'updateUnfocussed', value: false },
-        { name: 'searchSidebarIsPinned', value: true },
-        { name: 'dashboardSidebarIsPinned', value: false },
-        { name: 'themeMode', value: 'teint' },
-      ],
+      {
+        enableSmartSearch: true,
+        updateUnfocussed: false,
+        searchSidebarIsPinned: true,
+        dashboardSidebarIsPinned: false,
+        themeMode: 'teint',
+      },
       undefined,
       false,
     );
