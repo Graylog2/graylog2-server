@@ -56,8 +56,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -123,7 +125,9 @@ public class AuthzRolesResource extends RestResource {
 
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(
                 searchQuery, page, perPage,sort, order);
-        return PaginatedResponse.create("roles", result, query);
+        final Map<String, Set<Map<String, String>>> userRoleMap = userRoleContext(result);
+
+        return PaginatedResponse.create("roles", result, query, ImmutableMap.of("users", userRoleMap));
     }
 
     @GET
@@ -152,7 +156,7 @@ public class AuthzRolesResource extends RestResource {
         }
 
         final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(
-                searchQuery, page, perPage,sort, order, roleId);
+                searchQuery, page, perPage,sort, order, ImmutableSet.of(roleId));
         final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
         final Map<String, String> rolesMap = authzRolesService.findPaginatedByIds(
                 new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, "asc", roleIds)
@@ -267,5 +271,20 @@ public class AuthzRolesResource extends RestResource {
             throw new NotAllowedException("Cannot delete read only role with id: " + roleId);
         }
         authzRolesService.delete(roleId);
+    }
+
+
+    private Map<String, Set<Map<String, String>>> userRoleContext(PaginatedList<AuthzRoleDTO> roles) {
+        final PaginatedList<UserOverviewDTO> users = paginatedUserService.findPaginatedByRole(new SearchQuery(""),
+                1,0, UserOverviewDTO.FIELD_USERNAME, "asc",
+                roles.stream().map(AuthzRoleDTO::id).collect(Collectors.toSet()));
+        final Map<String, Set<Map<String, String>>> userRoleMap = new HashMap<>(roles.size());
+        roles.forEach(authzRoleDTO -> {
+            final Set<Map<String, String>> userMap = users.stream().filter(u -> u.roles().contains(authzRoleDTO.id()))
+                    .map(u -> ImmutableMap.of(UserOverviewDTO.FIELD_ID, Objects.requireNonNull(u.id()),
+                            UserOverviewDTO.FIELD_USERNAME, u.username())).collect(Collectors.toSet());
+            userRoleMap.put(authzRoleDTO.id(), userMap);
+        });
+        return userRoleMap;
     }
 }
