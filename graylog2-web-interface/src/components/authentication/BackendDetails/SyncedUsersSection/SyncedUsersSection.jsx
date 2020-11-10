@@ -6,7 +6,6 @@ import * as Immutable from 'immutable';
 import Role from 'logic/roles/Role';
 import type { PaginatedUsers } from 'actions/users/UsersActions';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
@@ -39,9 +38,6 @@ const _loadSyncedTeams = (authBackendId, pagination, setLoading, setPaginatedUse
   });
 };
 
-const _updateListOnUserDisable = (perPage, query, setPagination) => AuthenticationActions.disableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
-const _updateListOnUserEnable = (perPage, query, setPagination) => AuthenticationActions.enableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
-
 type Props = {
   roles: Immutable.List<Role>,
   authenticationBackend: AuthenticationBackend,
@@ -52,11 +48,9 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
   const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: users } = paginatedUsers || {};
-  const { page, perPage, query } = pagination;
+  const { page } = pagination;
 
   useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [authenticationBackend.id, pagination]);
-  useEffect(() => _updateListOnUserDisable(perPage, query, setPagination), [perPage, query]);
-  useEffect(() => _updateListOnUserEnable(perPage, query, setPagination), [perPage, query]);
 
   if (!paginatedUsers) {
     return <Spinner />;

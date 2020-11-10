@@ -11,7 +11,7 @@ const Wrapper: StyledComponent<{active?: boolean}, ThemeInterface, HTMLDivElemen
 
 const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
   <Wrapper active={active}>
-    <Icon {...rest} name="circle" />
+    <Icon {...rest} name={active ? 'check-circle' : 'times-circle'} />
   </Wrapper>
 );
 

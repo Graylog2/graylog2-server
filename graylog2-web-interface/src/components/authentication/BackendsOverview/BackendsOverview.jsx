@@ -56,8 +56,6 @@ const _loadBackends = (pagination, setLoading, setPaginatedBackends) => {
   });
 };
 
-const _updateListOnUserDisable = (refreshOverview) => AuthenticationActions.disableUser.completed.listen(refreshOverview);
-const _updateListOnUserEnable = (refreshOverview) => AuthenticationActions.enableUser.completed.listen(refreshOverview);
 const _updateListOnBackendDelete = (refreshOverview) => AuthenticationActions.delete.completed.listen(refreshOverview);
 const _updateListOnBackendActivation = (refreshOverview) => AuthenticationActions.setActiveBackend.completed.listen(refreshOverview);
 
@@ -73,8 +71,6 @@ const BackendsOverview = () => {
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
   useEffect(() => _loadBackends(pagination, setLoading, setPaginatedBackends), [pagination]);
-  useEffect(() => _updateListOnUserDisable(_refreshOverview), [_refreshOverview]);
-  useEffect(() => _updateListOnUserEnable(_refreshOverview), [_refreshOverview]);
   useEffect(() => _updateListOnBackendDelete(_refreshOverview), [_refreshOverview]);
   useEffect(() => _updateListOnBackendActivation(_refreshOverview), [_refreshOverview]);
 

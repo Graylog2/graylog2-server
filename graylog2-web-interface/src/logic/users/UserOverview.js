@@ -1,6 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+export type AccountStatus = 'enabled' | 'disabled' | 'deleted';
+
 export type UserOverviewJSON = {
   id: string,
   username: string,
@@ -15,6 +17,7 @@ export type UserOverviewJSON = {
   enabled: boolean,
   auth_service_id: string,
   auth_service_uid: string,
+  account_status: AccountStatus,
 };
 
 type InternalState = {
@@ -31,6 +34,7 @@ type InternalState = {
   enabled: boolean,
   authServiceId: string,
   authServiceUid: string,
+  accountStatus: AccountStatus,
 };
 
 export default class UserOverview {
@@ -50,6 +54,7 @@ export default class UserOverview {
     enabled: $PropertyType<InternalState, 'enabled'>,
     authServiceId: $PropertyType<InternalState, 'authServiceId'>,
     authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
+    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
   ) {
     this._value = {
       id,
@@ -65,6 +70,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     };
   }
 
@@ -128,6 +134,10 @@ export default class UserOverview {
     return this._value.authServiceUid;
   }
 
+  get accountStatus() {
+    return this._value.accountStatus;
+  }
+
   toBuilder() {
     const {
       id,
@@ -143,6 +153,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     } = this._value;
 
     // eslint-disable-next-line no-use-before-define
@@ -160,6 +171,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     }));
   }
 
@@ -177,6 +189,7 @@ export default class UserOverview {
     enabled: $PropertyType<InternalState, 'enabled'>,
     authServiceId: $PropertyType<InternalState, 'authServiceId'>,
     authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
+    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
   ) {
     return new UserOverview(
       id,
@@ -192,6 +205,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     );
   }
 
@@ -210,6 +224,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     } = this._value;
 
     return {
@@ -226,6 +241,7 @@ export default class UserOverview {
       enabled,
       auth_service_id: authServiceId,
       auth_service_uid: authServiceUid,
+      account_status: accountStatus,
     };
   }
 
@@ -244,6 +260,7 @@ export default class UserOverview {
       enabled,
       auth_service_id: authServiceId,
       auth_service_uid: authServiceUid,
+      account_status: accountStatus,
     } = value;
 
     return UserOverview.create(
@@ -260,6 +277,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     );
   }
 
@@ -331,6 +349,10 @@ class Builder {
     return new Builder(this.value.set('authServiceUid', value));
   }
 
+  accountStatus(value: $PropertyType<InternalState, 'accountStatus'>) {
+    return new Builder(this.value.set('accountStatus', value));
+  }
+
   build() {
     const {
       id,
@@ -346,6 +368,7 @@ class Builder {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     } = this.value.toObject();
 
     return new UserOverview(
@@ -362,6 +385,7 @@ class Builder {
       enabled,
       authServiceId,
       authServiceUid,
+      accountStatus,
     );
   }
 }

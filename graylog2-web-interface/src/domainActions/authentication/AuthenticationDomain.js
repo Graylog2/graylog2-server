@@ -63,26 +63,6 @@ const testLogin: $PropertyType<ActionsType, 'testLogin'> = notifyingAction({
   }),
 });
 
-const enableUser: $PropertyType<ActionsType, 'enableUser'> = notifyingAction({
-  action: AuthenticationActions.enableUser,
-  success: (userId, username) => ({
-    message: `User "${username} was enabled successfully`,
-  }),
-  error: (error, userId, username) => ({
-    message: `Enabling user "${username}" failed with status: ${error}`,
-  }),
-});
-
-const disableUser: $PropertyType<ActionsType, 'disableUser'> = notifyingAction({
-  action: AuthenticationActions.disableUser,
-  success: (userId, username) => ({
-    message: `User "${username} was disabled successfully`,
-  }),
-  error: (error, userId, username) => ({
-    message: `Disabling user "${username}" failed with status: ${error}`,
-  }),
-});
-
 const setActiveBackend: $PropertyType<ActionsType, 'setActiveBackend'> = notifyingAction({
   action: AuthenticationActions.setActiveBackend,
   success: (authBackendId, authBackendTitle) => ({
@@ -115,8 +95,6 @@ export default {
   delete: deleteBackend,
   testConnection,
   testLogin,
-  enableUser,
-  disableUser,
   setActiveBackend,
   loadBackendsPaginated,
   loadUsersPaginated,

@@ -340,6 +340,7 @@ const ApiRoutes = {
     create_token: (userId, tokenName) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
     delete_token: (userId, tokenName) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
     list_tokens: (userId) => { return { url: `/users/${userId}/tokens` }; },
+    setStatus: (userId, accountStatus) => { return { url: `/users/${userId}/status/${accountStatus}` }; },
   },
   DashboardsController: {
     show: (id) => { return { url: `/dashboards/${id}` }; },

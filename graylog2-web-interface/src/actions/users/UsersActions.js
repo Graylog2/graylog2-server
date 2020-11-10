@@ -6,7 +6,7 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import User, { type UserJSON } from 'logic/users/User';
-import UserOverview from 'logic/users/UserOverview';
+import UserOverview, { type AccountStatus } from 'logic/users/UserOverview';
 
 export type UserCreate = {
   email: $PropertyType<UserJSON, 'email'>,
@@ -50,6 +50,7 @@ export type ActionsType = {
   deleteToken: (userId: string, tokenId: string, tokenName: string) => Promise<void>,
   loadUsers: () => Promise<Immutable.List<User>>,
   loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>,
+  setStatus: (userId: string, newStatus: AccountStatus) => Promise<void>,
 };
 
 const UsersActions: RefluxActions<ActionsType> = singletonActions(
@@ -66,6 +67,7 @@ const UsersActions: RefluxActions<ActionsType> = singletonActions(
     deleteToken: { asyncResult: true },
     loadUsersPaginated: { asyncResult: true },
     loadUsers: { asyncResult: true },
+    setStatus: { asyncResult: true },
   }),
 );
 

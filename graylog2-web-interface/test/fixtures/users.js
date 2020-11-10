@@ -21,6 +21,7 @@ export const viewsManager: UserJSON = {
   timezone: 'UTC',
   username: 'betty',
   client_address: '127.0.0.1',
+  account_status: 'enabled',
 };
 
 export const admin: UserJSON = {
@@ -38,6 +39,7 @@ export const admin: UserJSON = {
   session_timeout_ms: 28800000,
   timezone: 'UTC',
   username: 'alonzo',
+  account_status: 'enabled',
 };
 
 export const alice = User.builder()
@@ -53,6 +55,7 @@ export const alice = User.builder()
   .sessionActive(true)
   .sessionTimeoutMs(10000000000)
   .clientAddress('127.0.0.1')
+  .accountStatus('enabled')
   .build();
 
 export const bob = User.builder()
@@ -68,6 +71,7 @@ export const bob = User.builder()
   .sessionActive(false)
   .sessionTimeoutMs(10000000000)
   .clientAddress('172.0.0.1')
+  .accountStatus('enabled')
   .build();
 
 export const adminUser = User.builder()
@@ -82,6 +86,7 @@ export const adminUser = User.builder()
   .sessionActive(true)
   .sessionTimeoutMs(10000000000)
   .clientAddress('192.168.0.1')
+  .accountStatus('enabled')
   .build();
 
 export const userList = Immutable.List<User>([adminUser, bob, alice]);

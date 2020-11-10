@@ -80,8 +80,6 @@ export type LoadActiveResponse = LoadActiveResponse & {
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
   delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
-  disableUser: (userId: string, username: string) => Promise<void>,
-  enableUser: (userId: string, username: string) => Promise<void>,
   load: (id: string) => Promise<LoadResponse>,
   loadActive: () => Promise<LoadActiveResponse>,
   loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,
@@ -97,8 +95,6 @@ const AuthenticationActions: RefluxActions<ActionsType> = singletonActions(
   () => Reflux.createActions({
     create: { asyncResult: true },
     delete: { asyncResult: true },
-    disableUser: { asyncResult: true },
-    enableUser: { asyncResult: true },
     load: { asyncResult: true },
     loadActive: { asyncResult: true },
     loadBackendsPaginated: { asyncResult: true },
