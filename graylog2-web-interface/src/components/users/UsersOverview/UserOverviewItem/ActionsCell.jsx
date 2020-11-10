@@ -49,7 +49,7 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
   );
 };
 
-const EditActions = ({ user, user: { username, id, fullName, accountStatus } }: { user: UserOverview }) => {
+const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
   const _toggleStatus = () => {
     const newStatus = accountStatus === 'enabled' ? 'disabled' : 'enabled';
     UsersDomain.setStatus(id, newStatus);
@@ -75,11 +75,13 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus } }: 
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
         <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
-          <MenuItem id={`set-status-user-${id}`}
-                    onClick={_toggleStatus}
-                    title={`Set new account status for ${fullName}`}>
-            {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
-          </MenuItem>
+          { !external && !readOnly && (
+            <MenuItem id={`set-status-user-${id}`}
+                      onClick={_toggleStatus}
+                      title={`Set new account status for ${fullName}`}>
+              {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
+            </MenuItem>
+          ) }
           <MenuItem id={`delete-user-${id}`}
                     bsStyle="primary"
                     bsSize="xs"
