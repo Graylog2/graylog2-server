@@ -10,7 +10,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }) => {
   const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
 
   return (
-    <div style={{ position: 'relative', zIndex: 10 }} data-testid="streams-filter" title={placeholder}>
+    <div style={{ position: 'relative' }} data-testid="streams-filter" title={placeholder}>
       <Select placeholder={placeholder}
               disabled={disabled}
               displayKey="key"
