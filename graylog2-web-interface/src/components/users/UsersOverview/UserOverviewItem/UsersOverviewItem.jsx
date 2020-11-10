@@ -8,6 +8,7 @@ import RolesCell from 'components/permissions/RolesCell';
 
 import ActionsCell from './ActionsCell';
 import LoggedInCell from './LoggedInCell';
+import StatusCell from './StatusCell';
 
 type Props = {
   user: UserOverview,
@@ -25,6 +26,7 @@ const UsersOverviewItem = ({
     sessionActive,
     username,
     roles,
+    accountStatus,
   },
   isActive,
 }: Props) => {
@@ -41,6 +43,7 @@ const UsersOverviewItem = ({
       <td className="limited">{username}</td>
       <td className="limited">{email}</td>
       <td className="limited">{clientAddress}</td>
+      <StatusCell accountStatus={accountStatus} />
       <RolesCell roles={roles} />
       <ActionsCell user={user} />
     </tr>

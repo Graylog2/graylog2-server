@@ -3,6 +3,8 @@ import * as Immutable from 'immutable';
 
 import type { PreferencesMap } from 'stores/users/PreferencesStore';
 
+import type { AccountStatus } from './UserOverview';
+
 type StartPage = {
   id: string,
   type: string,
@@ -25,6 +27,7 @@ export type UserJSON = {
   startpage?: StartPage,
   timezone: ?string,
   username: string,
+  account_status: AccountStatus,
 };
 
 type InternalState = {
@@ -43,6 +46,7 @@ type InternalState = {
   sessionActive: boolean,
   clientAddress: string,
   lastActivity: ?string,
+  accountStatus: AccountStatus,
 };
 
 export default class User {
@@ -64,6 +68,7 @@ export default class User {
     sessionActive: $PropertyType<InternalState, 'sessionActive'>,
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
+    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
   ) {
     this._value = {
       id,
@@ -81,6 +86,7 @@ export default class User {
       sessionActive,
       clientAddress,
       lastActivity,
+      accountStatus,
     };
   }
 
@@ -122,6 +128,10 @@ export default class User {
 
   get external() {
     return this._value.external;
+  }
+
+  get accountStatus() {
+    return this._value.accountStatus;
   }
 
   get sessionTimeoutMs() {
@@ -201,6 +211,7 @@ export default class User {
       sessionActive,
       clientAddress,
       lastActivity,
+      accountStatus,
     } = this._value;
 
     // eslint-disable-next-line no-use-before-define
@@ -220,6 +231,7 @@ export default class User {
       sessionActive,
       clientAddress,
       lastActivity,
+      accountStatus,
     }));
   }
 
@@ -239,6 +251,7 @@ export default class User {
     sessionActive: $PropertyType<InternalState, 'sessionActive'>,
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
+    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
   ) {
     return new User(
       id,
@@ -256,11 +269,12 @@ export default class User {
       sessionActive,
       clientAddress,
       lastActivity,
+      accountStatus,
     );
   }
 
   static empty() {
-    return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.Set(), false, false, -1, undefined, false, '', '');
+    return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.Set(), false, false, -1, undefined, false, '', '', 'enabled');
   }
 
   toJSON(): UserJSON {
@@ -280,6 +294,7 @@ export default class User {
       sessionActive,
       clientAddress,
       lastActivity,
+      accountStatus,
     } = this._value;
 
     return {
@@ -298,6 +313,7 @@ export default class User {
       session_active: sessionActive,
       client_address: clientAddress,
       last_activity: lastActivity,
+      account_status: accountStatus,
     };
   }
 
@@ -324,6 +340,8 @@ export default class User {
       client_address,
       // eslint-disable-next-line camelcase
       last_activity,
+      // eslint-disable-next-line camelcase
+      account_status,
     } = value;
 
     return User.create(
@@ -342,6 +360,7 @@ export default class User {
       session_active,
       client_address,
       last_activity,
+      account_status,
     );
   }
 
@@ -421,6 +440,10 @@ class Builder {
     return new Builder(this.value.set('lastActivity', value));
   }
 
+  accountStatus(value: $PropertyType<InternalState, 'accountStatus'>) {
+    return new Builder(this.value.set('accountStatus', value));
+  }
+
   build() {
     const {
       id,
@@ -438,6 +461,7 @@ class Builder {
       sessionActive,
       clientAddress,
       lastActivity,
+      accountStatus,
     } = this.value.toObject();
 
     return new User(
@@ -456,6 +480,7 @@ class Builder {
       sessionActive,
       clientAddress,
       lastActivity,
+      accountStatus,
     );
   }
 }

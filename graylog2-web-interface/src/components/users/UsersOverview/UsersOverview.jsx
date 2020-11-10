@@ -22,7 +22,7 @@ const DEFAULT_PAGINATION = {
   query: '',
 };
 
-const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Enabled', 'Role', 'Actions'];
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
