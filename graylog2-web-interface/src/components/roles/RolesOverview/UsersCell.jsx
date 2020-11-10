@@ -5,7 +5,7 @@ import * as Immutable from 'immutable';
 import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { IfPermitted, CountBadge } from 'components/common';
-import type { UserContext } from 'logic/roles/Role';
+import type { UserContext } from 'actions/roles/AuthzRolesActions';
 
 type Props = {
   users: Immutable.Set<UserContext>,

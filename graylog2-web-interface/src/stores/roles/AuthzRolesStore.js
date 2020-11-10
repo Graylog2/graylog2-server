@@ -11,7 +11,7 @@ import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
 import type { RoleJSON } from 'logic/roles/Role';
-import AuthzRolesActions, { type PaginatedRoles, type PaginatedUsers } from 'actions/roles/AuthzRolesActions';
+import AuthzRolesActions, { type PaginatedRoles, type PaginatedUsers, type RoleContext } from 'actions/roles/AuthzRolesActions';
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
