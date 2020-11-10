@@ -563,6 +563,7 @@ public class UsersResource extends RestResource {
 
         final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
         final User user = loadUserById(userId);
+        checkPermission(RestPermissions.USERS_EDIT, user.getName());
         final User.AccountStatus oldStatus = user.getAccountStatus();
 
         if (oldStatus.equals(newStatus)) {

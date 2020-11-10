@@ -49,7 +49,12 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
   );
 };
 
-const EditActions = ({ user, user: { username, id, fullName } }: { user: UserOverview }) => {
+const EditActions = ({ user, user: { username, id, fullName, accountStatus } }: { user: UserOverview }) => {
+  const _toggleStatus = () => {
+    const newStatus = accountStatus === 'enabled' ? 'disabled' : 'enabled';
+    UsersDomain.setStatus(id, newStatus);
+  };
+
   const _deleteUser = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete user ${fullName}?`)) {
@@ -70,6 +75,11 @@ const EditActions = ({ user, user: { username, id, fullName } }: { user: UserOve
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
         <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
+          <MenuItem id={`set-status-user-${id}`}
+                    onClick={_toggleStatus}
+                    title={`Set new account status for ${fullName}`}>
+            {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
+          </MenuItem>
           <MenuItem id={`delete-user-${id}`}
                     bsStyle="primary"
                     bsSize="xs"
