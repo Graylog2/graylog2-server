@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import numeral from 'numeral';
 
 import AppConfig from 'util/AppConfig';
-import { Timestamp, Spinner } from 'components/common';
+import { Timestamp } from 'components/common';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import DateTime from 'logic/datetimes/DateTime';
 
