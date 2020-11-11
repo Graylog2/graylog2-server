@@ -11,6 +11,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import withHideOnCloud from 'util/conditional/withHideOnCloud';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -107,4 +108,4 @@ const IndexSetCreationPage = createReactClass({
   },
 });
 
-export default IndexSetCreationPage;
+export default withHideOnCloud(IndexSetCreationPage);

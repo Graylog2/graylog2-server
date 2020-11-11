@@ -13,6 +13,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
+import withHideOnCloud from 'util/conditional/withHideOnCloud';
 import Routes from 'routing/Routes';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
@@ -99,4 +100,4 @@ const IndexSetConfigurationPage = createReactClass({
   },
 });
 
-export default IndexSetConfigurationPage;
+export default withHideOnCloud(IndexSetConfigurationPage);

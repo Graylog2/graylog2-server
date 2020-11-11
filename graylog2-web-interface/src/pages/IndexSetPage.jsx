@@ -12,6 +12,7 @@ import { IndexerClusterHealthSummary } from 'components/indexers';
 import { DocumentationLink } from 'components/support';
 
 import DocsHelper from 'util/DocsHelper';
+import withHideOnCloud from 'util/conditional/withHideOnCloud';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -183,4 +184,4 @@ const IndexSetPage = createReactClass({
   },
 });
 
-export default IndexSetPage;
+export default withHideOnCloud(IndexSetPage);
