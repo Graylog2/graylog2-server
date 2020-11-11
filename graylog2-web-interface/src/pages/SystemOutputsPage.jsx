@@ -6,7 +6,6 @@ import StoreProvider from 'injection/StoreProvider';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
-import withHideOnCloud from 'util/conditional/withHideOnCloud';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -36,4 +35,4 @@ const SystemOutputsPage = createReactClass({
   },
 });
 
-export default withHideOnCloud(SystemOutputsPage);
+export default SystemOutputsPage;
