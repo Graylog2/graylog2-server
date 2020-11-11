@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class ViewService extends PaginatedDbService<ViewDTO> {
@@ -90,6 +91,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                                                         String sortField,
                                                         int page,
                                                         int perPage) {
+        checkNotNull(sortField);
         return searchPaginated(
                 DBQuery.and(
                         DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
