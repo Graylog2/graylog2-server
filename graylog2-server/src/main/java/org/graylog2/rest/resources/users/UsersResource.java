@@ -103,6 +103,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -556,10 +557,16 @@ public class UsersResource extends RestResource {
     @ApiOperation("Update the account status for a user")
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
     public Response updateAccountStatus(
-            @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true) @PathParam("userId") String userId,
+            @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true)
+            @PathParam("userId") @NotBlank String userId,
             @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
-                    defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
+                      defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
             @PathParam("newStatus") @NotBlank String newStatusString) throws ValidationException {
+
+        final User currentUser = requireNonNull(getCurrentUser(), "currentUser cannot be null");
+        if (userId.equalsIgnoreCase(currentUser.getId())) {
+            throw new BadRequestException("Users are not allowed to set their own status");
+        }
 
         final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
         final User user = loadUserById(userId);
