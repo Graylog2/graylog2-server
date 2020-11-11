@@ -32,10 +32,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Api(value = "System/ClusterStats", description = "Cluster stats")
+@Api(value = "System/ClusterStats", description = "[DEPRECATED] Cluster stats")
 @RequiresAuthentication
 @Path("/system/cluster/stats")
 @Produces(MediaType.APPLICATION_JSON)
+@Deprecated
 public class ClusterStatsResource extends RestResource {
     private final ClusterStatsService clusterStatsService;
 
