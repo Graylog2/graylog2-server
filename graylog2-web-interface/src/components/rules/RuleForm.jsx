@@ -20,11 +20,11 @@ const RuleForm = ({ create }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    handleSavePipelineRule(() => { history.push(Routes.SYSTEM.PIPELINES.RULES); });
+    handleSavePipelineRule(() => { history.goBack(); });
   };
 
   const handleApply = () => {
-    handleSavePipelineRule();
+    handleSavePipelineRule((rule) => { history.replace(Routes.SYSTEM.PIPELINES.RULE(rule.id)); });
   };
 
   const handleDescriptionChange = (event) => {

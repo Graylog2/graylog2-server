@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useRef } from 'react';
+import React, { createContext, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -20,7 +20,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
   };
 
-  const validateNewRule = (callback) => {
+  const validateNewRule = useCallback((callback) => {
     const nextRule = {
       ...rule,
       source: ruleSourceRef.current.editor.getSession().getValue(),
@@ -28,7 +28,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     };
 
     RulesActions.parse(nextRule, callback);
-  };
+  }, [rule]);
 
   const validateBeforeSave = (callback = () => {}) => {
     const savedRule = {
@@ -53,7 +53,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
       promise = RulesActions.save.triggerPromise(nextRule);
     }
 
-    promise.then(() => callback());
+    promise.then((response) => callback(response));
   };
 
   const handleSavePipelineRule = (callback = () => {}) => {
@@ -69,7 +69,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     if (descriptionRef.current) {
       descriptionRef.current.value = rule.description;
     }
-  }, [rule]);
+  });
 
   useEffect(() => {
     if (ruleSourceRef.current) {
@@ -88,7 +88,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
         }, 500);
       });
     }
-  }, [ruleSourceRef.current]);
+  }, [validateNewRule]);
 
   return (
     <PipelineRulesContext.Provider value={{
