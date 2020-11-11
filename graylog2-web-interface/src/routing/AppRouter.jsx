@@ -165,11 +165,13 @@ const AppRouter = () => {
                      component={EditContentPackPage} />
               <Route path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')} component={ShowContentPackPage} />
               <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
-              <Route path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-              <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-              <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                     component={IndexSetConfigurationPage} />
 
+              {!isCloud && <Route path={Routes.SYSTEM.INDEX_SETS.CREATE}
+                                  component={IndexSetCreationPage} />}
+              {!isCloud && <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')}
+                                  component={IndexSetPage} />}
+              {!isCloud && <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                                  component={IndexSetConfigurationPage} />)
               {!isCloud && <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />}
               {!isCloud && <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />}
 
