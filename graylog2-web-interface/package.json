@@ -60,10 +60,7 @@
     },
     "testPathIgnorePatterns": [
       ".fixtures.js$"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest"
-    }
+    ]
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
