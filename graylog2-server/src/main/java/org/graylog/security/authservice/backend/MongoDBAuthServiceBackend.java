@@ -138,4 +138,9 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
     public AuthServiceBackendTestResult testLogin(AuthServiceCredentials credentials, @Nullable AuthServiceBackendDTO existingConfig) {
         return AuthServiceBackendTestResult.createFailure("Not implemented");
     }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

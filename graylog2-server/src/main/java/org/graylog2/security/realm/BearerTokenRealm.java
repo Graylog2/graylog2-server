@@ -25,10 +25,8 @@ import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog.security.authservice.AuthServiceAuthenticator;
-import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.AuthServiceException;
 import org.graylog.security.authservice.AuthServiceResult;
-import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +63,7 @@ public class BearerTokenRealm extends AuthenticatingRealm {
         log.debug("Attempting authentication for bearer token received from <{}>", token.getHost());
         try {
             final AuthServiceResult result =
-                    authenticator.authenticate(AuthServiceCredentials.create("", EncryptedValue.builder().build()));
+                    authenticator.authenticate(token.getToken());
 
             if (result.isSuccess()) {
                 log.debug("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}/{}>",

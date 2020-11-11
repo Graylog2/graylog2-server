@@ -53,6 +53,11 @@ public abstract class AuthServiceCredentials {
         return Builder.create();
     }
 
+    @Override
+    public String toString() {
+        return username();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public static Builder create() {

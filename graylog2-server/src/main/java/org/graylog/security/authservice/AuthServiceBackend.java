@@ -17,11 +17,15 @@
 package org.graylog.security.authservice;
 
 import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface AuthServiceBackend {
+    Logger log = LoggerFactory.getLogger(AuthServiceBackend.class);
+
     String INTERNAL_BACKEND_ID = "000000000000000000000001";
 
     interface Factory<TYPE extends AuthServiceBackend> {
@@ -29,7 +33,13 @@ public interface AuthServiceBackend {
     }
 
     Optional<UserDetails> authenticateAndProvision(AuthServiceCredentials authCredentials,
-                                                   ProvisionerService provisionerService);
+            ProvisionerService provisionerService);
+
+    default Optional<UserDetails> authenticateAndProvision(String token, ProvisionerService provisionerService) {
+        log.debug("Cannot authenticate by token. Token-based authentication is not supported by auth service backend " +
+                "<" + getName() + ">.");
+        return Optional.empty();
+    }
 
     String backendType();
 
@@ -42,4 +52,6 @@ public interface AuthServiceBackend {
     AuthServiceBackendTestResult testConnection(@Nullable AuthServiceBackendDTO existingConfig);
 
     AuthServiceBackendTestResult testLogin(AuthServiceCredentials credentials, @Nullable AuthServiceBackendDTO existingConfig);
+
+    String getName();
 }

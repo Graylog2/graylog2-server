@@ -35,6 +35,17 @@ public class AuthServiceAuthenticator {
         this.provisionerService = provisionerService;
     }
 
+    public AuthServiceResult authenticate(String token) {
+        final Optional<AuthServiceBackend> activeBackend = authServiceConfig.getActiveBackend();
+        if (!activeBackend.isPresent()) {
+            final AuthServiceBackend defaultBackend = authServiceConfig.getDefaultBackend();
+            throw new AuthServiceException("No active auth service backend configured. Tokens can not be " +
+                    "authenticated with the default backend. Please activate a backend capable of token-based " +
+                    "authentication.", defaultBackend.backendType(), defaultBackend.backendId());
+        }
+        return authenticate(token, activeBackend.get());
+    }
+
     /**
      * Tries to authenticate the username with the given password and returns the authenticated username if successful.
      *
@@ -61,23 +72,31 @@ public class AuthServiceAuthenticator {
         return authenticate(authCredentials, authServiceConfig.getDefaultBackend());
     }
 
+    private AuthServiceResult authenticate(String token, AuthServiceBackend backend) {
+        final Optional<UserDetails> userDetails = backend.authenticateAndProvision(token, provisionerService);
+
+        return userDetails.map(ud -> successResult(ud, backend))
+                .orElseGet(() -> failResult("<token>", backend));
+    }
+
     private AuthServiceResult authenticate(AuthServiceCredentials authCredentials, AuthServiceBackend backend) {
         final Optional<UserDetails> userDetails = backend.authenticateAndProvision(authCredentials, provisionerService);
 
-        if (userDetails.isPresent()) {
-            return AuthServiceResult.builder()
-                    .username(authCredentials.username())
-                    .userProfileId(userDetails.get().databaseId().get())
-                    .backendType(backend.backendType())
-                    .backendId(backend.backendId())
-                    .backendTitle(backend.backendTitle())
-                    .build();
-        }
-
-        return failResult(authCredentials, backend);
+        return userDetails.map(ud -> successResult(ud, backend))
+                .orElseGet(() -> failResult(authCredentials.username(), backend));
     }
 
-    private AuthServiceResult failResult(AuthServiceCredentials authCredentials, AuthServiceBackend backend) {
-        return AuthServiceResult.failed(authCredentials.username(), backend);
+    private AuthServiceResult successResult(UserDetails userDetails, AuthServiceBackend backend) {
+        return AuthServiceResult.builder()
+                .username(userDetails.username())
+                .userProfileId(userDetails.databaseId().get())
+                .backendType(backend.backendType())
+                .backendId(backend.backendId())
+                .backendTitle(backend.backendTitle())
+                .build();
+    }
+
+    private AuthServiceResult failResult(String username, AuthServiceBackend backend) {
+        return AuthServiceResult.failed(username, backend);
     }
 }
