@@ -103,7 +103,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -561,10 +560,10 @@ public class UsersResource extends RestResource {
             @PathParam("userId") @NotBlank String userId,
             @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
                       defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
-            @PathParam("newStatus") @NotBlank String newStatusString) throws ValidationException {
+            @PathParam("newStatus") @NotBlank String newStatusString,
+            @Context UserContext userContext) throws ValidationException {
 
-        final User currentUser = requireNonNull(getCurrentUser(), "currentUser cannot be null");
-        if (userId.equalsIgnoreCase(currentUser.getId())) {
+        if (userId.equalsIgnoreCase(userContext.getUserId())) {
             throw new BadRequestException("Users are not allowed to set their own status");
         }
 
