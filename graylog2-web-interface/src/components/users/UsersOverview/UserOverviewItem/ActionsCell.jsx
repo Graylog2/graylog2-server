@@ -1,7 +1,9 @@
 // @flow strict
 import * as React from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import { LinkContainer } from 'components/graylog/router';
 import UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
@@ -50,9 +52,17 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
 };
 
 const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
+  const currentUser = useContext(CurrentUserContext) || {};
+
   const _toggleStatus = () => {
-    const newStatus = accountStatus === 'enabled' ? 'disabled' : 'enabled';
-    UsersDomain.setStatus(id, newStatus);
+    // eslint-disable-next-line no-alert
+    if (accountStatus === 'enabled' && window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
+      UsersDomain.setStatus(id, 'disabled');
+
+      return;
+    }
+
+    UsersDomain.setStatus(id, 'enabled');
   };
 
   const _deleteUser = () => {
@@ -61,6 +71,8 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
       UsersDomain.delete(id, fullName);
     }
   };
+
+  const showEnableDisable = !external && !readOnly && currentUser.id !== id;
 
   return (
     <>
@@ -75,7 +87,7 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
         <EditTokensAction user={user} wrapperComponent={MenuItem} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
-          { !external && !readOnly && (
+          { showEnableDisable && (
             <MenuItem id={`set-status-user-${id}`}
                       onClick={_toggleStatus}
                       title={`Set new account status for ${fullName}`}>
