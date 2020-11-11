@@ -18,14 +18,14 @@ import Reflux from 'reflux';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 const StartpageStore = Reflux.createStore({
   listenables: [],
 
-  set(username, type, id) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.update(username).url);
+  set(userId, type, id) {
+    const url = qualifyUrl(ApiRoutes.UsersApiController.update(userId).url);
     const payload = {};
 
     if (type && id) {

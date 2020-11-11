@@ -24,6 +24,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
+import StartpageFormGroup from '../UserCreate/StartpageFormGroup';
 
 type Props = {
   user: User,
@@ -34,16 +35,19 @@ const SettingsSection = ({
   user: {
     timezone,
     sessionTimeoutMs,
+    startpage,
   },
   onSubmit,
 }: Props) => (
   <SectionComponent title="Settings">
     <Formik onSubmit={onSubmit}
-            initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs }}>
+            initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage }}>
       {({ isSubmitting, isValid }) => (
         <Form className="form form-horizontal">
           <TimeoutFormGroup />
           <TimezoneFormGroup />
+          <StartpageFormGroup />
+
           <Row className="no-bm">
             <Col xs={12}>
               <div className="pull-right">
