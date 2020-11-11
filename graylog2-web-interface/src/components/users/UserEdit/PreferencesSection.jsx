@@ -18,15 +18,16 @@ type Props = {
   user: User,
 };
 
-
 const PreferencesSection = ({ user }: Props) => {
   const onSubmit = (data) => PreferencesActions.saveUserPreferences(user.username, data);
+
   const _resetStartpage = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to reset the startpage from user ${user.fullName}. Please confirm.`)) {
       StartpageStore.set(user.id);
     }
   };
+
   const isStartpageSet = !!user.startpage?.type;
   const resetTitle = isStartpageSet ? 'Reset startpage' : 'No startpage set';
   const resetButton = (
