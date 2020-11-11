@@ -55,9 +55,11 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
   const currentUser = useContext(CurrentUserContext) || {};
 
   const _toggleStatus = () => {
-    // eslint-disable-next-line no-alert
-    if (accountStatus === 'enabled' && window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
-      UsersDomain.setStatus(id, 'disabled');
+    if (accountStatus === 'enabled') {
+      // eslint-disable-next-line no-alert
+      if (window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
+        UsersDomain.setStatus(id, 'disabled');
+      }
 
       return;
     }
