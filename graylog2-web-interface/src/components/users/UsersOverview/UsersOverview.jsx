@@ -22,7 +22,7 @@ const DEFAULT_PAGINATION = {
   query: '',
 };
 
-const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Enabled', 'Role', 'Actions'];
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
@@ -67,6 +67,7 @@ const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
 };
 
 const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const UsersOverview = () => {
   const currentUser = useContext(CurrentUserContext);
@@ -78,6 +79,7 @@ const UsersOverview = () => {
 
   useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);
   useEffect(() => _updateListOnUserDelete(perPage, query, setPagination), [perPage, query]);
+  useEffect(() => _updateListOnUserSetStatus(pagination, setLoading, setPaginatedUsers), [pagination]);
 
   if (!users) {
     return <Spinner />;

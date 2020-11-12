@@ -10,6 +10,7 @@ import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { TextOverflowEllipsis } from 'components/common';
 import { Button, ButtonToolbar } from 'components/graylog';
 
 type Props = {
@@ -21,6 +22,10 @@ type Props = {
 const StyledButtonToolbar = styled(ButtonToolbar)`
   display: flex;
   justify-content: flex-end;
+`;
+
+const DescriptionCell = styled.td`
+  max-width: 300px;
 `;
 
 const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
@@ -94,7 +99,7 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
 };
 
 const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props) => {
-  const { title, defaultRoles, id } = authenticationBackend;
+  const { title, description, defaultRoles, id } = authenticationBackend;
   const detailsLink = isActive ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE : Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id);
 
   return (
@@ -104,6 +109,11 @@ const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props)
           {title}
         </Link>
       </td>
+      <DescriptionCell>
+        <TextOverflowEllipsis>
+          {description}
+        </TextOverflowEllipsis>
+      </DescriptionCell>
       <td className="limited">
         <RolesList defaultRolesIds={defaultRoles} roles={roles} />
       </td>

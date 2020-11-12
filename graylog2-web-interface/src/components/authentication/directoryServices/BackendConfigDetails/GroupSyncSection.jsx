@@ -14,10 +14,11 @@ import { STEP_KEY as GROUP_SYNC_KEY } from '../BackendWizard/GroupSyncStep';
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
+  excludedFields?: {[ inputName: string ]: boolean },
   roles: Immutable.List<Role>,
 };
 
-const GroupSyncSection = ({ authenticationBackend, roles }: Props) => {
+const GroupSyncSection = ({ authenticationBackend, roles, excludedFields }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncSectionPlugin = enterpriseGroupSyncPlugin?.components.GroupSyncSection;
 
@@ -32,8 +33,14 @@ const GroupSyncSection = ({ authenticationBackend, roles }: Props) => {
   }
 
   return (
-    <GroupSyncSectionPlugin authenticationBackend={authenticationBackend} roles={roles} />
+    <GroupSyncSectionPlugin authenticationBackend={authenticationBackend}
+                            excludedFields={excludedFields}
+                            roles={roles} />
   );
+};
+
+GroupSyncSection.defaultProps = {
+  excludedFields: undefined,
 };
 
 export default GroupSyncSection;

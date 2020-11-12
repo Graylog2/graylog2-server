@@ -28,7 +28,6 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoProbe;
 import org.graylog2.system.stats.mongo.MongoStats;
-import org.graylog2.users.RoleService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -42,7 +41,6 @@ public class ClusterStatsService {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final OutputService outputService;
-    private final RoleService roleService;
     private final AlertService alertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final DashboardService dashboardService;
@@ -55,7 +53,6 @@ public class ClusterStatsService {
                                StreamService streamService,
                                StreamRuleService streamRuleService,
                                OutputService outputService,
-                               RoleService roleService,
                                AlertService alertService,
                                AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                                DashboardService dashboardService,
@@ -66,7 +63,6 @@ public class ClusterStatsService {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
-        this.roleService = roleService;
         this.alertService = alertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.dashboardService = dashboardService;

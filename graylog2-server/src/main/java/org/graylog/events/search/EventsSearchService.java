@@ -63,7 +63,10 @@ public class EventsSearchService {
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
-        final ImmutableSet.Builder<String> filterBuilder = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> filterBuilder = ImmutableSet.<String>builder()
+                // Make sure we only filter for actual events and ignore anything else that might be in the event
+                // indices. (fixes an issue when users store non-event messages in event indices)
+                .add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
 
         if (!parameters.filter().eventDefinitions().isEmpty()) {
             final String eventDefinitionFilter = parameters.filter().eventDefinitions().stream()

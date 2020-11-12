@@ -119,5 +119,52 @@ describe('EntityShareState', () => {
       expect(third.title).toBe('Jane Doe');
       expect(forth.title).toBe('John Wick');
     });
+
+    it('should put new selections to the beginning', () => {
+      const janeIsOwner = ActiveShare
+        .builder()
+        .grant('grant-jane-id')
+        .grantee(jane.id)
+        .capability(owner.id)
+        .build();
+      const aliceIsOwner = ActiveShare
+        .builder()
+        .grant('grant-jane-id')
+        .grantee(alice.id)
+        .capability(owner.id)
+        .build();
+      const bobIsViewer = ActiveShare
+        .builder()
+        .grant('grant-bob-id')
+        .grantee(bob.id)
+        .capability(viewer.id)
+        .build();
+      const newSelection = ActiveShare
+        .builder()
+        .grant('grant-john-id')
+        .grantee(john.id)
+        .capability(manager.id)
+        .build();
+      const activeShares = Immutable.List([janeIsOwner, aliceIsOwner, bobIsViewer]);
+
+      const selection = Immutable.Map({
+        [janeIsOwner.grantee]: janeIsOwner.capability,
+        [aliceIsOwner.grantee]: aliceIsOwner.capability,
+        [bobIsViewer.grantee]: bobIsViewer.capability,
+        [newSelection.grantee]: newSelection.capability,
+      });
+
+      const { selectedGrantees } = entityShareStateFixture.toBuilder()
+        .activeShares(activeShares)
+        .selectedGranteeCapabilities(selection)
+        .build();
+
+      const [first, second, third, forth] = selectedGrantees.toArray();
+
+      expect(first.title).toBe('John Wick');
+      expect(second.title).toBe('Alice Muad\'Dib');
+      expect(third.title).toBe('Bob Bobson');
+      expect(forth.title).toBe('Jane Doe');
+    });
   });
 });

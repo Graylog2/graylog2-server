@@ -7,7 +7,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
-import { handleSubmit } from '../ldap/BackendCreate';
+import handleCreate from '../HandleCreate';
 
 export const HELP = {
   // server config help
@@ -46,7 +46,13 @@ export const HELP = {
   ),
 };
 
+export const AUTH_BACKEND_META = {
+  serviceTitle: 'Active Directory',
+  serviceType: 'active-directory',
+};
+
 const INITIAL_VALUES = {
+  title: AUTH_BACKEND_META.serviceTitle,
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
@@ -54,11 +60,6 @@ const INITIAL_VALUES = {
   userFullNameAttribute: 'displayName',
   userNameAttribute: 'userPrincipalName',
   verifyCertificates: true,
-};
-
-export const AUTH_BACKEND_META = {
-  serviceTitle: 'Active Directory',
-  serviceType: 'active-directory',
 };
 
 const BackendCreate = () => {
@@ -79,7 +80,7 @@ const BackendCreate = () => {
                      help={help}
                      excludedFields={excludedFields}
                      initialValues={initialValues}
-                     onSubmit={handleSubmit} />
+                     onSubmit={handleCreate} />
     </DocumentTitle>
   );
 };

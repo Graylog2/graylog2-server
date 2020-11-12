@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BootstrapPopover } from 'react-bootstrap';
-import styled, { css, ThemeContext } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 
 const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
@@ -24,7 +24,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.top {
       > .arrow {
         border-top-color: ${borderColor};
-  
+
         &::after {
           border-top-color: ${backgroundColor};
         }
@@ -34,7 +34,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.right {
       > .arrow {
         border-right-color: ${borderColor};
-  
+
         &::after {
           border-right-color: ${backgroundColor};
           z-index: 1;
@@ -45,7 +45,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.bottom {
       > .arrow {
         border-bottom-color: ${borderColor};
-  
+
         &::after {
           border-bottom-color: ${arrowColor};
         }
@@ -55,7 +55,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.left {
       > .arrow {
         border-left-color: ${borderColor};
-  
+
         &::after {
           border-left-color: ${backgroundColor};
         }
@@ -65,12 +65,10 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
 });
 
 const Popover = (props) => {
-  const theme = useContext(ThemeContext);
-
   return (
-    <GraylogThemeProvider overrideMode={theme?.mode}>
+    <ThemeAndUserProvider>
       <StyledPopover {...props} />
-    </GraylogThemeProvider>
+    </ThemeAndUserProvider>
   );
 };
 

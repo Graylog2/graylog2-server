@@ -14,12 +14,15 @@ import BackendWizardContext from './BackendWizardContext';
 
 export type StepKeyType = 'user-synchronization';
 export const STEP_KEY: StepKeyType = 'user-synchronization';
+// Form validation needs to include all input names
+// to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
   defaultRoles: { required: true },
   userFullNameAttribute: { required: true },
   userNameAttribute: { required: true },
   userSearchBase: { required: true },
   userSearchPattern: { required: true },
+  userUniqueIdAttribute: {},
 };
 
 type Props = {
@@ -35,6 +38,7 @@ type Props = {
 
 const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
+  const { backendValidationErrors } = stepsState;
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
 
   const _onSubmitAll = (validateForm) => {
@@ -48,6 +52,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
   return (
     // $FlowFixMe innerRef works as expected
     <Formik initialValues={stepsState.formValues}
+            initialErrors={backendValidationErrors}
             innerRef={formRef}
             onSubmit={onSubmit}
             validateOnBlur={false}
@@ -57,6 +62,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
         <Form className="form form-horizontal">
           <FormikFormGroup help={help.userSearchBase}
                            label="Search Base DN"
+                           error={backendValidationErrors?.userSearchBase}
                            name="userSearchBase"
                            placeholder="Search Base DN"
                            validate={validateField(FORM_VALIDATION.userSearchBase)} />
@@ -64,12 +70,14 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
           <FormikFormGroup help={help.userSearchPattern}
                            label="Search Pattern"
                            name="userSearchPattern"
+                           error={backendValidationErrors?.userSearchPattern}
                            placeholder="Search Pattern"
                            validate={validateField(FORM_VALIDATION.userSearchPattern)} />
 
           <FormikFormGroup help={help.userNameAttribute}
                            label="Name Attribute"
                            name="userNameAttribute"
+                           error={backendValidationErrors?.userNameAttribute}
                            placeholder="Name Attribute"
                            validate={validateField(FORM_VALIDATION.userNameAttribute)} />
 
@@ -77,6 +85,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                            label="Full Name Attribute"
                            name="userFullNameAttribute"
                            placeholder="Full Name Attribute"
+                           error={backendValidationErrors?.userFullNameAttribute}
                            validate={validateField(FORM_VALIDATION.userFullNameAttribute)} />
 
           {!excludedFields.userUniqueIdAttribute && (
@@ -84,13 +93,14 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                              label="ID Attribute"
                              name="userUniqueIdAttribute"
                              placeholder="ID Attribute"
-                             validate={validateField(FORM_VALIDATION.userFullNameAttribute)} />
+                             error={backendValidationErrors?.userUniqueIdAttribute}
+                             validate={validateField(FORM_VALIDATION.userUniqueIdAttribute)} />
           )}
 
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the static role assignment will only affect to new users created via LDAP/LDAP!<br />
+                Changing the static role assignment will only affect new users created via {stepsState.authBackendMeta.serviceTitle}!
                 Existing user accounts will be updated on their next login, or if you edit their roles manually.
               </Panel>
             </Col>
@@ -100,7 +110,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
             {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
               <Input bsStyle={error ? 'error' : undefined}
                      help={help.defaultRoles}
-                     error={error}
+                     error={error ?? backendValidationErrors?.defaultRoles}
                      id="default-roles-select"
                      label="Default Roles"
                      labelClassName="col-sm-3"

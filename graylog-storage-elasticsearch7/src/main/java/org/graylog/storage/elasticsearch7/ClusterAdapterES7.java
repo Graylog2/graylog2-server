@@ -192,7 +192,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     @Override
     public ClusterStats clusterStats() {
-        final Request request = new Request("GET", "/_cluster/stats/nodes");
+        final Request request = new Request("GET", "/_cluster/stats/nodes/*");
 
         final JsonNode clusterStatsResponseJson = jsonApi.perform(request,
                 "Couldn't read Elasticsearch cluster stats");

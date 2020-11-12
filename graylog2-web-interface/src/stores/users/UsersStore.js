@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
 import type { Store } from 'stores/StoreTypes';
-import type { UserOverviewJSON } from 'logic/users/UserOverview';
+import type { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { singletonStore } from 'views/logic/singleton';
@@ -130,6 +130,14 @@ const UsersStore: Store<{}> = singletonStore(
         }));
 
       UsersActions.loadUsersPaginated.promise(promise);
+
+      return promise;
+    },
+
+    setStatus(userId: string, accountStatus: AccountStatus): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.setStatus(userId, accountStatus).url);
+      const promise = fetch('PUT', url);
+      UsersActions.setStatus.promise(promise);
 
       return promise;
     },

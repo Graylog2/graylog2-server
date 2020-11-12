@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 
@@ -13,52 +13,42 @@ import useCurrentThemeMode from './UseCurrentThemeMode';
 
 type Props = {
   children: React.Node,
-  overrideMode: ?string,
 };
 
-const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
-  const formattedUtils = {
-    ...utils,
-    colorLevel: utils.colorLevel(themeColors),
-    readableColor: utils.readableColor(themeColors),
-  };
-
-  return {
-    mode,
-    changeMode,
-    breakpoints,
-    colors: themeColors,
-    fonts,
-    components: {
-      button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
-      aceEditor: aceEditorStyles({ colors: themeColors }),
-    },
-    utils: formattedUtils,
-  };
-};
-
-const GraylogThemeProvider = ({ children, overrideMode }: Props) => {
-  const [mode, setCurrentThemeMode] = useCurrentThemeMode(overrideMode);
-
+const GraylogThemeProvider = ({ children }: Props) => {
+  const [mode, changeMode] = useCurrentThemeMode();
   const themeColors = colors[mode];
 
-  const generatedTheme = themeColors ? createTheme(mode, themeColors, setCurrentThemeMode) : undefined;
-  const theme = useMemo(() => (generatedTheme), [mode, themeColors]);
+  const theme = useCallback((): ThemeInterface => {
+    const formattedUtils = {
+      ...utils,
+      colorLevel: utils.colorLevel(themeColors),
+      readableColor: utils.readableColor(themeColors),
+    };
 
-  return theme ? (
+    return {
+      mode,
+      changeMode,
+      breakpoints,
+      colors: themeColors,
+      fonts,
+      components: {
+        button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
+        aceEditor: aceEditorStyles({ colors: themeColors }),
+      },
+      utils: formattedUtils,
+    };
+  }, [mode, themeColors, changeMode]);
+
+  return (
     <ThemeProvider theme={theme}>
       {children}
     </ThemeProvider>
-  ) : null;
+  );
 };
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.any.isRequired,
-  overrideMode: PropTypes.string,
-};
-
-GraylogThemeProvider.defaultProps = {
-  overrideMode: undefined,
 };
 
 export default GraylogThemeProvider;

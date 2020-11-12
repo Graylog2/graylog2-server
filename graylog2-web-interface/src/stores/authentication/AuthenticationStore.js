@@ -116,22 +116,6 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    enableUser(userId: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.AuthenticationController.enableUser(userId).url);
-      const promise = fetch('POST', url);
-      AuthenticationActions.enableUser.promise(promise);
-
-      return promise;
-    },
-
-    disableUser(userId: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.AuthenticationController.disableUser(userId).url);
-      const promise = fetch('POST', url);
-      AuthenticationActions.disableUser.promise(promise);
-
-      return promise;
-    },
-
     setActiveBackend(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.updateConfiguration().url);
       const promise = fetch('POST', url, { active_backend: backendId });
@@ -162,8 +146,8 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    loadUsersPaginated({ page, perPage, query }: Pagination): Promise<PaginatedUsers> {
-      const url = PaginationURL(ApiRoutes.AuthenticationController.loadUsersPaginated().url, page, perPage, query);
+    loadUsersPaginated(authBackendId, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
+      const url = PaginationURL(ApiRoutes.AuthenticationController.loadUsersPaginated(authBackendId).url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedUsersResponse) => ({

@@ -6,6 +6,8 @@ import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
 export type WizardFormValues = {
+  title?: string,
+  description?: string,
   defaultRoles?: string,
   groupSearchBase?: string,
   groupSearchPattern?: string,
@@ -36,6 +38,7 @@ export type AuthBackendMeta = {
 };
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
+  backendValidationErrors: ?{ [inputName: string]: ?string },
   formValues: WizardFormValues,
   invalidStepKeys: Array<string>,
   authBackendMeta: AuthBackendMeta,
@@ -47,6 +50,7 @@ export type BackendWizardType = WizardStepsState & {
 
 const initialState = {
   activeStepKey: '',
+  backendValidationErrors: undefined,
   authBackendMeta: {},
   formValues: {},
   invalidStepKeys: [],

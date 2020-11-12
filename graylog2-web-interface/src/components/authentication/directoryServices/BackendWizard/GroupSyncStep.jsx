@@ -23,7 +23,16 @@ export type Props = {
   validateOnMount: boolean,
 };
 
-const GroupSyncStep = ({ onSubmitAll, prepareSubmitPayload, formRef, submitAllError, validateOnMount, roles, help, excludedFields }: Props) => {
+const GroupSyncStep = ({
+  onSubmitAll,
+  prepareSubmitPayload,
+  formRef,
+  submitAllError,
+  validateOnMount,
+  roles,
+  help,
+  excludedFields,
+}: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
 

@@ -17,6 +17,7 @@
 package org.graylog.security;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -185,9 +186,9 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                 .build());
     }
 
-    public ImmutableSet<GrantDTO> getAll() {
+    public ImmutableList<GrantDTO> getAll() {
         try (final Stream<GrantDTO> stream = streamAll()) {
-            return stream.collect(ImmutableSet.toImmutableSet());
+            return stream.collect(ImmutableList.toImmutableList());
         }
     }
 

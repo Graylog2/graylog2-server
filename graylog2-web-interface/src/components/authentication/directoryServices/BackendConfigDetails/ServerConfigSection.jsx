@@ -14,11 +14,13 @@ type Props = {
 };
 
 const ServerConfigSection = ({ authenticationBackend }: Props) => {
-  const { servers = [], systemUserDn, systemUserPassword, transportSecurity, verifyCertificates } = authenticationBackend.config;
+  const { title, description, config: { servers = [], systemUserDn, systemUserPassword, transportSecurity, verifyCertificates } } = authenticationBackend;
   const serverUrls = servers.map((server) => `${server.host}:${server.port}`).join(', ');
 
   return (
     <SectionComponent title="Server Configuration" headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={SERVER_CONFIG_KEY} />}>
+      <ReadOnlyFormGroup label="Title" value={title} />
+      <ReadOnlyFormGroup label="Description" value={description} />
       <ReadOnlyFormGroup label="Server Address" value={serverUrls} />
       <ReadOnlyFormGroup label="System Username" value={systemUserDn} />
       <ReadOnlyFormGroup label="System Password" value={systemUserPassword?.isSet ? '******' : null} />

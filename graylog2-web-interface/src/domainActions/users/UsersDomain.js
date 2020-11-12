@@ -101,6 +101,16 @@ const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = not
   }),
 });
 
+const setStatus: $PropertyType<ActionsType, 'setStatus'> = notifyingAction({
+  action: UsersActions.setStatus,
+  success: (userId, accountStatus) => ({
+    message: `User "${userId}" was set to ${accountStatus}`,
+  }),
+  error: (error, userId, accountStatus) => ({
+    message: `Updating user ("${userId}") to ${accountStatus} failed with status: ${error}`,
+  }),
+});
+
 export default {
   create,
   load,
@@ -113,4 +123,5 @@ export default {
   deleteToken,
   loadUsers,
   loadUsersPaginated,
+  setStatus,
 };

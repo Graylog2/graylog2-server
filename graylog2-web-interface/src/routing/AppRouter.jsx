@@ -107,7 +107,7 @@ const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
     <Route key={`${path}-${Component.displayName}`}
            exact
            path={appPrefixed(path)}
-           component={WrappedComponent} />
+           render={WrappedComponent} />
   );
 };
 

@@ -13,7 +13,7 @@ import Routes from 'routing/Routes';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
-import BackendDetailsActive from 'components/authentication/BackendDetailsActive';
+import BackendDetails from 'components/authentication/BackendDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 const _pageTitle = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
@@ -69,7 +69,7 @@ const AuthenticationPage = () => {
         </PageHeader>
 
         {finishedLoading && activeBackend && (
-          <BackendDetailsActive authenticationBackend={activeBackend} />
+          <BackendDetails authenticationBackend={activeBackend} />
         )}
       </>
     </DocumentTitle>

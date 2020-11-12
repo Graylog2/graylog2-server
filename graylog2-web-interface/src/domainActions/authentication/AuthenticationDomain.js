@@ -32,7 +32,7 @@ const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
 const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   action: AuthenticationActions.update,
   success: (authBackendId, authBackend) => ({
-    message: `Authentication service "${authBackend.title} was updated successfully`,
+    message: `Authentication service "${authBackend.title}" was updated successfully`,
   }),
   error: (error, authBackendId, authBackend) => ({
     message: `Updating authentication service "${authBackend.title}" failed with status: ${error}`,
@@ -63,26 +63,6 @@ const testLogin: $PropertyType<ActionsType, 'testLogin'> = notifyingAction({
   }),
 });
 
-const enableUser: $PropertyType<ActionsType, 'enableUser'> = notifyingAction({
-  action: AuthenticationActions.enableUser,
-  success: (userId, username) => ({
-    message: `User "${username} was enabled successfully`,
-  }),
-  error: (error, userId, username) => ({
-    message: `Enabling user "${username}" failed with status: ${error}`,
-  }),
-});
-
-const disableUser: $PropertyType<ActionsType, 'disableUser'> = notifyingAction({
-  action: AuthenticationActions.disableUser,
-  success: (userId, username) => ({
-    message: `User "${username} was disabled successfully`,
-  }),
-  error: (error, userId, username) => ({
-    message: `Disabling user "${username}" failed with status: ${error}`,
-  }),
-});
-
 const setActiveBackend: $PropertyType<ActionsType, 'setActiveBackend'> = notifyingAction({
   action: AuthenticationActions.setActiveBackend,
   success: (authBackendId, authBackendTitle) => ({
@@ -102,8 +82,8 @@ const loadBackendsPaginated: $PropertyType<ActionsType, 'loadBackendsPaginated'>
 
 const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = notifyingAction({
   action: AuthenticationActions.loadUsersPaginated,
-  error: (error) => ({
-    message: `Loading synchronized users failed with status: ${error}`,
+  error: (authBackendId, error) => ({
+    message: `Loading synchronized users for authentication service with id "${authBackendId}" failed with status: ${error}`,
   }),
 });
 
@@ -115,8 +95,6 @@ export default {
   delete: deleteBackend,
   testConnection,
   testLogin,
-  enableUser,
-  disableUser,
   setActiveBackend,
   loadBackendsPaginated,
   loadUsersPaginated,

@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { LinkContainer, Link } from 'components/graylog/router';
 import Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
-import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import UserOverview from 'logic/users/UserOverview';
 import { Button, ButtonToolbar } from 'components/graylog';
 import RolesCell from 'components/permissions/RolesCell';
@@ -23,7 +22,6 @@ const ActionsWrapper = styled(ButtonToolbar)`
 
 const SyncedUsersOverviewItem = ({
   user: {
-    enabled,
     fullName,
     id,
     roles: userRolesIds,
@@ -46,17 +44,7 @@ const SyncedUsersOverviewItem = ({
       <RolesCell roles={userRolesNames} />
       <td className="limited">
         <ActionsWrapper>
-          {enabled
-            ? (
-              <Button type="button" bsStyle="info" bsSize="xs" onClick={() => AuthenticationDomain.disableUser(id, username)}>
-                Disable
-              </Button>
-            ) : (
-              <Button type="button" bsStyle="info" bsSize="xs" onClick={() => AuthenticationDomain.enableUser(id, username)}>
-                Enable
-              </Button>
-            )}
-          <LinkContainer to={Routes.SYSTEM.USERS.edit(encodeURIComponent(username))}>
+          <LinkContainer to={Routes.SYSTEM.USERS.edit(id)}>
             <Button type="button" bsStyle="info" bsSize="xs">
               Edit
             </Button>

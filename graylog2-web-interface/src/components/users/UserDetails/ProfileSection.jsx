@@ -19,6 +19,7 @@ const ProfileSection = ({
     clientAddress,
     lastActivity,
     sessionActive,
+    accountStatus,
   },
 }: Props) => (
   <SectionComponent title="Profile">
@@ -28,6 +29,7 @@ const ProfileSection = ({
     <ReadOnlyFormGroup label="Client Address" value={clientAddress} />
     <ReadOnlyFormGroup label="Last Activity" value={lastActivity} />
     <ReadOnlyFormGroup label="Logged In" value={<LoggedInIcon active={sessionActive} />} />
+    <ReadOnlyFormGroup label="Enabled" value={accountStatus === 'enabled'} />
   </SectionComponent>
 );
 

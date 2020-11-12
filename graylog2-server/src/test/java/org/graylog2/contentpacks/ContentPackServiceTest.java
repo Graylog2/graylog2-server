@@ -47,6 +47,7 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
@@ -93,6 +94,8 @@ public class ContentPackServiceTest {
     @Mock
     private GrokPatternService patternService;
     @Mock
+    private UserService userService;
+    @Mock
     private ContentPackInstallationPersistenceService contentPackInstallService;
     @Mock
     private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
@@ -117,7 +120,7 @@ public class ContentPackServiceTest {
         outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityFacade<?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService, userService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2)
         );
 
