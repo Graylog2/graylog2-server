@@ -219,11 +219,6 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
         }
     }
 
-    @Override
-    public String getName() {
-        return TYPE_NAME;
-    }
-
     private LDAPAuthServiceBackendConfig buildTestConfig(@Nullable AuthServiceBackendDTO existingBackendConfig) {
         final LDAPAuthServiceBackendConfig.Builder newConfigBuilder = config.toBuilder();
 
