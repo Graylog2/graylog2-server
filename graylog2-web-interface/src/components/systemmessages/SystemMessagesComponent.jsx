@@ -20,7 +20,11 @@ class SystemMessagesComponent extends React.Component {
     const { currentPage } = this.state;
 
     this.loadMessages(currentPage);
-    this.interval = setInterval(() => { this.loadMessages(currentPage); }, 1000);
+
+    this.interval = setInterval(() => {
+      const { currentPage: page } = this.state;
+      this.loadMessages(page);
+    }, 1000);
   }
 
   componentWillUnmount() {
