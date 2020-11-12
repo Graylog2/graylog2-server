@@ -28,7 +28,7 @@ const Container = styled.div`
 `;
 
 const RolesSection = ({ user, onSubmit }: Props) => {
-  const { username } = user;
+  const { username, id } = user;
   const [loading, setLoading] = useState(false);
   const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const [errors, setErrors] = useState();
@@ -45,7 +45,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
 
   const onRolesUpdate = (data: { roles: Array<string> }) => onSubmit(data).then(() => {
     _onLoad().then(setPaginatedRoles);
-    UsersDomain.loadByUsername(username);
+    UsersDomain.load(id);
   });
 
   const _onAssignRole = (newRoles: Immutable.Set<DescriptiveItem>) => {

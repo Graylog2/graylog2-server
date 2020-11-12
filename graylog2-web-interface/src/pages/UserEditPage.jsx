@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
+import { UsersActions } from 'stores/users/UsersStore';
 import withParams from 'routing/withParams';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
@@ -27,12 +28,18 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
   </>
 );
 
+const _updateUserOnLoad = (setLoadedUser) => UsersActions.load.completed.listen(setLoadedUser);
+
 const UserEditPage = ({ params }: Props) => {
   const [loadedUser, setLoadedUser] = useState();
   const userId = params?.userId;
 
+  // We need to trigger a user state update in child components and do so by calling the load action
+  // and by defining a listener for this action which updates the state.
+  useEffect(() => _updateUserOnLoad(setLoadedUser), []);
+
   useEffect(() => {
-    UsersDomain.load(userId).then(setLoadedUser);
+    UsersDomain.load(userId);
   }, [userId]);
 
   return (
