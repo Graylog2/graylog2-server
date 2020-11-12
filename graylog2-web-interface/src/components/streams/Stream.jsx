@@ -214,7 +214,7 @@ class Stream extends React.Component {
       ? <Icon name="cube" title="Created from content pack" /> : null);
 
     const streamControls = (
-      <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+      <OverlayElement overlay={defaultStreamTooltip} placement="top">
         <StreamControls stream={stream}
                         permissions={permissions}
                         user={user}
