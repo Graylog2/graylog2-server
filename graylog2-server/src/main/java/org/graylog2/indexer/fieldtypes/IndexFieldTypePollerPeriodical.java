@@ -102,11 +102,6 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
      */
     @Override
     public void doRun() {
-        if (serverIsNotRunning()) {
-            LOG.debug("Server is not running, skipping run.");
-            return;
-        }
-
         if (!cluster.isConnected()) {
             LOG.info("Cluster not connected yet, delaying index field type initialization until it is reachable.");
             while (true) {
