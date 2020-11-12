@@ -64,7 +64,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 
 @RequiresAuthentication
 @Api(value = "Authorization/Roles", description = "Manage roles")
@@ -240,7 +240,7 @@ public class AuthzRolesResource extends RestResource {
 
     private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater) throws ValidationException {
         usernames.forEach(username -> {
-            checkPermission(USERS_EDIT, username);
+            checkPermission(USERS_ROLESEDIT, username);
 
             final User user = userService.load(username);
             if (user == null) {
