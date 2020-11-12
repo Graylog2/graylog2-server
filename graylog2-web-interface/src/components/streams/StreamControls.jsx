@@ -70,16 +70,21 @@ const StreamControls = createReactClass({
       <span>
         <DropdownButton title="More Actions"
                         pullRight
-                        id={`more-actions-dropdown-${stream.id}`}
-                        disabled={isDefaultStream}>
+                        id={`more-actions-dropdown-${stream.id}`}>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
-            <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit}>Edit stream</MenuItem>
+            <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit} disabled={isDefaultStream}>
+              Edit stream
+            </MenuItem>
           </IfPermitted>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
-            <MenuItem key={`quickAddRule-${stream.id}`} onSelect={this._onQuickAdd}>Quick add rule</MenuItem>
+            <MenuItem key={`quickAddRule-${stream.id}`} onSelect={this._onQuickAdd} disabled={isDefaultStream}>
+              Quick add rule
+            </MenuItem>
           </IfPermitted>
           <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
-            <MenuItem key={`cloneStream-${stream.id}`} onSelect={this._onClone}>Clone this stream</MenuItem>
+            <MenuItem key={`cloneStream-${stream.id}`} onSelect={this._onClone} disabled={isDefaultStream}>
+              Clone this stream
+            </MenuItem>
           </IfPermitted>
           <IfPermitted permissions="stream_outputs:read">
             <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
@@ -94,7 +99,7 @@ const StreamControls = createReactClass({
             <MenuItem key={`divider-${stream.id}`} divider />
           </IfPermitted>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
-            <MenuItem key={`deleteStream-${stream.id}`} onSelect={this._onDelete}>
+            <MenuItem key={`deleteStream-${stream.id}`} onSelect={this._onDelete} disabled={isDefaultStream}>
               Delete this stream
             </MenuItem>
           </IfPermitted>
