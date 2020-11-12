@@ -18,27 +18,28 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Subtract } from 'utility-types';
 
 import useQuery from './useQuery';
 
 export type Location = {
-  query: { [string]: ?mixed },
-  pathname: string,
-  search: string,
+  query: {
+    [key: string]: unknown | null | undefined;
+  };
+  pathname: string;
+  search: string;
 };
 
 type LocationContext = {
-  location: Location,
+  location: Location;
 };
 
-const withLocation = <Props: LocationContext & {...}, ComponentType: React$ComponentType<Props>>(
-  Component: ComponentType,
-): React$ComponentType<$Diff<React$ElementConfig<ComponentType>, LocationContext>> => (props) => {
-    const location = useLocation();
-    const query = useQuery();
-    const locationWithQuery: Location = useMemo(() => ({ ...location, query }), [location, query]);
+const withLocation = <Props extends LocationContext>(Component: React.ComponentType<Props>): React.ComponentType<Subtract<Props, LocationContext>> => (props) => {
+  const location = useLocation();
+  const query = useQuery();
+  const locationWithQuery: Location = useMemo(() => ({ ...location, query }), [location, query]);
 
-    return <Component {...props} location={locationWithQuery} />;
-  };
+  return <Component {...props as Props} location={locationWithQuery} />;
+};
 
 export default withLocation;

@@ -17,16 +17,19 @@
 // @flow strict
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
+import { Subtract } from 'utility-types';
 
-type ParamsContext = { params: { [string]: ?string } };
+type ParamsContext = {
+  params: {
+    [key: string]: string | null | undefined;
+  };
+};
 
-function withParams<Props: ParamsContext & { ... }, ComponentType: React$ComponentType<Props>>(
-  Component: ComponentType,
-): React$ComponentType<$Diff<React$ElementConfig<ComponentType>, ParamsContext>> {
+function withParams<Props extends ParamsContext>(Component: React.ComponentType<Props>): React.ComponentType<Subtract<Props, ParamsContext>> {
   return (props) => {
     const params = useParams();
 
-    return <Component {...props} params={params} />;
+    return <Component {...props as Props} params={params} />;
   };
 }
 
