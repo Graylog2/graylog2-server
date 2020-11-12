@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/// <reference types="jest-enzyme" />
+
 import jQuery from 'jquery';
 import sizeMe from 'react-sizeme';
 
