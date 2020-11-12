@@ -51,6 +51,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
     private static final Joiner JOINER = Joiner.on(", ");
 
     public static final String NAME = "http-header-authentication";
+    public static final String SESSION_AUTH_HEADER = "http-header-auth-user";
 
     private final ClusterConfigService clusterConfigService;
     private final AuthServiceAuthenticator authServiceAuthenticator;
