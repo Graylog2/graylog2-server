@@ -68,14 +68,6 @@ class IndexFieldTypePollerPeriodicalTest {
     }
 
     @Test
-    void executionIsSkippedWhenServerIsNotRunning() {
-        when(serverStatus.getLifecycle()).thenReturn(Lifecycle.HALTING);
-        when(cluster.isConnected()).thenThrow(new RuntimeException("If this exception is thrown, then execution is not skipped!"));
-
-        this.periodical.doRun();
-    }
-
-    @Test
     void scheduledExecutionIsSkippedWhenServerIsNotRunning() throws InterruptedException {
         when(serverStatus.getLifecycle()).thenReturn(Lifecycle.HALTING);
         final IndexSetConfig indexSetConfig = mockIndexSetConfig();
