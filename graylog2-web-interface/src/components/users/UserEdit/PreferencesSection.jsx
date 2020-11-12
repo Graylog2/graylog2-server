@@ -9,7 +9,9 @@ import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
+import StoreProvider from 'injection/StoreProvider';
 
+const StartpageStore = StoreProvider.getStore('Startpage');
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 type Props = {
@@ -19,8 +21,25 @@ type Props = {
 const PreferencesSection = ({ user }: Props) => {
   const onSubmit = (data) => PreferencesActions.saveUserPreferences(user.username, data);
 
+  const _resetStartpage = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`You are about to reset the startpage from user ${user.fullName}. Please confirm.`)) {
+      StartpageStore.set(user.id);
+    }
+  };
+
+  const isStartpageSet = !!user.startpage?.type;
+  const resetTitle = isStartpageSet ? 'Reset startpage' : 'No startpage set';
+  const resetButton = (
+    <Button title={resetTitle}
+            disabled={!isStartpageSet}
+            onClick={_resetStartpage}>
+      Reset Startpage
+    </Button>
+  );
+
   return (
-    <SectionComponent title="Preferences">
+    <SectionComponent title="Preferences" headerActions={resetButton}>
       <Formik onSubmit={onSubmit}
               initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (
