@@ -1,19 +1,19 @@
 import { $Call } from 'utility-types';
 
-type ExtractResultType<R> = (arg0: (...args: any[]) => Promise<R>) => R;
+type ExtractResultType<R> = $Call<ExtractTypeFromPromise<ReturnType<R>>>;
+type ExtractTypeFromPromise<R> = (promise: Promise<R>) => R;
 
-export type ListenableAction<R> = R & {
-  $call: R;
-  listen: (arg0: (arg0: $Call<ExtractResultType<R>>) => any) => () => void;
+export type ListenableAction<R extends (...args: any[]) => Promise<any>> = R & {
+  listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
   completed: {
-    listen: (arg0: (arg0: $Call<ExtractResultType<R>>) => any) => () => void;
+    listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
   };
-  promise: (arg0: Promise<$Call<ExtractResultType<R>>>) => void;
+  promise: (promise: ReturnType<R>) => void;
 };
 
 export type RefluxActions<A> = { [P in keyof A]: ListenableAction<A[P]> };
 
 export type Store<State> = {
-  listen: (arg0: (arg0: State) => unknown) => () => void;
+  listen: (cb: (state: State) => unknown) => () => void;
   getInitialState: () => State;
 };
