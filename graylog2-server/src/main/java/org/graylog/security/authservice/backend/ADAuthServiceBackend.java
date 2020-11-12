@@ -239,11 +239,6 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
         }
     }
 
-    @Override
-    public String getName() {
-        return TYPE_NAME;
-    }
-
     private ADAuthServiceBackendConfig buildTestConfig(@Nullable AuthServiceBackendDTO existingBackendConfig) {
         final ADAuthServiceBackendConfig.Builder newConfigBuilder = config.toBuilder();
 
