@@ -23,13 +23,15 @@ const GroupSyncSection = ({ authenticationBackend, roles, excludedFields }: Prop
   const GroupSyncSectionPlugin = enterpriseGroupSyncPlugin?.components.GroupSyncSection;
 
   if (!GroupSyncSectionPlugin) {
-    <SectionComponent title="Group Synchronization"
-                      headerActions={(
-                        <EditLinkButton authenticationBackendId={authenticationBackend.id}
-                                        stepKey={GROUP_SYNC_KEY} />
+    return (
+      <SectionComponent title="Group Synchronization"
+                        headerActions={(
+                          <EditLinkButton authenticationBackendId={authenticationBackend.id}
+                                          stepKey={GROUP_SYNC_KEY} />
                       )}>
-      <EnterprisePluginNotFound featureName="group synchronization" />
-    </SectionComponent>;
+        <EnterprisePluginNotFound featureName="group synchronization" />
+      </SectionComponent>
+    );
   }
 
   return (
