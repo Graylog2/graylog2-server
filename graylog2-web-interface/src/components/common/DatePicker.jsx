@@ -46,7 +46,7 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
  * Component that renders a given children and wraps a date picker around it. The date picker will show when
  * the children is clicked, and hidden when clicking somewhere else.
  */
-const DatePicker = ({ date, onChange }) => {
+const DatePicker = ({ date, fromDate, onChange }) => {
   let selectedDate;
 
   if (date) {
@@ -66,6 +66,9 @@ const DatePicker = ({ date, onChange }) => {
       const dateTime = DateTime.ignoreTZ(moddedDate);
 
       return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
+    },
+    disabled: {
+      before: new Date(fromDate),
     },
   };
 

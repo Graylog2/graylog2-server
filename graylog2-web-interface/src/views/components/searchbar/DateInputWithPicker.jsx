@@ -70,7 +70,8 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
                   disabled={disabled}
                   title={title}
                   date={value}
-                  onChange={_onDatePicked} />
+                  onChange={_onDatePicked}
+                  fromDate={fromDate} />
     </div>
   );
 };

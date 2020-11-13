@@ -152,7 +152,7 @@ const fieldUpdate = (value) => {
   };
 };
 
-const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
+const AbsoluteRangeField = ({ disabled, limitDuration, originalTimeRange, from }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
 
@@ -161,13 +161,13 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
       {({ field: { value, onChange, onBlur, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
-        const fromDateTime = error ? originalTimeRange[range] : value || originalTimeRange[range];
+        const dateTime = error ? originalTimeRange[range] : value || originalTimeRange[range];
         const {
           initialDateTime,
           handleChangeSetTime,
           handleClickTimeNow,
           handleTimeToggle,
-        } = fieldUpdate(fromDateTime);
+        } = fieldUpdate(dateTime);
 
         const _onChangeSetTime = (event) => {
           hourIcon.current = TIME_ICON_MID;
@@ -202,7 +202,8 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
-                                 error={error} />
+                                 error={error}
+                                 fromDate={from ? moment().seconds(-limitDuration).toDate() : moment(originalTimeRange.from).toDate()} />
 
             <div>
               <SetTimeOption>

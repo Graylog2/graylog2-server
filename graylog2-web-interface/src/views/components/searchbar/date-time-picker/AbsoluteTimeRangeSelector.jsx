@@ -3,6 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { StyledComponent } from 'styled-components';
+import moment from 'moment';
 
 import { Icon } from 'components/common';
 
@@ -35,13 +36,14 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
+const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange }: Props) => {
   return (
     <AbsoluteWrapper>
       <RangeWrapper>
         <AbsoluteRangeField from
                             originalTimeRange={originalTimeRange}
-                            disabled={disabled} />
+                            disabled={disabled}
+                            limitDuration={limitDuration} />
       </RangeWrapper>
 
       <IconWrap>
@@ -51,7 +53,8 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
       <RangeWrapper>
         <AbsoluteRangeField from={false}
                             originalTimeRange={originalTimeRange}
-                            disabled={disabled} />
+                            disabled={disabled}
+                            limitDuration={limitDuration} />
       </RangeWrapper>
     </AbsoluteWrapper>
   );
