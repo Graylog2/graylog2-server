@@ -18,6 +18,7 @@ type Props = {
     range: string | number,
   },
   limitDuration: number,
+  setDisableApply: (boolean) => void,
 };
 
 const RANGE_TYPES = [
@@ -50,7 +51,7 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   align-items: center;
   display: grid;
   grid-template-columns: max-content repeat(5, 1fr) max-content;
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr) auto;
   grid-column-gap: 0;
   grid-row-gap: 0;
   
@@ -58,6 +59,7 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
 
 const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   grid-area: 2 / 1 / 3 / 3;
+  position: relative;
   
   .form-group {
     margin: 0;
@@ -104,62 +106,44 @@ const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled
   }
 `);
 
-const initialRangeType = ({ range, ...restRange }) => {
-  if (range === 0) {
-    return {
-      ...restRange,
-      rangeValue: 1,
-      rangeType: 'seconds',
-      rangeAllTime: false,
-      range,
-    };
-  }
-
-  return RANGE_TYPES.map(({ type }) => {
-    const diff = moment.duration(range, 'seconds').as(type);
-
-    if (diff - Math.floor(diff) === 0) {
-      return {
-        ...restRange,
-        rangeValue: diff || 1,
-        rangeType: type || 'seconds',
-        rangeAllTime: false,
-        range,
-      };
-    }
-
-    return null;
-  }).filter(Boolean).pop();
-};
+const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.dark.danger};
+  grid-area: 3 / 1 / 3 / 8;
+  font-size: ${theme.fonts.size.tiny};
+  font-style: italic;
+  padding: 3px;
+`);
 
 const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => {
   const typeDuration = moment.duration(1, type).asSeconds();
 
   if (limitDuration === 0 || typeDuration <= limitDuration) {
-    return { label, type };
+    return { label, value: type };
   }
 
   return null;
 }).filter(Boolean);
 
-const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
+const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration, setDisableApply }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
-
   const _isValidRange = (value) => !(limitDuration === 0 || (value <= limitDuration && limitDuration !== 0));
 
   return (
     <RelativeWrapper>
       <Field name="tempTimeRange.range" validate={_isValidRange}>
-        {({ field: { value, onChange, name }, meta }) => {
+        {({ field: { value, onChange, name }, meta: { error } }) => {
+          setDisableApply(error);
+
           const fromValue = RANGE_TYPES.map(({ type }) => {
+            const isAllTime = value === 0;
             const diff = moment.duration(value, 'seconds').as(type);
 
             if (diff - Math.floor(diff) === 0) {
               return {
                 ...originalTimeRange,
-                rangeValue: diff || 1,
-                rangeType: type || 'seconds',
-                rangeAllTime: false,
+                rangeValue: diff || 0,
+                rangeType: isAllTime ? 'seconds' : type,
+                rangeAllTime: isAllTime,
                 range: value,
               };
             }
@@ -180,12 +164,6 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
           };
 
           const _onCheckAllTime = (event) => {
-            console.log('_onCheckAllTime', {
-              type: 'rangeAllTime',
-              value: event.target.checked,
-              rangeValue: event.target.checked ? fromValue.rangeValue : initialRangeType(originalTimeRange),
-            });
-
             onChange({ target: { name, value: event.target.checked ? 0 : originalTimeRange.range } });
           };
 
@@ -208,18 +186,23 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                        value={fromValue.rangeValue}
                        title="Set the range value"
                        onChange={_onChangeTime}
-                       bsStyle={meta.error ? 'error' : null} />
+                       bsStyle={error ? 'error' : null} />
               </InputWrap>
               <StyledSelect id="relative-timerange-from-length"
                             name="relative-timerange-from-length"
                             disabled={disabled || fromValue.rangeAllTime}
                             value={fromValue.rangeType}
                             options={availableRangeTypes}
-                            placeholder="Select a range type"
+                            placeholder="Select a range length"
                             onChange={_onChangeType}
                             clearable={false} />
 
               <Ago />
+              {error && (
+                <ErrorMessage>
+                  Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
+                </ErrorMessage>
+              )}
             </RangeWrapper>
           );
         }}

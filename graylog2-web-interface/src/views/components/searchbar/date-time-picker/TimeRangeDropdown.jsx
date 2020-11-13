@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 import moment from 'moment';
 
-import { Button, Col, Label, Tabs, Tab, Row, Popover } from 'components/graylog';
+import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
@@ -75,7 +75,7 @@ const LimitLabel: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   }
 `);
 
-const timeRangeTypeTabs = (config, activeKey, originalRangeValue, limitDuration) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+const timeRangeTypeTabs = (config, activeKey, originalRangeValue, limitDuration, setDisableApply) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
@@ -86,7 +86,8 @@ const timeRangeTypeTabs = (config, activeKey, originalRangeValue, limitDuration)
         <RangeComponent config={config}
                         disabled={false}
                         originalTimeRange={originalRangeValue}
-                        limitDuration={limitDuration} />
+                        limitDuration={limitDuration}
+                        setDisableApply={setDisableApply} />
       )}
     </Tab>
   );
@@ -96,6 +97,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const formik = useFormikContext();
   const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+  const [disableApply, setDisableApply] = useState(false);
   const { value: nextRangeValue } = nextRangeProps;
   const { value: originalRangeValue } = originalTimerange;
 
@@ -164,7 +166,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                 <p>No Override to Date.</p>
               </Tab>
             )}
-            {timeRangeTypeTabs(config, activeKey, originalRangeValue, limitDuration)}
+            {timeRangeTypeTabs(config, activeKey, originalRangeValue, limitDuration, setDisableApply)}
           </StyledTabs>
         </Col>
       </Row>
@@ -176,7 +178,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
         <Col md={6}>
           <div className="pull-right">
             <Button bsStyle="link" onClick={handleCancel}>Cancel</Button>
-            <Button bsStyle="success" onClick={handleApply}>Apply</Button>
+            <Button bsStyle="success" onClick={handleApply} disabled={disableApply}>Apply</Button>
           </div>
         </Col>
       </Row>
