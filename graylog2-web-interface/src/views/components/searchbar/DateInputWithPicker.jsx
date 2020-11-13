@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import { DateUtils } from 'react-day-picker';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button, Tooltip } from 'components/graylog';
@@ -28,6 +29,10 @@ type Props = {
 
 const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title, initialDateTimeObject }: Props) => {
   const _onDatePicked = (date) => {
+    if (DateUtils.isDayBefore(date, fromDate)) {
+      return false;
+    }
+
     const newDate = moment(date).toObject();
 
     return onChange(moment({
