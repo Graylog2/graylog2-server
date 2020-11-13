@@ -34,6 +34,8 @@ import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog.security.authservice.AuthServiceBackend;
+import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
@@ -303,5 +305,22 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addGRNType(GRNType type, Class<? extends GRNDescriptorProvider> descriptorProvider) {
         final MapBinder<GRNType, GRNDescriptorProvider> mapBinder = MapBinder.newMapBinder(binder(), GRNType.class, GRNDescriptorProvider.class);
         mapBinder.addBinding(type).to(descriptorProvider);
+    }
+
+    protected MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {
+        return MapBinder.newMapBinder(
+                binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<AuthServiceBackend.Factory<? extends AuthServiceBackend>>() {}
+        );
+    }
+
+    protected void addAuthServiceBackend(String name,
+            Class<? extends AuthServiceBackend> backendClass,
+            Class<? extends AuthServiceBackend.Factory<? extends AuthServiceBackend>> factoryClass,
+            Class<? extends AuthServiceBackendConfig> configClass) {
+        install(new FactoryModuleBuilder().implement(AuthServiceBackend.class, backendClass).build(factoryClass));
+        authServiceBackendBinder().addBinding(name).to(factoryClass);
+        registerJacksonSubtype(configClass, name);
     }
 }
