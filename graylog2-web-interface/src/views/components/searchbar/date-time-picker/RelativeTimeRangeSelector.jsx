@@ -158,7 +158,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
           };
 
           const _onChangeType = (type) => {
-            const newTimeValue = moment.duration(fromValue.rangeType, type).asSeconds();
+            const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
 
             onChange({ target: { name, value: newTimeValue } });
           };
