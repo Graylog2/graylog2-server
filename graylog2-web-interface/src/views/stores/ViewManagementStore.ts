@@ -52,12 +52,12 @@ export type ViewSummary = {
 export type ViewSummaries = Array<ViewSummary>;
 
 type ViewManagementActionsType = RefluxActions<{
-  create: (View) => Promise<View>,
-  delete: (View) => Promise<View>,
+  create: (view: View) => Promise<View>,
+  delete: (view: View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
-  get: (string) => Promise<ViewJson>,
-  search: (string, number, number, ?SortField, ?SortOrder) => Promise<PaginatedViews>,
-  update: (View) => Promise<View>,
+  get: (viewId: string) => Promise<ViewJson>,
+  search: (query: string, page?: number, perPage?: number, sortBy?: SortField, sortOrder?: SortOrder) => Promise<PaginatedViews>,
+  update: (view: View) => Promise<View>,
 }>;
 
 const ViewManagementActions: ViewManagementActionsType = singletonActions(

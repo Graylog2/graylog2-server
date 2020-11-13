@@ -32,11 +32,11 @@ import type { TitleType } from './TitleTypes';
 import ViewState from '../logic/views/ViewState';
 
 type CurrentViewStateActionsType = RefluxActions<{
-  fields: (Immutable.Set<string>) => Promise<*>,
-  formatting: (FormattingSettings) => Promise<*>,
-  titles: (Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<*>,
-  widgets: (Immutable.List<Widget>) => Promise<*>,
-  widgetPositions: () => Promise<*>,
+  fields: (fields: Immutable.Set<string>) => Promise<unknown>,
+  formatting: (formatting: FormattingSettings) => Promise<unknown>,
+  titles: (titles: Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<unknown>,
+  widgets: (widgets: Immutable.List<Widget>) => Promise<unknown>,
+  widgetPositions: () => Promise<unknown>,
 }>;
 
 export const CurrentViewStateActions: CurrentViewStateActionsType = singletonActions(

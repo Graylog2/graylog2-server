@@ -44,13 +44,13 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  create: (ViewType, ?string) => Promise<ViewStoreState>,
-  load: (View, ?boolean) => Promise<ViewStoreState>,
-  properties: (Properties) => Promise<void>,
-  search: (Search) => Promise<View>,
-  selectQuery: (string) => Promise<string>,
-  state: (ViewStateMap) => Promise<View>,
-  update: (View) => Promise<ViewStoreState>,
+  create: (type: ViewType, streamId?: string) => Promise<ViewStoreState>,
+  load: (view: View, isNew?: boolean) => Promise<ViewStoreState>,
+  properties: (properties: Properties) => Promise<void>,
+  search: (search: Search) => Promise<View>,
+  selectQuery: (queryId: string) => Promise<string>,
+  state: (state: ViewStateMap) => Promise<View>,
+  update: (view: View) => Promise<ViewStoreState>,
 }>;
 
 export const ViewActions: ViewActionsType = singletonActions(
@@ -92,7 +92,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create(type: ViewType, streamId: ?string = null) {
+    create(type: ViewType, streamId: string = null) {
       return ViewGenerator(type, streamId)
         .then((newView) => {
           const [view] = this._updateSearch(newView);
@@ -151,7 +151,7 @@ export const ViewStore: ViewStoreType = singletonStore(
 
       return promise;
     },
-    load(view: View, isNew: ?boolean = false): Promise<ViewStoreState> {
+    load(view: View, isNew: boolean = false): Promise<ViewStoreState> {
       this.view = view;
       this.dirty = false;
 

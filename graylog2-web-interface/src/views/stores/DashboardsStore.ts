@@ -28,7 +28,7 @@ import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore
 import View from '../logic/views/View';
 
 type DashboardsActionsType = RefluxActions<{
-  search: (?string, ?number, ?number, ?SortField, ?SortOrder) => Promise<PaginatedViews>,
+  search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,
 }>;
 
 export type DashboardsStoreState = {
@@ -36,6 +36,7 @@ export type DashboardsStoreState = {
   pagination: {
     total: number,
     page: number,
+    // eslint-disable-next-line camelcase
     per_page: number,
     count: number,
   },

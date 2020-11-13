@@ -42,7 +42,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
   'views.Queries',
   () => Reflux.createStore({
     listenables: [QueriesActions],
-    queries: new Immutable.OrderedMap<QueryId, Query>(),
+    queries: Immutable.OrderedMap<QueryId, Query>(),
     search: Search.create(),
 
     init() {

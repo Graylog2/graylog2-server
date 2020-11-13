@@ -27,14 +27,14 @@ import { singletonActions } from 'views/logic/singleton';
 export type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 
 type QueriesActionsType = RefluxActions<{
-  create: (Query, ViewState) => Promise<QueriesList>,
-  duplicate: (QueryId) => Promise<QueriesList>,
-  query: (QueryId, string) => Promise<QueriesList>,
-  rangeType: (QueryId, TimeRangeTypes) => Promise<QueriesList>,
-  rangeParams: (QueryId, string, string | number) => Promise<QueriesList>,
-  remove: (QueryId) => Promise<QueriesList>,
-  timerange: (QueryId, TimeRange) => Promise<QueriesList>,
-  update: (QueryId, Query) => Promise<QueriesList>,
+  create: (query: Query, viewState: ViewState) => Promise<QueriesList>,
+  duplicate: (queryId: QueryId) => Promise<QueriesList>,
+  query: (queryId: QueryId, newQueryString: string) => Promise<QueriesList>,
+  rangeType: (queryId: QueryId, rangeType: TimeRangeTypes) => Promise<QueriesList>,
+  rangeParams: (queryId: QueryId, key: string, value: string | number) => Promise<QueriesList>,
+  remove: (queryId: QueryId) => Promise<QueriesList>,
+  timerange: (queryId: QueryId, newTimeRange: TimeRange) => Promise<QueriesList>,
+  update: (queryId: QueryId, query: Query) => Promise<QueriesList>,
 }>;
 
 // eslint-disable-next-line import/prefer-default-export

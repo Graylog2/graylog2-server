@@ -27,10 +27,10 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewActions, ViewStore } from './ViewStore';
 
 type ViewStatesActionsTypes = RefluxActions<{
-  add: (QueryId, ViewState) => Promise<ViewState>,
-  duplicate: (QueryId) => Promise<ViewState>,
-  remove: (QueryId) => Promise<ViewState>,
-  update: (QueryId, ViewState) => Promise<ViewState>,
+  add: (queryId: QueryId, viewState: ViewState) => Promise<ViewState>,
+  duplicate: (queryId: QueryId) => Promise<ViewState>,
+  remove: (queryId: QueryId) => Promise<ViewState>,
+  update: (queryId: QueryId, viewState: ViewState) => Promise<ViewState>,
 }>;
 
 export const ViewStatesActions: ViewStatesActionsTypes = singletonActions(

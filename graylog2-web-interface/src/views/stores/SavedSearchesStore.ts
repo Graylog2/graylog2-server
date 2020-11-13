@@ -28,11 +28,11 @@ import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore
 import View from '../logic/views/View';
 
 export type SavedSearchesActionsType = RefluxActions<{
-  search: (?string, ?number, ?number, ?SortField, ?SortOrder) => Promise<PaginatedViews>,
+  search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,
 }>;
 
 export type SavedSearchesState = {
-  list: ?Array<View>,
+  list: Array<View> | undefined,
   pagination: {
     total: number,
     page: number,

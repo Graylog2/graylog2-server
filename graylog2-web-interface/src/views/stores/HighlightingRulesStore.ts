@@ -29,9 +29,9 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type HighlightingRulesActionsType = RefluxActions<{
-  add: (HighlightingRule) => Promise<Array<HighlightingRule>>,
-  remove: (HighlightingRule) => Promise<Array<HighlightingRule>>,
-  update: (HighlightingRule) => Promise<Array<HighlightingRule>>,
+  add: (rule: HighlightingRule) => Promise<Array<HighlightingRule>>,
+  remove: (rule: HighlightingRule) => Promise<Array<HighlightingRule>>,
+  update: (rule: HighlightingRule) => Promise<Array<HighlightingRule>>,
 }>;
 
 const HighlightingRulesActions: HighlightingRulesActionsType = singletonActions(

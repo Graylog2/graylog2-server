@@ -31,11 +31,11 @@ const defaultExecutionState = SearchExecutionState.empty();
 type ParameterMap = Immutable.Map<string, any>;
 
 export type SearchExecutionStateActionsType = RefluxActions<{
-  bindParameterValue: (string, any) => Promise<SearchExecutionState>,
-  setParameterValues: (ParameterMap) => Promise<SearchExecutionState>,
-  replace: (SearchExecutionState, ?boolean) => Promise<SearchExecutionState>,
+  bindParameterValue: (name: string, value: any) => Promise<SearchExecutionState>,
+  setParameterValues: (parameters: ParameterMap) => Promise<SearchExecutionState>,
+  replace: (state: SearchExecutionState, trigger?: boolean) => Promise<SearchExecutionState>,
   clear: () => Promise<SearchExecutionState>,
-  globalOverride: (?GlobalOverride) => Promise<SearchExecutionState>,
+  globalOverride: (globalOverride?: GlobalOverride) => Promise<SearchExecutionState>,
 }>;
 
 export const SearchExecutionStateActions: SearchExecutionStateActionsType = singletonActions(
@@ -73,7 +73,7 @@ export const SearchExecutionStateStore = singletonStore(
       return this.executionState;
     },
 
-    replace(executionState: SearchExecutionState, trigger?: boolean = true): SearchExecutionState {
+    replace(executionState: SearchExecutionState, trigger: boolean = true): SearchExecutionState {
       this.executionState = executionState;
 
       if (trigger) {
@@ -110,7 +110,7 @@ export const SearchExecutionStateStore = singletonStore(
       return this.executionState;
     },
 
-    globalOverride(newGlobalOverride: ?GlobalOverride): SearchExecutionState {
+    globalOverride(newGlobalOverride: GlobalOverride | undefined): SearchExecutionState {
       this.executionState = this.executionState.toBuilder()
         .globalOverride(newGlobalOverride)
         .build();

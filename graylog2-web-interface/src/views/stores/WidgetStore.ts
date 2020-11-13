@@ -29,19 +29,19 @@ import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewSta
 
 type WidgetId = string;
 
-type Widgets = Immutable.OrderedMap<string, Widget>;
+export type Widgets = Immutable.OrderedMap<string, Widget>;
 
 type WidgetActionsType = RefluxActions<{
-  create: (Widget) => Promise<Widget>,
-  duplicate: (WidgetId) => Promise<Widget>,
-  filter: (WidgetId, string) => Promise<Widgets>,
-  timerange: (WidgetId, TimeRange) => Promise<Widgets>,
-  query: (WidgetId, QueryString) => Promise<Widgets>,
-  streams: (WidgetId, Array<string>) => Promise<Widgets>,
-  remove: (WidgetId) => Promise<Widgets>,
-  update: (WidgetId, Widget) => Promise<Widgets>,
-  updateConfig: (WidgetId, any) => Promise<Widgets>,
-  updateWidgets: (Map<string, Widget>) => Promise<Widgets>,
+  create: (widget: Widget) => Promise<Widget>,
+  duplicate: (widgetId: WidgetId) => Promise<Widget>,
+  filter: (widgetId: WidgetId, filter: string) => Promise<Widgets>,
+  timerange: (widgetId: WidgetId, timerange: TimeRange) => Promise<Widgets>,
+  query: (widgetId: WidgetId, queryString: QueryString) => Promise<Widgets>,
+  streams: (widgetId: WidgetId, streams: Array<string>) => Promise<Widgets>,
+  remove: (widgetId: WidgetId) => Promise<Widgets>,
+  update: (widgetId: WidgetId, widget: Widget) => Promise<Widgets>,
+  updateConfig: (widgetId: WidgetId, config: any) => Promise<Widgets>,
+  updateWidgets: (widgets: Map<string, Widget>) => Promise<Widgets>,
 }>;
 
 type WidgetStoreState = {
@@ -69,7 +69,7 @@ export const WidgetStore = singletonStore(
   () => Reflux.createStore({
     listenables: [WidgetActions],
 
-    widgets: new Immutable.Map(),
+    widgets: Immutable.Map(),
     activeQuery: undefined,
 
     init() {

@@ -26,11 +26,13 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import { SearchExecutionStateActions, SearchExecutionStateStore } from './SearchExecutionStateStore';
 
+type GlobalOverrideStoreState = GlobalOverride | undefined;
+
 export type GlobalOverrideActionsType = RefluxActions<{
-  query: (string) => Promise<?GlobalOverride>,
-  set: (?TimeRange, ?string) => Promise<?GlobalOverride>,
-  reset: () => Promise<?GlobalOverride>,
-  timerange: (?TimeRange) => Promise<?GlobalOverride>,
+  query: (newQueryString: string) => Promise<GlobalOverrideStoreState>,
+  set: (newTimeRange?: TimeRange, newQueryString?: string) => Promise<GlobalOverrideStoreState>,
+  reset: () => Promise<GlobalOverrideStoreState>,
+  timerange: (newTimeRange?: TimeRange) => Promise<GlobalOverrideStoreState>,
 }>;
 
 export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions(
@@ -43,7 +45,6 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
   }),
 );
 
-type GlobalOverrideStoreState = ?GlobalOverride;
 type GlobalOverrideStoreType = Store<GlobalOverrideStoreState>;
 
 export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
@@ -63,7 +64,7 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
     getInitialState() {
       return this.globalOverride;
     },
-    set(newTimerange: ?TimeRange, newQueryString: ?string): Promise<?GlobalOverride> {
+    set(newTimerange?: TimeRange, newQueryString?: string): Promise<GlobalOverride | undefined> {
       const newQuery = newQueryString ? createElasticsearchQueryString(newQueryString) : undefined;
       const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
       const newGlobalOverride = currentGlobalOverride.toBuilder().query(newQuery).timerange(newTimerange).build();
@@ -103,7 +104,7 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
 
       return promise;
     },
-    _propagateNewGlobalOverride(newGlobalOverride: ?GlobalOverride) {
+    _propagateNewGlobalOverride(newGlobalOverride: GlobalOverride | undefined) {
       return newGlobalOverride !== this.globalOverride
         ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
         : Promise.resolve(this.globalOverride);

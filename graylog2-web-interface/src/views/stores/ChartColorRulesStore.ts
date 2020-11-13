@@ -21,7 +21,7 @@ import { get, isEqual } from 'lodash';
 
 import type { RefluxActions } from 'stores/StoreTypes';
 import Widget from 'views/logic/widgets/Widget';
-import { WidgetActions, WidgetStore } from 'views/stores/WidgetStore';
+import { WidgetActions, Widgets, WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 
@@ -34,7 +34,7 @@ export type ColorRule = {
 };
 
 type ChartColorRulesActionsType = RefluxActions<{
-  set: (widgetId: string, name: string, color: Color) => Promise<Array<ColorRule>>,
+  set: (widgetId: string, name: string, color: Color) => Promise<Widgets>,
 }>;
 
 const ChartColorRulesActions: ChartColorRulesActionsType = singletonActions(
@@ -90,7 +90,7 @@ const ChartColorRulesStore = singletonStore(
     _state(): Array<ColorRule> {
       return this.state;
     },
-    set(widgetId: string, name: string, color: Color): Promise<*> {
+    set(widgetId: string, name: string, color: Color): Promise<unknown> {
       const widget = this.widgets.get(widgetId);
       const formattingSettings: WidgetFormattingSettings = get(widget, ['config', 'formattingSettings'], WidgetFormattingSettings.empty());
       const { chartColors } = formattingSettings;

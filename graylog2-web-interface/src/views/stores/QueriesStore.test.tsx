@@ -50,7 +50,7 @@ describe('QueriesStore', () => {
   });
 
   it('initializes with an empty map', () => {
-    expect(QueriesStore.getInitialState()).toEqual(new Immutable.OrderedMap<QueryId, Query>());
+    expect(QueriesStore.getInitialState()).toEqual(Immutable.OrderedMap<QueryId, Query>());
   });
 
   it('subscribes to ViewStore upon initialization', () => {
