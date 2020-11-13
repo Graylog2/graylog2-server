@@ -2,7 +2,7 @@ import { $Call } from 'utility-types';
 
 type PromiseProvider = (...args: any[]) => Promise<any>;
 type ExtractResultType<R extends PromiseProvider> = $Call<ExtractTypeFromPromise<ReturnType<R>>>;
-type ExtractTypeFromPromise<R> = (promise: Promise<R>) => R;
+type ExtractTypeFromPromise<P> = P extends Promise<infer R> ? R : P;
 
 export type ListenableAction<R extends PromiseProvider> = R & {
   listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
