@@ -42,6 +42,8 @@ public abstract class LDAPConnectorConfig {
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
         public static Builder create() {
@@ -80,6 +82,11 @@ public abstract class LDAPConnectorConfig {
         public static LDAPServer fromUrl(String url) {
             final URI uri = URI.create(url);
             return create(uri.getHost(), uri.getPort());
+        }
+
+        @Override
+        public String toString() {
+            return hostname() + ":" + port();
         }
     }
 }
