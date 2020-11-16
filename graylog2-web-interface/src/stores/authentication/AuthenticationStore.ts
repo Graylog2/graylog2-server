@@ -40,11 +40,12 @@ import type { PaginatedUsers } from 'actions/users/UsersActions';
 import type { PaginatedResponseType, Pagination } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
-import UserOverview, { type UserOverviewJSON } from 'logic/users/UserOverview';
+import UserOverview, { UserOverviewJSON } from 'logic/users/UserOverview';
+import {$PropertyType} from "utility-types/dist/utility-types";
 
 type PaginatedBackendsResponse = PaginatedResponseType & {
   context: {
-    active_backend: ?AuthenticationBackendJSON,
+    active_backend: AuthenticationBackendJSON | null | undefined,
   },
   backends: Array<AuthenticationBackendJSON>,
 };
@@ -97,7 +98,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    update(backendId: ?$PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<LoadResponse> {
+    update(backendId: null | undefined | $PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<LoadResponse> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.update(backendId).url);
       const promise = fetch('PUT', url, payload).then((result) => (result ? {
         backend: AuthenticationBackend.fromJSON(result.backend),
@@ -108,7 +109,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    delete(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
+    delete(backendId: null | undefined | $PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.delete(backendId).url);
       const promise = fetch('DELETE', url);
       AuthenticationActions.delete.promise(promise);
@@ -132,7 +133,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    setActiveBackend(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
+    setActiveBackend(backendId: null | undefined | $PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.updateConfiguration().url);
       const promise = fetch('POST', url, { active_backend: backendId });
       AuthenticationActions.setActiveBackend.promise(promise);
