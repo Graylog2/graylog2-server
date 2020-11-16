@@ -21,8 +21,8 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 type CustomizationActionsType = RefluxActions<{
-  update: (type: string, config: {}) => Promise<mixed>,
-  get: (type: string) => Promise<mixed>,
+  update: (type: string, config: {}) => Promise<unknown>,
+  get: (type: string) => Promise<unknown>,
 }>;
 
 const CustomizationActions: CustomizationActionsType = singletonActions('customization.actions', () => Reflux.createActions({
