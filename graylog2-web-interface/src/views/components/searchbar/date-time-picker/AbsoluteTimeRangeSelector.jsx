@@ -36,14 +36,16 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange }: Props) => {
+const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange, currentTimerange, setDisableApply }: Props) => {
   return (
     <AbsoluteWrapper>
       <RangeWrapper>
         <AbsoluteRangeField from
                             originalTimeRange={originalTimeRange}
                             disabled={disabled}
-                            limitDuration={limitDuration} />
+                            limitDuration={limitDuration}
+                            currentTimerange={currentTimerange}
+                            setDisableApply={setDisableApply} />
       </RangeWrapper>
 
       <IconWrap>
@@ -54,7 +56,9 @@ const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange 
         <AbsoluteRangeField from={false}
                             originalTimeRange={originalTimeRange}
                             disabled={disabled}
-                            limitDuration={limitDuration} />
+                            limitDuration={limitDuration}
+                            currentTimerange={currentTimerange}
+                            setDisableApply={setDisableApply} />
       </RangeWrapper>
     </AbsoluteWrapper>
   );

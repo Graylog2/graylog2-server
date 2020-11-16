@@ -75,7 +75,7 @@ const LimitLabel: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   }
 `);
 
-const timeRangeTypeTabs = (config, activeKey, originalRangeValue, limitDuration, setDisableApply) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, setDisableApply, currentTimerange) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
@@ -83,11 +83,11 @@ const timeRangeTypeTabs = (config, activeKey, originalRangeValue, limitDuration,
          key={`time-range-type-selector-${type}`}
          eventKey={type}>
       {type === activeKey && (
-        <RangeComponent config={config}
-                        disabled={false}
+        <RangeComponent disabled={false}
                         originalTimeRange={originalRangeValue}
                         limitDuration={limitDuration}
-                        setDisableApply={setDisableApply} />
+                        setDisableApply={setDisableApply}
+                        currentTimerange={currentTimerange} />
       )}
     </Tab>
   );
@@ -144,6 +144,8 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     </PopoverTitle>
   );
 
+  const currentTimerange = nextRangeProps.value || originalTimerange.value;
+
   return (
     <StyledPopover id="timerange-type"
                    placement="bottom"
@@ -152,7 +154,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                    arrowOffsetLeft={34}>
       <Row>
         <Col md={12}>
-          <TimeRangeLivePreview timerange={nextRangeProps.value || originalTimerange.value} />
+          <TimeRangeLivePreview timerange={currentTimerange} />
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
@@ -166,7 +168,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                 <p>No Override to Date.</p>
               </Tab>
             )}
-            {timeRangeTypeTabs(config, activeKey, originalRangeValue, limitDuration, setDisableApply)}
+            {timeRangeTypeTabs(activeKey, originalRangeValue, limitDuration, setDisableApply, currentTimerange)}
           </StyledTabs>
         </Col>
       </Row>

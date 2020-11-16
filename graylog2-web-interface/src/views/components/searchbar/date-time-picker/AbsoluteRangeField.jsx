@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 import moment from 'moment';
+import { DateUtils } from 'react-day-picker';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
@@ -21,10 +22,12 @@ import type { ThemeInterface } from 'theme';
 type Props = {
   disabled: boolean,
   from: boolean,
-  originalTimeRange: {
+  currentTimerange: {
     from: string,
     to: string,
   },
+  limitDuration: number,
+  setDisableApply: (boolean) => void,
 };
 
 const TIME_TYPES = [
@@ -66,6 +69,13 @@ const StyledButton = styled(Button)`
   padding: 6px 9px;
   line-height: 1.1;
 `;
+
+const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.dark.danger};
+  font-size: ${theme.fonts.size.tiny};
+  font-style: italic;
+  padding: 3px;
+`);
 
 const _isValidDateString = (dateString: string) => {
   if (dateString === undefined) {
@@ -152,16 +162,30 @@ const fieldUpdate = (value) => {
   };
 };
 
-const AbsoluteRangeField = ({ disabled, limitDuration, originalTimeRange, from }: Props) => {
+const _isDayAfter = ({ from, to }) => {
+  if (DateUtils.isDayAfter(new Date(from), new Date(to))) {
+    return 'From date can not be before the Until date.';
+  }
+
+  return '';
+};
+
+const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, setDisableApply }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
+  const [timeRangeError, setTimeRangeError] = useState('');
+
+  useEffect(() => {
+    setTimeRangeError(_isDayAfter(currentTimerange));
+  }, [currentTimerange]);
 
   return (
     <Field name={`tempTimeRange[${range}]`} validate={_isValidDateString}>
       {({ field: { value, onChange, onBlur, name }, meta: { error } }) => {
+        setDisableApply(!!error || !!timeRangeError);
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
-        const dateTime = error ? originalTimeRange[range] : value || originalTimeRange[range];
+        const dateTime = error ? currentTimerange[range] : value || currentTimerange[range];
         const {
           initialDateTime,
           handleChangeSetTime,
@@ -193,17 +217,23 @@ const AbsoluteRangeField = ({ disabled, limitDuration, originalTimeRange, from }
           _onChange(handleTimeToggle(endOfDay));
         };
 
+        const _onChangeDate = (newDate) => {
+          _onChange(newDate);
+        };
+
         return (
           <>
             <DateInputWithPicker disabled={disabled}
-                                 onChange={_onChange}
+                                 onChange={_onChangeDate}
                                  onBlur={onBlur}
-                                 value={value || originalTimeRange[range]}
+                                 value={value || currentTimerange[range]}
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
                                  error={error}
-                                 fromDate={from ? moment().seconds(-limitDuration).toDate() : moment(originalTimeRange.from).toDate()} />
+                                 fromDate={from ? moment().seconds(-limitDuration).toDate() : moment(currentTimerange.from).toDate()} />
+
+            {from && timeRangeError && (<ErrorMessage>{timeRangeError}</ErrorMessage>)}
 
             <div>
               <SetTimeOption>
@@ -273,7 +303,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, originalTimeRange, from }
 
 AbsoluteRangeField.propTypes = {
   from: PropTypes.bool.isRequired,
-  originalTimeRange: PropTypes.shape({
+  currentTimerange: PropTypes.shape({
     from: PropTypes.string,
     to: PropTypes.string,
   }).isRequired,
