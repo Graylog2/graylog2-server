@@ -43,19 +43,18 @@ const HighlightingRulesActions: HighlightingRulesActionsType = singletonActions(
   }),
 );
 
-type KeyProps = { field: string, value: Value };
-type KeyType = Immutable.Record<KeyProps>;
+class Key extends Immutable.Record({ field: null, value: undefined }) {}
 
-const makeKey = Immutable.Record({ field: null, value: null });
+const makeKey = (field: string, value: Value) => new Key({ field, value });
 
-type StateType = Immutable.OrderedMap<KeyType, string>;
+type StateType = Immutable.OrderedMap<Key, string>;
 
 const HighlightingRulesStore = singletonStore(
   'views.HighlightingRules',
   () => Reflux.createStore({
     listenables: [HighlightingRulesActions],
 
-    state: Immutable.OrderedMap<KeyType, string>(),
+    state: Immutable.OrderedMap<Key, string>(),
 
     init() {
       this.listenTo(CurrentViewStateStore, this.onViewStateStoreChange, this.onViewStateStoreChange);
@@ -67,11 +66,8 @@ const HighlightingRulesStore = singletonStore(
       this.formatting = formatting;
       const { highlighting } = formatting;
       const rules = highlighting.reduce(
-        (prev: StateType, rule: HighlightingRule) => prev.set(makeKey({
-          field: rule.field,
-          value: rule.value,
-        }), rule.color),
-        Immutable.OrderedMap<KeyType, string>(),
+        (prev: StateType, rule: HighlightingRule) => prev.set(makeKey(rule.field, rule.value), rule.color),
+        Immutable.OrderedMap<Key, string>(),
       );
 
       if (!isEqual(rules, this.state)) {
@@ -99,7 +95,7 @@ const HighlightingRulesStore = singletonStore(
 
     add(rule: HighlightingRule): Promise<Array<HighlightingRule>> {
       const { field, value, color } = rule;
-      const key = makeKey({ field, value });
+      const key = makeKey(field, value);
       const promise = (this.state.has(key) ? Promise.resolve() : this._propagateAndTrigger(this.state.set(key, color)))
         .then(() => this._state());
 
@@ -109,7 +105,7 @@ const HighlightingRulesStore = singletonStore(
     },
     remove(rule: HighlightingRule): Promise<Array<HighlightingRule>> {
       const { field, value } = rule;
-      const key = makeKey({ field, value });
+      const key = makeKey(field, value);
       const promise = (this.state.has(key) ? this._propagateAndTrigger(this.state.delete(key)) : Promise.resolve())
         .then(() => this._state());
 
@@ -119,7 +115,7 @@ const HighlightingRulesStore = singletonStore(
     },
     update(rule: HighlightingRule): Promise<Array<HighlightingRule>> {
       const { field, value, color } = rule;
-      const key = makeKey({ field, value });
+      const key = makeKey(field, value);
       const promise = this._propagateAndTrigger(this.state.set(key, color));
 
       HighlightingRulesActions.update.promise(promise);
