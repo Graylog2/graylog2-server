@@ -15,6 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+declare global {
+  interface Window {
+    singletons: { [key: string]: unknown };
+  }
+}
 
 // eslint-disable-next-line arrow-parens
 const singleton = <R>(key: string, supplier: () => R): R => {
@@ -22,7 +27,7 @@ const singleton = <R>(key: string, supplier: () => R): R => {
     window.singletons[key] = supplier();
   }
 
-  return window.singletons[key];
+  return window.singletons[key] as R;
 };
 
 const singletonActions = <R>(key: string, supplier: () => R): R => singleton(`${key}Actions`, supplier);
@@ -33,8 +38,4 @@ if (typeof window.singletons === 'undefined') {
   window.singletons = {};
 }
 
-export {
-  singleton,
-  singletonActions,
-  singletonStore,
-};
+export { singleton, singletonActions, singletonStore };
