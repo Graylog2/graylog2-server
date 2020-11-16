@@ -17,13 +17,15 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
+import { $PropertyType, $Shape } from 'utility-types';
 
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
-import User, { type UserJSON } from 'logic/users/User';
-import UserOverview, { type AccountStatus } from 'logic/users/UserOverview';
+import User, { UserJSON } from 'logic/users/User';
+import UserOverview, { AccountStatus } from 'logic/users/UserOverview';
 
+/* eslint-disable camelcase */
 export type UserCreate = {
   email: $PropertyType<UserJSON, 'email'>,
   full_name: $PropertyType<UserJSON, 'full_name'>,
@@ -49,9 +51,10 @@ export type ChangePasswordRequest = {
   old_password: string,
   password: string,
 };
+/* eslint-enable camelcase */
 
 export type PaginatedUsers = PaginatedList<UserOverview> & {
-  adminUser: ?UserOverview,
+  adminUser: UserOverview | null | undefined,
 };
 
 export type ActionsType = {
