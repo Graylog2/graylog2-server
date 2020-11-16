@@ -30,7 +30,7 @@ export type UserContext = {
 };
 
 export type RoleContext = {
-  users: { [string]: UserContext[] },
+  users: { [key: string]: UserContext[] },
 };
 
 export type PaginatedRoles = PaginatedList<Role> & {
