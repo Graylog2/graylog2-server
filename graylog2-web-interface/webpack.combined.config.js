@@ -21,6 +21,10 @@ const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pl
   .map((config) => `${globCwd}/${config}`)
   .filter(isNotDependency);
 
+if (pluginConfigs.some((config) => config.includes('graylog-plugin-cloud/server-plugin'))) {
+  process.env.IS_CLOUD = true;
+}
+
 process.env.web_src_path = path.resolve(__dirname);
 
 // eslint-disable-next-line import/no-dynamic-require
