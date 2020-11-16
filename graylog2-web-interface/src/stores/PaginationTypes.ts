@@ -47,6 +47,13 @@ export type ListPagination = Pagination & {
   count: number,
 };
 
+export const DEFAULT_PAGINATION = {
+  page: 1,
+  perPage: 10,
+  query: '',
+  total: 0,
+};
+
 export type PaginatedList<ItemType> = {
   list: Immutable.List<ItemType>,
   pagination: ListPagination,
