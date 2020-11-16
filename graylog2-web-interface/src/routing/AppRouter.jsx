@@ -21,6 +21,8 @@ import App from 'routing/App';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
+import AppConfig from 'util/AppConfig';
+
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
 import {
@@ -139,6 +141,8 @@ const AppRouter = () => {
   const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
 
+  const isCloud = AppConfig.isCloud();
+
   return (
     <Router history={history}>
       <RouterErrorBoundary>
@@ -211,13 +215,19 @@ const AppRouter = () => {
                                component={ShowContentPackPage} />
 
                         <Route exact path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
-                        <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
-                        <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-                        <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-                        <Route exact
-                               path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                               component={IndexSetConfigurationPage} />
-                        <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+
+                        {!isCloud && (
+                          <>
+                            <Route path={Routes.SYSTEM.INDEX_SETS.CREATE}
+                                   component={IndexSetCreationPage} />
+                            <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')}
+                                   component={IndexSetPage} />
+                            <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                                   component={IndexSetConfigurationPage} />
+                            <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
+                            <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+                          </>
+                        )}
 
                         <Route exact path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
                         <Route exact
