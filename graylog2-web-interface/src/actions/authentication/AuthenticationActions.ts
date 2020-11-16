@@ -17,18 +17,18 @@
 // @flow strict
 import Reflux from 'reflux';
 
-import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
+import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import type { PaginatedUsers } from 'actions/users/UsersActions';
+import {$PropertyType} from "utility-types";
 
 export type AuthenticationBackendCreate = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,
   description: $PropertyType<AuthenticationBackendJSON, 'description'>,
   config: {
     type: string,
-    ...any,
   },
 };
 
@@ -38,19 +38,18 @@ export type AuthenticationBackendUpdate = {
   description: $PropertyType<AuthenticationBackendJSON, 'description'>,
   config: {
     type: string,
-    ...any,
   },
 };
 
 export type PaginatedBackends = PaginatedList<AuthenticationBackend> & {
   context: {
-    activeBackend: ?AuthenticationBackend,
+    activeBackend: AuthenticationBackend | undefined | null,
   },
 };
 
 export type ConnectionTestPayload = {
   backend_configuration: AuthenticationBackendCreate,
-  backend_id: ?string,
+  backend_id: string | undefined | null,
 };
 export type ConnectionTestResult = {
   success: boolean,
@@ -58,7 +57,7 @@ export type ConnectionTestResult = {
   errors: Array<string>,
 };
 export type LoginTestPayload = {
-  backend_id: ?string,
+  backend_id: string | undefined | null,
   backend_configuration: AuthenticationBackendCreate,
   user_login: {
     username: string,
@@ -84,10 +83,10 @@ export type LoginTestResult = {
 };
 
 export type LoadResponse = {
-  backend: ?AuthenticationBackend,
+  backend: AuthenticationBackend | undefined | null,
 };
 
-export type LoadActiveResponse = LoadActiveResponse & {
+export type LoadActiveResponse = LoadResponse & {
   context: {
     backendTotal: number,
   },
@@ -95,12 +94,12 @@ export type LoadActiveResponse = LoadActiveResponse & {
 
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
-  delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  delete: (authBackendId: $PropertyType<AuthenticationBackend | undefined | null, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   load: (id: string) => Promise<LoadResponse>,
   loadActive: () => Promise<LoadActiveResponse>,
   loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,
   loadUsersPaginated: (authBackendId: string, pagination: Pagination) => Promise<PaginatedUsers>,
-  setActiveBackend: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  setActiveBackend: (authBackendId: $PropertyType<AuthenticationBackend, 'id'> | undefined | null, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
   testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,
   update: (id: string, AuthenticationBackendUpdate) => Promise<LoadResponse>,
