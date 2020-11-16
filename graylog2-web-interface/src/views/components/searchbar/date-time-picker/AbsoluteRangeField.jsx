@@ -6,7 +6,6 @@ import { Field } from 'formik';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 import moment from 'moment';
-import { DateUtils } from 'react-day-picker';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
@@ -74,7 +73,7 @@ const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = style
   color: ${theme.colors.variant.dark.danger};
   font-size: ${theme.fonts.size.tiny};
   font-style: italic;
-  padding: 3px;
+  padding: 3px 3px 9px;
 `);
 
 const _isValidDateString = (dateString: string) => {
@@ -163,7 +162,7 @@ const fieldUpdate = (value) => {
 };
 
 const _isDayAfter = ({ from, to }) => {
-  if (DateUtils.isDayAfter(new Date(from), new Date(to))) {
+  if (new Date(from) > new Date(to)) {
     return 'From date can not be before the Until date.';
   }
 

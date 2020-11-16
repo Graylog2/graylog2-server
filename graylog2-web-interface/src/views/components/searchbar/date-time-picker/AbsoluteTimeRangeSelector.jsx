@@ -27,6 +27,12 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   flex: 4;
   align-items: center;
   min-height: 290px;
+  display: flex;
+  flex-direction: column;
+  
+  .DayPicker-wrapper {
+    padding-bottom: 0;
+  }
 `;
 
 const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
