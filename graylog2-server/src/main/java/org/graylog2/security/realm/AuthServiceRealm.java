@@ -97,7 +97,7 @@ public class AuthServiceRealm extends AuthenticatingRealm {
                         result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
                 return toAuthenticationInfo(result);
             } else {
-                LOG.warn("Failed to authenticate username <{}> with backend <{}/{}/{}>",
+                LOG.debug("Failed to authenticate username <{}> with backend <{}/{}/{}>",
                         result.username(), result.backendTitle(), result.backendType(), result.backendId());
                 return null;
             }
