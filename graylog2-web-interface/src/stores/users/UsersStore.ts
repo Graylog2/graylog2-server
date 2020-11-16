@@ -36,7 +36,7 @@ export type PaginatedUsersResponse = PaginatedListJSON & {
   };
 };
 
-const UsersStore: Store = singletonStore('Users', () => Reflux.createStore({
+const UsersStore: Store<undefined> = singletonStore('Users', () => Reflux.createStore({
   listenables: [UsersActions],
 
   create(user: UserCreate): Promise<void> {

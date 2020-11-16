@@ -14,7 +14,7 @@ export type ListenableAction<R extends PromiseProvider> = R & {
 
 export type RefluxActions<A extends { [key: string]: PromiseProvider }> = { [P in keyof A]: ListenableAction<A[P]> };
 
-export type Store<State = undefined> = {
+export type Store<State> = {
   listen: (cb: (state: State) => unknown) => () => void;
   getInitialState: () => State;
 };
