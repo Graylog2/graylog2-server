@@ -29,6 +29,7 @@ import type { Store } from 'stores/StoreTypes';
 import type { GRN } from 'logic/permissions/types';
 import PaginationURL from 'util/PaginationURL';
 import type { Pagination } from 'stores/PaginationTypes';
+import {Optional} from "utility-types";
 
 const DEFAULT_PREPARE_PAYLOAD = {};
 
@@ -73,7 +74,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return this._state();
     },
 
-    prepare(entityType: string, entityTitle: string, entityGRN: GRN, payload: EntitySharePayload = DEFAULT_PREPARE_PAYLOAD): Promise<EntityShareState> {
+    prepare(entityType: string, entityTitle: string, entityGRN: GRN, payload: Optional<EntitySharePayload> = DEFAULT_PREPARE_PAYLOAD): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 

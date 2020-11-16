@@ -22,11 +22,11 @@ import SharedEntity from 'logic/permissions/SharedEntity';
 import type { GRN } from 'logic/permissions/types';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 import { singletonActions } from 'views/logic/singleton';
-import EntityShareState, { type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
+import EntityShareState, { SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 
 export type PaginatedEntityShares = PaginatedList<SharedEntity> & {
   context: {
-    granteeCapabilities: { [grn: GRN]: string },
+    granteeCapabilities: { [grn: string]: string },
   },
 };
 
@@ -35,7 +35,7 @@ export type EntitySharePayload = {
 };
 
 export type ActionsType = {
-  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: ?EntitySharePayload) => Promise<EntityShareState>,
+  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload | null | undefined) => Promise<EntityShareState>,
   update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>,
   loadUserSharesPaginated: (userId: string, pagination: Pagination) => Promise<PaginatedEntityShares>,
 };
