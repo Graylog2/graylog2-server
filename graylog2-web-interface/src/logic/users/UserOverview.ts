@@ -14,63 +14,63 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
+import { $PropertyType } from 'utility-types';
 import * as Immutable from 'immutable';
 
-export type AccountStatus = 'enabled' | 'disabled' | 'deleted';
+export type AccountStatus = "enabled" | "disabled" | "deleted";
 
 export type UserOverviewJSON = {
-  id: string,
-  username: string,
-  full_name: string,
-  email: string,
-  external_user: ?boolean,
-  roles: Array<string>,
-  read_only: ?boolean,
-  session_active: ?boolean,
-  client_address: string,
-  last_activity: ?string,
-  enabled: boolean,
-  auth_service_id: string,
-  auth_service_uid: string,
-  account_status: AccountStatus,
+  id: string;
+  username: string;
+  full_name: string;
+  email: string;
+  external_user: boolean | null | undefined;
+  roles: Array<string>;
+  read_only: boolean | null | undefined;
+  session_active: boolean | null | undefined;
+  client_address: string;
+  last_activity: string | null | undefined;
+  enabled: boolean;
+  auth_service_id: string;
+  auth_service_uid: string;
+  account_status: AccountStatus;
 };
 
 type InternalState = {
-  id: string,
-  username: string,
-  fullName: string,
-  email: string,
-  roles: Immutable.Set<string>,
-  readOnly: boolean,
-  external: boolean,
-  sessionActive: boolean,
-  clientAddress: string,
-  lastActivity: ?string,
-  enabled: boolean,
-  authServiceId: string,
-  authServiceUid: string,
-  accountStatus: AccountStatus,
+  id: string;
+  username: string;
+  fullName: string;
+  email: string;
+  roles: Immutable.Set<string>;
+  readOnly: boolean;
+  external: boolean;
+  sessionActive: boolean;
+  clientAddress: string;
+  lastActivity: string | null | undefined;
+  enabled: boolean;
+  authServiceId: string;
+  authServiceUid: string;
+  accountStatus: AccountStatus;
 };
 
 export default class UserOverview {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    username: $PropertyType<InternalState, 'username'>,
-    fullName: $PropertyType<InternalState, 'fullName'>,
-    email: $PropertyType<InternalState, 'email'>,
-    roles: $PropertyType<InternalState, 'roles'>,
-    readOnly: $PropertyType<InternalState, 'readOnly'>,
-    external: $PropertyType<InternalState, 'external'>,
-    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
-    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
-    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
-    enabled: $PropertyType<InternalState, 'enabled'>,
-    authServiceId: $PropertyType<InternalState, 'authServiceId'>,
-    authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
-    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    id: $PropertyType<InternalState, "id">,
+    username: $PropertyType<InternalState, "username">,
+    fullName: $PropertyType<InternalState, "fullName">,
+    email: $PropertyType<InternalState, "email">,
+    roles: $PropertyType<InternalState, "roles">,
+    readOnly: $PropertyType<InternalState, "readOnly">,
+    external: $PropertyType<InternalState, "external">,
+    sessionActive: $PropertyType<InternalState, "sessionActive">,
+    clientAddress: $PropertyType<InternalState, "clientAddress">,
+    lastActivity: $PropertyType<InternalState, "lastActivity">,
+    enabled: $PropertyType<InternalState, "enabled">,
+    authServiceId: $PropertyType<InternalState, "authServiceId">,
+    authServiceUid: $PropertyType<InternalState, "authServiceUid">,
+    accountStatus: $PropertyType<InternalState, "accountStatus">
   ) {
     this._value = {
       id,
@@ -192,20 +192,20 @@ export default class UserOverview {
   }
 
   static create(
-    id: $PropertyType<InternalState, 'id'>,
-    username: $PropertyType<InternalState, 'username'>,
-    fullName: $PropertyType<InternalState, 'fullName'>,
-    email: $PropertyType<InternalState, 'email'>,
-    roles: $PropertyType<InternalState, 'roles'>,
-    readOnly: $PropertyType<InternalState, 'readOnly'>,
-    external: $PropertyType<InternalState, 'external'>,
-    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
-    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
-    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
-    enabled: $PropertyType<InternalState, 'enabled'>,
-    authServiceId: $PropertyType<InternalState, 'authServiceId'>,
-    authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
-    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    id: $PropertyType<InternalState, "id">,
+    username: $PropertyType<InternalState, "username">,
+    fullName: $PropertyType<InternalState, "fullName">,
+    email: $PropertyType<InternalState, "email">,
+    roles: $PropertyType<InternalState, "roles">,
+    readOnly: $PropertyType<InternalState, "readOnly">,
+    external: $PropertyType<InternalState, "external">,
+    sessionActive: $PropertyType<InternalState, "sessionActive">,
+    clientAddress: $PropertyType<InternalState, "clientAddress">,
+    lastActivity: $PropertyType<InternalState, "lastActivity">,
+    enabled: $PropertyType<InternalState, "enabled">,
+    authServiceId: $PropertyType<InternalState, "authServiceId">,
+    authServiceUid: $PropertyType<InternalState, "authServiceUid">,
+    accountStatus: $PropertyType<InternalState, "accountStatus">
   ) {
     return new UserOverview(
       id,
@@ -221,7 +221,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
-      accountStatus,
+      accountStatus
     );
   }
 
@@ -279,8 +279,7 @@ export default class UserOverview {
       account_status: accountStatus,
     } = value;
 
-    return UserOverview.create(
-      id,
+    return UserOverview.create(id,
       username,
       fullName,
       email,
@@ -293,7 +292,7 @@ export default class UserOverview {
       enabled,
       authServiceId,
       authServiceUid,
-      accountStatus,
+      accountStatus
     );
   }
 
@@ -313,59 +312,59 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>) {
+  id(value: $PropertyType<InternalState, "id">) {
     return new Builder(this.value.set('id', value));
   }
 
-  username(value: $PropertyType<InternalState, 'username'>) {
+  username(value: $PropertyType<InternalState, "username">) {
     return new Builder(this.value.set('username', value));
   }
 
-  fullName(value: $PropertyType<InternalState, 'fullName'>) {
+  fullName(value: $PropertyType<InternalState, "fullName">) {
     return new Builder(this.value.set('fullName', value));
   }
 
-  email(value: $PropertyType<InternalState, 'email'>) {
+  email(value: $PropertyType<InternalState, "email">) {
     return new Builder(this.value.set('email', value));
   }
 
-  roles(value: $PropertyType<InternalState, 'roles'>) {
+  roles(value: $PropertyType<InternalState, "roles">) {
     return new Builder(this.value.set('roles', value));
   }
 
-  readOnly(value: $PropertyType<InternalState, 'readOnly'>) {
+  readOnly(value: $PropertyType<InternalState, "readOnly">) {
     return new Builder(this.value.set('readOnly', value));
   }
 
-  external(value: $PropertyType<InternalState, 'external'>) {
+  external(value: $PropertyType<InternalState, "external">) {
     return new Builder(this.value.set('external', value));
   }
 
-  sessionActive(value: $PropertyType<InternalState, 'sessionActive'>) {
+  sessionActive(value: $PropertyType<InternalState, "sessionActive">) {
     return new Builder(this.value.set('sessionActive', value));
   }
 
-  clientAddress(value: $PropertyType<InternalState, 'clientAddress'>) {
+  clientAddress(value: $PropertyType<InternalState, "clientAddress">) {
     return new Builder(this.value.set('clientAddress', value));
   }
 
-  lastActivity(value: $PropertyType<InternalState, 'lastActivity'>) {
+  lastActivity(value: $PropertyType<InternalState, "lastActivity">) {
     return new Builder(this.value.set('lastActivity', value));
   }
 
-  enabled(value: $PropertyType<InternalState, 'enabled'>) {
+  enabled(value: $PropertyType<InternalState, "enabled">) {
     return new Builder(this.value.set('enabled', value));
   }
 
-  authServiceId(value: $PropertyType<InternalState, 'authServiceId'>) {
+  authServiceId(value: $PropertyType<InternalState, "authServiceId">) {
     return new Builder(this.value.set('authServiceId', value));
   }
 
-  authServiceUid(value: $PropertyType<InternalState, 'authServiceUid'>) {
+  authServiceUid(value: $PropertyType<InternalState, "authServiceUid">) {
     return new Builder(this.value.set('authServiceUid', value));
   }
 
-  accountStatus(value: $PropertyType<InternalState, 'accountStatus'>) {
+  accountStatus(value: $PropertyType<InternalState, "accountStatus">) {
     return new Builder(this.value.set('accountStatus', value));
   }
 
@@ -401,7 +400,7 @@ class Builder {
       enabled,
       authServiceId,
       authServiceUid,
-      accountStatus,
+      accountStatus
     );
   }
 }
