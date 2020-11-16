@@ -35,7 +35,7 @@ public class AuthServiceAuthenticator {
         this.provisionerService = provisionerService;
     }
 
-    public AuthServiceResult authenticate(String token) {
+    public AuthServiceResult authenticate(AuthServiceToken token) {
         final Optional<AuthServiceBackend> activeBackend = authServiceConfig.getActiveBackend();
         if (!activeBackend.isPresent()) {
             final AuthServiceBackend defaultBackend = authServiceConfig.getDefaultBackend();
@@ -72,7 +72,7 @@ public class AuthServiceAuthenticator {
         return authenticate(authCredentials, authServiceConfig.getDefaultBackend());
     }
 
-    private AuthServiceResult authenticate(String token, AuthServiceBackend backend) {
+    private AuthServiceResult authenticate(AuthServiceToken token, AuthServiceBackend backend) {
         final Optional<UserDetails> userDetails = backend.authenticateAndProvision(token, provisionerService);
 
         return userDetails.map(ud -> successResult(ud, backend))

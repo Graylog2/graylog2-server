@@ -19,21 +19,22 @@ package org.graylog2.shared.security;
 import org.apache.shiro.authc.BearerToken;
 import org.graylog2.audit.AuditActor;
 
-public class ActorAwareBearerToken extends BearerToken implements ActorAwareAuthenticationToken {
+public class TypedBearerToken extends BearerToken implements ActorAwareAuthenticationToken {
     private final AuditActor actor;
+    private final String type;
 
-    public ActorAwareBearerToken(String token, AuditActor actor) {
+    public TypedBearerToken(String token, AuditActor actor, String type) {
         super(token);
         this.actor = actor;
-    }
-
-    public ActorAwareBearerToken(String token, String host, AuditActor actor) {
-        super(token, host);
-        this.actor = actor;
+        this.type = type;
     }
 
     @Override
     public AuditActor getActor() {
          return actor;
+    }
+
+    public String getType() {
+        return type;
     }
 }
