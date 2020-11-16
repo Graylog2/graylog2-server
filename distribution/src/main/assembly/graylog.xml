@@ -13,7 +13,7 @@
             <directory>${project.basedir}/..</directory>
             <includes>
                 <include>README.markdown</include>
-                <include>COPYING</include>
+                <include>LICENSE</include>
                 <include>UPGRADING.rst</include>
             </includes>
         </fileSet>
