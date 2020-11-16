@@ -30,9 +30,6 @@ module.exports = {
     },
     {
       files: ['*.ts', '*.tsx'],
-      extends: [
-        'plugin:@typescript-eslint/recommended',
-      ],
       parser: '@typescript-eslint/parser',
       plugins: ['@typescript-eslint/eslint-plugin'],
       rules: {
@@ -40,6 +37,8 @@ module.exports = {
         '@typescript-eslint/no-use-before-define': ['error'],
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': ['error'],
+        'no-redeclare': 'off',
+        '@typescript-eslint/no-redeclare': ['error'],
       },
     },
   ],
