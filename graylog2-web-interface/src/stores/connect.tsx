@@ -18,36 +18,38 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { isFunction } from 'lodash';
+import { Optional } from 'utility-types';
 
 import isDeepEqual from './isDeepEqual';
 
 type StoreType<State> = {
-  getInitialState: () => State,
-  listen: ((State) => mixed) => (() => void),
+  getInitialState: () => State;
+  listen: (cb: (state: State) => unknown) => () => void;
 };
 
-type ExtractStoreState = <V, Store: StoreType<V>>(Store) => V;
-type ExtractComponentProps = <Props>(React.ComponentType<Props>) => Props;
+export type ExtractStoreState<Store> = Store extends StoreType<infer V> ? V : never;
 
-type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
+export type ResultType<Stores> = { [K in keyof Stores]: ExtractStoreState<Stores[K]> };
 
-type PropsMapper<V, R> = (V) => R;
+type PropsMapper<V, R> = (props: V) => R;
 
-const id = <V, R>(x: V) => {
-  // $FlowFixMe: Casting by force
-  return (x: R);
-};
+const id = <V, >(x: V): V => x;
 
-export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: PropsMapper<V, R> = id): R {
+export function useStore<U>(store: StoreType<U>): U;
+export function useStore<U, M extends (props: U) => any>(store: StoreType<U>, propsMapper: M): ReturnType<M>;
+
+export function useStore(store, propsMapper = id) {
   const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
   const storeStateRef = useRef(storeState);
 
   useEffect(() => store.listen((newState) => {
-    if (!isDeepEqual(newState, storeStateRef.current)) {
-      setStoreState(propsMapper(newState));
-      storeStateRef.current = newState;
+    const mappedProps = propsMapper(newState);
+
+    if (!isDeepEqual(mappedProps, storeStateRef.current)) {
+      setStoreState(mappedProps);
+      storeStateRef.current = mappedProps;
     }
-  }), [store]);
+  }), [propsMapper, store]);
 
   return storeState;
 }
@@ -78,14 +80,30 @@ export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: P
  *
  */
 
-function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props>, MappedProps>(
-  Component: ComponentType,
+function connect<Props extends object, Stores extends object>(
+    Component: React.ComponentType<Props>,
+    stores: Stores
+    // @ts-ignore
+): React.ComponentType<Optional<Props, keyof Stores>>;
+
+function connect<Stores extends object, Props extends MappedProps, MappedProps extends object>(
+    Component: React.ComponentType<Props>,
+    stores: Stores,
+    mapProps: PropsMapper<ResultType<Stores>, MappedProps>
+): React.ComponentType<Optional<Props, keyof MappedProps>>;
+
+function connect<
+    Stores,
+    Props extends MappedProps,
+    MappedProps extends object,
+    >(
+  Component: React.ComponentType<Props>,
   stores: Stores,
-  mapProps: (ResultType<Stores>) => MappedProps = (props) => props,
-): React.ComponentType<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
+  mapProps: PropsMapper<ResultType<Stores>, MappedProps> = (props: ResultType<Stores>) => props as unknown as MappedProps,
+): React.ComponentType<Optional<Props, keyof MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
 
-  class ConnectStoresWrapper extends React.Component<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
+  class ConnectStoresWrapper extends React.Component<Optional<Props, keyof MappedProps>> {
     // eslint-disable-next-line react/state-in-constructor
     state: ResultType<Stores>;
 
@@ -108,7 +126,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
         const state = store.getInitialState();
 
         return [key, state];
-      }).reduce((prev, [key, state]) => ({ ...prev, [key]: state }), {});
+      }).reduce((prev, [key, state]) => ({ ...prev, [key as string]: state }), {});
 
       this.state = { ...this.state, ...storeStates };
     }
@@ -146,17 +164,20 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
         storeProps[key] = state[key];
       });
 
-      return mapProps(storeProps);
+      return mapProps(storeProps as ResultType<Stores>);
     };
 
     render() {
       const nextProps = this._genProps(this.state);
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { ref, ...componentProps } = this.props;
 
-      return <Component {...nextProps} {...componentProps} />;
+      return <Component {...nextProps as MappedProps} {...componentProps as Props} />;
     }
   }
 
+  // @ts-ignore
   ConnectStoresWrapper.displayName = `ConnectStoresWrapper[${wrappedComponentName}] stores=${Object.keys(stores).join(',')}`;
 
   return ConnectStoresWrapper;

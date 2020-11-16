@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+/// <reference types="jest-enzyme" />
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'wrappedEnzyme';
@@ -151,10 +152,9 @@ describe('connect()', () => {
   });
 
   describe('generates `shouldComponentUpdate`', () => {
-    // $FlowFixMe: Treating this as a component
-    const Component: React.ComponentType<{}> = jest.fn(() => <span>Hello!</span>);
-    const SimplestStore = ({
-      getInitialState: jest.fn(),
+    const Component: React.ComponentType<{ someProp?: any, foo: number }> = jest.fn(() => <span>Hello!</span>);
+    const SimplestStore: Store<number> = ({
+      getInitialState: jest.fn(() => 42),
       listen: jest.fn(() => () => {}),
     });
 
@@ -163,7 +163,7 @@ describe('connect()', () => {
     it('comparing empty values properly', () => {
       const ComponentClass = connect(Component, {});
 
-      const wrapper = mount(<ComponentClass />);
+      const wrapper = mount(<ComponentClass foo={42} />);
 
       wrapper.setProps({});
 
@@ -177,7 +177,7 @@ describe('connect()', () => {
       mount(<ComponentClass />);
       const update = asMock(SimplestStore.listen).mock.calls[0][0];
 
-      Component.mockClear();
+      asMock(Component).mockClear();
 
       update(next);
 
@@ -189,7 +189,7 @@ describe('connect()', () => {
 
       const wrapper = mount(<ComponentClass someProp={initial} />);
 
-      Component.mockClear();
+      asMock(Component).mockClear();
 
       wrapper.setProps({ someProp: next });
 
@@ -279,7 +279,7 @@ describe('useStore', () => {
 
   it('allows mangling of props before passing them', () => {
     const Component = () => {
-      const { value } = useStore(SimpleStore, ({ value: v } = {}) => ({ value: v * 2 })) || {};
+      const { value } = useStore(SimpleStore, ({ value: v } = { value: 0 }) => ({ value: v * 2 })) || {};
 
       return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
     };
