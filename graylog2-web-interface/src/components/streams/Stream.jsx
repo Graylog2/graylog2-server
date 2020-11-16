@@ -14,6 +14,7 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 import StreamMetaData from './StreamMetaData';
 import StreamControls from './StreamControls';
@@ -167,7 +168,7 @@ const Stream = createReactClass({
         </LinkContainer>
       );
 
-      if (this.isPermitted(permissions, ['stream_outputs:read'])) {
+      if (this.isPermitted(permissions, ['stream_outputs:read']) && !AppConfig.isCloud()) {
         manageOutputsLink = (
           <LinkContainer to={Routes.stream_outputs(stream.id)}>
             <Button bsStyle="info">Manage Outputs</Button>
