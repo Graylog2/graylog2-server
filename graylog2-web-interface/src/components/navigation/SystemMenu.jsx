@@ -5,6 +5,7 @@ import { NavDropdown } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import naturalSort from 'javascript-natural-sort';
 
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
@@ -90,9 +91,11 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['outputs:read']}>
         <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
       </IfPermitted>
-      <IfPermitted permissions={['indices:read']}>
-        <NavigationLink path={Routes.SYSTEM.INDICES.LIST} description="Indices" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['indices:read']}>
+          <NavigationLink path={Routes.SYSTEM.INDICES.LIST} description="Indices" />
+        </IfPermitted>
+      </HideOnCloud>
       <IfPermitted permissions={['loggers:read']}>
         <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
       </IfPermitted>

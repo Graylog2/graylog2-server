@@ -8,6 +8,7 @@ import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
 import URLUtils from 'util/URLUtils';
+import AppConfig from 'util/AppConfig';
 
 import Routes from 'routing/Routes';
 
@@ -112,6 +113,8 @@ const AppRouter = () => {
     );
   });
 
+  const isCloud = AppConfig.isCloud();
+
   return (
     <Router history={history}>
       <Route component={RouterErrorBoundary}>
@@ -162,12 +165,19 @@ const AppRouter = () => {
                      component={EditContentPackPage} />
               <Route path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')} component={ShowContentPackPage} />
               <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
-              <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
-              <Route path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-              <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-              <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                     component={IndexSetConfigurationPage} />
-              <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+
+              {!isCloud && (
+                <>
+                  <Route path={Routes.SYSTEM.INDEX_SETS.CREATE}
+                         component={IndexSetCreationPage} />
+                  <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')}
+                         component={IndexSetPage} />
+                  <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                         component={IndexSetConfigurationPage} />
+                  <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
+                  <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+                </>
+              )}
 
               <Route path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
               <Route path={Routes.SYSTEM.LOOKUPTABLES.CREATE} component={LUTTablesPage} action="create" />

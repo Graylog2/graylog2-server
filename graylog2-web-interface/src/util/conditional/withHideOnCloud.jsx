@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import AppConfig from '../AppConfig';
+import HideOnCloud from './HideOnCloud';
 
 /**
  * Higher order Component that will not render if environment is on cloud
@@ -12,13 +12,7 @@ import AppConfig from '../AppConfig';
 function withHideOnCloud<Config: {}>(
   Component: React.AbstractComponent<Config>,
 ): React.AbstractComponent<Config> {
-  return (props) => {
-    if (AppConfig.isCloud()) {
-      return null;
-    }
-
-    return <Component {...props} />;
-  };
+  return (props) => <HideOnCloud><Component {...props} /></HideOnCloud>;
 }
 
 export default withHideOnCloud;
