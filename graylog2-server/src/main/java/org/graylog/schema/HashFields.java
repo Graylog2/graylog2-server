@@ -16,13 +16,10 @@
  */
 package org.graylog.schema;
 
-public class AutonomousSystemFields {
-    public static final String AS_DOMAIN = "as_domain";
-    public static final String AS_ISP = "as_isp";
-    public static final String AS_NUMBER = "as_number";
-    public static final String AS_ORGANIZATION = "as_organization";
-
-    // To be removed
-//    @Deprecated
-//    public static final String AS_ORGANIZATION_NAME = AS_ORGANIZATION;
+public class HashFields {
+    public static final String HASH_MD5 = "hash_md5";
+    public static final String HASH_SHA1 = "hash_sha1";
+    public static final String HASH_SHA256 = "hash_sha256";
+    public static final String HASH_SHA512 = "hash_sha512";
+    public static final String HASH_IMPHASH = "hash_imphash";
 }

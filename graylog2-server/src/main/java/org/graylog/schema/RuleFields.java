@@ -16,13 +16,7 @@
  */
 package org.graylog.schema;
 
-public class AutonomousSystemFields {
-    public static final String AS_DOMAIN = "as_domain";
-    public static final String AS_ISP = "as_isp";
-    public static final String AS_NUMBER = "as_number";
-    public static final String AS_ORGANIZATION = "as_organization";
-
-    // To be removed
-//    @Deprecated
-//    public static final String AS_ORGANIZATION_NAME = AS_ORGANIZATION;
+public class RuleFields {
+    public static final String RULE_ID = "rule_id";
+    public static final String RULE_NAME = "rule_name";
 }

@@ -19,15 +19,13 @@ package org.graylog.schema;
 public class NetworkFields {
     public static final String NETWORK_APPLICATION = "network_application";
     public static final String NETWORK_BYTES = "network_bytes";
-    public static final String NETWORK_BYTES_RX = "network_bytes_rx";
-    public static final String NETWORK_BYTES_TX = "network_bytes_tx";
     public static final String NETWORK_COMMUNITY_ID = "network_community_id";
     public static final String NETWORK_DATA_BYTES = "network_data_bytes";
     public static final String NETWORK_DIRECTION = "network_direction";
     public static final String NETWORK_FORWARDED_IP = "network_forwarded_ip";
     public static final String NETWORK_HEADER_BYTES = "network_header_bytes";
     public static final String NETWORK_IANA_NUMBER = "network_iana_number";
-    public static final String NETWORK_ICMP_BYTES = "network_icmp_bytes";
+    public static final String NETWORK_ICMP_TYPE = "network_icmp_type";
     public static final String NETWORK_INNER = "network_inner";
     public static final String NETWORK_INTERFACE_IN = "network_interface_in";
     public static final String NETWORK_INTERFACE_OUT = "network_interface_out";
@@ -39,4 +37,10 @@ public class NetworkFields {
     public static final String NETWORK_TUNNEL_DURATION = "network_tunnel_duration";
     public static final String NETWORK_TUNNEL_TYPE = "network_tunnel_type";
     public static final String NETWORK_TYPE = "network_type";
+
+    // To be removed
+    @Deprecated
+    public static final String NETWORK_BYTES_RX = DestinationFields.DESTINATION_BYTES_SENT;
+    @Deprecated
+    public static final String NETWORK_BYTES_TX = SourceFields.SOURCE_BYTES_SENT;
 }
