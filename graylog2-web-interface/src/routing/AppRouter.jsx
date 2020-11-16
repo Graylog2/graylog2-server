@@ -132,7 +132,7 @@ const AppRouter = () => {
               <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
               <Route path={Routes.STREAMS} component={StreamsPage} />
               <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
-              <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
+              {!isCloud && <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
               <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
               <Route path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
               <Route path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
