@@ -17,9 +17,6 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { $PropertyType, $Shape } from 'utility-types';
-import { $PropertyType, $Shape } from 'utility-types';
-import Reflux from 'reflux';
-import * as Immutable from 'immutable';
 
 import { singletonActions } from 'views/logic/singleton';
 import { RefluxActions } from 'stores/StoreTypes';

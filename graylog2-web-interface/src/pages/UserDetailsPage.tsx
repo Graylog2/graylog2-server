@@ -25,6 +25,7 @@ import UserDetails from 'components/users/UserDetails';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
+import User from 'logic/users/User';
 
 type Props = {
   params: {
@@ -43,7 +44,7 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 );
 
 const UserDetailsPage = ({ params }: Props) => {
-  const [loadedUser, setLoadedUser] = useState();
+  const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const userId = params?.userId;
 
   useEffect(() => {
