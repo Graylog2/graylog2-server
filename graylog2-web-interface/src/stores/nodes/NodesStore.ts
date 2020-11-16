@@ -37,7 +37,7 @@ type NodeInfo = {
 };
 
 type NodesListResponse = {
-  nodes: ?Array<NodeInfo>,
+  nodes: Array<NodeInfo> | null | undefined,
   total: number,
 };
 
@@ -77,7 +77,7 @@ const NodesStore = Reflux.createStore({
 
         if (response.nodes) {
           this.nodes = response.nodes
-            .map((node) => [node.node_id, node])
+            .map<[string, NodeInfo]>((node) => [node.node_id, node])
             .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
           this.clusterId = this._clusterId();
