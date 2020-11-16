@@ -56,7 +56,7 @@ const _streamFilters = (selectedStreams: Array<string>): Array<Immutable.Map<str
   return selectedStreams.map((stream) => Immutable.Map({ type: 'stream', id: stream }));
 };
 
-export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
+export const filtersForQuery = (streams: Array<string> | null | undefined): FilterType | null | undefined => {
   if (!streams || streams.length === 0) {
     return null;
   }
@@ -69,7 +69,7 @@ export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
   });
 };
 
-export const filtersToStreamSet = (filter: ?Immutable.Map<string, any>): Immutable.Set<string> => {
+export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
   if (!filter) {
     return Immutable.Set();
   }
@@ -89,28 +89,28 @@ export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
-export type RelativeTimeRange = {|
+export type RelativeTimeRange = {
   type: 'relative',
   range: number,
-|};
+};
 
-export type AbsoluteTimeRange = {|
+export type AbsoluteTimeRange = {
   type: 'absolute',
   from: string,
   to: string,
-|};
+};
 
-export type KeywordTimeRange = {|
+export type KeywordTimeRange = {
   type: 'keyword',
   keyword: string,
-|};
+};
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
 export default class Query {
-  _value: InternalState;
+  private _value: InternalState;
 
-  constructor(id: QueryId, query: any, timerange: any, filter?: FilterType, searchTypes: SearchTypeList) {
+  constructor(id: QueryId, query: any, timerange: any, filter?: FilterType, searchTypes?: SearchTypeList) {
     this._value = { id, query, timerange, filter, searchTypes };
   }
 
@@ -126,7 +126,7 @@ export default class Query {
     return this._value.timerange;
   }
 
-  get filter(): ?FilterType {
+  get filter(): FilterType | null | undefined {
     return this._value.filter;
   }
 
@@ -181,7 +181,7 @@ export default class Query {
 
   // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .searchTypes([]);
   }
@@ -195,7 +195,7 @@ export default class Query {
 }
 
 class Builder {
-  value: InternalBuilderState;
+  private value: InternalBuilderState;
 
   constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
@@ -217,7 +217,7 @@ class Builder {
     return new Builder(this.value.set('timerange', value));
   }
 
-  filter(value: ?FilterType): Builder {
+  filter(value: FilterType | null | undefined): Builder {
     return new Builder(this.value.set('filter', Immutable.fromJS(value)));
   }
 

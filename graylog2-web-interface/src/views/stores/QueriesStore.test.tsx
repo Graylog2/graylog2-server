@@ -102,7 +102,7 @@ describe('QueriesStore', () => {
     });
 
     it('throws error if invalid type is given', () => {
-      // $FlowFixMe: Passing invalid second argument on purpose
+      // @ts-ignore
       return QueriesActions.rangeType('query1', 'invalid')
         .catch((error) => expect(error).toEqual(new Error('Invalid time range type: invalid')));
     });
