@@ -17,7 +17,8 @@
 // @flow strict
 import Reflux from 'reflux';
 
-import type { PreferencesThemeMode, ThemeMode } from 'theme/constants';
+import { PREFERENCES_THEME_MODE } from 'theme/constants';
+import type { ThemeMode } from 'theme/constants';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -30,19 +31,29 @@ export type Preference = {
   value: boolean | string,
 };
 
+type BooleanString = 'true' | 'false'
+
+export type PreferencesUpdateMap = {
+  enableSmartSearch: boolean | BooleanString,
+  updateUnfocussed: boolean | BooleanString,
+  dashboardSidebarIsPinned?: boolean | BooleanString,
+  searchSidebarIsPinned?: boolean | BooleanString,
+  [PREFERENCES_THEME_MODE]: ThemeMode,
+};
+
 export type PreferencesMap = {
   enableSmartSearch: boolean,
   updateUnfocussed: boolean,
   dashboardSidebarIsPinned?: boolean,
   searchSidebarIsPinned?: boolean,
-  [PreferencesThemeMode]: ThemeMode,
+  [PREFERENCES_THEME_MODE]: ThemeMode,
 };
 
 type PreferencesResponse = {
   preferences: PreferencesMap,
 };
 
-const convertPreferences = (preferences: PreferencesMap): PreferencesMap => {
+const convertPreferences = (preferences: PreferencesUpdateMap): PreferencesMap => {
   const convertedPreferences = {};
 
   Object.entries(preferences).forEach(([key, value]) => {
@@ -55,6 +66,7 @@ const convertPreferences = (preferences: PreferencesMap): PreferencesMap => {
     }
   });
 
+  // @ts-ignore
   return convertedPreferences;
 };
 
@@ -62,7 +74,7 @@ const PreferencesStore = Reflux.createStore({
   listenables: [PreferencesActions],
   URL: qualifyUrl('/users/'),
 
-  saveUserPreferences(userName: string, preferences: PreferencesMap, callback: (preferences: PreferencesMap) => void = () => {}, displaySuccessNotification: boolean = true): void {
+  saveUserPreferences(userName: string, preferences: PreferencesUpdateMap, callback: (preferences: PreferencesUpdateMap) => void = () => {}, displaySuccessNotification: boolean = true): void {
     const convertedPreferences = convertPreferences(preferences);
     const url = `${this.URL + userName}/preferences`;
     const promise = fetch('PUT', url, { preferences: convertedPreferences })

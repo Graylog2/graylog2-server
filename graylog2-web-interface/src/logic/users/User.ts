@@ -242,6 +242,7 @@ export default class User {
   }
 
   static empty() {
+    // @ts-ignore
     return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.Set(), false, false, -1, undefined, false, '', '', 'enabled');
   }
 
