@@ -166,14 +166,18 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')} component={ShowContentPackPage} />
               <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
 
-              {!isCloud && <Route path={Routes.SYSTEM.INDEX_SETS.CREATE}
-                                  component={IndexSetCreationPage} />}
-              {!isCloud && <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')}
-                                  component={IndexSetPage} />}
-              {!isCloud && <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                                  component={IndexSetConfigurationPage} />}
-              {!isCloud && <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />}
-              {!isCloud && <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />}
+              {!isCloud && (
+                <>
+                  <Route path={Routes.SYSTEM.INDEX_SETS.CREATE}
+                         component={IndexSetCreationPage} />
+                  <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')}
+                         component={IndexSetPage} />
+                  <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                         component={IndexSetConfigurationPage} />
+                  <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
+                  <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+                </>
+              )}
 
               <Route path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
               <Route path={Routes.SYSTEM.LOOKUPTABLES.CREATE} component={LUTTablesPage} action="create" />
