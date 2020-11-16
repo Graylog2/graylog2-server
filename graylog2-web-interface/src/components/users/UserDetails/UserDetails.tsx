@@ -31,7 +31,7 @@ import TeamsSection from './TeamsSection';
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 
 type Props = {
-  user: ?User,
+  user: User | null | undefined,
 };
 
 const UserDetails = ({ user }: Props) => {
