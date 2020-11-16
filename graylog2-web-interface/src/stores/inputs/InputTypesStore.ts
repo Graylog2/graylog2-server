@@ -71,11 +71,11 @@ const InputTypesStore = Reflux.createStore({
   list() {
     const promiseTypes = fetch('GET', qualifyUrl(this.sourceUrl));
     const promiseDescriptions = fetch('GET', qualifyUrl(`${this.sourceUrl}/all`));
-    const promise = Promise.all([promiseTypes, promiseDescriptions]);
+    const promise: Promise<[{ types: InputTypes }, InputDescriptions]> = Promise.all([promiseTypes, promiseDescriptions]);
 
     promise
       .then(
-        ([typesResponse: { types: InputTypes }, descriptionsResponse: InputDescriptions]) => {
+        ([typesResponse, descriptionsResponse]) => {
           this.inputTypes = typesResponse.types;
           this.inputDescriptions = descriptionsResponse;
           this.trigger(this.getInitialState());
