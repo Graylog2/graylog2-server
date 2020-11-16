@@ -177,7 +177,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
         }
 
         resolve(QueriesActions.timerange(queryId, newTimerange));
-      });
+      }) as Promise<QueriesList>;
 
       QueriesActions.rangeType.promise(promise);
 
