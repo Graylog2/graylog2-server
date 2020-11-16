@@ -17,26 +17,26 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { $PropertyType, $Shape } from 'utility-types';
-import { $PropertyType, $Shape } from "utility-types";
-import Reflux from "reflux";
-import * as Immutable from "immutable";
+import { $PropertyType, $Shape } from 'utility-types';
+import Reflux from 'reflux';
+import * as Immutable from 'immutable';
 
-import { singletonActions } from "views/logic/singleton";
-import { RefluxActions } from "stores/StoreTypes";
-import { Pagination, PaginatedList } from "stores/PaginationTypes";
-import User, { UserJSON } from "logic/users/User";
-import UserOverview, { AccountStatus } from "logic/users/UserOverview";
+import { singletonActions } from 'views/logic/singleton';
+import { RefluxActions } from 'stores/StoreTypes';
+import { Pagination, PaginatedList } from 'stores/PaginationTypes';
+import User, { UserJSON } from 'logic/users/User';
+import UserOverview, { AccountStatus } from 'logic/users/UserOverview';
 
 /* eslint-disable camelcase */
 export type UserCreate = {
-  email: $PropertyType<UserJSON, "email">;
-  full_name: $PropertyType<UserJSON, "full_name">;
+  email: $PropertyType<UserJSON, 'email'>;
+  full_name: $PropertyType<UserJSON, 'full_name'>;
   password: string;
-  permissions: $PropertyType<UserJSON, "permissions">;
-  roles: $PropertyType<UserJSON, "roles">;
-  session_timeout_ms: $PropertyType<UserJSON, "session_timeout_ms">;
-  timezone: $PropertyType<UserJSON, "timezone">;
-  username: $PropertyType<UserJSON, "username">;
+  permissions: $PropertyType<UserJSON, 'permissions'>;
+  roles: $PropertyType<UserJSON, 'roles'>;
+  session_timeout_ms: $PropertyType<UserJSON, 'session_timeout_ms'>;
+  timezone: $PropertyType<UserJSON, 'timezone'>;
+  username: $PropertyType<UserJSON, 'username'>;
 };
 
 export type UserUpdate = $Shape<UserCreate & {
@@ -86,7 +86,7 @@ const UsersActions: RefluxActions<ActionsType> = singletonActions('Users', () =>
   deleteToken: { asyncResult: true },
   loadUsersPaginated: { asyncResult: true },
   loadUsers: { asyncResult: true },
-  setStatus: { asyncResult: true }
+  setStatus: { asyncResult: true },
 }));
 
 export default UsersActions;
