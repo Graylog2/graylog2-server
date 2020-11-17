@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
+import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import { Overlay } from 'react-overlays';
 
@@ -29,8 +30,10 @@ import StopPropagation from './StopPropagation';
  */
 
 type ActionToggleProps = {
-  children: React.Node,
-  onClick: (SyntheticInputEvent<HTMLButtonElement>) => void,
+  children: React.ReactElement,
+  onClick: (event: SyntheticEvent) => void,
+  // eslint-disable-next-line react/no-unused-prop-types
+  bsRole?: string,
 };
 
 type ActionDropdownState = {
@@ -38,14 +41,14 @@ type ActionDropdownState = {
 };
 
 type FilterPropsProps = {
-  children: React.Node,
-  style?: { [string]: any },
+  children: React.ReactElement,
+  style?: { [key: string]: any },
 };
 
 type ActionDropdownProps = {
-  children: React.Node,
+  children: React.ReactElement,
   container?: HTMLElement,
-  element: React.Node,
+  element: React.ReactNode,
 };
 
 const ActionToggle = ({ children, onClick }: ActionToggleProps) => {
@@ -79,18 +82,29 @@ ActionToggle.propTypes = {
 
 ActionToggle.defaultProps = {
   onClick: () => {},
+  bsRole: undefined,
 };
 
-const FilterProps = ({ children, style }: FilterPropsProps) => React.Children.map(
-  children,
-  (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }),
-);
+const FilterProps = ({ children, style }: FilterPropsProps) => {
+  const mappedChildren = React.Children.map(
+    children,
+    (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }),
+  );
+
+  return <>{mappedChildren}</>;
+};
 
 class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdownState> {
-  target: ?HTMLElement;
+  target: HTMLElement | undefined | null;
 
   static defaultProps = {
     container: undefined,
+  };
+
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+    container: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+    element: PropTypes.node.isRequired,
   };
 
   constructor(props: ActionDropdownProps) {
@@ -101,7 +115,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     };
   }
 
-  _onToggle = (e: SyntheticInputEvent<HTMLButtonElement>) => {
+  _onToggle = (e: SyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
     this.setState(({ show }) => ({ show: !show }));
@@ -113,7 +127,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
     const mappedChildren = React.Children.map(
       children,
-      (child) => child && React.cloneElement(child, {
+      (child: React.ReactElement) => child && React.cloneElement(child, {
         ...child.props,
         ...(child.props.onSelect ? {
           onSelect: (eventKey, event) => {
@@ -147,11 +161,5 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     );
   }
 }
-
-ActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
-  container: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  element: PropTypes.node.isRequired,
-};
 
 export default ActionDropdown;
