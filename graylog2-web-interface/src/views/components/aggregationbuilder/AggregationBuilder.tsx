@@ -46,7 +46,7 @@ type EventResult = {
 
 export type VisualizationComponentProps = {
   config: AggregationWidgetConfig,
-  data: { [string]: Rows, events?: Events },
+  data: { [key: string]: Rows } & { events?: Events },
   editing?: boolean,
   effectiveTimerange: AbsoluteTimeRange,
   fields: FieldTypeMappingsList,
@@ -61,8 +61,7 @@ export type VisualizationComponent =
   & React.ComponentType<VisualizationComponentProps>;
 
 export const makeVisualization = (component: React.ComponentType<VisualizationComponentProps>, type: string): VisualizationComponent => {
-  // $FlowFixMe: Casting by force
-  const visualizationComponent: VisualizationComponent = component;
+  const visualizationComponent = component as VisualizationComponent;
 
   visualizationComponent.type = type;
 
