@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 
@@ -26,13 +27,15 @@ type InternalState = {
   trendPreference: TrendPreference,
 };
 
+/* eslint-disable camelcase */
 export type NumberVisualizationConfigJSON = {
   trend: boolean,
   trend_preference: TrendPreference,
 };
+/* eslint-enable camelcase */
 
 export default class NumberVisualizationConfig extends VisualizationConfig {
-  _value: InternalState;
+  private readonly _value: InternalState;
 
   // eslint-disable-next-line no-undef
   constructor(
@@ -52,8 +55,8 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map((this._value: { [string]: any })));
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Builder(Immutable.Map(this._value));
   }
 
   static create(
