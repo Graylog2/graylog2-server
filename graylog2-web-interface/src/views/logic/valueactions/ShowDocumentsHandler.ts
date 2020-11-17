@@ -50,7 +50,6 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
 };
 
 const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
-  // $FlowFixMe: Needs to be typed properly, right now contains an arbitrary set of keys/values.
   const mergedObject = valuePath.reduce((elem, acc) => ({
     ...acc,
     ...elem,
@@ -61,11 +60,11 @@ const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widge
     .reduce((prev: string, next: string) => addToQuery(prev, next), '');
   const query = addToQuery(widgetQuery, valuePathQuery);
   const valuePathFields = extractFieldsFromValuePath(valuePath);
-  const messageListFields = new Set([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]);
+  const messageListFields = [].concat(new Set<string>([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]));
   const newWidget = duplicateCommonWidgetSettings(MessagesWidget.builder(), widget)
     .query(createElasticsearchQueryString(query))
     .newId()
-    .config(new MessagesWidgetConfig.builder()
+    .config(MessagesWidgetConfig.builder()
       .fields([...messageListFields])
       .showMessageRow(true).build())
     .build();
