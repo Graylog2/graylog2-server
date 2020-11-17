@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
+import { $PropertyType } from 'utility-types';
 
 import { LinkContainer } from 'components/graylog/router';
 import Role from 'logic/roles/Role';
