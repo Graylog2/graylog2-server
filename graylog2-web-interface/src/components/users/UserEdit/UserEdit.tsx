@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
 
@@ -40,7 +39,7 @@ import SectionGrid from '../../common/Section/SectionGrid';
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 type Props = {
-  user: ?User,
+  user: User,
 };
 
 const _updateUser = (data, currentUser, userId) => {
