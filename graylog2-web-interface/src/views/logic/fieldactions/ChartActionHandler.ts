@@ -49,7 +49,7 @@ const fieldTypeFor = (fieldName: string, queryId: string): FieldType => {
     return FieldType.Unknown;
   }
 
-  const mapping: FieldTypeMapping = (fieldTypes: FieldTypeMappingsList)
+  const mapping: FieldTypeMapping = (fieldTypes as FieldTypeMappingsList)
     .find((m: FieldTypeMapping) => m.name === fieldName, null, new FieldTypeMapping(fieldName, FieldType.Unknown));
 
   return mapping.type;
