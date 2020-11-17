@@ -28,24 +28,24 @@ export type ActionComponentProps = {
   queryId: QueryId,
   field: FieldName,
   type: FieldType,
-  value: ?FieldValue,
+  value: FieldValue | undefined | null,
 };
 
-export type ActionComponentType = React.AbstractComponent<ActionComponentProps>;
+export type ActionComponentType = React.ComponentType<ActionComponentProps>;
 
-export type ActionComponents = { [string]: React.Element<ActionComponentType> };
+export type ActionComponents = { [key: string]: React.ElementType<ActionComponentType> };
 
-export type SetActionComponents = ((ActionComponents) => ActionComponents) => void;
+export type SetActionComponents = (fn: (component: ActionComponents) => ActionComponents) => void;
 
-export type ActionHandlerArguments = {|
+export type ActionHandlerArguments = {
   queryId: QueryId,
   field: FieldName,
   value?: FieldValue,
   type: FieldType,
   contexts: ActionContexts,
-|};
+};
 
-export type ActionHandler = (ActionHandlerArguments) => Promise<mixed>;
+export type ActionHandler = (ActionHandlerArguments) => Promise<unknown>;
 export type ActionHandlerCondition = (ActionHandlerArguments) => boolean;
 
 export type ActionHandlerConditions = {
@@ -53,12 +53,12 @@ export type ActionHandlerConditions = {
   isHidden?: ActionHandlerCondition,
 };
 
-export type HandlerAction = {|
+export type HandlerAction = {
   type: string,
   title: string,
   component?: ActionComponentType,
   handler?: ActionHandler,
-|};
+};
 
 export type ActionDefinition = HandlerAction & ActionHandlerConditions;
 
@@ -84,7 +84,7 @@ export function createHandlerFor(action: ActionDefinition, setActionComponents: 
                          type={type} />
       );
 
-      setActionComponents((actionComponents) => ({ [id]: renderedComponent, ...actionComponents }));
+      setActionComponents((actionComponents) => ({ [id]: renderedComponent, ...actionComponents } as ActionComponents));
 
       return Promise.resolve();
     };
