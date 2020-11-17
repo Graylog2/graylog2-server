@@ -23,8 +23,4 @@ public class GeoFields {
     public static final String GEO_COORDINATES = "geo_coordinates";
     public static final String GEO_NAME = "geo_name";
     public static final String GEO_STATE_NAME = "geo_state_name";
-
-    // To be removed
-//    @Deprecated
-//    public static final String GEO_COUNTRY_ISO_CODE = GEO_COUNTRY_ISO;
 }

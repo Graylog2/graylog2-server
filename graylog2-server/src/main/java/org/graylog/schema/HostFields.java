@@ -50,10 +50,4 @@ public class HostFields {
     public static final String HOST_GEO_COORDINATES = HOST_PREFIX + GeoFields.GEO_COORDINATES;
     public static final String HOST_GEO_NAME = HOST_PREFIX + GeoFields.GEO_NAME;
     public static final String HOST_GEO_STATE_NAME = HOST_PREFIX + GeoFields.GEO_STATE_NAME;
-
-    // To be removed
-//    @Deprecated
-//    public static final String HOST_AS_ORGANIZATION_NAME = HOST_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
-//    @Deprecated
-//    public static final String HOST_GEO_COUNTRY_ISO_CODE = HOST_PREFIX + GeoFields.GEO_COUNTRY_ISO;
 }

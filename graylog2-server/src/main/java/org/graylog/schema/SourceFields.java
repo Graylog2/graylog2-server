@@ -33,7 +33,6 @@ public class SourceFields {
     public static final String SOURCE_PACKETS_SENT = "source_packets_sent";
     public static final String SOURCE_PORT = "source_port";
     public static final String SOURCE_TYPE = "source_type";
-    public static final String SOURCE_USER_NAME = "source_user_name";
     public static final String SOURCE_VSYS_UUID = "source_vsys_uuid";
     public static final String SOURCE_ZONE = "source_zone";
 
@@ -59,13 +58,14 @@ public class SourceFields {
     public static final String SOURCE_GEO_NAME = SOURCE_PREFIX + GeoFields.GEO_NAME;
     public static final String SOURCE_GEO_STATE_NAME = SOURCE_PREFIX + GeoFields.GEO_STATE_NAME;
 
+    // User Fields
+    public static final String SOURCE_USER = SOURCE_PREFIX + UserFields.USER;
+    public static final String SOURCE_USER_EMAIL = SOURCE_PREFIX + UserFields.USER_EMAIL;
+    public static final String SOURCE_USER_NAME = SOURCE_PREFIX + UserFields.USER_NAME;
+
     // To be removed
     @Deprecated
     public static final String SOURCE_PACKETS = SOURCE_PACKETS_SENT;
-    @Deprecated
-    public static final String SOURCE_USER = "source_user";
-    @Deprecated
-    public static final String SOURCE_USER_EMAIL = "source_user_email";
     @Deprecated
     public static final String SOURCE_AS_ORGANIZATION_NAME = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION;
 }

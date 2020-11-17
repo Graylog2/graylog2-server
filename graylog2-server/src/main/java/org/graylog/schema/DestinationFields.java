@@ -34,7 +34,6 @@ public class DestinationFields {
     public static final String DESTINATION_PACKETS_SENT = "destination_packets_sent";
     public static final String DESTINATION_PORT = "destination_port";
     public static final String DESTINATION_TYPE = "destination_type";
-    public static final String DESTINATION_USER_NAME = "destination_user_name";
     public static final String DESTINATION_VSYS_UUID = "destination_vsys_uuid";
     public static final String DESTINATION_ZONE = "destination_zone";
 
@@ -59,6 +58,9 @@ public class DestinationFields {
     public static final String DESTINATION_GEO_COORDINATES = DESTINATION_PREFIX + GeoFields.GEO_COORDINATES;
     public static final String DESTINATION_GEO_NAME = DESTINATION_PREFIX + GeoFields.GEO_NAME;
     public static final String DESTINATION_GEO_STATE_NAME = DESTINATION_PREFIX + GeoFields.GEO_STATE_NAME;
+
+    // User Fields
+    public static final String DESTINATION_USER_NAME = DESTINATION_PREFIX + UserFields.USER_NAME;
 
     // To be removed
     @Deprecated
