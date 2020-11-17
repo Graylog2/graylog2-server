@@ -36,7 +36,7 @@ export default class VisualizationConfig {
     throw new Error('Must not be called on abstract class!');
   }
 
-  static __registrations: { [string]: typeof VisualizationConfig } = {};
+  static __registrations: { [key: string]: typeof VisualizationConfig } = {};
 
   static registerSubtype(type: string, implementingClass: typeof VisualizationConfig) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
