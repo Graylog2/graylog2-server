@@ -90,7 +90,7 @@ FormikInput.defaultProps = {
   labelClassName: undefined,
   onChange: undefined,
   type: 'text',
-  validate: () => {},
+  validate: () => undefined,
   wrapperClassName: undefined,
   error: undefined,
 };
