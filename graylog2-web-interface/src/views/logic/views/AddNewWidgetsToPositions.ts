@@ -33,7 +33,7 @@ export default (positionsMap: Immutable.Map<string, WidgetPosition>,
       const pos = position.toBuilder().row(position.row + widgetDef.defaultHeight).build();
 
       return newPosMap.set(id, pos);
-    }, Immutable.Map());
+    }, Immutable.Map<string, WidgetPosition>());
     const position = overrideWidgetPositions.get(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
 
     return result.set(widget.id, position.toBuilder().row(1).col(1).build());
