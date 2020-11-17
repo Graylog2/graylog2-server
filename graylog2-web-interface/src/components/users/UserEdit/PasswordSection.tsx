@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
@@ -22,7 +21,7 @@ import { Formik, Form } from 'formik';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Button, Row, Col } from 'components/graylog';
-import User from 'logic/users/User';
+import User, {UserJSON} from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { FormikFormGroup } from 'components/common';
@@ -49,7 +48,7 @@ const _onSubmit = (formData, userId) => {
 };
 
 const PasswordSection = ({ user: { id } }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser: UserJSON = useContext(CurrentUserContext);
   let requiresOldPassword = true;
 
   if (isPermitted(currentUser?.permissions, 'users:passwordchange:*')) {
