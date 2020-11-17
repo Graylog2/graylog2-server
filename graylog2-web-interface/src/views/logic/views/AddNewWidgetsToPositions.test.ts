@@ -31,7 +31,7 @@ describe('AddNewWidgetsToPositions', () => {
   it('should add a new widget to the first row and column', () => {
     const newMessageList = Widget.builder().id('foo-1').type('MESSAGES').build();
     const widgets = [newMessageList];
-    const positions = Immutable.Map();
+    const positions = Immutable.Map<string, WidgetPosition>();
     const newPositions = AddNewWidgetsToPositions(positions, widgets);
 
     expect(newPositions).toMatchSnapshot();
