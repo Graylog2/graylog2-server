@@ -32,9 +32,10 @@ type InternalState = {
   dataType: string,
   defaultValue: any,
   optional: boolean,
-  binding: ?ParameterBinding,
+  binding: ParameterBinding | undefined | null,
 };
 
+/* eslint-disable camelcase */
 export type ParameterJson = {
   type: string,
   name: string,
@@ -43,15 +44,16 @@ export type ParameterJson = {
   data_type: string,
   default_value: any,
   optional: boolean,
-  binding: ?ParameterBindingJsonRepresentation,
+  binding: ParameterBindingJsonRepresentation | undefined | null,
 };
+/* eslint-enable camelcase */
 
 class Parameter {
-  _value: InternalState;
+  private _value: InternalState;
 
-  static __registrations: { [string]: typeof Parameter } = {};
+  static __registrations: { [key: string]: typeof Parameter } = {};
 
-  constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding: ?ParameterBinding) {
+  constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding) {
     this._value = { type, name, title, description, dataType, defaultValue, optional, binding };
   }
 
@@ -89,7 +91,7 @@ class Parameter {
     return true;
   }
 
-  get binding(): ?ParameterBinding {
+  get binding(): ParameterBinding | undefined | null {
     return this._value.binding;
   }
 
@@ -109,6 +111,10 @@ class Parameter {
   }
 }
 
-export default singleton('views.logic.parameters.Parameter', () => Parameter);
+const SingletonParameter = singleton('views.logic.parameters.Parameter', () => Parameter);
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type SingletonParameter = InstanceType<typeof Parameter>;
+
+export default SingletonParameter;
 
 export type ParameterMap = Immutable.Map<string, Parameter>;
