@@ -17,8 +17,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import View from 'views/logic/views/View';
-import type { ViewJson } from 'views/logic/views/View';
+import View, { ViewJson } from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 
 const simpleView = (): View => View.builder()
@@ -35,7 +34,7 @@ const simpleView = (): View => View.builder()
   .requires({})
   .build();
 
-const simpleViewJson = (): ViewJson => ({ ...(simpleView().toJSON()), requires: {} });
+const simpleViewJson = () => ({ ...simpleView().toJSON(), requires: {} });
 
 export {
   simpleView,
