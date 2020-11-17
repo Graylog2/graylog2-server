@@ -17,6 +17,7 @@
 // @flow strict
 import uuid from 'uuid/v4';
 import { Set } from 'immutable';
+import { $Shape } from 'utility-types';
 
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -47,11 +48,11 @@ type FormattedPivot = {
   },
 };
 
-type TimeConfig = {|
+type TimeConfig = {
   interval: 'timeunit',
   unit: TimeUnit,
   value: number,
-|};
+};
 
 const formatPivot = (pivot: Pivot): FormattedPivot => {
   const { type, field, config } = pivot;
@@ -60,11 +61,9 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
   switch (type) {
     // eslint-disable-next-line no-case-declarations
     case 'time':
-      // $FlowFixMe: ConfigType is not properly typed yet
       if (newConfig.interval.type === 'timeunit') {
         const { interval } = newConfig;
-        // $FlowFixMe: We know this is the right type
-        const { unit, value } = (interval: { interval: TimeConfig });
+        const { unit, value } = interval as TimeConfig;
 
         newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
       }
@@ -102,7 +101,7 @@ const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPiv
 export default ({ config }: { config: AggregationWidgetConfig }) => {
   const chartConfig = generateConfig(uuid(), 'chart', config);
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const configBuilder = ConfigBuilder.create([chartConfig]);
 
   // TODO: This should go into a visualization config specific function
@@ -129,6 +128,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   return configBuilder.build();
 };
 
+/* eslint-disable camelcase */
 type Config = {
   id: string,
   name: string,
@@ -147,6 +147,7 @@ type Config = {
     id: string,
   },
 };
+/* eslint-enable camelcase */
 
 class ConfigBuilder {
   value: Set<Config>;
