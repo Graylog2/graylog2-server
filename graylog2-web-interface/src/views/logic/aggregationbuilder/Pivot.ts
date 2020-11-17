@@ -16,7 +16,7 @@
  */
 // @flow strict
 
-type ConfigType = { [string]: mixed };
+type ConfigType = { [key: string]: unknown };
 
 export const DateType = 'time';
 export const ValuesType = 'values';
