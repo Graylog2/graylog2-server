@@ -23,6 +23,25 @@ module.exports = {
   overrides: [
     {
       files: ['*.js', '*.jsx'],
+      extends: [
+        'plugin:flowtype/recommended',
+      ],
+      plugins: ['flowtype'],
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['@typescript-eslint/eslint-plugin'],
+      rules: {
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': ['error'],
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': ['error'],
+        'no-redeclare': 'off',
+        '@typescript-eslint/no-redeclare': ['error'],
+        'no-shadow': 'off',
+        '@typescript-eslint/no-shadow': ['error'],
+      },
     },
   ],
   extends: [
@@ -31,13 +50,11 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/react',
-    'plugin:flowtype/recommended',
     'plugin:jest-formatting/strict',
   ],
   plugins: [
     'import',
     'react-hooks',
-    'flowtype',
     'jest-formatting',
   ],
   rules: {
@@ -70,6 +87,7 @@ module.exports = {
     'object-shorthand': ['error', 'methods'],
     'react/forbid-prop-types': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],
+    'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
     'react/jsx-one-expression-per-line': 'off',
