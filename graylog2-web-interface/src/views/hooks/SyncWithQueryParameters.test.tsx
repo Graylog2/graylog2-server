@@ -25,7 +25,7 @@ import history from 'util/History';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
+import Query, {createElasticsearchQueryString, filtersForQuery, RelativeTimeRange} from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import type { TimeRange } from 'views/logic/queries/Query';
 
@@ -46,7 +46,7 @@ jest.mock('views/stores/ViewStore', () => ({
 
 jest.mock('util/History');
 
-const lastFiveMinutes = { type: 'relative', range: 300 };
+const lastFiveMinutes: RelativeTimeRange = { type: 'relative', range: 300 };
 const createSearch = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') => Search.builder()
   .queries([
     Query.builder()
