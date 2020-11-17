@@ -34,7 +34,7 @@ const useActionListeners = (actions, callback, dependencies) => {
   }, dependencies);
 };
 
-const extractTimerangeParams = (timerange: TimeRange) => {
+const extractTimerangeParams = (timerange: TimeRange): [string, string | number][] => {
   const { type } = timerange;
   const result = { rangetype: type };
 
@@ -46,7 +46,7 @@ const extractTimerangeParams = (timerange: TimeRange) => {
   }
 };
 
-export const syncWithQueryParameters = (query: string, action: (string) => mixed = history.push) => {
+export const syncWithQueryParameters = (query: string, action: (string) => unknown = history.push) => {
   const { view } = ViewStore.getInitialState() || {};
 
   if (view && view.type === View.Type.Search) {
