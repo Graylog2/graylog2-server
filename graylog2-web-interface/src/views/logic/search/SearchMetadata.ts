@@ -33,10 +33,12 @@ type State = {
   undeclared: Immutable.Set<string>,
 };
 
+/* eslint-disable camelcase */
 export type SearchMetadataJson = {
-  query_metadata: { [string]: QueryMetadataJson },
-  declared_parameters: { [string]: ParameterJson },
+  query_metadata: { [key: string]: QueryMetadataJson },
+  declared_parameters: { [key: string]: ParameterJson },
 };
+/* eslint-enable camelcase */
 
 export default class SearchMetadata {
   _value: State;
@@ -76,9 +78,9 @@ export default class SearchMetadata {
     // eslint-disable-next-line camelcase
     const { query_metadata, declared_parameters } = value;
     const queryMetadata = Immutable.Map(query_metadata)
-      .map((metadata: QueryMetadataJson) => QueryMetadata.fromJSON(metadata));
+      .map((metadata: QueryMetadataJson) => QueryMetadata.fromJSON(metadata)).toMap();
     const declaredParameters = Immutable.Map(declared_parameters)
-      .map((parameter: ParameterJson) => Parameter.fromJSON(parameter));
+      .map((parameter: ParameterJson) => Parameter.fromJSON(parameter)).toMap();
 
     return new SearchMetadata(queryMetadata, declaredParameters);
   }
