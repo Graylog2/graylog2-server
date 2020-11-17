@@ -26,6 +26,7 @@ import type { Definition } from 'views/logic/aggregationbuilder/Series';
 
 import type { TimeUnit } from '../../../Constants';
 import SortConfig from '../../aggregationbuilder/SortConfig';
+import NumberVisualizationConfig from "views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig";
 
 const mapTimeunit = (unit: TimeUnit) => {
   switch (unit) {
@@ -111,7 +112,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
 
   // TODO: This should go into a visualization config specific function
   // $FlowFixMe: This is a NumberVisualizationConfig. We know so for config.visualization is 'numeric'.
-  if (config.visualization === 'numeric' && config.visualizationConfig && config.visualizationConfig.trend) {
+  if (config.visualization === 'numeric' && config.visualizationConfig && (config.visualizationConfig as NumberVisualizationConfig).trend) {
     const trendConfig = {
       ...(generateConfig(uuid(), 'trend', config)),
       timerange: { type: 'offset', source: 'search_type', id: chartConfig.id },
