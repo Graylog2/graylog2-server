@@ -17,12 +17,12 @@
 // @flow strict
 import * as React from 'react';
 
-export type ActionContexts = { [string]: * };
+export type ActionContexts = { [key: string]: any };
 
 const ActionContext = React.createContext<ActionContexts>({});
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   value: ActionContexts;
 };
 
