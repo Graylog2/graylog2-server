@@ -22,13 +22,13 @@ export type SeriesConfigJson = {
 };
 
 type InternalState = {
-  name: ?string,
+  name: string | undefined | null,
 };
 
 export default class SeriesConfig {
   _value: InternalState;
 
-  constructor(name: ?string) {
+  constructor(name: string | undefined | null) {
     this._value = { name };
   }
 
@@ -53,12 +53,13 @@ export default class SeriesConfig {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 }
 
 type BuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: BuilderState;
 
