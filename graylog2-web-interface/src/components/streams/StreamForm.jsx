@@ -88,7 +88,7 @@ class StreamForm extends React.Component {
   _indexSetSelect = () => {
     const { indexSetId } = this.state;
 
-    if (!AppConfig.isCloud()) {
+    if (AppConfig.isCloud()) {
       return null;
     }
 
