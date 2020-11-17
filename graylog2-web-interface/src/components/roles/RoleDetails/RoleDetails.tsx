@@ -26,7 +26,7 @@ import ProfileSection from './ProfileSection';
 import UsersSection from './UsersSection';
 
 type Props = {
-  role: ?Role,
+  role: Role | null | undefined,
 };
 
 const RoleDetails = ({ role }: Props) => {
