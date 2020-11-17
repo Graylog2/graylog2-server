@@ -42,7 +42,7 @@ const ViewTransformer = (searchView: View): View => {
         .query(query)
         .streams(streams)
         .build();
-    });
+    }).toList();
 
     return viewState.toBuilder()
       .widgets(widgets)
