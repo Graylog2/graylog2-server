@@ -29,6 +29,7 @@ describe('SelectExtractorType', () => {
   const field = 'value_field';
   const focus = jest.fn();
 
+  // @ts-ignore
   window.open = jest.fn(() => { return { focus }; });
 
   const message = {
