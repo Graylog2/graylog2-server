@@ -22,10 +22,10 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
-type Props = {|
+type Props = {
   toggleEdit: () => void,
   editing: boolean,
-|};
+};
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
