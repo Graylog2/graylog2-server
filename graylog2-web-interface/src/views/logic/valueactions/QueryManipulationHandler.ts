@@ -28,7 +28,7 @@ import View from '../views/View';
 import GlobalOverride from '../search/GlobalOverride';
 import type { ElasticsearchQueryString, QueryId } from '../queries/Query';
 
-function connectToStore<State>(store: Store<State>, updateFn: (State) => mixed): void {
+function connectToStore<State>(store: Store<State>, updateFn: (state: State) => unknown): void {
   updateFn(store.getInitialState());
   store.listen(updateFn);
 }
@@ -38,7 +38,7 @@ export default class QueryManipulationHandler {
 
   view: View;
 
-  globalOverride: ?GlobalOverride;
+  globalOverride: GlobalOverride | undefined | null;
 
   constructor() {
     connectToStore(QueriesStore, (queries) => { this.queries = queries; });
