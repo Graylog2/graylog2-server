@@ -27,7 +27,7 @@ type Props = {
 
 const EventListConfiguration = ({ enabled, onChange }: Props) => {
   return (
-    <Checkbox onChange={(event: SyntheticInputEvent<HTMLInputElement>) => onChange(event.target.checked)}
+    <Checkbox onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
               checked={enabled}>
       Enable Event Annotation
     </Checkbox>
