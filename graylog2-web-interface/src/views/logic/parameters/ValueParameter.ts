@@ -30,11 +30,11 @@ export default class ValueParameter extends Parameter {
   // eslint-disable-next-line no-use-before-define
   static Builder: typeof Builder;
 
-  constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding: ?ParameterBinding) {
+  constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding) {
     super(ValueParameter.type, name, title, description, dataType, defaultValue, optional, binding);
   }
 
-  static create(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding: ?ParameterBinding): ValueParameter {
+  static create(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding): ValueParameter {
     return new ValueParameter(name, title, description, dataType, defaultValue, optional, binding);
   }
 
