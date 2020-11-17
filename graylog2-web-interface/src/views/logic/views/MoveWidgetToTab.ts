@@ -63,7 +63,7 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
     .build();
 };
 
-const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: ?string): TitlesMap => {
+const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: string | undefined | null): TitlesMap => {
   if (!newTitle) {
     return titlesMap;
   }
@@ -74,7 +74,7 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: ?st
   return titlesMap.set('widget', newWidgetTitleMap);
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, newWidgetPosition: WidgetPosition, widgetTitle: ?string): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, newWidgetPosition: WidgetPosition, widgetTitle: string | undefined | null): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newWidget = widget.toBuilder().id(uuid()).build();
   const newWidgets = viewState.widgets.push(newWidget);
@@ -97,16 +97,16 @@ const _getWidgetPosition = (widgetId: WidgetId, queryId: QueryId, view: View): W
   return view.state.get(queryId).widgetPositions[widgetId];
 };
 
-const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): ?string => {
+const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => {
   return view.state.get(queryId).titles.getIn(['widget', widgetId]);
 };
 
-const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): ?View => {
+const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): View | undefined | null => {
   if (dashboard.type !== View.Type.Dashboard) {
     throw new Error(`Unexpected type ${dashboard.type} expected ${View.Type.Dashboard}`);
   }
 
-  const match: ?[Widget, QueryId] = FindWidgetAndQueryIdInView(widgetId, dashboard);
+  const match: [Widget, QueryId] | undefined | null = FindWidgetAndQueryIdInView(widgetId, dashboard);
 
   if (match) {
     const [widget, queryId] = match;
