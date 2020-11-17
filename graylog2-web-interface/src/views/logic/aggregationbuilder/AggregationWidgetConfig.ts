@@ -42,7 +42,7 @@ type InternalState = {
   series: Array<Series>,
   sort: Array<SortConfig>,
   visualization: string,
-  visualizationConfig: ?VisualizationConfig,
+  visualizationConfig: VisualizationConfig | undefined | null,
   eventAnnotation: boolean,
 };
 
@@ -137,7 +137,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 
   toBuilder() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map((this._value: { [string]: any })));
+    return new Builder(Immutable.Map(this._value));
   }
 
   toJSON() {
@@ -257,7 +257,7 @@ class Builder {
     return new Builder(this.value.set('visualization', type));
   }
 
-  visualizationConfig(config: ?VisualizationConfig) {
+  visualizationConfig(config: VisualizationConfig | undefined | null) {
     return new Builder(this.value.set('visualizationConfig', config));
   }
 
@@ -265,7 +265,7 @@ class Builder {
     return new Builder(this.value.set('rollup', rollup));
   }
 
-  formattingSettings(value: ?WidgetFormattingSettings) {
+  formattingSettings(value: WidgetFormattingSettings | undefined | null) {
     return new Builder(this.value.set('formattingSettings', value));
   }
 
