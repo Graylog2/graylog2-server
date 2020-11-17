@@ -16,6 +16,7 @@
  */
 // @flow strict
 import chroma from 'chroma-js';
+import {RelativeTimeRange} from "views/logic/queries/Query";
 
 export const TIMESTAMP_FIELD = 'timestamp';
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, 'source'];
@@ -24,7 +25,7 @@ export const Messages = {
 };
 
 export const DEFAULT_RANGE_TYPE = 'relative';
-export const DEFAULT_TIMERANGE = { type: DEFAULT_RANGE_TYPE, range: 300 };
+export const DEFAULT_TIMERANGE: RelativeTimeRange = { type: DEFAULT_RANGE_TYPE, range: 300 };
 
 export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
@@ -40,7 +41,7 @@ export const TimeUnits = {
   months: 'Months',
 };
 
-export type TimeUnit = $Keys<typeof TimeUnits>;
+export type TimeUnit = keyof typeof TimeUnits;
 
 export const viewsPath = '/views';
 export const showViewsPath = `${viewsPath}/:viewId`;
