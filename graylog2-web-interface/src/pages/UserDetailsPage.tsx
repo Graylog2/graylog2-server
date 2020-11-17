@@ -33,7 +33,7 @@ type Props = {
   },
 };
 
-const PageTitle = ({ fullName }: {fullName: ?string}) => (
+const PageTitle = ({ fullName }: {fullName: string}) => (
   <>
     User Details {fullName && (
       <>
