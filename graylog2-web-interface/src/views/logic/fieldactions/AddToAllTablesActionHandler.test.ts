@@ -53,6 +53,7 @@ describe('AddToAllTablesActionHandler', () => {
 
     const expectedWidgets = Map([[expectdMessageWidget.id, expectdMessageWidget], [pivotWidget.id, pivotWidget]]);
 
+    // @ts-ignore
     WidgetStore.getInitialState = jest.fn(() => widgets);
 
     WidgetActions.updateWidgets = mockAction(jest.fn((newWidgets) => {
