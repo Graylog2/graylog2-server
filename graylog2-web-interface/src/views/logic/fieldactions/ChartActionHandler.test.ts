@@ -66,8 +66,7 @@ describe('ChartActionHandler', () => {
 
   describe('retrieves field type for `timestamp` field', () => {
     beforeEach(() => {
-      // $FlowFixMe this is a mock
-      pivotForField.mockReturnValue('PIVOT');
+      asMock(pivotForField).mockReturnValue('PIVOT');
     });
 
     it('uses Unknown if FieldTypeStore returns nothing', () => {
