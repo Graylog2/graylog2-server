@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { Field } from 'formik';
 
@@ -24,9 +23,6 @@ const TimeoutFormGroup = () => (
   <Field name="session_timeout_ms">
     {({ field: { name, value, onChange } }) => (
       <TimeoutInput value={value}
-                    labelSize={3}
-                    controlSize={9}
-                    name={name}
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
     )}
   </Field>
