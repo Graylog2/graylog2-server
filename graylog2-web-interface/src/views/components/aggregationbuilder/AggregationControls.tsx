@@ -38,9 +38,11 @@ import SeriesSelect from './SeriesSelect';
 import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 import EventListConfiguration from './EventListConfiguration';
+import {$PropertyType} from "utility-types";
+import SortConfig from "views/logic/aggregationbuilder/SortConfig";
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   config: AggregationWidgetConfig,
   fields: Immutable.List<FieldTypeMapping>,
   onChange: (AggregationWidgetConfig) => void,
@@ -114,7 +116,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().sort(sort).build() }));
   };
 
-  _onSortDirectionChange = (direction: $PropertyType<$PropertyType<Props, 'config'>, 'direction'>) => {
+  _onSortDirectionChange = (direction: $PropertyType<SortConfig, 'direction'>) => {
     this._setAndPropagate((state) => ({
       config: state.config.toBuilder().sort(state.config.sort
         .map((sort) => sort.toBuilder().direction(direction).build())).build(),
@@ -165,7 +167,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     const suggester = new SeriesFunctionsSuggester(formattedFields);
 
     const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex((x) => x === visualization) >= 0;
-    const childrenWithCallback = React.Children.map(children, (child) => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
+    const childrenWithCallback = React.Children.map(children, (child: React.ReactElement) => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
     const VisualizationConfigComponent = VisualizationConfigType?.component;
 
