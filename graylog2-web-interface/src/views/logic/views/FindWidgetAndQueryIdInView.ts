@@ -23,8 +23,8 @@ import ViewState from './ViewState';
 
 import Widget from '../widgets/Widget';
 
-const FindWidgetAndQueryIdInView = (widgetId: WidgetId, view: View): ?[Widget, QueryId] => {
-  return view.state.reduce((foundWidget: ?[Widget, QueryId], state: ViewState, queryId: QueryId): ?[Widget, QueryId] => {
+const FindWidgetAndQueryIdInView = (widgetId: WidgetId, view: View): [Widget, QueryId] | undefined | null => {
+  return view.state.reduce((foundWidget: [Widget, QueryId] | undefined | null, state: ViewState, queryId: QueryId): [Widget, QueryId] | undefined | null => {
     if (foundWidget) {
       return foundWidget;
     }
