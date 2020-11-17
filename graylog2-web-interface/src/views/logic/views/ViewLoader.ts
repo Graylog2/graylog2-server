@@ -28,7 +28,7 @@ const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
   return hooks.reduce((prev, cur: ViewHook) => prev.then(() => cur(args)), Promise.resolve());
 };
 
-type Query = { [string]: any };
+type Query = { [key: string]: any };
 type OnSuccess = () => void;
 type OnError = () => void;
 
