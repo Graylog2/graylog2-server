@@ -30,15 +30,16 @@ type SearchTypePivot = {
 };
 
 type SearchTypeBase = {
-  filter: ?string,
+  filter: string | undefined | null,
   id: string,
-  name: ?string,
-  query: ?ElasticsearchQueryString,
-  timerange: ?TimeRange,
+  name: string | undefined | null,
+  query: ElasticsearchQueryString | undefined | null,
+  timerange: TimeRange | undefined | null,
   type: string,
   streams: Array<string>,
 };
 
+/* eslint-disable camelcase */
 export type AggregationSearchType = SearchTypeBase & {
   sort: Array<SortConfig>,
   series: Array<{id: string, type: string, field: string}>,
@@ -46,6 +47,7 @@ export type AggregationSearchType = SearchTypeBase & {
   row_groups: Array<SearchTypePivot>,
   rollup: boolean,
 };
+/* eslint-enable camelcase */
 
 export type MessagesSearchType = SearchTypeBase & {
   sort: Array<MessageSortConfig>,
