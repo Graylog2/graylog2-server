@@ -17,13 +17,15 @@
 // @flow strict
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { Optional } from 'utility-types';
 
-function withPluginEntities<Props, Entities: {}>(
-  Component: React.AbstractComponent<Props>,
+function withPluginEntities<Props extends {}, Entities extends {}>(
+  Component: React.ComponentType<Props>,
   entityMapping: Entities,
-): React.AbstractComponent<$Diff<Props, $ObjMapi<Entities, <Key: string>(Key) => $ElementType<Props, Key>>>> {
+  // @ts-ignore
+): React.ComponentType<Optional<Props, keyof Entities>> {
   const entities = Object.entries(entityMapping)
-    .map(([targetKey, entityKey]) => ([targetKey, PluginStore.exports(entityKey)]))
+    .map(([targetKey, entityKey]) => [targetKey, PluginStore.exports(entityKey)])
     .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
   return (props: Props) => <Component {...entities} {...props} />;
