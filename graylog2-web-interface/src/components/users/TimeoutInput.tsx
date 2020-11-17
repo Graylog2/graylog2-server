@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -81,6 +80,8 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
     setUnit(newUnit);
   };
 
+  // @ts-ignore
+  // @ts-ignore
   return (
     <>
       <Input id="timeout-controls"
@@ -112,6 +113,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                      onChange={_onChangeValue} />
             </Col>
             <Col xs={4}>
+              {/* @ts-ignore TODO: No overload matches this call */}
               <TimeoutUnitSelect disabled={sessionTimeoutNever}
                                  value={`${unit}`}
                                  onChange={_onChangeUnit} />
