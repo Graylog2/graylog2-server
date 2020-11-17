@@ -38,7 +38,7 @@ class Widget {
   // eslint-disable-next-line no-use-before-define
   static Builder: typeof Builder;
 
-  constructor(id: string, type: string, config: any, filter: string | null | undefined, timerange: TimeRange | null | undefined, query: QueryString | null | undefined, streams: Array<string> = []) {
+  constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams: Array<string> = []) {
     this._value = { id, type, config, filter: filter === null ? undefined : filter, timerange, query, streams };
   }
 
