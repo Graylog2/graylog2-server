@@ -47,19 +47,19 @@ export default class GlobalOverride {
     this._value = { timerange, query, keepSearchTypes, searchTypes };
   }
 
-  get timerange(): ?TimeRange {
+  get timerange(): TimeRange | undefined | null {
     return this._value.timerange;
   }
 
-  get query(): ?QueryString {
+  get query(): QueryString | undefined | null {
     return this._value.query;
   }
 
-  get keepSearchTypes(): ?string[] {
+  get keepSearchTypes(): string[] | undefined | null {
     return this._value.keepSearchTypes;
   }
 
-  get searchTypes(): ?MessageListOptions {
+  get searchTypes(): MessageListOptions | undefined | null {
     return this._value.searchTypes;
   }
 
