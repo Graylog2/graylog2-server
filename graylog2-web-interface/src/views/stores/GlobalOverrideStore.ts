@@ -20,7 +20,7 @@ import Reflux from 'reflux';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type {ElasticsearchQueryString, TimeRange} from 'views/logic/queries/Query';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
@@ -93,7 +93,7 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
       return promise;
     },
     query(newQueryString: string) {
-      const newQuery = {
+      const newQuery: ElasticsearchQueryString = {
         type: 'elasticsearch',
         query_string: newQueryString,
       };
