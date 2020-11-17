@@ -69,7 +69,7 @@ export default class Search {
 
   get requiredParameters(): Immutable.Set<Parameter> {
     return this.parameters
-      .filter((p) => (!p.optional && !p.defaultValue));
+      .filter((p) => (!p.optional && !p.defaultValue)).toSet();
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -106,9 +106,9 @@ export default class Search {
 }
 
 class Builder {
-  value: Immutable.Map<string, *>;
+  private value: Immutable.Map<string, any>;
 
-  constructor(value: Immutable.Map<string, *> = Immutable.Map()) {
+  constructor(value: Immutable.Map<string, any> = Immutable.Map()) {
     this.value = value;
   }
 
@@ -117,7 +117,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(ObjectID().toString());
+    return this.id(new ObjectID().toString());
   }
 
   queries(value: (Array<Query> | QuerySet)): Builder {
