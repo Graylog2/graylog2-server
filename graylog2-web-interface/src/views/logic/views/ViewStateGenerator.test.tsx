@@ -20,7 +20,7 @@ import ViewStateGenerator from './ViewStateGenerator';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 
-const mockList = jest.fn(() => Promise.resolve([]));
+const mockList = jest.fn((...args) => Promise.resolve([]));
 
 jest.mock('injection/CombinedProvider', () => ({
   get: (type) => ({
@@ -45,10 +45,10 @@ describe('ViewStateGenerator', () => {
   });
 
   it('adds decorators for current stream to message table', async () => {
-    mockList.mockReturnValue([
+    mockList.mockReturnValue(Promise.resolve([
       { id: 'decorator1', stream: 'foobar', order: 0, type: 'something' },
       { id: 'decorator2', stream: 'different', order: 0, type: 'something' },
-    ]);
+    ]));
 
     const result = await ViewStateGenerator(View.Type.Search, 'foobar');
 
@@ -64,10 +64,10 @@ describe('ViewStateGenerator', () => {
   });
 
   it('adds decorators for default search to message table if stream id is `null`', async () => {
-    mockList.mockReturnValue([
+    mockList.mockReturnValue(Promise.resolve([
       { id: 'decorator1', stream: 'foobar', order: 0, type: 'something' },
       { id: 'decorator2', stream: null, order: 0, type: 'something' },
-    ]);
+    ]));
 
     const result = await ViewStateGenerator(View.Type.Search, null);
 
@@ -83,10 +83,10 @@ describe('ViewStateGenerator', () => {
   });
 
   it('does not add decorators for current stream to message table if none exist for this stream', async () => {
-    mockList.mockReturnValue([
+    mockList.mockReturnValue(Promise.resolve([
       { id: 'decorator1', stream: 'foobar', order: 0, type: 'something' },
       { id: 'decorator2', stream: null, order: 0, type: 'something' },
-    ]);
+    ]));
 
     const result = await ViewStateGenerator(View.Type.Search, 'otherstream');
 
