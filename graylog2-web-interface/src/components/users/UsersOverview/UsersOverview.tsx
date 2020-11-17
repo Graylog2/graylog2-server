@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
 import type { PaginatedUsers } from 'actions/users/UsersActions';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/graylog';
@@ -31,6 +30,8 @@ import UserOverviewItem from './UserOverviewItem';
 import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
+import UserOverview from 'logic/users/UserOverview';
+import {UserJSON} from "logic/users/User";
 
 const DEFAULT_PAGINATION = {
   page: 1,
@@ -86,11 +87,11 @@ const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const UsersOverview = () => {
-  const currentUser = useContext(CurrentUserContext);
-  const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
+  const currentUser = useContext<UserJSON>(CurrentUserContext);
+  const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { list: users, adminUser, pagination: { total } = {} } = paginatedUsers || {};
+  const { list: users, adminUser, pagination: { total = 0 } = {} } = paginatedUsers || {};
   const { page, query, perPage } = pagination;
 
   useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);
@@ -102,7 +103,7 @@ const UsersOverview = () => {
   }
 
   const searchFilter = <UsersFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
-  const _usersOverviewItem = (user) => <UserOverviewItem user={user} isActive={(currentUser?.id === user.id)} />;
+  const _usersOverviewItem = (user: UserOverview) => <UserOverviewItem user={user} isActive={(currentUser?.id === user.id)} />;
 
   return (
     <Container>
