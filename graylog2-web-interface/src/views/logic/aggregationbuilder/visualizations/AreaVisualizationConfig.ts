@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
+import {$PropertyType} from "utility-types";
 
 type InternalState = {
   interpolation: InterpolationMode,
@@ -29,7 +30,7 @@ export type AreaVisualizationConfigJSON = {
 };
 
 export default class AreaVisualizationConfig extends VisualizationConfig {
-  _value: InternalState;
+  private readonly _value: InternalState;
 
   constructor(interpolation: $PropertyType<InternalState, 'interpolation'>) {
     super();
