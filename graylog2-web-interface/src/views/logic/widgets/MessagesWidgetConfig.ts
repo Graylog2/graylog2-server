@@ -29,7 +29,7 @@ export type Decorator = {
   id: string,
   type: string,
   config: any,
-  stream: ?string,
+  stream: string | undefined | null,
   order: number,
 };
 
@@ -44,6 +44,7 @@ export type MessagesWidgetConfigJSON = {
   decorators: Array<Decorator>,
   fields: Array<string>,
   sort: Array<SortConfigJson>,
+  // eslint-disable-next-line camelcase
   show_message_row: boolean,
 };
 
@@ -75,8 +76,8 @@ export default class MessagesWidgetConfig extends WidgetConfig {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map((this._value: { [string]: any })));
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Builder(Immutable.Map((this._value)));
   }
 
   toJSON() {
@@ -106,7 +107,7 @@ export default class MessagesWidgetConfig extends WidgetConfig {
 
   // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .decorators([])
       .fields([])
@@ -122,6 +123,7 @@ export default class MessagesWidgetConfig extends WidgetConfig {
 }
 
 type BuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: BuilderState;
 
