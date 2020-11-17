@@ -16,20 +16,20 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import IconButton from 'components/common/IconButton';
 
 import type { DescriptiveItem } from './PaginatedItemOverview';
 
 type Props = {
   item: DescriptiveItem,
-  onDeleteItem?: (DescriptiveItem) => void,
+  onDeleteItem?: (descriptiveItem: DescriptiveItem) => void,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const Container: StyledComponent<undefined, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   display: flex;
   padding: 10px;
   background-color: ${theme.colors.table.background};
