@@ -54,6 +54,12 @@ type TimeConfig = {
   value: number,
 };
 
+type TimePivotConfig = {
+  interval: {
+    type: string;
+  };
+};
+
 const formatPivot = (pivot: Pivot): FormattedPivot => {
   const { type, field, config } = pivot;
   const newConfig = { ...config };
@@ -61,7 +67,7 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
   switch (type) {
     // eslint-disable-next-line no-case-declarations
     case 'time':
-      if (newConfig.interval.type === 'timeunit') {
+      if ((newConfig as TimePivotConfig).interval.type === 'timeunit') {
         const { interval } = newConfig;
         const { unit, value } = interval as TimeConfig;
 
@@ -72,12 +78,11 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
     default:
   }
 
-  // $FlowFixMe: Not properly typed yet.
   return {
     type,
     field,
     ...newConfig,
-  };
+  } as FormattedPivot;
 };
 
 type FormattedSeries = $Shape<{
