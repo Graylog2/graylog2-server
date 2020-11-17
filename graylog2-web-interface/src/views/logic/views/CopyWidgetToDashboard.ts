@@ -38,13 +38,13 @@ const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
     .build();
 };
 
-const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View): ?View => {
+const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View): View | undefined | null => {
   if (dashboard.type !== View.Type.Dashboard) {
     return undefined;
   }
 
   const queryMap: Map<QueryId, Query> = Map(search.search.queries.map((q) => [q.id, q]));
-  const match: ?[Widget, QueryId] = FindWidgetAndQueryIdInView(widgetId, search);
+  const match: [Widget, QueryId] | undefined | null = FindWidgetAndQueryIdInView(widgetId, search);
 
   if (match) {
     const [widget, queryId] = match;
