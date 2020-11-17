@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
+import { $PropertyType } from 'utility-types';
 
 import UserOverview from 'logic/users/UserOverview';
 import { OverlayTrigger, Popover } from 'components/graylog';
