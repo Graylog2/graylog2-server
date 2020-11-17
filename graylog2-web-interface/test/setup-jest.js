@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import jQuery from 'jquery';
+/// <reference types="jest-enzyme" />
+
 import sizeMe from 'react-sizeme';
 
 import registerBuiltinStores from 'injection/registerBuiltinStores';
-
-global.$ = jQuery;
-
-global.jQuery = jQuery;
 
 sizeMe.noPlaceholders = true;
 

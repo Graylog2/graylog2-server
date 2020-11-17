@@ -20,7 +20,7 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "*": ["*", "./src/*"]
+      "*": ["*", "./src/*", "./test/*"]
     }
   },
   "include": [

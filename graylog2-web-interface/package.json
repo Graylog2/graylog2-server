@@ -48,6 +48,8 @@
       "node_modules"
     ],
     "moduleFileExtensions": [
+      "ts",
+      "tsx",
       "js",
       "jsx"
     ],
@@ -59,11 +61,8 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/fileMock.js"
     },
     "testPathIgnorePatterns": [
-      ".fixtures.js$"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest"
-    }
+      ".fixtures.[jt]s$"
+    ]
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
@@ -142,6 +141,7 @@
     "@testing-library/dom": "7.20.2",
     "@testing-library/jest-dom": "5.11.0",
     "@testing-library/react": "11.0.4",
+    "@types/jest": "25.2.3",
     "assets-webpack-plugin": "^5.1.2",
     "babel-core": "^7.0.0-0",
     "babel-jest": "^25.1.0",
