@@ -49,7 +49,7 @@ export type ParameterJson = {
 /* eslint-enable camelcase */
 
 class Parameter {
-  private _value: InternalState;
+  protected _value: InternalState;
 
   static __registrations: { [key: string]: typeof Parameter } = {};
 
