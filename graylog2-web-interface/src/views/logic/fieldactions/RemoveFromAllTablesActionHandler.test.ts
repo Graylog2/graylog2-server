@@ -53,6 +53,7 @@ describe('RemoveFromAllTablesActionHandler', () => {
 
     const expectedWidgets = Map([[expectedMessageWidget.id, expectedMessageWidget], [pivotWidget.id, pivotWidget]]);
 
+    // @ts-ignore
     WidgetStore.getInitialState = jest.fn(() => widgets);
 
     WidgetActions.updateWidgets = mockAction(jest.fn((newWidgets) => {
