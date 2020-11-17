@@ -17,7 +17,11 @@
 // @flow strict
 import Widget from '../widgets/Widget';
 
-const duplicateCommonWidgetSettings = (widgetBuilder: Widget.Builder, originalWidget: Widget) => {
+const duplicateCommonWidgetSettings = (
+// @ts-ignore
+  widgetBuilder: Widget.Builder,
+  originalWidget: Widget,
+) => {
   let result = widgetBuilder;
   const { filter, query, streams, timerange } = originalWidget;
 
