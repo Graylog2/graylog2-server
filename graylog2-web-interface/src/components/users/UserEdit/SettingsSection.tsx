@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { Formik, Form } from 'formik';
+import { $PropertyType } from 'utility-types';
 
 import { Button, Row, Col } from 'components/graylog';
 import User from 'logic/users/User';
@@ -27,7 +27,7 @@ import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 
 type Props = {
   user: User,
-  onSubmit: ({ timezone: $PropertyType<User, 'timezone'> }) => Promise<void>,
+  onSubmit: (payload: { timezone: $PropertyType<User, 'timezone'> }) => Promise<void>,
 };
 
 const SettingsSection = ({
