@@ -18,17 +18,19 @@ class SystemOverviewPage extends React.Component {
             <NotificationsList />
           </IfPermitted>
 
-          <IfPermitted permissions="systemjobs:read">
-            <SystemJobsComponent />
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="systemjobs:read">
+              <SystemJobsComponent />
+            </IfPermitted>
+          </HideOnCloud>
 
           <GraylogClusterOverview />
 
-          <IfPermitted permissions="indexercluster:read">
-            <IndexerClusterHealth />
-          </IfPermitted>
-
           <HideOnCloud>
+            <IfPermitted permissions="indexercluster:read">
+              <IndexerClusterHealth />
+            </IfPermitted>
+
             <IfPermitted permissions="indices:failures">
               <IndexerFailuresComponent />
             </IfPermitted>
