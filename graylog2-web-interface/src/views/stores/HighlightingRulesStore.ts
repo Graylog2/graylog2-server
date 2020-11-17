@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import ViewState from 'views/logic/views/ViewState';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -49,7 +49,7 @@ const makeKey = (field: string, value: Value) => new Key({ field, value });
 
 type StateType = Immutable.OrderedMap<Key, string>;
 
-const HighlightingRulesStore = singletonStore(
+const HighlightingRulesStore: Store<Array<HighlightingRule>> = singletonStore(
   'views.HighlightingRules',
   () => Reflux.createStore({
     listenables: [HighlightingRulesActions],
