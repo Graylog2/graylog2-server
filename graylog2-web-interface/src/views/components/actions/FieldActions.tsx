@@ -32,15 +32,15 @@ import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from 
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Field.css';
 
-type Props = {|
-  children: React.Node,
+type Props = {
+  children: React.ReactNode,
   disabled: boolean,
-  element: React.Node,
-  menuContainer: ?HTMLElement,
+  element: React.ReactNode,
+  menuContainer: HTMLElement | undefined | null,
   name: string,
   queryId: QueryId,
   type: FieldType,
-|};
+};
 
 type State = {
   open: boolean,
@@ -81,7 +81,7 @@ class FieldActions extends React.Component<Props, State> {
     const handlerArgs = { queryId, field: name, type, contexts: this.context };
     const fieldActions: Array<ActionDefinition> = PluginStore.exports('fieldActions')
       .filter((action: ActionDefinition) => {
-        const { isHidden = (() => false: ActionHandlerCondition) } = action;
+        const { isHidden = () => false } = action;
 
         return !isHidden(handlerArgs);
       })
@@ -94,7 +94,7 @@ class FieldActions extends React.Component<Props, State> {
           handler(handlerArgs);
         };
 
-        const { isEnabled = (() => true: ActionHandlerCondition) } = action;
+        const { isEnabled = () => true } = action;
         const actionDisabled = !isEnabled(handlerArgs);
 
         return (
