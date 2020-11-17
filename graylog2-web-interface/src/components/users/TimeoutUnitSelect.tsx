@@ -33,13 +33,15 @@ class TimeoutUnitSelect extends React.Component {
     { value: `${MS_DAY}`, label: 'Days' },
   ];
 
+  sessionTimeoutUnit: undefined | { value: string };
+
   getValue = () => {
     return this.sessionTimeoutUnit.value;
   };
 
   render() {
     return (
-      <TimeoutSelect ref={(sessionTimeoutUnit) => { this.session_timeout_unit = sessionTimeoutUnit; }}
+      <TimeoutSelect ref={(sessionTimeoutUnit) => { this.sessionTimeoutUnit = sessionTimeoutUnit; }}
                      options={this.options}
                      {...this.props} />
     );
