@@ -26,7 +26,7 @@ import { BootstrapModalForm } from 'components/bootstrap';
 import type { ActionComponentProps } from '../../components/actions/ActionHandler';
 
 type State = {
-  selectedExtractor: ?string,
+  selectedExtractor: string | undefined | null,
 };
 
 class SelectExtractorType extends React.Component<ActionComponentProps, State> {
