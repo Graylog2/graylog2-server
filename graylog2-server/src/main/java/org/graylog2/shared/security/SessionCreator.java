@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -86,6 +88,7 @@ public class SessionCreator {
                 long timeoutInMillis = user.getSessionTimeoutMs();
                 session.setTimeout(timeoutInMillis);
                 session.setAttribute("username", user.getName());
+                getSessionAttributes(subject).forEach(session::setAttribute);
             } else {
                 // set a sane default. really we should be able to load the user from above.
                 session.setTimeout(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
@@ -119,5 +122,23 @@ public class SessionCreator {
             auditEventSender.failure(authToken.getActor(), SESSION_CREATE, auditEventContext);
             return Optional.empty();
         }
+    }
+
+    /**
+     * Extract additional session attributes out of a subject's principal collection. We assume that if there is a
+     * second principal, that this would be a map of session attributes.
+     */
+    private Map<?, ?> getSessionAttributes(Subject subject) {
+        final List<?> principals = subject.getPrincipals().asList();
+        if (principals.size() < 2) {
+            return Collections.emptyMap();
+        }
+        Object sessionAttributes = principals.get(1);
+        if (sessionAttributes instanceof Map) {
+            return (Map<?,?>) sessionAttributes;
+        }
+        log.error("Unable to extract session attributes from subject. Expected <Map.class> but got <{}>.",
+                sessionAttributes.getClass().getSimpleName());
+        return Collections.emptyMap();
     }
 }

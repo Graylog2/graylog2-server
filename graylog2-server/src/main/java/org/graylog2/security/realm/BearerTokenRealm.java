@@ -16,6 +16,7 @@
  */
 package org.graylog2.security.realm;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -23,6 +24,7 @@ import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.graylog.security.authservice.AuthServiceAuthenticator;
 import org.graylog.security.authservice.AuthServiceException;
 import org.graylog.security.authservice.AuthServiceResult;
@@ -88,6 +90,12 @@ public class BearerTokenRealm extends AuthenticatingRealm {
     }
 
     private AuthenticationInfo toAuthenticationInfo(AuthServiceResult result) {
-        return new SimpleAccount(result.userProfileId(), null, NAME + "/" + result.backendType());
+        String realmName = NAME + "/" + result.backendType();
+
+        @SuppressWarnings("ConstantConditions")
+        final SimplePrincipalCollection principals = new SimplePrincipalCollection(
+                ImmutableList.of(result.userProfileId(), result.sessionAttributes()), realmName);
+
+        return new SimpleAccount(principals, null, realmName);
     }
 }

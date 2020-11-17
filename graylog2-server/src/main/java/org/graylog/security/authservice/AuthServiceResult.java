@@ -19,6 +19,8 @@ package org.graylog.security.authservice;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -35,12 +37,14 @@ public abstract class AuthServiceResult {
 
     public abstract String backendTitle();
 
+    public abstract Map<String, Object> sessionAttributes();
+
     public boolean isSuccess() {
         return !isNullOrEmpty(userProfileId());
     }
 
     public static Builder builder() {
-        return new AutoValue_AuthServiceResult.Builder();
+        return Builder.create();
     }
 
     public static AuthServiceResult failed(String username, AuthServiceBackend backend) {
@@ -54,6 +58,10 @@ public abstract class AuthServiceResult {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        public static Builder create() {
+            return new AutoValue_AuthServiceResult.Builder().sessionAttributes(Collections.emptyMap());
+        }
+
         public abstract Builder username(String username);
 
         public abstract Builder userProfileId(String userProfileId);
@@ -63,6 +71,8 @@ public abstract class AuthServiceResult {
         public abstract Builder backendType(String backendType);
 
         public abstract Builder backendTitle(String backendTitle);
+
+        public abstract Builder sessionAttributes(Map<String, Object> sessionAttributes);
 
         public abstract AuthServiceResult build();
     }
