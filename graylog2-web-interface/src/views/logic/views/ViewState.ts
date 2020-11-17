@@ -43,7 +43,7 @@ type BuilderState = Map<string, any>;
 
 export type ViewStateJson = {
   formatting?: FormattingSettingsJSON,
-  positions: { [string]: WidgetPositionJSON },
+  positions: { [key: string]: WidgetPositionJSON },
   selected_fields: FieldNameList,
   titles: TitlesMap,
   widgets: Array<any>,
@@ -58,7 +58,7 @@ export default class ViewState {
     titles: TitlesMap,
     widgets: Array<Widget>,
     widgetMapping: WidgetMapping,
-    widgetPositions: { [string]: WidgetPosition },
+    widgetPositions: { [key: string]: WidgetPosition },
     formatting: FormattingSettings,
     staticMessageListId?: string) {
     this._value = { fields, titles, widgets: List(widgets), widgetMapping, widgetPositions: Map(widgetPositions), formatting, staticMessageListId };
@@ -93,11 +93,11 @@ export default class ViewState {
     return this._value.widgetMapping;
   }
 
-  get widgetPositions(): { [string]: WidgetPosition } {
+  get widgetPositions(): { [key: string]: WidgetPosition } {
     return this._value.widgetPositions.toJS();
   }
 
-  get staticMessageListId(): ?string {
+  get staticMessageListId(): string | undefined | null {
     return this._value.staticMessageListId;
   }
 
@@ -109,8 +109,8 @@ export default class ViewState {
       widgetIdTranslation[widget.id] = newWidget.id;
 
       return newWidget;
-    });
-    const newWidgetTitles = Map(this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]));
+    }).toList();
+    const newWidgetTitles = Map<string, string>(this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]));
     const newTitles = this.titles
       .set(TitleTypes.Widget, newWidgetTitles)
       .updateIn([TitleTypes.Tab, 'title'], (value) => (value ? `${value} (Copy)` : value));
@@ -170,7 +170,7 @@ export default class ViewState {
       .widgets(List(widgets.map((w) => Widget.fromJSON(w))))
       .widgetMapping(fromJS(widgetMapping))
       .fields(selectedFields)
-      .widgetPositions(Map(positions).map(WidgetPosition.fromJSON))
+      .widgetPositions(Map(positions).map(WidgetPosition.fromJSON).toMap())
       .formatting(formatting ? FormattingSettings.fromJSON(formatting) : FormattingSettings.empty())
       .build();
   }
@@ -197,7 +197,7 @@ class Builder {
     return new Builder(this.value.set('formatting', value));
   }
 
-  titles(value: (TitlesMap | { [TitleType]: { [string]: string } })): Builder {
+  titles(value: (TitlesMap | { tab?: { [key: string]: string }, widget: { [key: string]: string } })): Builder {
     return new Builder(this.value.set('titles', fromJS(value)));
   }
 
@@ -209,7 +209,7 @@ class Builder {
     return new Builder(this.value.set('widgetMapping', value));
   }
 
-  widgetPositions(value: (Map<string, WidgetPosition> | { [string]: WidgetPosition })): Builder {
+  widgetPositions(value: (Map<string, WidgetPosition> | { [key: string]: WidgetPosition })): Builder {
     return new Builder(this.value.set('widgetPositions', Map(value)));
   }
 
