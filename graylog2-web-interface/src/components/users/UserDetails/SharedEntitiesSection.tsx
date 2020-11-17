@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { $PropertyType } from 'utility-types';
 
 import SharedEntitiesOverview from 'components/permissions/SharedEntitiesOverview';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
