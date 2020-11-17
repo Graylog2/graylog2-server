@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
@@ -26,6 +25,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';
+import {UserJSON} from "logic/users/User";
 
 type Props = {
   user: UserOverview,
@@ -68,7 +68,7 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
 };
 
 const EditActions = ({ user, user: { username, id, fullName, accountStatus, external, readOnly } }: { user: UserOverview }) => {
-  const currentUser = useContext(CurrentUserContext) || {};
+  const currentUser = useContext<UserJSON>(CurrentUserContext);
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {
@@ -90,7 +90,7 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
     }
   };
 
-  const showEnableDisable = !external && !readOnly && currentUser.id !== id;
+  const showEnableDisable = !external && !readOnly && currentUser?.id !== id;
 
   return (
     <>
