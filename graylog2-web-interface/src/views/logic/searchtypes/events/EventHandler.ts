@@ -24,17 +24,17 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-export type Event = {|
+export type Event = {
   id: string,
   timestamp: string,
   message: string,
   alert: boolean,
   streams: Array<string>,
-|};
+};
 
 export type Events = Array<Event>;
 
-type GroupedEvents = { [string]: Events };
+type GroupedEvents = { [key: string]: Events };
 
 type Shape = {
   type: 'line',
@@ -76,9 +76,8 @@ export default {
     };
   },
 
-  transformGroupedEvents(events: GroupedEvents): [[string, Event | number]] {
-    // $FlowFixMe Object.entries has only mixed values.
-    return Object.entries(events).map(([timestamp:string, eventArray:Events]) => {
+  transformGroupedEvents(events: GroupedEvents): [string, Event | number][] {
+    return Object.entries(events).map(([timestamp, eventArray]) => {
       if (!(eventArray instanceof Array)) {
         throw new Error('Unexpected data type');
       }
