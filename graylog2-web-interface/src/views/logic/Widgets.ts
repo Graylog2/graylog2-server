@@ -24,7 +24,7 @@ import pivotForField from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from './aggregationbuilder/AggregationWidgetConfig';
 import MessageWidget from './widgets/MessagesWidget';
-import MessageWidgetConfig from './widgets/MessagesWidgetConfig.js';
+import MessageWidgetConfig from './widgets/MessagesWidgetConfig';
 import Series from './aggregationbuilder/Series';
 import FieldType from './fieldtypes/FieldType';
 import type { Decorator } from './widgets/MessagesWidgetConfig';
