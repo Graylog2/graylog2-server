@@ -40,7 +40,7 @@ export default class SortConfig {
 
   static SERIES_TYPE = 'series';
 
-  _value: InternalState;
+  private readonly _value: InternalState;
 
   constructor(type: string, field: string, direction: Direction) {
     this._value = { type, field, direction };
@@ -72,7 +72,7 @@ export default class SortConfig {
   static fromJSON(value: SortConfigJson) {
     const { type, field, direction } = value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .type(type)
       .field(field)
@@ -80,14 +80,14 @@ export default class SortConfig {
       .build();
   }
 
-  static __registrations: { [string]: typeof SortConfig } = {};
+  static __registrations: { [key: string]: typeof SortConfig } = {};
 
   static registerSubtype(type: string, implementingClass: typeof SortConfig) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
 
   static fromPivot(pivot: Pivot) {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .type(this.PIVOT_TYPE)
       .field(pivot.field)
@@ -96,7 +96,7 @@ export default class SortConfig {
   }
 
   static fromSeries(series: Series) {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .type(this.SERIES_TYPE)
       .field(series.function)
@@ -108,14 +108,14 @@ export default class SortConfig {
   toBuilder(): Builder {
     const { type, field, direction } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ type, field, direction }));
   }
 }
 
 type BuilderState = Immutable.Map<string, any>;
 export class Builder {
-  value: BuilderState;
+  private readonly value: BuilderState;
 
   constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
