@@ -31,7 +31,7 @@ const RemoveFromAllTablesActionHandler: FieldActionHandler = ({ field }) => {
     }
 
     return widget;
-  });
+  }).toMap();
 
   return WidgetActions.updateWidgets(newWidgets);
 };
