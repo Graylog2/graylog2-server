@@ -14,21 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
+import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
 
 type Props = {
+  id: string,
+  label: string,
   name: string,
   type?: string,
-  help?: React.Node,
+  help?: React.Component,
   labelClassName?: string,
-  onChange?: (SyntheticInputEvent<Input>) => void,
+  onChange?: (event: SyntheticEvent<Input>) => void,
   wrapperClassName?: string,
-  validate?: (string) => ?string,
+  validate?: (string) => string | undefined | null,
   error?: string,
 };
 

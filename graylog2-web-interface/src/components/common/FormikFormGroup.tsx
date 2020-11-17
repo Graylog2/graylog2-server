@@ -24,7 +24,7 @@ import FormikInput from './FormikInput';
 type Props = {
   label: string,
   name: string,
-  onChange?: (payload: SyntheticEvent<Input>) => void,
+  onChange?: (event: SyntheticEvent<Input>) => void,
   labelClassName?: string,
   wrapperClassName?: string,
 };
