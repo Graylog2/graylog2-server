@@ -21,10 +21,10 @@ import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import FormikInput from './FormikInput';
 
-type FormValues = { [string]: mixed };
+type FormValues = { [key: string]: unknown };
 
 describe('<FormikInput />', () => {
-  const SimpleForm = ({ children, onSubmit, initialValues }: { children: React.Node, onSubmit: (FormValues) => Promise<void>, initialValues?: FormValues}) => (
+  const SimpleForm = ({ children, onSubmit, initialValues }: { children: JSX.Element, onSubmit: (FormValues) => Promise<void>, initialValues?: FormValues}) => (
     <Formik onSubmit={(data) => onSubmit(data)} initialValues={initialValues}>
       <Form>
         {children}
