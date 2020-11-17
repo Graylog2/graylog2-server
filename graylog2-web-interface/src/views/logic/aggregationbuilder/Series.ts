@@ -31,11 +31,11 @@ type InternalState = {
   function: string,
 };
 
-export type Definition = {|
+export type Definition = {
   type: string,
   field?: string,
   percentile?: string,
-|};
+};
 
 const parametersRegex = /\((.+)\)/;
 const funcNameRegex = /(\w+)\(/;
@@ -112,7 +112,7 @@ export default class Series {
   }
 
   static forFunction(func: string) {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .function(func)
       .config(SeriesConfig.empty())
@@ -120,12 +120,13 @@ export default class Series {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map((this._value: { [string]: any })));
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Builder(Immutable.Map(this._value));
   }
 }
 
 type BuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: BuilderState;
 
@@ -141,7 +142,7 @@ class Builder {
     return new Builder(this.value.set('config', newConfig));
   }
 
-  parameter(newParameter: *) {
+  parameter(newParameter: any) {
     return new Builder(this.value.set('parameter', newParameter));
   }
 
