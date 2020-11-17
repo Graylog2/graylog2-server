@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
@@ -60,11 +59,13 @@ const _validate = (values) => {
   return errors;
 };
 
+type RequestError = { additional: { res: { text: string }}};
+
 const UserCreate = () => {
   const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
-  const [users, setUsers] = useState();
+  const [users, setUsers] = useState<Immutable.List<User>>();
   const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
-  const [submitError, setSubmitError] = useState();
+  const [submitError, setSubmitError] = useState<RequestError>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
 
   useEffect(() => {
