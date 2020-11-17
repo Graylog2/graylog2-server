@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
@@ -29,7 +30,7 @@ export type LineVisualizationConfigJSON = {
 };
 
 export default class LineVisualizationConfig extends VisualizationConfig {
-  _value: InternalState;
+  private readonly _value: InternalState;
 
   constructor(interpolation: $PropertyType<InternalState, 'interpolation'>) {
     super();
@@ -41,7 +42,7 @@ export default class LineVisualizationConfig extends VisualizationConfig {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
