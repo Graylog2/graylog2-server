@@ -30,8 +30,9 @@ const Wrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   -ms-grid-column: 1;
 `;
 
+type Dimensions = { height: number; width: number; };
 type Props = {
-  children: ({ height: number, width: number }) => React.Element<*>,
+  children: (dimentions: Dimensions) => React.ReactElement,
 };
 type State = {
   height: number,
@@ -39,7 +40,11 @@ type State = {
 };
 
 class FullSizeContainer extends React.Component<Props, State> {
-  wrapper: ?HTMLDivElement;
+  private wrapper: HTMLDivElement | undefined | null;
+
+  static propTypes = {
+    children: PropTypes.func.isRequired,
+  };
 
   constructor(props: Props) {
     super(props);
@@ -82,9 +87,5 @@ class FullSizeContainer extends React.Component<Props, State> {
     );
   }
 }
-
-FullSizeContainer.propTypes = {
-  children: PropTypes.func.isRequired,
-};
 
 export default FullSizeContainer;
