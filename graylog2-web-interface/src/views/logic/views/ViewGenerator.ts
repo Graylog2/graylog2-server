@@ -22,7 +22,7 @@ import type { ViewType } from './View';
 import Search from '../search/Search';
 import QueryGenerator from '../queries/QueryGenerator';
 
-export default async (type: ViewType, streamId: ?string) => {
+export default async (type: ViewType, streamId: string | undefined | null) => {
   const query = QueryGenerator(streamId);
   const search = Search.create().toBuilder().queries([query]).build();
   const viewState = await ViewStateGenerator(type, streamId);
