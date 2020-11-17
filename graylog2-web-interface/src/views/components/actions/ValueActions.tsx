@@ -25,20 +25,20 @@ import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 
 import { createHandlerFor } from './ActionHandler';
-import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
+import type { ActionComponents, ActionDefinition } from './ActionHandler';
 
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Value.css';
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
-  children: React.Node,
-  element: React.Node,
+  children: React.ReactNode,
+  element: React.ReactNode,
   field: string,
-  menuContainer: ?HTMLElement,
+  menuContainer: HTMLElement | undefined | null,
   queryId: QueryId,
   type: FieldType,
-  value: React.Node,
+  value: React.ReactNode,
 };
 
 type State = {
@@ -79,11 +79,11 @@ class ValueActions extends React.Component<Props, State> {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;
     const { open, overflowingComponents: components } = this.state;
     // $FlowFixMe: Object.values signature is in the way for this one
-    const overflowingComponents: Array<React.Node> = Object.values(components);
+    const overflowingComponents: Array<React.ReactNode> = Object.values(components);
     const handlerArgs = { queryId, field, type, value, contexts: this.context };
     const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
       .filter((action: ActionDefinition) => {
-        const { isHidden = (() => false: ActionHandlerCondition) } = action;
+        const { isHidden = () => false } = action;
 
         return !isHidden(handlerArgs);
       })
@@ -96,7 +96,7 @@ class ValueActions extends React.Component<Props, State> {
           handler(handlerArgs);
         };
 
-        const { isEnabled = (() => true: ActionHandlerCondition) } = action;
+        const { isEnabled = () => true } = action;
         const actionDisabled = !isEnabled(handlerArgs);
 
         return (
