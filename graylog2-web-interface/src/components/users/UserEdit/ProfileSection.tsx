@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { Formik, Form } from 'formik';
+import { $PropertyType } from 'utility-types';
 
 import { Button, Col, Row } from 'components/graylog';
 import { ReadOnlyFormGroup } from 'components/common';
@@ -28,7 +28,8 @@ import EmailFormGroup from '../UserCreate/EmailFormGroup';
 
 type Props = {
   user: User,
-  onSubmit: ({
+  onSubmit: (payload: {
+    // eslint-disable-next-line camelcase
     full_name: $PropertyType<User, 'fullName'>,
     email: $PropertyType<User, 'email'>,
   }) => Promise<void>,
