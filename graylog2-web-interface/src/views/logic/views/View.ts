@@ -37,7 +37,7 @@ export type PluginMetadata = {
   name: string,
   url: string,
 };
-export type Requirements = { [string]: PluginMetadata };
+export type Requirements = { [key: string]: PluginMetadata };
 export type ViewStateMap = Immutable.Map<QueryId, ViewState>;
 
 export type SearchType = 'SEARCH';
@@ -66,7 +66,7 @@ export type ViewJson = {
   description: string,
   search_id: string,
   properties: Properties,
-  state: { [QueryId]: ViewStateJson },
+  state: { [key: string]: ViewStateJson },
   created_at: Date,
   owner: string,
   requires: Requirements,
@@ -159,7 +159,7 @@ export default class View {
     return this._value.requires || {};
   }
 
-  getSearchTypeByWidgetId(widgetId: string): ?QuerySearchType {
+  getSearchTypeByWidgetId(widgetId: string): QuerySearchType | undefined | null {
     const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
     const searchTypeId = widgetMapping.get(widgetId).first();
 
@@ -219,7 +219,7 @@ export default class View {
   static fromJSON(value: ViewJson): View {
     // eslint-disable-next-line camelcase
     const { id, type, title, summary, description, properties, state, created_at, owner, requires } = value;
-    const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON);
+    const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
 
     return View.create()
       .toBuilder()
@@ -264,7 +264,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(ObjectID().toString());
+    return this.id(new ObjectID().toString());
   }
 
   title(value: string): Builder {
@@ -287,7 +287,7 @@ class Builder {
     return new Builder(this.value.set('properties', value));
   }
 
-  state(value: (ViewStateMap | { [QueryId]: ViewState })): Builder {
+  state(value: (ViewStateMap | { [key: string]: ViewState })): Builder {
     return new Builder(this.value.set('state', Immutable.Map(value)));
   }
 
