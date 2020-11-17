@@ -73,7 +73,7 @@ const _defaultWidgets: DefaultWidgets = {
   },
 };
 
-export default async (type: ViewType, streamId: string | undefined | null) => {
+export default async (type: ViewType, streamId?: string) => {
   const { titles, widgets, positions } = await _defaultWidgets[type](streamId);
 
   return ViewState.create()
