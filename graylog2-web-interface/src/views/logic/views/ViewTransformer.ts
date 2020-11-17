@@ -51,7 +51,7 @@ const ViewTransformer = (searchView: View): View => {
   // Remove query string attached to the existing search query
   const newQueries = searchView.search.queries.map(
     (query) => query.toBuilder().query({ ...query.query, query_string: '' }).build(),
-  );
+  ).toSet();
   const newSearch = searchView.search.toBuilder().queries(newQueries).build();
 
   return searchView.toBuilder()
