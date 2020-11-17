@@ -120,39 +120,39 @@ class Builder {
   }
 
   type(value: string): Builder {
-    return new this.constructor(this.value.set('type', value));
+    return new Builder(this.value.set('type', value));
   }
 
   name(value: string): Builder {
-    return new this.constructor(this.value.set('name', value));
+    return new Builder(this.value.set('name', value));
   }
 
   title(value: string): Builder {
-    return new this.constructor(this.value.set('title', value));
+    return new Builder(this.value.set('title', value));
   }
 
   description(value: string): Builder {
-    return new this.constructor(this.value.set('description', value));
+    return new Builder(this.value.set('description', value));
   }
 
   dataType(value: string): Builder {
-    return new this.constructor(this.value.set('dataType', value));
+    return new Builder(this.value.set('dataType', value));
   }
 
   defaultValue(value: any): Builder {
-    return new this.constructor(this.value.set('defaultValue', value));
+    return new Builder(this.value.set('defaultValue', value));
   }
 
   optional(value: boolean): Builder {
-    return new this.constructor(this.value.set('optional', value));
+    return new Builder(this.value.set('optional', value));
   }
 
   lookupTable(value: string): Builder {
-    return new this.constructor(this.value.set('lookupTable', value));
+    return new Builder(this.value.set('lookupTable', value));
   }
 
   key(value: string): Builder {
-    return new this.constructor(this.value.set('key', value));
+    return new Builder(this.value.set('key', value));
   }
 
   build(): LookupTableParameter {
