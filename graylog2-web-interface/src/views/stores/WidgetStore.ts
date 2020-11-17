@@ -20,7 +20,7 @@ import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import { get, isEqual } from 'lodash';
 
-import type { RefluxActions } from 'stores/StoreTypes';
+import type {RefluxActions, Store} from 'stores/StoreTypes';
 import Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
@@ -64,7 +64,7 @@ export const WidgetActions: WidgetActionsType = singletonActions(
   }),
 );
 
-export const WidgetStore = singletonStore(
+export const WidgetStore: Store<WidgetStoreState> = singletonStore(
   'views.Widget',
   () => Reflux.createStore({
     listenables: [WidgetActions],
