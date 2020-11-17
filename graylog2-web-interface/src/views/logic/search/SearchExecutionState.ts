@@ -25,18 +25,20 @@ export type ParameterBindings = Immutable.Map<string, ParameterBinding>;
 
 type InternalState = {
   parameterBindings: ParameterBindings,
-  globalOverride: ?GlobalOverride,
+  globalOverride: GlobalOverride | undefined | null,
 };
 
+/* eslint-disable camelcase */
 type JsonRepresentation = {
-  global_override: ?GlobalOverride,
+  global_override: GlobalOverride | undefined | null,
   parameter_bindings: ParameterBindings,
 };
+/* eslint-enable camelcase */
 
 export default class SearchExecutionState {
-  _value: InternalState;
+  private _value: InternalState;
 
-  constructor(parameterBindings: ParameterBindings = Immutable.Map(), globalOverride: ?GlobalOverride) {
+  constructor(parameterBindings: ParameterBindings = Immutable.Map(), globalOverride?: GlobalOverride) {
     this._value = { parameterBindings, globalOverride };
   }
 
@@ -44,7 +46,7 @@ export default class SearchExecutionState {
     return this._value.parameterBindings;
   }
 
-  get globalOverride(): ?GlobalOverride {
+  get globalOverride(): GlobalOverride | undefined | null {
     return this._value.globalOverride;
   }
 
@@ -52,11 +54,11 @@ export default class SearchExecutionState {
   toBuilder(): Builder {
     const { globalOverride, parameterBindings } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ globalOverride, parameterBindings }));
   }
 
-  static create(parameterBindings: ParameterBindings, globalOverride: ?GlobalOverride): SearchExecutionState {
+  static create(parameterBindings: ParameterBindings, globalOverride: GlobalOverride | undefined | null): SearchExecutionState {
     return new SearchExecutionState(parameterBindings, globalOverride);
   }
 
