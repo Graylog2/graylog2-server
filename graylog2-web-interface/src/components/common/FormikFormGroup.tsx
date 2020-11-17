@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
+import { SyntheticEvent } from 'react';
 
 import { Input } from 'components/bootstrap';
 
@@ -24,7 +24,7 @@ import FormikInput from './FormikInput';
 type Props = {
   label: string,
   name: string,
-  onChange?: (SyntheticInputEvent<Input>) => void,
+  onChange?: (payload: SyntheticEvent<Input>) => void,
   labelClassName?: string,
   wrapperClassName?: string,
 };
