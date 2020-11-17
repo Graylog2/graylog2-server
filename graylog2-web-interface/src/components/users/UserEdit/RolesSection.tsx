@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 import * as Immutable from 'immutable';
@@ -26,7 +25,7 @@ import { ErrorAlert } from 'components/common';
 import User from 'logic/users/User';
 import PaginatedItemOverview, {
   DEFAULT_PAGINATION,
-  type DescriptiveItem,
+  DescriptiveItem,
 } from 'components/common/PaginatedItemOverview';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -36,7 +35,7 @@ import RolesQueryHelp from '../RolesQueryHelp';
 
 type Props = {
   user: User,
-  onSubmit: ({ roles: string[] }) => Promise<void>,
+  onSubmit: (payload: { roles: string[] }) => Promise<void>,
 };
 const Container = styled.div`
   margin-top 15px;
@@ -46,8 +45,8 @@ const Container = styled.div`
 const RolesSection = ({ user, onSubmit }: Props) => {
   const { username, id } = user;
   const [loading, setLoading] = useState(false);
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
-  const [errors, setErrors] = useState();
+  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles>();
+  const [errors, setErrors] = useState<string | undefined>();
 
   const _onLoad = useCallback((pagination = DEFAULT_PAGINATION) => {
     setLoading(true);
@@ -69,7 +68,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     const newRoleNames = newRoles.map((r) => r.name);
     const newUserRoles = userRoles.union(newRoleNames).toJS();
 
-    setErrors();
+    setErrors(undefined);
 
     return onRolesUpdate({ roles: newUserRoles });
   };
@@ -83,7 +82,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
 
     if (ensureReaderOrAdminRole(newUserRoles)) {
       onRolesUpdate({ roles: newUserRoles });
-      setErrors();
+      setErrors(undefined);
     } else {
       setErrors('Roles must at least contain Admin or Reader role.');
       _onLoad().then(setPaginatedRoles);
