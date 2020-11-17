@@ -26,8 +26,15 @@ type Props = {
   user: User,
 };
 
+const defaultPreferences = {
+    enableSmartSearch: false,
+    updateUnfocussed: false,
+    searchSidebarIsPinned: false,
+    dashboardSidebarIsPinned: false,
+};
+
 const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly } }: Props) => {
-  let preferences = databasePreferences || {};
+  let preferences = databasePreferences || defaultPreferences;
 
   if (readOnly) {
     const localStoragePreferences = {
