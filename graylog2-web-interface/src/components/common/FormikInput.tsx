@@ -26,7 +26,7 @@ type Props = {
   label: string,
   name: string,
   type?: string,
-  help?: React.Component,
+  help?: JSX.Element,
   labelClassName?: string,
   onChange?: (event: SyntheticEvent<Input>) => void,
   wrapperClassName?: string,
