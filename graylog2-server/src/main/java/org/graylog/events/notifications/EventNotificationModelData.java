@@ -24,6 +24,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +56,7 @@ public abstract class EventNotificationModelData {
     @JsonProperty("event")
     public abstract EventDto event();
 
+    @Nullable
     @JsonProperty("backlog")
     public abstract ImmutableList<MessageSummary> backlog();
 
@@ -80,7 +82,7 @@ public abstract class EventNotificationModelData {
 
         public abstract Builder event(EventDto event);
 
-        public abstract Builder backlog(List<MessageSummary> backlog);
+        public abstract Builder backlog(@Nullable List<MessageSummary> backlog);
 
         public abstract EventNotificationModelData build();
     }
