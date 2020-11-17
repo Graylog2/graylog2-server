@@ -27,7 +27,7 @@ import ProfileSection from '../RoleDetails/ProfileSection';
 import SectionGrid from '../../common/Section/SectionGrid';
 
 type Props = {
-  role: ?Role,
+  role: Role | null | undefined,
 };
 
 const RoleEdit = ({ role }: Props) => {
