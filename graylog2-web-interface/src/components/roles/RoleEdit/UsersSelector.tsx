@@ -25,15 +25,15 @@ import * as Immutable from 'immutable';
 
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import Role from 'logic/roles/Role';
-import { type PaginatedListType } from 'components/common/PaginatedItemOverview';
+import { PaginatedListType } from 'components/common/PaginatedItemOverview';
 import UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { Button } from 'components/graylog';
 import { Select, ErrorAlert } from 'components/common';
 
 type Props = {
-  onSubmit: (user: Immutable.Set<UserOverview>) => Promise<?PaginatedListType>,
+  onSubmit: (user: Immutable.Set<UserOverview>) => Promise<PaginatedListType | null | undefined>,
   role: Role,
 };
 
@@ -75,9 +75,9 @@ const _renderOption = ({ label }: { label: string }) => (
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
 const UsersSelector = ({ role, onSubmit }: Props) => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<Immutable.List<UserOverview>>(Immutable.List.of());
   const [options, setOptions] = useState([]);
-  const [error, setError] = useState();
+  const [error, setError] = useState<string | undefined>();
 
   const _loadUsers = useCallback(() => {
     const getUnlimited = { page: 1, perPage: 0, query: '' };
@@ -100,7 +100,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
     }
 
     const newUsers = user.split(',');
-    const userOverview = Immutable.Set(compact(newUsers.map((newUser) => {
+    const userOverview: Immutable.Set<UserOverview> = Immutable.Set(compact(newUsers.map((newUser) => {
       return users.find((u) => u.username === newUser);
     })));
 
@@ -110,7 +110,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
       return;
     }
 
-    setError();
+    setError(undefined);
     onSubmit(userOverview).then(() => { resetForm(); });
   };
 
@@ -158,7 +158,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
             </FormElements>
             {errors && (
               <Errors>
-                {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => (
+                {Object.entries(errors).map(([fieldKey, value]: [string, unknown]) => (
                   <span key={fieldKey}>{String(value)}.</span>
                 ))}
               </Errors>
