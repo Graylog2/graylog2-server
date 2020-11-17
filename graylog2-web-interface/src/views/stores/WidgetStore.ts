@@ -41,7 +41,7 @@ type WidgetActionsType = RefluxActions<{
   remove: (widgetId: WidgetId) => Promise<Widgets>,
   update: (widgetId: WidgetId, widget: Widget) => Promise<Widgets>,
   updateConfig: (widgetId: WidgetId, config: any) => Promise<Widgets>,
-  updateWidgets: (widgets: Map<string, Widget>) => Promise<Widgets>,
+  updateWidgets: (widgets: Immutable.Map<string, Widget>) => Promise<Widgets>,
 }>;
 
 type WidgetStoreState = Immutable.Map<string, Widget>;
