@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
+import { $PropertyType } from 'utility-types';
 
 import { Alert, Col, Row } from 'components/graylog';
 import User from 'logic/users/User';
