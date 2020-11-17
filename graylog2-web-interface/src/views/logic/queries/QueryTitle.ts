@@ -20,7 +20,7 @@ import type { QueryId } from './Query';
 import View from '../views/View';
 import ViewState from '../views/ViewState';
 
-const queryTitle = (view: View, queryId: QueryId): ?string => (view && view.search && view.search.queries
+const queryTitle = (view: View, queryId: QueryId): string | undefined | null => (view && view.search && view.search.queries
   ? view.search.queries.keySeq()
     .map((q, idx) => {
       if (queryId !== undefined && q.id !== undefined && queryId === q.id) {
