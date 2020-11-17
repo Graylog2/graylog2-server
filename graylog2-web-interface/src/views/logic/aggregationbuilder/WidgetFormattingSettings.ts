@@ -16,15 +16,17 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import type { Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
-type ChartColors = { [string]: Color };
+type ChartColors = { [key: string]: Color };
 
 type InternalState = {
   chartColors: ChartColors,
 };
 
+/* eslint-disable camelcase */
 type ChartColorSettingJson = {
   field_name: string,
   chart_color: Color,
@@ -33,9 +35,10 @@ type ChartColorSettingJson = {
 export type WidgetFormattingSettingsJSON = {
   chart_colors: Array<ChartColorSettingJson>,
 };
+/* eslint-enable camelcase */
 
 export default class WidgetFormattingSettings {
-  _value: InternalState;
+  private readonly _value: InternalState;
 
   // eslint-disable-next-line no-undef
   constructor(chartColors: $PropertyType<InternalState, 'chartColors'>) {
@@ -47,7 +50,7 @@ export default class WidgetFormattingSettings {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
@@ -57,7 +60,7 @@ export default class WidgetFormattingSettings {
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .chartColors({});
   }
