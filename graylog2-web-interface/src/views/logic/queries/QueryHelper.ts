@@ -17,11 +17,11 @@
 // @flow strict
 import { trim } from 'lodash';
 
-const isPhrase = (searchTerm: ?string) => {
+const isPhrase = (searchTerm: string | undefined | null) => {
   return String(searchTerm).indexOf(' ') !== -1;
 };
 
-const escape = (searchTerm: ?string) => {
+const escape = (searchTerm: string | undefined | null) => {
   let escapedTerm = String(searchTerm);
 
   // Replace newlines.
