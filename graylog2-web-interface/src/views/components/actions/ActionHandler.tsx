@@ -33,7 +33,7 @@ export type ActionComponentProps = {
 
 export type ActionComponentType = React.ComponentType<ActionComponentProps>;
 
-export type ActionComponents = { [key: string]: React.ElementType<ActionComponentType> };
+export type ActionComponents = { [key: string]: React.ReactElement<ActionComponentProps> };
 
 export type SetActionComponents = (fn: (component: ActionComponents) => ActionComponents) => void;
 
