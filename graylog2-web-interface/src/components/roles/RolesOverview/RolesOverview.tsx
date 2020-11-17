@@ -17,12 +17,12 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
@@ -79,7 +79,7 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
 const _updateListOnRoleDelete = (perPage, query, setPagination) => AuthzRolesActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 
 const RolesOverview = () => {
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
+  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined | null>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: roles } = paginatedRoles || {};
