@@ -57,7 +57,7 @@ const viewJson: ViewJson = {
 describe('ViewLoader', () => {
   beforeEach(() => {
     ViewManagementActions.get = mockAction(jest.fn(() => Promise.resolve(viewJson)));
-    // $FlowFixMe: Return type ignored in test.
+    // @ts-ignore
     ViewActions.load = jest.fn(() => Promise.resolve());
   });
 
