@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import * as Immutable from 'immutable';
@@ -28,9 +27,9 @@ import type { ListPagination, Pagination } from 'stores/PaginationTypes';
 import PaginatedItem from './PaginatedItem';
 
 export type DescriptiveItem = {
-  +id: string,
-  +name: string,
-  +description: string,
+  id: string;
+  name: string;
+  description: string;
 };
 
 export type PaginatedListType = {
@@ -42,15 +41,15 @@ type Props = {
   noDataText?: string,
   onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType>,
   overrideList?: PaginatedListType,
-  onDeleteItem?: (DescriptiveItem) => void,
-  queryHelper?: React.Node,
+  onDeleteItem?: (descriptiveItem: DescriptiveItem) => void,
+  queryHelper?: React.ReactNode,
 };
 
 const pageSizes = [5, 10, 30];
 export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '' };
 
 const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText }: Props) => {
-  const [paginatedList, setPaginatedList] = useState<?PaginatedListType>();
+  const [paginatedList, setPaginatedList] = useState<PaginatedListType>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
 
@@ -70,7 +69,8 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
     return <Spinner />;
   }
 
-  let itemList = <EmptyResult>{noDataText}</EmptyResult>;
+  const emptyResult = <EmptyResult>{noDataText}</EmptyResult>;
+  let itemList;
 
   if (paginatedList.list && paginatedList.list.size >= 1) {
     itemList = paginatedList.list.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />);
@@ -89,7 +89,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
                   queryHelpComponent={queryHelper}
                   searchButtonLabel="Filter" />
       <div>
-        {itemList}
+        {itemList !== undefined ? itemList : emptyResult}
       </div>
     </PaginatedList>
   );
