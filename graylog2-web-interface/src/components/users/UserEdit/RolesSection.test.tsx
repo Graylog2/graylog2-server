@@ -45,8 +45,8 @@ describe('<RolesSection />', () => {
   });
 
   it('should assigning a role', async () => {
-    const onSubmitStub = jest.fn(() => Promise.resolve());
-    render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub()} />);
+    const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
+    render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise);
     await act(() => mockLoadRolesPromise);
 
@@ -62,8 +62,8 @@ describe('<RolesSection />', () => {
   });
 
   it('should filter assigned roles', async () => {
-    const onSubmitStub = jest.fn(() => Promise.resolve());
-    render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub()} />);
+    const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
+    render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise);
     await act(() => mockLoadRolesPromise);
 
@@ -82,8 +82,8 @@ describe('<RolesSection />', () => {
     const newExampleUser = alice.toBuilder()
       .roles(Immutable.Set([assignedRole1.name, assignedRole2.name]))
       .build();
-    const onSubmitStub = jest.fn(() => Promise.resolve());
-    render(<RolesSection user={newExampleUser} onSubmit={(data) => onSubmitStub()} />);
+    const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
+    render(<RolesSection user={newExampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise);
     await act(() => mockLoadRolesPromise);
 
