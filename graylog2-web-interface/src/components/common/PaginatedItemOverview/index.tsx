@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PaginatedItemOverview, {
   DEFAULT_PAGINATION,
-  type PaginatedListType,
-  type DescriptiveItem,
+  PaginatedListType,
+  DescriptiveItem,
 } from './PaginatedItemOverview';
 
 export type {
