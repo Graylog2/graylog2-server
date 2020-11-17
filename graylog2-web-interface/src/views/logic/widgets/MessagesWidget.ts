@@ -27,7 +27,7 @@ import type { WidgetState } from './Widget';
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export default class MessagesWidget extends Widget {
-  constructor(id: string, config: any, filter: ?string, timerange: ?TimeRange, query: ?QueryString, streams: Array<string> = []) {
+  constructor(id: string, config: any, filter: string | undefined | null, timerange: TimeRange | undefined | null, query: QueryString | undefined | null, streams: Array<string> = []) {
     super(id, MessagesWidget.type, config, filter, timerange, query, streams);
   }
 
@@ -60,12 +60,12 @@ export default class MessagesWidget extends Widget {
   toBuilder() {
     const { id, config, filter, timerange, query, streams } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Map({ id, config, filter, timerange, query, streams }));
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 
