@@ -30,13 +30,16 @@ import Widget from '../widgets/Widget';
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 type Result = {
-  titles: { widget: { [string]: string } },
+  titles: { widget: { [key: string]: string } },
   widgets: Array<Widget>,
-  positions: { [string]: WidgetPosition },
+  positions: { [key: string]: WidgetPosition },
 };
 
-const _defaultWidgets: { [ViewType]: (?string) => Promise<Result> } = {
-  [View.Type.Search]: async (streamId: ?string) => {
+type ViewCreator = (streamId: string | undefined | null) => Promise<Result>;
+type DefaultWidgets = Record<ViewType, ViewCreator>;
+
+const _defaultWidgets: DefaultWidgets = {
+  [View.Type.Search]: async (streamId: string | undefined | null) => {
     const decorators = await DecoratorsActions.list();
     const streamDecorators = decorators ? decorators.filter((decorator) => decorator.stream === streamId) : [];
     const histogram = resultHistogram();
@@ -61,16 +64,16 @@ const _defaultWidgets: { [ViewType]: (?string) => Promise<Result> } = {
     return { titles, widgets, positions };
   },
   // eslint-disable-next-line no-unused-vars
-  [View.Type.Dashboard]: async (streamId: ?string) => {
+  [View.Type.Dashboard]: async (streamId: string | undefined | null) => {
     const widgets = [];
     const titles = {};
     const positions = {};
 
-    return { titles, widgets, positions };
+    return { titles, widgets, positions } as Result;
   },
 };
 
-export default async (type: ViewType, streamId: ?string) => {
+export default async (type: ViewType, streamId: string | undefined | null) => {
   const { titles, widgets, positions } = await _defaultWidgets[type](streamId);
 
   return ViewState.create()
