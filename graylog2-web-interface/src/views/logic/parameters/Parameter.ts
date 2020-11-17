@@ -48,10 +48,14 @@ export type ParameterJson = {
 };
 /* eslint-enable camelcase */
 
+type ParameterSubClass = {
+  fromJSON: (json: ParameterJson) => Parameter;
+};
+
 class Parameter {
   protected _value: InternalState;
 
-  static __registrations: { [key: string]: typeof Parameter } = {};
+  static __registrations: { [key: string]: ParameterSubClass } = {};
 
   constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding) {
     this._value = { type, name, title, description, dataType, defaultValue, optional, binding };
@@ -106,7 +110,7 @@ class Parameter {
     throw new Error(`No class found for type <${type}>`);
   }
 
-  static registerSubtype(type: string, implementingClass: typeof Parameter) {
+  static registerSubtype(type: string, implementingClass: ParameterSubClass) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
 }
