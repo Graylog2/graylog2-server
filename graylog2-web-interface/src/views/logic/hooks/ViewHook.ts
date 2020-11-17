@@ -19,8 +19,8 @@ import View from 'views/logic/views/View';
 
 export type ViewHookArguments = {
   view: View,
-  retry: () => Promise<*>,
-  query: { [string]: any },
+  retry: () => Promise<unknown>,
+  query: { [key: string]: any },
 };
 
 export type ViewHook = (ViewHookArguments) => Promise<boolean>;
