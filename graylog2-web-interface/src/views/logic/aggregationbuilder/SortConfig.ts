@@ -64,8 +64,7 @@ export default class SortConfig {
     return {
       type,
       field,
-      // $FlowFixMe$: type is changed implicitly during serialisation
-      direction,
+      direction: direction as unknown as DirectionJson,
     };
   }
 
