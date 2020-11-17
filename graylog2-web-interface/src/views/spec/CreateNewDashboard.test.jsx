@@ -1,3 +1,6 @@
+/**
+ * @jest-environment <rootDir>/test/integration-environment.js
+ */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -13,9 +16,6 @@
  * You should have received a copy of the Server Side Public License
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
-/**
- * @jest-environment <rootDir>/test/integration-environment.js
  */
 // @flow strict
 import * as React from 'react';
