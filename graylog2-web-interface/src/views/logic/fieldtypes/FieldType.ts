@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 
 type Property = 'compound' | 'enumerable' | 'full-text-search' | 'numeric' | 'decorated';
 
-export const Properties: { [string]: Property } = {
+export const Properties: { [key: string]: Property } = {
   Compound: 'compound',
   Enumerable: 'enumerable',
   FullTextSearch: 'full-text-search',
@@ -30,6 +30,7 @@ export const Properties: { [string]: Property } = {
 export type FieldTypeJSON = {
   type: string,
   properties: Array<Property>,
+  // eslint-disable-next-line camelcase
   index_names: Array<string>,
 };
 
