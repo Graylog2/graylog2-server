@@ -17,7 +17,7 @@
 // @flow strict
 import * as React from 'react';
 
-export type NewViewLoaderContextType = () => mixed;
+export type NewViewLoaderContextType = () => unknown;
 
 const NewViewLoaderContext = React.createContext<NewViewLoaderContextType>(() => {});
 
