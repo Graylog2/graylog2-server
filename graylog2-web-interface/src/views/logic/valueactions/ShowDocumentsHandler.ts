@@ -60,11 +60,12 @@ const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widge
     .reduce((prev: string, next: string) => addToQuery(prev, next), '');
   const query = addToQuery(widgetQuery, valuePathQuery);
   const valuePathFields = extractFieldsFromValuePath(valuePath);
-  const messageListFields = [].concat(new Set<string>([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]));
+  const messageListFields = new Set<string>([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]);
   const newWidget = duplicateCommonWidgetSettings(MessagesWidget.builder(), widget)
     .query(createElasticsearchQueryString(query))
     .newId()
     .config(MessagesWidgetConfig.builder()
+      // @ts-ignore
       .fields([...messageListFields])
       .showMessageRow(true).build())
     .build();
