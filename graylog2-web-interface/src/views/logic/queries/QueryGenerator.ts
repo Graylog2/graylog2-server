@@ -22,7 +22,7 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import Query, { createElasticsearchQueryString, filtersForQuery } from './Query';
 import type { QueryId } from './Query';
 
-export default (streamId: string | undefined | null, id: QueryId = uuid()): Query => {
+export default (streamId?: string, id: QueryId = uuid()): Query => {
   const streamIds = streamId ? [streamId] : null;
   const streamFilter = filtersForQuery(streamIds);
   const builder = Query.builder()
