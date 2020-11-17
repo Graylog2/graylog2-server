@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 
 import UserOverview from 'logic/users/UserOverview';
@@ -23,8 +22,8 @@ import { Col, Row } from 'components/graylog';
 
 type Props = {
   adminUser: UserOverview,
-  dataRowFormatter: (user: UserOverview) => React.Node,
-  headerCellFormatter: (header: string) => React.Node,
+  dataRowFormatter: (user: UserOverview) => JSX.Element,
+  headerCellFormatter: (header: string) => JSX.Element,
   headers: Array<string>,
 };
 
