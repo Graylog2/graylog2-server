@@ -25,7 +25,7 @@ import InteractiveContext from './contexts/InteractiveContext';
 
 describe('Field', () => {
   describe('handles value action menu depending on interactive context', () => {
-    const component = (interactive) => ({ children, ...props }) => (
+    const component = (interactive) => ({ children, ...props }: React.ComponentProps<typeof Field>) => (
       <InteractiveContext.Provider value={interactive}>
         <Field {...props}>
           {children}
