@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -81,7 +82,7 @@ type Props = {
   id: string,
   view: ViewStoreState,
   widget: WidgetModel,
-  data?: Array<*>,
+  data?: Array<unknown>,
   editing?: boolean,
   errors?: Array<{ description: string }>,
   fields: Immutable.List<FieldTypeMapping>,
@@ -111,7 +112,7 @@ export type OnVisualizationConfigChange = (VisualizationConfig) => void;
 
 export type WidgetProps = {
   config: AggregationWidgetConfig,
-  data: { [string]: Result },
+  data: { [key: string]: Result },
   editing?: boolean,
   toggleEdit: () => void,
   fields: FieldTypeMappingsList,
@@ -231,7 +232,7 @@ class Widget extends React.Component<Props, State> {
     }
   };
 
-  _onCopyToDashboard = (widgetId: string, dashboardId: ?string): void => {
+  _onCopyToDashboard = (widgetId: string, dashboardId: string | undefined | null): void => {
     const { view } = this.props;
     const { view: activeView } = view;
 
