@@ -5,6 +5,7 @@ import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import FormsUtils from 'util/FormsUtils';
+import AppConfig from '../../util/AppConfig';
 
 const { IndexSetsActions } = CombinedProvider.get('IndexSets');
 
@@ -84,14 +85,15 @@ class StreamForm extends React.Component {
     this.setState(change);
   };
 
-  state = this._getValuesFromProps(this.props);
+  _indexSetSelect = () => {
+    const { indexSetId } = this.state;
 
-  render() {
-    const { title, description, removeMatchesFromDefaultStream, indexSetId } = this.state;
+    if (AppConfig.isCloud()) {
+      return null;
+    }
 
-    let indexSetSelect;
     if (this.props.indexSets) {
-      indexSetSelect = (
+      return (
         <Input id="index-set-selector"
                label="Index Set"
                help="Messages that match this stream will be written to the configured index set.">
@@ -103,9 +105,15 @@ class StreamForm extends React.Component {
                   value={indexSetId} />
         </Input>
       );
-    } else {
-      indexSetSelect = <Spinner>Loading index sets...</Spinner>;
     }
+
+    return <Spinner>Loading index sets...</Spinner>;
+  };
+
+  state = this._getValuesFromProps(this.props);
+
+  render() {
+    const { title, description, removeMatchesFromDefaultStream } = this.state;
 
     return (
       <BootstrapModalForm ref={(c) => { this.modal = c; }}
@@ -129,7 +137,7 @@ class StreamForm extends React.Component {
                value={description}
                onChange={this.handleChange}
                placeholder="What kind of messages are routed into this stream?" />
-        {indexSetSelect}
+        {this._indexSetSelect()}
         <Input id="RemoveFromDefaultStream"
                type="checkbox"
                label="Remove matches from &lsquo;All messages&rsquo; stream"

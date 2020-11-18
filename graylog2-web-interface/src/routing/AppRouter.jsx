@@ -132,7 +132,7 @@ const AppRouter = () => {
               <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
               <Route path={Routes.STREAMS} component={StreamsPage} />
               <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
-              <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
+              {!isCloud && <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
               <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
               <Route path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
               <Route path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
@@ -214,7 +214,7 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
               <Route path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
               <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
-              <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
+              {!isCloud && <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />}
               <Route path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} component={AuthenticationPage}>
                 <IndexRoute component={UsersPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.LIST} component={UsersPage} />
