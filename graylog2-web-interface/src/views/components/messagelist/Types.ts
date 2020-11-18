@@ -15,29 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-export type Message = {|
+export type Message = {
   id: string,
   index: string,
-  fields: { [string]: any },
-  formatted_fields?: { [string]: any },
-  highlight_ranges?: { [string]: any },
+  fields: { [key: string]: any },
+  formatted_fields?: { [key: string]: any },
+  highlight_ranges?: { [key: string]: any },
   decoration_stats?: {
-    added_fields: { [string]: any },
-    changed_fields: { [string]: any },
-    removed_fields: { [string]: any },
+    added_fields: { [key: string]: any },
+    changed_fields: { [key: string]: any },
+    removed_fields: { [key: string]: any },
   },
-|};
+};
 
-export type BackendMessage = {|
+export type BackendMessage = {
   index: string,
-  message: {
-    _id: string,
-    [string]: mixed,
+  message: { _id: string } & {
+    [key: string]: unknown,
   },
-  highlight_ranges?: { [string]: any },
+  highlight_ranges?: { [key: string]: any },
   decoration_stats?: {
-    added_fields: { [string]: any },
-    changed_fields: { [string]: any },
-    removed_fields: { [string]: any },
+    added_fields: { [key: string]: any },
+    changed_fields: { [key: string]: any },
+    removed_fields: { [key: string]: any },
   },
-|};
+};
