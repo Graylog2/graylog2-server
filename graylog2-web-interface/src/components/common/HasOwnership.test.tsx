@@ -25,12 +25,13 @@ import { createGRN } from 'logic/permissions/GRN';
 import HasOwnership from './HasOwnership';
 
 type Props = {
-  currentUser: {|
+  currentUser: {
     grn_permissions: string[],
     permissions: string[],
-  |},
+  },
   id: string,
   type: string,
+  hideChildren?: boolean,
 };
 
 describe('HasOwnership', () => {
