@@ -31,7 +31,7 @@ type Props = {
   onChange: OnChange,
 };
 
-const _changeScaling = (event: SyntheticInputEvent<HTMLInputElement>, interval: AutoInterval, onChange: OnChange) => {
+const _changeScaling = (event: React.ChangeEvent<HTMLInputElement>, interval: AutoInterval, onChange: OnChange) => {
   const scaling = 1 / FormsUtils.getValueFromInput(event.target);
 
   onChange({ ...interval, scaling });
