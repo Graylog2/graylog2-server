@@ -8088,6 +8088,9 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
   integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
 
+"graylog-jest-preset@file:packages/graylog-jest-preset":
+  version "1.0.0"
+
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "4.1.0-SNAPSHOT"
   dependencies:
@@ -8096,6 +8099,7 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
     create-react-class "15.6.3"
     eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-ab972aeb-116c-4f48-b346-06a6b7f40a2c-1605784651207/node_modules/eslint-config-graylog"
     formik "2.2.0"
+    graylog-jest-preset "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-22744e42-8c3f-435e-9dfc-85d037c4db67-1605711441533/node_modules/graylog-jest-preset"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.5.1"

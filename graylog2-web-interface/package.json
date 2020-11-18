@@ -29,39 +29,9 @@
     "extends": "graylog"
   },
   "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}"
-    ],
-    "setupFiles": [
-      "jest-localstorage-mock",
-      "<rootDir>/test/setup-jest.js",
-      "<rootDir>/test/mock-FetchProvider.js",
-      "<rootDir>/test/mock-Version.js",
-      "<rootDir>/test/console-warnings-fail-tests.js"
-    ],
-    "setupFilesAfterEnv": [
-      "jest-enzyme"
-    ],
-    "moduleDirectories": [
-      "src",
-      "test",
-      "node_modules"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx"
-    ],
-    "moduleNameMapper": {
-      "^file-loader(\\?esModule=false)?!(.+)$": "$2",
-      "^!style/useable!.*\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
-      "\\.(css|less)$": "identity-obj-proxy",
-      "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/fileMock.js"
-    },
-    "testPathIgnorePatterns": [
-      ".fixtures.[jt]s$"
+   "preset": "graylog-jest-preset",
+   "setupFiles": [
+     "<rootDir>/test/setup-jest.js"
     ]
   },
   "dependencies": {
@@ -139,13 +109,8 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-flow": "^7.8.3",
     "@babel/preset-react": "^7.8.3",
-    "@testing-library/dom": "7.20.2",
-    "@testing-library/jest-dom": "5.11.0",
-    "@testing-library/react": "11.0.4",
-    "@types/jest": "25.2.3",
     "assets-webpack-plugin": "^5.1.2",
     "babel-core": "^7.0.0-0",
-    "babel-jest": "^25.1.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-dynamic-import-node": "^2.3.0",
@@ -157,8 +122,6 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.2",
     "css-loader": "^0.28.10",
-    "enzyme": "3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
     "eslint-config-graylog": "file:packages/eslint-config-graylog",
     "eslint-loader": "^4.0.2",
     "estraverse-fb": "^1.3.1",
@@ -169,18 +132,11 @@
     "fork-ts-checker-webpack-plugin": "^6.0.0",
     "glob": "^7.0.0",
     "html-webpack-plugin": "^4.2.0",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^25.1.0",
-    "jest-environment-enzyme": "^7.1.2",
-    "jest-enzyme": "^7.1.2",
-    "jest-localstorage-mock": "^2.4.0",
-    "jest-styled-components": "7.0.2",
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^2.1.1",
-    "react-select-event": "^5.0.0",
     "react-styleguidist": "^11.0.8",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
