@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-export type AutoInterval = {|
+export type AutoInterval = {
   type: 'auto',
   scaling?: number,
-|};
+};
 
-export type TimeUnitInterval = {|
+export type TimeUnitInterval = {
   type: 'timeunit',
   value: number,
   unit: string,
-|};
+};
 
 export type Interval = AutoInterval | TimeUnitInterval;
