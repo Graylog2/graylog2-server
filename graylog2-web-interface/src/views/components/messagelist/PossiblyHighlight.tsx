@@ -26,12 +26,12 @@ import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import formatNumber from './FormatNumber';
 import isNumeric from './IsNumeric';
 
-export type HighlightRange = {|
+export type HighlightRange = {
   start: number,
   length: number,
-|};
+};
 
-type Ranges = { [string]: Array<HighlightRange> };
+type Ranges = { [key: string]: Array<HighlightRange> };
 
 const highlight = (value: any, idx: number, style = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
 
