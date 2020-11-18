@@ -22,7 +22,7 @@ import SearchPageLayoutContext from './SearchPageLayoutContext';
 import SearchPageLayoutState from './SearchPageLayoutState';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactElement,
 };
 
 const SearchPageLayoutProvider = ({ children }: Props) => {
