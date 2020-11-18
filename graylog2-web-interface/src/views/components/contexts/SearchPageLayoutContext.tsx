@@ -28,6 +28,6 @@ export type SearchPageLayout = {
   actions: { toggleSidebarPinning: () => void },
 };
 
-const SearchPageLayoutContext = React.createContext<?SearchPageLayout>();
+const SearchPageLayoutContext = React.createContext<SearchPageLayout | undefined>(undefined);
 
 export default SearchPageLayoutContext;
