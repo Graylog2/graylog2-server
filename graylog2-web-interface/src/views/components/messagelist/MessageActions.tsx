@@ -30,9 +30,9 @@ type Props = {
   id: string,
   fields: {
     timestamp: string,
-    [string]: mixed,
+    [key: string]: unknown,
   },
-  decorationStats: ?any,
+  decorationStats: any,
   disabled: boolean,
   disableSurroundingSearch: boolean,
   disableTestAgainstStream: boolean,
