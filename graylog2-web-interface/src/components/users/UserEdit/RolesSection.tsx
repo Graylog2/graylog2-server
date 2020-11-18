@@ -45,7 +45,7 @@ const Container = styled.div`
 const RolesSection = ({ user, onSubmit }: Props) => {
   const { username, id } = user;
   const [loading, setLoading] = useState(false);
-  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles>();
+  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [errors, setErrors] = useState<string | undefined>();
 
   const _onLoad = useCallback((pagination = DEFAULT_PAGINATION) => {

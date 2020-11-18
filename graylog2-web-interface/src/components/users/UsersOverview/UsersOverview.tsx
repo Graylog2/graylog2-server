@@ -88,7 +88,7 @@ const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) =
 
 const UsersOverview = () => {
   const currentUser = useContext<UserJSON | undefined>(CurrentUserContext);
-  const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers>();
+  const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: users, adminUser, pagination: { total = 0 } = {} } = paginatedUsers || {};

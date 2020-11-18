@@ -65,7 +65,7 @@ const UserCreate = () => {
   const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
   const [users, setUsers] = useState<Immutable.List<User> | undefined>();
   const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
-  const [submitError, setSubmitError] = useState<RequestError>();
+  const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
 
   useEffect(() => {
