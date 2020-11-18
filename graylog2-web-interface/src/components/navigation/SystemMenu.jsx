@@ -88,9 +88,11 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['inputs:read']}>
         <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" />
       </IfPermitted>
-      <IfPermitted permissions={['outputs:read']}>
-        <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['outputs:read']}>
+          <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
+        </IfPermitted>
+      </HideOnCloud>
       <HideOnCloud>
         <IfPermitted permissions={['indices:read']}>
           <NavigationLink path={Routes.SYSTEM.INDICES.LIST} description="Indices" />
