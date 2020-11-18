@@ -17,6 +17,6 @@
 // @flow strict
 import * as React from 'react';
 
-const HighlightMessageContext = React.createContext<?string>();
+const HighlightMessageContext = React.createContext<string | undefined>(undefined);
 
 export default HighlightMessageContext;
