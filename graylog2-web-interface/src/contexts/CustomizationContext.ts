@@ -20,11 +20,11 @@ import * as React from 'react';
 import { singleton } from '../views/logic/singleton';
 
 export type CustomizationSetting = {
-  [string]: boolean | string | number,
+  [key: string]: boolean | string | number,
 };
 
 export type CustomizationType = {
-  [string]: CustomizationSetting,
+  [key: string]: CustomizationSetting,
 };
 
 const defaultCustomization = {};
