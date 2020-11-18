@@ -23,9 +23,9 @@ import { ViewActions } from 'views/stores/ViewStore';
 
 type Props = {
   interval: number,
-  view: ?View,
-  activeQuery: ?QueryId,
-  tabs?: ?Array<number>,
+  view: View | undefined | null
+  activeQuery: QueryId | undefined | null
+  tabs?: Array<number> | undefined | null,
 };
 
 const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
