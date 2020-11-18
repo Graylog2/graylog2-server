@@ -30,8 +30,9 @@ import { PivotList, SeriesList, SortList } from './AggregationBuilderPropTypes';
 const mapFields = (fields) => fields.sort(defaultCompare)
   .map((v, idx) => ({ label: v.label, value: idx }));
 
-const findIdxInFields = (fields, sort) => Immutable.List(fields)
+const findIdxInFields = (fields: SortOption[], sort) => Immutable.List<SortOption>(fields)
   .map((field) => field.value)
+  .toList()
   .findIndex((field) => sort && (field.type === sort.type && field.field === sort.field));
 
 const mapNewValue = (fields, idx) => (fields[idx] ? [fields[idx].value] : []);
@@ -39,11 +40,11 @@ const mapNewValue = (fields, idx) => (fields[idx] ? [fields[idx].value] : []);
 type Props = {
   pivots: Array<Pivot>,
   series: Array<Series>,
-  onChange: (Array<*>) => any,
+  onChange: (newSorts: Array<any>) => any,
   sort: Array<SortConfig>,
 };
 
-const currentValue = (sort, fields) => {
+const currentValue = (sort, fields: SortOption[]) => {
   const currentIdx = sort && findIdxInFields(fields, sort[0]);
 
   if (currentIdx === undefined) {
@@ -53,10 +54,15 @@ const currentValue = (sort, fields) => {
   return fields[currentIdx];
 };
 
+type SortOption = {
+  label: string;
+  value: SortConfig;
+};
+
 const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
   const pivotOptions = pivots.map((pivot) => ({ label: pivot.field, value: SortConfig.fromPivot(pivot) }));
   const seriesOptions = series.map((s) => ({ label: s.effectiveName, value: SortConfig.fromSeries(s) }));
-  const fields = [].concat(pivotOptions, seriesOptions);
+  const fields: SortOption[] = [].concat(pivotOptions, seriesOptions);
   const options = mapFields(fields);
 
   const _onChange = (newValue, reason) => {
