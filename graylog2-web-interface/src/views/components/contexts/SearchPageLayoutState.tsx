@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useContext, useState } from 'react';
 
-import View, { type ViewType } from 'views/logic/views/View';
+import View, { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -28,18 +28,19 @@ import Store from 'logic/local-storage/Store';
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 type Props = {
-  children: ({
+  children: (layoutConsumer: {
     setLayoutState: (stateKey: string, value: boolean) => void,
     getLayoutState: (stateKey: string, defaultValue: boolean) => boolean,
-  }) => React.Node,
+  }) => React.ReactElement;
 };
 
-const _getPinningPreferenceKey = (viewType: ?ViewType): 'dashboardSidebarIsPinned' | 'searchSidebarIsPinned' => {
-  const preferenceKeyMapping = {
-    [View.Type.Dashboard]: 'dashboardSidebarIsPinned',
-    [View.Type.Search]: 'searchSidebarIsPinned',
-  };
+type PinningPreferenceKey = 'dashboardSidebarIsPinned' | 'searchSidebarIsPinned';
+const preferenceKeyMapping: { [key in typeof View.Type.Dashboard | typeof View.Type.Search]: PinningPreferenceKey } = {
+  [View.Type.Dashboard]: 'dashboardSidebarIsPinned',
+  [View.Type.Search]: 'searchSidebarIsPinned',
+};
 
+const _getPinningPreferenceKey = (viewType: ViewType | undefined): PinningPreferenceKey => {
   const preferenceKey = viewType && preferenceKeyMapping[viewType];
 
   if (!preferenceKey) {
