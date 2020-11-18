@@ -31,8 +31,20 @@ const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters)
   return undeclaredParameters.size > 0 || missingValues.size > 0;
 };
 
-const WithSearchStatus = (Component: React.AbstractComponent<any>) => connect(
-  ({ config, isDisabled, onExecute }) => {
+type SearchStatusProps = {
+  config: object;
+  disableSearch: boolean;
+  onExecute: () => void;
+}
+
+type WrapperProps = {
+  config: object;
+  isDisabled: boolean;
+  onExecute: () => void;
+};
+
+const WithSearchStatus = (Component: React.ComponentType<SearchStatusProps>): React.ComponentType<{}> => connect(
+  ({ config, isDisabled, onExecute }: WrapperProps) => {
     return <Component disableSearch={isDisabled} onExecute={onExecute} config={config} />;
   },
   {
