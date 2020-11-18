@@ -25,6 +25,7 @@ import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchStoreState } from 'views/stores/SearchStore';
+import View from '../logic/views/View';
 
 type Props = {
   currentView: ViewStoreState,
@@ -48,12 +49,5 @@ const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
     </Modal.Footer>
   </BootstrapModalWrapper>
 );
-
-DebugOverlay.propTypes = {
-  currentView: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  searches: PropTypes.object.isRequired,
-  show: PropTypes.bool.isRequired,
-};
 
 export default connect(DebugOverlay, { currentView: ViewStore, searches: SearchStore });
