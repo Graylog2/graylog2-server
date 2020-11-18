@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 type Props = {
-  children: React.Node,
+  children: Array<JSX.Element | string> | JSX.Element,
   delay: number,
 };
 
@@ -37,7 +37,7 @@ const Delayed = ({ children, delay }: Props) => {
     return () => clearTimeout(delayTimeout);
   }, []);
 
-  return delayFinished ? children : null;
+  return delayFinished ? <>{children}</> : null;
 };
 
 Delayed.propTypes = {
