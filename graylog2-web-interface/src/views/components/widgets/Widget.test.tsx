@@ -348,6 +348,7 @@ describe('<Widget />', () => {
 
   describe('copy widget to dashboard', () => {
     beforeEach(() => {
+      // @ts-ignore
       DashboardsStore.getInitialState = jest.fn(() => dashboardState);
       ViewStore.getInitialState = jest.fn(() => viewStoreState);
       ViewManagementActions.get = mockAction(jest.fn((() => Promise.resolve(dashboard1.toJSON()))));
