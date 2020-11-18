@@ -26,7 +26,7 @@ import PossiblyHighlight from './PossiblyHighlight';
 import Highlight from './Highlight';
 
 type Props = {
-  children: ?React.Node,
+  children: React.ReactElement,
   field: string,
   value?: any,
 };
