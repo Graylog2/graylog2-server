@@ -37,7 +37,7 @@ type CurrentUser = {
   };
 };
 
-const useCurrentThemeMode = () => {
+const useCurrentThemeMode = (): [string, (newThemeMode: string) => void] => {
   const browserThemePreference = usePrefersColorScheme();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({

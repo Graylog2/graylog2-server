@@ -28,4 +28,5 @@ export type ThemeInterface = {
   utils: Utils,
   mode: string,
   changeMode: (string) => void,
+  components: { [component: string]: any },
 };
