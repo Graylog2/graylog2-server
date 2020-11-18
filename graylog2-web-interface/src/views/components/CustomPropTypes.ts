@@ -28,7 +28,7 @@ const FieldTypeMapping = PropTypes.instanceOf(TFieldTypeMapping);
 const FieldListType = ImmutablePropTypes.listOf(FieldTypeMapping);
 
 const CurrentView = PropTypes.shape({
-  activeQuery: PropTypes.string,
+  activeQuery: PropTypes.string.isRequired,
 });
 
 export type CurrentViewType = {
