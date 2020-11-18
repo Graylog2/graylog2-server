@@ -33,13 +33,21 @@ import style from './MessageTableEntry.css';
 import type { Message } from './Types';
 
 import TypeSpecificValue from '../TypeSpecificValue';
+import { Store } from 'src/stores/StoreTypes';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
+
+type Stream = { id: string };
+type Input = { id: string };
+
+type InputsStoreState = {
+  inputs: Array<Input>;
+};
 
 const ConnectedMessageDetail = connect(
   MessageDetail,
   {
-    availableInputs: InputsStore,
+    availableInputs: InputsStore as Store<InputsStoreState>,
     availableStreams: StreamsStore,
     configurations: SearchConfigStore,
   },
@@ -50,9 +58,9 @@ const ConnectedMessageDetail = connect(
 
     return ({
       ...rest,
-      allStreams: Immutable.List(streams),
-      streams: Immutable.Map(streams.map((stream) => [stream.id, stream])),
-      inputs: Immutable.Map(inputs.map((input) => [input.id, input])),
+      allStreams: Immutable.List<Stream>(streams),
+      streams: Immutable.Map<string, Stream>(streams.map((stream) => [stream.id, stream])),
+      inputs: Immutable.Map<string, Input>(inputs.map((input) => [input.id, input])),
       searchConfig: searchesClusterConfig,
     });
   },
@@ -85,7 +93,7 @@ const MessageTableEntry = ({
   highlightMessage = '',
   message,
   showMessageRow = false,
-  selectedFields = Immutable.OrderedSet(),
+  selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
 }: Props) => {
   const _toggleDetail = () => {
@@ -150,6 +158,7 @@ const MessageTableEntry = ({
       && (
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
+            {/* @ts-ignore */}
             <ConnectedMessageDetail message={message}
                                     fields={fields}
                                     disableSurroundingSearch={disableSurroundingSearch}
@@ -178,6 +187,7 @@ MessageTableEntry.propTypes = {
       removed_fields: PropTypes.object,
     }),
   }).isRequired,
+  // @ts-ignore
   selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
   showMessageRow: PropTypes.bool,
   toggleDetail: PropTypes.func.isRequired,
