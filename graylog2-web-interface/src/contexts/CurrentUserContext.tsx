@@ -21,6 +21,6 @@ import type { UserJSON } from 'logic/users/User';
 
 import { singleton } from '../views/logic/singleton';
 
-const CurrentUserContext = React.createContext<?UserJSON>();
+const CurrentUserContext = React.createContext<UserJSON | undefined>(undefined);
 
 export default singleton('contexts.CurrentUserContext', () => CurrentUserContext);
