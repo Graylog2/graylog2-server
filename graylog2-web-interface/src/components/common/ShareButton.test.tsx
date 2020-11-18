@@ -27,11 +27,13 @@ import ShareButton from './ShareButton';
 const entityType = 'dashboard';
 const entityId = 'dashboard-id';
 const entityGRN = createGRN(entityType, entityId);
-const SimpleShareButton = ({ onClick, grnPermissions, ...rest }: { onClick: () => void, grnPermissions: Array<string> }) => (
+const SimpleShareButton = ({ onClick, grnPermissions, ...rest }: { onClick: () => void, grnPermissions: Array<string>, disabledInfo?: string | undefined }) => (
   <CurrentUserContext.Provider value={{ ...viewsManager, grn_permissions: grnPermissions }}>
     <ShareButton {...rest} onClick={onClick} entityType={entityType} entityId={entityId} />
   </CurrentUserContext.Provider>
 );
+
+SimpleShareButton.defaultProps = { disabledInfo: undefined };
 
 describe('<ShareButton />', () => {
   it('should be clickable if user has correct permissions', async () => {
