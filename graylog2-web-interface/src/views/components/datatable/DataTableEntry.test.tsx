@@ -31,7 +31,7 @@ import EmptyValue from '../EmptyValue';
 
 jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
-const f = (source: string, field: string = source): {| field: string, source: string |} => ({ field, source });
+const f = (source: string, field: string = source): { field: string, source: string } => ({ field, source });
 const createFields = (fields: Array<string>) => OrderedSet(fields.map((field) => f(field)));
 const fields = createFields(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
 const item = {
