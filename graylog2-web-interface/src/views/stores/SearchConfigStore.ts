@@ -19,6 +19,7 @@ import Reflux from 'reflux';
 import CombinedProvider from 'injection/CombinedProvider';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { Store } from 'stores/StoreTypes';
+import { SearchesConfig } from 'components/search/SearchConfig';
 
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 
@@ -30,7 +31,7 @@ export const SearchConfigActions = singletonActions(
 );
 
 export type SearchConfigStoreState = {
-  searchesClusterConfig: {};
+  searchesClusterConfig: SearchesConfig;
 };
 
 // eslint-disable-next-line import/prefer-default-export
