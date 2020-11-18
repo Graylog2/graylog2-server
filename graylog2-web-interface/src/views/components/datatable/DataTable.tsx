@@ -35,15 +35,16 @@ import Headers from './Headers';
 import styles from './DataTable.css';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-import type { VisualizationComponent } from '../aggregationbuilder/AggregationBuilder';
+import type {VisualizationComponent, VisualizationComponentProps} from '../aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from '../aggregationbuilder/AggregationBuilder';
+import {Events} from "views/logic/searchtypes/events/EventHandler";
 
-type Props = {
+type Props = VisualizationComponentProps & {
   config: AggregationWidgetConfig,
   currentView: {
     activeQuery: string,
   },
-  data: { chart: Rows },
+  data: { [key: string]: Rows } & { events?: Events },
   fields: FieldTypeMappingsList,
 };
 
@@ -87,7 +88,7 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
     isEqual,
   );
 
-  return Immutable.List(uniqRows).sort(_compareArray).toArray();
+  return Immutable.List<Array<string>>(uniqRows).sort(_compareArray).toArray();
 };
 
 const DataTable = ({ config, currentView, data, fields }: Props) => {
@@ -147,6 +148,6 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   );
 };
 
-const ConnectedDataTable: VisualizationComponent = makeVisualization(connect(DataTable, { currentView: ViewStore }), 'table');
+const ConnectedDataTable = makeVisualization(connect(DataTable, { currentView: ViewStore }), 'table');
 
 export default ConnectedDataTable;
