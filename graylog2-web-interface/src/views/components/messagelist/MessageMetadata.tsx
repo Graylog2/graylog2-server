@@ -22,9 +22,9 @@ import { MessageDetailsDefinitionList } from 'components/graylog';
 
 type Props = {
   timestamp: string,
-  receivedBy: React.Node,
+  receivedBy: React.ReactElement,
   index: string,
-  streams: Immutable.Set<React.Node>,
+  streams: Immutable.Set<React.ReactElement>,
 };
 
 const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
