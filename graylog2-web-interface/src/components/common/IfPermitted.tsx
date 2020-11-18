@@ -28,7 +28,7 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
  */
 
 type Props = {
-  children: React.Node,
+  children: JSX.Element | JSX.Element[],
   permissions: string | Array<string>,
   anyPermissions?: boolean,
 };
@@ -45,19 +45,25 @@ const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) 
   const currentUser = useContext(CurrentUserContext);
 
   if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
-    return React.Children.map(children, (child) => {
-      if (React.isValidElement(child)) {
-        const presentProps = (child && child.props) ? Object.keys(child.props) : [];
-        // do not overwrite existing props
-        const filteredRest = Object.entries(rest)
-          .filter((entry) => !presentProps.includes(entry[0]))
-          .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
+    return (
+      <>
+        {
+          React.Children.map(children, (child) => {
+            if (React.isValidElement(child)) {
+              const presentProps = (child && child.props) ? Object.keys(child.props) : [];
+              // do not overwrite existing props
+              const filteredRest = Object.entries(rest)
+                .filter((entry) => !presentProps.includes(entry[0]))
+                .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
 
-        return React.cloneElement(child, filteredRest);
-      }
+              return React.cloneElement(child, filteredRest);
+            }
 
-      return child;
-    });
+            return child;
+          })
+        }
+      </>
+    );
   }
 
   return null;
