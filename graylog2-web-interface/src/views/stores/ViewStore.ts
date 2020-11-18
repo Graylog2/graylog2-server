@@ -151,7 +151,7 @@ export const ViewStore: ViewStoreType = singletonStore(
 
       return promise;
     },
-    load(view: View, isNew: boolean = false): Promise<ViewStoreState> {
+    load(view: View, isNew = false): Promise<ViewStoreState> {
       this.view = view;
       this.dirty = false;
 

@@ -25,7 +25,7 @@ import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';
-import {UserJSON} from "logic/users/User";
+import { UserJSON } from 'logic/users/User';
 
 type Props = {
   user: UserOverview,

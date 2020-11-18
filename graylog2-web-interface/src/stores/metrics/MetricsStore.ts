@@ -192,6 +192,7 @@ const MetricsStore = Reflux.createStore({
     })).then((responses) => {
       const metricsNames = {};
       const metricsErrors = {};
+
       responses.forEach((response) => {
         if (response.nodeId) {
           metricsNames[response.nodeId] = response.names;

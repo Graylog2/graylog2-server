@@ -17,6 +17,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types/dist/utility-types';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { Store } from 'stores/StoreTypes';
@@ -41,7 +42,6 @@ import type { PaginatedResponseType, Pagination } from 'stores/PaginationTypes';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserOverview, { UserOverviewJSON } from 'logic/users/UserOverview';
-import {$PropertyType} from "utility-types/dist/utility-types";
 
 type PaginatedBackendsResponse = PaginatedResponseType & {
   context: {

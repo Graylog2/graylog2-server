@@ -74,7 +74,7 @@ const PreferencesStore = Reflux.createStore({
   listenables: [PreferencesActions],
   URL: qualifyUrl('/users/'),
 
-  saveUserPreferences(userName: string, preferences: PreferencesUpdateMap, callback: (preferences: PreferencesUpdateMap) => void = () => {}, displaySuccessNotification: boolean = true): void {
+  saveUserPreferences(userName: string, preferences: PreferencesUpdateMap, callback: (preferences: PreferencesUpdateMap) => void = () => {}, displaySuccessNotification = true): void {
     const convertedPreferences = convertPreferences(preferences);
     const url = `${this.URL + userName}/preferences`;
     const promise = fetch('PUT', url, { preferences: convertedPreferences })

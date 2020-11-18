@@ -73,7 +73,7 @@ export const SearchExecutionStateStore = singletonStore(
       return this.executionState;
     },
 
-    replace(executionState: SearchExecutionState, trigger: boolean = true): SearchExecutionState {
+    replace(executionState: SearchExecutionState, trigger = true): SearchExecutionState {
       this.executionState = executionState;
 
       if (trigger) {
@@ -99,7 +99,7 @@ export const SearchExecutionStateStore = singletonStore(
       return this.executionState;
     },
 
-    bindParameterValue(parameterName: String, value: any): SearchExecutionState {
+    bindParameterValue(parameterName: string, value: any): SearchExecutionState {
       this.executionState = this.executionState.toBuilder()
         .parameterBindings(this.executionState.parameterBindings.set(parameterName, ParameterBinding.forValue(value)))
         .build();

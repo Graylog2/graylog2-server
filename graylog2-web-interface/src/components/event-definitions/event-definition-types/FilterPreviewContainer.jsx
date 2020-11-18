@@ -30,7 +30,6 @@ import FilterPreview from './FilterPreview';
 const { FilterPreviewStore, FilterPreviewActions } = CombinedProvider.get('FilterPreview');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-
 class FilterPreviewContainer extends React.Component {
   state = {
     queryId: uuid(),

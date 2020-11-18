@@ -27,10 +27,10 @@ type Props = {
 };
 
 const defaultPreferences = {
-    enableSmartSearch: false,
-    updateUnfocussed: false,
-    searchSidebarIsPinned: false,
-    dashboardSidebarIsPinned: false,
+  enableSmartSearch: false,
+  updateUnfocussed: false,
+  searchSidebarIsPinned: false,
+  dashboardSidebarIsPinned: false,
 };
 
 const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly } }: Props) => {

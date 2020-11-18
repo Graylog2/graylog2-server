@@ -25,13 +25,13 @@ import { ThemeInterface } from 'theme';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/graylog';
+import UserOverview from 'logic/users/UserOverview';
+import { UserJSON } from 'logic/users/User';
 
 import UserOverviewItem from './UserOverviewItem';
 import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
-import UserOverview from 'logic/users/UserOverview';
-import {UserJSON} from "logic/users/User";
 
 const DEFAULT_PAGINATION = {
   page: 1,

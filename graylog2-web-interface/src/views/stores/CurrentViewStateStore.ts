@@ -19,7 +19,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
-import type {RefluxActions, Store} from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'views/logic/singleton';

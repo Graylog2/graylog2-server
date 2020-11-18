@@ -17,6 +17,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import type { PaginatedUsersResponse } from 'stores/users/UsersStore';
 import type { Store } from 'stores/StoreTypes';
@@ -30,7 +31,6 @@ import type { RoleJSON } from 'logic/roles/Role';
 import AuthzRolesActions, { PaginatedRoles, PaginatedUsers, RoleContext } from 'actions/roles/AuthzRolesActions';
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
-import {$PropertyType} from "utility-types";
 
 export type PaginatedRolesResponse = PaginatedListJSON & {
   roles: Array<RoleJSON>,
@@ -38,7 +38,7 @@ export type PaginatedRolesResponse = PaginatedListJSON & {
 };
 
 // eslint-disable-next-line camelcase
-const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [], context = { users: undefined} }: PaginatedRolesResponse) => ({
+const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [], context = { users: undefined } }: PaginatedRolesResponse) => ({
   list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
   pagination: {
     query,

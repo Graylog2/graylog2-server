@@ -21,7 +21,7 @@ import { Formik, Form } from 'formik';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Button, Row, Col } from 'components/graylog';
-import User, {UserJSON} from 'logic/users/User';
+import User, { UserJSON } from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { FormikFormGroup } from 'components/common';
