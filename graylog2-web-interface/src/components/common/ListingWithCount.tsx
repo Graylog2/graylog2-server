@@ -16,7 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 
@@ -24,7 +24,7 @@ import CountBadge from './CountBadge';
 
 type Props = {
   count: number,
-  listing: React.Node,
+  listing: JSX.Element,
 };
 
 const Listing: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
