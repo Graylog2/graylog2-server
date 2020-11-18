@@ -44,7 +44,7 @@ type Props = {
     timerange: TimeRange,
     query: QueryString,
   },
-  disableSearch: boolean,
+  disableSearch?: boolean,
   onExecute: () => void,
 };
 
