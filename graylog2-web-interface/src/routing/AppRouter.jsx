@@ -164,7 +164,7 @@ const AppRouter = () => {
                         <Route exact path={Routes.GETTING_STARTED} component={GettingStartedPage} />
                         <Route exact path={Routes.STREAMS} component={StreamsPage} />
                         <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
-                        <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
+                        {!isCloud && <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
 
                         <Route exact path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
                         <Route exact path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
@@ -274,7 +274,8 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
                         <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
                         <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
-                        <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
+
+                        {!isCloud && <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />}
 
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
