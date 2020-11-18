@@ -16,6 +16,7 @@
  */
 // @flow strict
 import Reflux from 'reflux';
+import { Store } from 'src/stores/StoreTypes';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
@@ -28,11 +29,15 @@ export const StreamsActions = singletonActions(
   () => Reflux.createActions(['refresh']),
 );
 
-/* As the current typescript implementation of the `StreamsStore` is not holding a state, using it requires to query the
+/* As the current implementation of the `StreamsStore` is not holding a state, using it requires to query the
    streams list for every component using it over and over again. This simple Reflux store is supposed to query the
    `StreamsStore` once and hold the result for future subscribers.
    */
-export const StreamsStore = singletonStore(
+export type StreamsStoreState = {
+  streams: Array<{ id: string }>;
+};
+
+export const StreamsStore: Store<StreamsStoreState> = singletonStore(
   'views.Streams',
   () => Reflux.createStore({
     listenables: [StreamsActions],
