@@ -24,14 +24,14 @@ import PaginatedList from './PaginatedList';
 
 describe('PaginatedList', () => {
   it('should display Pagination', () => {
-    const { getByText } = render(<PaginatedList totalItems={100} onChange={() => {}}>The list</PaginatedList>);
+    const { getByText } = render(<PaginatedList totalItems={100} onChange={() => {}}><div>The list</div></PaginatedList>);
 
     expect(getByText('The list')).not.toBeNull();
     expect(getByText('1')).not.toBeNull();
   });
 
   it('should not dived by 0 if pageSize is 0 Pagination', () => {
-    const { getByText } = render(<PaginatedList totalItems={100} pageSize={0} onChange={() => {}}>The list</PaginatedList>);
+    const { getByText } = render(<PaginatedList totalItems={100} pageSize={0} onChange={() => {}}><div>The list</div></PaginatedList>);
 
     expect(getByText('The list')).not.toBeNull();
   });
@@ -39,7 +39,7 @@ describe('PaginatedList', () => {
   it('should not display Pagination, when context is not interactive', () => {
     const { queryByText } = render(
       <InteractiveContext.Provider value={false}>
-        <PaginatedList totalItems={100} onChange={() => {}}>The list</PaginatedList>,
+        <PaginatedList totalItems={100} onChange={() => {}}><div>The list</div></PaginatedList>,
       </InteractiveContext.Provider>,
     );
 
@@ -49,7 +49,7 @@ describe('PaginatedList', () => {
 
   it('should reset current page on page size change', () => {
     const onChangeStub = jest.fn();
-    const { getByLabelText } = render(<PaginatedList totalItems={200} onChange={onChangeStub} activePage={3}>The list</PaginatedList>);
+    const { getByLabelText } = render(<PaginatedList totalItems={200} onChange={onChangeStub} activePage={3}><div>The list</div></PaginatedList>);
 
     const pageSizeInput = getByLabelText('Show');
 
