@@ -22,7 +22,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactElement,
 };
 
 export default ({ children }: Props) => {
