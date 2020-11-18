@@ -18,6 +18,7 @@
 import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
+import { Store } from 'src/stores/StoreTypes';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -57,7 +58,7 @@ export type SearchStoreState = {
   widgetMapping: WidgetMapping,
 };
 
-export const SearchStore = singletonStore(
+export const SearchStore: Store<SearchStoreState> = singletonStore(
   'views.Search',
   () => Reflux.createStore({
     listenables: [SearchActions],
