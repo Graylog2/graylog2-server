@@ -21,7 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
 const parseSearchIdUrl = (id) => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);
@@ -39,7 +39,7 @@ export const SearchMetadataActions: SearchMetadataActionsType = singletonActions
   }),
 );
 
-export const SearchMetadataStore = singletonStore(
+export const SearchMetadataStore: Store<SearchMetadata> = singletonStore(
   'views.SearchMetadata',
   () => Reflux.createStore({
     listenables: [SearchMetadataActions],
