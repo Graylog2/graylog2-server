@@ -21,7 +21,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 
 export type ValueRendererProps = {
   field: string,
-  value: *,
+  value: any,
   type: FieldType,
 };
 
