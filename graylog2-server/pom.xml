@@ -969,16 +969,6 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>yarn flow-check</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <configuration>
-                                    <arguments>flow-check</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
                                 <id>yarn tsc</id>
                                 <goals>
                                     <goal>yarn</goal>
