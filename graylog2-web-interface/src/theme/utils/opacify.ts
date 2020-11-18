@@ -34,7 +34,7 @@ function opacify(color: string, amount: number): string {
   }
 
   const parsedAlpha = chroma(color).alpha();
-  const newAlpha = (parsedAlpha * 100 + parseFloat(amount) * 100) / 100;
+  const newAlpha = (parsedAlpha * 100 + amount * 100) / 100;
 
   return chroma(color).alpha(newAlpha).css();
 }
