@@ -29,15 +29,17 @@ import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 
 import CustomPropTypes from '../CustomPropTypes';
 
-type Option = {|
+type Option = {
   label: string,
-  value: string,
+  value: Series,
   parameter?: string | number,
-|};
+};
 
-type IncompleteOption = {| incomplete: true, parameterNeeded: false, value: string, label: string, value: string | number, parameter?: string | number |};
-type ParameterNeededOption = {| incomplete: true, parameterNeeded: true, value: string, value: string |};
-type BackToFunctions = {| label: string, backToFunctions: true |};
+type IncompleteOption = { incomplete: true, parameterNeeded: false, label: string, value: string | number, parameter?: string | number };
+type ParameterNeededOption = { incomplete: true, parameterNeeded: true, value: string };
+type BackToFunctions = { label: string, backToFunctions: true };
+
+type IsOption = Option | IncompleteOption | ParameterNeededOption | BackToFunctions;
 
 const parseSeries = (series: Array<Option>) => (series ? series.map((s) => s.value) : []);
 
@@ -50,18 +52,33 @@ const newSeriesConfigChange = (values, series, newSeries, onChange) => {
 const _wrapOption = (series) => ({ label: series.effectiveName, value: series });
 
 type Props = {
-  onChange: (Array<Series>) => boolean,
+  onChange: (newSeries: Array<Series>) => boolean,
   series: Array<Series>,
-  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>, for: (string | number, ?(string | number)) => Array<Option> },
+  suggester: ((string) => Array<Option>) & {
+    defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>,
+    for: (func: string | number, parameter: string | number | undefined | null) => Array<Option>,
+  },
 };
 
 type State = {
   options: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>,
 };
 
+const isParameterNeeded = (option: IsOption): option is ParameterNeededOption => option && 'parameterNeeded' in option && option.parameterNeeded === true;
+
+const isIncomplete = (option: IsOption): option is IncompleteOption => option && 'incomplete' in option && 'parameterNeeded' in option && option.parameterNeeded === false;
+
+const isBackToFunctions = (option: IsOption): option is BackToFunctions => option && 'backToFunctions' in option && option.backToFunctions === true;
+
 class SeriesSelect extends React.Component<Props, State> {
   static defaultProps = {
     suggester: new SeriesFunctionsSuggester(),
+  };
+
+  static propTypes = {
+    onChange: PropTypes.func.isRequired,
+    series: PropTypes.arrayOf(CustomPropTypes.instanceOf(Series)).isRequired,
+    suggester: PropTypes.any,
   };
 
   constructor(props: Props) {
@@ -77,16 +94,16 @@ class SeriesSelect extends React.Component<Props, State> {
     const { onChange, suggester } = this.props;
     const last = newSeries[newSeries.length - 1];
 
-    if (last && last.parameterNeeded) {
+    if (isParameterNeeded(last)) {
       const options = parameterOptionsForType(last.value)
         .map((value) => ({ label: value.toString(), value: last.value, parameterNeeded: false, incomplete: true, parameter: value }));
 
-      this.setState({ options });
+      this.setState({ options } as State);
 
       return false;
     }
 
-    if (last && last.incomplete) {
+    if (isIncomplete(last)) {
       const options = [].concat(
         [{ label: 'Back to function list', backToFunctions: true }],
         suggester.for(last.value, last.parameter),
@@ -99,12 +116,11 @@ class SeriesSelect extends React.Component<Props, State> {
 
     this._resetToFunctions();
 
-    if (last && last.backToFunctions) {
+    if (isBackToFunctions(last)) {
       return false;
     }
 
-    // $FlowFixMe: Only `Option` present now.
-    onChange(parseSeries(newSeries));
+    onChange(parseSeries(newSeries as Option[]));
 
     return true;
   };
@@ -162,11 +178,5 @@ class SeriesSelect extends React.Component<Props, State> {
     );
   }
 }
-
-SeriesSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  series: PropTypes.arrayOf(CustomPropTypes.instanceOf(Series)).isRequired,
-  suggester: PropTypes.any,
-};
 
 export default SeriesSelect;
