@@ -61,8 +61,7 @@ const MessageFields = ({ message, fields }: Props) => {
           <MessageField fieldName={key}
                         fieldType={type}
                         message={message}
-                        value={formattedFields[key]}
-                        disableFieldActions={false} />
+                        value={formattedFields[key]} />
         </CustomHighlighting>
       );
     });
