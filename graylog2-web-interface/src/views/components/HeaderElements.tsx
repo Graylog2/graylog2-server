@@ -23,12 +23,16 @@ type Props = {
   headerElements: Array<React.ComponentType<{}>>,
 };
 
-const HeaderElements = ({ headerElements = [] }: Props) => headerElements
-// eslint-disable-next-line react/no-array-index-key
-  .map((Component, idx) => <Component key={idx} />);
+const HeaderElements = ({ headerElements = [] }: Props) => (
+  <>
+    {headerElements
+      // eslint-disable-next-line react/no-array-index-key
+      .map((Component, idx) => <Component key={idx} />)}
+  </>
+);
 
 const mapping = {
   headerElements: 'views.elements.header',
 };
 
-export default withPluginEntities<Props, typeof mapping>(HeaderElements, mapping);
+export default withPluginEntities(HeaderElements, mapping);
