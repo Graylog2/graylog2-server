@@ -18,6 +18,7 @@ import Reflux from 'reflux';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { Store } from 'stores/StoreTypes';
 
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 
@@ -28,8 +29,12 @@ export const SearchConfigActions = singletonActions(
   }),
 );
 
+export type SearchConfigStoreState = {
+  searchesClusterConfig: {};
+};
+
 // eslint-disable-next-line import/prefer-default-export
-export const SearchConfigStore = singletonStore(
+export const SearchConfigStore: Store<SearchConfigStoreState> = singletonStore(
   'views.SearchConfig',
   () => Reflux.createStore({
     listenables: [SearchConfigActions],
