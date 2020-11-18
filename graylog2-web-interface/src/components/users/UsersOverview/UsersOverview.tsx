@@ -87,7 +87,7 @@ const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.
 const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const UsersOverview = () => {
-  const currentUser = useContext<UserJSON>(CurrentUserContext);
+  const currentUser = useContext<UserJSON | undefined>(CurrentUserContext);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers>();
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);

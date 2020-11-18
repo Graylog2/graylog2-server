@@ -80,8 +80,6 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
     setUnit(newUnit);
   };
 
-  // @ts-ignore
-  // @ts-ignore
   return (
     <>
       <Input id="timeout-controls"
@@ -113,6 +111,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                      onChange={_onChangeValue} />
             </Col>
             <Col xs={4}>
+              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
               {/* @ts-ignore TODO: No overload matches this call */}
               <TimeoutUnitSelect disabled={sessionTimeoutNever}
                                  value={`${unit}`}

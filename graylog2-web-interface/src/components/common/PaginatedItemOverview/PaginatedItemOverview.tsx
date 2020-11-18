@@ -49,7 +49,7 @@ const pageSizes = [5, 10, 30];
 export const DEFAULT_PAGINATION = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '' };
 
 const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper, noDataText }: Props) => {
-  const [paginatedList, setPaginatedList] = useState<PaginatedListType>();
+  const [paginatedList, setPaginatedList] = useState<PaginatedListType | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
 
@@ -89,7 +89,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
                   queryHelpComponent={queryHelper}
                   searchButtonLabel="Filter" />
       <div>
-        {itemList !== undefined ? itemList : emptyResult}
+        {itemList ?? emptyResult}
       </div>
     </PaginatedList>
   );
