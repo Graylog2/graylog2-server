@@ -24,9 +24,9 @@ import TypeSpecificTimeHistogramConfiguration from './TypeSpecificTimeHistogramC
 import styles from './TimeHistogramPivot.css';
 import type { Interval } from './Interval';
 
-export type IntervalConfig = {|
+export type IntervalConfig = {
   interval: Interval,
-|};
+};
 
 type Props = {
   onChange: (IntervalConfig) => void,
