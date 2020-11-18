@@ -21,13 +21,13 @@ import { validate } from 'legacy/validations';
 import { Button } from 'components/graylog/index';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactElement,
   disabled: boolean,
   onCancel: () => void,
-  onSubmitForm: any => void,
+  onSubmitForm: (arg: any) => void,
 };
 
-const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> => React.forwardRef(
+const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> => React.forwardRef<HTMLFormElement, Props>(
   ({ children, disabled, onCancel, onSubmitForm }: Props, ref) => {
     const onSubmit = (event) => {
       event.stopPropagation();
