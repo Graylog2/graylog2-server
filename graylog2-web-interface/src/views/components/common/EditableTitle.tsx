@@ -17,7 +17,7 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme/types';
 
@@ -90,7 +90,7 @@ export default class EditableTitle extends React.Component<Props, State> {
     this._submitValue();
   };
 
-  _onChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
+  _onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     evt.preventDefault();
     this.setState({ value: evt.target.value });
   };
@@ -106,7 +106,7 @@ export default class EditableTitle extends React.Component<Props, State> {
     }
   }
 
-  _onSubmit = (e: SyntheticInputEvent<HTMLInputElement>) => {
+  _onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
     this._toggleEditing();
