@@ -149,8 +149,12 @@ const AppRouter = () => {
               <Route path={Routes.show_alert_condition(':streamId', ':conditionId')}
                      component={EditAlertConditionPage} />
               <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-              {!isCloud && <Route path={Routes.SYSTEM.INPUTS} component={InputsPage} />}
-              <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
+              {!isCloud && (
+                <>
+                  <Route path={Routes.SYSTEM.INPUTS} component={InputsPage} />
+                  <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
+                </>
+              )}
               <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
               <Route path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage} />
               <Route path={Routes.new_extractor(':nodeId', ':inputId')} component={CreateExtractorsPage} />
