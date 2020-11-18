@@ -24,7 +24,7 @@ import suppressConsole from 'helpers/suppressConsole';
 import PivotGenerator from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldTypesContext, { type FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 
 import PivotSelect from './PivotSelect';
 
@@ -35,7 +35,7 @@ jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn())
 describe('PivotSelect', () => {
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
   type SimplePivotProps = {
-    fieldTypes?: ?FieldTypes,
+    fieldTypes?: FieldTypes | undefined | null,
   };
   const SimplePivotSelect = ({ fieldTypes }: SimplePivotProps) => (
     <FieldTypesContext.Provider value={fieldTypes}>
