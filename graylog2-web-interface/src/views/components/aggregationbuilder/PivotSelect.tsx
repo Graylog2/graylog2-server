@@ -56,7 +56,7 @@ const newPivotConfigChange = (values, value, newPivotConfig, onChange) => {
 };
 
 type Props = {
-  onChange: Array<Pivot> => void,
+  onChange: (newPivots: Array<Pivot>) => void,
   value: Array<Pivot>,
 };
 
@@ -67,8 +67,8 @@ const PivotSelect = ({ onChange, value, ...props }: Props) => {
   const ValueComponent = ({ children, innerProps, ...rest }) => {
     const element = rest.data;
     const fields = fieldTypes?.all
-      ? fieldTypes.all.filter((v) => v.name === element.label)
-      : Immutable.List();
+      ? fieldTypes.all.filter((v) => v.name === element.label).toList()
+      : Immutable.List<FieldTypeMapping>();
     const fieldType = fields.isEmpty() ? FieldType.Unknown : fields.first().type;
     // eslint-disable-next-line react/prop-types
     const { className } = innerProps;
