@@ -27,11 +27,7 @@ import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
-type Props = {
-  children: React.Node,
-};
-
-const GraylogThemeProvider = ({ children }: Props) => {
+const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
   const themeColors = colors[mode];
 
