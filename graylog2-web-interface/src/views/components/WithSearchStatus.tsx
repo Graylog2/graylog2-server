@@ -23,6 +23,7 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { getParameterBindingsAsMap } from 'views/logic/search/SearchExecutionState';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import {SearchesConfig} from "components/search/SearchConfig";
 
 const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters) => {
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);
@@ -32,18 +33,24 @@ const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters)
 };
 
 type SearchStatusProps = {
-  config: object;
+  config: SearchesConfig;
   disableSearch: boolean;
   onExecute: () => void;
 }
 
 type WrapperProps = {
-  config: object;
+  config: SearchesConfig;
   isDisabled: boolean;
   onExecute: () => void;
 };
 
-const WithSearchStatus = (Component: React.ComponentType<SearchStatusProps>): React.ComponentType<{}> => connect(
+type ResultProps = {
+  config?: SearchesConfig;
+  isDisabled?: boolean;
+  onExecute: () => void;
+};
+
+const WithSearchStatus = (Component: React.ComponentType<SearchStatusProps>): React.ComponentType<ResultProps> => connect(
   ({ config, isDisabled, onExecute }: WrapperProps) => {
     return <Component disableSearch={isDisabled} onExecute={onExecute} config={config} />;
   },

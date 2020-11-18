@@ -75,7 +75,7 @@ const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElem
   ` : '')}
 `;
 
-const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
+const SearchArea: StyledComponent<{}, void, any> = styled(AppContentGrid)`
   height: 100%;
   overflow-y: auto;
 `;
@@ -123,7 +123,7 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 const ViewAdditionalContextProvider = connect(
   AdditionalContext.Provider,
   { view: ViewStore, configs: SearchConfigStore },
-  ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
+  ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } } as { value: object}),
 );
 
 const Search = ({ location }: Props) => {
@@ -146,7 +146,7 @@ const Search = ({ location }: Props) => {
 
     StreamsActions.refresh();
 
-    let storeListenersUnsubscribes = Immutable.List();
+    let storeListenersUnsubscribes = Immutable.List<() => void>();
 
     refreshIfNotUndeclared().finally(() => {
       storeListenersUnsubscribes = storeListenersUnsubscribes
@@ -211,12 +211,6 @@ const Search = ({ location }: Props) => {
   );
 };
 
-Search.propTypes = {
-  location: PropTypes.shape({
-    query: PropTypes.object.isRequired,
-    pathname: PropTypes.string.isRequired,
-    search: PropTypes.string.isRequired,
-  }).isRequired,
-};
+Search.propTypes = {};
 
 export default withLocation(Search);
