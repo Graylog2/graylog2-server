@@ -110,6 +110,7 @@ import {
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import AppConfig from 'util/AppConfig';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
   const ParentComponent = parentComponent ?? React.Fragment;
@@ -139,6 +140,8 @@ const AppRouter = () => {
   const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
 
+  const isCloud = AppConfig.isCloud();
+
   return (
     <Router history={history}>
       <RouterErrorBoundary>
@@ -160,7 +163,7 @@ const AppRouter = () => {
                         <Route exact path={Routes.GETTING_STARTED} component={GettingStartedPage} />
                         <Route exact path={Routes.STREAMS} component={StreamsPage} />
                         <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
-                        <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
+                        {!isCloud && <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
 
                         <Route exact path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
                         <Route exact path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
@@ -211,13 +214,19 @@ const AppRouter = () => {
                                component={ShowContentPackPage} />
 
                         <Route exact path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
-                        <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
-                        <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-                        <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-                        <Route exact
-                               path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                               component={IndexSetConfigurationPage} />
-                        <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+
+                        {!isCloud && (
+                          <>
+                            <Route path={Routes.SYSTEM.INDEX_SETS.CREATE}
+                                   component={IndexSetCreationPage} />
+                            <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')}
+                                   component={IndexSetPage} />
+                            <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                                   component={IndexSetConfigurationPage} />
+                            <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
+                            <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+                          </>
+                        )}
 
                         <Route exact path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
                         <Route exact
@@ -264,7 +273,7 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
                         <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
                         <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
-                        <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
+                        {!isCloud && <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />}
 
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />

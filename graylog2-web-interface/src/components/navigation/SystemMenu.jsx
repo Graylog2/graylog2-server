@@ -24,6 +24,7 @@ import { NavDropdown } from 'components/graylog';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 import NavigationLink from './NavigationLink';
 
@@ -119,12 +120,14 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['inputs:read']}>
         <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" />
       </IfPermitted>
-      <IfPermitted permissions={['outputs:read']}>
-        <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
-      </IfPermitted>
-      <IfPermitted permissions={['indices:read']}>
-        <NavigationLink path={Routes.SYSTEM.INDICES.LIST} description="Indices" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['outputs:read']}>
+          <NavigationLink path={Routes.SYSTEM.OUTPUTS} description="Outputs" />
+        </IfPermitted>
+        <IfPermitted permissions={['indices:read']}>
+          <NavigationLink path={Routes.SYSTEM.INDICES.LIST} description="Indices" />
+        </IfPermitted>
+      </HideOnCloud>
       <IfPermitted permissions={['loggers:read']}>
         <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
       </IfPermitted>
