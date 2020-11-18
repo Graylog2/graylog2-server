@@ -24,8 +24,8 @@ import { StreamsActions, StreamsStore } from 'views/stores/StreamsStore';
 import StreamsContext from './StreamsContext';
 
 type Props = {
-  children: React.Node,
-  streams: ?Array<*>,
+  children: React.ReactElement,
+  streams: Array<any> | undefined | null,
 };
 
 const StreamsProvider = ({ children, streams }: Props) => {
@@ -40,4 +40,4 @@ const StreamsProvider = ({ children, streams }: Props) => {
   );
 };
 
-export default connect(StreamsProvider, { streams: StreamsStore }, ({ streams: { streams } = {} }) => ({ streams }));
+export default connect(StreamsProvider, { streams: StreamsStore }, ({ streams: { streams } = { streams: undefined } }) => ({ streams }));
