@@ -70,7 +70,7 @@ const CustomOption = (optionRenderer: (Option) => JSX.Element) => (
 );
 /* eslint-enable react/prop-types */
 
-const CustomSingleValue = (valueRenderer: (Option) => JSX.Element) => (
+const CustomSingleValue = (valueRenderer: (option: Option) => JSX.Element) => (
   ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
 );
 
@@ -200,7 +200,7 @@ type Props = {
   allowCreate?: boolean,
   autoFocus?: boolean,
   clearable?: boolean,
-  components?: ComponentsProp | null, undefined,
+  components?: ComponentsProp | null | undefined,
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
@@ -343,11 +343,7 @@ class Select extends React.Component<Props, State> {
 
   getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => JSX.Element,
     valueRenderer?: (option: Option) => JSX.Element): any => {
-    const customComponents = {
-      Input: undefined,
-      Option: undefined,
-      SingleValue: undefined,
-    };
+    const customComponents: { [key: string]: any } = {};
 
     if (inputProps) {
       customComponents.Input = CustomInput(inputProps);

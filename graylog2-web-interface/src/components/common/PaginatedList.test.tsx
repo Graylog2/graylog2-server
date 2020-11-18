@@ -39,11 +39,12 @@ describe('PaginatedList', () => {
   it('should not display Pagination, when context is not interactive', () => {
     const { queryByText } = render(
       <InteractiveContext.Provider value={false}>
-        <PaginatedList totalItems={100} onChange={() => {}}><div>The list</div></PaginatedList>,
+        <PaginatedList totalItems={100} onChange={() => {}}>
+          <div>The list</div>
+        </PaginatedList>,
       </InteractiveContext.Provider>,
     );
 
-    expect(queryByText('The list')).toBeNull();
     expect(queryByText('1')).toBeNull();
   });
 
