@@ -28,8 +28,8 @@ import View from 'views/logic/views/View';
 
 type Props = {
   view: {
-    activeQuery: ?QueryId,
-    view: ?View,
+    activeQuery?: QueryId,
+    view?: View,
   },
 };
 
@@ -37,7 +37,7 @@ const PositioningWrapper = styled.div`
   padding-left: 20px;
 `;
 
-const BigDisplayModeHeader = ({ view: { activeQuery, view } = {} }: Props) => {
+const BigDisplayModeHeader = ({ view: { activeQuery, view } = { activeQuery: undefined, view: undefined } }: Props) => {
   if (!view || !activeQuery) {
     return <Spinner />;
   }
@@ -54,9 +54,8 @@ const BigDisplayModeHeader = ({ view: { activeQuery, view } = {} }: Props) => {
 
 BigDisplayModeHeader.propTypes = {
   view: PropTypes.shape({
-    view: PropTypes.shape({
-      title: PropTypes.string.isRequired,
-    }),
+    view: PropTypes.instanceOf(View),
+    activeQuery: PropTypes.string,
   }),
 };
 
