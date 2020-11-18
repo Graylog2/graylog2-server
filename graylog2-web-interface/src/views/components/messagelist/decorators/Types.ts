@@ -19,7 +19,7 @@ export type Decorator = {
   id: string,
   order: number,
   type: string,
-  stream: ?string,
+  stream: string | undefined | null,
 };
 
 // Not properly typed yet, but not needed for the current scope.
