@@ -21,6 +21,7 @@ import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import type { StyledComponent } from 'styled-components';
+import { $PropertyType } from 'utility-types';
 
 import { Col, Row } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -28,6 +29,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
@@ -38,8 +40,6 @@ import SeriesSelect from './SeriesSelect';
 import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 import EventListConfiguration from './EventListConfiguration';
-import {$PropertyType} from "utility-types";
-import SortConfig from "views/logic/aggregationbuilder/SortConfig";
 
 type Props = {
   children: React.ReactNode,
