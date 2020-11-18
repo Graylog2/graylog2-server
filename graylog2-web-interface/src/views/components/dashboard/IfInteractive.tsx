@@ -20,7 +20,7 @@ import * as React from 'react';
 import InteractiveContext from '../contexts/InteractiveContext';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactElement | React.ReactElement[],
 };
 const IfInteractive = ({ children }: Props) => (
   <InteractiveContext.Consumer>
