@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import UserPreferencesContext from './UserPreferencesContext';
 import CurrentUserContext from './CurrentUserContext';
 
-const CurrentUserPreferencesProvider = ({ children }: { children: React.Node }) => {
+const CurrentUserPreferencesProvider = ({ children }: { children: React.ReactElement }) => {
   const currentUser = useContext(CurrentUserContext);
   const preferences = currentUser?.preferences;
 
