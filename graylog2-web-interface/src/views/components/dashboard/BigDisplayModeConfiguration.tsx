@@ -27,11 +27,11 @@ import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
 
-export type UntypedBigDisplayModeQuery = {|
+export type UntypedBigDisplayModeQuery = {
   interval?: string,
   refresh?: string,
   tabs?: string,
-|};
+};
 
 type Configuration = {
   queryCycleInterval?: number,
