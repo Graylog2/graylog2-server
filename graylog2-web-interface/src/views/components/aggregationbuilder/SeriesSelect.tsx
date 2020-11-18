@@ -66,7 +66,7 @@ type State = {
 
 const isParameterNeeded = (option: IsOption): option is ParameterNeededOption => option && 'parameterNeeded' in option && option.parameterNeeded === true;
 
-const isIncomplete = (option: IsOption): option is IncompleteOption => option && 'incomplete' in option && 'parameterNeeded' in option && option.parameterNeeded === false;
+const isIncomplete = (option: IsOption): option is IncompleteOption => option && 'incomplete' in option && !option.parameterNeeded;
 
 const isBackToFunctions = (option: IsOption): option is BackToFunctions => option && 'backToFunctions' in option && option.backToFunctions === true;
 
