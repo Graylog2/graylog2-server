@@ -24,14 +24,14 @@ import CustomPropTypes from './CustomPropTypes';
 import FieldActions from './actions/FieldActions';
 import InteractiveContext from './contexts/InteractiveContext';
 
-type Props = {|
-  children?: React.Node,
+type Props = {
+  children?: React.ReactNode,
   disabled?: boolean,
   name: string,
-  menuContainer: ?HTMLElement,
+  menuContainer: HTMLElement | undefined | null,
   queryId: string,
   type: FieldType,
-|};
+};
 
 const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
   <InteractiveContext.Consumer>
