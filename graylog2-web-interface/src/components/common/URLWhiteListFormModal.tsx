@@ -48,47 +48,55 @@ type Props = {
 };
 
 class URLWhiteListFormModal extends React.Component<Props, State> {
-    configModal: ?BootstrapModalForm = React.createRef();
+  configModal: BootstrapModalForm = React.createRef();
 
-    inputs = {};
+  inputs = {};
 
-    static defaultProps = {
-      newUrlEntry: '',
-      onUpdate: () => {},
-      configuration: {},
-      urlType: '',
+  static propTypes = {
+    newUrlEntry: PropTypes.string,
+    onUpdate: PropTypes.func,
+    configuration: PropTypes.object,
+    currentUser: PropTypes.object.isRequired,
+    urlType: PropTypes.string,
+  };
+
+  static defaultProps = {
+    newUrlEntry: '',
+    onUpdate: () => { return undefined; },
+    configuration: {},
+    urlType: '',
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      config: { entries: [], disabled: false },
+      isValid: false,
+    };
+
+    this.configModal = React.createRef();
+  }
+
+  componentDidMount() {
+    const { currentUser: { permissions } } = this.props;
+
+    if (isPermitted(permissions, ['urlwhitelist:read'])) {
+      ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
     }
+  }
 
-    constructor(props) {
-      super(props);
+  componentDidUpdate(prevProps) {
+    const { config: { entries } } = this.state;
+    const { newUrlEntry } = this.props;
+    const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
 
-      this.state = {
-        config: { entries: [], disabled: false },
-        isValid: false,
-      };
-
-      this.configModal = React.createRef();
+    if (urlwhitelistConfig && entries.length === 0) {
+      this._setDefaultWhiteListState(urlwhitelistConfig);
+    } else if (prevProps.newUrlEntry !== newUrlEntry) {
+      this._setDefaultWhiteListState({ entries: [], disabled: false });
     }
-
-    componentDidMount() {
-      const { currentUser: { permissions } } = this.props;
-
-      if (isPermitted(permissions, ['urlwhitelist:read'])) {
-        ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
-      }
-    }
-
-    componentDidUpdate(prevProps) {
-      const { config: { entries } } = this.state;
-      const { newUrlEntry } = this.props;
-      const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
-
-      if (urlwhitelistConfig && entries.length === 0) {
-        this._setDefaultWhiteListState(urlwhitelistConfig);
-      } else if (prevProps.newUrlEntry !== newUrlEntry) {
-        this._setDefaultWhiteListState({ entries: [], disabled: false });
-      }
-    }
+  }
 
   _setDefaultWhiteListState =(urlwhitelistConfig) => {
     const { newUrlEntry, urlType } = this.props;
@@ -183,15 +191,9 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
   }
 }
 
-URLWhiteListFormModal.propTypes = {
-  newUrlEntry: PropTypes.string,
-  onUpdate: PropTypes.func,
-  configuration: PropTypes.object,
-  currentUser: PropTypes.object.isRequired,
-  urlType: PropTypes.string,
-};
-
 export default connect(URLWhiteListFormModal, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({
+  /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+  // @ts-ignore TODO: ConfigurationsStore returns unknown
   ...configurations,
   ...currentUser,
   ...otherProps,
