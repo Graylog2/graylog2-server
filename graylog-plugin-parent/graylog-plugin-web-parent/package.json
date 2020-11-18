@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Dummy package.json for graylog-plugin-web-parent",
   "author": "Graylog, Inc.",
-  "license": "GPL-3.0",
+  "license": "SSPL-1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/Graylog2/graylog2-server.git"
