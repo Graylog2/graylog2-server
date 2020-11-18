@@ -17,10 +17,10 @@
 // @flow strict
 import PropTypes from 'prop-types';
 
-import colorLevel, { type ColorLevel } from './colorLevel';
-import contrastingColor, { type ContrastingColor } from './contrastingColor';
-import opacify, { type Opacify } from './opacify';
-import readableColor, { type ReadableColor } from './readableColor';
+import colorLevel, { ColorLevel } from './colorLevel';
+import contrastingColor, { ContrastingColor } from './contrastingColor';
+import opacify, { Opacify } from './opacify';
+import readableColor, { ReadableColor } from './readableColor';
 
 export type Utils = {
   colorLevel: ColorLevel,
