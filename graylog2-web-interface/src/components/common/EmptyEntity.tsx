@@ -17,11 +17,11 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Container: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,7 +38,7 @@ const Headline = styled.h2`
 `;
 
 type Props = {
-  children: React.Node,
+  children: JSX.Element | string,
   title: string,
 };
 
