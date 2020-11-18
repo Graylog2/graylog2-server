@@ -209,7 +209,7 @@ Pagination.defaultProps = {
   hidePreviousAndNextPageLinks: false,
   hideFirstAndLastPageLinks: false,
   disabled: false,
-  onChange: () => { return undefined; },
+  onChange: () => {},
 };
 
 export default Pagination;
