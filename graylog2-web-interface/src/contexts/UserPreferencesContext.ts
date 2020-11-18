@@ -17,7 +17,7 @@
 // @flow strict
 import * as React from 'react';
 
-import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE, type PreferencesThemeMode, type ThemeMode } from 'theme/constants';
+import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
 
 import { singleton } from '../views/logic/singleton';
 
@@ -26,7 +26,7 @@ export type UserPreferences = {
   updateUnfocussed: boolean,
   searchSidebarIsPinned?: boolean,
   dashboardSidebarIsPinned?: boolean,
-  [PreferencesThemeMode]: ThemeMode,
+  [PREFERENCES_THEME_MODE]: ThemeMode,
 };
 
 export const defaultUserPreferences = {
