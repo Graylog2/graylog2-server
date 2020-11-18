@@ -28,7 +28,7 @@ type Props = {
   children?: React.ReactNode,
   disabled?: boolean,
   name: string,
-  menuContainer: HTMLElement | undefined | null,
+  menuContainer?: HTMLElement,
   queryId: string,
   type: FieldType,
 };
