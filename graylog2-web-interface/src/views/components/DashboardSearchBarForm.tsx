@@ -20,22 +20,24 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
-import type { FormikProps } from 'formik/@flow-typed';
+import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
 type Values = {
-  timerange: ?TimeRange,
-  queryString: ?string,
+  timerange: TimeRange | undefined | null,
+  queryString: string | undefined | null,
 };
 
 type Props = {
   initialValues: Values,
   onSubmit: (Values) => void | Promise<any>,
-  children: ((props: FormikProps<Values>) => React$Node) | React$Node,
+  children: ((props: FormikProps<Values>) => React.ReactElement) | React.ReactElement,
 };
+
+const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
 
 const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, queryString }) => {
@@ -56,7 +58,7 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
             onSubmit={_onSubmit}>
       {(...args) => (
         <Form>
-          {isFunction(children) ? children(...args) : children}
+          {_isFunction(children) ? children(...args) : children}
         </Form>
       )}
     </Formik>
