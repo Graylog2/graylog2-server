@@ -23,7 +23,7 @@ import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 
-const HighlightingRulesProvider = ({ children }: { children: React.Node }) => {
+const HighlightingRulesProvider = ({ children }: { children: React.ReactNode }) => {
   const highlightingRules = useStore(HighlightingRulesStore);
 
   return highlightingRules
