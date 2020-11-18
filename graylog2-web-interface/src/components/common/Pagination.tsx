@@ -40,7 +40,7 @@ type Props = {
   onChange: (nextPage: number) => void,
 };
 
-const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled(BootstrapPagination)(({ theme }) => css`
+const StyledBootstrapPagination: StyledComponent<undefined, ThemeInterface, unknown> = styled(BootstrapPagination)(({ theme }) => css`
   &.pagination {
     font-size: ${theme.fonts.size.small};
     margin-top: 10px;
@@ -209,7 +209,7 @@ Pagination.defaultProps = {
   hidePreviousAndNextPageLinks: false,
   hideFirstAndLastPageLinks: false,
   disabled: false,
-  onChange: () => {},
+  onChange: () => { return undefined; },
 };
 
 export default Pagination;
