@@ -24,8 +24,8 @@ import { loadNewView as defaultLoadNewView, loadView as defaultLoadView } from '
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 
 type Props = {
-  loadNewView?: () => mixed,
-  loadView?: (string) => mixed,
+  loadNewView?: () => unknown,
+  loadView?: (string) => unknown,
 };
 
 const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
