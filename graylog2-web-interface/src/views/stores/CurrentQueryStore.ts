@@ -16,14 +16,16 @@
  */
 import Reflux from 'reflux';
 import { isEqual } from 'lodash';
+import { Store } from 'src/stores/StoreTypes';
 
 import { singletonStore } from 'views/logic/singleton';
+import Query from 'views/logic/queries/Query';
 
 import { QueriesStore } from './QueriesStore';
 import { ViewStore } from './ViewStore';
 
 // eslint-disable-next-line import/prefer-default-export
-export const CurrentQueryStore = singletonStore(
+export const CurrentQueryStore: Store<Query> = singletonStore(
   'views.CurrentQuery',
   () => Reflux.createStore({
     init() {
