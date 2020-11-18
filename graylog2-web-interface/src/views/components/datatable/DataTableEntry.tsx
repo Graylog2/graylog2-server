@@ -31,16 +31,16 @@ import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
-type Field = {|
+type Field = {
   field: string,
   source: string,
-|};
+};
 type Props = {
   columnPivots: Array<string>,
   columnPivotValues: Array<Array<string>>,
   currentView: CurrentViewType,
   fields: Immutable.Set<Field>,
-  item: { [string]: * },
+  item: { [key: string]: any },
   series: Array<Series>,
   types: FieldTypeMappingsList,
   valuePath: ValuePath,
@@ -48,7 +48,7 @@ type Props = {
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: ?string) => (
+const _column = (field: string, value: any, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: string | undefined | null) => (
   <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
       <CustomHighlighting field={source ?? field} value={value}>
