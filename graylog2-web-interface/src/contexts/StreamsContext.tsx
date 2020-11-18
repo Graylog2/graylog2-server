@@ -17,6 +17,6 @@
 // @flow strict
 import * as React from 'react';
 
-const StreamsContext = React.createContext<?Array<*>>();
+const StreamsContext = React.createContext<Array<any> | undefined>(undefined);
 
 export default StreamsContext;
