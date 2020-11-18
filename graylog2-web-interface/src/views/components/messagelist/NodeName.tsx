@@ -22,6 +22,8 @@ import Routes from 'routing/Routes';
 import { Icon } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
+import { NodesStoreState } from 'stores/nodes/NodesStore';
+import { Store } from 'stores/StoreTypes';
 
 const { NodesStore } = CombinedProvider.get('Nodes');
 
@@ -32,7 +34,7 @@ type NodeInfo = {
 };
 type Props = {
   nodeId: NodeId,
-  nodes: { [NodeId]: NodeInfo },
+  nodes: { [key: string]: NodeInfo },
 };
 
 const NodeName = ({ nodeId, nodes }: Props) => {
@@ -62,4 +64,4 @@ NodeName.propTypes = {
   nodeId: PropTypes.string.isRequired,
 };
 
-export default connect(NodeName, { nodes: NodesStore }, ({ nodes: { nodes = {} } = {} }) => ({ nodes }));
+export default connect(NodeName, { nodes: NodesStore as Store<NodesStoreState> }, ({ nodes: { nodes = {} } = {} }) => ({ nodes }));
