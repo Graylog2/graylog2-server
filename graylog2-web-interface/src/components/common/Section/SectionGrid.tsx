@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import styled, { type StyledComponent, css } from 'styled-components';
+import styled, { StyledComponent, css } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 
 const SectionGrid: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   display: grid;
