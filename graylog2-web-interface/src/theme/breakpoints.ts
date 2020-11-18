@@ -17,20 +17,27 @@
 // @flow strict
 import PropTypes from 'prop-types';
 
-const sizes: {[string]: number} = {
+const sizes: { [key: string]: number } = {
   xs: 480,
   sm: 768,
   md: 992,
   lg: 1200,
 };
 
-const min: {[string]: string} = {};
-const max: {[string]: string} = {};
+const min: { [key: string]: string } = {};
+const max: { [key: string]: string } = {};
 
 Object.keys(sizes).forEach((bp) => {
   min[bp] = `${sizes[bp]}px`;
   max[bp] = `${sizes[bp] - 1}px`;
 });
+
+type Breakpoint = {
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+};
 
 export type Breakpoints = {
   min: {
@@ -63,8 +70,8 @@ export const breakpointPropTypes = PropTypes.shape({
 });
 
 const breakpoints: Breakpoints = {
-  min,
-  max,
+  min: min as Breakpoint,
+  max: max as Breakpoint,
 };
 
 export default breakpoints;
