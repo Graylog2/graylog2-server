@@ -16,17 +16,17 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent, css } from 'styled-components';
+import styled, { StyledComponent, css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { Row, Col } from 'components/graylog';
 
 type Props = {
-  children: React.Node,
+  children: JSX.Element | JSX.Element[],
   title: string,
   showLoading?: boolean,
-  headerActions?: React.Node,
+  headerActions?: JSX.Element,
 };
 
 const Header = styled.div`
