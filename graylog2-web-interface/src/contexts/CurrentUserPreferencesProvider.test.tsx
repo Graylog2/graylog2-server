@@ -22,7 +22,7 @@ import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
-import UserPreferencesContext, { defaultUserPreferences, type UserPreferences } from './UserPreferencesContext';
+import UserPreferencesContext, { defaultUserPreferences, UserPreferences } from './UserPreferencesContext';
 import CurrentUserProvider from './CurrentUserProvider';
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 
@@ -31,7 +31,7 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({ CurrentUser: { CurrentUserStore: MockStore() } }));
 
 describe('CurrentUserPreferencesProvider', () => {
-  const SimpleCurrentUserPreferencesProvider = ({ children }: {children: JestMockFn<*, *>}) => (
+  const SimpleCurrentUserPreferencesProvider = ({ children }) => (
     <CurrentUserPreferencesProvider>
       <UserPreferencesContext.Consumer>
         {children}
