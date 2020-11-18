@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 
 import Icon from './Icon';
@@ -134,17 +133,17 @@ type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: React.Node,
-  component: React.Node,
+  title: JSX.Element,
+  component: JSX.Element,
   disabled?: boolean,
 };
 
 export type Steps = Array<Step>;
 type Props = {
   steps: Steps,
-  activeStep: ?StepKey,
+  activeStep: StepKey | null | undefined,
   onStepChange: (StepKey) => void,
-  children: PropTypes.elementType,
+  children: JSX.Element | JSX.Element[],
   horizontal: boolean,
   justified: boolean,
   containerClassName: string,
@@ -218,7 +217,7 @@ class Wizard extends React.Component<Props, State> {
     this._warnOnInvalidActiveStep(activeStep, steps);
   }
 
-  _warnOnInvalidActiveStep = (activeStep: ?StepKey, steps: Steps) => {
+  _warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
     if (activeStep === undefined || activeStep === null) {
       return;
     }
@@ -229,7 +228,7 @@ class Wizard extends React.Component<Props, State> {
     }
   };
 
-  _isValidActiveStep = (activeStep: ?StepKey, steps: Steps) => {
+  _isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
     if (activeStep === undefined || activeStep === null) {
       return false;
     }
@@ -262,9 +261,9 @@ class Wizard extends React.Component<Props, State> {
     const disabledPosition = direction === 'next' ? (len - 1) : 0;
     const currentPosition = steps.findIndex((step) => step.key === this._getSelectedStep());
     const otherPosition = direction === 'next' ? (currentPosition + 1) : (currentPosition - 1);
-    const otherStep = (steps[otherPosition] || {});
+    const otherStep = (steps[otherPosition]);
 
-    return steps[disabledPosition].key === selectedStep || otherStep.disabled;
+    return steps[disabledPosition].key === selectedStep || otherStep?.disabled;
   };
 
   _onNext = () => {
