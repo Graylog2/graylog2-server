@@ -18,7 +18,7 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
@@ -49,7 +49,7 @@ export const SearchExecutionStateActions: SearchExecutionStateActionsType = sing
   }),
 );
 
-export const SearchExecutionStateStore = singletonStore(
+export const SearchExecutionStateStore: Store<SearchExecutionState> = singletonStore(
   'views.SearchExecutionState',
   () => Reflux.createStore({
     listenables: [SearchExecutionStateActions],

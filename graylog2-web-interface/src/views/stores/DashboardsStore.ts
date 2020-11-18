@@ -21,7 +21,7 @@ import URLUtils from 'util/URLUtils';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
 
@@ -30,17 +30,6 @@ import View from '../logic/views/View';
 type DashboardsActionsType = RefluxActions<{
   search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,
 }>;
-
-export type DashboardsStoreState = {
-  list?: Array<View>,
-  pagination: {
-    total: number,
-    page: number,
-    // eslint-disable-next-line camelcase
-    per_page: number,
-    count: number,
-  },
-};
 
 const DashboardsActions: DashboardsActionsType = singletonActions(
   'views.Dashboards',
@@ -51,7 +40,19 @@ const DashboardsActions: DashboardsActionsType = singletonActions(
 
 const dashboardsUrl = URLUtils.qualifyUrl('/dashboards');
 
-const DashboardsStore = singletonStore(
+export type Pagination = {
+  total: number;
+  count: number;
+  page: number;
+  perPage: number;
+};
+
+export type DashboardsStoreState = {
+  pagination: Pagination;
+  list: Array<View> | undefined;
+};
+
+const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
   'views.Dashboards',
   () => Reflux.createStore({
     listenables: [DashboardsActions],

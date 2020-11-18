@@ -30,6 +30,7 @@ import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
 
 import ViewState from '../logic/views/ViewState';
+import WidgetPosition from "views/logic/widgets/WidgetPosition";
 
 type CurrentViewStateActionsType = RefluxActions<{
   fields: (fields: Immutable.Set<string>) => Promise<unknown>,
@@ -109,9 +110,9 @@ export const CurrentViewStateStore: CurrentViewStateStoreType = singletonStore(
     },
 
     widgets(nextWidgets) {
-      const positionsMap = Immutable.Map(this._activeState().widgetPositions);
+      const positionsMap = Immutable.Map<string, WidgetPosition>(this._activeState().widgetPositions);
       const nextWidgetIds = nextWidgets.map(({ id }) => id);
-      const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId));
+      const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId)).toMap();
       const newPositionMap = AddNewWidgetsToPositions(cleanedPositionsMap, nextWidgets);
 
       const newActiveState = this._activeState().toBuilder()
