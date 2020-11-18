@@ -92,7 +92,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                  id="session-timeout-never"
                  name="session_timeout_never"
                  label="Sessions do not time out"
-                 help="When checked sessions never time out due to inactivity."
+                 help="When checked, sessions never time out due to inactivity."
                  formGroupClassName="no-bm"
                  onChange={_onClick}
                  checked={sessionTimeoutNever} />
