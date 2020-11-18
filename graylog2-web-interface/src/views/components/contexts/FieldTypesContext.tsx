@@ -27,5 +27,5 @@ export type FieldTypes = {
   queryFields: Map<string, FieldTypeMappingsList>,
 };
 
-const FieldTypesContext = React.createContext<?FieldTypes>();
+const FieldTypesContext = React.createContext<FieldTypes | undefined>(undefined);
 export default singleton('contexts.FieldTypesContext', () => FieldTypesContext);
