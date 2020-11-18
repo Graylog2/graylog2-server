@@ -17,19 +17,20 @@
 // @flow strict
 import * as React from 'react';
 
-import { Spinner } from 'components/common';
-import SectionGrid from 'components/common/Section/SectionGrid';
+import { Spinner, IfPermitted } from 'components/common';
 import Role from 'logic/roles/Role';
 
-import TeamsSection from './TeamsSection';
-import ProfileSection from './ProfileSection';
 import UsersSection from './UsersSection';
+import TeamsSection from './TeamsSection';
+
+import ProfileSection from '../RoleDetails/ProfileSection';
+import SectionGrid from '../../common/Section/SectionGrid';
 
 type Props = {
-  role: ?Role,
+  role: Role | null | undefined,
 };
 
-const RoleDetails = ({ role }: Props) => {
+const RoleEdit = ({ role }: Props) => {
   if (!role) {
     return <Spinner />;
   }
@@ -41,10 +42,12 @@ const RoleDetails = ({ role }: Props) => {
       </div>
       <div>
         <UsersSection role={role} />
-        <TeamsSection role={role} />
+        <IfPermitted permissions="teams:edit">
+          <TeamsSection role={role} />
+        </IfPermitted>
       </div>
     </SectionGrid>
   );
 };
 
-export default RoleDetails;
+export default RoleEdit;

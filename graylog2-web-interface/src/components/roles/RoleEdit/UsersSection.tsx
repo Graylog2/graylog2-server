@@ -41,7 +41,7 @@ const Container = styled.div`
 const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState();
-  const [errors, setErrors] = useState();
+  const [errors, setErrors] = useState<string | undefined>();
 
   const _onLoad = useCallback((pagination) => {
     setLoading(true);
@@ -67,7 +67,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       return;
     }
 
-    setErrors();
+    setErrors(undefined);
 
     AuthzRolesDomain.removeMember(id, user.name).then(() => {
       _onLoad(DEFAULT_PAGINATION).then(setPaginatedUsers);

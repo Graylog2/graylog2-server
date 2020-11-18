@@ -18,6 +18,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { $PropertyType } from 'utility-types';
 
 import { LinkContainer } from 'components/graylog/router';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
@@ -37,7 +38,7 @@ const ActionsWrapper = styled.div`
   justify-content: flex-end;
 `;
 
-const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<Role, 'name'>, setDeleting: boolean => void) => {
+const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<Role, 'name'>, setDeleting: (boolean) => void) => {
   let confirmMessage = `Do you really want to delete role "${roleName}"?`;
   const getOneUser = { page: 1, perPage: 1, query: '' };
   setDeleting(true);

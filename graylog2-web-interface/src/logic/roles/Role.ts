@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 type InternalState = {
   id: string,
@@ -30,6 +31,7 @@ export type RoleJSON = {
   name: string,
   description: string,
   permissions: Immutable.Set<string>,
+  // eslint-disable-next-line camelcase
   read_only: boolean,
 };
 
@@ -82,7 +84,7 @@ export default class Role {
       readOnly,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       id,
       name,
@@ -145,9 +147,8 @@ export default class Role {
     );
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
