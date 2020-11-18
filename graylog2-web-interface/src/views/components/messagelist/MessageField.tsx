@@ -41,7 +41,7 @@ type Props = {
   message: Message,
   value: any,
   currentView: {
-    activeQuery: string,
+    activeQuery?: string,
   },
 };
 
