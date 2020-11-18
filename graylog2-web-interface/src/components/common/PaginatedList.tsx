@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
@@ -28,7 +27,7 @@ const DEFAULT_PAGE_SIZES = [10, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
-  children: React.Node,
+  children: JSX.Element | JSX.Element[],
   className?: string,
   onChange: (currentPage: number, pageSize: number) => void,
   activePage: number,
@@ -69,7 +68,7 @@ const PaginatedList = ({
     setPageSize(propsPageSize);
   }, [propsPageSize]);
 
-  const _onChangePageSize = (event: SyntheticInputEvent<HTMLLinkElement>) => {
+  const _onChangePageSize = (event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
