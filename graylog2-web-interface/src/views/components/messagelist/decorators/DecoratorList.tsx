@@ -34,12 +34,12 @@ type ReorderedItems = Array<{ id: string }>;
 type DecoratorSummary = {
   id: string,
   order: number,
-  title: React.Node,
+  title: React.ReactElement,
 };
 type Props = {
   decorators: Array<DecoratorSummary>,
   disableDragging?: boolean,
-  onReorder: (ReorderedItems) => mixed,
+  onReorder: (ReorderedItems) => unknown,
 };
 
 class DecoratorList extends React.Component<Props> {
