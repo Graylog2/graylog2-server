@@ -29,13 +29,21 @@ import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { PreferencesStore } = CombinedProvider.get('Preferences');
 
+type CurrentUser = {
+  currentUser?: {
+    username: string;
+    // eslint-disable-next-line camelcase
+    read_only: boolean;
+  };
+};
+
 const useCurrentThemeMode = () => {
   const browserThemePreference = usePrefersColorScheme();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
-    username: userStore?.currentUser?.username,
+    username: (userStore as CurrentUser)?.currentUser?.username,
     // eslint-disable-next-line camelcase
-    userIsReadOnly: userStore?.currentUser?.read_only ?? true,
+    userIsReadOnly: (userStore as CurrentUser)?.currentUser?.read_only ?? true,
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
