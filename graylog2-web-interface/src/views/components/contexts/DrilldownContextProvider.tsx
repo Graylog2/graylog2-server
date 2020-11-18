@@ -31,9 +31,9 @@ import ViewTypeContext from './ViewTypeContext';
 import type { Drilldown } from './DrilldownContext';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactElement,
   widget: Widget,
-  globalOverride: ?GlobalOverride,
+  globalOverride: GlobalOverride | undefined,
   currentQuery: Query,
 };
 
