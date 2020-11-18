@@ -16,13 +16,13 @@
  */
 // @flow strict
 import Reflux from 'reflux';
+import { $PropertyType } from 'utility-types';
 
 import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import type { PaginatedUsers } from 'actions/users/UsersActions';
-import {$PropertyType} from "utility-types";
 
 export type AuthenticationBackendCreate = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,

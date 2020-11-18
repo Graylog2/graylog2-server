@@ -53,7 +53,7 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
     listenables: [FieldTypesActions],
 
     _all: Immutable.List<FieldTypeMapping>(),
-    _queryFields: Immutable.Map<String, FieldTypeMappingsList>(),
+    _queryFields: Immutable.Map<string, FieldTypeMappingsList>(),
 
     init() {
       this.all();

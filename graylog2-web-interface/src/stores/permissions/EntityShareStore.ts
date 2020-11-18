@@ -17,6 +17,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
+import { Optional } from 'utility-types';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -29,7 +30,6 @@ import type { Store } from 'stores/StoreTypes';
 import type { GRN } from 'logic/permissions/types';
 import PaginationURL from 'util/PaginationURL';
 import type { Pagination } from 'stores/PaginationTypes';
-import {Optional} from "utility-types";
 
 const DEFAULT_PREPARE_PAYLOAD = {};
 
