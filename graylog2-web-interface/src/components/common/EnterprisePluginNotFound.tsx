@@ -37,7 +37,7 @@ const HeaderIcon = styled(Icon)`
 
 type Props = {
   featureName: string,
-  wrapperClassName: ?string,
+  wrapperClassName: string | null | undefined,
 };
 
 const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
