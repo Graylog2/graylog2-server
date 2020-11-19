@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
@@ -29,7 +29,7 @@ const ToolsStore = StoreProvider.getStore('Tools');
 
 type Props = {
   label: string,
-  onChange: (event: SyntheticInputEvent<EventTarget>) => void,
+  onChange: (event: SyntheticEvent<EventTarget>) => void,
   validationMessage: string,
   validationState: string,
   url: string,
@@ -37,6 +37,7 @@ type Props = {
   wrapperClassName: string,
   urlType: string,
 };
+
 const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, labelClassName, wrapperClassName, urlType }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);

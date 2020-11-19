@@ -17,9 +17,9 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { Alert, Button, Col, Row } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
@@ -34,7 +34,7 @@ const Container: StyledComponent<{margin: number}, ThemeInterface, HTMLElement> 
 
 type Props = {
   onClose: () => void,
-  children: React.Node,
+  children: JSX.Element | string,
   bsStyle: string,
   marginTopBottom: number,
   runtimeError: boolean,
@@ -83,7 +83,7 @@ ErrorAlert.defaultProps = {
   runtimeError: false,
   marginTopBottom: 15,
   children: null,
-  onClose: () => {},
+  onClose: () => undefined,
 };
 
 export default ErrorAlert;

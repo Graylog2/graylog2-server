@@ -16,15 +16,15 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { Col, Row, HelpBlock } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
 type Props = {
-  label: React.Node,
-  value: ?mixed,
+  label: JSX.Element,
+  value: unknown,
   help?: string,
 };
 
@@ -48,7 +48,7 @@ const BooleanValue = ({ value }: { value: boolean }) => (
   <><BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}</>
 );
 
-const readableValue = (value: $PropertyType<Props, 'value'>) => {
+const readableValue = (value: Props['value']) => {
   if (typeof value === 'boolean') {
     return <BooleanValue value={value} />;
   }

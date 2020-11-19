@@ -21,16 +21,19 @@ import PropTypes from 'prop-types';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { createGRN } from 'logic/permissions/GRN';
+import { UserJSON } from 'logic/users/User';
+
+type ChildFun = ({ disabled: boolean }) => JSX.Element;
 
 type Props = {
-  children: React.Node | ({ disabled: boolean }) => React.Node,
+  children: JSX.Element | ChildFun,
   id: string,
   type: string,
   hideChildren: boolean,
 };
 
 const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
-  const currentUser = useContext(CurrentUserContext);
+  const currentUser = useContext<UserJSON>(CurrentUserContext);
   const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
   const adminPermission = '*';

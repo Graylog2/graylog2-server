@@ -21,11 +21,11 @@ import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
-import { themePropTypes, type ThemeInterface } from 'theme';
+import { themePropTypes, ThemeInterface } from 'theme';
 
 import Icon from './Icon';
 
-type Option = { [string]: any };
+type Option = { [key: string]: any };
 
 const MultiValueRemove = (props) => (
   <Components.MultiValueRemove {...props}>
@@ -57,8 +57,8 @@ type CustomOptionProps = {
   data: any,
 };
 /* eslint-disable react/prop-types */
-const CustomOption = (optionRenderer: (Option) => React.Node) => (
-  (props: CustomOptionProps): React.Element<Components.Option> => {
+const CustomOption = (optionRenderer: (Option) => JSX.Element) => (
+  (props: CustomOptionProps): JSX.Element => {
     const { data, ...rest } = props;
 
     return (
@@ -70,11 +70,11 @@ const CustomOption = (optionRenderer: (Option) => React.Node) => (
 );
 /* eslint-enable react/prop-types */
 
-const CustomSingleValue = (valueRenderer: (Option) => React.Node) => (
+const CustomSingleValue = (valueRenderer: (option: Option) => JSX.Element) => (
   ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
 );
 
-const CustomInput = (inputProps: { [string]: any }) => (
+const CustomInput = (inputProps: { [key: string]: any }) => (
   (props) => <Components.Input {...props} {...inputProps} />
 );
 
@@ -166,11 +166,11 @@ const valueContainer = (base) => ({
   padding: '2px 12px',
 });
 
-type OverriddenComponents = {|
-  DropdownIndicator: React.ComponentType<any>,
-  MultiValueRemove: React.ComponentType<any>,
-  IndicatorSeparator: React.ComponentType<any>,
-|};
+type OverriddenComponents = {
+  DropdownIndicator: React.ComponentType<any>;
+  MultiValueRemove: React.ComponentType<any>;
+  IndicatorSeparator: React.ComponentType<any>;
+};
 
 const _components: OverriddenComponents = {
   DropdownIndicator,
@@ -191,40 +191,40 @@ const _styles = ({ size, theme }) => ({
   valueContainer,
 });
 
-type ComponentsProp = {|
+type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>,
-|};
+};
 
 type Props = {
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
   clearable?: boolean,
-  components?: ?ComponentsProp,
+  components?: ComponentsProp | null | undefined,
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
   ignoreAccents?: boolean,
-  inputProps?: { [string]: any },
+  inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
   onChange: (string) => void,
-  onReactSelectChange?: (Option | Array<Option>) => void,
-  optionRenderer?: (Option) => React.Node,
+  onReactSelectChange?: (option: Option | Option[]) => void,
+  optionRenderer?: (option: Option) => JSX.Element,
   options: Array<Option>,
   placeholder: string,
   size?: 'normal' | 'small',
   theme: ThemeInterface,
   value?: string,
   valueKey: string,
-  valueRenderer?: (Option) => React.Node,
+  valueRenderer?: (option: Option) => JSX.Element,
 };
 
-type CustomComponents = {|
+type CustomComponents = {
   Input?: React.ComponentType<any>,
   Option?: React.ComponentType<any>,
   SingleValue?: React.ComponentType<any>,
-|};
+};
 
 type State = {
   customComponents: CustomComponents,
@@ -287,6 +287,12 @@ class Select extends React.Component<Props, State> {
     valueKey: PropTypes.string,
     /** Custom function to render the selected option in the Select. */
     valueRenderer: PropTypes.func,
+    /** Label text for add button */
+    addLabelText: PropTypes.string,
+    /** Automatically Focus on Select */
+    autoFocus: PropTypes.bool,
+    /** special onChange handler */
+    onReactSelectChange: PropTypes.func,
   };
 
   static defaultProps = {
@@ -335,9 +341,9 @@ class Select extends React.Component<Props, State> {
     }
   };
 
-  getCustomComponents = (inputProps?: { [string]: any }, optionRenderer?: (Option) => React.Node,
-    valueRenderer?: (Option) => React.Node): any => {
-    const customComponents = {};
+  getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => JSX.Element,
+    valueRenderer?: (option: Option) => JSX.Element): any => {
+    const customComponents: { [key: string]: any } = {};
 
     if (inputProps) {
       customComponents.Input = CustomInput(inputProps);
@@ -379,7 +385,7 @@ class Select extends React.Component<Props, State> {
 
     this.setState({ value: value });
 
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
     const { onChange = (v: string) => {} } = this.props;
 
     onChange(value);
@@ -401,7 +407,7 @@ class Select extends React.Component<Props, State> {
     });
   };
 
-  _selectTheme = (defaultTheme: {[string]: any}) => {
+  _selectTheme = (defaultTheme: {[key: string]: any}) => {
     const { theme } = this.props;
 
     return {
@@ -461,9 +467,12 @@ class Select extends React.Component<Props, State> {
       multi: isMulti,
       disabled: isDisabled,
       clearable: isClearable,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       inputProps, // Do not pass down prop
       matchProp,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       optionRenderer, // Do not pass down prop
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
       ...rest
     } = this.props;
@@ -488,6 +497,8 @@ class Select extends React.Component<Props, State> {
                        filterOption={customFilter}
                        components={mergedComponents}
                        isOptionDisabled={(option) => !!option.disabled}
+                       /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+                       // @ts-ignore TODO: Fix props assignment for _styles
                        styles={_styles(this.props)}
                        theme={this._selectTheme}
                        value={formattedValue} />

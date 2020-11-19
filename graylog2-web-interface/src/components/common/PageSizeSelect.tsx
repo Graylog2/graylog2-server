@@ -16,13 +16,14 @@
  */
 // @flow strict
 import * as React from 'react';
+import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { Input } from 'components/bootstrap';
 
-const Wrapper: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Wrapper: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
   margin-bottom: 5px;
 
   && .form-group {
@@ -43,7 +44,7 @@ type Props = {
   className?: string,
   pageSize: number,
   pageSizes: Array<number>,
-  onChange: (event: SyntheticInputEvent<HTMLLinkElement>) => void,
+  onChange: (event: SyntheticEvent<HTMLOptionElement>) => void,
 };
 
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (

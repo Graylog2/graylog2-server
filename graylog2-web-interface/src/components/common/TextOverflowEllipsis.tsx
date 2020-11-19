@@ -14,33 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
+import styled, { StyledComponent } from 'styled-components';
 
-import DataTableFilter from 'components/common/DataTable/Filter';
+import type { ThemeInterface } from 'theme';
+
+const Wrapper: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
 
 type Props = {
-  setFilteredRows: (Array<mixed>) => void,
-  resetPagination: () => void,
-  rows: Array<mixed>,
+  children: string,
 };
 
-const Filter = ({ setFilteredRows, resetPagination, rows, ...filterProps }: Props) => {
-  const onDataFiltered = (newFilteredGroups, filterText) => {
-    if (filterText && filterText !== '') {
-      setFilteredRows(newFilteredGroups);
-    } else {
-      setFilteredRows(rows);
-    }
+/**
+ * Component that signals text overflow to users by using an ellipsis.
+ * The parent component needs a concrete width.
+ */
+const TextOverflowEllipsis = ({ children }: Props) => (
+  <Wrapper title={children}>
+    {children}
+  </Wrapper>
+);
 
-    resetPagination();
-  };
-
-  return (
-    <DataTableFilter {...filterProps}
-                     rows={rows}
-                     onDataFiltered={onDataFiltered} />
-  );
-};
-
-export default Filter;
+export default TextOverflowEllipsis;

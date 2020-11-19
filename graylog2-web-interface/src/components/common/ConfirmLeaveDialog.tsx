@@ -28,6 +28,7 @@ import AppConfig from 'util/AppConfig';
 type Props = {
   question: string,
 };
+
 const ConfirmLeaveDialog = ({ question }: Props) => {
   const handleLeavePage = useCallback((e) => {
     if (AppConfig.gl2DevMode()) {

@@ -16,27 +16,29 @@
  */
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import styled, { StyledComponent } from 'styled-components';
 
-import { Alert } from 'components/graylog';
+import type { ThemeInterface } from 'theme';
+
+import CountBadge from './CountBadge';
 
 type Props = {
-  children: React.Node,
-  className: ?string,
+  count: number,
+  listing: JSX.Element,
 };
 
-const EmptyResult = ({ children, className }: Props) => (
-  <Alert className={`${className ?? ''} no-bm`}>{children}</Alert>
+const Listing: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+const ListingWithCount = ({ count, listing }: Props) => (
+  <Listing title={String(listing)}>
+    <CountBadge>{count}</CountBadge>
+    {' '}
+    {listing}
+  </Listing>
 );
 
-EmptyResult.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  className: PropTypes.string,
-};
-
-EmptyResult.defaultProps = {
-  children: 'No data available.',
-  className: undefined,
-};
-
-export default EmptyResult;
+export default ListingWithCount;

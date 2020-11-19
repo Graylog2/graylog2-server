@@ -22,7 +22,7 @@ import { Popover, OverlayTrigger } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
 type Props = {
-  children: React.Node,
+  children: JSX.Element,
   id?: string,
   title: string,
   className: string,

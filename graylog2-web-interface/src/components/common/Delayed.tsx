@@ -16,20 +16,33 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
-
-import type { ThemeInterface } from 'theme';
-
-const Badge: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => `
-  background-color: ${theme.colors.variant.light.info};
-`);
+import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 type Props = {
-  children: React.Node;
+  children: Array<JSX.Element | string> | JSX.Element,
+  delay: number,
 };
 
-const CountBadge = ({ children }: Props) => (
-  <Badge className="badge">{children}</Badge>
-);
+const Delayed = ({ children, delay }: Props) => {
+  const [delayFinished, setDelayFinished] = useState(delay <= 0);
 
-export default CountBadge;
+  useEffect(() => {
+    if (delay <= 0) {
+      return () => {};
+    }
+
+    const delayTimeout = window.setTimeout(() => setDelayFinished(true), delay);
+
+    return () => clearTimeout(delayTimeout);
+  }, []);
+
+  return delayFinished ? <>{children}</> : null;
+};
+
+Delayed.propTypes = {
+  children: PropTypes.node.isRequired,
+  delay: PropTypes.number.isRequired,
+};
+
+export default Delayed;
