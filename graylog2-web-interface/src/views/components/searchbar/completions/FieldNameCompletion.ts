@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $ReadOnly } from 'utility-types';
 
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
@@ -67,7 +68,7 @@ class FieldNameCompletion implements Completer {
 
   fields: FieldTypesStoreState;
 
-  currentQueryFieldNames: { [string]: string };
+  currentQueryFieldNames: { [key: string]: string };
 
   staticSuggestions: Array<Suggestion>;
 
@@ -102,11 +103,11 @@ class FieldNameCompletion implements Completer {
     }
   };
 
-  _isFollowingExistsOperator = (lastToken: ?Token) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
+  _isFollowingExistsOperator = (lastToken: Token | undefined | null) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
 
-  _isFollowingFieldName = (lastToken: ?Token) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
+  _isFollowingFieldName = (lastToken: Token | undefined | null) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
 
-  getCompletions = (currentToken: ?Token, lastToken: ?Token, prefix: string) => {
+  getCompletions = (currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string) => {
     if (this._isFollowingFieldName(lastToken) && !this._isFollowingExistsOperator(lastToken)) {
       return [];
     }
@@ -123,15 +124,15 @@ class FieldNameCompletion implements Completer {
 
     const allButInCurrent = all.filter((field) => !this.currentQueryFieldNames[field.name]);
     const fieldsToMatchIn = valuePosition
-      ? [...currentQueryFields]
-      : [...this.staticSuggestions, ...currentQueryFields];
-    const currentQuery = fieldsToMatchIn.filter(matchesFieldName)
+      ? [...currentQueryFields.toArray()]
+      : [...this.staticSuggestions, ...currentQueryFields.toArray()];
+    const currentQuery = fieldsToMatchIn.filter((field) => (matchesFieldName(field) > 0))
       .map((field) => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
-    const allFields = allButInCurrent.filter(matchesFieldName)
+    const allFields = allButInCurrent.filter((field) => (matchesFieldName(field) > 0))
       .map((field) => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
 
-    return [...currentQuery, ...allFields];
+    return [...currentQuery, ...allFields.toArray()];
   }
 }
 
