@@ -50,8 +50,8 @@ type Props = {
   availableStreams: Array<{ key: string, value: string }>,
   config: SearchesConfig,
   currentQuery: Query,
-  disableSearch: boolean,
-  onSubmit: (update: { timerange: TimeRange, streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
+  disableSearch?: boolean,
+  onSubmit?: (update: { timerange: TimeRange, streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
