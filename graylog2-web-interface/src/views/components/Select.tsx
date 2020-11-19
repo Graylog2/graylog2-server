@@ -16,14 +16,14 @@
  */
 // @flow strict
 import React, { useRef, useMemo } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
 import { Overlay } from 'react-overlays';
 import { withTheme } from 'styled-components';
 import { createFilter } from 'react-select/lib/filters';
 
-import { themePropTypes, type ThemeInterface } from 'theme';
+import { themePropTypes, ThemeInterface } from 'theme';
 
 const MultiValueRemove = (props) => {
   return (
@@ -33,8 +33,12 @@ const MultiValueRemove = (props) => {
   );
 };
 
-const OverlayInner = ({ children, style }: {children: Node, style?: { left: number, top: number }}) => React.Children.map(children,
-  (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }));
+const OverlayInner = ({ children, style }: { children: React.ReactElement, style?: { left: number, top: number } }) => (
+  <>
+    {React.Children.map(children,
+      (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }))}
+  </>
+);
 
 const getRefContainerWidth = (selectRef, allowOptionCreation) => {
   const currentRef = selectRef?.current;
@@ -123,8 +127,8 @@ const placeholder = ({ theme }) => (base) => ({
 
 type Props = {
   allowOptionCreation?: boolean,
-  components: { [string]: ComponentType<any> },
-  styles: { [string]: any },
+  components: { [key: string]: ComponentType<any> },
+  styles: { [key: string]: any },
   ignoreAccents: boolean,
   ignoreCase: boolean,
   theme: ThemeInterface,
@@ -137,7 +141,7 @@ const ValueWithTitle = (props: { data: { label: string } }) => {
 };
 
 const MenuOverlay = (selectRef) => (props) => {
-  const listStyle = {
+  const listStyle: React.CSSProperties = {
     zIndex: 1050,
     position: 'absolute',
   };
@@ -190,7 +194,7 @@ const Select = ({
   };
   const filterOption = createFilter({ ignoreCase, ignoreAccents });
 
-  const selectTheme = (defaultTheme: {[string]: any}) => {
+  const selectTheme = (defaultTheme: {[key: string]: any}) => {
     return {
       ...defaultTheme,
       colors: {
