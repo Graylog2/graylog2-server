@@ -17,7 +17,7 @@
 // @flow strict
 import { flatten, flow, isEqual, set } from 'lodash';
 
-import type { Key, Leaf, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import transformKeys from './TransformKeys';
@@ -32,17 +32,17 @@ export type ChartDefinition = {
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
 export type ExtractedSeries = Array<ChartData>;
-export type ValuesBySeries = { [string]: Array<number>};
+export type ValuesBySeries = { [key: string]: Array<number>};
 
-export type KeyJoiner = (Array<any>) => string;
+export type KeyJoiner = (keys: Array<any>) => string;
 
-export type Generator = (string, string, Array<string>, Array<any>, Array<Array<any>>, number, number, AggregationWidgetConfig) => ChartDefinition;
+export type Generator = (type: string, name: string, labels: Array<string>, values: Array<any>, data: Array<Array<any>>, idx: number, total: number, config: AggregationWidgetConfig) => ChartDefinition;
 
 const _defaultKeyJoiner = (keys) => keys.join('-');
 
 const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
 
-export const flattenLeafs = (leafs: Array<Leaf>, matcher: Value => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => {
+export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => {
   return flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
 };
 
@@ -55,14 +55,15 @@ export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySer
   ]);
 };
 
+const isLeaf = (row: Row): row is Leaf => (row.source === 'leaf');
+
 export const getLeafsFromRows = (rows: Rows): Array<Leaf> => {
-  // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
-  return rows.filter((row) => (row.source === 'leaf'));
+  return rows.filter(isLeaf);
 };
 
 export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
 
-export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher?: Value => boolean) => {
+export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher?: (value: Value) => boolean) => {
   return (results: Rows) => {
     const leafs = getLeafsFromRows(results);
     const xLabels = getXLabelsFromLeafs(leafs);
@@ -113,8 +114,8 @@ export const chartData = (
   data: Rows,
   chartType: string,
   generator: Generator = _defaultChartGenerator,
-  customSeriesFormatter?: ({valuesBySeries: ValuesBySeries, xLabels: Array<any>}) => ExtractedSeries = formatSeries,
-  leafValueMatcher?: Value => boolean,
+  customSeriesFormatter: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries = formatSeries,
+  leafValueMatcher?: (value: Value) => boolean,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
 
