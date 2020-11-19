@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import { Alert } from 'components/graylog';
 
 type Props = {
-  children: JSX.Element | string,
+  children: React.ReactElement | string,
   className: string | null | undefined,
 };
 

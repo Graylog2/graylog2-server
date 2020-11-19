@@ -23,10 +23,10 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import { createGRN } from 'logic/permissions/GRN';
 import { UserJSON } from 'logic/users/User';
 
-type ChildFun = ({ disabled: boolean }) => JSX.Element;
+type ChildFun = ({ disabled: boolean }) => React.ReactElement;
 
 type Props = {
-  children: JSX.Element | ChildFun,
+  children: React.ReactElement | ChildFun,
   id: string,
   type: string,
   hideChildren: boolean,

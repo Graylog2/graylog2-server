@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 type Props = {
-  children: Array<JSX.Element | string> | JSX.Element,
+  children: Array<React.ReactElement | string> | React.ReactElement,
   delay: number,
 };
 

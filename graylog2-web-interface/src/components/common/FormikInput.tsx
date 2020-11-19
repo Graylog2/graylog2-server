@@ -26,7 +26,7 @@ type Props = {
   label?: string,
   name: string,
   type?: string,
-  help?: JSX.Element | string,
+  help?: React.ReactElement | string,
   minLength?: number,
   maxLength?: number,
   labelClassName?: string,

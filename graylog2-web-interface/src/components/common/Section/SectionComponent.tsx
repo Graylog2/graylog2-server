@@ -23,10 +23,10 @@ import { ThemeInterface } from 'theme';
 import { Row, Col } from 'components/graylog';
 
 type Props = {
-  children: JSX.Element | JSX.Element[],
+  children: React.ReactElement | React.ReactElement[],
   title: string,
   showLoading?: boolean,
-  headerActions?: JSX.Element,
+  headerActions?: React.ReactElement,
 };
 
 const Header = styled.div`

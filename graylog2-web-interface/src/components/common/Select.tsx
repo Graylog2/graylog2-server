@@ -57,8 +57,8 @@ type CustomOptionProps = {
   data: any,
 };
 /* eslint-disable react/prop-types */
-const CustomOption = (optionRenderer: (Option) => JSX.Element) => (
-  (props: CustomOptionProps): JSX.Element => {
+const CustomOption = (optionRenderer: (Option) => React.ReactElement) => (
+  (props: CustomOptionProps): React.ReactElement => {
     const { data, ...rest } = props;
 
     return (
@@ -70,7 +70,7 @@ const CustomOption = (optionRenderer: (Option) => JSX.Element) => (
 );
 /* eslint-enable react/prop-types */
 
-const CustomSingleValue = (valueRenderer: (option: Option) => JSX.Element) => (
+const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (
   ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
 );
 
@@ -210,14 +210,14 @@ type Props = {
   multi?: boolean,
   onChange: (string) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
-  optionRenderer?: (option: Option) => JSX.Element,
+  optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
   size?: 'normal' | 'small',
   theme: ThemeInterface,
   value?: string,
   valueKey: string,
-  valueRenderer?: (option: Option) => JSX.Element,
+  valueRenderer?: (option: Option) => React.ReactElement,
 };
 
 type CustomComponents = {
@@ -341,8 +341,8 @@ class Select extends React.Component<Props, State> {
     }
   };
 
-  getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => JSX.Element,
-    valueRenderer?: (option: Option) => JSX.Element): any => {
+  getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer?: (option: Option) => React.ReactElement,
+    valueRenderer?: (option: Option) => React.ReactElement): any => {
     const customComponents: { [key: string]: any } = {};
 
     if (inputProps) {

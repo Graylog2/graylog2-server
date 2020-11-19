@@ -34,7 +34,7 @@ const Container: StyledComponent<{margin: number}, ThemeInterface, HTMLElement> 
 
 type Props = {
   onClose: (msg: string | undefined) => void,
-  children: JSX.Element | string,
+  children: React.ReactElement | string,
   bsStyle: string,
   marginTopBottom: number,
   runtimeError: boolean,

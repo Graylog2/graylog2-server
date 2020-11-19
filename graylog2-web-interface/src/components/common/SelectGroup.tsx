@@ -20,7 +20,7 @@ import styled, { StyledComponent } from 'styled-components';
 import { ThemeInterface } from 'theme';
 
 type Props = {
-  children: JSX.Element,
+  children: React.ReactElement,
   className?: string,
 };
 

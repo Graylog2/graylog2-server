@@ -24,7 +24,7 @@ import CountBadge from './CountBadge';
 
 type Props = {
   count: number,
-  listing: JSX.Element,
+  listing: React.ReactElement,
 };
 
 const Listing: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
