@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import AuthenticationBackend, { type AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
+import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
+import { $PropertyType } from 'utility-types';
 
 type TransportSecurity = ('tls' | 'start_tls' | 'none');
 type ServerAddress = { host: string, port: number };
@@ -60,8 +61,7 @@ export type WizardSubmitPayload = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,
   description: $PropertyType<AuthenticationBackendJSON, 'description'>,
   default_roles: $PropertyType<AuthenticationBackendJSON, 'default_roles'>,
-  config: {
-    ...DirectoryServiceBackendConfigJson,
-    system_user_password: ?(string | { keep_value: true } | { delete_value: true } | { set_value: ?string }),
+  config: DirectoryServiceBackendConfigJson & {
+    system_user_password: (string | { keep_value: true } | { delete_value: true } | { set_value: string | undefined }) | undefined,
   },
 };
