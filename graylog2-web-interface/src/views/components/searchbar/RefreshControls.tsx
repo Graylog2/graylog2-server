@@ -58,7 +58,10 @@ type Props = {
 
 class RefreshControls extends React.Component<Props> {
   static propTypes = {
-    refreshConfig: PropTypes.object.isRequired,
+    refreshConfig: PropTypes.exact({
+      interval: PropTypes.number.isRequired,
+      enabled: PropTypes.bool.isRequired,
+    }).isRequired,
   };
 
   componentWillUnmount(): void {
@@ -80,7 +83,7 @@ class RefreshControls extends React.Component<Props> {
   };
 
   _buttonLabel = (refreshConfigEnabled, naturalInterval) => {
-    let buttonText = 'Not updating';
+    let buttonText: React.ReactNode = 'Not updating';
 
     if (refreshConfigEnabled) {
       buttonText = <>Update every {naturalInterval}</>;
