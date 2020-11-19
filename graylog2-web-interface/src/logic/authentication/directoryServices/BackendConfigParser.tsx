@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable camelcase */
-// @flow strict
-import type { DirectoryServiceBackendConfigJson, DirectoryServiceBackendConfig } from './types';
+import { DirectoryServiceBackendConfigJson, DirectoryServiceBackendConfig } from './types';
 
 const toJson = ({
   servers,
