@@ -20,9 +20,10 @@ import PropTypes from 'prop-types';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
-import EventHandler from 'views/logic/searchtypes/events/EventHandler';
+import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -50,7 +51,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
 
-const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom, timeRangeTo) => {
+const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom: string, timeRangeTo: string) => {
   const barWidth = 0.03; // width in percentage, relative to chart width
   const minXUnits = 30;
 
@@ -60,6 +61,7 @@ const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom, timeRa
 
   return chartDataResult.map((data) => {
     if (data?.x?.length === 1) {
+      // @ts-ignore
       const timeRangeMS = new Date(timeRangeTo) - new Date(timeRangeFrom);
       const widthXUnits = timeRangeMS * barWidth;
 
@@ -73,16 +75,19 @@ const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom, timeRa
   });
 };
 
-const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
-  const { visualizationConfig } = config;
-  const layout = {};
+type Layout = {
+  shapes?: Shapes;
+  barmode?: string;
+};
 
-  /* $FlowFixMe: type inheritance does not work here */
+const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+  const visualizationConfig = config.visualizationConfig as BarVisualizationConfig;
+  const layout: Layout = {};
+
   if (visualizationConfig && visualizationConfig.barmode) {
     layout.barmode = visualizationConfig.barmode;
   }
 
-  /* $FlowFixMe: type inheritance does not work here */
   const opacity = visualizationConfig ? visualizationConfig.opacity : 1.0;
 
   const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values, opacity });
