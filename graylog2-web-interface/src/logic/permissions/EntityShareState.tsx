@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import type {
   GranteeType,
@@ -32,7 +33,7 @@ import ActiveShare from './ActiveShare';
 import SharedEntity from './SharedEntity';
 import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
-import ValidationResult, { type ValidationResultJSON } from './ValidationResult';
+import ValidationResult, { ValidationResultJSON } from './ValidationResult';
 
 export type GranteesList = Immutable.List<Grantee>;
 export type CapabilitiesList = Immutable.List<Capability>;
@@ -41,8 +42,8 @@ export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
-const _missingDependenciesFromJSON = (missingDependenciesJSON) => {
-  let missingDependencies = Immutable.Map();
+const _missingDependenciesFromJSON = (missingDependenciesJSON): Immutable.Map<string, Immutable.List<SharedEntity>> => {
+  let missingDependencies = Immutable.Map<string, Immutable.List<SharedEntity>>();
 
   Object.keys(missingDependenciesJSON).forEach((granteeGRN) => {
     const dependencyList = missingDependenciesJSON[granteeGRN];
@@ -52,7 +53,7 @@ const _missingDependenciesFromJSON = (missingDependenciesJSON) => {
   return missingDependencies;
 };
 
-const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>, activeShares: ?ActiveShares): Immutable.List<T> => {
+const _sortAndOrderGrantees = <T extends GranteeInterface>(grantees: Immutable.List<T>, activeShares?: ActiveShares | undefined | null): Immutable.List<T> => {
   const granteesByType = grantees
     .filter((grantee) => !activeShares || activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) >= 0)
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
@@ -61,16 +62,16 @@ const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>,
     .filter((grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1)
     .reverse();
 
-  return Immutable.List().concat(
+  return Immutable.List<T>().concat(
     newGrantees,
     granteesByType.get('error'),
     granteesByType.get('global'),
     granteesByType.get('team'),
     granteesByType.get('user'),
-  ).filter((grantee) => grantee);
+  ).filter((grantee) => !!grantee).toList();
 };
 
-type InternalState = {|
+type InternalState = {
   entity: GRN,
   availableGrantees: GranteesList,
   availableCapabilities: CapabilitiesList,
@@ -78,19 +79,19 @@ type InternalState = {|
   selectedGranteeCapabilities: SelectedGranteeCapabilities,
   missingDependencies: MissingDependencies,
   validationResults: ValidationResult,
-|};
+};
 
-export type EntityShareStateJson = {|
+export type EntityShareStateJson = {
   entity: $PropertyType<InternalState, 'entity'>,
   available_grantees: Array<GranteeType>,
   available_capabilities: Array<CapabilityType>,
   active_shares: Array<ActiveShareType>,
-  selected_grantee_capabilities: {|
-    [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Capability, 'id'>,
-  |} | {||},
-  missing_permissions_on_dependencies: {[GRN]: Array<SharedEntityType>},
+  selected_grantee_capabilities: {
+    [grantee: string]: $PropertyType<Capability, 'id'>,
+  } | {},
+  missing_permissions_on_dependencies: {[key: string]: Array<SharedEntityType>},
   validation_result: ValidationResultJSON,
-|};
+};
 
 export default class EntityShareState {
   _value: InternalState;
