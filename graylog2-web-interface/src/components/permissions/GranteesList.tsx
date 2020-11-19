@@ -23,7 +23,7 @@ import { $PropertyType } from 'utility-types';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import { Pagination, PageSizeSelect } from 'components/common';
 import { Alert } from 'components/graylog';
-import EntityShareState, { ActiveShares, CapabilitiesList,  SelectedGrantees } from 'logic/permissions/EntityShareState';
+import EntityShareState, { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
 import { ThemeInterface } from 'theme';
