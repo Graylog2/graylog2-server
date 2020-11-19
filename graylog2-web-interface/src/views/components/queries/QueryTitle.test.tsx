@@ -57,7 +57,6 @@ describe('QueryTitle', () => {
         <QueryTitle active
                     id="deadbeef"
                     openEditModal={() => {}}
-                    onChange={() => {}}
                     onClose={() => Promise.resolve()}
                     title="Foo" />,
       );
@@ -74,7 +73,6 @@ describe('QueryTitle', () => {
         <QueryTitle active
                     id="deadbeef"
                     openEditModal={() => {}}
-                    onChange={() => {}}
                     onClose={() => Promise.resolve()}
                     title="Foo" />,
       );
@@ -93,7 +91,6 @@ describe('QueryTitle', () => {
         <QueryTitle active
                     id="deadbeef"
                     openEditModal={openEditModalFn}
-                    onChange={() => {}}
                     onClose={() => Promise.resolve()}
                     title="Foo" />,
       );
