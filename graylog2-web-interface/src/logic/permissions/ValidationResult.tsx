@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import type { GRN } from './types';
 
@@ -33,6 +34,7 @@ type InternalState = {
   failed: boolean,
 };
 
+/* eslint-disable camelcase */
 export type ValidationResultJSON = {
   errors: {
     selected_grantee_capabilities: string[],
@@ -42,6 +44,7 @@ export type ValidationResultJSON = {
   },
   failed: boolean,
 };
+/* eslint-enable camelcase */
 
 export default class ValidationResult {
   _value: InternalState;
@@ -77,7 +80,7 @@ export default class ValidationResult {
       failed,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       errors,
       errorContext,
@@ -94,6 +97,14 @@ export default class ValidationResult {
     return new ValidationResult(errors, errorContext, failed);
   }
 
+  static createSuccess() {
+    return ValidationResult.create(
+      { selectedGranteeCapabilities: Immutable.List() },
+      { selectedGranteeCapabilities: Immutable.List() },
+      false,
+    );
+  }
+
   toJSON() {
     const { errors, errorContext, failed } = this._value;
 
@@ -108,9 +119,13 @@ export default class ValidationResult {
     };
   }
 
-  static fromJSON(value: ValidationResultJSON = {}) {
+  static fromJSON(value: ValidationResultJSON | undefined | null) {
+    if (!value) {
+      return ValidationResult.createSuccess();
+    }
+
     // eslint-disable-next-line camelcase
-    const { errors: errorsJson = {}, error_context = {}, failed } = value;
+    const { errors: errorsJson, error_context, failed } = value;
     const errors = {
       selectedGranteeCapabilities: Immutable.List(errorsJson.selected_grantee_capabilities),
     };
@@ -123,7 +138,7 @@ export default class ValidationResult {
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
