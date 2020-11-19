@@ -21,7 +21,7 @@ import StringUtils from 'util/StringUtils';
 import type { ViewType } from 'views/logic/views/View';
 
 type Props = {
-  type: ?ViewType,
+  type: ViewType | undefined | null,
   capitalize?: boolean,
 };
 
