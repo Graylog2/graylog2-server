@@ -16,7 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 import * as Immutable from 'immutable';
 
 import type { ThemeInterface } from 'theme';
