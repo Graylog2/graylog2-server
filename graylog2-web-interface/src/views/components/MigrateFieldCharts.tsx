@@ -176,9 +176,13 @@ const _migrateWidgets = (legacyCharts) => {
 
     const newWidgetsRowOffset = legacyCharts.length * defaultHeight;
     const existingWidgetPos = _updateExistingWidgetPos(currentView.state.widgetPositions, newWidgetsRowOffset);
-    const newViewState = currentView.state
+      const newViewState = currentView.state
       .toBuilder()
-      .widgets(Immutable.List([...currentView.state.widgets, ...newWidgets]))
+      .widgets(Immutable.List([
+          // @ts-ignore
+          ...currentView.state.widgets,
+          ...newWidgets
+      ]))
       .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
       .build();
 
@@ -186,7 +190,7 @@ const _migrateWidgets = (legacyCharts) => {
   });
 };
 
-const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void, setMigrationFinished: boolean => void) => {
+const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: (migrating: boolean) => void, setMigrationFinished: (finished: boolean) => void) => {
   setMigrating(true);
 
   _migrateWidgets(legacyCharts).then(({ newViewState, currentQueryId }) => {
