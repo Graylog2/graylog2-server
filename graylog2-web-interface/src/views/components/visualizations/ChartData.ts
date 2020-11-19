@@ -38,6 +38,8 @@ export type ChartDefinition = {
     size: number,
     color: string,
   },
+  customdata?: any,
+  colorscale?: [number, string][],
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
