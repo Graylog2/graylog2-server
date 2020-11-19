@@ -31,7 +31,7 @@ import type { ThemeInterface } from 'theme';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
+const KeywordPreview: StyledComponent<{}, void, any> = styled(Alert)`
   display: flex;
   align-items: center;
   min-height: 34px;
@@ -40,7 +40,7 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => css`
+const KeywordInput: StyledComponent<{}, ThemeInterface, any> = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);
@@ -62,9 +62,9 @@ type Props = {
 
 const _validateKeyword = (
   keyword: string,
-  _setSuccessfullPreview: ({ from: string, to: string }) => void,
+  _setSuccessfullPreview: (preview: { from: string, to: string }) => void,
   _setFailedPreview: () => string,
-): ?Promise<string> => {
+): Promise<string> | undefined | null => {
   if (keyword === undefined) {
     return undefined;
   }
@@ -73,6 +73,12 @@ const _validateKeyword = (
     ? Promise.resolve('Keyword must not be empty!')
     : ToolsStore.testNaturalDate(keyword)
       .then(_setSuccessfullPreview, _setFailedPreview);
+};
+
+type FormState = {
+  timerange: {
+    keyword?: string;
+  };
 };
 
 const KeywordTimeRangeSelector = ({ disabled }: Props) => {
@@ -87,7 +93,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
-  const formik = useFormikContext();
+  const formik = useFormikContext<FormState>();
 
   const _validate = useCallback(
     (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
