@@ -20,7 +20,7 @@ import { useCallback, useMemo } from 'react';
 import { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { type ThemeInterface, themePropTypes } from 'theme';
+import { ThemeInterface, themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
@@ -29,17 +29,17 @@ import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
 import type { Completer } from './SearchBarAutocompletions';
 
-type Props = {|
-  completerFactory: (Array<Completer>) => AutoCompleter,
+type Props = {
+  completerFactory: (completers: Array<Completer>) => AutoCompleter,
   completers: Array<Completer>,
   disabled?: boolean,
-  onBlur?: (string) => void,
-  onChange: (string) => Promise<string>,
-  onExecute: (string) => void,
+  onBlur?: (query: string) => void,
+  onChange: (query: string) => Promise<string>,
+  onExecute: (query: string) => void,
   placeholder?: string,
   theme: ThemeInterface,
   value: string,
-|};
+};
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
@@ -123,4 +123,4 @@ QueryInput.defaultProps = {
 
 const mapping = { completers: 'views.completers' };
 
-export default withPluginEntities<$Rest<Props, {| theme: ThemeInterface |}>, typeof mapping>(withTheme(QueryInput), mapping);
+export default withPluginEntities(withTheme(QueryInput), mapping);
