@@ -32,7 +32,7 @@ type Props = {
   disabled: boolean,
 };
 
-const StyledTimerangeSelector: StyledComponent<{}, void, *> = styled(TimerangeSelector)`
+const StyledTimerangeSelector: StyledComponent<{}, void, any> = styled(TimerangeSelector)`
   display: flex;
 `;
 
