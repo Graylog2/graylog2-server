@@ -93,7 +93,7 @@ const _loadRoles = (setPaginatedRoles) => {
 };
 
 const RolesSelector = ({ assignedRolesIds, onSubmit, identifier }: Props) => {
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
+  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [selectedRoleName, setSelectedRoleName] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
