@@ -19,28 +19,29 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { $PropertyType } from 'utility-types';
 
 import type { GRN } from 'logic/permissions/types';
 import EntityShareState from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
-import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { Select } from 'components/common';
 
-import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
+import GranteesSelector, { SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
 import DependenciesWarning from './DependenciesWarning';
 import ValidationError from './ValidationError';
 import ShareableEntityURL from './ShareableEntityURL';
 
 type Props = {
-  description: $PropertyType<Props, 'description'>,
   entityGRN: GRN,
+  description: string,
   entityType: $PropertyType<SharedEntity, 'type'>,
   entityTitle: $PropertyType<SharedEntity, 'title'>,
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
-  granteesSelectRef: ?Select,
+  granteesSelectRef: Select | null | undefined,
 };
 
 const Section = styled.div`
@@ -125,7 +126,6 @@ const EntityShareSettings = ({
       <Section>
         <GranteesList activeShares={activeShares}
                       availableCapabilities={availableCapabilities}
-                      entityGRN={entityGRN}
                       entityType={entityType}
                       onDelete={_handleDeletion}
                       onCapabilityChange={_handleSelection}
