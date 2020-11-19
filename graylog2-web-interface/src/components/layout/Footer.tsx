@@ -17,7 +17,7 @@
 // @flow strict
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent, css } from 'styled-components';
+import styled, { StyledComponent, css } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import Version from 'util/Version';
@@ -72,13 +72,14 @@ const Footer = ({ system }: Props) => {
 
   return (
     <StyledFooter>
+      {/* @ts-ignore jvm s checked in line 65 */}
       Graylog {system.version} on {system.hostname} ({jvm.info})
     </StyledFooter>
   );
 };
 
 Footer.propTypes = {
-  system: PropTypes.shape({
+  system: PropTypes.exact({
     version: PropTypes.string,
     hostname: PropTypes.string,
   }),
@@ -88,4 +89,4 @@ Footer.defaultProps = {
   system: undefined,
 };
 
-export default connect(Footer, { system: SystemStore }, ({ system: { system } = {} }) => ({ system }));
+export default connect(Footer, { system: SystemStore }, ({ system: { system } = {} }: { system }) => ({ system }));
