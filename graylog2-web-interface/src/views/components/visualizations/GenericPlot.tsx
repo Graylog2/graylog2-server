@@ -54,7 +54,7 @@ export type ChartConfig = {
 };
 
 export type ColorMap = {
-  [string]: string,
+  [key: string]: string,
 };
 
 export type ChartColor = {
@@ -66,11 +66,11 @@ export type ChartColor = {
 };
 
 type Props = {
-  chartData: Array<*>,
-  getChartColor?: (Array<ChartConfig>, string) => ?string,
+  chartData: Array<any>,
+  getChartColor?: (data: Array<ChartConfig>, name: string) => string | undefined | null,
   layout: {},
-  onZoom: (string, string) => boolean,
-  setChartColor?: (ChartConfig, ColorMap) => ChartColor,
+  onZoom: (from: string, to: string) => boolean,
+  setChartColor?: (data: ChartConfig, color: ColorMap) => ChartColor,
   theme: ThemeInterface,
 };
 
@@ -80,7 +80,6 @@ type State = {
 
 type Axis = {
   autosize: boolean,
-  [string]: string,
 };
 
 const nonInteractiveLayout = {
@@ -145,7 +144,7 @@ class GenericPlot extends React.Component<Props, State> {
     return false;
   };
 
-  _onColorSelect = (setColor: (string, string) => Promise<*>, name: string, newColor: string) => setColor(name, newColor)
+  _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
     .then(this._onCloseColorPopup);
 
   // eslint-disable-next-line no-unused-vars
