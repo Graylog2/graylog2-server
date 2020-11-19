@@ -65,7 +65,7 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', () => {
-    const { getByText } = render(<SearchBar config={config} onExecute={() => {}} />);
+    const { getByText } = render(<SearchBar config={config} />);
 
     expect(getByText('Search in last day')).not.toBeNull();
     expect(getByText('Search in all messages')).not.toBeNull();
