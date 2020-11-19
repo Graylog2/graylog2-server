@@ -33,92 +33,92 @@ import java.util.Map;
 @JsonDeserialize(builder = SlackEventNotificationConfigEntity.Builder.class)
 public abstract class SlackEventNotificationConfigEntity implements EventNotificationConfigEntity {
 
-	public static final String TYPE_NAME = "slack-notification-v1";
+    public static final String TYPE_NAME = "slack-notification-v1";
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_COLOR)
-	public abstract ValueReference color();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_COLOR)
+    public abstract ValueReference color();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)
-	public abstract ValueReference webhookUrl();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)
+    public abstract ValueReference webhookUrl();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_CHANNEL)
-	public abstract ValueReference channel();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_CHANNEL)
+    public abstract ValueReference channel();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_CUSTOM_MESSAGE)
-	public abstract ValueReference customMessage();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_CUSTOM_MESSAGE)
+    public abstract ValueReference customMessage();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_USER_NAME)
-	public abstract ValueReference userName();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_USER_NAME)
+    public abstract ValueReference userName();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_NOTIFY_CHANNEL)
-	public abstract ValueReference notifyChannel();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_NOTIFY_CHANNEL)
+    public abstract ValueReference notifyChannel();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_LINK_NAMES)
-	public abstract ValueReference linkNames();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_LINK_NAMES)
+    public abstract ValueReference linkNames();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_ICON_URL)
-	public abstract ValueReference iconUrl();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_ICON_URL)
+    public abstract ValueReference iconUrl();
 
-	@JsonProperty(SlackEventNotificationConfig.FIELD_ICON_EMOJI)
-	public abstract ValueReference iconEmoji();
+    @JsonProperty(SlackEventNotificationConfig.FIELD_ICON_EMOJI)
+    public abstract ValueReference iconEmoji();
 
-	public static Builder builder() {
-		return Builder.create();
-	}
+    public static Builder builder() {
+        return Builder.create();
+    }
 
-	public abstract Builder toBuilder();
+    public abstract Builder toBuilder();
 
-	@AutoValue.Builder
-	public static abstract class Builder implements EventNotificationConfigEntity.Builder<Builder> {
+    @AutoValue.Builder
+    public static abstract class Builder implements EventNotificationConfigEntity.Builder<Builder> {
 
-		@JsonCreator
-		public static Builder create() {
-			return new AutoValue_SlackEventNotificationConfigEntity.Builder()
-					.type(TYPE_NAME);
-		}
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_SlackEventNotificationConfigEntity.Builder()
+                    .type(TYPE_NAME);
+        }
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_COLOR)
-		public abstract Builder color(ValueReference color);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_COLOR)
+        public abstract Builder color(ValueReference color);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)
-		public abstract Builder webhookUrl(ValueReference webhookUrl);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_WEBHOOK_URL)
+        public abstract Builder webhookUrl(ValueReference webhookUrl);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_CHANNEL)
-		public abstract Builder channel(ValueReference channel);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_CHANNEL)
+        public abstract Builder channel(ValueReference channel);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_CUSTOM_MESSAGE)
-		public abstract Builder customMessage(ValueReference customMessage);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_CUSTOM_MESSAGE)
+        public abstract Builder customMessage(ValueReference customMessage);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_USER_NAME)
-		public abstract Builder userName(ValueReference userName);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_USER_NAME)
+        public abstract Builder userName(ValueReference userName);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_NOTIFY_CHANNEL)
-		public abstract Builder notifyChannel(ValueReference notifyChannel);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_NOTIFY_CHANNEL)
+        public abstract Builder notifyChannel(ValueReference notifyChannel);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_LINK_NAMES)
-		public abstract Builder linkNames(ValueReference linkNames);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_LINK_NAMES)
+        public abstract Builder linkNames(ValueReference linkNames);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_ICON_URL)
-		public abstract Builder iconUrl(ValueReference iconUrl);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_ICON_URL)
+        public abstract Builder iconUrl(ValueReference iconUrl);
 
-		@JsonProperty(SlackEventNotificationConfig.FIELD_ICON_EMOJI)
-		public abstract Builder iconEmoji(ValueReference iconEmoji);
+        @JsonProperty(SlackEventNotificationConfig.FIELD_ICON_EMOJI)
+        public abstract Builder iconEmoji(ValueReference iconEmoji);
 
-		public abstract SlackEventNotificationConfigEntity build();
-	}
+        public abstract SlackEventNotificationConfigEntity build();
+    }
 
-	@Override
-	public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
-		return SlackEventNotificationConfig.builder()
-				.color(color().asString(parameters))
-				.webhookUrl(webhookUrl().asString(parameters))
-				.channel(channel().asString(parameters))
-				.customMessage(customMessage().asString(parameters))
-				.userName(userName().asString(parameters))
-				.notifyChannel(notifyChannel().asBoolean(parameters))
-				.linkNames(linkNames().asBoolean(parameters))
-				.iconUrl(iconUrl().asString(parameters))
-				.iconEmoji(iconEmoji().asString(parameters))
-				.build();
-	}
+    @Override
+    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        return SlackEventNotificationConfig.builder()
+                .color(color().asString(parameters))
+                .webhookUrl(webhookUrl().asString(parameters))
+                .channel(channel().asString(parameters))
+                .customMessage(customMessage().asString(parameters))
+                .userName(userName().asString(parameters))
+                .notifyChannel(notifyChannel().asBoolean(parameters))
+                .linkNames(linkNames().asBoolean(parameters))
+                .iconUrl(iconUrl().asString(parameters))
+                .iconEmoji(iconEmoji().asString(parameters))
+                .build();
+    }
 }

@@ -18,6 +18,9 @@ package org.graylog.integrations.notifications.types;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
 import org.graylog.events.notifications.EventNotificationService;
@@ -26,9 +29,12 @@ import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -40,16 +46,22 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SlackEventNotificationTest  {
+public class SlackEventNotificationTest {
+
+    //code under test
+    SlackEventNotification slackEventNotification;
 
     @Mock
     NodeId mockNodeId;
@@ -58,49 +70,42 @@ public class SlackEventNotificationTest  {
     NotificationService mockNotificationService;
 
     @Mock
-    SlackClient slackClient;
+    SlackClient mockSlackClient;
 
     @Mock
     EventNotificationService notificationCallbackService;
 
-    private SlackEventNotification slackEventNotification;
+
     private SlackEventNotificationConfig slackEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
-
 
 
     @Before
     public void setUp() {
 
-        given_a_bad_event_notificationConfig();
+        getDummySlackNotificationConfig();
         eventNotificationContext = NotificationTestData.getDummyContext(getHttpNotification(), "ayirp").toBuilder().notificationConfig(slackEventNotificationConfig).build();
-
-
-        final ImmutableList<MessageSummary> messageSummaries = ImmutableList.of(
-                new MessageSummary("graylog_1", new Message("Test message 1", "source1", new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC))),
-                new MessageSummary("graylog_2", new Message("Test message 2", "source2", new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)))
-        );
-
+        final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
         slackEventNotification = new SlackEventNotification(notificationCallbackService, new ObjectMapperProvider().get(),
-                                                            Engine.createEngine(),
-                                                            mockNotificationService,
-                                                            mockNodeId,slackClient);
+                Engine.createEngine(),
+                mockNotificationService,
+                mockNodeId, mockSlackClient);
 
     }
 
-    private void given_a_bad_event_notificationConfig() {
+    private void getDummySlackNotificationConfig() {
         slackEventNotificationConfig = new AutoValue_SlackEventNotificationConfig.Builder()
                 .notifyChannel(true)
                 .type(SlackEventNotificationConfig.TYPE_NAME)
                 .color("#FF2052")
                 .webhookUrl("axzzzz")
                 .channel("#general")
+                .backlogSize(1)
                 .customMessage("a custom message")
                 .linkNames(true)
                 .build();
-        slackEventNotificationConfig.validate();
     }
 
     private NotificationDto getHttpNotification() {
@@ -116,10 +121,10 @@ public class SlackEventNotificationTest  {
 
     @Test
     public void createSlackMessage() throws EventNotificationException {
-       String expected = "{\"link_names\":true,\"attachments\":[{\"fallback\":\"Custom Message\",\"text\":\"a custom message\",\"pretext\":\"Custom Message:\",\"color\":\"#FF2052\"}],\"channel\":\"#general\",\"text\":\"@channel *Alert _Event Definition Test Title_* triggered:\\n> Event Definition Test Description \\n\"}";
-       SlackMessage message =  slackEventNotification.createSlackMessage(eventNotificationContext, slackEventNotificationConfig);
-       String actual  = message.getJsonString();
-       assertThat(actual).isEqualTo(expected);
+        String expected = "{\"link_names\":true,\"attachments\":[{\"fallback\":\"Custom Message\",\"text\":\"a custom message\",\"pretext\":\"Custom Message:\",\"color\":\"#FF2052\"}],\"channel\":\"#general\",\"text\":\"@channel *Alert _Event Definition Test Title_* triggered:\\n> Event Definition Test Description \\n\"}";
+        SlackMessage message = slackEventNotification.createSlackMessage(eventNotificationContext, slackEventNotificationConfig);
+        String actual = message.getJsonString();
+        assertThat(actual).isEqualTo(expected);
 
     }
 
@@ -141,15 +146,9 @@ public class SlackEventNotificationTest  {
     }
 
     @Test
-    public void getAlarmBacklog() {
-        List<MessageSummary> messageSummaries = slackEventNotification.getAlarmBacklog(eventNotificationContext);
-        assertThat(messageSummaries.size()).isEqualTo(2);
-    }
-
-    @Test
     public void getCustomMessageModel() {
-        List<MessageSummary> messageSummaries = slackEventNotification.getAlarmBacklog(eventNotificationContext);
-        Map<String, Object> customMessageModel = slackEventNotification.getCustomMessageModel(eventNotificationContext, slackEventNotificationConfig, messageSummaries);
+        List<MessageSummary> messageSummaries = generateMessageSummaries(50);
+        Map<String, Object> customMessageModel = slackEventNotification.getCustomMessageModel(eventNotificationContext, slackEventNotificationConfig.type(), messageSummaries);
         //there are 9 keys and two asserts needs to be implemented (backlog,event)
         assertThat(customMessageModel).isNotNull();
         assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
@@ -161,26 +160,145 @@ public class SlackEventNotificationTest  {
     }
 
 
-    @Test (expected = PermanentEventNotificationException.class)
-    public void execute_with_invalid_webhook_url() throws TemporaryEventNotificationException, PermanentEventNotificationException {
-       //has an invalid webhook url
-       slackEventNotification.execute(eventNotificationContext);
+    @Test(expected = EventNotificationException.class)
+    public void execute_with_invalid_webhook_url() throws EventNotificationException {
+        givenGoodNotificationService();
+        givenGoodNodeId();
+        givenSlackClientThrowsPermException();
+        //when execute is called with a invalid webhook URL, we expect a event notification exception
+        slackEventNotification.execute(eventNotificationContext);
+    }
+
+
+    @Test(expected = EventNotificationException.class)
+    public void execute_with_null_event_timerange() throws EventNotificationException {
+        EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
+        assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
+        assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
+        assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(SlackEventNotificationConfig.TYPE_NAME);
+        slackEventNotification.execute(yetAnotherContext);
+    }
+
+    private EventNotificationContext getEventNotificationContextToSimulateNullPointerException() {
+        final DateTime now = DateTime.parse("2019-01-01T00:00:00.000Z");
+        final ImmutableList<String> keyTuple = ImmutableList.of("a", "b");
+
+        final EventDto eventDto = EventDto.builder()
+                .id("01DF119QKMPCR5VWBXS8783799")
+                .eventDefinitionType("aggregation-v1")
+                .eventDefinitionId("54e3deadbeefdeadbeefaffe")
+                .originContext("urn:graylog:message:es:graylog_0:199a616d-4d48-4155-b4fc-339b1c3129b2")
+                .eventTimestamp(now)
+                .processingTimestamp(now)
+                .streams(ImmutableSet.of("000000000000000000000002"))
+                .sourceStreams(ImmutableSet.of("000000000000000000000001"))
+                .message("Test message")
+                .source("source")
+                .keyTuple(keyTuple)
+                .key(String.join("|", keyTuple))
+                .priority(4)
+                .alert(false)
+                .fields(ImmutableMap.of("hello", "world"))
+                .build();
+
+        //uses the eventDEfinitionDto from NotificationTestData.getDummyContext in the setup method
+        EventDefinitionDto eventDefinitionDto = eventNotificationContext.eventDefinition().get();
+        return EventNotificationContext.builder()
+                .notificationId("1234")
+                .notificationConfig(slackEventNotificationConfig)
+                .event(eventDto)
+                .eventDefinition(eventDefinitionDto)
+                .build();
+    }
+
+
+    private void givenGoodNotificationService() {
+        given(mockNotificationService.buildNow()).willReturn(new NotificationImpl().addTimestamp(Tools.nowUTC()));
+    }
+
+    private void givenSlackClientThrowsPermException() throws TemporaryEventNotificationException, PermanentEventNotificationException {
+        doThrow(PermanentEventNotificationException.class)
+                .when(mockSlackClient)
+                .send(any(), anyString());
+
+    }
+
+    private void givenGoodNodeId() {
+        when(mockNodeId.toString()).thenReturn("12345");
+        assertThat(mockNodeId).isNotNull();
+        assertThat(mockNodeId.toString()).isEqualTo("12345");
     }
 
 
     @Test
     public void buildCustomMessage() throws PermanentEventNotificationException {
-       String s =  slackEventNotification.buildCustomMessage(eventNotificationContext,slackEventNotificationConfig,"${thisDoesnotExist}");
-       assertThat(s).isEmpty();
-       String expectedCustomMessage =  slackEventNotification.buildCustomMessage(eventNotificationContext,slackEventNotificationConfig,"test");
-       assertThat(expectedCustomMessage).isNotEmpty();
+        String s = slackEventNotification.buildCustomMessage(eventNotificationContext, slackEventNotificationConfig, "${thisDoesnotExist}");
+        assertThat(s).isEmpty();
+        String expectedCustomMessage = slackEventNotification.buildCustomMessage(eventNotificationContext, slackEventNotificationConfig, "test");
+        assertThat(expectedCustomMessage).isNotEmpty();
 
     }
 
     @Test(expected = PermanentEventNotificationException.class)
     public void buildCustomMessage_with_invalidTemplate() throws EventNotificationException {
         slackEventNotificationConfig = buildInvalidTemplate();
-        slackEventNotification.buildCustomMessage(eventNotificationContext,slackEventNotificationConfig,"Title:       ${does't exist}");
+        slackEventNotification.buildCustomMessage(eventNotificationContext, slackEventNotificationConfig, "Title:       ${does't exist}");
+    }
+
+
+    @Test
+    public void test_customMessage() throws PermanentEventNotificationException {
+
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .backlogSize(5)
+                .build();
+        String message = slackEventNotification.buildCustomMessage(eventNotificationContext, slackConfig, "Ich spreche Deutsch");
+        assertThat(message).isEqualTo("Ich spreche Deutsch");
+    }
+
+
+    @Test
+    public void test_backlog_message_limit_when_backlogSize_isFive() {
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .backlogSize(5)
+                .build();
+
+        //global setting is at N and the message override is 5 then the backlog size = 5
+        List<MessageSummary> messageSummaries = slackEventNotification.getMessageBacklog(eventNotificationContext, slackConfig);
+        assertThat(messageSummaries.size()).isEqualTo(5);
+    }
+
+    @Test
+    public void test_backlog_message_limit_when_backlogSize_isZero() {
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .backlogSize(0)
+                .build();
+
+        //global setting is at N and the message override is 0 then the backlog size = 50
+        List<MessageSummary> messageSummaries = slackEventNotification.getMessageBacklog(eventNotificationContext, slackConfig);
+        assertThat(messageSummaries.size()).isEqualTo(50);
+    }
+
+    @Test
+    public void test_backlog_message_limit_When_eventNotificationContext_isNull() {
+        SlackEventNotificationConfig slackConfig = SlackEventNotificationConfig.builder()
+                .backlogSize(0)
+                .build();
+
+        //global setting is at N and the eventNotificationContext is null then the message summaries is null
+        List<MessageSummary> messageSummaries = slackEventNotification.getMessageBacklog(null, slackConfig);
+        assertThat(messageSummaries).isNull();
+    }
+
+
+    ImmutableList<MessageSummary> generateMessageSummaries(int size) {
+
+        List<MessageSummary> messageSummaries = new ArrayList();
+        for (int i = 0; i < size; i++) {
+            MessageSummary summary = new MessageSummary("graylog_" + i, new Message("Test message_" + i, "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
+            messageSummaries.add(summary);
+        }
+        return ImmutableList.copyOf(messageSummaries);
     }
 
     SlackEventNotificationConfig buildInvalidTemplate() {

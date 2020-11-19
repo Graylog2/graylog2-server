@@ -41,140 +41,165 @@ import java.util.regex.Pattern;
 @JsonDeserialize(builder = SlackEventNotificationConfig.Builder.class)
 public abstract class SlackEventNotificationConfig implements EventNotificationConfig {
 
-	private final String regex = "https:\\/\\/hooks.slack.com\\/services\\/";
-	private final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-	public static final String TYPE_NAME = "slack-notification-v1";
+    public static final String TYPE_NAME = "slack-notification-v1";
 
-	static final String FIELD_COLOR = "color";
-	static final String FIELD_WEBHOOK_URL = "webhook_url";
-	static final String FIELD_CHANNEL = "channel";
-	static final String FIELD_CUSTOM_MESSAGE = "custom_message";
-	static final String FIELD_USER_NAME = "user_name";
-	static final String FIELD_NOTIFY_CHANNEL = "notify_channel";
-	static final String FIELD_LINK_NAMES = "link_names";
-	static final String FIELD_ICON_URL = "icon_url";
-	static final String FIELD_ICON_EMOJI = "icon_emoji";
+    private final String regex = "https:\\/\\/hooks.slack.com\\/services\\/";
+    private final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+    private static final String HEX_COLOR = "#ff0500";
+
+    private static final String CUSTOM_MESSAGE = "hello World";
+    private static final boolean FALSE = false;
+    private static final long BACKLOG_SIZE = 0;
 
 
-	@JsonProperty(FIELD_COLOR)
-	@NotBlank
-	public abstract String color();
+    static final String INVALID_BACKLOG_ERROR_MESSAGE = "Backlog size cannot be less than zero .";
+    static final String INVALID_CHANNEL_ERROR_MESSAGE = "Channel cannot be empty.";
+    static final String INVALID_WEBHOOK_ERROR_MESSAGE = "Please specify a valid webhook url";
+    static final String WEB_HOOK_URL = "https://hooks.slack.com/services/xxx/xxxx/xxxxxxxxxxxxxxxxxxx";
+    static final String CHANNEL = "#general";
 
-	@JsonProperty(FIELD_WEBHOOK_URL)
-	@NotBlank
-	public abstract String webhookUrl();
-
-	@JsonProperty(FIELD_CHANNEL)
-	@NotBlank
-	public abstract String channel();
-
-	@JsonProperty(FIELD_CUSTOM_MESSAGE)
-	public abstract String customMessage();
-
-	@JsonProperty(FIELD_USER_NAME)
-	@Nullable
-	public abstract String userName();
-
-	@JsonProperty(FIELD_NOTIFY_CHANNEL)
-	public abstract boolean notifyChannel();
-
-	@JsonProperty(FIELD_LINK_NAMES)
-	public abstract boolean linkNames();
-
-	@JsonProperty(FIELD_ICON_URL)
-	@Nullable
-	public abstract String iconUrl();
-
-	@JsonProperty(FIELD_ICON_EMOJI)
-	@Nullable
-	public abstract String iconEmoji();
+    static final String FIELD_COLOR = "color";
+    static final String FIELD_WEBHOOK_URL = "webhook_url";
+    static final String FIELD_CHANNEL = "channel";
+    static final String FIELD_CUSTOM_MESSAGE = "custom_message";
+    static final String FIELD_USER_NAME = "user_name";
+    static final String FIELD_NOTIFY_CHANNEL = "notify_channel";
+    static final String FIELD_LINK_NAMES = "link_names";
+    static final String FIELD_ICON_URL = "icon_url";
+    static final String FIELD_ICON_EMOJI = "icon_emoji";
+    static final String FIELD_BACKLOG_SIZE = "backlog_size";
 
 
-	@Override
-	@JsonIgnore
-	public JobTriggerData toJobTriggerData(EventDto dto) {
-		return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
-	}
-
-	public static SlackEventNotificationConfig.Builder builder() {
-		return SlackEventNotificationConfig.Builder.create();
-	}
-
-	@Override
-	@JsonIgnore
-	public ValidationResult validate() {
-		ValidationResult validation =  new ValidationResult();
-		final Matcher matcher = pattern.matcher(webhookUrl());
-
-		if (channel().isEmpty()) {
-			validation.addError(FIELD_CHANNEL, "Channel cannot be empty.");
-		}
-
-		if(matcher.find() == false) {
-			validation.addError(FIELD_WEBHOOK_URL, "please specify a valid webhook url");
-		}
-		return validation;
-
-	}
-
-	@AutoValue.Builder
-	public static abstract class Builder implements EventNotificationConfig.Builder<SlackEventNotificationConfig.Builder> {
-		@JsonCreator
-		public static SlackEventNotificationConfig.Builder create() {
-
-			return new AutoValue_SlackEventNotificationConfig.Builder()
-					.type(TYPE_NAME)
-					.color("#ff0500")
-					.webhookUrl("https://hooks.slack.com/services/xxx/xxxx/xxxxxxxxxxxxxxxxxxx")
-					.channel("slacktest2")
-					.customMessage("hello World")
-					.notifyChannel(false)
-					.linkNames(false);
-		}
-
-		@JsonProperty(FIELD_COLOR)
-		public abstract SlackEventNotificationConfig.Builder color(String color);
-
-		@JsonProperty(FIELD_WEBHOOK_URL)
-		public abstract SlackEventNotificationConfig.Builder webhookUrl(String webhookUrl);
-
-		@JsonProperty(FIELD_CHANNEL)
-		public abstract SlackEventNotificationConfig.Builder channel(String channel);
-
-		@JsonProperty(FIELD_CUSTOM_MESSAGE)
-		public abstract SlackEventNotificationConfig.Builder customMessage(String customMessage);
-
-		@JsonProperty(FIELD_USER_NAME)
-		public abstract SlackEventNotificationConfig.Builder userName(String userName);
-
-		@JsonProperty(FIELD_NOTIFY_CHANNEL)
-		public abstract SlackEventNotificationConfig.Builder notifyChannel(boolean notifyChannel);
-
-		@JsonProperty(FIELD_LINK_NAMES)
-		public abstract SlackEventNotificationConfig.Builder linkNames(boolean linkNames);
-
-		@JsonProperty(FIELD_ICON_URL)
-		public abstract SlackEventNotificationConfig.Builder iconUrl(String iconUrl);
-
-		@JsonProperty(FIELD_ICON_EMOJI)
-		public abstract SlackEventNotificationConfig.Builder iconEmoji(String iconEmoji);
+    @JsonProperty(FIELD_BACKLOG_SIZE)
+    public abstract long backlogSize();
 
 
-		public abstract SlackEventNotificationConfig build();
-	}
+    @JsonProperty(FIELD_COLOR)
+    @NotBlank
+    public abstract String color();
 
-	@Override
-	public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-		return SlackEventNotificationConfigEntity.builder()
-				.color(ValueReference.of(color()))
-				.webhookUrl(ValueReference.of(webhookUrl()))
-				.channel(ValueReference.of(channel()))
-				.customMessage(ValueReference.of(customMessage()))
-				.userName(ValueReference.of(userName()))
-				.notifyChannel(ValueReference.of(notifyChannel()))
-				.linkNames(ValueReference.of(linkNames()))
-				.iconUrl(ValueReference.of(iconUrl()))
-				.iconEmoji(ValueReference.of(iconEmoji()))
-				.build();
-	}
+    @JsonProperty(FIELD_WEBHOOK_URL)
+    @NotBlank
+    public abstract String webhookUrl();
+
+    @JsonProperty(FIELD_CHANNEL)
+    @NotBlank
+    public abstract String channel();
+
+    @JsonProperty(FIELD_CUSTOM_MESSAGE)
+    public abstract String customMessage();
+
+    @JsonProperty(FIELD_USER_NAME)
+    @Nullable
+    public abstract String userName();
+
+    @JsonProperty(FIELD_NOTIFY_CHANNEL)
+    public abstract boolean notifyChannel();
+
+    @JsonProperty(FIELD_LINK_NAMES)
+    public abstract boolean linkNames();
+
+    @JsonProperty(FIELD_ICON_URL)
+    @Nullable
+    public abstract String iconUrl();
+
+    @JsonProperty(FIELD_ICON_EMOJI)
+    @Nullable
+    public abstract String iconEmoji();
+
+
+    @Override
+    @JsonIgnore
+    public JobTriggerData toJobTriggerData(EventDto dto) {
+        return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
+    }
+
+    public static SlackEventNotificationConfig.Builder builder() {
+        return SlackEventNotificationConfig.Builder.create();
+    }
+
+    @Override
+    @JsonIgnore
+    public ValidationResult validate() {
+        ValidationResult validation = new ValidationResult();
+        final Matcher matcher = pattern.matcher(webhookUrl());
+
+        if (backlogSize() < 0) {
+            validation.addError(FIELD_BACKLOG_SIZE, INVALID_BACKLOG_ERROR_MESSAGE);
+        }
+
+        if (channel().isEmpty()) {
+            validation.addError(FIELD_CHANNEL, INVALID_CHANNEL_ERROR_MESSAGE);
+        }
+
+        if (matcher.find() == false) {
+            validation.addError(FIELD_WEBHOOK_URL, INVALID_WEBHOOK_ERROR_MESSAGE);
+        }
+        return validation;
+
+    }
+
+    @AutoValue.Builder
+    public static abstract class Builder implements EventNotificationConfig.Builder<SlackEventNotificationConfig.Builder> {
+        @JsonCreator
+        public static SlackEventNotificationConfig.Builder create() {
+
+            return new AutoValue_SlackEventNotificationConfig.Builder()
+                    .type(TYPE_NAME)
+                    .color(HEX_COLOR)
+                    .webhookUrl(WEB_HOOK_URL)
+                    .channel(CHANNEL)
+                    .customMessage(CUSTOM_MESSAGE)
+                    .notifyChannel(FALSE)
+                    .backlogSize(BACKLOG_SIZE)
+                    .linkNames(FALSE);
+        }
+
+        @JsonProperty(FIELD_COLOR)
+        public abstract SlackEventNotificationConfig.Builder color(String color);
+
+        @JsonProperty(FIELD_WEBHOOK_URL)
+        public abstract SlackEventNotificationConfig.Builder webhookUrl(String webhookUrl);
+
+        @JsonProperty(FIELD_CHANNEL)
+        public abstract SlackEventNotificationConfig.Builder channel(String channel);
+
+        @JsonProperty(FIELD_CUSTOM_MESSAGE)
+        public abstract SlackEventNotificationConfig.Builder customMessage(String customMessage);
+
+        @JsonProperty(FIELD_USER_NAME)
+        public abstract SlackEventNotificationConfig.Builder userName(String userName);
+
+        @JsonProperty(FIELD_NOTIFY_CHANNEL)
+        public abstract SlackEventNotificationConfig.Builder notifyChannel(boolean notifyChannel);
+
+        @JsonProperty(FIELD_LINK_NAMES)
+        public abstract SlackEventNotificationConfig.Builder linkNames(boolean linkNames);
+
+        @JsonProperty(FIELD_ICON_URL)
+        public abstract SlackEventNotificationConfig.Builder iconUrl(String iconUrl);
+
+        @JsonProperty(FIELD_ICON_EMOJI)
+        public abstract SlackEventNotificationConfig.Builder iconEmoji(String iconEmoji);
+
+        @JsonProperty(FIELD_BACKLOG_SIZE)
+        public abstract SlackEventNotificationConfig.Builder backlogSize(long backlogSize);
+
+        public abstract SlackEventNotificationConfig build();
+    }
+
+    @Override
+    public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return SlackEventNotificationConfigEntity.builder()
+                .color(ValueReference.of(color()))
+                .webhookUrl(ValueReference.of(webhookUrl()))
+                .channel(ValueReference.of(channel()))
+                .customMessage(ValueReference.of(customMessage()))
+                .userName(ValueReference.of(userName()))
+                .notifyChannel(ValueReference.of(notifyChannel()))
+                .linkNames(ValueReference.of(linkNames()))
+                .iconUrl(ValueReference.of(iconUrl()))
+                .iconEmoji(ValueReference.of(iconEmoji()))
+                .build();
+    }
 }

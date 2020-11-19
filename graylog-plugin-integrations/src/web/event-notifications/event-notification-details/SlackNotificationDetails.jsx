@@ -39,6 +39,7 @@ const SlackNotificationDetails = ({ notification }) => (
                            {notification.config.custom_message || <em>Empty body</em>}
                          </NewExampleWell>
                        )} />
+    <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
     <ReadOnlyFormGroup label="User Name" value={notification.config.username} />
     <ReadOnlyFormGroup label="Notify Channel" value={notification.config.notify_channel} />
     <ReadOnlyFormGroup label="Link Names" value={notification.config.link_names} />

@@ -18,10 +18,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
+import camelCase from 'lodash/camelCase';
 
-import { Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import { Button, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
+import { Input } from 'components/bootstrap';
+import { Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/graylog';
 import { ColorPickerPopover } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 
@@ -34,6 +35,7 @@ class SlackNotificationForm extends React.Component {
         link_names: PropTypes.string,
         icon_url: PropTypes.string,
         icon_emoji: PropTypes.string,
+        backlog_size: PropTypes.number,
         user_name: PropTypes.string,
         notify_channel: PropTypes.string,
         custom_message: PropTypes.string,
@@ -47,6 +49,7 @@ class SlackNotificationForm extends React.Component {
           link_names: PropTypes.string,
           icon_url: PropTypes.string,
           icon_emoji: PropTypes.string,
+          backlog_size: PropTypes.number,
           user_name: PropTypes.string,
           notify_channel: PropTypes.string,
           custom_message: PropTypes.string,
@@ -93,7 +96,34 @@ class SlackNotificationForm extends React.Component {
       link_names: false,
       icon_url: '',
       icon_emoji: '',
+      backlog_size: 0,
 
+    };
+
+    constructor(props) {
+      super(props);
+
+      const defaultBacklogSize = props.config.backlog_size;
+
+      this.state = {
+        isBacklogSizeEnabled: defaultBacklogSize > 0,
+        backlogSize: defaultBacklogSize,
+      };
+    }
+
+    handleBacklogSizeChange = (event) => {
+      const { name } = event.target;
+      const value = getValueFromInput(event.target);
+
+      this.setState({ [camelCase(name)]: value });
+      this.propagateChange(name, getValueFromInput(event.target));
+    };
+
+    toggleBacklogSize = () => {
+      const { isBacklogSizeEnabled, backlogSize } = this.state;
+
+      this.setState({ isBacklogSizeEnabled: !isBacklogSizeEnabled });
+      this.propagateChange('backlog_size', (isBacklogSizeEnabled ? 0 : backlogSize));
     };
 
     propagateChange = (key, value) => {
@@ -115,6 +145,9 @@ class SlackNotificationForm extends React.Component {
 
     render() {
       const { config, validation } = this.props;
+      const { isBacklogSizeEnabled, backlogSize } = this.state;
+      const url = 'https://docs.graylog.org/en/latest/pages/alerts.html#data-available-to-notifications';
+      const element = <p>Custom message to be appended below the alert title. See <a href={url} rel="noopener noreferrer" target="_blank">docs </a>for more details.</p>;
 
       return (
         <>
@@ -157,9 +190,30 @@ class SlackNotificationForm extends React.Component {
                  label="Custom Message (optional)"
                  type="textarea"
                  bsStyle={validation.errors.custom_message ? 'error' : null}
-                 help={get(validation, 'errors.custom_message[0]', 'Custom message to be appended below the alert title. See https://docs.graylog.org/en/latest/pages/alerts.html#data-available-to-notifications for more details.')}
+                 help={get(validation, 'errors.custom_message[0]', element)}
                  value={config.custom_message || ''}
                  onChange={this.handleChange} />
+
+          <FormGroup>
+            <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
+            <InputGroup>
+              <InputGroup.Addon>
+                <input id="toggle_backlog_size"
+                       type="checkbox"
+                       checked={isBacklogSizeEnabled}
+                       onChange={this.toggleBacklogSize} />
+              </InputGroup.Addon>
+              <FormControl type="number"
+                           id="backlog_size"
+                           name="backlog_size"
+                           onChange={this.handleBacklogSizeChange}
+                           value={backlogSize}
+                           min="0"
+                           disabled={!isBacklogSizeEnabled} />
+            </InputGroup>
+            <HelpBlock>Limit the number of backlog messages sent as part of the Slack notification.  If set to 0, no limit will be enforced.</HelpBlock>
+          </FormGroup>
+
           <Input id="notification-userName"
                  name="user_name"
                  label="User Name (optional)"
