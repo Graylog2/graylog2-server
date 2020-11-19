@@ -105,16 +105,10 @@ const _extractFirstSeriesName = (config) => {
     : series[0].function;
 };
 
-type NumberVisualizationConfigType = {
-  +visualizationConfig: NumberVisualizationConfig,
-};
-
 const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
-  // $FlowFixMe: We know it is the correct subclass
-  const numberVisualizationConfig = (config: NumberVisualizationConfigType);
-  const { visualizationConfig = NumberVisualizationConfig.create() } = numberVisualizationConfig;
+  const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
   const field = _extractFirstSeriesName(config);
 
@@ -126,7 +120,7 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
   const { value: previousValue } = _extractValueAndField(trendRows || []);
 
   if (!field || (value !== 0 && !value)) {
-    return 'N/A';
+    return <>'N/A'</>;
   }
 
   const Container = visualizationConfig.trend ? GridContainer : SingleItemGrid;
