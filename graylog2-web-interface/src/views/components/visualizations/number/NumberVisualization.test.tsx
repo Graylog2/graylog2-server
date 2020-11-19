@@ -24,6 +24,8 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
+import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import { CurrentViewType } from 'views/components/CustomPropTypes';
 
 import NumberVisualization from './NumberVisualization';
 
@@ -48,8 +50,13 @@ jest.mock('views/components/Value', () => {
   };
 });
 
+type Data = Record<string, Rows>;
+type SUTProps = {
+  data?: Data;
+};
+
 describe('NumberVisualization', () => {
-  const data = {
+  const data: Data = {
     chart:
       [{
         key: [],
@@ -64,14 +71,15 @@ describe('NumberVisualization', () => {
         ],
       }],
   };
-  const currentView = { activeQuery: 'dead-beef' };
+  const currentView: CurrentViewType = { activeQuery: 'dead-beef' };
   const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT())]);
 
-  const SimplifiedNumberVisualization = (props = {}) => (
+  const SimplifiedNumberVisualization = (props: SUTProps = {}) => (
     <NumberVisualization data={data}
                          width={200}
                          height={200}
                          fields={fields}
+                         // @ts-ignore
                          currentView={currentView}
                          onChange={() => {}}
                          toggleEdit={() => {}}
@@ -103,7 +111,7 @@ describe('NumberVisualization', () => {
   });
 
   it('renders 0 if value is 0', () => {
-    const dataWithZeroValue = {
+    const dataWithZeroValue: { chart: Rows } = {
       chart: [{
         key: [],
         source: 'leaf',
@@ -123,7 +131,7 @@ describe('NumberVisualization', () => {
   });
 
   it('renders N/A if value is null', () => {
-    const dataWithZeroValue = {
+    const dataWithZeroValue: Data = {
       chart: [{
         key: [],
         source: 'leaf',
