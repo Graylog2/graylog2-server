@@ -18,7 +18,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import EventHandler from 'views/logic/searchtypes/events/EventHandler';
+import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -30,7 +30,7 @@ const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels
 
 const ScatterVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', seriesGenerator);
-  const layout = {};
+  const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
     const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
