@@ -58,7 +58,7 @@ type State = {
   newTitle: string,
 };
 
-const _isAllowedToEdit = (view: View, currentUser: ?UserJSON) => (
+const _isAllowedToEdit = (view: View, currentUser: UserJSON | undefined | null) => (
   view.owner === currentUser?.username
   || isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
 );
@@ -123,7 +123,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     this.setState({ showShareSearch: !showShareSearch });
   };
 
-  onChangeTitle = (e: SyntheticInputEvent<HTMLInputElement>) => {
+  onChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newTitle: e.target.value });
   };
 
