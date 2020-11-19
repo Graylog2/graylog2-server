@@ -17,7 +17,7 @@
 // @flow strict
 import * as React from 'react';
 
-import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 
 import ViewDescription from './description/ViewDescription';
 import AddWidgetButton from './create/AddWidgetButton';
@@ -25,7 +25,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 
 /* eslint-disable react/no-unused-prop-types */
 export type SidebarSectionProps = {
-  sidebarChildren: React.Node,
+  sidebarChildren: React.ReactNode,
   sidebarIsPinned: boolean,
   queryId: string,
   results: any,
@@ -38,7 +38,7 @@ export type SidebarSection = {
   key: string,
   title: string,
   icon: string,
-  content: SidebarSectionProps => React.Node,
+  content: React.ComponentType<SidebarSectionProps>,
 };
 
 const sidebarSections: Array<SidebarSection> = [
@@ -52,9 +52,8 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'create',
     icon: 'plus',
     title: 'Create',
-    content: ({ toggleSidebar, queryId, sidebarIsPinned }: SidebarSectionProps) => (
-      <AddWidgetButton queryId={queryId}
-                       onClick={!sidebarIsPinned ? toggleSidebar : () => {}} />
+    content: ({ toggleSidebar, sidebarIsPinned }: SidebarSectionProps) => (
+      <AddWidgetButton onClick={!sidebarIsPinned ? toggleSidebar : () => {}} />
     ),
   },
   {
@@ -67,7 +66,7 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'fieldList',
     icon: 'subscript',
     title: 'Fields',
-    content: ({ sidebarChildren }: SidebarSectionProps) => sidebarChildren,
+    content: ({ sidebarChildren }: SidebarSectionProps) => <>{sidebarChildren}</>,
   },
 ];
 
