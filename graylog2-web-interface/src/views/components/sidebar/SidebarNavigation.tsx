@@ -22,10 +22,10 @@ import type { StyledComponent } from 'styled-components';
 import type { ThemeInterface } from 'theme';
 
 import NavItem from './NavItem';
-import { type SidebarSection } from './sidebarSections';
+import { SidebarSection } from './sidebarSections';
 
 type Props = {
-  activeSection: ?SidebarSection,
+  activeSection: SidebarSection | undefined | null,
   sections: Array<SidebarSection>,
   selectSidebarSection: (sectionKey: string) => void,
   sidebarIsPinned: boolean,
