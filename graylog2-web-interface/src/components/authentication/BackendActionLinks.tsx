@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 
 import { LinkContainer } from 'components/graylog/router';
@@ -23,7 +22,7 @@ import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/graylog';
 
 type Props = {
-  activeBackend: ?AuthenticationBackend,
+  activeBackend: AuthenticationBackend | undefined,
   finishedLoading: boolean,
 };
 
@@ -48,4 +47,5 @@ const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => (
     </LinkContainer>
   </ButtonToolbar>
 );
+
 export default BackendActionLinks;
