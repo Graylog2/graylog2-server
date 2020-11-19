@@ -16,28 +16,27 @@
  */
 // @flow strict
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useContext } from 'react';
+import PropTypes from 'prop-types';
 
-import connect from 'stores/connect';
-import { StreamsActions, StreamsStore } from 'views/stores/StreamsStore';
+import UserPreferencesContext from './UserPreferencesContext';
+import CurrentUserContext from './CurrentUserContext';
 
-import StreamsContext from './StreamsContext';
+const CurrentUserPreferencesProvider = ({ children }: { children: React.ReactElement }) => {
+  const currentUser = useContext(CurrentUserContext);
+  const preferences = currentUser?.preferences;
 
-type Props = {
-  children: React.Node,
-  streams: ?Array<*>,
+  return preferences
+    ? (
+      <UserPreferencesContext.Provider value={preferences}>
+        {children}
+      </UserPreferencesContext.Provider>
+    )
+    : children;
 };
 
-const StreamsProvider = ({ children, streams }: Props) => {
-  useEffect(() => {
-    StreamsActions.refresh();
-  }, []);
-
-  return (
-    <StreamsContext.Provider value={streams}>
-      {children}
-    </StreamsContext.Provider>
-  );
+CurrentUserPreferencesProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
-export default connect(StreamsProvider, { streams: StreamsStore }, ({ streams: { streams } = {} }) => ({ streams }));
+export default CurrentUserPreferencesProvider;

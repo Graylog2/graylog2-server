@@ -28,7 +28,7 @@ const CustomizationActions = ActionsProvider.getActions('Customizations');
 
 const urlPrefix = ApiRoutes.ClusterConfigResource.config().url;
 
-type CustomizationsStoreState = {
+export type CustomizationsStoreState = {
   customization: {},
 };
 

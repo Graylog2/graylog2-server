@@ -16,11 +16,28 @@
  */
 // @flow strict
 import * as React from 'react';
+import { useEffect } from 'react';
 
-import type { UserJSON } from 'logic/users/User';
+import connect from 'stores/connect';
+import { StreamsActions, StreamsStore } from 'views/stores/StreamsStore';
 
-import { singleton } from '../views/logic/singleton';
+import StreamsContext from './StreamsContext';
 
-const CurrentUserContext = React.createContext<?UserJSON>();
+type Props = {
+  children: React.ReactElement,
+  streams: Array<any> | undefined | null,
+};
 
-export default singleton('contexts.CurrentUserContext', () => CurrentUserContext);
+const StreamsProvider = ({ children, streams }: Props) => {
+  useEffect(() => {
+    StreamsActions.refresh();
+  }, []);
+
+  return (
+    <StreamsContext.Provider value={streams}>
+      {children}
+    </StreamsContext.Provider>
+  );
+};
+
+export default connect(StreamsProvider, { streams: StreamsStore }, ({ streams: { streams } = { streams: undefined } }) => ({ streams }));

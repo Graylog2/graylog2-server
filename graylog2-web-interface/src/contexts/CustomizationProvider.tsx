@@ -20,13 +20,15 @@ import PropTypes from 'prop-types';
 
 import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
+import { CustomizationsStoreState } from 'stores/customizations/CustomizationsStore';
+import { Store } from 'stores/StoreTypes';
 
 import CustomizationContext from './CustomizationContext';
 
 const { CustomizationsStore } = CombinedProvider.get('Customizations');
 
-const CustomizationProvider = ({ children }: { children: React.Node }) => {
-  const customization = useStore(CustomizationsStore, (state) => state.customization);
+const CustomizationProvider = ({ children }) => {
+  const customization = useStore(CustomizationsStore as Store<CustomizationsStoreState>, (state) => state.customization);
 
   return customization
     ? (

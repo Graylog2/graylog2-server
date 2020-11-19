@@ -17,17 +17,25 @@
 // @flow strict
 import * as React from 'react';
 
+import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
+
 import { singleton } from '../views/logic/singleton';
 
-export type CustomizationSetting = {
-  [string]: boolean | string | number,
+export type UserPreferences = {
+  enableSmartSearch: boolean,
+  updateUnfocussed: boolean,
+  searchSidebarIsPinned?: boolean,
+  dashboardSidebarIsPinned?: boolean,
+  [PREFERENCES_THEME_MODE]: ThemeMode,
 };
 
-export type CustomizationType = {
-  [string]: CustomizationSetting,
+export const defaultUserPreferences = {
+  enableSmartSearch: true,
+  updateUnfocussed: false,
+  searchSidebarIsPinned: false,
+  dashboardSidebarIsPinned: false,
+  [PREFERENCES_THEME_MODE]: DEFAULT_THEME_MODE,
 };
 
-const defaultCustomization = {};
-
-const CustomizationContext = React.createContext<CustomizationType>(defaultCustomization);
-export default singleton('contexts.CustomizationContext', () => CustomizationContext);
+const UserPreferencesContext = React.createContext<UserPreferences>(defaultUserPreferences);
+export default singleton('contexts.UserPreferencesContext', () => UserPreferencesContext);

@@ -17,6 +17,17 @@
 // @flow strict
 import * as React from 'react';
 
-const StreamsContext = React.createContext<?Array<*>>();
+import { singleton } from '../views/logic/singleton';
 
-export default StreamsContext;
+export type CustomizationSetting = {
+  [key: string]: boolean | string | number,
+};
+
+export type CustomizationType = {
+  [key: string]: CustomizationSetting,
+};
+
+const defaultCustomization = {};
+
+const CustomizationContext = React.createContext<CustomizationType>(defaultCustomization);
+export default singleton('contexts.CustomizationContext', () => CustomizationContext);
