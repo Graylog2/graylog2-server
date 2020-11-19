@@ -25,11 +25,12 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import {ViewMetaData, ViewMetadataStore} from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 
 import QueryTabs from './QueryTabs';
 import CustomPropTypes from './CustomPropTypes';
+import Query from '../logic/queries/Query';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 
@@ -55,7 +56,16 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   return promise.then(() => QueriesActions.remove(queryId)).then(() => ViewStatesActions.remove(queryId));
 };
 
-const QueryBar = ({ children, queries, queryTitles, viewMetadata }) => {
+type Props = {
+  children?: React.ReactElement,
+  queries: object,
+  queryTitles: object,
+  viewMetadata: {
+    activeQuery: string,
+  },
+};
+
+const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
   const childrenWithQueryId = React.Children.map(children, (child) => React.cloneElement(child, { queryId: activeQuery }));
   const selectQueryAndExecute = (queryId) => onSelectQuery(queryId);
@@ -73,10 +83,10 @@ const QueryBar = ({ children, queries, queryTitles, viewMetadata }) => {
 };
 
 QueryBar.propTypes = {
-  children: CustomPropTypes.node,
+  children: PropTypes.element,
   queries: PropTypes.object.isRequired,
   queryTitles: PropTypes.object.isRequired,
-  viewMetadata: PropTypes.shape({
+  viewMetadata: PropTypes.exact({
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
 };
