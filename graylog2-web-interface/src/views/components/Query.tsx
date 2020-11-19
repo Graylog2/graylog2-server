@@ -45,7 +45,9 @@ const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
 const MAXIMUM_GRID_SIZE = 12;
 
 const _onPositionsChange = (positions) => {
-  const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width)])).toJS();
+  const newPositions: Record<string, WidgetPosition> = Immutable.Map<string, WidgetPosition>(
+    positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width)])
+  ).toJS();
 
   CurrentViewStateActions.widgetPositions(newPositions);
 };
