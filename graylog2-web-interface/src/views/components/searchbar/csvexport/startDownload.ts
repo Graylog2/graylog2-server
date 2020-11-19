@@ -17,7 +17,7 @@
 // @flow strict
 import { Set } from 'immutable';
 
-import { type ExportPayload } from 'util/MessagesExportUtils';
+import { ExportPayload } from 'util/MessagesExportUtils';
 import StringUtils from 'util/StringUtils';
 import Query from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
@@ -43,19 +43,19 @@ const getFilename = (view, selectedWidget) => {
 };
 
 const startDownload = (
-  downloadFile: (payload: ExportPayload, searchQueries: Set<Query>, searchType: ?SearchType, searchId: string, filename: string) => Promise<void>,
+  downloadFile: (payload: ExportPayload, searchQueries: Set<Query>, searchType: SearchType | undefined | null, searchId: string, filename: string) => Promise<void>,
   view: View,
   executionState: SearchExecutionState,
-  selectedWidget: ?Widget,
+  selectedWidget: Widget | undefined | null,
   selectedFields: { field: string }[],
-  limit: ?number,
+  limit: number | undefined | null,
 ) => {
   const payload: ExportPayload = {
     execution_state: executionState,
     fields_in_order: selectedFields.map((field) => field.field),
     limit,
   };
-  const searchType: ?SearchType = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;
+  const searchType: SearchType | undefined | null = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;
   const filename = getFilename(view, selectedWidget);
 
   return downloadFile(payload, view.search.queries, searchType, view.search.id, filename);
