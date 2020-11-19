@@ -21,7 +21,7 @@ import View from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
 };
 const IfSearch = ({ children }: Props) => (
   <ViewTypeContext.Consumer>
