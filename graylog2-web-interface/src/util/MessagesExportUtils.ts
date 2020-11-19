@@ -21,13 +21,15 @@ import { fetchFile } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-import { type QueryString, type TimeRange } from 'views/logic/queries/Query';
+import { QueryString, TimeRange } from 'views/logic/queries/Query';
 
 export type ExportPayload = {
-  timerange?: ?TimeRange,
+  timerange?: TimeRange | undefined | null,
+  // eslint-disable-next-line camelcase
   query_string?: QueryString,
   streams?: string[],
-  fields_in_order: ?string[],
+  // eslint-disable-next-line camelcase
+  fields_in_order: string[] | undefined | null,
 };
 
 const downloadCSV = (fileContent: string, filename: string = 'search-result') => {
