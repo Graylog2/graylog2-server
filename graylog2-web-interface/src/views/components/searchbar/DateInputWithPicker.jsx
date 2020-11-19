@@ -13,7 +13,7 @@ type Props = {
   disabled: ?boolean,
   error: ?string,
   value: string,
-  onChange: ({ target: { name: string, value: string } }) => void,
+  onChange: (string) => void,
   name: string,
   title: ?string,
   initialDateTimeObject: {

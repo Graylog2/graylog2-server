@@ -11,9 +11,6 @@ import { Icon, Select } from 'components/common';
 
 type Props = {
   disabled: boolean,
-  config: {
-    query_time_range_limit: string,
-  },
   originalTimeRange: {
     range: string | number,
   },
@@ -241,9 +238,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
 };
 
 RelativeTimeRangeSelector.propTypes = {
-  config: PropTypes.shape({
-    query_time_range_limit: PropTypes.string.isRequired,
-  }).isRequired,
+  limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({
     range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -252,6 +247,7 @@ RelativeTimeRangeSelector.propTypes = {
 
 RelativeTimeRangeSelector.defaultProps = {
   disabled: false,
+  limitDuration: 0,
 };
 
 export default RelativeTimeRangeSelector;
