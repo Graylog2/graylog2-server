@@ -22,7 +22,7 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
-import EventHandler from 'views/logic/searchtypes/events/EventHandler';
+import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import type { ChartDefinition } from '../ChartData';
@@ -44,8 +44,7 @@ const getChartColor = (fullData, name) => {
 const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
 
 const LineVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
-  // $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
-  const visualizationConfig: LineVisualizationConfig = config.visualizationConfig || LineVisualizationConfig.empty();
+  const visualizationConfig = (config.visualizationConfig || LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
     type,
@@ -56,7 +55,7 @@ const LineVisualization: VisualizationComponent = makeVisualization(({ config, d
   }), [interpolation]);
 
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator);
-  const layout = {};
+  const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
     const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
