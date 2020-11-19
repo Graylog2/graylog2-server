@@ -91,7 +91,11 @@ MessageField.propTypes = {
   currentView: CustomPropTypes.CurrentView.isRequired,
   fieldName: PropTypes.string.isRequired,
   fieldType: CustomPropTypes.FieldType.isRequired,
-  message: PropTypes.object.isRequired,
+  message: PropTypes.exact({
+    id: PropTypes.string.isRequired,
+    index: PropTypes.string.isRequired,
+    fields: PropTypes.object.isRequired
+  }).isRequired,
   value: PropTypes.any.isRequired,
 };
 
