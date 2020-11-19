@@ -17,7 +17,6 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
