@@ -36,12 +36,7 @@ import TopRow from 'views/components/searchbar/TopRow';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-
-const StyledTimeRange = styled.input`
-  width: 100%;
-  padding: 3px 9px;
-  margin: 0 12px;
-`;
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 const FlexCol = styled(Col)`
   display: flex;
@@ -80,9 +75,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            config={config}
                                            noOverride />
-                    <StyledTimeRange type="text"
-                                     value={JSON.stringify(values?.timerange)}
-                                     disabled />
+                    <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
                   <Col lg={8} md={6} xs={4}>
                     <RefreshControls />

@@ -56,7 +56,9 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
   useEffect(() => {
-    setTimeOutput(dateOutput(timerange));
+    if (timerange && (timerange.from !== from || timerange.to !== until)) {
+      setTimeOutput(dateOutput(timerange));
+    }
   }, [timerange]);
 
   return (
