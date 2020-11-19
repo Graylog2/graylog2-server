@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
+import { $PropertyType } from 'utility-types';
 import { useCallback } from 'react';
 import { Field } from 'formik';
 
@@ -30,7 +31,7 @@ const _capabilitiesOptions = (capabilities: CapabilitiesList) => (
 );
 
 type Props = {
-  onChange?: $PropertyType<CapabilityType, 'id'> => void,
+  onChange?: (id: $PropertyType<CapabilityType, 'id'>) => void,
   capabilities: CapabilitiesList,
   title?: string,
 };
