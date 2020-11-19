@@ -1,0 +1,22 @@
+{
+  "grants": [
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000003"
+      },
+      "grantee": "grn::::user:john",
+      "capability": "manage",
+      "target": "grn::::stream:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6210000000004"
+      },
+      "grantee": "grn::::user:jane",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeefaffe",
+      "created_by": "grn::::user:admin"
+    }
+  ]
+}
