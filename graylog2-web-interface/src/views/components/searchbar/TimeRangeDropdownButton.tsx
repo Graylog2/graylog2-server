@@ -29,7 +29,7 @@ const StyledDropdownButton: StyledComponent<{}, void, DropdownButton> = styled(D
 
 type Props = {
   onSelect: (newType: string) => void,
-  children: React.Node,
+  children: React.ReactNode,
   disabled?: boolean,
 };
 
