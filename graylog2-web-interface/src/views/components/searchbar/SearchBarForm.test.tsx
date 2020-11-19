@@ -19,7 +19,7 @@ import * as React from 'react';
 import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
-import SearchBarForm from './SearchBarForm';
+import SearchBarForm, { Values } from './SearchBarForm';
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 
 const changeInput = async (input, value) => {
@@ -31,7 +31,7 @@ const changeInput = async (input, value) => {
 describe('SearchBarForm', () => {
   describe('with AbsoluteTimeRangeSelector', () => {
     it('validates if timerange "from" date is after "to" date', async () => {
-      const initialValues = {
+      const initialValues: Values = {
         timerange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-17 10:04:30.329' },
         queryString: '*',
         streams: [],
