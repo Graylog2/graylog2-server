@@ -31,7 +31,7 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {
   toggleModal: () => void,
-  deleteSavedSearch: (View) => Promise<View>,
+  deleteSavedSearch: (view: View) => Promise<View>,
   views: SavedSearchesState,
 };
 
@@ -42,12 +42,12 @@ type State = {
   perPage: number,
 };
 
-const AlertIcon: StyledComponent<{}, ThemeInterface, *> = styled(Icon)(({ theme }) => css`
+const AlertIcon: StyledComponent<{}, ThemeInterface, any> = styled(Icon)(({ theme }) => css`
   margin-right: 6px;
   color: ${theme.colors.variant.primary};
 `);
 
-const NoSavedSearches: StyledComponent<{}, ThemeInterface, *> = styled(Alert)`
+const NoSavedSearches: StyledComponent<{}, ThemeInterface, any> = styled(Alert)`
   clear: right;
   display: flex;
   align-items: center;
