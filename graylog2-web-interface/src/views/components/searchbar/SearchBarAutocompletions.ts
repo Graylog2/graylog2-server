@@ -20,7 +20,7 @@ import { sortBy, uniqBy } from 'lodash';
 import type { Editor, ResultsCallback, Session, Position, CompletionResult, AutoCompleter, Token } from './ace-types';
 
 export interface Completer {
-  getCompletions(currentToken: ?Token, lastToken: ?Token, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult>;
+  getCompletions(currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult>;
 }
 
 export default class SearchBarAutoCompletions implements AutoCompleter {
@@ -37,7 +37,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     const currentToken = editor.session.getTokenAt(pos.row, pos.column);
     const currentTokenIdx = tokens.findIndex((t) => (t === currentToken));
 
-    const lastToken: ?Token = currentTokenIdx > 0 ? tokens[currentTokenIdx - 1] : null;
+    const lastToken: Token | undefined | null = currentTokenIdx > 0 ? tokens[currentTokenIdx - 1] : null;
 
     const results = this.completers
       .map((completer) => {
