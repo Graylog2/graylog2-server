@@ -67,7 +67,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     this.modal.close();
   };
 
-  _onDraftChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
+  _onDraftChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ titleDraft: evt.target.value });
   };
 
