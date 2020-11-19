@@ -28,6 +28,16 @@ export type ChartDefinition = {
   x?: Array<string>,
   y?: Array<any>,
   z?: Array<Array<any>>,
+  fill?: string,
+  line?: { shape: string },
+  hovertemplate?: string,
+  mode?: string,
+  opacity?: number,
+  text?: string[],
+  marker?: {
+    size: number,
+    color: string,
+  },
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
