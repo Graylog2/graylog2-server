@@ -19,8 +19,8 @@ import * as React from 'react';
 
 import { singleton } from 'views/logic/singleton';
 
-export type ChartColorMap = { [string]: string };
-export type ChangeColorFunction = (string, string) => Promise<*>;
+export type ChartColorMap = { [key: string]: string };
+export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
 
 const ChartColorContext = React.createContext<{ colors: ChartColorMap, setColor: ChangeColorFunction }>({
   colors: {},
