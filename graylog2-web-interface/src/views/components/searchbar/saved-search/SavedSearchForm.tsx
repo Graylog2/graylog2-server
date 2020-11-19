@@ -25,14 +25,14 @@ import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'component
 import styles from './SavedSearchForm.css';
 
 type Props = {
-  onChangeTitle: (SyntheticInputEvent<HTMLInputElement>) => void,
+  onChangeTitle: (event: React.ChangeEvent<HTMLInputElement>) => void,
   saveSearch: () => void,
   saveAsSearch: () => void,
   disableCreateNew: boolean,
   toggleModal: () => void,
   isCreateNew: boolean,
   value: string,
-  target: ?Button,
+  target: Button | undefined | null,
 };
 
 const StyledForm = styled.form`
