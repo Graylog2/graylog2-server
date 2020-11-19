@@ -26,12 +26,11 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
+import type { Message } from './Types';
 import CustomHighlighting from './CustomHighlighting';
 
 type Props = {
-  message: {
-    formatted_fields: {},
-  },
+  message: Message,
   fields: FieldTypeMappingsList,
 };
 
