@@ -20,16 +20,18 @@ import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
+import { $PropertyType, Optional } from 'utility-types';
 
+import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap } from 'views/logic/views/View';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import Query from 'views/logic/queries/Query';
+import Query, { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import View, { type ViewType } from 'views/logic/views/View';
+import View, { ViewType } from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import Widget from 'views/logic/widgets/Widget';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
@@ -38,7 +40,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
-import CSVExportModal, { type Props as CSVExportModalProps } from './CSVExportModal';
+import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
 
 jest.mock('util/MessagesExportUtils', () => ({
   exportSearchMessages: jest.fn(() => Promise.resolve()),
@@ -95,7 +97,7 @@ describe('CSVExportModal', () => {
   const stateWithOneWidget: ViewState = ViewState.builder()
     .widgets(Immutable.List([widget1]))
     .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-    .titles(Immutable.Map({ widget: Immutable.Map({ 'widget-id-1': 'Widget 1' }) }))
+    .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map<string, string>({ 'widget-id-1': 'Widget 1' }) }))
     .build();
   const viewWithOneWidget = (viewType) => viewWithoutWidget(viewType)
     .toBuilder()
@@ -105,7 +107,7 @@ describe('CSVExportModal', () => {
   const stateWithMultipleWidgets: ViewState = ViewState.builder()
     .widgets(Immutable.List([widget1, widget2]))
     .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-    .titles(Immutable.Map({ widget: Immutable.Map({ 'widget-id-1': 'Widget 1', 'widget-id-2': 'Widget 2' }) }))
+    .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map({ 'widget-id-1': 'Widget 1', 'widget-id-2': 'Widget 2' }) }))
     .build();
   const viewWithMultipleWidgets = (viewType) => viewWithoutWidget(viewType)
     .toBuilder()
@@ -124,15 +126,11 @@ describe('CSVExportModal', () => {
 
   type SimpleCSVExportModalProps = {
     viewType?: ViewType,
-    closeModal?: $PropertyType<CSVExportModalProps, 'closeModal'>,
-    directExportWidgetId?: $PropertyType<CSVExportModalProps, 'directExportWidgetId'>,
-    fields?: $PropertyType<CSVExportModalProps, 'fields'>,
-    view?: $PropertyType<CSVExportModalProps, 'view'>,
-  };
+  } & Optional<CSVExportModalProps>;
 
   const SimpleCSVExportModal = ({ viewType = View.Type.Search, ...props }: SimpleCSVExportModalProps) => (
     <ViewTypeContext.Provider value={viewType}>
-      <CSVExportModal view={viewWithoutWidget(viewType)} {...props} />
+      <CSVExportModal view={viewWithoutWidget(viewType)} {...props as CSVExportModalProps} />
     </ViewTypeContext.Provider>
   );
 
@@ -147,12 +145,12 @@ describe('CSVExportModal', () => {
   it('should provide current execution state on export', async () => {
     const exportSearchMessagesAction = asMock(exportSearchMessages);
     const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });
-    const effectiveTimeRange = { type: 'absolute', from: '2020-01-01T12:18:17.827Z', to: '2020-01-01T12:23:17.827Z' };
-    const globalQuery = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
+    const effectiveTimeRange: AbsoluteTimeRange = { type: 'absolute', from: '2020-01-01T12:18:17.827Z', to: '2020-01-01T12:23:17.827Z' };
+    const globalQuery: ElasticsearchQueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
     const globalOverride = new GlobalOverride(effectiveTimeRange, globalQuery);
     const executionState = new SearchExecutionState(parameterBindings, globalOverride);
 
-    SearchExecutionStateStore.getInitialState.mockReturnValueOnce(executionState);
+    asMock(SearchExecutionStateStore.getInitialState).mockReturnValueOnce(executionState);
     const expectedPayload = {
       ...payload,
       fields_in_order: [
@@ -363,7 +361,7 @@ describe('CSVExportModal', () => {
       const secondViewState: ViewState = ViewState.builder()
         .widgets(Immutable.List([widget2]))
         .widgetMapping(Immutable.Map({ 'widget-id-2': Immutable.Set(['search-type-id-2']) }))
-        .titles(Immutable.Map({ widget: Immutable.Map({ 'widget-id-2': 'Widget 2' }) }))
+        .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map({ 'widget-id-2': 'Widget 2' }) }))
         .build();
 
       const complexView = viewWithoutWidget(View.Type.Dashboard)
