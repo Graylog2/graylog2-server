@@ -57,7 +57,7 @@ type Plugin = {
   url: string,
 };
 
-type RequirementsList = { [string]: Plugin };
+type RequirementsList = { [key: string]: Plugin };
 
 const missingRequirements = (requires, requirementsProvided): RequirementsList => Object.entries(requires)
   .filter(([require]) => !requirementsProvided.includes(require))
