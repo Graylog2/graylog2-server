@@ -8090,6 +8090,21 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
 
 "graylog-jest-preset@file:packages/graylog-jest-preset":
   version "1.0.0"
+  dependencies:
+    "@testing-library/dom" "7.20.2"
+    "@testing-library/jest-dom" "5.11.0"
+    "@testing-library/react" "11.0.4"
+    "@types/jest" "25.2.3"
+    babel-jest "^25.1.0"
+    enzyme "3.11.0"
+    enzyme-adapter-react-16 "^1.15.2"
+    identity-obj-proxy "^3.0.0"
+    jest "^25.1.0"
+    jest-environment-enzyme "^7.1.2"
+    jest-enzyme "^7.1.2"
+    jest-localstorage-mock "^2.4.0"
+    jest-styled-components "7.0.2"
+    react-select-event "^5.0.0"
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "4.1.0-SNAPSHOT"
@@ -8099,7 +8114,7 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
     create-react-class "15.6.3"
     eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-ab972aeb-116c-4f48-b346-06a6b7f40a2c-1605784651207/node_modules/eslint-config-graylog"
     formik "2.2.0"
-    graylog-jest-preset "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-22744e42-8c3f-435e-9dfc-85d037c4db67-1605711441533/node_modules/graylog-jest-preset"
+    graylog-jest-preset "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-9a08b9ff-b9fe-49ab-8058-9bbb4fb6892e-1605774902198/node_modules/graylog-jest-preset"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.5.1"
