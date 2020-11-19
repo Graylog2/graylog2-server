@@ -25,7 +25,7 @@ type Props = {
   originalTimeRange: {
     range: string | number,
   },
-  setDisableApply: (void) => void,
+  setDisableApply: (boolean) => void,
 };
 
 const RelativeTimeRangeSelector = (allProps: Props) => (

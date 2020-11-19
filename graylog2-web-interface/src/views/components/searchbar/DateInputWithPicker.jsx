@@ -28,8 +28,6 @@ type Props = {
 };
 
 const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title, initialDateTimeObject }: Props) => {
-  const inputRef = useRef({ input: { value } });
-
   const _onDatePicked = (date) => {
     const newDate = moment(date).toObject();
 
@@ -43,10 +41,6 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
 
   const _onChangeInput = (event) => onChange(event.target.value);
   const _onSetTimeToNow = () => onChange(moment().format(DateTime.Formats.TIMESTAMP));
-
-  useEffect(() => {
-    inputRef.current.input.value = value;
-  }, [value]);
 
   return (
     <div>
@@ -63,7 +57,7 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
              disabled={disabled}
              onChange={_onChangeInput}
              placeholder={DateTime.Formats.DATETIME}
-             ref={inputRef}
+             value={value}
              buttonAfter={(
                <Button disabled={disabled}
                        onClick={_onSetTimeToNow}
