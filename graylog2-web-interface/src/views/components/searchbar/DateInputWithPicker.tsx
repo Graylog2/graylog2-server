@@ -33,13 +33,13 @@ const _onDateSelected = (date) => {
 };
 
 type Props = {
-  disabled: ?boolean,
-  error: ?string,
+  disabled: boolean | undefined | null,
+  error: string | undefined | null,
   value: string,
-  onBlur: ?(({}) => void),
-  onChange: ({ target: { name: string, value: string } }) => void,
+  onBlur: (({}) => void) | undefined | null,
+  onChange: (event: { target: { name: string, value: string } }) => void,
   name: string,
-  title: ?string,
+  title: string | undefined | null,
 };
 const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}, onChange, name, title }: Props) => {
   const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [onChange]);
