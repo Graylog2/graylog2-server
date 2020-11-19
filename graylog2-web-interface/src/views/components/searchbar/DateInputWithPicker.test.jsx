@@ -39,13 +39,13 @@ describe('DateInputWithPicker', () => {
 
   it('pressing magic wand inserts current date', () => {
     const output = moment().format(DateTime.Formats.TIMESTAMP);
-    const onChange = jest.fn(() => output);
+    defaultProps.onChange.mockReturnValueOnce(output);
     const { getByTitle } = render(<DateInputWithPicker {...defaultProps} />);
 
     const insertCurrentDate = getByTitle('Insert current date');
 
     fireEvent.click(insertCurrentDate);
 
-    expect(onChange).toHaveReturnedWith(output);
+    expect(defaultProps.onChange).toHaveReturnedWith(output);
   });
 });

@@ -85,7 +85,7 @@ DatePicker.propTypes = {
    */
   onChange: PropTypes.func.isRequired,
   /** Earliest date possible to select in the date picker. */
-  fromDate: PropTypes.string,
+  fromDate: PropTypes.instanceOf(Date),
 };
 
 DatePicker.defaultProps = {

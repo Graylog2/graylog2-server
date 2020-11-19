@@ -25,7 +25,7 @@ type Props = {
     seconds: string | number,
     milliseconds: string | number,
   },
-  fromDate?: string,
+  fromDate?: Date,
 };
 
 const DateInputWithPicker = ({ disabled = false, error, fromDate, value, onChange, name, title, initialDateTimeObject }: Props) => {
@@ -85,7 +85,7 @@ const DateInputWithPicker = ({ disabled = false, error, fromDate, value, onChang
 DateInputWithPicker.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.string,
-  fromDate: PropTypes.string,
+  fromDate: PropTypes.instanceOf(Date),
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   onChange: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,

@@ -224,7 +224,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, s
         let fromDate = moment(currentTimerange.from).toDate();
 
         if (from) {
-          fromDate = limitDuration ? moment().seconds(-limitDuration).toDate() : null;
+          fromDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
         }
 
         return (
