@@ -83,7 +83,10 @@ const WorldMapVisualization: VisualizationComponent = makeVisualization(({ confi
   const viewport = get(config, 'visualizationConfig.viewport');
 
   const _onChange = (newViewport) => {
-    const visualizationConfig = (config.visualizationConfig ? config.visualizationConfig.toBuilder() : WorldMapVisualizationConfig.builder())
+    const visualizationConfig = (config.visualizationConfig
+      // FIXME: Ugly hack to get the builder type consistent
+      ? config.visualizationConfig.toBuilder() as unknown as ReturnType<typeof WorldMapVisualizationConfig['builder']>
+      : WorldMapVisualizationConfig.builder())
       .viewport(Viewport.create(newViewport.center, newViewport.zoom))
       .build();
 
