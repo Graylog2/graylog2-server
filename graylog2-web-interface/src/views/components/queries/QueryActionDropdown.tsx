@@ -22,12 +22,12 @@ import { Icon } from 'components/common';
 import ActionDropdown from 'views/components/common/ActionDropdown';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement | React.ReactElement[],
 };
 
 const QueryActionDropdown = ({ children }: Props) => (
   <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" />}>
-    {children}
+    <>{children}</>
   </ActionDropdown>
 );
 
