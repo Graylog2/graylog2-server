@@ -91,9 +91,9 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type)).toList().flatten();
 
   const [loading, setLoading] = useState(false);
-  const [selectedWidget, setSelectedWidget] = useState<?Widget>(initialWidget(messagesWidgets, directExportWidgetId));
+  const [selectedWidget, setSelectedWidget] = useState<Widget | undefined>(initialWidget(messagesWidgets, directExportWidgetId));
   const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(_getInitialFields(selectedWidget));
-  const [limit, setLimit] = useState<?number>();
+  const [limit, setLimit] = useState<number | undefined>();
 
   const singleWidgetDownload = !!directExportWidgetId;
   const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, messagesWidgets);
