@@ -35,7 +35,7 @@ const UsersCell = ({ users = Immutable.Set() }: Props) => {
     return (
       <IfPermitted permissions={[`users:read:${username}`]} key={id}>
         <>
-            <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>{index < (usersLength - 1) && ',  '}
+          <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>{index < (usersLength - 1) && ',  '}
         </>
       </IfPermitted>
     );
