@@ -27,7 +27,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 
-type Values = {
+export type Values = {
   timerange: TimeRange,
   streams: Array<string>,
   queryString: string,
