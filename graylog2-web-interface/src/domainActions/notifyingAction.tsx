@@ -53,7 +53,7 @@ const notifyingAction = <T, Args extends Array<T>, Result, ActionResult extends 
   success: successNotification,
   error: errorNotification,
   notFoundRedirect,
-}: Props<Args, ActionResult>): (...Args) => ActionResult => {
+}: Props<Args, ActionResult>): (...Args) => Promise<Result> => {
   return (...args: Args): Promise<Result> => action(...args).then((result) => {
     if (successNotification) _displaySuccessNotification(successNotification, ...args);
 
