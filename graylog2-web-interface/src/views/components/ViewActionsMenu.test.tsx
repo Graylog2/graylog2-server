@@ -16,6 +16,7 @@
  */
 // @flow strict
 import React from 'react';
+import * as mockImmutable from 'immutable';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { viewsManager } from 'fixtures/users';
 
@@ -41,7 +42,7 @@ jest.mock('views/stores/ViewStore', () => ({
 
 jest.mock('views/stores/SearchMetadataStore', () => ({
   SearchMetadataStore: {
-    getInitialState: () => ({ undeclared: [] }),
+    getInitialState: () => ({ undeclared: mockImmutable.Set() }),
     listen: () => jest.fn(),
   },
 }));
@@ -82,7 +83,7 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 describe('ViewActionsMenu', () => {
   const SimpleViewActionMenu = ({ currentUser, ...props }: {currentUser?: UserJSON}) => (
     <CurrentUserContext.Provider value={currentUser}>
-      <ViewActionsMenu {...props} router={{}} />
+      <ViewActionsMenu {...props} />
     </CurrentUserContext.Provider>
   );
 
