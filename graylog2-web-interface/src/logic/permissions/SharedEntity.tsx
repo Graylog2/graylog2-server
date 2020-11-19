@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import type { SharedEntityType } from 'logic/permissions/types';
 
