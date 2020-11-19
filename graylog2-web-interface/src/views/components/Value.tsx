@@ -25,14 +25,14 @@ import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 import InteractiveContext from './contexts/InteractiveContext';
 
-type Props = {|
-  children?: React.Node,
+type Props = {
+  children?: React.ReactNode,
   field: string,
-  value: *,
+  value: any,
   render?: ValueRenderer,
-  queryId: ?string,
+  queryId: string | null | undefined,
   type: FieldType,
-|};
+};
 
 const ValueActionTitle = styled.span`
   white-space: nowrap;
