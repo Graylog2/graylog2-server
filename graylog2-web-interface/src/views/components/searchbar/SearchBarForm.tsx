@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
-import type { FormikProps } from 'formik/@flow-typed';
+import type { FormikProps } from 'formik';
 
 import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -36,24 +36,22 @@ type Values = {
 type Props = {
   initialValues: Values,
   onSubmit: (Values) => void | Promise<any>,
-  children: ((props: FormikProps<Values>) => React$Node) | React$Node,
+  children: ((props: FormikProps<Values>) => React.ReactNode) | React.ReactNode,
 };
 
 const validate = (values) => {
-  const errors = {};
-
-  if (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to) {
-    errors.timerange = {
+  return (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to)
+    ? {
       from: 'Start date must be before end date',
-    };
-  }
-
-  return errors;
+    }
+    : {};
 };
 
 const StyledForm = styled(Form)`
   height: 100%;
 `;
+
+const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
 
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
@@ -79,7 +77,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
             validate={validate}>
       {(...args) => (
         <StyledForm>
-          {isFunction(children) ? children(...args) : children}
+          {_isFunction(children) ? children(...args) : children}
         </StyledForm>
       )}
     </Formik>
