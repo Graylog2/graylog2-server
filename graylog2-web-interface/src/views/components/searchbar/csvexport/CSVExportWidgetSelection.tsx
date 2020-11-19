@@ -31,7 +31,7 @@ const sortOptions = (options) => options.sort(
 );
 
 type Props = {
-  selectWidget: {label: string, value: Widget} => void,
+  selectWidget: (widget: { label: string, value: Widget }) => void,
   widgets: List<Widget>,
   view: View,
 };
