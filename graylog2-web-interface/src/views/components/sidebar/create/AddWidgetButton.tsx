@@ -47,34 +47,36 @@ type Props = {
 };
 
 type State = {
-  overflowingComponents: { [string]: React.Node },
+  overflowingComponents: { [key: string]: React.ReactNode },
 };
 
 export type CreatorProps = {
   view: View,
 };
 type CreatorType = 'preset' | 'generic';
-type CreatorFunction = (CreatorProps) => ?React.Node;
+type CreatorFunction = (CreatorProps) => React.ReactNode | undefined | null | void;
 
-type FunctionalCreator = {|
+type FunctionalCreator = {
   func: CreatorFunction,
   title: string,
   type: CreatorType,
   condition?: () => boolean,
-|};
+};
 
 type CreatorComponentProps = {
   onClose: () => void,
 };
 
-type ComponentCreator = {|
+type ComponentCreator = {
   component: React.ComponentType<CreatorComponentProps>,
   condition?: () => boolean,
   title: string,
   type: CreatorType,
-|};
+};
 
 type Creator = ComponentCreator | FunctionalCreator;
+
+const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
 
 class AddWidgetButton extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -89,7 +91,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     const { onClick } = this.props;
     const { view } = ViewStore.getInitialState();
 
-    if (creator.func) {
+    if (isCreatorFunc(creator)) {
       return () => {
         onClick();
 
@@ -126,7 +128,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);
   };
 
-  _createMenuItem = (creator: Creator): React.Node => (
+  _createMenuItem = (creator: Creator): React.ReactNode => (
     <CreateButton key={creator.title}
                   onClick={this._createHandlerFor(creator)}
                   disabled={creator.condition ? !creator.condition() : false}>
@@ -134,7 +136,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     </CreateButton>
   );
 
-  _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.Node => {
+  _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.ReactNode => {
     const typeCreators = creators.filter((c) => (c.type === type));
     const sortedCreators = sortBy(typeCreators, 'title');
 
@@ -147,7 +149,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     const presets = this._createGroup(creators, 'preset');
     const generic = this._createGroup(creators, 'generic');
     // $FlowFixMe: Object.value signature is in the way
-    const components: Array<React.Node> = Object.values(overflowingComponents);
+    const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
     return (
       <>
