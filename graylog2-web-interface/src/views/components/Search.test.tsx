@@ -112,7 +112,7 @@ jest.mock('routing/withLocation', () => (Component) => (props) => <Component loc
 const mockPromise = (res) => {
   const promise = Promise.resolve(res);
 
-  // $FlowFixMe: On purpose for a promise that does not need to be resolved
+  // @ts-ignore
   promise.then = (x) => x(res);
 
   return promise;
@@ -122,7 +122,7 @@ describe('Search', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
-    // $FlowFixMe: Exact promise type not required for test functionality
+    // @ts-ignore
     SearchActions.execute = jest.fn(() => mockPromise());
     StreamsActions.refresh = jest.fn();
     SearchConfigActions.refresh = jest.fn();
