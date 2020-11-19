@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import React, { type Element, type ElementRef, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 
@@ -35,8 +35,8 @@ const FontSize: StyledComponent<{ fontSize: number }, {}, HTMLDivElement> = styl
 `;
 
 type Props = {
-  children: Element<any>,
-  target?: ElementRef<any>,
+  children: React.ReactElement,
+  target?: React.Ref<any>,
   height: number,
   width: number,
 };
@@ -82,10 +82,9 @@ const useAutoFontSize = (target, _container, height, width) => {
 };
 
 const AutoFontSizer = ({ children, target, height, width }: Props) => {
-  const _container = useRef<?HTMLElement>();
+  const _container = useRef<HTMLElement | undefined>();
   const fontSize = useAutoFontSize(target, _container, height, width);
-  // $FlowFixMe: non-ideal react type declaration requires forced casting
-  const _mixedContainer: { current: mixed } = _container;
+  const _mixedContainer: { current } = _container;
 
   return (
     <FontSize fontSize={fontSize} ref={_mixedContainer}>
