@@ -23,6 +23,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 import * as fixtures from './HeatmapVisualization.fixtures';
 
@@ -40,7 +41,7 @@ describe('HeatmapVisualization', () => {
       .columnPivots([columnPivot]).series([series])
       .visualization('heatmap')
       .build();
-    const effectiveTimerange = { type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' };
+    const effectiveTimerange: AbsoluteTimeRange = { type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' };
     const plotLayout = { yaxis: { type: 'category', fixedrange: true }, xaxis: { type: 'category', fixedrange: true }, plot_bgcolor: '#440154', margin: { b: 40 } };
     const plotChartData = [
       {
