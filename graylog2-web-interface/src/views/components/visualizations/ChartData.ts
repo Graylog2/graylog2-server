@@ -95,7 +95,7 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   };
 };
 
-export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config: AggregationWidgetConfig): ((ExtractedSeries) => Array<ChartDefinition>) => {
+export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config?: AggregationWidgetConfig): ((ExtractedSeries) => Array<ChartDefinition>) => {
   return (results: ExtractedSeries) => {
     const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
       chartType,
