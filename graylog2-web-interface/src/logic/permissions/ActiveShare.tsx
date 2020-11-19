@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+import { $PropertyType } from 'utility-types';
 import * as Immutable from 'immutable';
 
 import type { ActiveShareType } from 'logic/permissions/types';
@@ -48,7 +49,7 @@ export default class Grantee {
   toBuilder(): Builder {
     const { grant, grantee, capability } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ grant, grantee, capability }));
   }
 
@@ -69,9 +70,8 @@ export default class Grantee {
       .build();
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
