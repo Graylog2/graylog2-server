@@ -16,16 +16,17 @@
  */
 // @flow strict
 import * as React from 'react';
+import { $PropertyType } from 'utility-types';
 import { useState } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { type ThemeInterface } from 'theme';
-import EntityShareState, { type CapabilitiesList } from 'logic/permissions/EntityShareState';
+import { ThemeInterface } from 'theme';
+import EntityShareState, { CapabilitiesList } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import { Spinner, IconButton } from 'components/common';
 import Capability from 'logic/permissions/Capability';
-import SelectedGrantee, { type CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
+import SelectedGrantee, { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 
 import GranteeIcon from './GranteeIcon';
 import CapabilitySelect from './CapabilitySelect';
@@ -84,11 +85,11 @@ type Props = {
   availableCapabilities: CapabilitiesList,
   currentGranteeState: CurrentGranteeState,
   grantee: SelectedGrantee,
-  onDelete: ($PropertyType<Grantee, 'id'>) => Promise<?EntityShareState>,
-  onCapabilityChange: ({
+  onDelete: (grantee: $PropertyType<Grantee, 'id'>) => Promise<EntityShareState | undefined | null>,
+  onCapabilityChange: (payload: {
     granteeId: $PropertyType<Grantee, 'id'>,
     capabilityId: $PropertyType<Capability, 'id'>,
-  }) => Promise<?EntityShareState>,
+  }) => Promise<EntityShareState | undefined | null>,
 };
 
 const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee: { id, capabilityId, type, title }, onDelete, onCapabilityChange }: Props) => {
