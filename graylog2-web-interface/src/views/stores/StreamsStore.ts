@@ -33,8 +33,12 @@ export const StreamsActions = singletonActions(
    streams list for every component using it over and over again. This simple Reflux store is supposed to query the
    `StreamsStore` once and hold the result for future subscribers.
    */
+export type Stream = {
+  id: string;
+  title: string;
+};
 export type StreamsStoreState = {
-  streams: Array<{ id: string }>;
+  streams: Array<Stream>;
 };
 
 export const StreamsStore: Store<StreamsStoreState> = singletonStore(
