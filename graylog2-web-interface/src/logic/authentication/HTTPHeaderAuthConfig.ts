@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 type InternalState = {
   enabled: boolean,
@@ -24,6 +25,7 @@ type InternalState = {
 
 export type HTTPHeaderAuthConfigJSON = {
   enabled: boolean,
+  // eslint-disable-next-line camelcase
   username_header: string,
 };
 
@@ -51,7 +53,7 @@ export default class HTTPHeaderAuthConfig {
       enabled,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ usernameHeader, enabled }));
   }
 
@@ -79,12 +81,13 @@ export default class HTTPHeaderAuthConfig {
 
   // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
 
 type BuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: BuilderState;
 
