@@ -16,6 +16,7 @@
  */
 // @flow strict
 import { $PropertyType } from 'utility-types';
+
 import { GranteeInterface } from './GranteeInterface';
 import Grantee from './Grantee';
 import Capability from './Capability';

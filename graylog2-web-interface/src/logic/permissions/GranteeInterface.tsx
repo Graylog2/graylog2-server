@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import Grantee from './Grantee';
 import { $PropertyType } from 'utility-types';
+
+import Grantee from './Grantee';
 
 export interface GranteeInterface {
   readonly title: $PropertyType<Grantee, 'title'>;
