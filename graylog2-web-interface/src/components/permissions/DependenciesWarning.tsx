@@ -16,12 +16,12 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
-import { type MissingDependencies, type GranteesList } from 'logic/permissions/EntityShareState';
+import { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
 import { Alert } from 'components/graylog';
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 
 type Props = {
   missingDependencies: MissingDependencies,
