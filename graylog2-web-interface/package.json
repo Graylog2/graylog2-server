@@ -29,7 +29,7 @@
     "extends": "graylog"
   },
   "jest": {
-   "preset": "graylog-jest-preset",
+   "preset": "jest-preset-graylog",
    "setupFiles": [
      "<rootDir>/test/setup-jest.js"
     ]
