@@ -111,7 +111,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
           {showWidgetSelection && (
             <CSVExportWidgetSelection selectWidget={(selection) => _onSelectWidget(selection, setSelectedWidget, setSelectedFields)}
                                       view={view}
-                                      widgets={messagesWidgets} />
+                                      widgets={messagesWidgets.toList()} />
           )}
           {!showWidgetSelection && (
             <CSVExportSettings fields={fields}
