@@ -17,11 +17,11 @@
 // @flow strict
 import * as React from 'react';
 import { useRef } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
 import { Alert, FormGroup, InputGroup, FormControl } from 'components/graylog';
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
 const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
