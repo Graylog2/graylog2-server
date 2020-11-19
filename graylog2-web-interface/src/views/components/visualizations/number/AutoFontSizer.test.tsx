@@ -37,7 +37,7 @@ class TargetMock {
 
 describe('AutoFontSizer', () => {
   it('uses default size if element does not provide dimensions', () => {
-    const target = {};
+    const target = { current: undefined };
     const wrapper = mount((
       <AutoFontSizer width={300}
                      height={300}
