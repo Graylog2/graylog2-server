@@ -34,9 +34,14 @@ const FontSize: StyledComponent<{ fontSize: number }, {}, HTMLDivElement> = styl
   font-size: ${(props) => `${props.fontSize}px`};
 `;
 
+type ElementWithDimensions = {
+  offsetHeight: number;
+  offsetWidth: number;
+};
+
 type Props = {
   children: React.ReactElement,
-  target?: React.Ref<any>,
+  target?: React.Ref<any> | ElementWithDimensions,
   height: number,
   width: number,
 };
