@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 
@@ -7,7 +23,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
-import { handleSubmit } from '../ldap/BackendCreate';
+import handleCreate from '../HandleCreate';
 
 export const HELP = {
   // server config help
@@ -46,7 +62,13 @@ export const HELP = {
   ),
 };
 
+export const AUTH_BACKEND_META = {
+  serviceTitle: 'Active Directory',
+  serviceType: 'active-directory',
+};
+
 const INITIAL_VALUES = {
+  title: AUTH_BACKEND_META.serviceTitle,
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
@@ -54,11 +76,6 @@ const INITIAL_VALUES = {
   userFullNameAttribute: 'displayName',
   userNameAttribute: 'userPrincipalName',
   verifyCertificates: true,
-};
-
-export const AUTH_BACKEND_META = {
-  serviceTitle: 'Active Directory',
-  serviceType: 'active-directory',
 };
 
 const BackendCreate = () => {
@@ -79,7 +96,7 @@ const BackendCreate = () => {
                      help={help}
                      excludedFields={excludedFields}
                      initialValues={initialValues}
-                     onSubmit={handleSubmit} />
+                     onSubmit={handleCreate} />
     </DocumentTitle>
   );
 };

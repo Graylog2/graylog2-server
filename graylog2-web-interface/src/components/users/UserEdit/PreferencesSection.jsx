@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 import { Formik, Form } from 'formik';
@@ -9,7 +25,9 @@ import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
+import StoreProvider from 'injection/StoreProvider';
 
+const StartpageStore = StoreProvider.getStore('Startpage');
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 type Props = {
@@ -19,8 +37,25 @@ type Props = {
 const PreferencesSection = ({ user }: Props) => {
   const onSubmit = (data) => PreferencesActions.saveUserPreferences(user.username, data);
 
+  const _resetStartpage = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`You are about to reset the startpage from user ${user.fullName}. Please confirm.`)) {
+      StartpageStore.set(user.id);
+    }
+  };
+
+  const isStartpageSet = !!user.startpage?.type;
+  const resetTitle = isStartpageSet ? 'Reset startpage' : 'No startpage set';
+  const resetButton = (
+    <Button title={resetTitle}
+            disabled={!isStartpageSet}
+            onClick={_resetStartpage}>
+      Reset Startpage
+    </Button>
+  );
+
   return (
-    <SectionComponent title="Preferences">
+    <SectionComponent title="Preferences" headerActions={resetButton}>
       <Formik onSubmit={onSubmit}
               initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (

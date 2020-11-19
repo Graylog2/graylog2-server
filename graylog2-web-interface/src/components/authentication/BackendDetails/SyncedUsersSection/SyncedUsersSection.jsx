@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
@@ -6,9 +22,9 @@ import * as Immutable from 'immutable';
 import Role from 'logic/roles/Role';
 import type { PaginatedUsers } from 'actions/users/UsersActions';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DataTable, PaginatedList, Spinner, EmptyResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
@@ -29,32 +45,28 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _loadSyncedTeams = (pagination, setLoading, setPaginatedUsers) => {
+const _loadSyncedTeams = (authBackendId, pagination, setLoading, setPaginatedUsers) => {
   setLoading(true);
 
-  AuthenticationDomain.loadUsersPaginated(pagination).then((paginatedUsers) => {
+  AuthenticationDomain.loadUsersPaginated(authBackendId, pagination).then((paginatedUsers) => {
     setPaginatedUsers(paginatedUsers);
     setLoading(false);
   });
 };
 
-const _updateListOnUserDisable = (perPage, query, setPagination) => AuthenticationActions.disableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
-const _updateListOnUserEnable = (perPage, query, setPagination) => AuthenticationActions.enableUser.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
-
 type Props = {
   roles: Immutable.List<Role>,
+  authenticationBackend: AuthenticationBackend,
 };
 
-const SyncedUsersSection = ({ roles }: Props) => {
+const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: users } = paginatedUsers || {};
-  const { page, perPage, query } = pagination;
+  const { page } = pagination;
 
-  useEffect(() => _loadSyncedTeams(pagination, setLoading, setPaginatedUsers), [pagination]);
-  useEffect(() => _updateListOnUserDisable(perPage, query, setPagination), [perPage, query]);
-  useEffect(() => _updateListOnUserEnable(perPage, query, setPagination), [perPage, query]);
+  useEffect(() => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers), [authenticationBackend.id, pagination]);
 
   if (!paginatedUsers) {
     return <Spinner />;

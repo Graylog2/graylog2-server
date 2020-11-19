@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -7,9 +23,10 @@ import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { Spinner } from 'components/common';
-import { Alert } from 'components/graylog';
 import SectionGrid from 'components/common/Section/SectionGrid';
-import SectionComponent from 'components/common/Section/SectionComponent';
+
+import SyncedUsersSection from './SyncedUsersSection';
+import SyncedTeamsSection from './SyncedTeamsSection';
 
 const _loadRoles = (setPaginatedRoles) => {
   const getUnlimited = { page: 1, perPage: 0, query: '' };
@@ -22,8 +39,8 @@ type Props = {
 };
 
 const BackendDetails = ({ authenticationBackend }: Props) => {
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
   const authService = getAuthServicePlugin(authenticationBackend.config.type);
+  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
@@ -43,16 +60,8 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
         <BackendConfigDetails authenticationBackend={authenticationBackend} roles={paginatedRoles.list} />
       </div>
       <div>
-        <SectionComponent title="Synchronized Users">
-          <Alert>
-            Managing synchronized users is only possible for the active authentication service.
-          </Alert>
-        </SectionComponent>
-        <SectionComponent title="Synchronized Teams">
-          <Alert>
-            Managing synchronized teams is only possible for the active authentication service.
-          </Alert>
-        </SectionComponent>
+        <SyncedUsersSection authenticationBackend={authenticationBackend} roles={paginatedRoles.list} />
+        <SyncedTeamsSection authenticationBackend={authenticationBackend} />
       </div>
     </SectionGrid>
   );

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
@@ -11,16 +27,17 @@ import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
 import type { RoleJSON } from 'logic/roles/Role';
-import AuthzRolesActions, { type PaginatedRoles, type PaginatedUsers } from 'actions/roles/AuthzRolesActions';
+import AuthzRolesActions, { type PaginatedRoles, type PaginatedUsers, type RoleContext } from 'actions/roles/AuthzRolesActions';
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
 export type PaginatedRolesResponse = PaginatedListJSON & {
   roles: Array<RoleJSON>,
+  context?: RoleContext,
 };
 
 // eslint-disable-next-line camelcase
-const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [] }: PaginatedRolesResponse) => ({
+const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [], context = {} }: PaginatedRolesResponse) => ({
   list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
   pagination: {
     query,
@@ -29,6 +46,7 @@ const _responseToPaginatedList = ({ count, total, page, per_page, query, roles =
     count,
     total,
   },
+  context,
 });
 
 // eslint-disable-next-line camelcase

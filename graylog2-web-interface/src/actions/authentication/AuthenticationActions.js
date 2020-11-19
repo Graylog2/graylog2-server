@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import Reflux from 'reflux';
 
@@ -80,12 +96,10 @@ export type LoadActiveResponse = LoadActiveResponse & {
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
   delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
-  disableUser: (userId: string, username: string) => Promise<void>,
-  enableUser: (userId: string, username: string) => Promise<void>,
   load: (id: string) => Promise<LoadResponse>,
   loadActive: () => Promise<LoadActiveResponse>,
   loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,
-  loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>,
+  loadUsersPaginated: (authBackendId: string, pagination: Pagination) => Promise<PaginatedUsers>,
   setActiveBackend: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
   testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,
@@ -97,8 +111,6 @@ const AuthenticationActions: RefluxActions<ActionsType> = singletonActions(
   () => Reflux.createActions({
     create: { asyncResult: true },
     delete: { asyncResult: true },
-    disableUser: { asyncResult: true },
-    enableUser: { asyncResult: true },
     load: { asyncResult: true },
     loadActive: { asyncResult: true },
     loadBackendsPaginated: { asyncResult: true },

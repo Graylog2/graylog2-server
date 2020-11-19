@@ -1,9 +1,9 @@
 {
   "name": "graylog-web-interface",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.0.1-SNAPSHOT",
   "description": "Graylog Web Interface",
   "author": "torch",
-  "license": "GPL-3.0",
+  "license": "SSPL-1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/graylog2/graylog2-web-interface.git"

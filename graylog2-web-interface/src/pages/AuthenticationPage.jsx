@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 import { useEffect } from 'react';
@@ -13,7 +29,7 @@ import Routes from 'routing/Routes';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
-import BackendDetailsActive from 'components/authentication/BackendDetailsActive';
+import BackendDetails from 'components/authentication/BackendDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 const _pageTitle = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
@@ -69,7 +85,7 @@ const AuthenticationPage = () => {
         </PageHeader>
 
         {finishedLoading && activeBackend && (
-          <BackendDetailsActive authenticationBackend={activeBackend} />
+          <BackendDetails authenticationBackend={activeBackend} />
         )}
       </>
     </DocumentTitle>

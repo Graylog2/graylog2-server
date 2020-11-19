@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -13,7 +29,7 @@ import { Col, Row } from 'components/graylog';
 import RolesOverviewItem from './RolesOverviewItem';
 import RolesFilter from './RolesFilter';
 
-const TABLE_HEADERS = ['Name', 'Description', 'Actions'];
+const TABLE_HEADERS = ['Name', 'Description', 'Users', 'Actions'];
 const DEFAULT_PAGINATION = {
   page: 1,
   perPage: 10,
@@ -54,8 +70,8 @@ const _headerCellFormatter = (header) => {
 const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
   setLoading(true);
 
-  AuthzRolesDomain.loadRolesPaginated(pagination).then((paginatedUsers) => {
-    setPaginatedRoles(paginatedUsers);
+  AuthzRolesDomain.loadRolesPaginated(pagination).then((paginatedRoles) => {
+    setPaginatedRoles(paginatedRoles);
     setLoading(false);
   });
 };
@@ -77,7 +93,7 @@ const RolesOverview = () => {
   }
 
   const searchFilter = <RolesFilter onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })} />;
-  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;
+  const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} users={paginatedRoles?.context?.users[role.id]} />;
 
   return (
     <Container>

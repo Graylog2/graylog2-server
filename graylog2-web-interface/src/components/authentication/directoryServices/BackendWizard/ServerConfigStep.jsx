@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 
 import * as React from 'react';
@@ -5,7 +21,7 @@ import styled from 'styled-components';
 import { useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
-import { formHasErrors, validateField } from 'util/FormsUtils';
+import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Button, ButtonToolbar } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -14,7 +30,12 @@ import BackendWizardContext from './BackendWizardContext';
 
 export type StepKeyType = 'server-configuration';
 export const STEP_KEY: StepKeyType = 'server-configuration';
+// Form validation needs to include all input names
+// to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
+  title: {
+    required: true,
+  },
   serverHost: {
     required: true,
   },
@@ -23,6 +44,11 @@ export const FORM_VALIDATION = {
     min: 1,
     max: 65535,
   },
+  description: {},
+  transportSecurity: {},
+  verifyCertificates: {},
+  systemUserDn: {},
+  systemUserPassword: {},
 };
 
 const ServerUrl = styled.div`
@@ -66,15 +92,7 @@ type Props = {
 
 const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
-  const { backendHasPassword } = stepsState.authBackendMeta;
-
-  const _onSubmitAll = (validateForm) => {
-    validateForm().then((errors) => {
-      if (!formHasErrors(errors)) {
-        onSubmitAll();
-      }
-    });
-  };
+  const { backendValidationErrors, authBackendMeta: { backendHasPassword } } = stepsState;
 
   const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
     const currentValue = values.transportSecurity;
@@ -93,16 +111,36 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
     onChange(event);
   };
 
+  const _onSubmitAll = (validateForm) => {
+    validateForm().then((errors) => {
+      if (!formHasErrors(errors)) {
+        onSubmitAll();
+      }
+    });
+  };
+
   return (
     // $FlowFixMe innerRef works as expected
     <Formik initialValues={stepsState.formValues}
             innerRef={formRef}
+            initialErrors={backendValidationErrors}
             onSubmit={onSubmit}
             validateOnBlur={false}
             validateOnChange={false}
             validateOnMount={validateOnMount}>
       {({ isSubmitting, setFieldValue, values, validateForm }) => (
         <Form className="form form-horizontal">
+          <FormikFormGroup help={help.title}
+                           label="Title"
+                           name="title"
+                           placeholder="Title" />
+
+          <FormikFormGroup help={help.description}
+                           label={<>Description <Opt /></>}
+                           type="textarea"
+                           name="description"
+                           placeholder="Description" />
+
           <Input id="uri-host"
                  label="Server Address"
                  labelClassName="col-sm-3"
@@ -111,11 +149,13 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
               <ServerUrl className="input-group">
                 <FormikInput formGroupClassName=""
                              name="serverHost"
+                             error={backendValidationErrors?.serverHost}
                              placeholder="Hostname"
-                             validate={validateField(FORM_VALIDATION.serverPort)} />
+                             validate={validateField(FORM_VALIDATION.serverHost)} />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikInput formGroupClassName=""
                              name="serverPort"
+                             error={backendValidationErrors?.serverPort}
                              placeholder="Port"
                              type="number"
                              validate={validateField(FORM_VALIDATION.serverPort)} />
@@ -162,8 +202,10 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             </>
           </Input>
           <FormikFormGroup help={help.systemUserDn}
+                           error={backendValidationErrors?.systemUserDn}
                            label={<>System User DN <Opt /></>}
                            name="systemUserDn"
+                           validate={validateField(FORM_VALIDATION.systemUserDn)}
                            placeholder="System User DN" />
 
           {(backendHasPassword && values.systemUserPassword === undefined) ? (
@@ -185,7 +227,9 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                              help={help.systemUserPassword}
                              label={<>System Password <Opt /></>}
                              name="systemUserPassword"
+                             error={backendValidationErrors?.systemUserPassword}
                              placeholder="System Password"
+                             validate={validateField(FORM_VALIDATION.systemUserPassword)}
                              type="password" />
           )}
 

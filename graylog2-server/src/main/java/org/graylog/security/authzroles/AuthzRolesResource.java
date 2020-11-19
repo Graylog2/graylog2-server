@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.security.authzroles;
 
@@ -56,13 +56,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 
 @RequiresAuthentication
 @Api(value = "Authorization/Roles", description = "Manage roles")
@@ -123,7 +125,9 @@ public class AuthzRolesResource extends RestResource {
 
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(
                 searchQuery, page, perPage,sort, order);
-        return PaginatedResponse.create("roles", result, query);
+        final Map<String, Set<Map<String, String>>> userRoleMap = userRoleContext(result);
+
+        return PaginatedResponse.create("roles", result, query, ImmutableMap.of("users", userRoleMap));
     }
 
     @GET
@@ -152,7 +156,7 @@ public class AuthzRolesResource extends RestResource {
         }
 
         final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(
-                searchQuery, page, perPage,sort, order, roleId);
+                searchQuery, page, perPage,sort, order, ImmutableSet.of(roleId));
         final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
         final Map<String, String> rolesMap = authzRolesService.findPaginatedByIds(
                 new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, "asc", roleIds)
@@ -236,7 +240,7 @@ public class AuthzRolesResource extends RestResource {
 
     private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater) throws ValidationException {
         usernames.forEach(username -> {
-            checkPermission(USERS_EDIT, username);
+            checkPermission(USERS_ROLESEDIT, username);
 
             final User user = userService.load(username);
             if (user == null) {
@@ -267,5 +271,20 @@ public class AuthzRolesResource extends RestResource {
             throw new NotAllowedException("Cannot delete read only role with id: " + roleId);
         }
         authzRolesService.delete(roleId);
+    }
+
+
+    private Map<String, Set<Map<String, String>>> userRoleContext(PaginatedList<AuthzRoleDTO> roles) {
+        final PaginatedList<UserOverviewDTO> users = paginatedUserService.findPaginatedByRole(new SearchQuery(""),
+                1,0, UserOverviewDTO.FIELD_USERNAME, "asc",
+                roles.stream().map(AuthzRoleDTO::id).collect(Collectors.toSet()));
+        final Map<String, Set<Map<String, String>>> userRoleMap = new HashMap<>(roles.size());
+        roles.forEach(authzRoleDTO -> {
+            final Set<Map<String, String>> userMap = users.stream().filter(u -> u.roles().contains(authzRoleDTO.id()))
+                    .map(u -> ImmutableMap.of(UserOverviewDTO.FIELD_ID, Objects.requireNonNull(u.id()),
+                            UserOverviewDTO.FIELD_USERNAME, u.username())).collect(Collectors.toSet());
+            userRoleMap.put(authzRoleDTO.id(), userMap);
+        });
+        return userRoleMap;
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-manifests",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.0.1-SNAPSHOT",
   "description": "Manifests needed to reuse vendor & shared bundles in graylog web interface plugins",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,7 +17,7 @@
     "webpack"
   ],
   "author": "Graylog, Inc. <hello@graylog.com>",
-  "license": "MIT",
+  "license": "SSPL-1.0",
   "bugs": {
     "url": "https://github.com/Graylog2/graylog-web-manifests/issues"
   },

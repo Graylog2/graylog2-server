@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 /* eslint-disable no-alert */
 import * as React from 'react';
@@ -10,6 +26,7 @@ import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { TextOverflowEllipsis } from 'components/common';
 import { Button, ButtonToolbar } from 'components/graylog';
 
 type Props = {
@@ -21,6 +38,10 @@ type Props = {
 const StyledButtonToolbar = styled(ButtonToolbar)`
   display: flex;
   justify-content: flex-end;
+`;
+
+const DescriptionCell = styled.td`
+  max-width: 300px;
 `;
 
 const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
@@ -94,7 +115,7 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
 };
 
 const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props) => {
-  const { title, defaultRoles, id } = authenticationBackend;
+  const { title, description, defaultRoles, id } = authenticationBackend;
   const detailsLink = isActive ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE : Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id);
 
   return (
@@ -104,6 +125,11 @@ const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props)
           {title}
         </Link>
       </td>
+      <DescriptionCell>
+        <TextOverflowEllipsis>
+          {description}
+        </TextOverflowEllipsis>
+      </DescriptionCell>
       <td className="limited">
         <RolesList defaultRolesIds={defaultRoles} roles={roles} />
       </td>

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import type { ActionsType } from 'actions/authentication/AuthenticationActions';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
@@ -32,7 +48,7 @@ const loadActive: $PropertyType<ActionsType, 'loadActive'> = notifyingAction({
 const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   action: AuthenticationActions.update,
   success: (authBackendId, authBackend) => ({
-    message: `Authentication service "${authBackend.title} was updated successfully`,
+    message: `Authentication service "${authBackend.title}" was updated successfully`,
   }),
   error: (error, authBackendId, authBackend) => ({
     message: `Updating authentication service "${authBackend.title}" failed with status: ${error}`,
@@ -63,26 +79,6 @@ const testLogin: $PropertyType<ActionsType, 'testLogin'> = notifyingAction({
   }),
 });
 
-const enableUser: $PropertyType<ActionsType, 'enableUser'> = notifyingAction({
-  action: AuthenticationActions.enableUser,
-  success: (userId, username) => ({
-    message: `User "${username} was enabled successfully`,
-  }),
-  error: (error, userId, username) => ({
-    message: `Enabling user "${username}" failed with status: ${error}`,
-  }),
-});
-
-const disableUser: $PropertyType<ActionsType, 'disableUser'> = notifyingAction({
-  action: AuthenticationActions.disableUser,
-  success: (userId, username) => ({
-    message: `User "${username} was disabled successfully`,
-  }),
-  error: (error, userId, username) => ({
-    message: `Disabling user "${username}" failed with status: ${error}`,
-  }),
-});
-
 const setActiveBackend: $PropertyType<ActionsType, 'setActiveBackend'> = notifyingAction({
   action: AuthenticationActions.setActiveBackend,
   success: (authBackendId, authBackendTitle) => ({
@@ -102,8 +98,8 @@ const loadBackendsPaginated: $PropertyType<ActionsType, 'loadBackendsPaginated'>
 
 const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = notifyingAction({
   action: AuthenticationActions.loadUsersPaginated,
-  error: (error) => ({
-    message: `Loading synchronized users failed with status: ${error}`,
+  error: (authBackendId, error) => ({
+    message: `Loading synchronized users for authentication service with id "${authBackendId}" failed with status: ${error}`,
   }),
 });
 
@@ -115,8 +111,6 @@ export default {
   delete: deleteBackend,
   testConnection,
   testLogin,
-  enableUser,
-  disableUser,
   setActiveBackend,
   loadBackendsPaginated,
   loadUsersPaginated,

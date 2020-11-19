@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import Qs from 'qs';
 
 const ApiRoutes = {
@@ -31,7 +47,7 @@ const ApiRoutes = {
     enableUser: (userId) => ({ url: `/system/authentication/users/${userId}/enable` }),
     load: (serviceId) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
     loadActive: () => ({ url: '/system/authentication/services/active-backend' }),
-    loadUsersPaginated: () => ({ url: '/system/authentication/services/active-backend/users' }),
+    loadUsersPaginated: (authBackendId) => ({ url: `/system/authentication/services/backends/${authBackendId}/users` }),
     servicesPaginated: () => ({ url: '/system/authentication/services/backends' }),
     testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
     testLogin: () => ({ url: '/system/authentication/services/test/backend/login' }),
@@ -340,6 +356,7 @@ const ApiRoutes = {
     create_token: (userId, tokenName) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
     delete_token: (userId, tokenName) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
     list_tokens: (userId) => { return { url: `/users/${userId}/tokens` }; },
+    setStatus: (userId, accountStatus) => { return { url: `/users/${userId}/status/${accountStatus}` }; },
   },
   DashboardsController: {
     show: (id) => { return { url: `/dashboards/${id}` }; },

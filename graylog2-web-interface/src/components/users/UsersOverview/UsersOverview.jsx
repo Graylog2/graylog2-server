@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
@@ -22,7 +38,7 @@ const DEFAULT_PAGINATION = {
   query: '',
 };
 
-const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Enabled', 'Role', 'Actions'];
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
@@ -67,6 +83,7 @@ const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
 };
 
 const _updateListOnUserDelete = (perPage, query, setPagination) => UsersActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
+const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const UsersOverview = () => {
   const currentUser = useContext(CurrentUserContext);
@@ -78,6 +95,7 @@ const UsersOverview = () => {
 
   useEffect(() => _loadUsers(pagination, setLoading, setPaginatedUsers), [pagination]);
   useEffect(() => _updateListOnUserDelete(perPage, query, setPagination), [perPage, query]);
+  useEffect(() => _updateListOnUserSetStatus(pagination, setLoading, setPaginatedUsers), [pagination]);
 
   if (!users) {
     return <Spinner />;

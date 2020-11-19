@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
@@ -13,6 +29,7 @@ type Props = {
   onChange?: (SyntheticInputEvent<Input>) => void,
   wrapperClassName?: string,
   validate?: (string) => ?string,
+  error?: string,
 };
 
 const checkboxProps = (value) => {
@@ -24,14 +41,15 @@ const inputProps = (value) => {
 };
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, ...rest }: Props) => {
+const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, error: errorProp, ...rest }: Props) => {
   const { validateOnChange } = useFormikContext();
 
   return (
     <Field name={name} validate={validate}>
-      {({ field: { value, onChange, onBlur }, meta: { error, touched } }) => {
+      {({ field: { value, onChange, onBlur }, meta: { error: validationError, touched } }) => {
         const typeSpecificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
-        const displayError = validateOnChange ? !!(error && touched) : !!error;
+        const displayValidationError = validateOnChange ? !!(validationError && touched) : !!validationError;
+        const error = displayValidationError ? validationError : errorProp;
 
         const _handleChange = (e) => {
           if (typeof propagateOnChange === 'function') {
@@ -47,7 +65,7 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
                  onBlur={onBlur}
                  help={help}
                  id={name}
-                 error={displayError ? error : undefined}
+                 error={error}
                  onChange={_handleChange}
                  type={type} />
         );
@@ -72,6 +90,7 @@ FormikInput.defaultProps = {
   type: 'text',
   validate: () => {},
   wrapperClassName: undefined,
+  error: undefined,
 };
 
 export default FormikInput;

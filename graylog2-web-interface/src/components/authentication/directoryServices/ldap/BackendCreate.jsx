@@ -1,15 +1,28 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as React from 'react';
 
-import UserNotification from 'util/UserNotification';
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
-import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 
 import WizardPageHeader from './WizardPageHeader';
 
-import type { WizardFormValues, AuthBackendMeta } from '../BackendWizard/BackendWizardContext';
+import handleCreate from '../HandleCreate';
 import BackendWizard from '../BackendWizard';
 
 export const AUTH_BACKEND_META = {
@@ -60,6 +73,7 @@ export const HELP = {
 };
 
 const INITIAL_VALUES = {
+  title: AUTH_BACKEND_META.serviceTitle,
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
@@ -67,25 +81,6 @@ const INITIAL_VALUES = {
   userNameAttribute: 'uid',
   userUniqueIdAttribute: 'entryUUID',
   verifyCertificates: true,
-};
-
-export const handleSubmit = (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean = true) => {
-  const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.', 'Success');
-  const notifyOnError = (error) => UserNotification.error(`Creating authentication service failed with status: ${error}`, 'Error');
-
-  return AuthenticationActions.create(payload).then((result) => {
-    if (result.backend && formValues.synchronizeGroups && enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(false, formValues, result.backend.id, AUTH_BACKEND_META.serviceType).then(notifyOnSuccess);
-    }
-
-    notifyOnSuccess();
-
-    return result;
-  }).catch((error) => {
-    notifyOnError(error);
-    throw error;
-  });
 };
 
 const BackendCreate = () => {
@@ -100,7 +95,7 @@ const BackendCreate = () => {
   return (
     <DocumentTitle title="Create LDAP Authentication Service">
       <WizardPageHeader />
-      <BackendWizard onSubmit={handleSubmit}
+      <BackendWizard onSubmit={handleCreate}
                      help={help}
                      authBackendMeta={AUTH_BACKEND_META}
                      initialValues={initialValues} />

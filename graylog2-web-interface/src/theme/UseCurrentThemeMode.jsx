@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import { useCallback, useContext, useState } from 'react';
 
@@ -13,26 +29,28 @@ import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { PreferencesStore } = CombinedProvider.get('Preferences');
 
-const useCurrentThemeMode = (overrideMode: ?string) => {
-  const browserPreference = usePrefersColorScheme();
+const useCurrentThemeMode = () => {
+  const browserThemePreference = usePrefersColorScheme();
+
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
     username: userStore?.currentUser?.username,
     // eslint-disable-next-line camelcase
     userIsReadOnly: userStore?.currentUser?.read_only ?? true,
   }));
+
   const userPreferences = useContext(UserPreferencesContext);
-  const initialThemeMode = overrideMode ?? (userIsReadOnly ? Store.get(PREFERENCES_THEME_MODE) : userPreferences[PREFERENCES_THEME_MODE]) ?? browserPreference ?? DEFAULT_THEME_MODE;
+  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
+  const initialThemeMode = userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
   const [currentThemeMode, setCurrentThemeMode] = useState<string>(initialThemeMode);
 
   const changeCurrentThemeMode = useCallback((newThemeMode: string) => {
     setCurrentThemeMode(newThemeMode);
+    Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 
-    if (userIsReadOnly) {
-      Store.set(PREFERENCES_THEME_MODE, newThemeMode);
-    } else {
+    if (!userIsReadOnly) {
       const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
 
-      PreferencesStore.saveUserPreferences(username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
+      PreferencesStore.saveUserPreferences(username, nextPreferences);
     }
   }, [userIsReadOnly, userPreferences, username]);
 

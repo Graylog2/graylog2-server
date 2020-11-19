@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import * as Immutable from 'immutable';
 
@@ -36,12 +52,17 @@ const _missingDependenciesFromJSON = (missingDependenciesJSON) => {
   return missingDependencies;
 };
 
-const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>): Immutable.List<T> => {
+const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>, activeShares: ?ActiveShares): Immutable.List<T> => {
   const granteesByType = grantees
+    .filter((grantee) => !activeShares || activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) >= 0)
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
     .groupBy((grantee) => grantee.type);
+  const newGrantees = grantees
+    .filter((grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1)
+    .reverse();
 
   return Immutable.List().concat(
+    newGrantees,
     granteesByType.get('error'),
     granteesByType.get('global'),
     granteesByType.get('team'),
@@ -135,7 +156,7 @@ export default class EntityShareState {
       return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
     }).toList();
 
-    return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities);
+    return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities, this._value.activeShares);
   }
 
   // eslint-disable-next-line no-use-before-define

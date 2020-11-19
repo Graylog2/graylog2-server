@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
@@ -116,22 +132,6 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    enableUser(userId: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.AuthenticationController.enableUser(userId).url);
-      const promise = fetch('POST', url);
-      AuthenticationActions.enableUser.promise(promise);
-
-      return promise;
-    },
-
-    disableUser(userId: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.AuthenticationController.disableUser(userId).url);
-      const promise = fetch('POST', url);
-      AuthenticationActions.disableUser.promise(promise);
-
-      return promise;
-    },
-
     setActiveBackend(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.updateConfiguration().url);
       const promise = fetch('POST', url, { active_backend: backendId });
@@ -162,8 +162,8 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    loadUsersPaginated({ page, perPage, query }: Pagination): Promise<PaginatedUsers> {
-      const url = PaginationURL(ApiRoutes.AuthenticationController.loadUsersPaginated().url, page, perPage, query);
+    loadUsersPaginated(authBackendId, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
+      const url = PaginationURL(ApiRoutes.AuthenticationController.loadUsersPaginated(authBackendId).url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedUsersResponse) => ({

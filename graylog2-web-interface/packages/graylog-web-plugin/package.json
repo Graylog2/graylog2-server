@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.0.1-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "plugin"
   ],
   "author": "Graylog, Inc. <hello@graylog.com>",
-  "license": "MIT",
+  "license": "SSPL-1.0",
   "bugs": {
     "url": "https://github.com/Graylog2/graylog-web-plugin/issues"
   },

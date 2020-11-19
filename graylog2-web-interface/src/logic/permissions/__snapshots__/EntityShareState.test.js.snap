@@ -8,6 +8,11 @@ Object {
       "grant": "grn::::grant:5ee2393bb3ceb9225f056efe",
       "grantee": "grn::::user:john",
     },
+    Object {
+      "capability": "grn::::capability:54e3deadbeefdeadbeef0002",
+      "grant": "grn::::grant:5ee2393bb3ceb9225f056fef",
+      "grantee": "grn::::user:jane",
+    },
   ],
   "available_capabilities": Array [
     Object {
