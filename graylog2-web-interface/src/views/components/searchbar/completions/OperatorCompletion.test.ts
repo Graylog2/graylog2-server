@@ -40,7 +40,7 @@ const OR = {
   meta: 'operator',
 };
 
-const term = (value: string, index: ?number, start: ?number) => ({ type: 'term', value, index, start });
+const term = (value: string, index?: number, start?: number) => ({ type: 'term', value, index, start });
 const whitespace = () => ({ type: 'text', value: ' ' });
 const and = () => ({ type: 'keyword.operator', value: 'AND' });
 const or = () => ({ type: 'keyword.operator', value: 'OR' });
