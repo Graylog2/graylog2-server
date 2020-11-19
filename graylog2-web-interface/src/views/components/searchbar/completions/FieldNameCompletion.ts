@@ -21,6 +21,7 @@ import { $ReadOnly } from 'utility-types';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import type { CompletionResult, Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';
@@ -118,21 +119,23 @@ class FieldNameCompletion implements Completer {
 
     const matchesFieldName = _matchesFieldName(prefix);
     const { all, queryFields } = this.fields;
-    const currentQueryFields: FieldTypeMappingsList = queryFields.get(this.activeQuery, Immutable.List());
+    // @ts-ignore
+    const currentQueryFields: FieldTypeMapping[] = queryFields.get(this.activeQuery, Immutable.List());
 
     const valuePosition = this._isFollowingExistsOperator(lastToken);
 
     const allButInCurrent = all.filter((field) => !this.currentQueryFieldNames[field.name]);
     const fieldsToMatchIn = valuePosition
-      ? [...currentQueryFields.toArray()]
-      : [...this.staticSuggestions, ...currentQueryFields.toArray()];
+      ? [...currentQueryFields]
+      : [...this.staticSuggestions, ...currentQueryFields];
     const currentQuery = fieldsToMatchIn.filter((field) => (matchesFieldName(field) > 0))
       .map((field) => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
-    const allFields = allButInCurrent.filter((field) => (matchesFieldName(field) > 0))
+    // @ts-ignore
+    const allFields: CompletionResult[] = allButInCurrent.filter((field) => (matchesFieldName(field) > 0))
       .map((field) => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
 
-    return [...currentQuery, ...allFields.toArray()];
+    return [...currentQuery, ...allFields];
   }
 }
 
