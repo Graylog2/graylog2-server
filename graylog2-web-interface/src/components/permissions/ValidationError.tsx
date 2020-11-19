@@ -16,12 +16,12 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 import { capitalize } from 'lodash';
 
 import { Alert } from 'components/graylog';
-import { type ThemeInterface } from 'theme';
-import { type GranteesList } from 'logic/permissions/EntityShareState';
+import { ThemeInterface } from 'theme';
+import { GranteesList } from 'logic/permissions/EntityShareState';
 import ValidationResult from 'logic/permissions/ValidationResult';
 
 const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
