@@ -17,7 +17,7 @@
 module.exports = {
   rootDir: '../../',
   collectCoverageFrom: [
-    'src/**/*.{js,jsx}',
+    'src/**/*.{js,jsx,ts,tsx}',
   ],
   setupFiles: [
     'jest-localstorage-mock',
