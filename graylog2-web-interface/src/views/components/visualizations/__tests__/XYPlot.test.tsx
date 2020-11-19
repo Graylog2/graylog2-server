@@ -20,13 +20,14 @@ import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { viewsManager } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
+import { $PropertyType } from 'utility-types';
 
 import type { UserJSON } from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import XYPlot, { type Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
+import XYPlot, { Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import Query from 'views/logic/queries/Query';
+import Query, { RelativeTimeRange } from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
@@ -136,7 +137,7 @@ describe('XYPlot', () => {
 
   it('uses effective time range from pivot result if all messages are selected', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
-    const allMessages = { type: 'relative', range: 0 };
+    const allMessages: RelativeTimeRange = { type: 'relative', range: 0 };
     const currentQueryForAllMessages = currentQuery.toBuilder().timerange(allMessages).build();
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
