@@ -120,7 +120,7 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
   const { value: previousValue } = _extractValueAndField(trendRows || []);
 
   if (!field || (value !== 0 && !value)) {
-    return <>'N/A'</>;
+    return <>N/A</>;
   }
 
   const Container = visualizationConfig.trend ? GridContainer : SingleItemGrid;
@@ -160,6 +160,6 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
   );
 };
 
-const ConnectedNumberVisualization: VisualizationComponent = makeVisualization(connect(NumberVisualization, { currentView: ViewStore }), 'numeric');
+const ConnectedNumberVisualization = makeVisualization(connect(NumberVisualization, { currentView: ViewStore }), 'numeric');
 
 export default ConnectedNumberVisualization;
