@@ -48,12 +48,12 @@ const _matchesFieldName = (prefix) => {
   return (field) => (field.name.indexOf(prefix) >= 0);
 };
 
-const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): ?Token => {
+const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Token | undefined | null => {
   return tokens.slice(0, currentTokenIdx).reverse().find((token) => (token.type !== 'text' || trim(token.value) !== ''));
 };
 
 class OperatorCompletion implements Completer {
-  getCompletions = (currentToken: ?Token, lastToken: ?Token, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult> => {
+  getCompletions = (currentToken: Token | undefined | null, lastToken: Token | undefined | null, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult> => {
     const lastNonEmptyToken = _lastNonEmptyToken(tokens, currentTokenIdx);
 
     if (!lastNonEmptyToken || (lastNonEmptyToken && (lastNonEmptyToken.type === 'keyword.operator'))) {
