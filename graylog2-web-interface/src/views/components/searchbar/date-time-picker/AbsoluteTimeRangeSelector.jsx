@@ -3,7 +3,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { StyledComponent } from 'styled-components';
-import moment from 'moment';
 
 import { Icon } from 'components/common';
 
@@ -12,6 +11,12 @@ import AbsoluteRangeField from './AbsoluteRangeField';
 type Props = {
   disabled: boolean,
   originalTimeRange: {
+    from: string,
+    to: string,
+  },
+  setDisableApply: (boolean) => void,
+  limitDuration: number,
+  currentTimerange: {
     from: string,
     to: string,
   },
@@ -73,10 +78,15 @@ const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange,
 AbsoluteTimeRangeSelector.propTypes = {
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  limitDuration: PropTypes.number,
+  currentTimerange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  setDisableApply: PropTypes.func,
 };
 
 AbsoluteTimeRangeSelector.defaultProps = {
   disabled: false,
+  limitDuration: 0,
+  setDisableApply: () => {},
 };
 
 export default AbsoluteTimeRangeSelector;

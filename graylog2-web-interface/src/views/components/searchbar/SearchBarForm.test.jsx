@@ -18,7 +18,7 @@ describe('SearchBarForm', () => {
       const { asFragment } = render(
         <SearchBarForm onSubmit={() => {}}
                        initialValues={initialValues}>
-          <AbsoluteTimeRangeSelector originalTimeRange={originalTimeRange} />
+          <AbsoluteTimeRangeSelector originalTimeRange={originalTimeRange} currentTimerange={initialValues.timerange} />
         </SearchBarForm>,
       );
 

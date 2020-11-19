@@ -25,11 +25,12 @@ type Props = {
     seconds: string | number,
     milliseconds: string | number,
   },
+  fromDate?: string,
 };
 
-const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title, initialDateTimeObject }: Props) => {
+const DateInputWithPicker = ({ disabled = false, error, fromDate, value, onChange, name, title, initialDateTimeObject }: Props) => {
   const _onDatePicked = (date) => {
-    if (DateUtils.isDayBefore(date, fromDate)) {
+    if (!!fromDate && DateUtils.isDayBefore(date, fromDate)) {
       return false;
     }
 
@@ -84,6 +85,7 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
 DateInputWithPicker.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.string,
+  fromDate: PropTypes.string,
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   onChange: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
@@ -102,6 +104,7 @@ DateInputWithPicker.propTypes = {
 DateInputWithPicker.defaultProps = {
   disabled: false,
   error: undefined,
+  fromDate: undefined,
   value: undefined,
   title: '',
 };

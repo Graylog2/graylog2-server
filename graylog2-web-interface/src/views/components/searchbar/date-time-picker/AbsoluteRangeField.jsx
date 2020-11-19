@@ -25,7 +25,7 @@ type Props = {
     from: string,
     to: string,
   },
-  limitDuration: number,
+  limitDuration?: number,
   setDisableApply: (boolean) => void,
 };
 
@@ -90,7 +90,7 @@ const _onFocusSelect = (event) => {
   event.target.select();
 };
 
-const zeroPad = (data, pad = 2) => String(data).padStart(pad, '0');
+const zeroPad = (data: string | number, pad = 2) => String(data).padStart(pad, '0');
 
 const parseTimeValue = (value, type) => {
   const isNotNumeric = value.match(/[^0-9]/g);
@@ -116,6 +116,7 @@ const fieldUpdate = (value) => {
   const initialDateTime = moment(value).toObject();
 
   TIME_TYPES.forEach((type) => {
+    // $FlowFixMe - moment is mad about strings, ignore until we move to TSX
     initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
   });
 
@@ -220,17 +221,24 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, s
           _onChange(newDate);
         };
 
+        let fromDate = moment(currentTimerange.from).toDate();
+
+        if (from) {
+          fromDate = limitDuration ? moment().seconds(-limitDuration).toDate() : null;
+        }
+
         return (
           <>
             <DateInputWithPicker disabled={disabled}
                                  onChange={_onChangeDate}
                                  onBlur={onBlur}
                                  value={value || currentTimerange[range]}
+                                 // $FlowFixMe - flow is mad about mixed types, ignore until we move to TSX
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
                                  error={error}
-                                 fromDate={from ? moment().seconds(-limitDuration).toDate() : moment(currentTimerange.from).toDate()} />
+                                 fromDate={fromDate} />
 
             {from && timeRangeError && (<ErrorMessage>{timeRangeError}</ErrorMessage>)}
 
@@ -307,10 +315,14 @@ AbsoluteRangeField.propTypes = {
     to: PropTypes.string,
   }).isRequired,
   disabled: PropTypes.bool,
+  limitDuration: PropTypes.number,
+  setDisableApply: PropTypes.func,
 };
 
 AbsoluteRangeField.defaultProps = {
   disabled: false,
+  limitDuration: 0,
+  setDisableApply: () => {},
 };
 
 export default AbsoluteRangeField;
