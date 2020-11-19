@@ -38,7 +38,7 @@ type Props = {
   activeQueryFields: ImmutableList<FieldTypeMapping>,
   allFields: ImmutableList<FieldTypeMapping>,
   currentGroup: string,
-  filter: ?string,
+  filter: string | undefined | null,
   viewMetadata: ViewMetadata,
 };
 
