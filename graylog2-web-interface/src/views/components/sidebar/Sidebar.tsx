@@ -23,22 +23,22 @@ import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
-import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
-import SearchPageLayoutContext, { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutContext, { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
-import sidebarSections, { type SidebarSection } from './sidebarSections';
+import sidebarSections, { SidebarSection } from './sidebarSections';
 
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
-  children: React.Element<any>,
+  children: React.ReactNode,
   queryId: string,
   results: QueryResult,
-  searchPageLayout: ?SearchPageLayout,
-  sections: Array<SidebarSection>,
+  searchPageLayout?: SearchPageLayout,
+  sections?: Array<SidebarSection>,
   viewIsNew: boolean,
   viewMetadata: ViewMetadata,
 };
@@ -59,7 +59,7 @@ const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styl
   z-index: 2;
 `);
 
-const _toggleSidebar = (initialSectionKey: string, activeSectionKey: ?string, setActiveSectionKey) => {
+const _toggleSidebar = (initialSectionKey: string, activeSectionKey: string | undefined | null, setActiveSectionKey) => {
   if (activeSectionKey) {
     setActiveSectionKey(null);
 
@@ -82,7 +82,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
 const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata, viewIsNew }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const initialSectionKey = sections[0].key;
-  const [activeSectionKey, setActiveSectionKey] = useState<?string>(sidebarIsPinned ? initialSectionKey : null);
+  const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(sidebarIsPinned ? initialSectionKey : null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
   const toggleSidebar = () => _toggleSidebar(initialSectionKey, activeSectionKey, setActiveSectionKey);
   const selectSidebarSection = (sectionKey: string) => _selectSidebarSection(sectionKey, activeSectionKey, setActiveSectionKey, toggleSidebar);
