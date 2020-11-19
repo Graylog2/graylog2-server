@@ -40,7 +40,7 @@ type Props = {
   availableGrantees: GranteesList,
   availableCapabilities: CapabilitiesList,
   className?: string,
-  granteesSelectRef: Select | null | undefined,
+  granteesSelectRef: typeof Select | null | undefined,
   onSubmit: (req: SelectionRequest) => Promise<EntityShareState | null | undefined>,
 };
 
