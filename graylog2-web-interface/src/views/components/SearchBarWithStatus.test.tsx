@@ -35,6 +35,7 @@ describe('SearchBarWithStatus', () => {
   const configurations = { searchesClusterConfig: {} };
 
   it('enables search button per default', () => {
+    // @ts-ignore
     const wrapper = mount(<SearchBarWithStatus configurations={configurations} searchMetadata={SearchMetadata.empty()} executionState={SearchExecutionState.empty()} />);
 
     expect(wrapper.find('SearchBar')).toHaveProp('disableSearch', false);
