@@ -122,8 +122,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                                          title="Search query syntax documentation"
                                          text={<Icon name="lightbulb" />} />
                     </div>
-                    <SearchButton running={isSubmitting}
-                                  disabled={disableSearch || isSubmitting || !isValid}
+                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
                                   dirty={dirty} />
 
                     <Field name="queryString">

@@ -81,8 +81,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                          title="Search query syntax documentation"
                                          text={<Icon name="lightbulb" />} />
                     </div>
-                    <SearchButton running={isSubmitting}
-                                  disabled={disableSearch || isSubmitting || !isValid}
+                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
                                   glyph="filter"
                                   dirty={dirty} />
 
