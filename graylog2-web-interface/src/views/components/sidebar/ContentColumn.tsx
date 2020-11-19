@@ -21,16 +21,16 @@ import type { StyledComponent } from 'styled-components';
 
 import type { ViewType } from 'views/logic/views/View';
 import type { ThemeInterface } from 'theme';
-import { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
-import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
+import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { IconButton } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   closeSidebar: () => void,
-  searchPageLayout: ?SearchPageLayout,
+  searchPageLayout: SearchPageLayout | undefined | null,
   sectionTitle: string,
   viewIsNew: boolean,
   viewMetadata: ViewMetadata,
@@ -157,7 +157,7 @@ const toggleSidebarPinning = (searchPageLayout) => {
   togglePinning();
 };
 
-const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType, viewIsNew: boolean) => {
+const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ViewType | undefined | null, viewIsNew: boolean) => {
   const viewTypeLabel = ViewTypeLabel({ type: viewType, capitalize: true });
   const unsavedViewTitle = `Unsaved ${viewTypeLabel}`;
   const savedViewTitle = viewMetadata.title ?? `Untitled ${viewTypeLabel}`;
