@@ -26,6 +26,7 @@ import UserOverview from 'logic/users/UserOverview';
 import { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import Role from 'logic/roles/Role';
+import { PaginatedList } from 'stores/PaginationTypes';
 
 import UsersSelector from './UsersSelector';
 
@@ -40,7 +41,7 @@ const Container = styled.div`
 
 const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [paginatedUsers, setPaginatedUsers] = useState();
+  const [paginatedUsers, setPaginatedUsers] = useState<PaginatedList<UserOverview>>();
   const [errors, setErrors] = useState<string | undefined>();
 
   const _onLoad = useCallback((pagination) => {
@@ -55,8 +56,12 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   }, [id, name]);
 
   const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => AuthzRolesDomain.addMembers(id,
-    newUsers.map((u) => u.username)).then(() => _onLoad(DEFAULT_PAGINATION)
-    .then(setPaginatedUsers));
+    newUsers.map((u) => u.username).toSet()).then(() => _onLoad(DEFAULT_PAGINATION)
+    .then((result) => {
+      setPaginatedUsers(result);
+
+      return result;
+    }));
 
   const _onUnassignUser = (user) => {
     if ((role.name === 'Reader' || role.name === 'Admin')

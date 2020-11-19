@@ -35,7 +35,7 @@ export type EntitySharePayload = {
 };
 
 export type ActionsType = {
-  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload | null | undefined) => Promise<EntityShareState>,
+  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload?: EntitySharePayload) => Promise<EntityShareState>,
   update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>,
   loadUserSharesPaginated: (userId: string, pagination: Pagination) => Promise<PaginatedEntityShares>,
 };
