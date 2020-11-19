@@ -16,7 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent, css } from 'styled-components';
+import styled, { StyledComponent, css } from 'styled-components';
 import numeral from 'numeral';
 
 import type { ThemeInterface } from 'theme';
@@ -29,11 +29,11 @@ export const TREND_NEUTRAL = undefined;
 
 type Props = {
   current: number,
-  previous: ?number,
+  previous: number | undefined | null,
   trendPreference: TrendPreference,
 };
 
-const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
+const Background: StyledComponent<{ trend: string | undefined | null }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
   const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
