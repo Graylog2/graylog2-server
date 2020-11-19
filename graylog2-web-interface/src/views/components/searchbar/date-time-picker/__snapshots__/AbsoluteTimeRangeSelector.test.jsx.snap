@@ -788,7 +788,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   name="tempTimeRange[from]"
                   placeholder="YYYY-MM-DD HH:mm:ss"
                   type="text"
-                  value=""
+                  value="1955-05-11 06:15:00.000"
                 />
                 <span
                   class="input-group-btn"
@@ -1424,7 +1424,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   name="tempTimeRange[to]"
                   placeholder="YYYY-MM-DD HH:mm:ss"
                   type="text"
-                  value=""
+                  value="1985-25-10 08:18:00.000"
                 />
                 <span
                   class="input-group-btn"
@@ -1753,7 +1753,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Wed Nov 18 2020"
                         aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--today"
+                        class="DayPicker-Day"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1763,7 +1763,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Thu Nov 19 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--today"
                         role="gridcell"
                         tabindex="-1"
                       >
