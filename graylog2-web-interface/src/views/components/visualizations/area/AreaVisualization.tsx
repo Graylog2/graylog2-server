@@ -18,7 +18,7 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-import EventHandler from 'views/logic/searchtypes/events/EventHandler';
+import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
@@ -44,8 +44,7 @@ const getChartColor = (fullData, name) => {
 const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
 
 const AreaVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
-  // $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
-  const visualizationConfig: AreaVisualizationConfig = config.visualizationConfig || AreaVisualizationConfig.empty();
+  const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
     type,
@@ -57,7 +56,7 @@ const AreaVisualization: VisualizationComponent = makeVisualization(({ config, d
   }), [interpolation]);
 
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator);
-  const layout = {};
+  const layout: { shapes?: Shapes } = {};
 
   if (config.eventAnnotation && data.events) {
     const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
