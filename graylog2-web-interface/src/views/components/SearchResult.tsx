@@ -33,8 +33,14 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/graylog';
 
+type IndicatorProps = {
+  searchLoadingState: {
+    isLoading: boolean;
+  };
+};
+
 const SearchLoadingIndicator = connect(
-  ({ searchLoadingState }) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
+  ({ searchLoadingState }: IndicatorProps) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
   { searchLoadingState: SearchLoadingStateStore },
 );
 
