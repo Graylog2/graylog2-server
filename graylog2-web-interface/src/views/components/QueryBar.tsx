@@ -17,6 +17,8 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import * as Immutable from 'immutable';
+import * as ImmutablePropTypes from 'react-immutable-proptypes';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
@@ -25,12 +27,10 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
-import {ViewMetaData, ViewMetadataStore} from 'views/stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 
 import QueryTabs from './QueryTabs';
-import CustomPropTypes from './CustomPropTypes';
-import Query from '../logic/queries/Query';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 
@@ -58,8 +58,8 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 
 type Props = {
   children?: React.ReactElement,
-  queries: object,
-  queryTitles: object,
+  queries: string[],
+  queryTitles: Immutable.Map<string, string>,
   viewMetadata: {
     activeQuery: string,
   },
@@ -84,8 +84,8 @@ const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
 
 QueryBar.propTypes = {
   children: PropTypes.element,
-  queries: PropTypes.object.isRequired,
-  queryTitles: PropTypes.object.isRequired,
+  queries: PropTypes.arrayOf(PropTypes.string).isRequired,
+  queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
