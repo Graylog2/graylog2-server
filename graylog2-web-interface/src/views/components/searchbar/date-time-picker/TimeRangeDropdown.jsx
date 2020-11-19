@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 import { useEffect, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 
@@ -8,6 +8,7 @@ import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm.js';
+import DateTime from 'logic/datetimes/DateTime';
 
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
@@ -37,6 +38,11 @@ const StyledPopover: StyledComponent<{}, void, typeof Popover> = styled(Popover)
 const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
   margin-top: 1px;
 `;
+
+const Timezone: StyledComponent<{}, void, HTMLParagraphElement> = styled.p(({ theme }) => css`
+  font-size: ${theme.fonts.size.small};
+  padding-left: 3px;
+`);
 
 const timeRangeTypeTabs = (config, activeKey, originalRangeValue) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
@@ -117,7 +123,10 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
       </Row>
 
       <Row className="row-sm">
-        <Col md={12}>
+        <Col md={6}>
+          <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
+        </Col>
+        <Col md={6}>
           <div className="pull-right">
             <Button bsStyle="link" onClick={handleCancel}>Cancel</Button>
             <Button bsStyle="success" onClick={handleApply}>Apply</Button>
