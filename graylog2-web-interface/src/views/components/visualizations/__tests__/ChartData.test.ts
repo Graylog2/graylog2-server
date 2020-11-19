@@ -23,7 +23,7 @@ import { flow, merge, fill } from 'lodash';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import { chartData, extractSeries, formatSeries, generateChart } from '../ChartData';
+import { chartData, ExtractedSeries, extractSeries, formatSeries, generateChart, ValuesBySeries } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
 const cwd = dirname(__filename);
@@ -157,7 +157,7 @@ describe('Chart helper functions', () => {
       const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
       const generatorFunction = (type, name, x, y, z) => ({ type, name, x, y, z });
 
-      const formatSeriesCustom = ({ valuesBySeries, xLabels }) => {
+      const formatSeriesCustom = ({ valuesBySeries, xLabels }: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
         // In this example we want to create only one series, with an z value, which contains all series data
         const z: Array<any> = Object.values(valuesBySeries).map((series) => {
           const newSeries = fill(Array(xLabels.length), null);
