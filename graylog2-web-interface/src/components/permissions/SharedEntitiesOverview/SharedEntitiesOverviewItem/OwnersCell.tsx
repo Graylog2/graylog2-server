@@ -24,7 +24,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
-import {UserJSON} from 'logic/users/User';
+import { UserJSON } from 'logic/users/User';
 
 type Props = {
   owners: GranteesList,
