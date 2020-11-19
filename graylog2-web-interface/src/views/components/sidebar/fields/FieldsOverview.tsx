@@ -37,7 +37,6 @@ type Props = {
   activeQueryFields: ImmutableList<FieldTypeMapping>,
   allFields: ImmutableList<FieldTypeMapping>,
   viewMetadata: ViewMetadata,
-  viewMetadata: ViewMetadata,
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
