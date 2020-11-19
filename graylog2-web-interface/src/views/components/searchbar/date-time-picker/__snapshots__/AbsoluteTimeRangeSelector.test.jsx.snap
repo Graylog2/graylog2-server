@@ -743,6 +743,17 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
   -ms-flex-align: center;
   align-items: center;
   min-height: 290px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c1 .DayPicker-wrapper {
+  padding-bottom: 0;
 }
 
 .c10 {
