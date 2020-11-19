@@ -23,7 +23,7 @@ import { Col, Row, HelpBlock } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
 type Props = {
-  label: JSX.Element,
+  label: JSX.Element | string,
   value: unknown,
   help?: string,
 };

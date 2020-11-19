@@ -34,7 +34,9 @@ const UsersCell = ({ users = Immutable.Set() }: Props) => {
   const usersComponents = users.take(MAX_USERS).toArray().map(({ id, username }, index) => {
     return (
       <IfPermitted permissions={[`users:read:${username}`]} key={id}>
-        <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>{index < (usersLength - 1) && ',  '}
+        <>
+            <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>{index < (usersLength - 1) && ',  '}
+        </>
       </IfPermitted>
     );
   });

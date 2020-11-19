@@ -73,11 +73,13 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
           </LinkContainer>
         </IfPermitted>
         {!readOnly && (
-          <IfPermitted permissions={[`roles:delete:${roleName}`]}>
-            &nbsp;
-            <Button id={`delete-role-${roleId}`} bsStyle="danger" bsSize="xs" title={`Delete role ${roleName}`} onClick={() => _deleteRole(roleId, roleName, setDeleting)} type="button">
-              {deleting ? <Spinner text="Deleting" delay={0} /> : 'Delete'}
-            </Button>
+            <IfPermitted permissions={[`roles:delete:${roleName}`]}>
+              <>
+                &nbsp;
+                <Button id={`delete-role-${roleId}`} bsStyle="danger" bsSize="xs" title={`Delete role ${roleName}`} onClick={() => _deleteRole(roleId, roleName, setDeleting)} type="button">
+                  {deleting ? <Spinner text="Deleting" delay={0} /> : 'Delete'}
+                </Button>
+              </>
           </IfPermitted>
         )}
       </ActionsWrapper>
