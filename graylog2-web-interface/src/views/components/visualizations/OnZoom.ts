@@ -28,7 +28,7 @@ import SearchActions from 'views/actions/SearchActions';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const onZoom = (currentQuery: Query, from: string, to: string, viewType: ?ViewType) => {
+const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewType | undefined | null) => {
   const currentUser = CurrentUserStore.get();
   const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
 
