@@ -29,11 +29,11 @@ import IfSearch from 'views/components/search/IfSearch';
 
 type CSVExportSettingsType = {
   fields: List<FieldTypeMapping>,
-  limit: ?number,
+  limit: number | undefined | null,
   setLimit: (limit: number) => void,
-  selectedWidget: ?Widget,
-  selectField: ({ label: string, value: string }[]) => void,
-  selectedFields: ?{field: string}[],
+  selectedWidget: Widget | undefined | null,
+  selectField: (fields: { label: string, value: string }[]) => void,
+  selectedFields: { field: string }[] | undefined | null,
   view: View,
 };
 
