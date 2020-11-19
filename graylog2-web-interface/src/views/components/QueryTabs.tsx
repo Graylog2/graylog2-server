@@ -23,8 +23,7 @@ import styled, { css } from 'styled-components';
 import { Tab, Tabs, Col, Row } from 'components/graylog';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { QueryIdsStore } from 'views/stores/QueryIdsStore';
-import Query from 'views/logic/queries/Query';
+import Query, { QueryId } from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
 
@@ -53,17 +52,17 @@ const StyledQueryTabs = styled(Tabs)(({ theme }) => css`
 `);
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  queries: Array<QueryIdsStore>,
+  queries: Array<QueryId>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
 };
 
 class QueryTabs extends React.Component<Props> {
-  queryTitleEditModal: ?QueryTitleEditModal;
+  private queryTitleEditModal: QueryTitleEditModal | undefined | null;
 
   static propTypes = {
     children: PropTypes.node,
