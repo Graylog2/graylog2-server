@@ -24,14 +24,14 @@ import type { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 type Props = {
-  type: ?ViewType,
-  children: React.Node,
+  type: ViewType | undefined | null,
+  children: React.ReactNode,
 };
 
 const CurrentViewTypeProvider = ({ type, children }: Props) => <ViewTypeContext.Provider value={type}>{children}</ViewTypeContext.Provider>;
 
 CurrentViewTypeProvider.propTypes = {
-  type: PropTypes.string.isRequired,
+  type: PropTypes.oneOf<ViewType>(['SEARCH', 'DASHBOARD']).isRequired,
   children: PropTypes.node.isRequired,
 };
 
