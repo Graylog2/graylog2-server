@@ -14,33 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 
-type InternalState = {|
+type InternalState = {
   id: string,
   title: string,
   description: string,
   defaultRoles: Immutable.List<string>,
   config: {
     type: string,
-    ...
   },
-|};
+};
 
-export type AuthenticationBackendJSON = {|
+export type AuthenticationBackendJSON = {
   id: string,
   title: string,
   description: string,
+  // eslint-disable-next-line camelcase
   default_roles: Array<string>,
   config: {
     type: string,
-    ...
   },
-|};
+};
 
 const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
   const authService = getAuthServicePlugin(config.type, true);
@@ -111,7 +110,7 @@ export default class AuthenticationBackend {
       config,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       id,
       title,
@@ -165,7 +164,7 @@ export default class AuthenticationBackend {
 
   // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
