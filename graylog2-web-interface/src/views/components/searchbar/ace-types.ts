@@ -22,14 +22,14 @@ export type Token = {
 };
 
 export type Session = {
-  getTokens: (number) => Array<Token>,
-  getTokenAt: (number, number) => ?Token,
+  getTokens: (no: number) => Array<Token>,
+  getTokenAt: (no: number, idx: number) => Token | undefined | null,
   getValue: () => string,
 };
 
 export type Renderer = {
   scroller: HTMLElement,
-  emptyMessageNode: ?HTMLElement,
+  emptyMessageNode: HTMLElement | undefined | null,
 };
 
 export type Command = {
@@ -39,12 +39,12 @@ export type Command = {
     mac: string,
   },
   // eslint-disable-next-line no-use-before-define
-  exec: Editor => void,
+  exec: (editor: Editor) => void,
 };
 
 export type Commands = {
-  addCommand: Command => void,
-  removeCommands: Array<string> => void,
+  addCommand: (command: Command) => void,
+  removeCommands: (commands: Array<string>) => void,
 };
 
 export type Popup = {
@@ -63,7 +63,7 @@ export type Editor = {
   completers: Array<AutoCompleter>,
   session: Session,
   renderer: Renderer,
-  setFontSize: (number) => void,
+  setFontSize: (newFontSize: number) => void,
 };
 
 export type CompletionResult = {
@@ -73,7 +73,7 @@ export type CompletionResult = {
   meta: any,
 };
 
-export type ResultsCallback = (null, Array<CompletionResult>) => void;
+export type ResultsCallback = (obj: null, results: Array<CompletionResult>) => void;
 
 export type Position = {
   row: number,
