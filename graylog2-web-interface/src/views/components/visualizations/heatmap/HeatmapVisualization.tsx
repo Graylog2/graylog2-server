@@ -24,11 +24,11 @@ import { makeVisualization } from 'views/components/aggregationbuilder/Aggregati
 
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
-import { chartData, type ValuesBySeries } from '../ChartData';
+import { chartData, ValuesBySeries } from '../ChartData';
 
 const BG_COLOR = '#440154';
 
-const COLORSCALE = [
+const COLORSCALE: [number, string][] = [
   [0.00, BG_COLOR],
   [0.05, '#481567'],
   [0.10, '#483677'],
