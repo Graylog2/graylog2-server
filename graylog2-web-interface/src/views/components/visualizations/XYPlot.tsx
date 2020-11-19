@@ -40,15 +40,15 @@ export type Props = {
   config: AggregationWidgetConfig,
   chartData: any,
   currentQuery: Query,
-  effectiveTimerange: {
+  effectiveTimerange?: {
     from: string,
     to: string,
   },
-  getChartColor?: (Array<ChartConfig>, string) => ?string,
+  getChartColor?: (data: Array<ChartConfig>, name: string) => (string | undefined | null | void),
   height?: number;
-  setChartColor?: (ChartConfig, ColorMap) => ChartColor,
+  setChartColor?: (config: ChartConfig, color: ColorMap) => ChartColor,
   plotLayout?: any,
-  onZoom: (Query, string, string, ?ViewType) => boolean,
+  onZoom?: (query: Query, from: string, to: string, viewType: ViewType | undefined | null) => boolean,
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -122,7 +122,7 @@ XYPlot.propTypes = {
   chartData: PropTypes.array.isRequired,
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   currentQuery: CustomPropTypes.instanceOf(Query).isRequired,
-  effectiveTimerange: PropTypes.shape({
+  effectiveTimerange: PropTypes.exact({
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
   }),
@@ -135,7 +135,6 @@ XYPlot.propTypes = {
 XYPlot.defaultProps = {
   plotLayout: {},
   getChartColor: undefined,
-  height: undefined,
   setChartColor: undefined,
   effectiveTimerange: undefined,
   onZoom: OnZoom,
