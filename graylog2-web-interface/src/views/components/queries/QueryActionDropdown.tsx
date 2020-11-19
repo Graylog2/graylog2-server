@@ -22,7 +22,7 @@ import { Icon } from 'components/common';
 import ActionDropdown from 'views/components/common/ActionDropdown';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactElement,
 };
 
 const QueryActionDropdown = ({ children }: Props) => (
