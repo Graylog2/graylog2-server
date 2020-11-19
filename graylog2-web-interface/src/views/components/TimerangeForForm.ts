@@ -23,6 +23,8 @@ import type { TimeRange } from 'views/logic/queries/Query';
 const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
 
 export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
+  const { type } = timerange;
+
   switch (timerange.type) {
     case 'absolute':
       return {
@@ -37,11 +39,13 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
       };
     case 'keyword':
       return timerange;
-    default: throw new Error(`Invalid time range type: ${timerange.type}`);
+    default: throw new Error(`Invalid time range type: ${type}`);
   }
 };
 
 export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
+  const { type } = timerange;
+
   switch (timerange.type) {
     case 'absolute':
       return {
@@ -56,12 +60,12 @@ export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
       };
     case 'keyword':
       return timerange;
-    default: throw new Error(`Invalid time range type: ${timerange.type}`);
+    default: throw new Error(`Invalid time range type: ${type}`);
   }
 };
 
 const migrationStrategies = {
-  absolute: (oldTimerange: ?TimeRange) => ({
+  absolute: (oldTimerange: TimeRange | undefined | null) => ({
     type: 'absolute',
     from: formatDatetime(new DateTime(moment().subtract((oldTimerange && oldTimerange.type === 'relative') ? oldTimerange.range : 300, 'seconds'))),
     to: formatDatetime(new DateTime(moment())),
@@ -71,7 +75,7 @@ const migrationStrategies = {
   disabled: () => undefined,
 };
 
-export const migrateTimeRangeToNewType = (oldTimerange: ?TimeRange, type: string): ?TimeRange => {
+export const migrateTimeRangeToNewType = (oldTimerange: TimeRange | undefined | null, type: string): TimeRange | undefined | null => {
   const oldType = oldTimerange ? oldTimerange.type : 'disabled';
 
   if (type === oldType) {
