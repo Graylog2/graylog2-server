@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import type { CapabilityType } from 'logic/permissions/types';
 
@@ -43,7 +44,7 @@ export default class Capability {
   toBuilder(): Builder {
     const { id, title } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ id, title }));
   }
 
@@ -65,7 +66,7 @@ export default class Capability {
 
   // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
