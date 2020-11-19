@@ -16,10 +16,11 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import { $PropertyType } from 'utility-types';
+import styled, { StyledComponent } from 'styled-components';
 
 import Grantee from 'logic/permissions/Grantee';
-import { type ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
