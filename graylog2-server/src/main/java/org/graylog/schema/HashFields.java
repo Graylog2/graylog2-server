@@ -16,11 +16,10 @@
  */
 package org.graylog.schema;
 
-public class GeoFields {
-    public static final String GEO_CITY_NAME = "geo_city_name";
-    public static final String GEO_COUNTRY_ISO = "geo_country_iso";
-    public static final String GEO_COUNTRY_NAME = "geo_country_name";
-    public static final String GEO_COORDINATES = "geo_coordinates";
-    public static final String GEO_NAME = "geo_name";
-    public static final String GEO_STATE_NAME = "geo_state_name";
+public class HashFields {
+    public static final String HASH_MD5 = "hash_md5";
+    public static final String HASH_SHA1 = "hash_sha1";
+    public static final String HASH_SHA256 = "hash_sha256";
+    public static final String HASH_SHA512 = "hash_sha512";
+    public static final String HASH_IMPHASH = "hash_imphash";
 }
