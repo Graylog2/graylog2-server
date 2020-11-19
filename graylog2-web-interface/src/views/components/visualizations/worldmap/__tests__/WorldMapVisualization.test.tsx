@@ -24,6 +24,8 @@ import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import WorldMapVisualization from '../WorldMapVisualization';
 
@@ -32,7 +34,7 @@ jest.mock('../MapVisualization', () => 'map-visualization');
 describe('WorldMapVisualization', () => {
   // $FlowFixMe: type is always defined
   const config = AggregationWidgetConfig.builder().visualization(WorldMapVisualization.type).build();
-  const effectiveTimerange = {
+  const effectiveTimerange: AbsoluteTimeRange = {
     from: '2019-07-04T13:37:00Z',
     to: '2019-07-05T13:37:00Z',
     type: 'absolute',
@@ -107,9 +109,8 @@ describe('WorldMapVisualization', () => {
 
   it('renders Map component with correct data, when a metric is defined', () => {
     const series = new Series('count()');
-    // $FlowFixMe: type is always defined
     const configWithMetric = AggregationWidgetConfig.builder().series([series]).visualization(WorldMapVisualization.type).build();
-    const data = {
+    const data: Record<string, Rows> = {
       chart: [
         {
           key: ['37.751,-97.822'],
@@ -145,9 +146,8 @@ describe('WorldMapVisualization', () => {
   });
 
   it('renders Map component with correct data, when no metric is defined', () => {
-    // $FlowFixMe: type is always defined
     const configWithoutMetric = AggregationWidgetConfig.builder().visualization(WorldMapVisualization.type).build();
-    const data = {
+    const data: Record<string, Rows> = {
       chart: [
         { key: ['37.751,-97.822'], values: [], source: 'leaf' },
         { key: ['35.69,139.69'], values: [], source: 'leaf' },
