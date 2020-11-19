@@ -42,15 +42,16 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
 import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
+import { SearchesConfig } from 'components/search/SearchConfig';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
-  availableStreams: Array<*>,
-  config: any,
+  availableStreams: Array<{ key: string, value: string }>,
+  config: SearchesConfig,
   currentQuery: Query,
   disableSearch: boolean,
-  onSubmit: ({ timerange: TimeRange, streams: Array<string>, queryString: string }, Query) => Promise<any>,
+  onSubmit: (update: { timerange: TimeRange, streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
@@ -152,7 +153,6 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
 };
 
 SearchBar.propTypes = {
-  config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
   onSubmit: PropTypes.func,
 };
