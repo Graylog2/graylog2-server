@@ -44,7 +44,12 @@ const timerangeStrategies = {
   },
 };
 
-const timerangeStrategy = (type: ?TimeRangeTypes) => {
+type TimeRangeInputProps = {
+  disabled: boolean;
+  config: SearchesConfig;
+};
+
+const timerangeStrategy = (type: TimeRangeTypes | undefined | null): { component: React.ComponentType<Partial<TimeRangeInputProps>> } => {
   if (!type) {
     return { component: DisabledTimeRangeSelector };
   }
