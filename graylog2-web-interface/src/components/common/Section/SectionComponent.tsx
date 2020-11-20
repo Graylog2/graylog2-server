@@ -23,7 +23,7 @@ import { ThemeInterface } from 'theme';
 import { Row, Col } from 'components/graylog';
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactNode,
   title: string,
   showLoading?: boolean,
   headerActions?: React.ReactElement,

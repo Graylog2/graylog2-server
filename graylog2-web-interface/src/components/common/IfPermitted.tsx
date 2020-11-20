@@ -28,7 +28,7 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
  */
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactNode,
   permissions: string | Array<string>,
   anyPermissions?: boolean,
 };

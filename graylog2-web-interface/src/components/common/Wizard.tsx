@@ -143,7 +143,7 @@ type Props = {
   steps: Steps,
   activeStep: StepKey | null | undefined,
   onStepChange: (StepKey) => void,
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactNode,
   horizontal: boolean,
   justified: boolean,
   containerClassName: string,

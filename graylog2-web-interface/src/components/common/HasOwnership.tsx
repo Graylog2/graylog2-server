@@ -26,7 +26,7 @@ import { UserJSON } from 'logic/users/User';
 type ChildFun = ({ disabled: boolean }) => React.ReactElement;
 
 type Props = {
-  children: React.ReactElement | ChildFun,
+  children: React.ReactNode | ChildFun,
   id: string,
   type: string,
   hideChildren: boolean,

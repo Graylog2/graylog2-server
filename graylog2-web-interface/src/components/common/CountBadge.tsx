@@ -25,7 +25,7 @@ const Badge: StyledComponent<undefined, ThemeInterface, HTMLSpanElement> = style
 `);
 
 type Props = {
-  children: React.ReactElement | string | number;
+  children: React.ReactNode;
 };
 
 const CountBadge = ({ children }: Props) => (

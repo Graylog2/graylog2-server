@@ -27,7 +27,7 @@ const DEFAULT_PAGE_SIZES = [10, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactNode,
   className?: string,
   onChange: (currentPage: number, pageSize: number) => void,
   activePage: number,
