@@ -99,7 +99,6 @@ export default class AuthenticationBackend {
     return this._value.config;
   }
 
-  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const {
       id,
@@ -109,7 +108,7 @@ export default class AuthenticationBackend {
       config,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       id,
       title,
@@ -161,9 +160,8 @@ export default class AuthenticationBackend {
     );
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
