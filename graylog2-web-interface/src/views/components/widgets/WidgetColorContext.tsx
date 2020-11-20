@@ -25,7 +25,7 @@ import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import ChartColorContext from '../visualizations/ChartColorContext';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   colorRules: Array<ColorRule>,
   id: string,
 };
