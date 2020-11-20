@@ -30,6 +30,7 @@ import SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import EntityShareSettings from './EntityShareSettings';
+import Select from 'components/common/Select';
 
 type Props = {
   description: string,
@@ -44,7 +45,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const entityGRN = createGRN(entityType, entityId);
-  const granteesSelectRef = useRef();
+  const granteesSelectRef = useRef<typeof Select>();
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
@@ -53,9 +54,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
   const _handleSave = () => {
     setDisableSubmit(true);
     const granteesSelect = granteesSelectRef?.current;
-    // @ts-ignore We dealt with the undefined case here
     const granteesSelectValue = granteesSelect?.state?.value;
-    // @ts-ignore We dealt with the undefined case here
     const granteesSelectOptions = granteesSelect?.props?.options;
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: entityShareState.selectedGranteeCapabilities,
