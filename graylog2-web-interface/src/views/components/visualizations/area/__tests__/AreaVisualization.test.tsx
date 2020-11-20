@@ -51,14 +51,14 @@ describe('AreaVisualization', () => {
       .series([Series.forFunction('avg(nf_bytes)'), Series.forFunction('sum(nf_pkts)')])
       .build();
 
-    const wrapper = mount((<AreaVisualization config={config}
-                                              data={simpleChartData}
-                                              effectiveTimerange={effectiveTimerange}
-                                              fields={Immutable.List()}
-                                              height={1024}
-                                              onChange={() => {}}
-                                              toggleEdit={() => {}}
-                                              width={800} />));
+    const wrapper = mount(<AreaVisualization config={config}
+                                             data={simpleChartData}
+                                             effectiveTimerange={effectiveTimerange}
+                                             fields={Immutable.List()}
+                                             height={1024}
+                                             onChange={() => {}}
+                                             toggleEdit={() => {}}
+                                             width={800} />);
 
     const genericPlot = wrapper.find('GenericPlot');
 
