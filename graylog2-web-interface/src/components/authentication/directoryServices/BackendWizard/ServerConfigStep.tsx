@@ -118,7 +118,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
 
   return (
     <Formik initialValues={stepsState.formValues}
-            ref={formRef}
+            innerRef={formRef}
             initialErrors={backendValidationErrors}
             onSubmit={onSubmit}
             validateOnBlur={false}
