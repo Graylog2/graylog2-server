@@ -33,7 +33,7 @@ describe('Views bindings field actions', () => {
   const findAction = (type) => fieldActions.find((binding) => binding.type === type);
 
   describe('Aggregate', () => {
-    const action = findAction('aggregate');
+    const action: FieldAction = findAction('aggregate');
     const { isEnabled } = action;
 
     it('is present', () => {
