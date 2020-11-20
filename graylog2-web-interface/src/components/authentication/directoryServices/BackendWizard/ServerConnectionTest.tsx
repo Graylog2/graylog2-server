@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useContext } from 'react';
 
@@ -24,7 +23,7 @@ import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
-import BackendWizardContext from './BackendWizardContext';
+import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
 
 const _addRequiredRequestPayload = (formValues) => {
   const necessaryAttributes = { ...formValues };
@@ -41,7 +40,7 @@ const _addRequiredRequestPayload = (formValues) => {
 };
 
 type Props = {
-  prepareSubmitPayload: () => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
 };
 
 const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
@@ -49,7 +48,7 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
   const [{ loading, success, message, errors }, setConnectionStatus] = useState({ loading: false, success: false, message: undefined, errors: undefined });
 
   const _handleConnectionCheck = () => {
-    const payload = _addRequiredRequestPayload(prepareSubmitPayload());
+    const payload = _addRequiredRequestPayload(prepareSubmitPayload(undefined));
 
     setConnectionStatus({ loading: true, message: undefined, errors: undefined, success: false });
 
