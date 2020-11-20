@@ -23,7 +23,7 @@ import type { StyledComponent } from 'styled-components';
 import type { ThemeInterface } from 'theme';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   show: boolean,
 };
 
