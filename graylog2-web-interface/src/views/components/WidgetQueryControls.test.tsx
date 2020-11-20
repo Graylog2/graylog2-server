@@ -22,6 +22,7 @@ import WrappingContainer from 'WrappingContainer';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import SearchBarForm from './searchbar/SearchBarForm';
@@ -68,7 +69,7 @@ describe('WidgetQueryControls', () => {
   const emptyGlobalOverride = {};
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
-  const Wrapper = ({ children }: { children: React.Node }) => (
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <WrappingContainer>
       <SearchBarForm initialValues={{ timerange: DEFAULT_TIMERANGE, queryString: '', streams: [] }} onSubmit={() => {}}>
         {children}
@@ -127,7 +128,7 @@ describe('WidgetQueryControls', () => {
 
       rerender(
         <Wrapper>
-          <WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />
+          <WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride as GlobalOverride} />
         </Wrapper>,
       );
 
