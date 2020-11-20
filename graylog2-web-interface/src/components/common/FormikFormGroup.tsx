@@ -23,6 +23,7 @@ import FormikInput from './FormikInput';
 
 type Props = {
   autoComplete?: string,
+  buttonAfter?: React.ReactElement | string,
   label: React.ReactElement | string,
   name: string,
   onChange?: (event: SyntheticEvent<Input>) => void,
@@ -52,6 +53,7 @@ const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChan
 
 FormikFormGroup.defaultProps = {
   autoComplete: undefined,
+  buttonAfter: undefined,
   onChange: undefined,
   labelClassName: 'col-sm-3',
   wrapperClassName: 'col-sm-9',
