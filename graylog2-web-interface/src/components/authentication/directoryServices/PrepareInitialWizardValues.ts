@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 
-import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 
-import type { WizardFormValues } from './BackendWizard/BackendWizardContext';
+import { WizardFormValues } from './BackendWizard/BackendWizardContext';
 
 export default ({
   title,
