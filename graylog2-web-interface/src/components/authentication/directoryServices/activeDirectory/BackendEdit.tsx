@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
@@ -30,17 +29,11 @@ import handleUpdate from '../HandleUpdate';
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
-  initialStepKey: ?string,
+  initialStepKey: string | null | undefined,
 };
 
-const _optionalWizardProps = (initialStepKey: ?string) => {
-  const props = {};
-
-  if (initialStepKey) {
-    props.initialStepKey = initialStepKey;
-  }
-
-  return props;
+const _optionalWizardProps = (initialStepKey: string | null | undefined) => {
+  return { initialStepKey }
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
