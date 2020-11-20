@@ -98,7 +98,7 @@ describe('XYPlot', () => {
 
   it('renders generic X/Y-Plot when no timeline config is passed', () => {
     const emptyConfig = AggregationWidgetConfig.builder().build();
-    const timerange = { from: 'foo', to: 'bar' };
+    const timerange = { from: 'foo', to: 'bar', type: 'absolute' };
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} config={emptyConfig} />);
     const genericPlot = wrapper.find('GenericPlot');
 
@@ -116,7 +116,7 @@ describe('XYPlot', () => {
 
   it('adds zoom handler for timeline plot', () => {
     CurrentUserStore.get.mockReturnValue({ timezone: 'UTC' });
-    const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
+    const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
 
@@ -136,7 +136,7 @@ describe('XYPlot', () => {
   });
 
   it('uses effective time range from pivot result if all messages are selected', () => {
-    const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
+    const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
     const allMessages: RelativeTimeRange = { type: 'relative', range: 0 };
     const currentQueryForAllMessages = currentQuery.toBuilder().timerange(allMessages).build();
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
