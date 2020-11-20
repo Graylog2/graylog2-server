@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 /* eslint-disable no-alert */
 import * as React from 'react';
 import * as Immutable from 'immutable';
@@ -44,7 +43,7 @@ const DescriptionCell = styled.td`
   max-width: 300px;
 `;
 
-const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
+const rolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
   const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found');
 
   return defaultRolesNames.join(', ');
@@ -131,7 +130,7 @@ const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props)
         </TextOverflowEllipsis>
       </DescriptionCell>
       <td className="limited">
-        <RolesList defaultRolesIds={defaultRoles} roles={roles} />
+        {rolesList({ defaultRolesIds: defaultRoles, roles })}
       </td>
       <ActionsCell authenticationBackend={authenticationBackend} isActive={isActive} />
     </tr>
