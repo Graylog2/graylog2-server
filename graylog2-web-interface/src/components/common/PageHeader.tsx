@@ -57,7 +57,7 @@ type Props = {
   children: Array<React.ReactElement>,
   subactions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
-  lifecycleMessage?: React.ReactElement,
+  lifecycleMessage?: React.ReactNode,
   subpage: boolean,
 };
 
