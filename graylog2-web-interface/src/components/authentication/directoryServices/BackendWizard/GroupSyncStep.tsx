@@ -14,28 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Formik } from 'formik';
+import { FormikProps } from 'formik';
 
 import { Row, Col, Button, ButtonToolbar } from 'components/graylog';
 import Role from 'logic/roles/Role';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { WizardFormValues } from './BackendWizardContext';
+import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { EnterprisePluginNotFound } from 'components/common';
 
-export type StepKeyType = 'group-synchronization';
-export const STEP_KEY: StepKeyType = 'group-synchronization';
+export const STEP_KEY = 'group-synchronization';
 
 export type Props = {
-  formRef: React.Ref<typeof Formik>,
+  formRef: React.Ref<FormikProps<WizardFormValues>>,
   onSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
-  help: { [inputName: string]: ?React.Node },
+  help: { [inputName: string]: React.ReactNode | null | undefined },
   excludedFields: { [inputName: string]: boolean },
-  prepareSubmitPayload: () => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
   roles: Immutable.List<Role>,
-  submitAllError: ?React.Node,
+  submitAllError: React.ReactNode | null | undefined,
   validateOnMount: boolean,
 };
 
