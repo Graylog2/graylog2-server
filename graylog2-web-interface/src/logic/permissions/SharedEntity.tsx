@@ -57,11 +57,10 @@ export default class SharedEntity {
     return this._value.type;
   }
 
-  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, owners, title } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ id, owners, title }));
   }
 
@@ -84,9 +83,8 @@ export default class SharedEntity {
       .build();
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

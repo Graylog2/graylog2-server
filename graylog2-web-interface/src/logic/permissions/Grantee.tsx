@@ -47,11 +47,10 @@ export default class Grantee implements GranteeInterface {
     return this._value.type;
   }
 
-  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, title, type } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ id, title, type }));
   }
 
@@ -72,9 +71,8 @@ export default class Grantee implements GranteeInterface {
       .build();
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
