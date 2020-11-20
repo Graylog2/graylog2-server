@@ -34,7 +34,7 @@ type Props = {
   },
 };
 
-const PageTitle = ({ fullName }: {fullName: ?string}) => (
+const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   <>
     Edit User {fullName && (
       <>
@@ -58,12 +58,19 @@ const UserEditPage = ({ params }: Props) => {
     UsersDomain.load(userId);
   }, [userId]);
 
+  // @ts-ignore We check if user is loaded with the optional
+  const fullName = loadedUser?.fullName ?? '';
+  // @ts-ignore We check if user is loaded with the optional
+  const readOnly = loadedUser?.readOnly ?? false;
+  // @ts-ignore We check if user is loaded with the optional
+  const userToEdit = userId === loadedUser?.id ? loadedUser : undefined;
+
   return (
-    <DocumentTitle title={`Edit User ${loadedUser?.fullName ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
+    <DocumentTitle title={`Edit User ${fullName}`}>
+      <PageHeader title={<PageTitle fullName={fullName} />}
                   subactions={(
                     <UserActionLinks userId={userId}
-                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
+                                     userIsReadOnly={readOnly} />
                   )}>
         <span>
           You can change the user details and password here and assign roles and teams.
@@ -77,7 +84,7 @@ const UserEditPage = ({ params }: Props) => {
 
         <UserOverviewLinks />
       </PageHeader>
-      <UserEdit user={userId === loadedUser?.id ? loadedUser : undefined} />
+      <UserEdit user={userToEdit} />
     </DocumentTitle>
   );
 };
