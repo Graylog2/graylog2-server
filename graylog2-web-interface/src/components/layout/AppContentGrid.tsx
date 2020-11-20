@@ -23,7 +23,7 @@ import type { StyledComponent } from 'styled-components';
 import { Grid } from 'components/graylog';
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactNode,
 };
 
 const Container: StyledComponent<Props, void, HTMLDivElement> = styled.div`
