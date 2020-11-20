@@ -17,13 +17,13 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 import type { ThemeInterface } from 'theme/types';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   small: boolean,
 };
 
