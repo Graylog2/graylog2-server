@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { compact, camelCase, mapKeys, mapValues } from 'lodash';
+import { $PropertyType } from 'utility-types';
 import PropTypes from 'prop-types';
+import { FormikProps } from 'formik';
 
 import history from 'util/History';
 import { validateField } from 'util/FormsUtils';
@@ -29,12 +29,12 @@ import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { Row, Col, Alert } from 'components/graylog';
-import Wizard, { type Step } from 'components/common/Wizard';
+import Wizard, { Step } from 'components/common/Wizard';
 import { FetchError } from 'logic/rest/FetchProvider';
-import type { LoadResponse as LoadBackendResponse } from 'actions/authentication/AuthenticationActions';
-import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import { LoadResponse as LoadBackendResponse } from 'actions/authentication/AuthenticationActions';
+import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
-import BackendWizardContext, { type WizardStepsState, type WizardFormValues, type AuthBackendMeta } from './BackendWizardContext';
+import BackendWizardContext, { WizardStepsState, WizardFormValues, AuthBackendMeta } from './BackendWizardContext';
 import {
   FORM_VALIDATION as SERVER_CONFIG_VALIDATION,
   STEP_KEY as SERVER_CONFIG_KEY,
@@ -54,7 +54,7 @@ const FORMS_VALIDATION = {
   [USER_SYNC_KEY]: USER_SYNC_VALIDATION,
 };
 
-const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?string }) => (
+const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: string | null | undefined }) => (
   <Row>
     <Col xs={9} xsOffset={3}>
       <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }}>
@@ -66,14 +66,14 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: ?s
   </Row>
 );
 
-const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: ?string }) => {
+const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string | null | undefined }) => {
   const backendErrorStrings = mapValues(backendErrors, (errorArray) => `Server validation error: ${errorArray.join(' ')}`);
   const formattedBackendErrors = mapKeys(backendErrorStrings, (value, key) => camelCase(key));
 
   return formattedBackendErrors;
 };
 
-export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string) => {
+export const _passwordPayload = (backendId: string | null | undefined, systemUserPassword: string | null | undefined) => {
   const _formatPayload = (password) => {
     if (!password) {
       return undefined;
@@ -99,7 +99,7 @@ export const _passwordPayload = (backendId: ?string, systemUserPassword: ?string
   return _formatPayload(systemUserPassword);
 };
 
-const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues): WizardSubmitPayload => {
+const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFormValues: WizardFormValues): WizardSubmitPayload => {
   // We need to ensure that we are using the actual form values
   // It is possible to provide already updated form values, so we do not need to get them twice
   const formValues = overrideFormValues ?? getUpdatedFormsValues();
@@ -230,7 +230,7 @@ type Props = {
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
   excludedFields: {[ inputName: string ]: boolean },
-  help: { [inputName: string]: ?React.Node },
+  help: { [inputName: string]: React.ReactNode | null | undefined },
   onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
 
@@ -243,7 +243,7 @@ const _loadRoles = (setPaginatedRoles) => {
 const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMeta, help, excludedFields }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const MatchingGroupsProvider = enterpriseGroupSyncPlugin?.components.MatchingGroupsProvider;
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
+  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [submitAllError, setSubmitAllError] = useState();
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStepKey,
@@ -254,10 +254,11 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
   });
 
   const formRefs = {
-    [SERVER_CONFIG_KEY]: useRef(),
-    [USER_SYNC_KEY]: useRef(),
-    [GROUP_SYNC_KEY]: useRef(),
+    [SERVER_CONFIG_KEY]: useRef<FormikProps<WizardFormValues>>(null),
+    [USER_SYNC_KEY]: useRef<FormikProps<WizardFormValues>>(null),
+    [GROUP_SYNC_KEY]: useRef<FormikProps<WizardFormValues>>(null),
   };
+
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   useEffect(() => {
