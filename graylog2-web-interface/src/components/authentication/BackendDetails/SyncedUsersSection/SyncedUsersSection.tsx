@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import * as Immutable from 'immutable';
@@ -61,7 +60,7 @@ type Props = {
 
 const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [paginatedUsers, setPaginatedUsers] = useState<?PaginatedUsers>();
+  const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: users } = paginatedUsers || {};
   const { page } = pagination;
