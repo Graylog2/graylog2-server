@@ -40,7 +40,7 @@ type Props = {
 };
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ autoComplete, labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
+const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
   <FormikInput {...rest}
                label={label}
                id={name}
