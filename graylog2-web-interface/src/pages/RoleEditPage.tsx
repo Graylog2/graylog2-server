@@ -28,6 +28,7 @@ import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
+import Role from 'logic/roles/Role';
 
 type Props = {
   params: {
@@ -35,7 +36,7 @@ type Props = {
   },
 };
 
-const PageTitle = ({ name }: {name: ?string}) => (
+const PageTitle = ({ name }: { name: string | undefined | null }) => (
   <>
     Edit Role {name && (
       <>
@@ -46,7 +47,7 @@ const PageTitle = ({ name }: {name: ?string}) => (
 );
 
 const RoleEditPage = ({ params }: Props) => {
-  const [loadedRole, setLoadedRole] = useState();
+  const [loadedRole, setLoadedRole] = useState<Role | undefined>();
   const roleId = params?.roleId;
 
   useEffect(() => {
