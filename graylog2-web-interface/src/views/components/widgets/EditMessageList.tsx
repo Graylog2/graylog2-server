@@ -19,7 +19,9 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
@@ -56,14 +58,14 @@ const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, con
   return onChange(newConfig);
 };
 
-const _onSortDirectionChange = (direction: $PropertyType<AggregationWidgetConfig, 'direction'>, config, onChange) => {
+const _onSortDirectionChange = (direction: SortConfig['direction'], config, onChange) => {
   const newConfig = config.toBuilder().sort(config.sort.map((sort) => sort.toBuilder().direction(direction).build())).build();
 
   return onChange(newConfig);
 };
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   config: MessagesWidgetConfig,
   fields: Immutable.List<FieldTypeMapping>,
   onChange: (MessagesWidgetConfig) => void,
