@@ -30,6 +30,7 @@ type Props = {
   formGroupClassName?: string,
   type?: string,
   error?: React.ReactElement | string,
+  placeholder?: string
   help?: React.ReactElement | string,
   minLength?: number,
   maxLength?: number,
@@ -55,6 +56,7 @@ FormikFormGroup.defaultProps = {
   formGroupClassName: undefined,
   type: undefined,
   error: undefined,
+  placeholder: undefined,
   help: undefined,
   minLength: undefined,
   maxLength: undefined,
