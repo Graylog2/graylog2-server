@@ -8098,6 +8098,7 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
     formik "2.2.0"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
+    jest-preset-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-41f5ec34-281a-4ac6-a23f-3766981d9d87-1605783815726/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -9594,6 +9595,24 @@ jest-pnp-resolver@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.1.tgz#ecdae604c077a7fbc70defb6d517c3c1c898923a"
   integrity sha512-pgFw2tm54fzgYvc/OHrnysABEObZCUNFnhjoRjaVOCN8NYc032/gVjPaHD4Aq6ApkSieWtfKAFQtmDKAmhupnQ==
+
+"jest-preset-graylog@file:packages/jest-preset-graylog":
+  version "1.0.0"
+  dependencies:
+    "@testing-library/dom" "7.20.2"
+    "@testing-library/jest-dom" "5.11.0"
+    "@testing-library/react" "11.0.4"
+    "@types/jest" "25.2.3"
+    babel-jest "^25.1.0"
+    enzyme "3.11.0"
+    enzyme-adapter-react-16 "^1.15.2"
+    identity-obj-proxy "^3.0.0"
+    jest "^25.1.0"
+    jest-environment-enzyme "^7.1.2"
+    jest-enzyme "^7.1.2"
+    jest-localstorage-mock "^2.4.0"
+    jest-styled-components "7.0.2"
+    react-select-event "^5.0.0"
 
 jest-regex-util@^24.9.0:
   version "24.9.0"

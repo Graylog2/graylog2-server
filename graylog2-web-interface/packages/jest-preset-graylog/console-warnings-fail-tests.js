@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable no-console */
-import { format } from 'util';
-import { DEPRECATION_NOTICE } from 'util/deprecationNotice';
+const { format } = require('util');
+
+const { DEPRECATION_NOTICE } = require('util/deprecationNotice');
 
 console.origWarn = console.warn;
 console.origError = console.error;
@@ -31,6 +32,7 @@ const ignoreWarning = (args) => (!args[0] || ignoredWarnings.filter((warning) =>
 
 console.warn = jest.fn((...args) => {
   console.origWarn(...args);
+
   if (!ignoreWarning(args)) {
     throw new Error(format(...args));
   }
@@ -38,6 +40,7 @@ console.warn = jest.fn((...args) => {
 
 console.error = jest.fn((...args) => {
   console.origError(...args);
+
   if (!ignoreWarning(args)) {
     throw new Error(format(...args));
   }
