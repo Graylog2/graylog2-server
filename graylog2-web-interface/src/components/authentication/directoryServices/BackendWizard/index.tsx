@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-
 import BackendWizard from './BackendWizard';
 
 export default BackendWizard;
