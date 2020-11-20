@@ -22,6 +22,7 @@ import { Input } from 'components/bootstrap';
 import FormikInput from './FormikInput';
 
 type Props = {
+  autoComplete?: string,
   label: React.ReactElement | string,
   name: string,
   onChange?: (event: SyntheticEvent<Input>) => void,
@@ -39,7 +40,7 @@ type Props = {
 };
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
+const FormikFormGroup = ({ autoComplete, labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
   <FormikInput {...rest}
                label={label}
                id={name}
@@ -50,6 +51,7 @@ const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChan
 );
 
 FormikFormGroup.defaultProps = {
+  autoComplete: undefined,
   onChange: undefined,
   labelClassName: 'col-sm-3',
   wrapperClassName: 'col-sm-9',
