@@ -29,10 +29,10 @@ import handleUpdate from '../HandleUpdate';
 
 type Props = {
   authenticationBackend: DirectoryServiceBackend,
-  initialStepKey: string | undefined,
+  initialStepKey: string | null | undefined,
 };
 
-const _optionalWizardProps = (initialStepKey: string | undefined) => {
+const _optionalWizardProps = (initialStepKey: string | null | undefined) => {
   return { initialStepKey };
 };
 
