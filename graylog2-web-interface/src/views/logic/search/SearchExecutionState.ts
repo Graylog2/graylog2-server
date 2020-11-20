@@ -58,7 +58,7 @@ export default class SearchExecutionState {
     return new Builder(Immutable.Map({ globalOverride, parameterBindings }));
   }
 
-  static create(parameterBindings: ParameterBindings, globalOverride: GlobalOverride | undefined | null): SearchExecutionState {
+  static create(parameterBindings: ParameterBindings, globalOverride?: GlobalOverride): SearchExecutionState {
     return new SearchExecutionState(parameterBindings, globalOverride);
   }
 
