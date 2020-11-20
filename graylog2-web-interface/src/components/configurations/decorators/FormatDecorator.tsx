@@ -23,8 +23,8 @@ import type { Decorator, DecoratorType } from 'views/components/messagelist/deco
 const formatDecorator = (
   decorator: Decorator,
   decorators: Array<Decorator>,
-  decoratorTypes: { [string]: DecoratorType },
-  updateFn?: (Array<Decorator>) => mixed,
+  decoratorTypes: { [key: string]: DecoratorType },
+  updateFn?: (newDecorators: Array<Decorator>) => unknown,
 ) => {
   const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
 
