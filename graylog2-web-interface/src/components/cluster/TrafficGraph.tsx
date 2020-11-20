@@ -25,7 +25,7 @@ import { Spinner } from 'components/common';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
 
 type Props = {
-  traffic: { [string]: number },
+  traffic: { [key: string]: number },
   width: number,
 };
 
