@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as PropTypes from 'prop-types';
@@ -28,7 +27,7 @@ import EditLinkButton from './EditLinkButton';
 
 import { STEP_KEY as USER_SYNC_KEY } from '../BackendWizard/UserSyncStep';
 
-const RolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
+const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>) => {
   const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found');
 
   return defaultRolesNames.join(', ');
@@ -61,7 +60,7 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields }: Props
       {!excludedFields.userUniqueIdAttribute && (
         <ReadOnlyFormGroup label="ID Attribute" value={userUniqueIdAttribute} />
       )}
-      <ReadOnlyFormGroup label="Default Roles" value={<RolesList roles={roles} defaultRolesIds={defaultRoles} />} />
+      <ReadOnlyFormGroup label="Default Roles" value={rolesList(defaultRoles, roles)} />
     </SectionComponent>
   );
 };
