@@ -35,10 +35,15 @@ type Props = {
 };
 
 class UrlWhiteListConfig extends React.Component<Props, State> {
-  configModal: ?BootstrapModalForm;
+  private configModal: BootstrapModalForm | undefined | null;
 
-  inputs = {};
+  private inputs = {};
 
+  static propTypes = {
+    config: PropTypes.object.isRequired,
+    updateConfig: PropTypes.func.isRequired,
+  };
+  
   constructor(props: Props) {
     super(props);
     const { config } = this.props;
@@ -49,7 +54,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     };
   }
 
-  _summary = (): React.Element<'tr'>[] => {
+  _summary = (): React.ReactElement<'tr'>[] => {
     const literal = 'literal';
     const { config: { entries } } = this.props;
 
@@ -143,10 +148,5 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     );
   }
 }
-
-UrlWhiteListConfig.propTypes = {
-  config: PropTypes.object.isRequired,
-  updateConfig: PropTypes.func.isRequired,
-};
 
 export default UrlWhiteListConfig;
