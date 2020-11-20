@@ -123,6 +123,7 @@ XYPlot.propTypes = {
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   currentQuery: CustomPropTypes.instanceOf(Query).isRequired,
   effectiveTimerange: PropTypes.exact({
+    type: PropTypes.string.isRequired,
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
   }),
