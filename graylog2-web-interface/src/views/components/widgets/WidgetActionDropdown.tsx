@@ -29,7 +29,7 @@ const WidgetActionDropdown = ({ children }: Props) => {
 
   return (
     <ActionDropdown element={widgetActionDropdownCaret}>
-      <>{children}</>
+      {children as React.ReactElement}
     </ActionDropdown>
   );
 };
