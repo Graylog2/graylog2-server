@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
 import { EnterprisePluginNotFound } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
