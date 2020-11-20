@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
-import type { Step } from 'components/common/Wizard';
+import { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
 export type WizardFormValues = {
@@ -40,6 +40,7 @@ export type WizardFormValues = {
   transportSecurity?: 'tls' | 'start_tls' | 'none',
   userFullNameAttribute?: string,
   userNameAttribute?: string,
+  userUniqueIdAttribute?: string,
   userSearchBase?: string,
   userSearchPattern?: string,
   verifyCertificates?: boolean,
@@ -54,7 +55,7 @@ export type AuthBackendMeta = {
 };
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
-  backendValidationErrors: ?{ [inputName: string]: ?string },
+  backendValidationErrors: { [inputName: string]: string | null | undefined } | null | undefined,
   formValues: WizardFormValues,
   invalidStepKeys: Array<string>,
   authBackendMeta: AuthBackendMeta,
@@ -67,7 +68,7 @@ export type BackendWizardType = WizardStepsState & {
 const initialState = {
   activeStepKey: '',
   backendValidationErrors: undefined,
-  authBackendMeta: {},
+  authBackendMeta: { serviceType: '', serviceTitle: '' },
   formValues: {},
   invalidStepKeys: [],
   setStepsState: () => {},
