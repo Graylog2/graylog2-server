@@ -65,7 +65,6 @@ describe('WidgetColorContext', () => {
     const { colors } = container.props();
 
     expect(colors).toEqual({ localhost: '#171EFE', 'sum(bytes)': '#affe42' });
-    expect();
   });
 
   it('supplies setter for color of current widget', () => {
