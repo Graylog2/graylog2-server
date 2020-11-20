@@ -25,7 +25,7 @@ type State = {
 
 type Props = {
   children: React.ReactElement,
-};
+} & { [key: string]: any };
 
 export default class WidgetErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
