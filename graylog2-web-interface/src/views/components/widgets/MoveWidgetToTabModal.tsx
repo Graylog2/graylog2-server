@@ -16,6 +16,7 @@
  */
 // @flow strict
 import React, { useState, useCallback } from 'react';
+import * as Immutable from 'immutable';
 
 import { ListGroup, ListGroupItem } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -30,7 +31,7 @@ type Props = {
   view: View,
   widgetId: string,
   onCancel: () => void,
-  onSubmit: (widgetId: string, selectedTab: ?string, keepCopy: boolean) => void,
+  onSubmit: (widgetId: string, selectedTab: string | undefined | null, keepCopy: boolean) => void,
 };
 
 type TabEntry = { id: string, name: string };
@@ -47,7 +48,7 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
   const { id: activeQuery } = useStore(CurrentQueryStore);
-  const queryIds = useStore(QueryIdsStore);
+  const queryIds = useStore(QueryIdsStore) as Immutable.List<string>;
   const onKeepCopy = useCallback((e) => setKeepCopy(e.target.checked), [setKeepCopy]);
   const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy), [widgetId, selectedTab, keepCopy]);
 
