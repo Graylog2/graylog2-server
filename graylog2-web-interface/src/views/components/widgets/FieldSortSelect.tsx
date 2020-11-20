@@ -28,7 +28,7 @@ import Select from 'views/components/Select';
 
 type Props = {
   fields: Immutable.List<FieldTypeMapping>,
-  onChange: (Array<*>) => any,
+  onChange: (newSort: Array<SortConfig>) => any,
   sort: Array<SortConfig>,
 };
 
@@ -48,7 +48,7 @@ const sortedOptions = (fields: Immutable.List<FieldTypeMapping>) => {
     (field1, field2) => defaultCompare(field1.name, field2.name),
   ).map(
     (field, idx) => ({ label: field.name, value: idx }),
-  );
+  ).toList();
 };
 
 const onOptionChange = (options: Immutable.List<Option>, onChange, newValue, reason) => {
@@ -69,7 +69,7 @@ const onOptionChange = (options: Immutable.List<Option>, onChange, newValue, rea
 };
 
 const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
-  const options: Immutable.List<Option> = sortedOptions(fields);
+  const options = sortedOptions(fields);
 
   return (
     <Select placeholder="None: click to add fields"
