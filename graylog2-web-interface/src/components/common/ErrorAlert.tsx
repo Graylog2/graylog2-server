@@ -33,7 +33,7 @@ const Container: StyledComponent<{margin: number}, ThemeInterface, HTMLElement> 
 `);
 
 type Props = {
-  onClose: (msg: string | undefined) => void,
+  onClose: (msg?: string) => void,
   children: React.ReactNode,
   bsStyle: string,
   marginTopBottom: number,
