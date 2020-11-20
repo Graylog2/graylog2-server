@@ -33,7 +33,7 @@ type Props = {
   onChange?: (event: SyntheticEvent<Input>) => void,
   wrapperClassName?: string,
   validate?: (string) => string | undefined | null,
-  error?: string,
+  error?: React.ReactElement | string,
   placeholder?: string,
   required?: boolean,
   formGroupClassName?: string,

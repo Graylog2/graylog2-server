@@ -55,7 +55,7 @@ export type AuthBackendMeta = {
 };
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
-  backendValidationErrors: { [inputName: string]: string | null | undefined } | null | undefined,
+  backendValidationErrors: { [inputName: string]: React.ReactElement | string | null | undefined } | null | undefined,
   formValues: WizardFormValues,
   invalidStepKeys: Array<string>,
   authBackendMeta: AuthBackendMeta,
