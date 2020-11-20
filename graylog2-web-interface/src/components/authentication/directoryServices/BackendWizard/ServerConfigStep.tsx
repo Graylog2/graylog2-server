@@ -88,6 +88,7 @@ type Props = {
 };
 
 const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendValidationErrors, authBackendMeta: { backendHasPassword } } = stepsState;
 

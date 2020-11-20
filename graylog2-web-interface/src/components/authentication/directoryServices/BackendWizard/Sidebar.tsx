@@ -58,6 +58,7 @@ type Props = {
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
   const [activeKey, setActiveKey] = useState<$PropertyType<Step, 'key'>>(SERVER_CONFIG_KEY);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 
   useEffect(() => {

@@ -19,10 +19,9 @@ import { useEffect, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
-import { PaginatedBackends } from 'actions/authentication/AuthenticationActions';
+import AuthenticationActions, { PaginatedBackends } from 'actions/authentication/AuthenticationActions';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 import { Col, Row } from 'components/graylog';
 

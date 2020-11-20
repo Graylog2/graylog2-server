@@ -33,7 +33,7 @@ type Props = {
 };
 
 const _optionalWizardProps = (initialStepKey: string | null | undefined) => {
-  return { initialStepKey }
+  return { initialStepKey };
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {

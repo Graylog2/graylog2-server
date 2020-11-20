@@ -21,9 +21,10 @@ import { FormikProps } from 'formik';
 import { Row, Col, Button, ButtonToolbar } from 'components/graylog';
 import Role from 'logic/roles/Role';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import { WizardFormValues } from './BackendWizardContext';
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { EnterprisePluginNotFound } from 'components/common';
+
+import { WizardFormValues } from './BackendWizardContext';
 
 export const STEP_KEY = 'group-synchronization';
 
