@@ -17,12 +17,13 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
+import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 import { Spinner, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const HTTPHeaderAuthConfigSection = () => {
-  const [loadedConfig, setLoadedConfig] = useState();
+  const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined>();
   const sectionTitle = 'Trusted Header Authentication';
 
   useEffect(() => {
