@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Formik, Form } from 'formik';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
+import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 import { Input } from 'components/bootstrap';
 import { Button, Col, Row, Alert } from 'components/graylog';
@@ -28,12 +28,12 @@ import { FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const HTTPHeaderAuthConfigSection = () => {
-  const [submitError, setSubmitError] = useState<?string>();
-  const [loadedConfig, setLoadedConfig] = useState();
+  const [submitError, setSubmitError] = useState<string | undefined>();
+  const [loadedConfig, setLoadedConfig] = useState<HTTPHeaderAuthConfig | undefined>();
   const sectionTitle = 'Trusted Header Authentication';
 
   const _onSubmit = (data) => {
-    setSubmitError();
+    setSubmitError(undefined);
 
     return HTTPHeaderAuthConfigDomain.update(data).then(() => {
       history.push(Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW);
