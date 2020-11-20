@@ -18,12 +18,12 @@
 /* eslint-disable import/prefer-default-export */
 import { useState, useEffect } from 'react';
 
-import type { LoadActiveResponse } from 'actions/authentication/AuthenticationActions';
-import type { ListenableAction } from 'stores/StoreTypes';
+import { LoadActiveResponse } from 'actions/authentication/AuthenticationActions';
+import { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
-const useActiveBackend = <T>(listenableActions: Array<ListenableAction<T>> = []) => {
-  const [loadActiveResponse, setLoadActiveResponse] = useState<?LoadActiveResponse>();
+const useActiveBackend = <T extends PromiseProvider>(listenableActions: Array<ListenableAction<T>> = []) => {
+  const [loadActiveResponse, setLoadActiveResponse] = useState<LoadActiveResponse | undefined>();
   const [finishedLoading, setFinishedLoading] = useState(false);
   const _loadActive = () => AuthenticationDomain.loadActive().then((response) => {
     setFinishedLoading(true);

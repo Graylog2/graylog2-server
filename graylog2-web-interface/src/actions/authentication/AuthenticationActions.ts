@@ -88,7 +88,7 @@ export type LoadResponse = {
 
 export type LoadActiveResponse = LoadResponse & {
   context: {
-    backendTotal: number,
+    backendsTotal: number,
   },
 };
 
