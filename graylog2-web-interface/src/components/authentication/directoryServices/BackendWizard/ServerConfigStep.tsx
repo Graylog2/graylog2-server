@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-
 import * as React from 'react';
 import styled from 'styled-components';
 import { useContext } from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, FormikProps } from 'formik';
 
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Button, ButtonToolbar } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
-import BackendWizardContext from './BackendWizardContext';
+import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
 
-export type StepKeyType = 'server-configuration';
-export const STEP_KEY: StepKeyType = 'server-configuration';
+export const STEP_KEY = 'server-configuration';
 // Form validation needs to include all input names
 // to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
@@ -82,11 +79,11 @@ const ProtocolOptions = styled.div`
 `;
 
 type Props = {
-  formRef: React.Ref<typeof Formik>,
-  help: { [inputName: string]: ?React.Node },
+  formRef: React.Ref<FormikProps<WizardFormValues>>,
+  help: { [inputName: string]: React.ReactNode | null | undefined },
   onSubmit: () => void,
   onSubmitAll: () => Promise<void>,
-  submitAllError: ?React.Node,
+  submitAllError: React.ReactNode | null | undefined,
   validateOnMount: boolean,
 };
 
@@ -120,9 +117,8 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   };
 
   return (
-    // $FlowFixMe innerRef works as expected
     <Formik initialValues={stepsState.formValues}
-            innerRef={formRef}
+            ref={formRef}
             initialErrors={backendValidationErrors}
             onSubmit={onSubmit}
             validateOnBlur={false}
