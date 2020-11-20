@@ -28,6 +28,7 @@ import { PageHeader, DocumentTitle } from 'components/common';
 import { Button } from 'components/graylog';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
+import Role from 'logic/roles/Role';
 
 type Props = {
   params: {
@@ -35,7 +36,7 @@ type Props = {
   },
 };
 
-const PageTitle = ({ fullName }: {fullName: ?string}) => (
+const PageTitle = ({ fullName }: { fullName: string | undefined | null }) => (
   <>
     Role Details {fullName && (
       <>
@@ -46,7 +47,7 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 );
 
 const RoleDetailsPage = ({ params }: Props) => {
-  const [loadedRole, setLoadedRole] = useState();
+  const [loadedRole, setLoadedRole] = useState<Role | undefined>();
   const roleId = params?.roleId;
 
   useEffect(() => {
