@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import { $PropertyType } from 'utility-types';
+
+import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 
 type TransportSecurity = ('tls' | 'start_tls' | 'none');
 type ServerAddress = { host: string, port: number };
@@ -34,6 +35,7 @@ export type DirectoryServiceBackendConfig = {
   verifyCertificates: boolean,
 };
 
+/* eslint-disable camelcase */
 export type DirectoryServiceBackendConfigJson = {
   servers: Array<ServerAddress>,
   system_user_dn: string,
@@ -47,6 +49,7 @@ export type DirectoryServiceBackendConfigJson = {
   user_unique_id_attribute: string,
   verify_certificates: boolean,
 };
+/* eslint-enable camelcase */
 
 export type DirectoryServiceBackend = {
   id: $PropertyType<AuthenticationBackend, 'id'>,
@@ -56,6 +59,7 @@ export type DirectoryServiceBackend = {
   config: DirectoryServiceBackendConfig,
 };
 
+/* eslint-disable camelcase */
 export type WizardSubmitPayload = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,
   description: $PropertyType<AuthenticationBackendJSON, 'description'>,
@@ -64,3 +68,4 @@ export type WizardSubmitPayload = {
     system_user_password: (string | { keep_value: true } | { delete_value: true } | { set_value: string | undefined }) | undefined,
   },
 };
+/* eslint-enable camelcase */
