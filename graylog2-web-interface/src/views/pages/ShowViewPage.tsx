@@ -30,16 +30,11 @@ import type { Location } from 'routing/withLocation';
 import SearchPage from './SearchPage';
 
 type Props = {
-  location: Location & {
-    state?: {
-      view: ?View,
-      widgetId: ?string,
-    },
-  },
+  location: Location,
   params: {
-    viewId: ?string,
+    viewId?: string,
   },
-  viewLoader: ViewLoaderFn,
+  viewLoader?: ViewLoaderFn,
 };
 
 const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: Props) => {
@@ -61,13 +56,6 @@ const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: P
 };
 
 ShowViewPage.propTypes = {
-  location: PropTypes.shape({
-    query: PropTypes.object,
-    state: PropTypes.shape({
-      view: PropTypes.object,
-      widgetId: PropTypes.string,
-    }),
-  }).isRequired,
   params: PropTypes.shape({
     viewId: PropTypes.string.isRequired,
   }).isRequired,
