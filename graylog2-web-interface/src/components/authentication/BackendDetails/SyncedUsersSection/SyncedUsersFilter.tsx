@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
 import UserQueryHelper from 'components/users/UsersQueryHelper';
 

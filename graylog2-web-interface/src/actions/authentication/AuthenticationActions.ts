@@ -19,9 +19,9 @@ import { $PropertyType } from 'utility-types';
 
 import AuthenticationBackend, { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import { singletonActions } from 'views/logic/singleton';
-import type { RefluxActions } from 'stores/StoreTypes';
-import type { Pagination, PaginatedList } from 'stores/PaginationTypes';
-import type { PaginatedUsers } from 'actions/users/UsersActions';
+import { RefluxActions } from 'stores/StoreTypes';
+import { Pagination, PaginatedList } from 'stores/PaginationTypes';
+import { PaginatedUsers } from 'actions/users/UsersActions';
 
 export type AuthenticationBackendCreate = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,

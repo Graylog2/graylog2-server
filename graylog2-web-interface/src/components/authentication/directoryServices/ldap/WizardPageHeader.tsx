@@ -19,7 +19,7 @@ import * as React from 'react';
 import AuthenticationOverviewLinks from 'components/authentication/AuthenticationOverviewLinks';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import { PageHeader } from 'components/common';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';

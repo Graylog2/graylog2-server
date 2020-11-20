@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+import  { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import { DocumentTitle, Spinner } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 

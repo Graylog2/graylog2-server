@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useContext } from 'react';
 
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import  { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';

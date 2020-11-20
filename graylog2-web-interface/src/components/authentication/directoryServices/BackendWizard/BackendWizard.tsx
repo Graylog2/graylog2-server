@@ -27,7 +27,7 @@ import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import  { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { Step } from 'components/common/Wizard';
 import { FetchError } from 'logic/rest/FetchProvider';
