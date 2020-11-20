@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import  { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/graylog';

@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import UserNotification from 'util/UserNotification';
-import  { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 
-import  { WizardFormValues } from './BackendWizard/BackendWizardContext';
+import { WizardFormValues } from './BackendWizard/BackendWizardContext';
 
 export default (payload: WizardSubmitPayload, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string, shouldUpdateGroupSync: boolean | undefined = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
