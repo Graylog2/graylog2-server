@@ -16,7 +16,6 @@
  */
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
@@ -45,11 +44,6 @@ const NewSearchPage = ({ location: { query } }: Props) => {
   return <SearchPage />;
 };
 
-NewSearchPage.propTypes = {
-  location: PropTypes.shape({
-    query: PropTypes.object,
-    pathname: PropTypes.string,
-  }).isRequired,
-};
+NewSearchPage.propTypes = {};
 
 export default withLocation(NewSearchPage);
