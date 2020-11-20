@@ -18,8 +18,8 @@
 import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
-import { Store } from 'src/stores/StoreTypes';
 
+import { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';

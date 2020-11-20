@@ -33,7 +33,7 @@ import style from './MessageTableEntry.css';
 import type { Message } from './Types';
 
 import TypeSpecificValue from '../TypeSpecificValue';
-import { Store } from 'src/stores/StoreTypes';
+import { Store } from 'stores/StoreTypes';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
 

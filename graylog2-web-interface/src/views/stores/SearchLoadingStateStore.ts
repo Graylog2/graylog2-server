@@ -16,8 +16,8 @@
  */
 // @flow strict
 import Reflux from 'reflux';
-import { Store } from 'src/stores/StoreTypes';
 
+import { Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 
 import { SearchActions } from './SearchStore';

@@ -16,8 +16,8 @@
  */
 // @flow strict
 import Reflux from 'reflux';
-import { Store } from 'src/stores/StoreTypes';
 
+import { Store } from 'stores/StoreTypes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 
