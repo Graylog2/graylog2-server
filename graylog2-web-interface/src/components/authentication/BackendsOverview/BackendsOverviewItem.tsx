@@ -43,7 +43,7 @@ const DescriptionCell = styled.td`
   max-width: 300px;
 `;
 
-const rolesList = ({ defaultRolesIds, roles }: {defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>}) => {
+const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>) => {
   const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found');
 
   return defaultRolesNames.join(', ');
@@ -130,7 +130,7 @@ const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props)
         </TextOverflowEllipsis>
       </DescriptionCell>
       <td className="limited">
-        {rolesList({ defaultRolesIds: defaultRoles, roles })}
+        {rolesList(defaultRoles, roles)}
       </td>
       <ActionsCell authenticationBackend={authenticationBackend} isActive={isActive} />
     </tr>
