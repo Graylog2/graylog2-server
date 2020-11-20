@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useContext } from 'react';
 import { Formik, Form } from 'formik';
@@ -23,25 +22,32 @@ import type { WizardSubmitPayload } from 'logic/authentication/directoryServices
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/graylog';
+import { LoginTestResult } from 'actions/authentication/AuthenticationActions'
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
-import BackendWizardContext from './BackendWizardContext';
+import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
 
 type Props = {
-  prepareSubmitPayload: () => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
 };
 
 const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
   const { authBackendMeta } = useContext(BackendWizardContext);
-  const initialLoginStatus = { loading: false, success: false, testFinished: false, result: {}, message: undefined, errors: [] };
-  const [{ loading, testFinished, success, message, errors, result }, setLoginStatus] = useState(initialLoginStatus);
+  const initialLoginStatus = { loading: false, success: false, testFinished: false, result: undefined, message: undefined, errors: [] };
+  const [{ loading, testFinished, success, message, errors, result }, setLoginStatus] = useState<
+    LoginTestResult & {
+      loading: boolean,
+      testFinished: boolean,
+      result: LoginTestResult['result'] | null | undefined
+    }
+  >(initialLoginStatus);
   const hasErrors = (errors && errors.length >= 1);
 
   const _handleLoginTest = ({ username, password }) => {
     setLoginStatus({ ...initialLoginStatus, loading: true });
 
     return AuthenticationDomain.testLogin({
-      backend_configuration: prepareSubmitPayload(),
+      backend_configuration: prepareSubmitPayload(undefined),
       user_login: { username, password },
       backend_id: authBackendMeta.backendId,
     }).then((response) => {
@@ -55,7 +61,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
       });
     }).catch((error) => {
       const requestErrors = [error?.message, error?.additional?.res?.text];
-      setLoginStatus({ loading: false, success: false, testFinished: true, result: {}, message: undefined, errors: requestErrors });
+      setLoginStatus({ loading: false, success: false, testFinished: true, result: undefined, message: undefined, errors: requestErrors });
     });
   };
 
@@ -85,14 +91,14 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
           {(!hasErrors && testFinished) && (
             <NotificationContainer bsStyle={success ? 'success' : 'danger'}>
               <b>
-                {!result.user_exists && 'User does not exist'}
-                {result.user_exists && (
+                {!result?.user_exists && 'User does not exist'}
+                {result?.user_exists && (
                   <>
-                    {result.login_success ? message : 'Login failed'}
+                    {result?.login_success ? message : 'Login failed'}
                   </>
                 )}
               </b>
-              {(result.user_exists && result.user_details) && (
+              {(result?.user_exists && result?.user_details) && (
                 <div>
                   <br />
                   <table className="table">
@@ -104,7 +110,7 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
                     </thead>
 
                     <tbody>
-                      {Object.entries(result.user_details).map(([key, value]) => (
+                      {Object.entries(result?.user_details).map(([key, value]) => (
                         <tr key={key}>
                           <td>
                             {String(key)}
