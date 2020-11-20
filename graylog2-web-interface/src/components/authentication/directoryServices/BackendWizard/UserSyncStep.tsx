@@ -41,7 +41,7 @@ export const FORM_VALIDATION = {
 
 type Props = {
   formRef: React.Ref<FormikProps<WizardFormValues>>,
-  help: { [inputName: string]: React.ReactNode | null | undefined },
+  help: { [inputName: string]: React.ReactElement | string | null | undefined },
   excludedFields: { [inputName: string]: boolean },
   roles: Immutable.List<Role>,
   onSubmit: () => void,

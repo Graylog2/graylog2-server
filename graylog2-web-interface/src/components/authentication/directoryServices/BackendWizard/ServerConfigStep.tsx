@@ -80,7 +80,7 @@ const ProtocolOptions = styled.div`
 
 type Props = {
   formRef: React.Ref<FormikProps<WizardFormValues>>,
-  help: { [inputName: string]: React.ReactNode | null | undefined },
+  help: { [inputName: string]: React.ReactElement | string | null | undefined },
   onSubmit: () => void,
   onSubmitAll: () => Promise<void>,
   submitAllError: React.ReactNode | null | undefined,

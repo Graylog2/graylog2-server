@@ -29,7 +29,7 @@ type Props = {
   wrapperClassName?: string,
   formGroupClassName?: string,
   type?: string,
-  help?: string,
+  help?: React.ReactElement | string,
   minLength?: number,
   maxLength?: number,
   required?: boolean,

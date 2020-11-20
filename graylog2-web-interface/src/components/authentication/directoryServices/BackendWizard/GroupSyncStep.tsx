@@ -31,7 +31,7 @@ export const STEP_KEY = 'group-synchronization';
 export type Props = {
   formRef: React.Ref<FormikProps<WizardFormValues>>,
   onSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
-  help: { [inputName: string]: React.ReactNode | null | undefined },
+  help: { [inputName: string]: React.ReactElement | string | null | undefined },
   excludedFields: { [inputName: string]: boolean },
   prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
   roles: Immutable.List<Role>,

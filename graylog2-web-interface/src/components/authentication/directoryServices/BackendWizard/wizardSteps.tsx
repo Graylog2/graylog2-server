@@ -31,7 +31,7 @@ type Props = {
   formRefs: Record<typeof SERVER_CONFIG_KEY | typeof USER_SYNC_KEY | typeof GROUP_SYNC_KEY, React.Ref<FormikProps<WizardFormValues>>>,
   excludedFields: { [inputName: string]: boolean },
   handleSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
-  help: { [inputName: string]: React.ReactNode | null | undefined },
+  help: { [inputName: string]: React.ReactElement | string | null | undefined },
   invalidStepKeys: Array<string>,
   prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
   roles: Immutable.List<Role>,

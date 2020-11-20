@@ -229,7 +229,7 @@ type Props = {
   initialStepKey: $PropertyType<Step, 'key'>,
   initialValues: WizardFormValues,
   excludedFields: {[ inputName: string ]: boolean },
-  help: { [inputName: string]: React.ReactNode | null | undefined },
+  help: { [inputName: string]: React.ReactElement | string | null | undefined },
   onSubmit: (WizardSubmitPayload, WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean) => Promise<LoadBackendResponse>,
 };
 
