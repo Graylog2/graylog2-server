@@ -41,7 +41,7 @@ import QueryInput from './searchbar/AsyncQueryInput';
 type Props = {
   availableStreams: Array<any>,
   config: any,
-  globalOverride: ?GlobalOverride,
+  globalOverride: GlobalOverride | undefined | null,
 };
 
 const BlurredWrapper = styled.div`
@@ -78,7 +78,7 @@ const ResetOverrideHint = () => (
   </CenteredBox>
 );
 
-const WidgetQueryControls = ({ availableStreams, config, globalOverride = {} }: Props) => {
+const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props) => {
   const isGloballyOverridden: boolean = globalOverride !== undefined
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
@@ -115,8 +115,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {} }: 
                                    title="Search query syntax documentation"
                                    text={<Icon name="lightbulb" type="regular" />} />
               </div>
-              <SearchButton running={isSubmitting}
-                            disabled={isGloballyOverridden || isSubmitting || !isValid}
+              <SearchButton disabled={isGloballyOverridden || isSubmitting || !isValid}
                             dirty={dirty} />
 
               <Field name="queryString">
