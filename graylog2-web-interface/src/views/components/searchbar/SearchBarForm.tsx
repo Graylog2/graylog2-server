@@ -42,7 +42,9 @@ type Props = {
 const validate = (values) => {
   return (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to)
     ? {
-      from: 'Start date must be before end date',
+      timerange: {
+        from: 'Start date must be before end date',
+      },
     }
     : {};
 };
