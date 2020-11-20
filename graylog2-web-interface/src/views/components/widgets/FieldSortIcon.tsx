@@ -30,7 +30,7 @@ import { Icon } from 'components/common';
 type Props = {
   config: MessagesWidgetConfig,
   fieldName: string,
-  onSortChange: (SortConfig[]) => Promise<void>,
+  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>,
   setLoadingState: (loading: boolean) => void,
 };
 
@@ -57,7 +57,7 @@ const _tooltip = (fieldName: string, newDirection: Direction) => {
   return `Sort ${fieldName} ${newDirection.direction}`;
 };
 
-const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fieldName: string, onSortChange: (SortConfig[]) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
+const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fieldName: string, onSortChange: (newSortConfig: SortConfig[]) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
   const newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
 
   setLoadingState(true);
