@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
+import { $PropertyType } from 'utility-types';
+
 import UserNotification from 'util/UserNotification';
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 
-import type { WizardFormValues, AuthBackendMeta } from './BackendWizard/BackendWizardContext';
+import { WizardFormValues, AuthBackendMeta } from './BackendWizard/BackendWizardContext';
 
-export default (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync?: boolean = true) => {
+export default (payload: WizardSubmitPayload, formValues: WizardFormValues, serviceType: $PropertyType<AuthBackendMeta, 'serviceType'>, shouldUpdateGroupSync: boolean | undefined = true) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.', 'Success');
   const notifyOnError = (error) => UserNotification.error(`Creating authentication service failed with status: ${error}`, 'Error');
