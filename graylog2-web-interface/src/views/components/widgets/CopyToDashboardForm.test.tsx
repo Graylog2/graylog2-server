@@ -19,7 +19,7 @@ import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 
-import { DashboardsActions } from 'views/stores/DashboardsStore';
+import { DashboardsActions, DashboardsStoreState } from 'views/stores/DashboardsStore';
 import View from 'views/logic/views/View';
 
 import CopyToDashboardForm from './CopyToDashboardForm';
@@ -34,17 +34,18 @@ describe('CopyToDashboardForm', () => {
   const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
     .build();
   const dashboardList = [view1, view2];
-  const dashboardState = {
+  const dashboardState: DashboardsStoreState = {
     list: dashboardList,
     pagination: {
       total: 2,
       page: 1,
-      per_page: 10,
+      perPage: 10,
       count: 2,
     },
   };
 
   it('should render the modal minimal', () => {
+    // @ts-ignore
     const { baseElement } = render(<CopyToDashboardForm />);
 
     expect(baseElement).not.toBeNull();
