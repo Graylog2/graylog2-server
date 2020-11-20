@@ -22,9 +22,9 @@ import Select from 'views/components/Select';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type Props = {
-  direction: ?string,
+  direction: string | undefined | null,
   disabled: boolean,
-  onChange: (Direction) => any,
+  onChange: (newDirection: Direction) => any,
 };
 
 const SortDirectionSelect = ({ direction, disabled, onChange }: Props) => (
