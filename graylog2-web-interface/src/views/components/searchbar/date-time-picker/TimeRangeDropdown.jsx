@@ -109,6 +109,12 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     }
   });
 
+  const _setDisableApply = (isDisabled: boolean) => {
+    if (disableApply !== isDisabled) {
+      setDisableApply(isDisabled);
+    }
+  };
+
   const onSelect = (newType) => {
     nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
     setActiveTab(newType);
@@ -166,7 +172,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                 <p>No Override to Date.</p>
               </Tab>
             )}
-            {timeRangeTypeTabs(config, activeKey, originalRangeValue, limitDuration, setDisableApply)}
+            {timeRangeTypeTabs(config, activeKey, originalRangeValue, limitDuration, _setDisableApply)}
           </StyledTabs>
         </Col>
       </Row>
