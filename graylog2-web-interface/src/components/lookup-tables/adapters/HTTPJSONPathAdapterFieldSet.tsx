@@ -16,13 +16,13 @@
  */
 // @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
 
 import { Input } from 'components/bootstrap';
 import { URLWhiteListInput, KeyValueTable } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
-type Headers = {[string]: string };
+type Headers = { [key: string]: string };
 
 type Config = {
   headers: Headers,
@@ -34,10 +34,10 @@ type Config = {
 
 type Props = {
   config: Config,
-  updateConfig: (Config) => void,
-  handleFormEvent: (Event) => void,
-  validationState: (string) => void,
-  validationMessage: (string, string) => void,
+  updateConfig: (config: Config) => void,
+  handleFormEvent: (event: SyntheticEvent<EventTarget>) => void,
+  validationState: (state: string) => string,
+  validationMessage: (field: string, message: string) => string,
 };
 
 class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
