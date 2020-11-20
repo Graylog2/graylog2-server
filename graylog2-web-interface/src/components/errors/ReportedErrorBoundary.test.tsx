@@ -30,19 +30,15 @@ import ReportedErrorBoundary from './ReportedErrorBoundary';
 jest.unmock('logic/rest/FetchProvider');
 jest.mock('routing/withLocation', () => (Component) => (props) => <Component {...props} location={{ pathname: '/' }} />);
 
-const router = {
-  listen: () => jest.fn(),
-};
-
 describe('ReportedErrorBoundary', () => {
   it('displays child component if there is no error', () => {
-    const { getByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
 
     expect(getByText('Hello World!')).not.toBeNull();
   });
 
   it('displays runtime error page when react error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
 
     suppressConsole(() => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
@@ -55,7 +51,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays not found page when not found error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 404, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
@@ -69,7 +65,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays reported error with an unkown type', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 404, body: { message: 'The error message' } };
 
     suppressConsole(() => {
@@ -83,7 +79,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
-    const { findByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { findByText, queryByText } = render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
     const response = { status: 403, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
