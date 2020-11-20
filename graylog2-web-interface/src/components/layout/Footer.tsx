@@ -29,15 +29,15 @@ const SystemStore = StoreProvider.getStore('System');
 
 type SystemStoreState = {
   system: {
-    version: string,
-    hostname: string,
+    version?: string,
+    hostname?: string,
   };
 };
 
 type Props = {
   system?: {
-    version: string,
-    hostname: string,
+    version?: string,
+    hostname?: string,
   },
 };
 
@@ -91,7 +91,7 @@ const Footer = ({ system }: Props) => {
 };
 
 Footer.propTypes = {
-  system: PropTypes.exact({
+  system: PropTypes.shape({
     version: PropTypes.string,
     hostname: PropTypes.string,
   }),
