@@ -21,7 +21,7 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
-import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
+import _ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 
 const mockView = View.builder()
   .type(View.Type.Dashboard)
@@ -55,13 +55,20 @@ jest.mock('views/pages/ShowViewPage', () => () => null);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
 
-describe('ShowDashboardInBigDisplayMode', () => {
-  const mockLocation = {
-    query: {
-      interval: '30', refresh: '10',
-    },
-  };
+const mockLocation = {
+  query: {
+    interval: '30', refresh: '10',
+  },
+};
 
+type SUTProps = {
+  params: { viewId: string };
+  location: typeof mockLocation;
+};
+
+const ShowDashboardInBigDisplayMode = _ShowDashboardInBigDisplayMode as React.ComponentType<SUTProps>;
+
+describe('ShowDashboardInBigDisplayMode', () => {
   beforeEach(() => {
     RefreshActions.disable = jest.fn();
   });
