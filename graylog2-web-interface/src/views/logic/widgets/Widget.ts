@@ -32,6 +32,10 @@ export type WidgetState = {
   streams: Array<string>;
 };
 
+type DeserializesWidgets = {
+  fromJSON: (value) => Widget;
+};
+
 class Widget {
   _value: WidgetState;
 
@@ -128,15 +132,15 @@ class Widget {
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 
   static __registrations: {
-    [key: string]: typeof Widget;
+    [key: string]: DeserializesWidgets;
   } = {};
 
-  static registerSubtype(type: string, implementingClass: typeof Widget) {
+  static registerSubtype(type: string, implementingClass: DeserializesWidgets) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
 }
