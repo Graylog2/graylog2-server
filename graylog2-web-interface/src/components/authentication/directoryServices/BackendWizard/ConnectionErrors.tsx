@@ -17,9 +17,9 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
+import { ThemeInterface } from 'theme';
 import { Alert } from 'components/graylog';
 
 export const NotificationContainer: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
