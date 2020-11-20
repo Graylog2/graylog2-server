@@ -28,24 +28,22 @@ import View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
 import withParams from 'routing/withParams';
-import withLocation from 'routing/withLocation';
+import withLocation, { Location } from 'routing/withLocation';
 
 import ShowViewPage from './ShowViewPage';
 
-type BigDisplayModeQuery = {|
-  tabs: ?Array<number>,
+type BigDisplayModeQuery = {
+  tabs?: Array<number>,
   interval: number,
   refresh: number,
-|};
+};
 
 type Props = {
-  location: {
-    query: UntypedBigDisplayModeQuery,
-  },
+  location: Location,
   params: any,
   view: {
-    view: ?View,
-    activeQuery: ?QueryId,
+    view?: View,
+    activeQuery?: QueryId,
   },
 };
 
