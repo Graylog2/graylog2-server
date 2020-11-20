@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -40,7 +39,7 @@ type Props = {
 
 const BackendDetails = ({ authenticationBackend }: Props) => {
   const authService = getAuthServicePlugin(authenticationBackend.config.type);
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
+  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
