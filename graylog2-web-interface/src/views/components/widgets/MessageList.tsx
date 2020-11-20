@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { isEmpty, get } from 'lodash';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -37,6 +38,7 @@ import CustomPropTypes from 'views/components/CustomPropTypes';
 import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import { BackendMessage } from 'views/components/messagelist/Types';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -69,15 +71,16 @@ type State = {
   currentPage: number,
 };
 
+type SearchType = { effectiveTimerange: TimeRange };
 type Props = {
   config: MessagesWidgetConfig,
   currentView: ViewStoreState,
-  data: { messages: Array<Object>, total: number, id: string },
+  data: { messages: Array<BackendMessage>, total: number, id: string },
   editing: boolean,
   fields: FieldTypeMappingsList,
   onConfigChange: (MessagesWidgetConfig) => Promise<void>,
   pageSize: number,
-  searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
+  searchTypes: { [searchTypeId: string]: SearchType },
   selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
 };
@@ -85,9 +88,9 @@ type Props = {
 class MessageList extends React.Component<Props, State> {
   static propTypes = {
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-    currentView: PropTypes.object.isRequired,
-    data: PropTypes.shape({
-      messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+    currentView: CustomPropTypes.CurrentView.isRequired,
+    data: PropTypes.exact({
+      messages: PropTypes.arrayOf(CustomPropTypes.BackendMessage).isRequired,
       total: PropTypes.number.isRequired,
       id: PropTypes.string.isRequired,
     }).isRequired,
@@ -95,15 +98,15 @@ class MessageList extends React.Component<Props, State> {
     fields: CustomPropTypes.FieldListType.isRequired,
     onConfigChange: PropTypes.func,
     pageSize: PropTypes.number,
-    searchTypes: PropTypes.object.isRequired,
-    selectedFields: PropTypes.object,
+    searchTypes: PropTypes.any.isRequired,
+    selectedFields: ImmutablePropTypes.setOf(PropTypes.string),
     setLoadingState: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     onConfigChange: () => Promise.resolve(),
     pageSize: Messages.DEFAULT_LIMIT,
-    selectedFields: Immutable.Set(),
+    selectedFields: Immutable.Set<string>(),
   };
 
   state = {
@@ -208,6 +211,7 @@ class MessageList extends React.Component<Props, State> {
   }
 }
 
+// @ts-ignore
 export default connect(MessageList,
   {
     selectedFields: SelectedFieldsStore,
