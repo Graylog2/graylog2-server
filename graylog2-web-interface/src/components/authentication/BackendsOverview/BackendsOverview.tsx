@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
@@ -77,8 +76,8 @@ const _updateListOnBackendActivation = (refreshOverview) => AuthenticationAction
 
 const BackendsOverview = () => {
   const [loading, setLoading] = useState();
-  const [paginatedRoles, setPaginatedRoles] = useState<?PaginatedRoles>();
-  const [paginatedBackends, setPaginatedBackends] = useState<?PaginatedBackends>();
+  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
+  const [paginatedBackends, setPaginatedBackends] = useState<PaginatedBackends | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: backends, context } = paginatedBackends || {};
   const { page, perPage, query } = pagination;
