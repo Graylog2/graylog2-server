@@ -20,14 +20,14 @@ import { render, fireEvent } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
-import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldType, { Property } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import FieldSortSelect from './FieldSortSelect';
 
 describe('FieldSortSelect', () => {
-  const properties = ['enumerable'];
+  const properties: Property[] = ['enumerable'];
   const fieldType1 = new FieldType('string', properties, []);
   const fieldTypeMapping1 = new FieldTypeMapping('date', fieldType1);
   const fieldType2 = new FieldType('string', properties, []);
