@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EntityShareState should import from json 1`] = `
+exports['EntityShareState should import from json 1'] = `
 Object {
   "active_shares": Array [
     Object {

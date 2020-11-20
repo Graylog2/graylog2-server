@@ -81,6 +81,7 @@ type InternalState = {
   validationResults: ValidationResult,
 };
 
+/* eslint-disable camelcase */
 export type EntityShareStateJson = {
   entity: $PropertyType<InternalState, 'entity'>,
   available_grantees: Array<GranteeType>,
@@ -92,6 +93,7 @@ export type EntityShareStateJson = {
   missing_permissions_on_dependencies: {[key: string]: Array<SharedEntityType>},
   validation_result: ValidationResultJSON,
 };
+/* eslint-enable camelcase */
 
 export default class EntityShareState {
   _value: InternalState;
@@ -172,7 +174,7 @@ export default class EntityShareState {
       validationResults,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       entity,
       availableGrantees,
@@ -237,9 +239,8 @@ export default class EntityShareState {
     );
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

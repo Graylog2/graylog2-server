@@ -28,9 +28,9 @@ import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
+import Select from 'components/common/Select';
 
 import EntityShareSettings from './EntityShareSettings';
-import Select from 'components/common/Select';
 
 type Props = {
   description: string,
