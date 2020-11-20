@@ -32,7 +32,7 @@ const SelectContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
 `;
 
 type Props = {
-  onChange: string => void,
+  onChange: (newValue: string) => void,
   value: string,
   streams: Array<Stream>,
 };
