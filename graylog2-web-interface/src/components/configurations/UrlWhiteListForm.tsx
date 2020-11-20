@@ -145,7 +145,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   const debouncedValidate = debounce(_validate, 500);
 
-  const _onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number, type: string) => {
+  const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number, type: string) => {
     if (type === regex) {
       debouncedValidate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
     } else {
