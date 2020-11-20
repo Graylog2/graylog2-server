@@ -31,7 +31,6 @@ import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 import Select from 'components/common/Select';
 
 import EntityShareSettings from './EntityShareSettings';
-import Select from 'components/common/Select';
 
 type Props = {
   description: string,
