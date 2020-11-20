@@ -20,19 +20,15 @@ import { FormikProps } from 'formik';
 
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
-import { WizardFormValues } from './BackendWizardContext';
 
+import { WizardFormValues } from './BackendWizardContext';
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
 import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import StepTitleWarning from './StepTitleWarning';
 
 type Props = {
-  formRefs: {
-    [SERVER_CONFIG_KEY]: React.Ref<FormikProps<WizardFormValues>>,
-    [USER_SYNC_KEY]: React.Ref<FormikProps<WizardFormValues>>,
-    [GROUP_SYNC_KEY]: React.Ref<FormikProps<WizardFormValues>>,
-  },
+  formRefs: Record<typeof SERVER_CONFIG_KEY | typeof USER_SYNC_KEY | typeof GROUP_SYNC_KEY, React.Ref<FormikProps<WizardFormValues>>>,
   excludedFields: { [inputName: string]: boolean },
   handleSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
   help: { [inputName: string]: React.ReactNode | null | undefined },
