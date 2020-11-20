@@ -17,10 +17,11 @@
 // @flow strict
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
-import styled, { type StyledComponent } from 'styled-components';
+import { $PropertyType } from 'utility-types';
+import styled, { StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
-import EntityShareState, { type GranteesList, type CapabilitiesList } from 'logic/permissions/EntityShareState';
+import { ThemeInterface } from 'theme';
+import EntityShareState, { GranteesList, CapabilitiesList } from 'logic/permissions/EntityShareState';
 import Capability from 'logic/permissions/Capability';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
@@ -39,8 +40,8 @@ type Props = {
   availableGrantees: GranteesList,
   availableCapabilities: CapabilitiesList,
   className?: string,
-  granteesSelectRef: ?Select,
-  onSubmit: SelectionRequest => Promise<?EntityShareState>,
+  granteesSelectRef: typeof Select | null | undefined,
+  onSubmit: (req: SelectionRequest) => Promise<EntityShareState | null | undefined>,
 };
 
 const FormElements = styled.div`
@@ -145,7 +146,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
             </FormElements>
             {errors && (
               <Errors>
-                {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => (
+                {Object.entries(errors).map(([fieldKey, value]: [string, unknown]) => (
                   <span key={fieldKey}>{String(value)}.</span>
                 ))}
               </Errors>

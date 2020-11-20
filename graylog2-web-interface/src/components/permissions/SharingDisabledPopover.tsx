@@ -16,34 +16,28 @@
  */
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
-import * as Immutable from 'immutable';
+import styled, { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
-
-const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
-  max-width: 300px;
-`;
-
-const Role = styled.span`
-  margin-right: 5px;
-  margin-bottom: 5px;
-  display: inline-block;
-  line-height: 15px;
-`;
+import HoverForHelp from 'components/common/HoverForHelp';
 
 type Props = {
-  roles: Immutable.Set<string>,
+  type: string,
+  description?: string,
 };
 
-const RolesCell = ({ roles }: Props) => (
-  <Td>
-    {roles.map((role) => (
-      <Role key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`}>
-        {role}
-      </Role>
-    ))}
-  </Td>
+const StyledHoverForHelp: StyledComponent<{}, ThemeInterface, typeof HoverForHelp> = styled(HoverForHelp)`
+  margin-left: 8px;
+`;
+
+const SharingDisabledPopover = ({ type, description }: Props) => (
+  <StyledHoverForHelp title="Sharing not possible" pullRight={false}>
+    {description || `Only owners of this ${type} are allowed to share it.`}
+  </StyledHoverForHelp>
 );
 
-export default RolesCell;
+SharingDisabledPopover.defaultProps = {
+  description: undefined,
+};
+
+export default SharingDisabledPopover;

@@ -83,7 +83,7 @@ Object {
     "errors": Object {
       "selected_grantee_capabilities": Immutable.List [],
     },
-    "failed": undefined,
+    "failed": false,
   },
 }
 `;

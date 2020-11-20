@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+import { $PropertyType } from 'utility-types';
+
 import type { ActionsType } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 

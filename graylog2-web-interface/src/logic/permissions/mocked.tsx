@@ -18,7 +18,7 @@
 import * as Immutable from 'immutable';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
-import { type AdditionalQueries } from 'util/PaginationURL';
+import { AdditionalQueries } from 'util/PaginationURL';
 
 // Temporary file to mock api responses
 

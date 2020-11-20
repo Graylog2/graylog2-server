@@ -15,34 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+import * as React from 'react';
+import styled, { StyledComponent } from 'styled-components';
 import * as Immutable from 'immutable';
 
-import SharedEntity from 'logic/permissions/SharedEntity';
+import type { ThemeInterface } from 'theme';
 
-export type GRN = string;
+const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
+  max-width: 300px;
+`;
 
-export type CapabilityType = {|
-  id: GRN,
-  title: 'Viewer' | 'Manager' | 'Owner',
-|};
+const Role = styled.span`
+  margin-right: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+  line-height: 15px;
+`;
 
-export type GranteeType = {|
-  id: GRN,
-  title: string,
-  type: 'global' | 'team' | 'user' | 'error',
-|};
+type Props = {
+  roles: Immutable.Set<string>,
+};
 
-export type ActiveShareType = {|
-  grant: GRN,
-  grantee: GRN,
-  capability: GRN,
-|};
+const RolesCell = ({ roles }: Props) => (
+  <Td>
+    {roles.map((role) => (
+      <Role key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`}>
+        {role}
+      </Role>
+    ))}
+  </Td>
+);
 
-export type SharedEntityType = {|
-  id: GRN,
-  owners: Array<GranteeType>,
-  title: string,
-  type: string,
-|};
-
-export type SharedEntities = Immutable.List<SharedEntity>;
+export default RolesCell;

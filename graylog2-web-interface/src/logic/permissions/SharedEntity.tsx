@@ -16,50 +16,71 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
-import type { CapabilityType } from 'logic/permissions/types';
+import type { SharedEntityType } from 'logic/permissions/types';
 
-type InternalState = CapabilityType;
+import Grantee from './Grantee';
 
-export default class Capability {
+type InternalState = {
+  id: $PropertyType<SharedEntityType, 'id'>,
+  owners: Immutable.List<Grantee>,
+  title: $PropertyType<SharedEntityType, 'title'>,
+  type: $PropertyType<SharedEntityType, 'type'>,
+};
+
+export default class SharedEntity {
   _value: InternalState;
 
   constructor(
     id: $PropertyType<InternalState, 'id'>,
+    owners: $PropertyType<InternalState, 'owners'>,
     title: $PropertyType<InternalState, 'title'>,
+    type: $PropertyType<InternalState, 'type'>,
   ) {
-    this._value = { id, title };
+    this._value = { id, owners, title, type };
   }
 
   get id(): $PropertyType<InternalState, 'id'> {
     return this._value.id;
   }
 
+  get owners(): $PropertyType<InternalState, 'owners'> {
+    return this._value.owners;
+  }
+
   get title(): $PropertyType<InternalState, 'title'> {
     return this._value.title;
   }
 
+  get type(): $PropertyType<InternalState, 'type'> {
+    return this._value.type;
+  }
+
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
-    const { id, title } = this._value;
+    const { id, owners, title } = this._value;
 
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map({ id, title }));
+    return new Builder(Immutable.Map({ id, owners, title }));
   }
 
   toJSON() {
-    const { id, title } = this._value;
+    const { id, owners, title, type } = this._value;
 
-    return { id, title };
+    return { id, owners, title, type };
   }
 
-  static fromJSON(value: InternalState): Capability {
-    const { id, title } = value;
+  static fromJSON(value: SharedEntityType): SharedEntity {
+    const { id, owners, title, type } = value;
+    const formattedOwners = Immutable.fromJS(owners.map((o) => Grantee.fromJSON(o)));
 
-    return Capability
+    return SharedEntity
       .builder()
       .id(id)
+      .owners(formattedOwners)
       .title(title)
+      .type(type)
       .build();
   }
 
@@ -83,13 +104,21 @@ class Builder {
     return new Builder(this.value.set('id', value));
   }
 
+  owners(value: $PropertyType<InternalState, 'owners'>): Builder {
+    return new Builder(this.value.set('owners', value));
+  }
+
   title(value: $PropertyType<InternalState, 'title'>): Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  build(): Capability {
-    const { id, title } = this.value.toObject();
+  type(value: $PropertyType<InternalState, 'type'>): Builder {
+    return new Builder(this.value.set('type', value));
+  }
 
-    return new Capability(id, title);
+  build(): SharedEntity {
+    const { id, owners, title, type } = this.value.toObject();
+
+    return new SharedEntity(id, owners, title, type);
   }
 }

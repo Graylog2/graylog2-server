@@ -46,7 +46,7 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const _sharedEntityOverviewItem = (sharedEntity, { granteeCapabilities } = {}) => {
+const _sharedEntityOverviewItem = (sharedEntity, { granteeCapabilities } = { granteeCapabilities: undefined }) => {
   const capability = granteeCapabilities?.[sharedEntity.id];
   const capabilityTitle = mockedPermissions.availableCapabilities[capability];
 
@@ -63,9 +63,9 @@ const _loadSharedEntities = (pagination, searchPaginated, setPaginatedEntityShar
 };
 
 const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Props) => {
-  const [paginatedEntityShares, setPaginatedEntityShares] = useState<?PaginatedEntityShares>();
+  const [paginatedEntityShares, setPaginatedEntityShares] = useState<PaginatedEntityShares | undefined>();
   const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
-  const { list, context, pagination: { total } = {} } = paginatedEntityShares || {};
+  const { list, context, pagination: { total } = { total: 0 } } = paginatedEntityShares || {};
   const { page, query, additionalQueries } = pagination;
 
   useEffect(() => _loadSharedEntities(pagination, searchPaginated, setPaginatedEntityShares, setLoading), [pagination, searchPaginated, setLoading]);

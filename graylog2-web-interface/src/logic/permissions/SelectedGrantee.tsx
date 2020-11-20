@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import { type GranteeInterface } from './GranteeInterface';
+import { $PropertyType } from 'utility-types';
+
+import { GranteeInterface } from './GranteeInterface';
 import Grantee from './Grantee';
 import Capability from './Capability';
 import type { ActiveShares } from './EntityShareState';
