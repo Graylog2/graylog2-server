@@ -21,7 +21,7 @@ import { useLocation } from 'react-router-dom';
 
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { type ReportedError, ReactErrorType, NotFoundErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
+import { ReportedError, ReactErrorType, NotFoundErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
@@ -52,11 +52,11 @@ const ReportedErrorPage = ({ reportedError }: { reportedError: ReportedError }) 
 };
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
 };
 
 const ReportedErrorBoundary = ({ children }: Props) => {
-  const [reportedError, setReportedError] = useState<?ReportedError>();
+  const [reportedError, setReportedError] = useState<ReportedError | undefined>();
 
   const report = (newError: ReportedError) => setReportedError(newError);
 
