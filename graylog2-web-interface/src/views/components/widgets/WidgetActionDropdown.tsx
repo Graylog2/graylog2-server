@@ -21,7 +21,7 @@ import ActionDropdown from 'views/components/common/ActionDropdown';
 import { IconButton } from 'components/common';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
 };
 
 const WidgetActionDropdown = ({ children }: Props) => {
@@ -29,7 +29,7 @@ const WidgetActionDropdown = ({ children }: Props) => {
 
   return (
     <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
+      <>{children}</>
     </ActionDropdown>
   );
 };
