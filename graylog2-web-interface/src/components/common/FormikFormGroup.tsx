@@ -22,7 +22,7 @@ import { Input } from 'components/bootstrap';
 import FormikInput from './FormikInput';
 
 type Props = {
-  label: string,
+  label: React.ReactElement | string,
   name: string,
   onChange?: (event: SyntheticEvent<Input>) => void,
   labelClassName?: string,

@@ -23,7 +23,7 @@ import { Input } from 'components/bootstrap';
 
 type Props = {
   id: string,
-  label?: string,
+  label?: React.ReactElement | string,
   name: string,
   type?: string,
   help?: React.ReactElement | string,
