@@ -14,31 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Formik } from 'formik';
+import { FormikProps } from 'formik';
 
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
+import { WizardFormValues } from './BackendWizardContext';
 
-import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY, type StepKeyType as ServerConfigKey } from './ServerConfigStep';
-import UserSyncStep, { STEP_KEY as USER_SYNC_KEY, type StepKeyType as UserSyncKey } from './UserSyncStep';
-import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY, type StepKeyType as GroupSyncKey } from './GroupSyncStep';
+import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
+import UserSyncStep, { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
+import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import StepTitleWarning from './StepTitleWarning';
 
 type Props = {
   formRefs: {
-    [ServerConfigKey | UserSyncKey | GroupSyncKey]: React.Ref<typeof Formik>,
+    [SERVER_CONFIG_KEY]: React.Ref<FormikProps<WizardFormValues>>,
+    [USER_SYNC_KEY]: React.Ref<FormikProps<WizardFormValues>>,
+    [GROUP_SYNC_KEY]: React.Ref<FormikProps<WizardFormValues>>,
   },
   excludedFields: { [inputName: string]: boolean },
   handleSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
-  help: { [inputName: string]: ?React.Node },
+  help: { [inputName: string]: React.ReactNode | null | undefined },
   invalidStepKeys: Array<string>,
-  prepareSubmitPayload: () => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
   roles: Immutable.List<Role>,
   setActiveStepKey: (stepKey: string) => void,
-  submitAllError: ?React.Node,
+  submitAllError: React.ReactNode | null | undefined,
 };
 
 const wizardSteps = ({
