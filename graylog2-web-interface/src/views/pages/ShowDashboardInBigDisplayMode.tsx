@@ -40,7 +40,6 @@ type BigDisplayModeQuery = {
 
 type Props = {
   location: Location,
-  params: any,
   view: {
     view?: View,
     activeQuery?: QueryId,
@@ -58,7 +57,7 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location, params, view: { view, activeQuery } = {} }: Props) => {
+const ShowDashboardInBigDisplayMode = ({ location, view: { view, activeQuery } = {} }: Props) => {
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
 
@@ -76,10 +75,10 @@ const ShowDashboardInBigDisplayMode = ({ location, params, view: { view, activeQ
       <BodyPositioningWrapper>
         {view && activeQuery ? <CycleQueryTab interval={configuration.interval} view={view} activeQuery={activeQuery} tabs={configuration.tabs} /> : null}
         <BigDisplayModeHeader />
-        <ShowViewPage location={{ query }} params={params} />
+        <ShowViewPage />
       </BodyPositioningWrapper>
     </InteractiveContext.Provider>
   );
 };
 
-export default withLocation(connect(withParams(ShowDashboardInBigDisplayMode), { view: ViewStore }));
+export default withLocation(connect(ShowDashboardInBigDisplayMode, { view: ViewStore }));
