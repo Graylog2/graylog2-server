@@ -24,7 +24,7 @@ type State = {
 };
 
 type Props = {
-  children: React.Node,
+  children: React.ReactElement,
 };
 
 export default class WidgetErrorBoundary extends React.Component<Props, State> {
@@ -40,10 +40,10 @@ export default class WidgetErrorBoundary extends React.Component<Props, State> {
   render() {
     const { error } = this.state;
     const { children, ...rest } = this.props;
-    const childrenWithProps = React.Children.map(children, (child) => React.cloneElement(child, rest));
+    const childrenWithProps = React.cloneElement(children, rest);
 
     return error
       ? <ErrorWidget title="While rendering this widget, the following error occurred:" errors={[{ description: error.toString() }]} />
-      : childrenWithProps;
+      : <>{childrenWithProps}</>;
   }
 }
