@@ -17,6 +17,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import URI from 'urijs';
+import { $PropertyType } from 'utility-types';
 
 import Routes from 'routing/Routes';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
@@ -29,7 +30,7 @@ type InternalState = {
   query: QueryString,
   streams: Array<string>,
   highlightedMessage: string,
-  filterFields: { [string]: mixed },
+  filterFields: { [key: string]: unknown },
 };
 
 const _searchTimerange = (timerange: TimeRange) => {
@@ -44,7 +45,7 @@ const _searchTimerange = (timerange: TimeRange) => {
   }
 };
 
-const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [string]: mixed } = {}) => Object.keys(filterFields)
+const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: string]: unknown } = {}) => Object.keys(filterFields)
   .filter((key) => (filterFields[key] !== null && filterFields[key] !== undefined))
   .map((key) => `${key}:"${escape(String(filterFields[key]))}"`)
   .reduce((prev, cur) => addToQuery(prev, cur), query ? query.query_string : '');
