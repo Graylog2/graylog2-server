@@ -25,7 +25,7 @@ import type { ThemeInterface } from 'theme';
 import { Dropdown } from './bootstrap-import';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   left: boolean,
   title: string,
 };
