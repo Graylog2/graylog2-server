@@ -49,8 +49,8 @@ const ErrorMessage = styled.div(({ theme }) => css`
 
 type Props = {
   backgroundImage?: string,
-  children?: React.Node,
-  description: React.Node,
+  children?: React.ReactNode,
+  description: React.ReactNode,
   title: string,
 };
 
