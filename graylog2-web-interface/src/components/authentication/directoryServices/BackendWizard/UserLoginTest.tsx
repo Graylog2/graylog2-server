@@ -76,12 +76,14 @@ const UserLoginTest = ({ prepareSubmitPayload }: Props) => {
             <Col sm={6}>
               <FormikInput label="Username"
                            name="username"
+                           id="user-login-username"
                            required />
             </Col>
             <Col sm={6}>
               <FormikInput label="Password"
                            name="password"
                            type="password"
+                           id="user-login-password"
                            required />
             </Col>
           </Row>
