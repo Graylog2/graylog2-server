@@ -23,7 +23,7 @@ import { Button } from 'components/graylog';
 
 type Props = {
   onCancel: () => void,
-  onFinish: () => void,
+  onFinish: (...args: any[]) => void,
 };
 
 const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => {
