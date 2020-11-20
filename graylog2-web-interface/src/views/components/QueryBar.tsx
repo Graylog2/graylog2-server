@@ -84,9 +84,13 @@ const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
 
 QueryBar.propTypes = {
   children: PropTypes.element,
-  queries: PropTypes.arrayOf(PropTypes.string).isRequired,
+  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
+    id: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    summary: PropTypes.string,
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
 };
