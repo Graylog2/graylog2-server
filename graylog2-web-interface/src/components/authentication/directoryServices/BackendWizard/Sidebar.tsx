@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
+import { $PropertyType } from 'utility-types';
 
-import type { ThemeInterface } from 'theme';
-import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
+import { ThemeInterface } from 'theme';
+import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/graylog';
+import { Step } from 'components/common/Wizard';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
-import BackendWizardContext from './BackendWizardContext';
+import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
 
@@ -52,11 +53,11 @@ const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled
   }
 `;
 type Props = {
-  prepareSubmitPayload: () => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
-  const [activeKey, setActiveKey] = useState(SERVER_CONFIG_KEY);
+  const [activeKey, setActiveKey] = useState<$PropertyType<Step, 'key'>>(SERVER_CONFIG_KEY);
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 
   useEffect(() => {
