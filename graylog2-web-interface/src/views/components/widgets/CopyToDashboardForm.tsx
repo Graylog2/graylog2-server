@@ -25,13 +25,13 @@ import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore
 
 type Props = {
   onCancel: () => void,
-  onSubmit: (string, ?string) => void,
+  onSubmit: (widgetId: string, selectedDashboard: string | undefined | null) => void,
   widgetId: string,
   dashboards: DashboardsStoreState,
 };
 
 const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagination }, onSubmit }: Props) => {
-  const [selectedDashboard, setSelectedDashboard] = useState<?string>(null);
+  const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
 
   const handleSearch = useCallback((query) => {
