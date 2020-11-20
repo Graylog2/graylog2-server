@@ -30,9 +30,11 @@ const ValueComponent = styled.span`
 `;
 
 type Props = {
-  onChange: ({ label: string, value: string }[]) => void,
+  onChange: (newFields: { label: string, value: string }[]) => void,
   fields: Immutable.List<FieldTypeMapping>,
-  value: ?{field: string}[],
+  value: { field: string }[] | undefined | null,
+  allowOptionCreation?: boolean,
+  inputId?: string,
 };
 
 const FieldSelect = ({ fields, onChange, value, ...rest }: Props) => {
