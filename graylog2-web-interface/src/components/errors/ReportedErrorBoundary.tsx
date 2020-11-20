@@ -82,7 +82,7 @@ const ReportedErrorBoundary = ({ children }: Props) => {
     return <ReportedErrorPage reportedError={reportedError} />;
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 export default ReportedErrorBoundary;
