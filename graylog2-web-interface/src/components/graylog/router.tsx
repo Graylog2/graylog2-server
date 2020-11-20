@@ -40,9 +40,14 @@ const _setActiveClassName = (pathname, to, currentClassName, displayName) => {
     : currentClassName;
 };
 
+type ChildrenProps = {
+  onClick: (e?: any) => void,
+  className: string,
+  href: string,
+};
 type Props = {
-  children: React.Node,
-  onClick?: () => mixed,
+  children: React.ReactElement<ChildrenProps, React.ComponentType>,
+  onClick?: () => unknown,
   to: string | HistoryElement,
 };
 
