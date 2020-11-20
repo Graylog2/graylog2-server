@@ -146,12 +146,14 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
               <ServerUrl className="input-group">
                 <FormikInput formGroupClassName=""
                              name="serverHost"
+                             id="serverHost"
                              error={backendValidationErrors?.serverHost}
                              placeholder="Hostname"
                              validate={validateField(FORM_VALIDATION.serverHost)} />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikInput formGroupClassName=""
                              name="serverPort"
+                             id="serverPort"
                              error={backendValidationErrors?.serverPort}
                              placeholder="Port"
                              type="number"
@@ -193,6 +195,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                 <FormikInput formGroupClassName=""
                              label="Verify Certificates"
                              name="verifyCertificates"
+                             id="verifyCertificates"
                              type="checkbox" />
               </ProtocolOptions>
 
