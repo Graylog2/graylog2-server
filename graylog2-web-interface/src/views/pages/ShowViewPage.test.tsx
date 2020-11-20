@@ -67,7 +67,7 @@ jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
 
 describe('ShowViewPage', () => {
-  const viewJson: ViewJson = {
+  const viewJson = {
     id: 'foo',
     type: 'DASHBOARD',
     title: 'Foo',
@@ -80,7 +80,7 @@ describe('ShowViewPage', () => {
     created_at: new Date(),
     owner: 'admin',
     requires: {},
-  };
+  } as ViewJson;
   const SimpleShowViewPage = (props) => (
     <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
       <ShowViewPage location={{ query: {} }}
@@ -113,7 +113,7 @@ describe('ShowViewPage', () => {
   it('reports NotForundError error if loading view returns 404', (done) => {
     const error = new Error('Not found');
 
-    // $FlowFixMe: Assigning to non-existing key on purpose
+    // @ts-ignore
     error.status = 404;
     asMock(ViewManagementActions.get).mockImplementation(mockAction(jest.fn(() => Promise.reject(error))));
 
@@ -136,8 +136,7 @@ describe('ShowViewPage', () => {
     SearchExecutionStateActions.setParameterValues = mockAction(jest.fn());
     const search = Search.create().toBuilder().parameters([]).build();
 
-    // $FlowFixMe: Calling mockImplementation on jest.fn()
-    ViewDeserializer.mockImplementation((response: ViewJson) => {
+    asMock(ViewDeserializer).mockImplementation((response: ViewJson) => {
       const view = View.fromJSON(response).toBuilder().search(search).build();
 
       return Promise.resolve(view);
