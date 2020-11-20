@@ -42,7 +42,7 @@ import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
 type DialogProps = {
   bsClass: string,
   className: string,
-  children: React.Node,
+  children: React.ReactNode,
 };
 
 const EditWidgetDialog = ({ className, children, bsClass, ...rest }: DialogProps) => (
@@ -57,7 +57,7 @@ EditWidgetDialog.propTypes = {
 };
 
 type Props = {
-  children: Array<React.Node>,
+  children: Array<React.ReactNode>,
 };
 
 const onSubmit = (values, widget: Widget) => {
