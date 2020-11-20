@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
@@ -25,7 +24,6 @@ import GroupSyncSection from './GroupSyncSection';
 
 describe('<GroupSyncSection />', () => {
   it('should display info if enterprise plugin does not exist', () => {
-    // $FlowFixMe AuthenticationBackend has the correct format
     render(<GroupSyncSection authenticationBackend={exampleAuthBackend} roles={Immutable.List()} />);
 
     expect(screen.getByText('Enterprise Feature')).toBeInTheDocument();
@@ -41,7 +39,6 @@ describe('<GroupSyncSection />', () => {
       },
     }));
 
-    // $FlowFixMe AuthenticationBackend has the correct format
     render(<GroupSyncSection authenticationBackend={exampleAuthBackend} roles={Immutable.List()} />);
 
     expect(screen.getByText('GroupSyncSection')).toBeInTheDocument();
