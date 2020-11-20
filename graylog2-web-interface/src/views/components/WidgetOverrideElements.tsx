@@ -20,18 +20,18 @@ import * as React from 'react';
 import withPluginEntities from 'views/logic/withPluginEntities';
 
 type Props = {
-  children: React.Node,
-  widgetOverrideElements: Array<React.ComponentType<{}>>,
+  children: React.ReactNode,
+  widgetOverrideElements: Array<React.ComponentType<OverrideProps>>,
 };
 
-export type OverrideComponentType = React.ComponentType<{ retry: () => mixed }> | Error;
+export type OverrideComponentType = React.ComponentType<{ retry: () => unknown }> | Error;
 
 export type OverrideProps = {
   override: (OverrideComponentType) => void,
 };
 
 type State = {
-  thrownComponent: ?OverrideComponentType,
+  thrownComponent: OverrideComponentType | undefined | null,
 };
 
 class WidgetOverrideElements extends React.Component<Props, State> {
