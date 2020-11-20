@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -53,7 +52,7 @@ const BackendCreateSelect = () => {
   const authServicesOptions = sortedAuthServices.map((service) => ({ label: service.displayName, value: service.name }));
 
   return (
-    <Formik onSubmit={_onSubmit} initialValues={{}}>
+    <Formik onSubmit={_onSubmit} initialValues={{ authServiceType: undefined }}>
       {({ isSubmitting, isValid }) => (
         <StyledForm>
           <ElementsContainer>
