@@ -24,7 +24,7 @@ import { Icon } from 'components/common';
 import type { ThemeInterface } from 'theme';
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
 };
 
 const Description: StyledComponent<{}, void, HTMLDivElement> = styled.div`
