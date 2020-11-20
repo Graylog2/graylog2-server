@@ -25,9 +25,9 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Messages } from 'views/Constants';
-import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
+import { SelectedFieldsStore, SelectedFieldsStoreState } from 'views/stores/SelectedFieldsStore';
 import { ViewStore } from 'views/stores/ViewStore';
-import { SearchActions, SearchStore } from 'views/stores/SearchStore';
+import { SearchActions, SearchStore, SearchStoreState } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -78,31 +78,14 @@ type Props = {
   data: { messages: Array<BackendMessage>, total: number, id: string },
   editing: boolean,
   fields: FieldTypeMappingsList,
-  onConfigChange: (MessagesWidgetConfig) => Promise<void>,
-  pageSize: number,
+  onConfigChange?: (MessagesWidgetConfig) => Promise<void>,
+  pageSize?: number,
   searchTypes: { [searchTypeId: string]: SearchType },
-  selectedFields?: Immutable.Set<string>,
+  selectedFields: Immutable.Set<string> | undefined,
   setLoadingState: (loading: boolean) => void,
 };
 
 class MessageList extends React.Component<Props, State> {
-  static propTypes = {
-    config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-    currentView: CustomPropTypes.CurrentView.isRequired,
-    data: PropTypes.exact({
-      messages: PropTypes.arrayOf(CustomPropTypes.BackendMessage).isRequired,
-      total: PropTypes.number.isRequired,
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-    editing: PropTypes.bool.isRequired,
-    fields: CustomPropTypes.FieldListType.isRequired,
-    onConfigChange: PropTypes.func,
-    pageSize: PropTypes.number,
-    searchTypes: PropTypes.any.isRequired,
-    selectedFields: ImmutablePropTypes.setOf(PropTypes.string),
-    setLoadingState: PropTypes.func.isRequired,
-  };
-
   static defaultProps = {
     onConfigChange: () => Promise.resolve(),
     pageSize: Messages.DEFAULT_LIMIT,
@@ -211,14 +194,19 @@ class MessageList extends React.Component<Props, State> {
   }
 }
 
-// @ts-ignore
-export default connect(MessageList,
-  {
-    selectedFields: SelectedFieldsStore,
-    currentView: ViewStore,
-    searches: SearchStore,
-  }, (props) => ({
+type MProps = React.ComponentProps<typeof MessageList>;
+const mapProps = (props: {
+  selectedFields: SelectedFieldsStoreState,
+  currentView: ViewStoreState,
+  searches: SearchStoreState,
+}) => ({
+  selectedFields: props.selectedFields,
+  currentView: props.currentView,
+  searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']) as { [searchTypeId: string]: SearchType },
+});
 
-    ...props,
-    searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']),
-  }));
+export default connect(MessageList, {
+  selectedFields: SelectedFieldsStore,
+  currentView: ViewStore,
+  searches: SearchStore,
+}, mapProps);
