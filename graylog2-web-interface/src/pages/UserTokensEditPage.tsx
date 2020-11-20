@@ -38,7 +38,7 @@ type Props = {
   },
 };
 
-const PageTitle = ({ fullName }: {fullName: ?string}) => (
+const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   <>
     Edit Tokens Of User  {fullName && (
       <>
@@ -82,7 +82,7 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken) => {
 
 const UserEditPage = ({ params }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const [loadedUser, setLoadedUser] = useState<?User>();
+  const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const [tokens, setTokens] = useState([]);
   const [deletingTokenId, setDeletingTokenId] = useState();
   const [creatingToken, setCreatingToken] = useState(false);
