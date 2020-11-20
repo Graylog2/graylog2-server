@@ -33,8 +33,7 @@ describe('Views bindings field actions', () => {
   const findAction = (type) => fieldActions.find((binding) => binding.type === type);
 
   describe('Aggregate', () => {
-    // $FlowFixMe: We are assuming here it is generally present
-    const action: Action = findAction('aggregate');
+    const action = findAction('aggregate');
     const { isEnabled } = action;
 
     it('is present', () => {
