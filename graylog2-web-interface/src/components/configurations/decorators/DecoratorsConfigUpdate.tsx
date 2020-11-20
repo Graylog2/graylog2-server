@@ -33,10 +33,10 @@ import formatDecorator from './FormatDecorator';
 type Props = {
   streams: Array<Stream>,
   decorators: Array<Decorator>,
-  types: { [string]: any },
+  types: { [key: string]: any },
   show?: boolean,
   onCancel: () => void,
-  onSave: (Array<Decorator>) => mixed,
+  onSave: (newDecorators: Array<Decorator>) => unknown,
 };
 
 const _updateOrder = (orderedDecorators, decorators, onChange) => {
@@ -53,7 +53,7 @@ const _updateOrder = (orderedDecorators, decorators, onChange) => {
   onChange(newDecorators);
 };
 
-const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef) => {
+const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef: React.Ref<BootstrapModalWrapper>) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const onCreate = useCallback(
@@ -101,17 +101,4 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   );
 };
 
-DecoratorsConfigUpdate.propTypes = {
-  streams: PropTypes.array.isRequired,
-  decorators: PropTypes.array.isRequired,
-  types: PropTypes.object.isRequired,
-  show: PropTypes.bool,
-  onCancel: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-};
-
-DecoratorsConfigUpdate.defaultProps = {
-  show: false,
-};
-
-export default React.forwardRef<Props, BootstrapModalWrapper>(DecoratorsConfigUpdate);
+export default React.forwardRef<BootstrapModalWrapper, Props>(DecoratorsConfigUpdate);
