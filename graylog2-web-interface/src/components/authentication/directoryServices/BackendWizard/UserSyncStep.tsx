@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { useContext } from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, FormikProps } from 'formik';
 
 import Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
@@ -26,10 +25,9 @@ import { Alert, Button, ButtonToolbar, Row, Col, Panel } from 'components/graylo
 import { Icon, FormikFormGroup, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 
-import BackendWizardContext from './BackendWizardContext';
+import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
 
-export type StepKeyType = 'user-synchronization';
-export const STEP_KEY: StepKeyType = 'user-synchronization';
+export const STEP_KEY = 'user-synchronization';
 // Form validation needs to include all input names
 // to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
@@ -42,13 +40,13 @@ export const FORM_VALIDATION = {
 };
 
 type Props = {
-  formRef: React.Ref<typeof Formik>,
-  help: { [inputName: string]: ?React.Node },
+  formRef: React.Ref<FormikProps<WizardFormValues>>,
+  help: { [inputName: string]: React.ReactNode | null | undefined },
   excludedFields: { [inputName: string]: boolean },
   roles: Immutable.List<Role>,
   onSubmit: () => void,
   onSubmitAll: () => Promise<void>,
-  submitAllError: ?React.Node,
+  submitAllError: React.ReactNode | null | undefined,
   validateOnMount: boolean,
 };
 
@@ -66,7 +64,6 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
   };
 
   return (
-    // $FlowFixMe innerRef works as expected
     <Formik initialValues={stepsState.formValues}
             initialErrors={backendValidationErrors}
             innerRef={formRef}
