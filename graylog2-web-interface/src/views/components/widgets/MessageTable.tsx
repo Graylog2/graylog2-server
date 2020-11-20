@@ -170,12 +170,13 @@ type Props = {
   editing?: boolean,
   fields: Immutable.List<FieldTypeMapping>,
   messages: Array<BackendMessage>,
-  onSortChange: (SortConfig[]) => Promise<void>,
+  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>,
   selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
 };
 
 type DefaultProps = {
+  editing: boolean,
   selectedFields: Immutable.Set<string>,
 };
 
