@@ -20,7 +20,7 @@ import styled, { StyledComponent } from 'styled-components';
 import type { ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
 
-import BackendsQueryHelper from './BackendsQueryHelper.jsx';
+import BackendsQueryHelper from './BackendsQueryHelper';
 
 type Props = {
   onSearch: (query: string) => void,
