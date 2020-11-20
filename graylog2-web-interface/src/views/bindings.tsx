@@ -81,7 +81,7 @@ import {
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 
-import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
+import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
 import NumberVisualizationConfiguration from './components/aggregationbuilder/NumberVisualizationConfiguration';
@@ -137,7 +137,7 @@ export default {
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
       needsControlledHeight: () => false,
-      searchResultTransformer: (data: Array<*>) => data[0],
+      searchResultTransformer: (data: Array<unknown>) => data[0],
       searchTypes: MessageConfigGenerator,
       titleGenerator: () => MessagesWidget.defaultTitle,
     },
@@ -203,18 +203,18 @@ export default {
       type: 'chart',
       title: 'Chart',
       handler: ChartActionHandler,
-      isEnabled: (({ type }) => type.isNumeric(): ActionHandlerCondition),
+      isEnabled: ({ type }) => type.isNumeric(),
     },
     {
       type: 'aggregate',
       title: 'Show top values',
       handler: AggregateActionHandler,
-      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields)): ActionHandlerCondition),
+      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
     },
     {
       type: 'statistics',
       title: 'Statistics',
-      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields)): ActionHandlerCondition),
+      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
       handler: FieldStatisticsHandler,
     },
     {
@@ -235,13 +235,13 @@ export default {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       handler: AddToAllTablesActionHandler,
-      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       handler: RemoveFromAllTablesActionHandler,
-      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
     },
   ],
   valueActions: [
@@ -266,7 +266,7 @@ export default {
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      isEnabled: (({ type, contexts }) => (!!contexts.message && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: ({ type, contexts }) => (!!contexts.message && !type.isDecorated()),
       component: SelectExtractorType,
     },
     {
