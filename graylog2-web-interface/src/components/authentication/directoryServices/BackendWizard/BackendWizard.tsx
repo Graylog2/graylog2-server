@@ -154,7 +154,6 @@ const _getInvalidStepKeys = (formValues, newBackendValidationErrors, excludedFie
   }
 
   const invalidStepKeys = Object.entries(validation).map(([stepKey, formValidation]) => {
-    // $FlowFixMe formValidation is valid input for Object.entries
     const stepHasError = Object.entries(formValidation).some(([fieldName, fieldValidation]) => {
       if (excludedFields[fieldName]) {
         return false;
