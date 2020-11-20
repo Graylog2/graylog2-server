@@ -23,6 +23,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import type { ClusterMetric } from 'stores/metrics/MetricsStore';
+import { Store } from 'stores/StoreTypes';
 
 const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 
@@ -31,31 +32,17 @@ type Props = {
   metricsUpdatedAt: number,
   name: string,
   zeroOnMissing: boolean,
-  children: React.Node,
+  children: React.ReactElement[],
 };
 
 class MetricContainer extends React.Component<Props> {
   static propTypes = {
-    metrics: PropTypes.shape({
-      nodeId: PropTypes.string,
-      nodeMetrics: PropTypes.shape({
-        metricName: PropTypes.string,
-        metricData: PropTypes.shape({
-          type: PropTypes.oneOf(['gauge', 'counter', 'meter', 'timer']),
-          full_name: PropTypes.string,
-          metric: PropTypes.object,
-          name: PropTypes.string,
-        }),
-      }),
-    }),
     metricsUpdatedAt: PropTypes.number,
     name: PropTypes.string.isRequired,
     zeroOnMissing: PropTypes.bool,
-    children: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
-    metrics: {},
     metricsUpdatedAt: TimeHelper.nowInSeconds(),
     zeroOnMissing: true,
   };
@@ -95,7 +82,7 @@ class MetricContainer extends React.Component<Props> {
 
     let throughput = Object.keys(metrics)
       .map((nodeId) => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
-      .reduce((accumulator: { throughput?: number }, currentMetric: { throughput: ?number }): { throughput?: number } => {
+      .reduce((accumulator: { throughput?: number }, currentMetric: { throughput: number | undefined | null }): { throughput?: number } => {
         return { throughput: (accumulator.throughput || 0) + (currentMetric.throughput || 0) };
       }, {});
 
@@ -115,8 +102,13 @@ class MetricContainer extends React.Component<Props> {
   }
 }
 
+type MetricsStoreState = {
+  metrics: ClusterMetric,
+  metricsUpdatedAt: number,
+};
+
 export default connect(MetricContainer,
-  { metricsStore: MetricsStore },
+  { metricsStore: MetricsStore as Store<MetricsStoreState> },
   ({ metricsStore, ...otherProps }) => ({
     ...otherProps,
     metrics: metricsStore.metrics,
