@@ -33,8 +33,8 @@ const Container: StyledComponent<{margin: number}, ThemeInterface, HTMLElement> 
 `);
 
 type Props = {
-  onClose: () => void,
-  children: JSX.Element | string,
+  onClose: (msg?: string) => void,
+  children: React.ReactNode,
   bsStyle: string,
   marginTopBottom: number,
   runtimeError: boolean,
@@ -56,7 +56,7 @@ const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 
             {children}
           </Col>
           <Col md={1}>
-            <Button bsSize="xsmall" bsStyle={finalBsStyle} className="pull-right" onClick={() => onClose()}>
+            <Button bsSize="xsmall" bsStyle={finalBsStyle} className="pull-right" onClick={() => onClose(undefined)}>
               <Icon name="times" />
             </Button>
           </Col>

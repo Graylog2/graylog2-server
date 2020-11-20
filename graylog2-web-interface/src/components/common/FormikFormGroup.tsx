@@ -27,6 +27,13 @@ type Props = {
   onChange?: (event: SyntheticEvent<Input>) => void,
   labelClassName?: string,
   wrapperClassName?: string,
+  formGroupClassName?: string,
+  type?: string,
+  help?: string,
+  minLength?: number,
+  maxLength?: number,
+  required?: boolean,
+  validate?: (any) => string | undefined,
 };
 
 /** Displays the FormikInput with a specific layout */
@@ -44,6 +51,13 @@ FormikFormGroup.defaultProps = {
   onChange: undefined,
   labelClassName: 'col-sm-3',
   wrapperClassName: 'col-sm-9',
+  formGroupClassName: undefined,
+  type: undefined,
+  help: undefined,
+  minLength: undefined,
+  maxLength: undefined,
+  required: false,
+  validate: () => undefined,
 };
 
 export default FormikFormGroup;

@@ -23,15 +23,20 @@ import { Input } from 'components/bootstrap';
 
 type Props = {
   id: string,
-  label: string,
+  label?: string,
   name: string,
   type?: string,
-  help?: JSX.Element,
+  help?: React.ReactElement | string,
+  minLength?: number,
+  maxLength?: number,
   labelClassName?: string,
   onChange?: (event: SyntheticEvent<Input>) => void,
   wrapperClassName?: string,
   validate?: (string) => string | undefined | null,
   error?: string,
+  placeholder?: string,
+  required?: boolean,
+  formGroupClassName?: string,
 };
 
 const checkboxProps = (value) => {
@@ -86,6 +91,7 @@ FormikInput.propTypes = {
 };
 
 FormikInput.defaultProps = {
+  label: undefined,
   help: undefined,
   labelClassName: undefined,
   onChange: undefined,
@@ -93,6 +99,11 @@ FormikInput.defaultProps = {
   validate: () => undefined,
   wrapperClassName: undefined,
   error: undefined,
+  minLength: undefined,
+  maxLength: undefined,
+  placeholder: undefined,
+  required: false,
+  formGroupClassName: undefined,
 };
 
 export default FormikInput;

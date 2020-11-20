@@ -133,8 +133,8 @@ type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: JSX.Element,
-  component: JSX.Element,
+  title: React.ReactElement,
+  component: React.ReactElement,
   disabled?: boolean,
 };
 
@@ -143,7 +143,7 @@ type Props = {
   steps: Steps,
   activeStep: StepKey | null | undefined,
   onStepChange: (StepKey) => void,
-  children: JSX.Element | JSX.Element[],
+  children: React.ReactNode,
   horizontal: boolean,
   justified: boolean,
   containerClassName: string,

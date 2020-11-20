@@ -22,8 +22,8 @@ import { Col, Row } from 'components/graylog';
 
 type Props = {
   adminUser: UserOverview,
-  dataRowFormatter: (user: UserOverview) => JSX.Element,
-  headerCellFormatter: (header: string) => JSX.Element,
+  dataRowFormatter: (user: UserOverview) => React.ReactElement,
+  headerCellFormatter: (header: string) => React.ReactElement,
   headers: Array<string>,
 };
 

@@ -53,6 +53,7 @@ const PasswordFormGroup = ({}: Props) => (
     <Row className="no-bm">
       <Col sm={6}>
         <FormikInput name="password"
+                     id="password"
                      maxLength={100}
                      type="password"
                      placeholder="Password"
@@ -63,6 +64,7 @@ const PasswordFormGroup = ({}: Props) => (
       </Col>
       <Col sm={6}>
         <FormikInput name="password_repeat"
+                     id="password_repeat"
                      maxLength={100}
                      type="password"
                      placeholder="Repeat password"
