@@ -24,7 +24,7 @@ import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
 
 type Props = {
-  children: React.ReactChildren,
+  children: React.ReactNode,
 };
 
 const StyledRow = styled(Row)`

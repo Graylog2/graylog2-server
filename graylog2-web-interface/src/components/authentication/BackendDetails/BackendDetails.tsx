@@ -46,7 +46,7 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   if (!authService) {
-    return `No authentication service plugin configured for type "${(authenticationBackend.config as TypedConfig).type}"`;
+    return <>{`No authentication service plugin configured for type "${(authenticationBackend.config as TypedConfig).type}"`}</>;
   }
 
   if (!paginatedRoles) {
