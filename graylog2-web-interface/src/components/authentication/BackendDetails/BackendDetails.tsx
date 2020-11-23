@@ -37,14 +37,15 @@ type Props = {
   authenticationBackend: AuthenticationBackend,
 };
 
+type TypedConfig = { type: string };
 const BackendDetails = ({ authenticationBackend }: Props) => {
-  const authService = getAuthServicePlugin(authenticationBackend.config.type);
+  const authService = getAuthServicePlugin((authenticationBackend.config as TypedConfig).type);
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   if (!authService) {
-    return `No authentication service plugin configured for type "${authenticationBackend.config.type}"`;
+    return `No authentication service plugin configured for type "${(authenticationBackend.config as TypedConfig).type}"`;
   }
 
   if (!paginatedRoles) {
