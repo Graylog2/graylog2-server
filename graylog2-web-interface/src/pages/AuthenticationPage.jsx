@@ -32,7 +32,7 @@ import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-const _pageTitle = (activeBackend: ?AuthenticationBackend, returnString?: boolean) => {
+const _pageTitle = (activeBackend: AuthenticationBackend | undefined | null, returnString?: boolean) => {
   const pageName = 'Active Authentication Service';
 
   if (activeBackend) {
