@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 /* eslint-disable no-console */
-const { format } = require('util');
+import { format } from 'util';
 
-const { DEPRECATION_NOTICE } = require('util/deprecationNotice');
+import { DEPRECATION_NOTICE } from 'util/deprecationNotice';
 
 console.origWarn = console.warn;
 console.origError = console.error;
