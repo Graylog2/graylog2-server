@@ -18,6 +18,7 @@
 import * as Immutable from 'immutable';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { DirectoryServiceBackendConfigJson } from 'logic/authentication/directoryServices/types';
 
 export const ldapBackend = AuthenticationBackend.builder()
   .id('ldap-auth-backend-id')
