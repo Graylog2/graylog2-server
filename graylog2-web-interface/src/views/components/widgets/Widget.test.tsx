@@ -16,6 +16,7 @@
  */
 // @flow strict
 import React from 'react';
+import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -23,7 +24,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 
 import Routes from 'routing/Routes';
-import { WidgetActions } from 'views/stores/WidgetStore';
+import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -39,6 +40,7 @@ import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
+import { TitlesMap } from 'views/stores/TitleTypes';
 
 import Widget from './Widget';
 
@@ -247,14 +249,14 @@ describe('<Widget />', () => {
 
     WidgetActions.duplicate = mockAction(jest.fn(() => Promise.resolve(WidgetModel.builder().id('duplicatedWidgetId').build())));
 
-    TitlesActions.set = mockAction(jest.fn((type, id, title) => {
+    TitlesActions.set = mockAction(jest.fn(async (type, id, title) => {
       expect(type).toEqual(TitleTypes.Widget);
       expect(id).toEqual('duplicatedWidgetId');
       expect(title).toEqual('Dummy Widget (copy)');
 
       done();
 
-      return Promise.resolve();
+      return Immutable.Map() as TitlesMap;
     }));
 
     fireEvent.click(duplicateBtn);
@@ -272,7 +274,7 @@ describe('<Widget />', () => {
   it('does not trigger action when clicking cancel after no changes were made', () => {
     const { getByText } = render(<DummyWidget editing />);
 
-    WidgetActions.updateConfig = mockAction(jest.fn());
+    WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
 
     const cancelBtn = getByText('Cancel');
 
@@ -285,8 +287,8 @@ describe('<Widget />', () => {
     const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
-    WidgetActions.updateConfig = mockAction(jest.fn());
-    WidgetActions.update = mockAction(jest.fn());
+    WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
+    WidgetActions.update = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
     const onChangeBtn = getByText('Click me');
 
     fireEvent.click(onChangeBtn);
@@ -304,8 +306,8 @@ describe('<Widget />', () => {
     const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
-    WidgetActions.updateConfig = mockAction(jest.fn());
-    WidgetActions.update = mockAction(jest.fn());
+    WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
+    WidgetActions.update = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
     const onChangeBtn = getByText('Click me');
 
     fireEvent.click(onChangeBtn);
@@ -351,9 +353,9 @@ describe('<Widget />', () => {
       // @ts-ignore
       DashboardsStore.getInitialState = jest.fn(() => dashboardState);
       ViewStore.getInitialState = jest.fn(() => viewStoreState);
-      ViewManagementActions.get = mockAction(jest.fn((() => Promise.resolve(dashboard1.toJSON()))));
+      ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
       SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
-      ViewManagementActions.update = mockAction(jest.fn(() => Promise.resolve()));
+      ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
       SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
       Routes.pluginRoute = jest.fn((route) => (id) => `${route}-${id}`);
 

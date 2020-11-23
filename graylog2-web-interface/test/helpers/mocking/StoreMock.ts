@@ -15,8 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+type MockMethod = string | [string, Function];
 
-// $FlowFixMe: Overriding type
-const asMock = (fn): JestMockFn<*, *> => fn;
+export default function MockStore(...args: Array<MockMethod>) {
+  const store = {
+    // eslint-disable-next-line func-call-spacing,no-spaced-func
+    listen: jest.fn(() => () => {}),
+    getInitialState: jest.fn(),
+  };
 
-export default asMock;
+  Array.from(args).forEach((method) => {
+    if (Array.isArray(method)) {
+      const [name, fn] = method;
+      store[name] = fn;
+    } else {
+      store[method] = jest.fn();
+    }
+  });
+
+  return store;
+}

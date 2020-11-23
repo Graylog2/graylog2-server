@@ -16,17 +16,6 @@
  */
 // @flow strict
 
-import type { ListenableAction } from 'stores/StoreTypes';
+const asMock = <Fn extends ((...args: any[]) => any)>(fn: Fn) => fn as unknown as jest.Mock<ReturnType<Fn>, Parameters<Fn>>;
 
-const listenable = () => ({ listen: jest.fn(() => jest.fn()) });
-
-const noop: function = jest.fn();
-
-const mockAction = <R: function>(fn: R = noop): ListenableAction<R> => {
-  return Object.assign(fn, listenable(), {
-    completed: listenable(),
-    promise: jest.fn(),
-  });
-};
-
-export default mockAction;
+export default asMock;

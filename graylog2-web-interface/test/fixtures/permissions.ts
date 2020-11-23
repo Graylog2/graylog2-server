@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+import { $PropertyType } from 'utility-types';
+
 import User from 'logic/users/User';
 
 // eslint-disable-next-line import/prefer-default-export

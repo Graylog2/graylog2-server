@@ -23,8 +23,9 @@ import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
-import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideActions, GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
+import { QueriesList } from 'views/actions/QueriesActions';
 
 import AddToQueryHandler from './AddToQueryHandler';
 
@@ -49,7 +50,7 @@ describe('AddToQueryHandler', () => {
     });
 
     QueriesStore.getInitialState = jest.fn(() => queries);
-    QueriesActions.query = mockAction(jest.fn(() => Promise.resolve()));
+    QueriesActions.query = mockAction(jest.fn(async () => Immutable.OrderedMap() as QueriesList));
     ViewStore.listen = jest.fn(() => () => {});
 
     ViewStore.getInitialState = jest.fn(() => ({
@@ -119,7 +120,7 @@ describe('AddToQueryHandler', () => {
         .query({ type: 'elasticsearch', query_string: 'something' })
         .build());
 
-      GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined)));
+      GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined as GlobalOverrideStoreState)));
       SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
     });
 

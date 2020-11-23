@@ -22,10 +22,10 @@ import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 
 import history from 'util/History';
-import { ViewStore } from 'views/stores/ViewStore';
+import { ViewStore, ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import Query, {createElasticsearchQueryString, filtersForQuery, RelativeTimeRange} from 'views/logic/queries/Query';
+import Query, { createElasticsearchQueryString, filtersForQuery, RelativeTimeRange } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import type { TimeRange } from 'views/logic/queries/Query';
 
@@ -74,7 +74,7 @@ describe('SyncWithQueryParameters', () => {
   it('does not do anything if current view is not a search', () => {
     asMock(ViewStore.getInitialState).mockReturnValueOnce({
       view: View.builder().type(View.Type.Dashboard).build(),
-    });
+    } as ViewStoreState);
 
     syncWithQueryParameters('');
 
@@ -85,7 +85,7 @@ describe('SyncWithQueryParameters', () => {
     const view = createView(createSearch({ type: 'relative', range: 600 }));
 
     it('with current time range and query', () => {
-      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view });
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view } as ViewStoreState);
 
       syncWithQueryParameters('/search');
 
@@ -93,7 +93,7 @@ describe('SyncWithQueryParameters', () => {
     });
 
     it('preserving query parameters present before', () => {
-      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view });
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view } as ViewStoreState);
 
       syncWithQueryParameters('/search?somevalue=23&somethingelse=foo');
 
@@ -107,7 +107,7 @@ describe('SyncWithQueryParameters', () => {
         to: '2020-01-12T13:42:23.000Z',
       }));
 
-      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithAbsoluteTimerange });
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithAbsoluteTimerange } as ViewStoreState);
 
       syncWithQueryParameters('/search');
 
@@ -121,7 +121,7 @@ describe('SyncWithQueryParameters', () => {
         keyword: 'Last five minutes',
       }));
 
-      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithAbsoluteTimerange });
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithAbsoluteTimerange } as ViewStoreState);
 
       syncWithQueryParameters('/search');
 
@@ -130,7 +130,7 @@ describe('SyncWithQueryParameters', () => {
     });
 
     it('by calling the provided action', () => {
-      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view });
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view } as ViewStoreState);
 
       syncWithQueryParameters('/search', history.replace);
 
@@ -140,7 +140,7 @@ describe('SyncWithQueryParameters', () => {
     it('adds list of streams to query', () => {
       const viewWithStreams = createView(createSearch(lastFiveMinutes, ['stream1', 'stream2']));
 
-      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithStreams });
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithStreams } as ViewStoreState);
 
       syncWithQueryParameters('/search');
 
@@ -151,7 +151,7 @@ describe('SyncWithQueryParameters', () => {
     it('removes list of streams to query if they become empty', () => {
       const viewWithStreams = createView(createSearch(lastFiveMinutes, []));
 
-      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithStreams });
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithStreams } as ViewStoreState);
 
       syncWithQueryParameters('/search?q=foo%3A42&rangetype=relative&relative=300&streams=stream1%2Cstream2');
 

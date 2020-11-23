@@ -24,7 +24,7 @@
  *
  * @param {function} fn - the function which should be called after disabling `console.error` and before restoring it.
  */
-const suppressConsole = (fn: () => mixed) => {
+const suppressConsole = (fn: () => void) => {
   /* eslint-disable no-console */
   const originalConsoleError = console.error;
   // $FlowFixMe: We explicitly want to overwrite `error`

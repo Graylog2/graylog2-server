@@ -145,7 +145,7 @@ describe('AggregationControls', () => {
         type: 'customConfig',
         component: CustomVisualizationConfigComponent,
       }],
-    }[type] || []));
+    }[type as string] || []));
 
     const configWithVisualizationConfig = config.toBuilder()
       .visualization('customConfig')

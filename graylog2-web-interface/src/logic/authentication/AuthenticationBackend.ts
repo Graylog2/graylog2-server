@@ -24,9 +24,11 @@ type InternalState = {
   title: string,
   description: string,
   defaultRoles: Immutable.List<string>,
-  config: {
-    type: string,
-  },
+  config: unknown,
+};
+
+type TypedConfig = {
+  type: string,
 };
 
 export type AuthenticationBackendJSON = {
@@ -35,13 +37,11 @@ export type AuthenticationBackendJSON = {
   description: string,
   // eslint-disable-next-line camelcase
   default_roles: Array<string>,
-  config: {
-    type: string,
-  },
+  config: unknown,
 };
 
 const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
-  const authService = getAuthServicePlugin(config.type, true);
+  const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configFromJson === 'function') {
     return authService.configFromJson(config);
@@ -51,7 +51,7 @@ const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config
 };
 
 const configToJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
-  const authService = getAuthServicePlugin(config.type, true);
+  const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configToJson === 'function') {
     return authService.configToJson(config);

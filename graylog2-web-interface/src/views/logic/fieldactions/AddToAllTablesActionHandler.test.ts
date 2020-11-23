@@ -45,21 +45,21 @@ describe('AddToAllTablesActionHandler', () => {
       .fields(['timestamp', 'source', 'author'])
       .showMessageRow(true)
       .build();
-    const expectdMessageWidget = Widget.builder()
+    const expectedMessageWidget = Widget.builder()
       .id(messageWidget.id)
       .type('MESSAGES')
       .config(expectedMessageWidgetConfig)
       .build();
 
-    const expectedWidgets = Map([[expectdMessageWidget.id, expectdMessageWidget], [pivotWidget.id, pivotWidget]]);
+    const expectedWidgets = Map([[expectedMessageWidget.id, expectedMessageWidget], [pivotWidget.id, pivotWidget]]);
 
     // @ts-ignore
     WidgetStore.getInitialState = jest.fn(() => widgets);
 
-    WidgetActions.updateWidgets = mockAction(jest.fn((newWidgets) => {
+    WidgetActions.updateWidgets = mockAction(jest.fn(async (newWidgets) => {
       expect(newWidgets).toEqual(expectedWidgets);
 
-      return Promise.resolve();
+      return newWidgets;
     }));
 
     AddToAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });

@@ -20,11 +20,13 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { ldapBackend as exampleAuthBackend } from 'fixtures/authenticationBackends';
 
+import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
+
 import GroupSyncSection from './GroupSyncSection';
 
 describe('<GroupSyncSection />', () => {
   it('should display info if enterprise plugin does not exist', () => {
-    render(<GroupSyncSection authenticationBackend={exampleAuthBackend} roles={Immutable.List()} />);
+    render(<GroupSyncSection authenticationBackend={exampleAuthBackend as DirectoryServiceBackend} roles={Immutable.List()} />);
 
     expect(screen.getByText('Enterprise Feature')).toBeInTheDocument();
     expect(screen.getByText('Group Synchronization')).toBeInTheDocument();
@@ -39,7 +41,7 @@ describe('<GroupSyncSection />', () => {
       },
     }));
 
-    render(<GroupSyncSection authenticationBackend={exampleAuthBackend} roles={Immutable.List()} />);
+    render(<GroupSyncSection authenticationBackend={exampleAuthBackend as DirectoryServiceBackend} roles={Immutable.List()} />);
 
     expect(screen.getByText('GroupSyncSection')).toBeInTheDocument();
   });

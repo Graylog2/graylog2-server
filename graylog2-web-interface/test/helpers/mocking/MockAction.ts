@@ -15,22 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-type MockMethod = string | [string, Function];
 
-export default function (...args: Array<MockMethod>) {
-  const store = {
-    // eslint-disable-next-line func-call-spacing,no-spaced-func
-    listen: jest.fn<[], () => void>(() => () => {}),
-    getInitialState: jest.fn<[], void>(),
-  };
-  Array.from(args).forEach((method) => {
-    if (Array.isArray(method)) {
-      const [name, fn] = method;
-      store[name] = fn;
-    } else {
-      store[method] = jest.fn<[], void>();
-    }
+import type { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
+
+const listenable = () => ({ listen: jest.fn(() => jest.fn()) });
+
+const noop: PromiseProvider = jest.fn(() => Promise.resolve());
+
+function mockAction(): ListenableAction<typeof noop>;
+function mockAction<R extends PromiseProvider>(fn: R): ListenableAction<R>;
+function mockAction(fn = noop) {
+  return Object.assign(fn, listenable(), {
+    completed: listenable(),
+    promise: jest.fn(),
   });
-
-  return store;
 }
+
+export default mockAction;
