@@ -17,7 +17,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import EntityShareState, { type MissingDependencies } from 'logic/permissions/EntityShareState';
+import EntityShareState, { MissingDependencies } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
 import SharedEntity from 'logic/permissions/SharedEntity';
