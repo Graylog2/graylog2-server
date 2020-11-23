@@ -15,25 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import { type Element } from 'react';
-import { render, type RenderOptionsWithoutCustomQueries } from '@testing-library/react';
+import * as React from 'react';
+import { render, RenderOptions } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import 'jest-styled-components';
 
 import WrappingContainer from './WrappingContainer';
 
-export const renderWithWrapper = (Component: Element<any>, options: ?RenderOptionsWithoutCustomQueries) => render(Component, {
+export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) => render(Component, {
   wrapper: WrappingContainer,
   ...options,
 });
 
-export function asElement<T>(elem: ?(HTMLElement | Node), elementType: Class<T>): T {
+export function asElement<T extends new(...args: any) => any>(elem: any, elementType: T): InstanceType<T> {
   if (elem && elem instanceof elementType) {
-    return (elem: T);
+    // @ts-ignore
+    return elem as T;
   }
 
-  // $FlowFixMe: Why is it not possible to extract the name of the class?
   const { name } = elementType;
   throw new Error(`Unable to cast ${elem?.constructor?.name ?? 'unknown'} to ${name}!`);
 }
