@@ -16,17 +16,19 @@
  */
 // @flow strict
 
-import type { ListenableAction } from 'stores/StoreTypes';
+import type { ListenableAction, PromiseProvider } from 'stores/StoreTypes';
 
 const listenable = () => ({ listen: jest.fn(() => jest.fn()) });
 
-const noop: function = jest.fn();
+const noop: PromiseProvider = jest.fn(() => Promise.resolve());
 
-const mockAction = <R: function>(fn: R = noop): ListenableAction<R> => {
+function mockAction(): ListenableAction<typeof noop>;
+function mockAction<R extends PromiseProvider>(fn: R): ListenableAction<R>;
+function mockAction(fn = noop) {
   return Object.assign(fn, listenable(), {
     completed: listenable(),
     promise: jest.fn(),
   });
-};
+}
 
 export default mockAction;
