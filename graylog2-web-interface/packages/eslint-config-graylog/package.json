@@ -11,7 +11,7 @@
     "eslint"
   ],
   "author": "Graylog, Inc. <hello@graylog.com>",
-  "license": "MIT",
+  "license": "SSPL-1.0",
   "dependencies": {
     "@typescript-eslint/parser": "4.8.1",
     "@typescript-eslint/eslint-plugin": "4.8.1",

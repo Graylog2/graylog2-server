@@ -42,6 +42,7 @@ const ActionsSM = styled.div`
     display: inline-block;
     vertical-align: top;
   }
+
   > :not(:last-child) {
     margin-right: 5px;
   }
@@ -53,11 +54,11 @@ const LIFECYCLE_DEFAULT_MESSAGES = {
 };
 
 type Props = {
-  title: JSX.Element,
-  children: Array<JSX.Element>,
-  subactions?: JSX.Element,
+  title: React.ReactNode,
+  children: Array<React.ReactElement>,
+  subactions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
-  lifecycleMessage?: JSX.Element,
+  lifecycleMessage?: React.ReactNode,
   subpage: boolean,
 };
 

@@ -22,16 +22,23 @@ import { Field, useFormikContext } from 'formik';
 import { Input } from 'components/bootstrap';
 
 type Props = {
+  autoComplete?: string,
+  buttonAfter?: React.ReactElement | string,
   id: string,
-  label: string,
+  label?: React.ReactElement | string,
   name: string,
   type?: string,
-  help?: JSX.Element,
+  help?: React.ReactElement | string,
+  minLength?: number,
+  maxLength?: number,
   labelClassName?: string,
   onChange?: (event: SyntheticEvent<Input>) => void,
   wrapperClassName?: string,
   validate?: (string) => string | undefined | null,
-  error?: string,
+  error?: React.ReactElement | string,
+  placeholder?: string,
+  required?: boolean,
+  formGroupClassName?: string,
 };
 
 const checkboxProps = (value) => {
@@ -86,6 +93,9 @@ FormikInput.propTypes = {
 };
 
 FormikInput.defaultProps = {
+  buttonAfter: undefined,
+  autoComplete: undefined,
+  label: undefined,
   help: undefined,
   labelClassName: undefined,
   onChange: undefined,
@@ -93,6 +103,11 @@ FormikInput.defaultProps = {
   validate: () => undefined,
   wrapperClassName: undefined,
   error: undefined,
+  minLength: undefined,
+  maxLength: undefined,
+  placeholder: undefined,
+  required: false,
+  formGroupClassName: undefined,
 };
 
 export default FormikInput;

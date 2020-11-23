@@ -22,11 +22,22 @@ import { Input } from 'components/bootstrap';
 import FormikInput from './FormikInput';
 
 type Props = {
-  label: string,
+  autoComplete?: string,
+  buttonAfter?: React.ReactElement | string,
+  label: React.ReactElement | string,
   name: string,
   onChange?: (event: SyntheticEvent<Input>) => void,
   labelClassName?: string,
   wrapperClassName?: string,
+  formGroupClassName?: string,
+  type?: string,
+  error?: React.ReactElement | string,
+  placeholder?: string
+  help?: React.ReactElement | string,
+  minLength?: number,
+  maxLength?: number,
+  required?: boolean,
+  validate?: (any) => string | undefined,
 };
 
 /** Displays the FormikInput with a specific layout */
@@ -41,9 +52,20 @@ const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChan
 );
 
 FormikFormGroup.defaultProps = {
+  autoComplete: undefined,
+  buttonAfter: undefined,
   onChange: undefined,
   labelClassName: 'col-sm-3',
   wrapperClassName: 'col-sm-9',
+  formGroupClassName: undefined,
+  type: undefined,
+  error: undefined,
+  placeholder: undefined,
+  help: undefined,
+  minLength: undefined,
+  maxLength: undefined,
+  required: false,
+  validate: () => undefined,
 };
 
 export default FormikFormGroup;

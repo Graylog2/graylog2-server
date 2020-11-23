@@ -30,8 +30,8 @@ const HelpMessage = styled.span(({ theme, hasError }) => `
 `);
 
 type Props = {
-  help?: JSX.Element,
-  error?: JSX.Element,
+  help?: React.ReactElement,
+  error?: React.ReactElement,
 };
 
 /**
