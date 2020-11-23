@@ -55,7 +55,7 @@ const LIFECYCLE_DEFAULT_MESSAGES = {
 
 type Props = {
   title: React.ReactNode,
-  children: Array<React.ReactElement>,
+  children: React.ReactElement | Array<React.ReactElement>,
   subactions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
@@ -120,7 +120,7 @@ class PageHeader extends React.Component<Props> {
 
   render() {
     const { children: childList, subpage, title, subactions } = this.props;
-    const children = (childList !== undefined && childList.length !== undefined ? childList : [childList]);
+    const children = (childList !== undefined && 'length' in childList ? childList : [childList]);
 
     const topLevelClassNames = subpage ? '' : 'content';
 
