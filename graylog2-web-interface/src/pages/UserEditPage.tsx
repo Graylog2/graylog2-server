@@ -27,6 +27,7 @@ import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
+import User from 'logic/users/User';
 
 type Props = {
   params: {
@@ -47,7 +48,7 @@ const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
 const _updateUserOnLoad = (setLoadedUser) => UsersActions.load.completed.listen(setLoadedUser);
 
 const UserEditPage = ({ params }: Props) => {
-  const [loadedUser, setLoadedUser] = useState();
+  const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const userId = params?.userId;
 
   // We need to trigger a user state update in child components and do so by calling the load action
@@ -58,11 +59,8 @@ const UserEditPage = ({ params }: Props) => {
     UsersDomain.load(userId);
   }, [userId]);
 
-  // @ts-ignore We check if user is loaded with the optional
   const fullName = loadedUser?.fullName ?? '';
-  // @ts-ignore We check if user is loaded with the optional
   const readOnly = loadedUser?.readOnly ?? false;
-  // @ts-ignore We check if user is loaded with the optional
   const userToEdit = userId === loadedUser?.id ? loadedUser : undefined;
 
   return (
