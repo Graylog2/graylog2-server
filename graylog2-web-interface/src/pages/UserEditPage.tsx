@@ -27,6 +27,7 @@ import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
+import User from 'logic/users/User';
 
 type Props = {
   params: {
@@ -34,7 +35,7 @@ type Props = {
   },
 };
 
-const PageTitle = ({ fullName }: {fullName: ?string}) => (
+const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   <>
     Edit User {fullName && (
       <>
@@ -47,7 +48,7 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 const _updateUserOnLoad = (setLoadedUser) => UsersActions.load.completed.listen(setLoadedUser);
 
 const UserEditPage = ({ params }: Props) => {
-  const [loadedUser, setLoadedUser] = useState();
+  const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const userId = params?.userId;
 
   // We need to trigger a user state update in child components and do so by calling the load action
@@ -58,12 +59,16 @@ const UserEditPage = ({ params }: Props) => {
     UsersDomain.load(userId);
   }, [userId]);
 
+  const fullName = loadedUser?.fullName ?? '';
+  const readOnly = loadedUser?.readOnly ?? false;
+  const userToEdit = userId === loadedUser?.id ? loadedUser : undefined;
+
   return (
-    <DocumentTitle title={`Edit User ${loadedUser?.fullName ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
+    <DocumentTitle title={`Edit User ${fullName}`}>
+      <PageHeader title={<PageTitle fullName={fullName} />}
                   subactions={(
                     <UserActionLinks userId={userId}
-                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
+                                     userIsReadOnly={readOnly} />
                   )}>
         <span>
           You can change the user details and password here and assign roles and teams.
@@ -77,7 +82,7 @@ const UserEditPage = ({ params }: Props) => {
 
         <UserOverviewLinks />
       </PageHeader>
-      <UserEdit user={userId === loadedUser?.id ? loadedUser : undefined} />
+      <UserEdit user={userToEdit} />
     </DocumentTitle>
   );
 };

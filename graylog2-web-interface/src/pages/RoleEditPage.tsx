@@ -20,14 +20,15 @@ import { useEffect, useState } from 'react';
 
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/graylog/router';
-import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import RoleDetails from 'components/roles/RoleDetails';
+import RoleEdit from 'components/roles/RoleEdit';
+import Routes from 'routing/Routes';
 import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
+import { Button } from 'components/graylog';
+import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
-import { Button } from 'components/graylog';
 import DocumentationLink from 'components/support/DocumentationLink';
-import Routes from 'routing/Routes';
+import Role from 'logic/roles/Role';
 
 type Props = {
   params: {
@@ -35,30 +36,30 @@ type Props = {
   },
 };
 
-const PageTitle = ({ fullName }: {fullName: ?string}) => (
+const PageTitle = ({ name }: { name: string | undefined | null }) => (
   <>
-    Role Details {fullName && (
+    Edit Role {name && (
       <>
-        - <i>{fullName}</i>
+        - <i>{name}</i>
       </>
   )}
   </>
 );
 
-const RoleDetailsPage = ({ params }: Props) => {
-  const [loadedRole, setLoadedRole] = useState();
+const RoleEditPage = ({ params }: Props) => {
+  const [loadedRole, setLoadedRole] = useState<Role | undefined>();
   const roleId = params?.roleId;
 
   useEffect(() => {
-    AuthzRolesDomain.load(roleId).then(setLoadedRole);
+    AuthzRolesActions.load(roleId).then(setLoadedRole);
   }, [roleId]);
 
   return (
-    <DocumentTitle title={`Role Details ${loadedRole?.name ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedRole?.name} />}
+    <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
+      <PageHeader title={<PageTitle name={loadedRole?.name} />}
                   subactions={<RoleActionLinks roleId={roleId} />}>
         <span>
-          Overview of details like name, description and assigned users.
+          You can assign the role to users.
         </span>
         <span>
           Learn more in the{' '}
@@ -69,9 +70,9 @@ const RoleDetailsPage = ({ params }: Props) => {
           <Button bsStyle="info">Roles Overview</Button>
         </LinkContainer>
       </PageHeader>
-      <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
+      <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>
   );
 };
 
-export default withParams(RoleDetailsPage);
+export default withParams(RoleEditPage);
