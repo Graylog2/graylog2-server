@@ -94,7 +94,7 @@ MessageField.propTypes = {
   message: PropTypes.exact({
     id: PropTypes.string.isRequired,
     index: PropTypes.string.isRequired,
-    fields: PropTypes.object.isRequired
+    fields: PropTypes.object.isRequired,
   }).isRequired,
   value: PropTypes.any.isRequired,
 };

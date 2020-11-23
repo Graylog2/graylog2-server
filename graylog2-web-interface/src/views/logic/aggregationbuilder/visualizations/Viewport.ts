@@ -76,6 +76,7 @@ export default class Viewport {
 }
 
 type InternalBuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: InternalBuilderState;
 

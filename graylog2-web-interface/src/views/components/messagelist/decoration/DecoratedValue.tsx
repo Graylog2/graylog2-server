@@ -21,10 +21,10 @@ import DecoratorContext from './DecoratorContext';
 import type { ValueRenderer, ValueRendererProps } from './ValueRenderer';
 
 const pipelineFromDecorators = (decorators: Array<ValueRenderer>): ValueRenderer => {
-  const Component: ValueRenderer = ({value, ...rest}: ValueRendererProps) => (
-      <>
-        {decorators.reduce<React.ReactElement>((prev, Cur) => <Cur {...rest} value={value}>{prev}</Cur>, null)}
-      </>
+  const Component: ValueRenderer = ({ value, ...rest }: ValueRendererProps) => (
+    <>
+      {decorators.reduce<React.ReactElement>((prev, Cur) => <Cur {...rest} value={value}>{prev}</Cur>, null)}
+    </>
   );
 
   return Component;

@@ -16,10 +16,10 @@
  */
 // @flow strict
 import * as Immutable from 'immutable';
+import { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
-import {$PropertyType} from "utility-types";
 
 type InternalState = {
   interpolation: InterpolationMode,

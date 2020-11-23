@@ -25,6 +25,7 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import { Store } from 'stores/StoreTypes';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -33,7 +34,6 @@ import style from './MessageTableEntry.css';
 import type { Message } from './Types';
 
 import TypeSpecificValue from '../TypeSpecificValue';
-import { Store } from 'stores/StoreTypes';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
 

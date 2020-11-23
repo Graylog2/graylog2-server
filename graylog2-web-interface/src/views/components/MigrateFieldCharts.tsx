@@ -176,12 +176,12 @@ const _migrateWidgets = (legacyCharts) => {
 
     const newWidgetsRowOffset = legacyCharts.length * defaultHeight;
     const existingWidgetPos = _updateExistingWidgetPos(currentView.state.widgetPositions, newWidgetsRowOffset);
-      const newViewState = currentView.state
+    const newViewState = currentView.state
       .toBuilder()
       .widgets(Immutable.List([
-          // @ts-ignore
-          ...currentView.state.widgets,
-          ...newWidgets
+        // @ts-ignore
+        ...currentView.state.widgets,
+        ...newWidgets,
       ]))
       .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
       .build();

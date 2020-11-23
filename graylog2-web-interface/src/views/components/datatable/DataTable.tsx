@@ -27,6 +27,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import { Events } from 'views/logic/searchtypes/events/EventHandler';
 
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
@@ -35,9 +36,8 @@ import Headers from './Headers';
 import styles from './DataTable.css';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-import type {VisualizationComponent, VisualizationComponentProps} from '../aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponent, VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from '../aggregationbuilder/AggregationBuilder';
-import {Events} from "views/logic/searchtypes/events/EventHandler";
 
 type Props = VisualizationComponentProps & {
   config: AggregationWidgetConfig,

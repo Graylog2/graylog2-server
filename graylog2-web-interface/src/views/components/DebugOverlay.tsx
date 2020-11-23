@@ -25,6 +25,7 @@ import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchStoreState } from 'views/stores/SearchStore';
+
 import View from '../logic/views/View';
 
 type Props = {

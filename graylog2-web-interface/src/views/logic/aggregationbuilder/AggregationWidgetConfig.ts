@@ -230,6 +230,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 }
 
 type BuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: BuilderState;
 

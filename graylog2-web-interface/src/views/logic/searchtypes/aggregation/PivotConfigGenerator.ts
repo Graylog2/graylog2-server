@@ -23,10 +23,10 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { Definition } from 'views/logic/aggregationbuilder/Series';
+import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
 import type { TimeUnit } from '../../../Constants';
 import SortConfig from '../../aggregationbuilder/SortConfig';
-import NumberVisualizationConfig from "views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig";
 
 const mapTimeunit = (unit: TimeUnit) => {
   switch (unit) {

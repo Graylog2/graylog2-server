@@ -16,7 +16,8 @@
  */
 // @flow strict
 import chroma from 'chroma-js';
-import {RelativeTimeRange} from "views/logic/queries/Query";
+
+import { RelativeTimeRange } from 'views/logic/queries/Query';
 
 export const TIMESTAMP_FIELD = 'timestamp';
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, 'source'];
