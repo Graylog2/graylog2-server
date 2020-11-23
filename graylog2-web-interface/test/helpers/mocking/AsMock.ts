@@ -16,7 +16,6 @@
  */
 // @flow strict
 
-// $FlowFixMe: Overriding type
-const asMock = (fn): JestMockFn<*, *> => fn;
+const asMock = <Fn extends ((...args: any[]) => any)>(fn: Fn) => fn as unknown as jest.Mock<ReturnType<Fn>, Parameters<Fn>>;
 
 export default asMock;

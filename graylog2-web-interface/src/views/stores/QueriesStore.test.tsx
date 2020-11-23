@@ -19,8 +19,10 @@ import moment from 'moment';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 
+import View from 'views/logic/views/View';
+
 import { QueriesActions, QueriesStore } from './QueriesStore';
-import { ViewStore } from './ViewStore';
+import { ViewStore, ViewStoreState } from './ViewStore';
 
 import type { QueryId } from '../logic/queries/Query';
 import Query from '../logic/queries/Query';
@@ -43,6 +45,10 @@ const fixedDate = new Date('2020-01-16T12:23:42.123Z');
 
 jest.spyOn(global.Date, 'now')
   .mockReturnValue(fixedDate.valueOf());
+
+const newViewStoreStateForQueries = (queries: Query[]) => ({
+  view: View.create().toBuilder().search(Search.create().toBuilder().queries(queries).build()).build(),
+} as ViewStoreState);
 
 describe('QueriesStore', () => {
   beforeEach(() => {
@@ -67,13 +73,7 @@ describe('QueriesStore', () => {
       done();
     });
 
-    callback({
-      view: {
-        search: {
-          queries,
-        },
-      },
-    });
+    callback(newViewStoreStateForQueries(queries));
 
     unsubscribe();
   });
@@ -88,11 +88,7 @@ describe('QueriesStore', () => {
     beforeEach(() => {
       const callback = asMock(ViewStore.listen).mock.calls[0][0];
 
-      callback({
-        view: {
-          search: Search.builder().queries(queries).build(),
-        },
-      });
+      callback(newViewStoreStateForQueries(queries));
     });
 
     it('throws error if no type is given', () => {

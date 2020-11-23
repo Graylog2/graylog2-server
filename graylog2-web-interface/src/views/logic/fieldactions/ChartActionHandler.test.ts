@@ -23,6 +23,7 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import Series from 'views/logic/aggregationbuilder/Series';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import ChartActionHandler from './ChartActionHandler';
 
@@ -66,7 +67,7 @@ describe('ChartActionHandler', () => {
 
   describe('retrieves field type for `timestamp` field', () => {
     beforeEach(() => {
-      asMock(pivotForField).mockReturnValue('PIVOT');
+      asMock(pivotForField).mockReturnValue(Pivot.create('foo', 'bar'));
     });
 
     it('uses Unknown if FieldTypeStore returns nothing', () => {

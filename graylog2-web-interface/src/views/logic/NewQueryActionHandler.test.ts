@@ -18,7 +18,7 @@
 import asMock from 'helpers/mocking/AsMock';
 
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import { ViewStore, ViewStoreState } from 'views/stores/ViewStore';
 
 import NewQueryActionHandler from './NewQueryActionHandler';
 import View from './views/View';
@@ -39,7 +39,7 @@ describe('NewQueryActionHandler', () => {
   beforeEach(() => {
     asMock(ViewStore.getInitialState).mockReturnValue({
       view: View.create().toBuilder().type(View.Type.Dashboard).build(),
-    });
+    } as ViewStoreState);
   });
 
   it('creates a new query', () => NewQueryActionHandler()
