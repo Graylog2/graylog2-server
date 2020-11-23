@@ -84,9 +84,6 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
 
 UnauthorizedErrorPage.propTypes = {
   description: PropTypes.node,
-  error: PropTypes.exact({
-    message: PropTypes.string.isRequired,
-  }).isRequired,
   errorDetails: PropTypes.string,
   title: PropTypes.string,
 };
