@@ -76,6 +76,7 @@ import {
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
@@ -235,7 +236,7 @@ export default {
       isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
     },
   ],
-  valueActions: [
+  valueActions: filterCloudValueActions([
     {
       type: 'exclude',
       title: 'Exclude from results',
@@ -266,7 +267,7 @@ export default {
       handler: HighlightValueHandler,
       isEnabled: HighlightValueHandler.isEnabled,
     },
-  ],
+  ], ['create-extractor']),
   visualizationTypes: [
     {
       type: AreaVisualization.type,
