@@ -53,7 +53,7 @@ const LIFECYCLE_DEFAULT_MESSAGES = {
 };
 
 type Props = {
-  title: React.ReactElement,
+  title: React.ReactElement | string,
   children: Array<React.ReactElement>,
   subactions?: React.ReactElement,
   lifecycle?: 'experimental' | 'legacy',

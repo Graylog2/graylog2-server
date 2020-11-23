@@ -1,6 +1,6 @@
 import { $Call } from 'utility-types';
 
-type PromiseProvider = (...args: any[]) => Promise<any>;
+export type PromiseProvider = (...args: any[]) => Promise<any>;
 type ExtractResultType<R extends PromiseProvider> = $Call<ExtractTypeFromPromise<ReturnType<R>>>;
 type ExtractTypeFromPromise<P> = P extends Promise<infer R> ? R : P;
 

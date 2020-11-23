@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Reflux from 'reflux';
 
-import type { RefluxActions } from 'stores/StoreTypes';
-import HTTPHeaderAuthConfig, { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
+import { RefluxActions } from 'stores/StoreTypes';
 import { singletonActions } from 'views/logic/singleton';
+import HTTPHeaderAuthConfig, { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 
 export type ActionsType = {
   load: () => Promise<HTTPHeaderAuthConfig>,

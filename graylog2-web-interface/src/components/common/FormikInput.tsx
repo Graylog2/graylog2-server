@@ -22,8 +22,10 @@ import { Field, useFormikContext } from 'formik';
 import { Input } from 'components/bootstrap';
 
 type Props = {
+  autoComplete?: string,
+  buttonAfter?: React.ReactElement | string,
   id: string,
-  label?: string,
+  label?: React.ReactElement | string,
   name: string,
   type?: string,
   help?: React.ReactElement | string,
@@ -33,7 +35,7 @@ type Props = {
   onChange?: (event: SyntheticEvent<Input>) => void,
   wrapperClassName?: string,
   validate?: (string) => string | undefined | null,
-  error?: string,
+  error?: React.ReactElement | string,
   placeholder?: string,
   required?: boolean,
   formGroupClassName?: string,
@@ -91,6 +93,8 @@ FormikInput.propTypes = {
 };
 
 FormikInput.defaultProps = {
+  buttonAfter: undefined,
+  autoComplete: undefined,
   label: undefined,
   help: undefined,
   labelClassName: undefined,
