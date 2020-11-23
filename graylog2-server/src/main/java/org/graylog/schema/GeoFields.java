@@ -17,14 +17,10 @@
 package org.graylog.schema;
 
 public class GeoFields {
-    public static final String GEO_CITY_ISO_CODE = "geo_city_iso_code";
     public static final String GEO_CITY_NAME = "geo_city_name";
-    public static final String GEO_STATE_NAME = "geo_state_name";
-    public static final String GEO_COUNTRY_ISO_CODE = "geo_country_iso_code";
+    public static final String GEO_COUNTRY_ISO = "geo_country_iso";
     public static final String GEO_COUNTRY_NAME = "geo_country_name";
     public static final String GEO_COORDINATES = "geo_coordinates";
-
-    // To be removed
-    @Deprecated
-    public static final String GEO_ISO_CODE = "geo_iso_code";
+    public static final String GEO_NAME = "geo_name";
+    public static final String GEO_STATE_NAME = "geo_state_name";
 }

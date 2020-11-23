@@ -16,9 +16,10 @@
  */
 package org.graylog.schema;
 
-public class ApplicationFields {
-    public static final String APPLICATION_NAME = "application_name";
-    public static final String APPLICATION_RESPONSE_TIME = "application_response_time";
-    public static final String APPLICATION_SSO_SIGNONMODE = "application_sso_signonmode";
-    public static final String APPLICATION_SSO_TARGET_NAME = "application_sso_target_name";
+public class HashFields {
+    public static final String HASH_MD5 = "hash_md5";
+    public static final String HASH_SHA1 = "hash_sha1";
+    public static final String HASH_SHA256 = "hash_sha256";
+    public static final String HASH_SHA512 = "hash_sha512";
+    public static final String HASH_IMPHASH = "hash_imphash";
 }
