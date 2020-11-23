@@ -42,6 +42,7 @@ const ActionsSM = styled.div`
     display: inline-block;
     vertical-align: top;
   }
+
   > :not(:last-child) {
     margin-right: 5px;
   }
