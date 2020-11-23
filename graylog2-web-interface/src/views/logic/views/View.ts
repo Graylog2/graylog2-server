@@ -58,6 +58,7 @@ type InternalState = {
   requires: Requirements,
 };
 
+/* eslint-disable camelcase */
 export type ViewJson = {
   id: string,
   type: ViewType,
@@ -71,6 +72,7 @@ export type ViewJson = {
   owner: string,
   requires: Requirements,
 };
+/* eslint-enable camelcase */
 
 export default class View {
   static Type: { Search: SearchType, Dashboard: DashboardType } = {
@@ -107,7 +109,7 @@ export default class View {
   }
 
   static create(): View {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder().createdAt(new Date()).build();
   }
 
@@ -179,11 +181,10 @@ export default class View {
     return widgetTitles.get(widget.id) || defaultTitle;
   }
 
-  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       id,
       title,
@@ -236,9 +237,8 @@ export default class View {
       .build();
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

@@ -38,6 +38,7 @@ type Props = {
 };
 
 type TypedConfig = { type: string };
+
 const BackendDetails = ({ authenticationBackend }: Props) => {
   const authService = getAuthServicePlugin((authenticationBackend.config as TypedConfig).type);
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();

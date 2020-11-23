@@ -17,7 +17,7 @@
 // @flow strict
 type MockMethod = string | [string, Function];
 
-export default function (...args: Array<MockMethod>) {
+export default function MockStore(...args: Array<MockMethod>) {
   const store = {
     // eslint-disable-next-line func-call-spacing,no-spaced-func
     listen: jest.fn(() => () => {}),
