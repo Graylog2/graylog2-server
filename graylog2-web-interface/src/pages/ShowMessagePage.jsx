@@ -35,10 +35,11 @@ const StreamsStore = StoreProvider.getStore('Streams');
 
 type Props = {
   params: {
-    index: ?string,
-    messageId: ?string,
+    index: string | undefined | null,
+    messageId: string | undefined | null,
   },
 };
+
 const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   if (!index || !messageId) {
     throw new Error('index and messageId need to be specified!');
@@ -46,8 +47,8 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
 
   const [message, setMessage] = useState();
   const [inputs, setInputs] = useState(Immutable.Map);
-  const [streams, setStreams] = useState();
-  const [allStreams, setAllStreams] = useState();
+  const [streams, setStreams] = useState<Immutable.Map<string, unknown>>();
+  const [allStreams, setAllStreams] = useState<Immutable.List<unknown>>();
 
   useEffect(() => { NodesActions.list(); }, []);
 
@@ -107,7 +108,7 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
 };
 
 ShowMessagePage.propTypes = {
-  params: PropTypes.shape({
+  params: PropTypes.exact({
     index: PropTypes.string.isRequired,
     messageId: PropTypes.string.isRequired,
   }).isRequired,
