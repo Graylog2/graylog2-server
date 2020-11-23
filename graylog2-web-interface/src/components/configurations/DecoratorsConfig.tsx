@@ -22,7 +22,7 @@ import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import CombinedProvider from 'injection/CombinedProvider';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 
@@ -36,7 +36,7 @@ import BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 const DecoratorsConfig = () => {
-  const [streams, setStreams] = useState();
+  const [streams, setStreams] = useState<Array<Stream> | undefined>();
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [decorators, setDecorators] = useState();
   const [types, setTypes] = useState();
@@ -69,8 +69,7 @@ const DecoratorsConfig = () => {
     .sort((d1, d2) => d1.order - d2.order);
   const readOnlyDecoratorItems = sortedDecorators.map((decorator) => formatDecorator(decorator, currentDecorators, types));
 
-  const streamOptions = streams
-    .filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id));
+  const streamOptions = streams.filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id));
 
   return (
     <div>

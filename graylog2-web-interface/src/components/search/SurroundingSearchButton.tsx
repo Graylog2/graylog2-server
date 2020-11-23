@@ -56,7 +56,7 @@ type Props = {
   searchConfig: SearchesConfig,
   timestamp: string,
   id: string,
-  messageFields: { [string]: mixed },
+  messageFields: { [key: string]: unknown },
 };
 
 const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }: Props) => {

@@ -3,3 +3,7 @@ declare module '*.css' {
   const classes: CSSClasses;
   export default classes;
 }
+
+declare module '*.jpg' {
+  export default string;
+}

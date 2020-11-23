@@ -17,9 +17,9 @@
 // @flow strict
 import DecoratorsUpdater from './DecoratorsUpdater';
 
-const mockCreate = jest.fn(() => Promise.resolve());
-const mockUpdate = jest.fn(() => Promise.resolve());
-const mockRemove = jest.fn(() => Promise.resolve());
+const mockCreate = jest.fn((...args: any[]) => Promise.resolve(args));
+const mockUpdate = jest.fn((...args: any[]) => Promise.resolve(args));
+const mockRemove = jest.fn((...args: any[]) => Promise.resolve(args));
 
 jest.mock('injection/CombinedProvider', () => ({
   get: (type) => ({

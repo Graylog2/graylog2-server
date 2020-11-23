@@ -163,10 +163,6 @@ const Navigation = ({ location }: Props) => {
   );
 };
 
-Navigation.propTypes = {
-  location: PropTypes.shape({
-    pathname: PropTypes.string.isRequired,
-  }).isRequired,
-};
+Navigation.propTypes = {};
 
 export default withLocation(Navigation);

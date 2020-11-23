@@ -23,14 +23,26 @@ import type { ThemeInterface } from 'theme';
 import Version from 'util/Version';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
+import { Store } from 'stores/StoreTypes';
 
 const SystemStore = StoreProvider.getStore('System');
 
+type SystemStoreState = {
+  system: {
+    version?: string,
+    hostname?: string,
+  };
+};
+
 type Props = {
   system?: {
-    version: string,
-    hostname: string,
+    version?: string,
+    hostname?: string,
   },
+};
+
+type Jvm = {
+  info: string;
 };
 
 const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.footer(({ theme }) => css`
@@ -46,7 +58,7 @@ const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.fo
 `);
 
 const Footer = ({ system }: Props) => {
-  const [jvm, setJvm] = useState();
+  const [jvm, setJvm] = useState<Jvm | undefined>();
 
   useEffect(() => {
     let mounted = true;
@@ -79,7 +91,7 @@ const Footer = ({ system }: Props) => {
 };
 
 Footer.propTypes = {
-  system: PropTypes.exact({
+  system: PropTypes.shape({
     version: PropTypes.string,
     hostname: PropTypes.string,
   }),
@@ -89,4 +101,8 @@ Footer.defaultProps = {
   system: undefined,
 };
 
-export default connect(Footer, { system: SystemStore }, ({ system: { system } = {} }: { system }) => ({ system }));
+export default connect(
+  Footer,
+  { system: SystemStore as Store<SystemStoreState> },
+  ({ system: { system } = { system: undefined } }) => ({ system }),
+);

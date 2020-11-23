@@ -32,14 +32,10 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
   it('should render the field set', () => {
     const { container } = render(
       <HTTPJSONPathAdapterFieldSet config={config}
-                                   updateConfig={() => {
-                                   }}
-                                   handleFormEvent={() => {
-                                   }}
-                                   validationState={() => {
-                                   }}
-                                   validationMessage={() => {
-                                   }} />,
+                                   updateConfig={() => {}}
+                                   handleFormEvent={() => {}}
+                                   validationState={() => 'success'}
+                                   validationMessage={() => ''} />,
     );
 
     expect(container).not.toBeNull();
@@ -50,12 +46,9 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
     const { getByTestId, getByText } = render(
       <HTTPJSONPathAdapterFieldSet config={config}
                                    updateConfig={updateConfig}
-                                   handleFormEvent={() => {
-                                   }}
-                                   validationState={() => {
-                                   }}
-                                   validationMessage={() => {
-                                   }} />,
+                                   handleFormEvent={() => {}}
+                                   validationState={() => 'success'}
+                                   validationMessage={() => ''} />,
     );
     const newKeyInput = getByTestId('newKey');
     const newValueInput = getByTestId('newValue');

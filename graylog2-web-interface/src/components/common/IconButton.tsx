@@ -68,7 +68,7 @@ IconButton.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string,
   onClick: PropTypes.func,
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
 };
 
 IconButton.defaultProps = {
@@ -76,6 +76,7 @@ IconButton.defaultProps = {
   focusable: true,
   onClick: undefined,
   title: undefined,
+  name: undefined,
 };
 
 export default IconButton;

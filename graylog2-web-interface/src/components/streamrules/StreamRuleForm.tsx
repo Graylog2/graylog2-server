@@ -28,6 +28,7 @@ import connect from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import FormsUtils from 'util/FormsUtils';
+import { Store } from 'stores/StoreTypes';
 
 const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
 
@@ -47,7 +48,7 @@ type StreamRuleType = {
 };
 
 type Props = {
-  onSubmit: (?string, StreamRule) => void,
+  onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: StreamRule) => void,
   streamRule: StreamRule,
   streamRuleTypes: [StreamRuleType],
   title: string,
@@ -65,6 +66,15 @@ class StreamRuleForm extends React.Component<Props, State> {
     streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
     inputs: [],
     onClose: () => {},
+  };
+
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+    streamRule: PropTypes.object,
+    streamRuleTypes: PropTypes.array.isRequired,
+    title: PropTypes.string.isRequired,
+    inputs: PropTypes.array,
+    onClose: PropTypes.func,
   };
 
   FIELD_PRESENCE_RULE_TYPE = 5;
@@ -255,15 +265,10 @@ class StreamRuleForm extends React.Component<Props, State> {
   }
 }
 
-StreamRuleForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  streamRule: PropTypes.object,
-  streamRuleTypes: PropTypes.array.isRequired,
-  title: PropTypes.string.isRequired,
-  inputs: PropTypes.array,
-  onClose: PropTypes.func,
+type InputsStoreState = {
+  inputs: Array<unknown>;
 };
 
 export default connect(StreamRuleForm,
-  { inputs: InputsStore },
+  { inputs: InputsStore as Store<InputsStoreState> },
   ({ inputs }) => ({ inputs: inputs.inputs }));

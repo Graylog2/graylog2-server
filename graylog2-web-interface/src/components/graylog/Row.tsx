@@ -33,7 +33,7 @@ export const RowContentStyles = css(({ theme }: RowContentType) => css`
   border-radius: 4px;
 `);
 
-const Row: StyledComponent<{children: any}, void, *> = styled(BootstrapRow)`
+const Row: StyledComponent<{children: any}, void, any> = styled(BootstrapRow)`
   &.content {
     ${RowContentStyles}
   }

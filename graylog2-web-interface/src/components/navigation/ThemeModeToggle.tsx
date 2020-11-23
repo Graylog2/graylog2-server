@@ -17,11 +17,11 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css, withTheme, type StyledComponent } from 'styled-components';
+import styled, { css, withTheme, StyledComponent } from 'styled-components';
 import defer from 'lodash/defer';
 
 import { Icon } from 'components/common';
-import { themePropTypes, type ThemeInterface } from 'theme';
+import { themePropTypes, ThemeInterface } from 'theme';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,

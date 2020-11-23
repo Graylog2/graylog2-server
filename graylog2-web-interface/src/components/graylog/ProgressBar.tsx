@@ -31,8 +31,7 @@ type StyledBarProps = {
   value: number,
 };
 
-type BarProps = {
-  ...StyledBarProps,
+type BarProps = StyledBarProps & {
   label: string,
 };
 
