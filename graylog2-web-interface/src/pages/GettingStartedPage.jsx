@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import PropTypes from 'prop-types';
 import * as React from 'react';
 
 import connect from 'stores/connect';
@@ -65,15 +64,10 @@ const GettingStartedPage = ({ system, location }: Props) => {
 
 GettingStartedPage.displayName = 'GettingStartedPage';
 
-GettingStartedPage.propTypes = {
-  location: PropTypes.object.isRequired,
-};
-
 export default connect(
   withLocation(GettingStartedPage),
   { systemStore: SystemStore },
-  (props) => ({
-    ...props,
-    system: props.systemStore.system,
+  ({ systemStore }: { systemStore: { system: unknown }}) => ({
+    system: systemStore.system,
   }),
 );
