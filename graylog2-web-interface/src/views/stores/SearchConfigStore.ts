@@ -23,9 +23,13 @@ import { SearchesConfig } from 'components/search/SearchConfig';
 
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 
+type SearchConfigActionsType = {
+  refresh: () => Promise<void>;
+};
+
 export const SearchConfigActions = singletonActions(
   'views.SearchConfig',
-  () => Reflux.createActions({
+  () => Reflux.createActions<SearchConfigActionsType>({
     refresh: { asyncResult: true },
   }),
 );

@@ -20,7 +20,6 @@ import * as Immutable from 'immutable';
 import Role from 'logic/roles/Role';
 import UserOverview from 'logic/users/UserOverview';
 import { singletonActions } from 'views/logic/singleton';
-import type { RefluxActions } from 'stores/StoreTypes';
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 
 export type UserContext = {
@@ -47,9 +46,9 @@ export type ActionsType = {
   loadRolesPaginated: (pagination: Pagination) => Promise<PaginatedRoles>,
 };
 
-const AuthzRolesActions: RefluxActions<ActionsType> = singletonActions(
+const AuthzRolesActions = singletonActions(
   'AuthzRoles',
-  () => Reflux.createActions({
+  () => Reflux.createActions<ActionsType>({
     load: { asyncResult: true },
     delete: { asyncResult: true },
     addMembers: { asyncResult: true },
