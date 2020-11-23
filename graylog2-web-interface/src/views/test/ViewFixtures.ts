@@ -34,7 +34,7 @@ const simpleView = (): View => View.builder()
   .requires({})
   .build();
 
-const simpleViewJson = () => ({ ...simpleView().toJSON(), requires: {} });
+const simpleViewJson = () => ({ ...simpleView().toJSON(), requires: {} }) as unknown as ViewJson;
 
 export {
   simpleView,
