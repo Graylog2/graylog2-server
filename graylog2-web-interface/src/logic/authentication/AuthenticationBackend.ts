@@ -18,13 +18,14 @@ import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
+import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
 
 type InternalState = {
   id: string,
   title: string,
   description: string,
   defaultRoles: Immutable.List<string>,
-  config: unknown,
+  config: DirectoryServiceBackendConfig,
 };
 
 type TypedConfig = {

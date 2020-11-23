@@ -18,6 +18,7 @@
 import * as Immutable from 'immutable';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
 
 export const ldapBackend = AuthenticationBackend.builder()
   .id('ldap-auth-backend-id')
@@ -26,16 +27,16 @@ export const ldapBackend = AuthenticationBackend.builder()
   .defaultRoles(Immutable.List(['reader-role-id']))
   .config({
     servers: [{ host: 'localhost', port: 389 }],
-    system_user_dn: '',
-    system_user_password: { is_set: false },
-    transport_security: 'none',
+    systemUserDn: '',
+    systemUserPassword: { isSet: false },
+    transportSecurity: 'none',
     type: 'ldap',
-    user_full_name_attribute: 'cn',
-    user_name_attribute: 'uid',
-    user_search_base: 'cn=users,dc=example,dc=com',
-    user_search_pattern: '(&(objectClass=person)(sn={0}))',
-    user_unique_id_attribute: 'entryUUID',
-    verify_certificates: true,
+    userFullNameAttribute: 'cn',
+    userNameAttribute: 'uid',
+    userSearchBase: 'cn=users,dc=example,dc=com',
+    userSearchPattern: '(&(objectClass=person)(sn={0}))',
+    userUniqueIdAttribute: 'entryUUID',
+    verifyCertificates: true,
   })
   .build();
 
@@ -46,14 +47,15 @@ export const activeDirectoryBackend = AuthenticationBackend.builder()
   .defaultRoles(Immutable.List(['reader-role-id']))
   .config({
     servers: [{ host: 'localhost', port: 636 }],
-    system_user_dn: '',
-    system_user_password: { is_set: false },
-    transport_security: 'tls',
+    systemUserDn: '',
+    systemUserPassword: { isSet: false },
+    transportSecurity: 'tls',
     type: 'active-directory',
-    user_full_name_attribute: 'displayName',
-    user_name_attribute: 'userPrincipalName',
-    user_search_base: 'cn=users,dc=example,dc=com',
-    user_search_pattern: '(&(objectClass=user)(|(sAMAccountName={0})(userPrincipalName={0})))',
-    verify_certificates: true,
+    userFullNameAttribute: 'displayName',
+    userNameAttribute: 'userPrincipalName',
+    userSearchBase: 'cn=users,dc=example,dc=com',
+    userSearchPattern: '(&(objectClass=user)(|(sAMAccountName={0})(userPrincipalName={0})))',
+    userUniqueIdAttribute: undefined,
+    verifyCertificates: true,
   })
   .build();
