@@ -17,6 +17,7 @@
 // @flow strict
 // eslint-disable-next-line import/no-cycle
 import { FetchError } from 'logic/rest/FetchProvider';
+import { $PropertyType } from 'utility-types';
 
 export const ReactErrorType = 'ReactError';
 export const NotFoundErrorType = 'NotFoundError';
