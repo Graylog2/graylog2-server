@@ -213,7 +213,7 @@ export default class View {
       state,
       created_at: createdAt,
       owner,
-    };
+    } as unknown as ViewJson;
   }
 
   static fromJSON(value: ViewJson): View {
@@ -244,6 +244,7 @@ export default class View {
 }
 
 type InternalBuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: InternalBuilderState;
 

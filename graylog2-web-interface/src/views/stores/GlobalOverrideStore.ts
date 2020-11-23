@@ -20,13 +20,13 @@ import Reflux from 'reflux';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type {ElasticsearchQueryString, TimeRange} from 'views/logic/queries/Query';
+import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import { SearchExecutionStateActions, SearchExecutionStateStore } from './SearchExecutionStateStore';
 
-type GlobalOverrideStoreState = GlobalOverride | undefined;
+export type GlobalOverrideStoreState = GlobalOverride | undefined;
 
 export type GlobalOverrideActionsType = RefluxActions<{
   query: (newQueryString: string) => Promise<GlobalOverrideStoreState>,
