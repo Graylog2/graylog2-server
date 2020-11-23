@@ -35,7 +35,7 @@ import javax.inject.Inject;
 public class PaloAlto9xInput extends MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto9xInput.class);
 
-    public static final String NAME = "Palo Alto Networks TCP (PAN-OS v9.x)";
+    public static final String NAME = "Palo Alto Networks TCP (PAN-OS v9+)";
 
     @Inject
     public PaloAlto9xInput(@Assisted Configuration configuration,

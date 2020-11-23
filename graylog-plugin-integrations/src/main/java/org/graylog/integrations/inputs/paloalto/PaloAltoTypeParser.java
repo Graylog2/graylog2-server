@@ -18,10 +18,13 @@ package org.graylog.integrations.inputs.paloalto;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 public class PaloAltoTypeParser {
 
@@ -37,7 +40,7 @@ public class PaloAltoTypeParser {
     }
 
     public ImmutableMap<String, Object> parseFields(List<String> fields) {
-        ImmutableMap.Builder<String, Object> x = new ImmutableMap.Builder<>();
+        Map<String, Object> fieldMap = Maps.newHashMap();
 
         for (PaloAltoFieldTemplate field : messageTemplate.getFields()) {
             String rawValue = null;
@@ -83,9 +86,25 @@ public class PaloAltoTypeParser {
                     throw new RuntimeException("Unhandled PAN mapping field type [" + field.fieldType() + "].");
             }
 
-            x.put(field.field(), value);
+            // Handling of duplicate keys
+            if (fieldMap.containsKey(field.field())) {
+                if (Strings.isNullOrEmpty(rawValue.trim()) || value.equals(fieldMap.get(field.field()))) {
+                    // Same value, do nothing
+                    continue;
+                } else if (fieldMap.get(field.field()) instanceof List) {
+                    List valueList = (List) fieldMap.get(field.field());
+                    valueList.add(value);
+                    value = valueList;
+                } else {
+                    List valueList = Lists.newArrayList();
+                    valueList.add(fieldMap.get(field.field()));
+                    valueList.add(value);
+                    value = valueList;
+                }
+            }
+            fieldMap.put(field.field(), value);
         }
 
-        return x.build();
+        return ImmutableMap.copyOf(fieldMap);
     }
 }
