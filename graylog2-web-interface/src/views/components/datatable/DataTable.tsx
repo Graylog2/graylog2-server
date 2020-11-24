@@ -36,7 +36,7 @@ import Headers from './Headers';
 import styles from './DataTable.css';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-import type { VisualizationComponent, VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = VisualizationComponentProps & {
