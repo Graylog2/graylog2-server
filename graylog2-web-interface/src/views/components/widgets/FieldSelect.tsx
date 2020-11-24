@@ -63,6 +63,8 @@ FieldSelect.propTypes = {
 FieldSelect.defaultProps = {
   onChange: () => {},
   value: null,
+  allowOptionCreation: false,
+  inputId: undefined,
 };
 
 export default FieldSelect;
