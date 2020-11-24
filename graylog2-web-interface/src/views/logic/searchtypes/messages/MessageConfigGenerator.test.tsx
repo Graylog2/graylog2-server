@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';

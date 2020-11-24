@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 // Workaround for IE11, see #7670
 const createEvent = (type: string) => {
   if (typeof (Event) === 'function') {

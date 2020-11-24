@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import View from 'views/logic/views/View';

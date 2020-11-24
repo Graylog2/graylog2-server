@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import type MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';

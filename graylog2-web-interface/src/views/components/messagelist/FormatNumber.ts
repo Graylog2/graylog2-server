@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import numeral from 'numeral';
 
 const formatNumber = (value: number): string => numeral(value).format('0,0.[0000000]');

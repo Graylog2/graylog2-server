@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import each from 'jest-each';

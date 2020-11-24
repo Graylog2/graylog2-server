@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
 

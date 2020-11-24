@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { Set, List } from 'immutable';
 
 import View, { ViewType } from 'views/logic/views/View';

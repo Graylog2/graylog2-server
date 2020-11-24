@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';

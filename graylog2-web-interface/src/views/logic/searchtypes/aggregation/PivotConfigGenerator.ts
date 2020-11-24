@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import uuid from 'uuid/v4';
 import { Set } from 'immutable';
 import { $Shape } from 'utility-types';

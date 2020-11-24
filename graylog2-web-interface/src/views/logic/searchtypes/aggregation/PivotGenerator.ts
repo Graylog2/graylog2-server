@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 

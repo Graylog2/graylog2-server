@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { ViewStore } from 'views/stores/ViewStore';
 
 import QueryGenerator from './queries/QueryGenerator';

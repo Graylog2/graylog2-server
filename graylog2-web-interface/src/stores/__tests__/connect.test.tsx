@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 /// <reference types="jest-enzyme" />
 import React from 'react';
 import { act } from 'react-dom/test-utils';

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 // eslint-disable-next-line import/prefer-default-export

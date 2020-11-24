@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import StoreProvider from 'injection/StoreProvider';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
