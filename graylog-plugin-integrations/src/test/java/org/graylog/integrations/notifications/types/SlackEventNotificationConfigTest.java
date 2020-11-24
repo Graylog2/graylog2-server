@@ -36,9 +36,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SlackEventNotificationConfigTest {
 
     @Test
-    public void validate_succeeds_whenWebhookUrlIsValid() {
+    public void validate_succeeds_whenWebhookUrlIsValidSlackUrl() {
         SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder()
                 .webhookUrl("https://hooks.slack.com/services/xxxx/xxxx/xxxxxxx")
+                .build();
+        ValidationResult result = slackEventNotificationConfig.validate();
+        Map errors = result.getErrors();
+        assertThat(errors).size().isEqualTo(0);
+    }
+
+    @Test
+    public void validate_succeeds_whenWebhookUrlIsValidDiscordSlackUrl() {
+        SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder()
+                .webhookUrl("https://discord.com/api/webhooks/xxxx/xxXXXxxxxxxxxx/slack")
+                .build();
+        ValidationResult result = slackEventNotificationConfig.validate();
+        Map errors = result.getErrors();
+        assertThat(errors).size().isEqualTo(0);
+    }
+
+    @Test
+    public void validate_succeeds_whenWebhookUrlIsValidDiscordappSlackUrl() {
+        SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder()
+                .webhookUrl("https://discordapp.com/api/webhooks/xxxx/xxXXXxxxxxxxxx/slack")
                 .build();
         ValidationResult result = slackEventNotificationConfig.validate();
         Map errors = result.getErrors();

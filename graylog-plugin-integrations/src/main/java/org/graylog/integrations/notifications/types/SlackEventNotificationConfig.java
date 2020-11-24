@@ -43,7 +43,7 @@ public abstract class SlackEventNotificationConfig implements EventNotificationC
 
     public static final String TYPE_NAME = "slack-notification-v1";
 
-    private final String regex = "https:\\/\\/hooks.slack.com\\/services\\/";
+    private final String regex = "https:\\/\\/(hooks.slack.com\\/services\\/|.*\\.?discord(app)?.com\\/api\\/webhooks.*\\/slack)";
     private final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
     private static final String HEX_COLOR = "#ff0500";
 
