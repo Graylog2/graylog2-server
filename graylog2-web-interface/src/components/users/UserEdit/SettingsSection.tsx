@@ -24,7 +24,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
-import StartpageFormGroup from '../UserCreate/StartpageFormGroup';
+import StartpageFormGroup from '../StartpageFormGroup';
 
 type Props = {
   user: User,
