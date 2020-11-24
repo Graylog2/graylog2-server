@@ -24,20 +24,20 @@ import FormattingSettings from 'views/logic/views/formatting/FormattingSettings'
 import Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import AddNewWidgetsToPositions from 'views/logic/views/AddNewWidgetsToPositions';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
 
 import ViewState from '../logic/views/ViewState';
-import WidgetPosition from "views/logic/widgets/WidgetPosition";
 
 type CurrentViewStateActionsType = RefluxActions<{
   fields: (fields: Immutable.Set<string>) => Promise<unknown>,
   formatting: (formatting: FormattingSettings) => Promise<unknown>,
   titles: (titles: Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<unknown>,
   widgets: (widgets: Immutable.List<Widget>) => Promise<unknown>,
-  widgetPositions: () => Promise<unknown>,
+  widgetPositions: (newPositions: Record<string, WidgetPosition>) => Promise<unknown>,
 }>;
 
 export const CurrentViewStateActions: CurrentViewStateActionsType = singletonActions(

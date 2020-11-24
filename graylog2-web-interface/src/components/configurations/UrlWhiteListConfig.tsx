@@ -43,7 +43,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
   };
-  
+
   constructor(props: Props) {
     super(props);
     const { config } = this.props;

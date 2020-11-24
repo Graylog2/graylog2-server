@@ -22,15 +22,18 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 import { QueryString, TimeRange } from 'views/logic/queries/Query';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
+/* eslint-disable camelcase */
 export type ExportPayload = {
   timerange?: TimeRange | undefined | null,
-  // eslint-disable-next-line camelcase
   query_string?: QueryString,
   streams?: string[],
-  // eslint-disable-next-line camelcase
   fields_in_order: string[] | undefined | null,
+  execution_state?: SearchExecutionState,
+  limit?: number,
 };
+/* eslint-enable camelcase */
 
 const downloadCSV = (fileContent: string, filename: string = 'search-result') => {
   download(fileContent, `${filename}.csv`, 'text/csv');

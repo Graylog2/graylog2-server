@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 
 import VisualizationConfig from './VisualizationConfig';
 
-export type BarMode = "stack" | "group" | "overlay" | "relative";
+export type BarMode = 'stack' | 'group' | 'overlay' | 'relative';
 
 export type BarVisualizationConfigType = {
   barmode: BarMode,
@@ -68,6 +68,7 @@ export default class BarVisualizationConfig extends VisualizationConfig {
 }
 
 type InternalBuilderState = Immutable.Map<string, any>;
+
 class Builder {
   value: InternalBuilderState;
 

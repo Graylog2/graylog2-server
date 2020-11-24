@@ -22,6 +22,8 @@ import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import { Store } from '../StoreTypes';
+
 const { NodesActions } = CombinedProvider.get('Nodes');
 const { SessionStore } = CombinedProvider.get('Session');
 
@@ -41,7 +43,12 @@ type NodesListResponse = {
   total: number,
 };
 
-const NodesStore = Reflux.createStore({
+export type NodesStoreState = {
+  nodes: Array<NodeInfo>;
+  clusterId: string;
+  nodeCount: number;
+};
+const NodesStore: Store<NodesStoreState> = Reflux.createStore({
   listenables: [NodesActions],
   nodes: undefined,
   clusterId: undefined,

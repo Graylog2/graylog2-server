@@ -17,7 +17,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-type Property = 'compound' | 'enumerable' | 'full-text-search' | 'numeric' | 'decorated';
+export type Property = 'compound' | 'enumerable' | 'full-text-search' | 'numeric' | 'decorated';
 
 export const Properties: { [key: string]: Property } = {
   Compound: 'compound',

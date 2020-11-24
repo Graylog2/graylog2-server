@@ -22,7 +22,7 @@ import { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import { ViewHook } from 'views/logic/hooks/ViewHook';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-const useViewLoader = (viewId: string, query: { [key: string]: any }, viewLoader: ViewLoaderFn): [boolean, React.ElementType | undefined] => {
+const useViewLoader = (viewId: string, query: { [key: string]: any }, viewLoader: ViewLoaderFn): [boolean, React.ReactElement | undefined] => {
   const loadingViewHooks: Array<ViewHook> = usePluginEntities('views.hooks.loadingView');
   const executingViewHooks: Array<ViewHook> = usePluginEntities('views.hooks.executingView');
 

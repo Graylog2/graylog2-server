@@ -21,6 +21,7 @@ import { get, isEqual } from 'lodash';
 
 import type ViewState from 'views/logic/views/ViewState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { Store } from 'stores/StoreTypes';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
@@ -38,7 +39,9 @@ export const SelectedFieldsActions = singletonActions(
   ]),
 );
 
-export const SelectedFieldsStore = singletonStore(
+export type SelectedFieldsStoreState = Set<string> | undefined;
+
+export const SelectedFieldsStore: Store<SelectedFieldsStoreState> = singletonStore(
   'views.SelectedFields',
   () => Reflux.createStore({
     listenables: [SelectedFieldsActions],
@@ -53,7 +56,7 @@ export const SelectedFieldsStore = singletonStore(
     },
 
     onViewStoreChange(newState: StateUpdate) {
-      const selectedFields = Set(get(newState, 'state.fields'));
+      const selectedFields = Set<string>(get(newState, 'state.fields'));
 
       if (!isEqual(this.selectedFields, selectedFields)) {
         this.selectedFields = selectedFields;

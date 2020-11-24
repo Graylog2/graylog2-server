@@ -99,7 +99,7 @@ function connect<
     >(
   Component: React.ComponentType<Props>,
   stores: Stores,
-  mapProps: PropsMapper<ResultType<Stores>, MappedProps> = (props: ResultType<Stores>) => props as unknown as MappedProps,
+  mapProps: PropsMapper<ResultType<Stores>, MappedProps> = (props: ResultType<Stores>) => props as MappedProps,
 ): React.ComponentType<Optional<Props, keyof MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
 

@@ -20,6 +20,10 @@ export type VisualizationConfigJson = {
   type: string,
 };
 
+type DeserializesVisualizationConfig = {
+  fromJSON: (type: string, value: any) => VisualizationConfig;
+};
+
 export default class VisualizationConfig {
   static fromJSON(type: string, value: any): VisualizationConfig {
     const implementingClass = VisualizationConfig.__registrations[type.toLocaleLowerCase()];
@@ -36,9 +40,9 @@ export default class VisualizationConfig {
     throw new Error('Must not be called on abstract class!');
   }
 
-  static __registrations: { [key: string]: typeof VisualizationConfig } = {};
+  static __registrations: { [key: string]: DeserializesVisualizationConfig } = {};
 
-  static registerSubtype(type: string, implementingClass: typeof VisualizationConfig) {
+  static registerSubtype(type: string, implementingClass: DeserializesVisualizationConfig) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
 }

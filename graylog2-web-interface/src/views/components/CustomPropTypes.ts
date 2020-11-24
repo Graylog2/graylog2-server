@@ -21,19 +21,43 @@ import { get } from 'lodash';
 
 import TFieldType from 'views/logic/fieldtypes/FieldType';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import View from 'views/logic/views/View';
 
 const TimeRangeType = PropTypes.oneOf(['relative', 'absolute', 'keyword']);
 const FieldType = PropTypes.instanceOf(TFieldType);
 const FieldTypeMapping = PropTypes.instanceOf(TFieldTypeMapping);
 const FieldListType = ImmutablePropTypes.listOf(FieldTypeMapping);
 
-const CurrentView = PropTypes.shape({
-  activeQuery: PropTypes.string,
+const CurrentView = PropTypes.exact({
+  activeQuery: PropTypes.string.isRequired,
+  view: PropTypes.instanceOf(View).isRequired,
+  dirty: PropTypes.bool.isRequired,
+  isNew: PropTypes.bool.isRequired,
 });
 
 export type CurrentViewType = {
   activeQuery: string,
 };
+
+const BackendMessage = PropTypes.exact({
+  index: PropTypes.string.isRequired,
+  message: PropTypes.exact({
+    _id: PropTypes.string.isRequired,
+  }).isRequired,
+});
+
+const Message = PropTypes.exact({
+  id: PropTypes.string.isRequired,
+  index: PropTypes.string.isRequired,
+  fields: PropTypes.object.isRequired,
+  formatted_fields: PropTypes.object,
+  highlight_ranges: PropTypes.object,
+  decoration_stats: PropTypes.exact({
+    added_fields: PropTypes.object,
+    changed_fields: PropTypes.object,
+    removed_fields: PropTypes.object,
+  }),
+});
 
 const ValidElements = PropTypes.oneOfType([
   PropTypes.element,
@@ -92,4 +116,14 @@ const instanceOf = (expected) => Object.assign(
   { isRequired: createInstanceOf(expected, true) },
 );
 
-export default ({ ...PropTypes, CurrentView, FieldListType, FieldType, OneOrMoreChildren, TimeRangeType, instanceOf });
+export default ({
+  ...PropTypes,
+  BackendMessage,
+  Message,
+  CurrentView,
+  FieldListType,
+  FieldType,
+  OneOrMoreChildren,
+  TimeRangeType,
+  instanceOf,
+});

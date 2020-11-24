@@ -50,7 +50,7 @@ type ResultProps = {
   onExecute: () => void;
 };
 
-const WithSearchStatus = (Component: React.ComponentType<SearchStatusProps>): React.ComponentType<ResultProps> => connect(
+const WithSearchStatus = (Component: React.ComponentType<Partial<SearchStatusProps>>): React.ComponentType<ResultProps> => connect(
   ({ config, isDisabled, onExecute }: WrapperProps) => {
     return <Component disableSearch={isDisabled} onExecute={onExecute} config={config} />;
   },
