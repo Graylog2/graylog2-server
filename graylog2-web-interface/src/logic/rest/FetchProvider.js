@@ -17,6 +17,7 @@
 import request from 'superagent-bluebird-promise';
 import BluebirdPromise from 'bluebird';
 
+import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
@@ -24,27 +25,6 @@ import ActionsProvider from 'injection/ActionsProvider';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-
-export class FetchError extends Error {
-  constructor(message, additional) {
-    super(message);
-    this.message = message ?? additional?.message ?? 'Undefined error.';
-
-    /* eslint-disable no-console */
-    try {
-      this.responseMessage = additional.body ? additional.body.message : undefined;
-
-      console.error(`There was an error fetching a resource: ${this.message}.`,
-        `Additional information: ${additional.body && additional.body.message ? additional.body.message : 'Not available'}`);
-    } catch (e) {
-      console.error(`There was an error fetching a resource: ${this.message}. No additional information available.`);
-    }
-    /* eslint-enable no-console */
-
-    this.additional = additional;
-    this.status = additional?.status; // Shortcut, as this is often used
-  }
-}
 
 const reportServerSuccess = () => {
   const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');

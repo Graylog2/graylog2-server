@@ -31,6 +31,7 @@ const SystemStore = StoreProvider.getStore('System');
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 
+/* eslint-disable camelcase */
 type Props = {
   system: {
     cluster_id: string,
@@ -39,6 +40,7 @@ type Props = {
   },
   location: Location,
 };
+/* eslint-enable camelcase */
 
 const GettingStartedPage = ({ system, location }: Props) => {
   if (!system) {
