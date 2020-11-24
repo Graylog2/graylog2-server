@@ -134,13 +134,12 @@ Sidebar.propTypes = {
 Sidebar.defaultProps = {
   results: {},
   sections: sidebarSections,
+  searchPageLayout: undefined,
 };
 
-const SidebarWithContext = (props: Props) => (
+const SidebarWithContext = (props: React.ComponentProps<typeof Sidebar>) => (
   <SearchPageLayoutContext.Consumer>
-    {(searchPageLayout) => {
-      return <Sidebar {...props} searchPageLayout={searchPageLayout} />;
-    }}
+    {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout} />}
   </SearchPageLayoutContext.Consumer>
 );
 
