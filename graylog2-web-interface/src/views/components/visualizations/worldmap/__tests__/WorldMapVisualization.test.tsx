@@ -32,7 +32,6 @@ import WorldMapVisualization from '../WorldMapVisualization';
 jest.mock('../MapVisualization', () => 'map-visualization');
 
 describe('WorldMapVisualization', () => {
-  // $FlowFixMe: type is always defined
   const config = AggregationWidgetConfig.builder().visualization(WorldMapVisualization.type).build();
   const effectiveTimerange: AbsoluteTimeRange = {
     from: '2019-07-04T13:37:00Z',
