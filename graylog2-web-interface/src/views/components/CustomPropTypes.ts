@@ -46,6 +46,19 @@ const BackendMessage = PropTypes.exact({
   }).isRequired,
 });
 
+const Message = PropTypes.exact({
+  id: PropTypes.string.isRequired,
+  index: PropTypes.string.isRequired,
+  fields: PropTypes.object.isRequired,
+  formatted_fields: PropTypes.object,
+  highlight_ranges: PropTypes.object,
+  decoration_stats: PropTypes.exact({
+    added_fields: PropTypes.object,
+    changed_fields: PropTypes.object,
+    removed_fields: PropTypes.object,
+  }),
+});
+
 const ValidElements = PropTypes.oneOfType([
   PropTypes.element,
   PropTypes.func,
@@ -106,6 +119,7 @@ const instanceOf = (expected) => Object.assign(
 export default ({
   ...PropTypes,
   BackendMessage,
+  Message,
   CurrentView,
   FieldListType,
   FieldType,
