@@ -267,7 +267,7 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.PIPELINES.SIMULATOR} component={SimulatorPage} />
                         <Route exact path={Routes.SYSTEM.PIPELINES.PIPELINE(':pipelineId')} component={PipelineDetailsPage} />
 
-                        <Route exact path={Routes.SYSTEM.LOGGING} component={LoggersPage} />
+                        {!isCloud && <Route exact path={Routes.SYSTEM.LOGGING} component={LoggersPage} />}
                         <Route exact path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
                         <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
                         <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
