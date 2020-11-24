@@ -45,7 +45,7 @@ const RolesOverviewPage = () => (
       <Col xs={12}>
         <Alert bsStyle="info">
           <Icon name="info-circle" />{' '}<b>Granting Permissions</b><br />
-          With Graylog 4.0 we&apos;ve updated the permissions system and changed the purpose of roles.
+          With Graylog 4.0, we&apos;ve updated the permissions system and changed the purpose of roles.
           The built-in roles still allow granting capabilities to users, like creating dashboards or viewing the archive catalog.
           But they no longer grant permissions for a specific dashboard or stream. It is also not possible to create an own role.
           Granting permissions for a specific entity can now be done by using its <b><Icon name="user-plus" /> Share</b> button. You can find the button e.g. on the entities overview page.

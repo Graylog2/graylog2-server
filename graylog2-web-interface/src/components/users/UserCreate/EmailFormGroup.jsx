@@ -25,7 +25,7 @@ const EmailFormGroup = () => (
                    maxLength={254}
                    type="email"
                    required
-                   help="Give the contact email address." />
+                   help="The user's email address." />
 );
 
 export default EmailFormGroup;
