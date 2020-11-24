@@ -52,6 +52,7 @@ jest.mock('views/components/Value', () => {
 
 type Data = Record<string, Rows>;
 type SUTProps = {
+  // eslint-disable-next-line react/require-default-props
   data?: Data;
 };
 

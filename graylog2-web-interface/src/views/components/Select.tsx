@@ -33,7 +33,11 @@ const MultiValueRemove = (props) => {
   );
 };
 
-const OverlayInner = ({ children, style }: { children: React.ReactElement, style?: { left: number, top: number } }) => (
+const OverlayInner = ({ children, style }: {
+  children: React.ReactElement,
+  // eslint-disable-next-line react/require-default-props
+  style?: { left: number, top: number }
+}) => (
   <>
     {React.Children.map(children,
       (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }))}
