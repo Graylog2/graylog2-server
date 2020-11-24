@@ -16,12 +16,12 @@
  */
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import mockAction from 'helpers/mocking/MockAction';
 
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
-import Query from 'views/logic/queries/Query';
 
 import QueryTitle from './QueryTitle';
 
@@ -30,7 +30,7 @@ jest.mock('views/stores/ViewStore', () => ({ ViewActions: {} }));
 
 describe('QueryTitle', () => {
   beforeEach(() => {
-    QueriesActions.duplicate = mockAction(jest.fn(() => Promise.resolve(Query.builder().newId().build())));
+    QueriesActions.duplicate = mockAction(jest.fn(() => Promise.resolve(Immutable.OrderedMap())));
     ViewActions.selectQuery = mockAction(jest.fn((queryId) => Promise.resolve(queryId)));
   });
 

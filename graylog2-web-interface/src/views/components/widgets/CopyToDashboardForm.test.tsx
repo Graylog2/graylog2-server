@@ -26,7 +26,15 @@ import CopyToDashboardForm from './CopyToDashboardForm';
 
 describe('CopyToDashboardForm', () => {
   beforeEach(() => {
-    DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
+    DashboardsActions.search = mockAction(jest.fn(async () => ({
+      pagination: {
+        total: 0,
+        page: 1,
+        perPage: 10,
+        count: 0,
+      },
+      list: [],
+    })));
   });
 
   const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')

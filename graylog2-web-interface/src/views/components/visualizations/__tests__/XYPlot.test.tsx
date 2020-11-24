@@ -16,6 +16,7 @@
  */
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { viewsManager } from 'fixtures/users';
@@ -93,7 +94,7 @@ describe('XYPlot', () => {
   };
 
   beforeEach(() => {
-    asMock(QueriesActions.timerange).mockReturnValueOnce(Promise.resolve());
+    asMock(QueriesActions.timerange).mockReturnValueOnce(Promise.resolve(Immutable.OrderedMap()));
   });
 
   it('renders generic X/Y-Plot when no timeline config is passed', () => {

@@ -27,6 +27,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+import ViewState from 'views/logic/views/ViewState';
 
 import { mockFieldCharts, viewState as mockViewState } from './MigrateFieldCharts.fixtures';
 
@@ -78,7 +79,7 @@ jest.mock('views/logic/Widgets', () => ({
 }));
 
 const getNewWidget = (actionMock) => {
-  const viewState = asMock(actionMock).mock.calls[0][1];
+  const viewState = asMock(actionMock).mock.calls[0][1] as ViewState;
   const widgetsTotal = viewState.widgets.size;
 
   return viewState.widgets.get(widgetsTotal - 1);

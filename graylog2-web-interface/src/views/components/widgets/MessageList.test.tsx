@@ -31,6 +31,7 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
 import InputsStore from 'stores/inputs/InputsStore';
+import { SearchExecutionResult } from 'views/actions/SearchActions';
 
 import MessageList from './MessageList';
 import RenderCompletionCallback from './RenderCompletionCallback';
@@ -228,7 +229,7 @@ describe('MessageList', () => {
   it('displays error description, when using pagination throws an error', async () => {
     asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(Promise.resolve({
       result: { errors: [{ description: 'Error description' }] },
-    }));
+    } as SearchExecutionResult));
 
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;

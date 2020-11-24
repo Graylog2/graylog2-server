@@ -109,7 +109,7 @@ jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
 jest.mock('routing/withLocation', () => (Component) => (props) => <Component location={{ query: {}, pathname: '', search: '' }} {...props} />);
 
-const mockPromise = (res) => {
+const mockPromise = <T,>(res: T): Promise<T> => {
   const promise = Promise.resolve(res);
 
   // @ts-ignore
@@ -136,12 +136,12 @@ describe('Search', () => {
       activeQuery: 'foobar',
     }));
 
-    FieldTypesActions.all = mockAction(jest.fn());
+    FieldTypesActions.all = mockAction(jest.fn(async () => {}));
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     // $FlowFixMe: Somehow flow does not see the `listen` property.
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
-    asMock(CurrentViewTypeProvider).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
+    asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
   const SimpleSearch = (props) => (
@@ -254,7 +254,7 @@ describe('Search', () => {
 
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
-    return cb({ search: {} })
+    return cb({ search: {} } as View)
       .then(() => {
         expect(SearchActions.execute).toHaveBeenCalled();
       });
@@ -274,7 +274,7 @@ describe('Search', () => {
     asMock(FieldTypesActions.all).mockClear();
     const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
 
-    return cb({ search: {} })
+    return cb({ search: {} } as View)
       .then(() => {
         expect(FieldTypesActions.all).toHaveBeenCalled();
       });

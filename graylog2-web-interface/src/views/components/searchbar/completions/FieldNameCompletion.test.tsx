@@ -17,9 +17,10 @@
 // @flow strict
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
+import * as Immutable from 'immutable';
 
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { FieldTypeMappingsList, FieldTypesStore, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 
 import FieldNameCompletion from './FieldNameCompletion';
 
@@ -39,8 +40,8 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 const _createField = (name) => ({ name, type: { type: 'string' } });
 const dummyFields = ['source', 'message', 'timestamp'].map(_createField);
 
-const _createQueryFields = (fields) => ({ get: () => fields });
-const _createFieldTypesStoreState = (fields) => ({ all: fields, queryFields: _createQueryFields(fields) });
+const _createQueryFields = (fields) => ({ get: () => fields }) as unknown as Immutable.Map<string, FieldTypeMappingsList>;
+const _createFieldTypesStoreState = (fields): FieldTypesStoreState => ({ all: fields, queryFields: _createQueryFields(fields) });
 
 describe('FieldNameCompletion', () => {
   beforeEach(() => {
@@ -120,10 +121,10 @@ describe('FieldNameCompletion', () => {
       }[queryId] || _default),
     };
 
-    const all = ['foo', 'bar'].map(_createField);
+    const all = Immutable.List(['foo', 'bar'].map(_createField));
 
     beforeEach(() => {
-      asMock(FieldTypesStore.getInitialState).mockReturnValue({ all, queryFields });
+      asMock(FieldTypesStore.getInitialState).mockReturnValue({ all, queryFields } as FieldTypesStoreState);
     });
 
     it('scores fields of current query higher', () => {
@@ -144,7 +145,7 @@ describe('FieldNameCompletion', () => {
       const completer = new FieldNameCompletion([]);
       const callback = asMock(ViewMetadataStore.listen).mock.calls[0][0];
 
-      callback({ activeQuery: 'query2' });
+      callback({ activeQuery: 'query2' } as ViewMetaData);
 
       const completions = completer.getCompletions(null, null, '');
       const completion = (fieldName) => completionByName(fieldName, completions);
