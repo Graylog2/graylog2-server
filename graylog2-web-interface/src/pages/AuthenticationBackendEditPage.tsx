@@ -19,11 +19,12 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 
 import withParams from 'routing/withParams';
-import withLocation, { type Location } from 'routing/withLocation';
+import withLocation, { Location } from 'routing/withLocation';
 import {} from 'components/authentication/bindings'; // Bind all authentication plugins
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { Spinner } from 'components/common';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 type Props = {
   params: {
@@ -33,7 +34,7 @@ type Props = {
 };
 
 const AuthenticationBackendEditPage = ({ params: { backendId }, location: { query: { initialStepKey } } }: Props) => {
-  const [authBackend, setAuthBackend] = useState();
+  const [authBackend, setAuthBackend] = useState<AuthenticationBackend | undefined>();
 
   useEffect(() => {
     AuthenticationDomain.load(backendId).then((response) => setAuthBackend(response.backend));
@@ -46,7 +47,7 @@ const AuthenticationBackendEditPage = ({ params: { backendId }, location: { quer
   const authService = getAuthServicePlugin(authBackend.config.type);
 
   if (!authService) {
-    return `No authentication service plugin configured for "${authBackend.config.type}"`;
+    return <>{`No authentication service plugin configured for "${authBackend.config.type}"`}</>;
   }
 
   const { editComponent: BackendEdit } = authService;

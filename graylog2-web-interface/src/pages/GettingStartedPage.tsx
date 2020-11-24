@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import PropTypes from 'prop-types';
 import * as React from 'react';
 
 import connect from 'stores/connect';
@@ -32,6 +31,7 @@ const SystemStore = StoreProvider.getStore('System');
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 
+/* eslint-disable camelcase */
 type Props = {
   system: {
     cluster_id: string,
@@ -40,6 +40,7 @@ type Props = {
   },
   location: Location,
 };
+/* eslint-enable camelcase */
 
 const GettingStartedPage = ({ system, location }: Props) => {
   if (!system) {
@@ -65,15 +66,10 @@ const GettingStartedPage = ({ system, location }: Props) => {
 
 GettingStartedPage.displayName = 'GettingStartedPage';
 
-GettingStartedPage.propTypes = {
-  location: PropTypes.object.isRequired,
-};
-
 export default connect(
   withLocation(GettingStartedPage),
   { systemStore: SystemStore },
-  (props) => ({
-    ...props,
-    system: props.systemStore.system,
+  ({ systemStore }: { systemStore: { system: unknown }}) => ({
+    system: systemStore.system,
   }),
 );

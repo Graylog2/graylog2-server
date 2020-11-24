@@ -28,7 +28,8 @@ jest.mock('views/components/messagelist/MessageDetail',
 const mockLoadMessage = jest.fn();
 const mockGetInput = jest.fn();
 const mockListNodes = jest.fn();
-const mockListStreams = jest.fn(() => Promise.resolve([]));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const mockListStreams = jest.fn((...args) => Promise.resolve([]));
 
 jest.mock('injection/CombinedProvider', () => ({
   get: jest.fn((type) => ({
@@ -54,6 +55,7 @@ describe('ShowMessagePage', () => {
   it('triggers a node list refresh on mount', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
+    // @ts-ignore
     render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
     await waitFor(() => expect(mockListNodes).toHaveBeenCalled());
   });
@@ -61,6 +63,7 @@ describe('ShowMessagePage', () => {
   it('renders for generic message', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
+    // @ts-ignore
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
 
     await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
@@ -71,6 +74,7 @@ describe('ShowMessagePage', () => {
   it('renders for generic event', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
+    // @ts-ignore
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'gl-events_0', messageId: '01DFZQ64CMGV30NT7DW2P7HQX2' }} />);
 
     await waitFor(() => expect(queryByTestId('spinner')).toBeNull());

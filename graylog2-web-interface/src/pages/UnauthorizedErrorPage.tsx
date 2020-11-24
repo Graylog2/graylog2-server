@@ -18,13 +18,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { FetchError } from 'logic/rest/FetchProvider';
+import FetchError from 'logic/errors/FetchError';
 import { Icon, ClipboardButton } from 'components/common';
 import ErrorPage from 'components/errors/ErrorPage';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 
-const createErrorMessageString = (errorDetails: ?string, pageDetails: string, errorMessage: string) => {
+const createErrorMessageString = (errorDetails: string | null | undefined, pageDetails: string, errorMessage: string) => {
   const defaultText = `${pageDetails}\n${errorMessage}`;
 
   if (errorDetails) {
@@ -35,11 +35,11 @@ const createErrorMessageString = (errorDetails: ?string, pageDetails: string, er
 };
 
 type Props = {
-  description?: React.Node,
+  description?: React.ReactNode,
   error: FetchError,
   errorDetails?: string,
   location: Location,
-  title: string,
+  title?: string,
 };
 
 const UnauthorizedErrorPage = ({ error, errorDetails, title, description, location: { pathname } }: Props) => {
@@ -84,13 +84,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
 
 UnauthorizedErrorPage.propTypes = {
   description: PropTypes.node,
-  error: PropTypes.shape({
-    message: PropTypes.string.isRequired,
-  }).isRequired,
   errorDetails: PropTypes.string,
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-  }).isRequired,
   title: PropTypes.string,
 };
 

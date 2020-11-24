@@ -30,6 +30,7 @@ import BackendDetails from 'components/authentication/BackendDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
 type Props = {
   params: {
@@ -37,7 +38,7 @@ type Props = {
   },
 };
 
-const _pageTitle = (authBackendTitle, returnString) => {
+const _pageTitle = (authBackendTitle, returnString = false) => {
   const pageName = 'Authentication Service Details';
   const backendTitle = StringUtils.truncateWithEllipses(authBackendTitle, 30);
 
@@ -49,7 +50,7 @@ const _pageTitle = (authBackendTitle, returnString) => {
 };
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
-  const [authBackend, setAuthBackend] = useState();
+  const [authBackend, setAuthBackend] = useState<AuthenticationBackend | undefined>();
 
   useEffect(() => {
     AuthenticationDomain.load(backendId).then((response) => setAuthBackend(response.backend));

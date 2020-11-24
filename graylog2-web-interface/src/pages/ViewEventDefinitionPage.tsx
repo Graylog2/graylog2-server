@@ -43,7 +43,7 @@ type Props = {
 
 const ViewEventDefinitionPage = ({ params }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const [eventDefinition, setEventDefinition] = useState();
+  const [eventDefinition, setEventDefinition] = useState<{ title: string } | undefined>();
   const { all: notifications } = useStore(EventNotificationsStore);
 
   useEffect(() => {
@@ -76,6 +76,7 @@ const ViewEventDefinitionPage = ({ params }: Props) => {
         <span>
           <PageHeader title="View Event Definition">
             <Spinner text="Loading Event Definition..." />
+            <></>
           </PageHeader>
         </span>
       </DocumentTitle>

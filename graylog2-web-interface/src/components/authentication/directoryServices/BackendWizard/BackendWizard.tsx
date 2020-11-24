@@ -30,7 +30,7 @@ import Routes from 'routing/Routes';
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { Row, Col, Alert } from 'components/graylog';
 import Wizard, { Step } from 'components/common/Wizard';
-import { FetchError } from 'logic/rest/FetchProvider';
+import FetchError from 'logic/errors/FetchError';
 import { LoadResponse as LoadBackendResponse } from 'actions/authentication/AuthenticationActions';
 import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
