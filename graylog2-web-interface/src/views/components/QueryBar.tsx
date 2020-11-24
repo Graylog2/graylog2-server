@@ -27,7 +27,7 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 
 import QueryTabs from './QueryTabs';
@@ -60,9 +60,7 @@ type Props = {
   children?: React.ReactElement,
   queries: string[],
   queryTitles: Immutable.Map<string, string>,
-  viewMetadata: {
-    activeQuery: string,
-  },
+  viewMetadata: ViewMetaData,
 };
 
 const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
