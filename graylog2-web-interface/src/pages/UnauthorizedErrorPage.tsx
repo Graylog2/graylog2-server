@@ -18,7 +18,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { FetchError } from 'logic/rest/FetchProvider';
+import FetchError from 'logic/errors/FetchError';
 import { Icon, ClipboardButton } from 'components/common';
 import ErrorPage from 'components/errors/ErrorPage';
 import withLocation from 'routing/withLocation';

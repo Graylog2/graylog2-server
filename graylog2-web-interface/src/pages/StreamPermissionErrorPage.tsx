@@ -18,16 +18,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { FetchError } from 'logic/rest/FetchProvider';
+import FetchError from 'logic/errors/FetchError';
 
 import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 
 type Props = {
-  error: FetchError,
+  error: FetchError | undefined | null,
   missingStreamIds: string[],
 };
 
-const StreamPermissionErrorPage = ({ error = {}, missingStreamIds = [] }: Props) => {
+const StreamPermissionErrorPage = ({ error, missingStreamIds = [] }: Props) => {
   const description = (
     <>
       <p>This resource includes streams you do not have permissions for.</p>

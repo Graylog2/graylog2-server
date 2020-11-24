@@ -19,7 +19,7 @@ import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
 
-import { FetchError } from 'logic/rest/FetchProvider';
+import FetchError from 'logic/errors/FetchError';
 
 import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 

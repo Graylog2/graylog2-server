@@ -23,7 +23,7 @@ import suppressConsole from 'helpers/suppressConsole';
 import history from 'util/History';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
-import { FetchError } from 'logic/rest/FetchProvider';
+import FetchError from 'logic/errors/FetchError';
 
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 

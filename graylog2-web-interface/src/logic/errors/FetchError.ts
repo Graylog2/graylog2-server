@@ -18,12 +18,18 @@
 type Body = {
   message: string;
   type: string;
+  streams?: string[];
+}
+
+type Res = {
+  text?: string;
 }
 
 type Additional = {
   status: number;
-  body: Body;
-};
+  body?: Body;
+  res?: Res;
+}
 
 export default class FetchError extends Error {
   responseMessage: string;
