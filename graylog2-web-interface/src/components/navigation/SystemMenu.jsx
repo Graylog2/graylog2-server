@@ -130,9 +130,11 @@ const SystemMenu = ({ location }) => {
           <NavigationLink path={Routes.SYSTEM.INDICES.LIST} description="Indices" />
         </IfPermitted>
       </HideOnCloud>
-      <IfPermitted permissions={['loggers:read']}>
-        <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['loggers:read']}>
+          <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
+        </IfPermitted>
+      </HideOnCloud>
       <IfPermitted permissions={['users:list']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.USERS.OVERVIEW} description="Users and Teams" />
       </IfPermitted>
