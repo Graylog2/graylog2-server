@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
@@ -13,7 +12,7 @@ type Props = {
   disabled: ?boolean,
   error: ?string,
   value: string,
-  onChange: ({ target: { name: string, value: string } }) => void,
+  onChange: (string) => void,
   name: string,
   title: ?string,
   initialDateTimeObject: {
@@ -28,8 +27,6 @@ type Props = {
 };
 
 const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title, initialDateTimeObject }: Props) => {
-  const inputRef = useRef({ input: { value } });
-
   const _onDatePicked = (date) => {
     const newDate = moment(date).toObject();
 
@@ -43,10 +40,6 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
 
   const _onChangeInput = (event) => onChange(event.target.value);
   const _onSetTimeToNow = () => onChange(moment().format(DateTime.Formats.TIMESTAMP));
-
-  useEffect(() => {
-    inputRef.current.input.value = value;
-  }, [value]);
 
   return (
     <div>
@@ -63,7 +56,7 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
              disabled={disabled}
              onChange={_onChangeInput}
              placeholder={DateTime.Formats.DATETIME}
-             ref={inputRef}
+             value={value}
              buttonAfter={(
                <Button disabled={disabled}
                        onClick={_onSetTimeToNow}

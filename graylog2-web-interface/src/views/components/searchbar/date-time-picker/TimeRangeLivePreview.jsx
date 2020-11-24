@@ -56,14 +56,23 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
   useEffect(() => {
-    setTimeOutput(dateOutput(timerange));
+    const output = dateOutput(timerange);
+
+    if (timerange.type !== 'relative') {
+      setTimeOutput({
+        from: dateTimeString(output.from),
+        until: dateTimeString(output.until),
+      });
+    } else {
+      setTimeOutput(output);
+    }
   }, [timerange]);
 
   return (
     <PreviewWrapper>
       <FromWrapper>
         <Title>From</Title>
-        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{dateTimeString(from)}</Date>
+        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{from}</Date>
       </FromWrapper>
 
       <MiddleIcon>
@@ -72,7 +81,7 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
 
       <UntilWrapper>
         <Title>Until</Title>
-        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{dateTimeString(until)}</Date>
+        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{until}</Date>
       </UntilWrapper>
     </PreviewWrapper>
   );

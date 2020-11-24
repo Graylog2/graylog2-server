@@ -1,41 +1,33 @@
 // @flow strict
 import * as React from 'react';
-// import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { fireEvent, render } from 'wrappedTestingLibrary';
 import moment from 'moment-timezone';
-import asMock from 'helpers/mocking/AsMock';
 
 import DateTime from 'logic/datetimes/DateTime';
 
 import DateInputWithPicker from './DateInputWithPicker';
 
+const dateTimeRange = '2020-04-08 13:22:46';
+const initialDateTimeObject = moment(dateTimeRange).toObject();
+
 describe('DateInputWithPicker', () => {
   beforeAll(() => { jest.clearAllMocks(); });
 
   it('renders with minimal props', () => {
-    const { container } = render(<DateInputWithPicker value="2020-04-08 13:22:46" onChange={() => {}} name="date-picker" />);
+    const { container } = render(<DateInputWithPicker value={dateTimeRange}
+                                                      initialDateTimeObject={initialDateTimeObject}
+                                                      onChange={() => {}}
+                                                      name="date-picker" />);
 
     expect(container).not.toBeNull();
   });
 
-  // it('shows date picker when focussing input', async () => {
-  //   const { getByPlaceholderText, getByText } = render((
-  //     <DateInputWithPicker value="2020-04-08 13:22:46"
-  //                          onChange={() => {}}
-  //                          title="Pick start date"
-  //                          name="date-picker" />
-  //   ));
-  //
-  //   const input = getByPlaceholderText(DateTime.Formats.DATETIME);
-  //
-  //   fireEvent.click(input);
-  //
-  //   await waitFor(() => getByText('Pick start date'));
-  // });
-
   it('calls onChange upon changing the input', () => {
     const onChange = jest.fn();
-    const { getByPlaceholderText } = render(<DateInputWithPicker value="2020-04-08 13:22:46" onChange={onChange} name="date-picker" />);
+    const { getByPlaceholderText } = render(<DateInputWithPicker value={dateTimeRange}
+                                                                 initialDateTimeObject={initialDateTimeObject}
+                                                                 onChange={onChange}
+                                                                 name="date-picker" />);
 
     const input = getByPlaceholderText(DateTime.Formats.DATETIME);
 
@@ -45,15 +37,17 @@ describe('DateInputWithPicker', () => {
   });
 
   it('pressing magic wand inserts current date', () => {
-    DateTime.now = jest.fn(DateTime.now);
-    asMock(DateTime.now).mockReturnValue(moment('2020-04-08T17:18:36.315Z').tz('utc'));
-    const onChange = jest.fn();
-    const { getByTitle } = render(<DateInputWithPicker value="2020-04-04 13:22:46" onChange={onChange} name="date-picker" />);
+    const output = moment().format(DateTime.Formats.TIMESTAMP);
+    const onChange = jest.fn(() => output);
+    const { getByTitle } = render(<DateInputWithPicker value={dateTimeRange}
+                                                       initialDateTimeObject={initialDateTimeObject}
+                                                       onChange={onChange}
+                                                       name="date-picker" />);
 
     const insertCurrentDate = getByTitle('Insert current date');
 
     fireEvent.click(insertCurrentDate);
 
-    expect(onChange).toHaveBeenCalledWith({ target: { name: 'date-picker', value: '2020-04-08 17:18:36.315' } });
+    expect(onChange).toHaveReturnedWith(output);
   });
 });

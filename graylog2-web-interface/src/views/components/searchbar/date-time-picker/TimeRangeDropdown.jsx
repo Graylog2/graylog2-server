@@ -1,14 +1,17 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
+import moment from 'moment';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
+import { Icon } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm.js';
 import DateTime from 'logic/datetimes/DateTime';
+import { type ThemeInterface } from 'theme';
 
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
@@ -30,21 +33,49 @@ type Props = {
 
 type RangeType = React.Element<Tab>;
 
-const StyledPopover: StyledComponent<{}, void, typeof Popover> = styled(Popover)`
-  max-width: 50vw;
+const StyledPopover: StyledComponent<{}, ThemeInterface, typeof Popover> = styled(Popover)(({ theme }) => css`
+  max-width: 100%; 
   min-width: 745px;
-`;
+  
+  @media (min-width: ${theme.breakpoints.min.md}) {
+    max-width: 50vw;  
+  }
+  
+  @media (min-width: ${theme.breakpoints.min.lg}) {
+    max-width: 35vw;  
+  }
+`);
 
 const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
   margin-top: 1px;
 `;
 
-const Timezone: StyledComponent<{}, void, HTMLParagraphElement> = styled.p(({ theme }) => css`
+const Timezone: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
   padding-left: 3px;
+  margin: 0;
+  line-height: 34px;
 `);
 
-const timeRangeTypeTabs = (config, activeKey, originalRangeValue) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+const PopoverTitle: StyledComponent<{}, void, HTMLSpanElement> = styled.span`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const LimitLabel: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  > svg {
+    margin-right: 3px;
+    color: ${theme.colors.variant.dark.warning};
+  }
+  
+  > span {
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.variant.darkest.warning};
+  }
+`);
+
+const timeRangeTypeTabs = (config, activeKey, originalRangeValue, limitDuration, setDisableApply) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
@@ -54,7 +85,9 @@ const timeRangeTypeTabs = (config, activeKey, originalRangeValue) => availableTi
       {type === activeKey && (
         <RangeComponent config={config}
                         disabled={false}
-                        originalTimeRange={originalRangeValue} />
+                        originalTimeRange={originalRangeValue}
+                        limitDuration={limitDuration}
+                        setDisableApply={setDisableApply} />
       )}
     </Tab>
   );
@@ -64,6 +97,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const formik = useFormikContext();
   const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+  const [disableApply, setDisableApply] = useState(false);
   const { value: nextRangeValue } = nextRangeProps;
   const { value: originalRangeValue } = originalTimerange;
 
@@ -74,6 +108,12 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
       nextRangeHelpers.setValue(originalRangeValue);
     }
   });
+
+  const _setDisableApply = (isDisabled: boolean) => {
+    if (disableApply !== isDisabled) {
+      setDisableApply(isDisabled);
+    }
+  };
 
   const onSelect = (newType) => {
     nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
@@ -96,10 +136,25 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
   const activeKey = activeTab || 'disabled';
 
+  const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
+
+  const title = (
+    <PopoverTitle>
+      <span>Search Timerange</span>
+      {limitDuration > 0 && (
+        <LimitLabel>
+          <Icon name="exclamation-triangle" />
+          <span>Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</span>
+        </LimitLabel>
+      )}
+    </PopoverTitle>
+  );
+
   return (
     <StyledPopover id="timerange-type"
                    placement="bottom"
                    positionTop={36}
+                   title={title}
                    arrowOffsetLeft={34}>
       <Row>
         <Col md={12}>
@@ -117,7 +172,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                 <p>No Override to Date.</p>
               </Tab>
             )}
-            {timeRangeTypeTabs(config, activeKey, originalRangeValue)}
+            {timeRangeTypeTabs(config, activeKey, originalRangeValue, limitDuration, _setDisableApply)}
           </StyledTabs>
         </Col>
       </Row>
@@ -129,7 +184,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
         <Col md={6}>
           <div className="pull-right">
             <Button bsStyle="link" onClick={handleCancel}>Cancel</Button>
-            <Button bsStyle="success" onClick={handleApply}>Apply</Button>
+            <Button bsStyle="success" onClick={handleApply} disabled={disableApply}>Apply</Button>
           </div>
         </Col>
       </Row>

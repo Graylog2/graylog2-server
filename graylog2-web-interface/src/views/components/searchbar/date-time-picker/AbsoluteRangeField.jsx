@@ -107,6 +107,7 @@ const fieldUpdate = (value) => {
   const initialDateTime = moment(value).toObject();
 
   TIME_TYPES.forEach((type) => {
+    // $FlowFixMe - something deep down in the bowels of flow is upset with this
     initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
   });
 
@@ -199,6 +200,7 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
                                  onChange={_onChange}
                                  onBlur={onBlur}
                                  value={value || originalTimeRange[range]}
+                                 // $FlowFixMe - something deep down in the bowels of flow is upset with this
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"

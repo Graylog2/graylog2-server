@@ -1,9 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useMemo, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { useField } from 'formik';
+import { Field } from 'formik';
 import styled, { css, type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
@@ -12,29 +11,28 @@ import { Icon, Select } from 'components/common';
 
 type Props = {
   disabled: boolean,
-  config: {
-    query_time_range_limit: string,
-  },
   originalTimeRange: {
     range: string | number,
   },
+  limitDuration: number,
+  setDisableApply: (boolean) => void,
 };
 
-const RANGE_VALUES = [
+const RANGE_TYPES = [
   {
-    value: 'seconds',
+    type: 'seconds',
     label: 'Seconds',
   }, {
-    value: 'minutes',
+    type: 'minutes',
     label: 'Minutes',
   }, {
-    value: 'hours',
+    type: 'hours',
     label: 'Hours',
   }, {
-    value: 'days',
+    type: 'days',
     label: 'Days',
   }, {
-    value: 'weeks',
+    type: 'weeks',
     label: 'Weeks',
   },
 ];
@@ -50,7 +48,7 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   align-items: center;
   display: grid;
   grid-template-columns: max-content repeat(5, 1fr) max-content;
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr) auto;
   grid-column-gap: 0;
   grid-row-gap: 0;
   
@@ -58,6 +56,7 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
 
 const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   grid-area: 2 / 1 / 3 / 3;
+  position: relative;
   
   .form-group {
     margin: 0;
@@ -94,7 +93,7 @@ const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled
   align-self: self-end;
   
   &.shortened {
-    grid-area: 1 / 2 / 2 / 3;
+    grid-area: 1 / 2 / 2 / 4;
     text-decoration: line-through;
     cursor: not-allowed;
   }
@@ -104,155 +103,114 @@ const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled
   }
 `);
 
-const RangeLimitNotice: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.dark.danger};
+  grid-area: 3 / 1 / 3 / 8;
+  font-size: ${theme.fonts.size.tiny};
   font-style: italic;
-  font-size: ${theme.fonts.size.small};
-  color: ${theme.colors.variant.darker.warning};
-  grid-area: 1 / 3 / 2 / 8;
-  text-align: right;
-  align-self: self-end;
-  margin-bottom: 5px;
-  
-  > svg {
-    margin-right: 3px;
-  }
+  padding: 3px;
 `);
 
-const initialRangeType = ({ range, ...restRange }) => {
-  if (range === 0) {
-    return {
-      ...restRange,
-      rangeValue: 1,
-      rangeType: 'seconds',
-      rangeAllTime: false,
-      range,
-    };
-  }
-
-  return RANGE_VALUES.map(({ value }) => {
-    const diff = moment.duration(range, 'seconds').as(value);
-
-    if (diff - Math.floor(diff) === 0) {
-      return {
-        ...restRange,
-        rangeValue: diff || 1,
-        rangeType: value || 'seconds',
-        rangeAllTime: false,
-        range,
-      };
-    }
-
-    return null;
-  }).filter(Boolean).pop();
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'rangeValue':
-      return {
-        ...state,
-        rangeValue: action.value,
-        range: moment.duration(action.value, state.rangeType).asSeconds(),
-      };
-    case 'rangeType':
-      return {
-        ...state,
-        rangeType: action.value,
-        range: moment.duration(state.rangeValue, action.value).asSeconds(),
-      };
-    case 'rangeAllTime':
-      return {
-        ...state,
-        rangeAllTime: action.value,
-        range: action.value ? 0 : moment.duration(state.rangeValue, state.rangeType).asSeconds(),
-      };
-    default:
-      throw new Error();
-  }
-};
-
-const buildRangeTypes = (config) => RANGE_VALUES.map(({ label, value }) => {
-  const typeDuration = moment.duration(1, value).asSeconds();
-  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
+const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => {
+  const typeDuration = moment.duration(1, type).asSeconds();
 
   if (limitDuration === 0 || typeDuration <= limitDuration) {
-    return { label, value };
+    return { label, value: type };
   }
 
   return null;
 }).filter(Boolean);
 
-const RelativeTimeRangeSelector = ({ config, disabled, originalTimeRange }: Props) => {
-  const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration, setDisableApply }: Props) => {
+  const availableRangeTypes = buildRangeTypes(limitDuration);
 
-  const [state, dispatch] = useReducer(reducer, {
-    range: originalTimeRange.range,
-    rangeAllTime: originalTimeRange.range === 0,
-  }, initialRangeType);
-
-  const typeDurationSeconds = useMemo(() => moment.duration(state.rangeValue, state.rangeType).asSeconds(), [state.rangeValue, state.rangeType]);
-  const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
-
-  const availableRangeTypes = buildRangeTypes(config);
-
-  useEffect(() => {
-    if (limitDuration === 0 || (typeDurationSeconds <= limitDuration && limitDuration !== 0)) {
-      nextRangeHelpers.setValue({ ...nextRangeProps.value, ...state });
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('Nuh uh uh - you went over the limit!');
+  const _isValidRange = (value) => {
+    if (!(limitDuration === 0 || (value <= limitDuration && limitDuration !== 0))) {
+      return 'Range is outside limit duration.';
     }
-  }, [limitDuration, state, typeDurationSeconds]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleAllTime = (event) => dispatch({
-    type: 'rangeAllTime',
-    value: event.target.checked,
-    rangeValue: event.target.checked ? state.rangeValue : initialRangeType(originalTimeRange),
-  });
+    return undefined;
+  };
 
   return (
     <RelativeWrapper>
-      <RangeWrapper>
-        <RangeTitle>From:</RangeTitle>
-        <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
-          <input type="checkbox"
-                 id="relative-all-time"
-                 value="0"
-                 checked={state.rangeAllTime}
-                 onChange={handleAllTime}
-                 disabled={limitDuration !== 0} />All Time
-        </RangeCheck>
-        {limitDuration !== 0
-          && (
-            <RangeLimitNotice><Icon name="exclamation-triangle" />Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</RangeLimitNotice>
-          )}
-        <InputWrap>
-          <Input id="relative-timerange-from-value"
-                 disabled={disabled || state.rangeAllTime}
-                 type="number"
-                 value={state.rangeValue}
-                 min="1"
-                 title="Set the range value"
-                 name="relative-timerange-from-value"
-                 onChange={(event) => dispatch({
-                   type: 'rangeValue',
-                   value: event.target.value,
-                 })} />
-        </InputWrap>
-        <StyledSelect id="relative-timerange-from-length"
-                      disabled={disabled || state.rangeAllTime}
-                      value={state.rangeType}
-                      options={availableRangeTypes}
-                      placeholder="Select a range type"
-                      name="relative-timerange-from-length"
-                      onChange={(event) => dispatch({
-                        type: 'rangeType',
-                        value: event,
-                      })}
-                      clearable={false} />
+      <Field name="tempTimeRange.range" validate={_isValidRange}>
+        {({ field: { value, onChange, name }, meta: { error } }) => {
+          setDisableApply(!!error);
 
-        <Ago />
-      </RangeWrapper>
+          const fromValue = RANGE_TYPES.map(({ type }) => {
+            const isAllTime = value === 0;
+            const diff = moment.duration(value, 'seconds').as(type);
+
+            if (diff - Math.floor(diff) === 0) {
+              return {
+                ...originalTimeRange,
+                rangeValue: diff || 0,
+                rangeType: isAllTime ? 'seconds' : type,
+                rangeAllTime: isAllTime,
+                range: value,
+              };
+            }
+
+            return null;
+          }).filter(Boolean).pop();
+
+          const _onChangeTime = (event) => {
+            const newTimeValue = moment.duration(event.target.value, fromValue.rangeType).asSeconds();
+
+            onChange({ target: { name, value: newTimeValue } });
+          };
+
+          const _onChangeType = (type) => {
+            const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
+
+            onChange({ target: { name, value: newTimeValue } });
+          };
+
+          const _onCheckAllTime = (event) => {
+            onChange({ target: { name, value: event.target.checked ? 0 : originalTimeRange.range } });
+          };
+
+          return (
+            <RangeWrapper>
+              <RangeTitle>From:</RangeTitle>
+              <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
+                <input type="checkbox"
+                       id="relative-all-time"
+                       value="0"
+                       checked={fromValue.rangeAllTime}
+                       onChange={_onCheckAllTime}
+                       disabled={limitDuration !== 0} />All Time
+              </RangeCheck>
+              <InputWrap>
+                <Input id="relative-timerange-from-value"
+                       name="relative-timerange-from-value"
+                       disabled={disabled || fromValue.rangeAllTime}
+                       type="number"
+                       value={fromValue.rangeValue}
+                       title="Set the range value"
+                       onChange={_onChangeTime}
+                       bsStyle={error ? 'error' : null} />
+              </InputWrap>
+              <StyledSelect id="relative-timerange-from-length"
+                            name="relative-timerange-from-length"
+                            disabled={disabled || fromValue.rangeAllTime}
+                            value={fromValue.rangeType}
+                            options={availableRangeTypes}
+                            placeholder="Select a range length"
+                            onChange={_onChangeType}
+                            clearable={false} />
+
+              <Ago />
+              {error && (
+                <ErrorMessage>
+                  Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
+                </ErrorMessage>
+              )}
+            </RangeWrapper>
+          );
+        }}
+      </Field>
 
       <StyledIcon name="arrow-right" />
 
@@ -275,7 +233,7 @@ const RelativeTimeRangeSelector = ({ config, disabled, originalTimeRange }: Prop
 
         <StyledSelect id="relative-timerange-until-length"
                       disabled
-                      value={RANGE_VALUES[0].value}
+                      value={RANGE_TYPES[0].type}
                       options={availableRangeTypes}
                       placeholder="Select an offset"
                       name="relative-timerange-until-length"
@@ -287,9 +245,7 @@ const RelativeTimeRangeSelector = ({ config, disabled, originalTimeRange }: Prop
 };
 
 RelativeTimeRangeSelector.propTypes = {
-  config: PropTypes.shape({
-    query_time_range_limit: PropTypes.string.isRequired,
-  }).isRequired,
+  limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({
     range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -298,6 +254,7 @@ RelativeTimeRangeSelector.propTypes = {
 
 RelativeTimeRangeSelector.defaultProps = {
   disabled: false,
+  limitDuration: 0,
 };
 
 export default RelativeTimeRangeSelector;

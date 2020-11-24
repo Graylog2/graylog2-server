@@ -6,28 +6,30 @@ import { Formik, Form } from 'formik';
 import OriginalRelativeTimeRangeSelector from './RelativeTimeRangeSelector';
 
 const defaultProps = {
-  config: {
-    query_time_range_limit: '0',
-  },
+  limitDuration: 0,
   disabled: false,
   originalTimeRange: {
     type: 'relative',
     range: 3600,
   },
+  setDisableApply: jest.fn(),
+};
+
+const initialValues = {
+  tempTimeRange: defaultProps.originalTimeRange,
 };
 
 type Props = {
   disabled: boolean,
-  config: {
-    query_time_range_limit: string,
-  },
+  limitDuration: number,
   originalTimeRange: {
     range: string | number,
   },
+  setDisableApply: (boolean) => void,
 };
 
 const RelativeTimeRangeSelector = (allProps: Props) => (
-  <Formik initialValues={{}}
+  <Formik initialValues={initialValues}
           onSubmit={() => {}}
           validateOnMount>
     <Form>
@@ -65,13 +67,11 @@ describe('RelativeTimeRangeSelector', () => {
     expect(rangeValue).toBeDisabled();
   });
 
-  it('All Time checkbox is disabled * notice shown if timerange limit is set', () => {
-    render(<RelativeTimeRangeSelector {...defaultProps} config={{ query_time_range_limit: 'PT24H' }} />);
+  it('All Time checkbox is disabled', () => {
+    render(<RelativeTimeRangeSelector {...defaultProps} limitDuration={10} />);
 
     const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
-    const limitWarning = screen.getByText(/Admin has limited searching to a day ago/i);
 
     expect(allTimeCheckbox).toBeDisabled();
-    expect(limitWarning).not.toBeNull();
   });
 });
