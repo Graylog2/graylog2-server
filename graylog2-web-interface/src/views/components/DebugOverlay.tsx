@@ -16,7 +16,6 @@
  */
 // @flow strict
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchStore } from 'views/stores/SearchStore';
@@ -25,8 +24,6 @@ import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchStoreState } from 'views/stores/SearchStore';
-
-import View from '../logic/views/View';
 
 type Props = {
   currentView: ViewStoreState,
