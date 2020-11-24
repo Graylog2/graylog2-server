@@ -18,12 +18,14 @@
 import * as React from 'react';
 import { render } from '@testing-library/react';
 
-import HighlightMessageInQuery from './HighlightMessageInQuery';
+import _HighlightMessageInQuery from './HighlightMessageInQuery';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 // eslint-disable-next-line react/prop-types
 jest.mock('routing/withLocation', () => (Component) => ({ query, ...rest }) => <Component location={{ query }} {...rest} />);
+
+const HighlightMessageInQuery = _HighlightMessageInQuery as React.ComponentType<React.ComponentProps<typeof _HighlightMessageInQuery> & { query?: any }>;
 
 describe('HighlightMessageInQuery', () => {
   const TestComponent = () => (

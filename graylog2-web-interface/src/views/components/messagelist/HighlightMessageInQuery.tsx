@@ -25,7 +25,6 @@ import HighlightMessageContext from '../contexts/HighlightMessageContext';
 type Props = {
   children: React.ReactElement,
   location: Location,
-  query?: any,
 };
 
 const emptyLocation = { query: undefined, pathname: undefined, search: undefined };
