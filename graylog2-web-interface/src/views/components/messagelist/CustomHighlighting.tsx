@@ -70,13 +70,12 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
 };
 
 CustomHighlighting.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.element.isRequired,
   field: PropTypes.string.isRequired,
   value: PropTypes.any,
 };
 
 CustomHighlighting.defaultProps = {
-  children: undefined,
   value: undefined,
 };
 
