@@ -14,43 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { viewsManager as currentUser } from 'fixtures/users';
+import { simpleEventDefinition } from 'fixtures/eventDefinition';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import EventDefinitionEntry from './EventDefinitionEntry';
 
-jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
-
 const exampleEventDefinition = {
-  alert: false,
-  config: {
-    conditions: { expression: null },
-    execute_every_ms: 60000,
-    group_by: [],
-    query: '',
-    query_parameters: [],
-    search_within_ms: 60000,
-    series: [],
-    streams: ['5fad57fde23593249ad8a6af'],
-    type: 'aggregation-v1',
-  },
-  description: '',
-  field_spec: {},
+  ...simpleEventDefinition,
   id: 'event-definition-id',
-  key_spec: [],
-  notification_settings: { grace_period_ms: 0, backlog_size: 0 },
-  notifications: [],
-  priority: 2,
-  storage: [{
-    streams: ['000000000000000000000002'],
-    type: 'persist-to-streams-v1',
-  }],
-  title: 'New example',
 };
+
+jest.mock('components/permissions/EntityShareModal', () => () => <div>EntityShareModal content</div>);
 
 describe('EventDefinitionEntry', () => {
   const renderSUT = (grn_permissions = [], permissions = []) => (
