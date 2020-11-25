@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 import moment from 'moment';
 
@@ -98,16 +98,13 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
   const [disableApply, setDisableApply] = useState(false);
-  const { value: nextRangeValue } = nextRangeProps;
-  const { value: originalRangeValue } = originalTimerange;
 
-  const [activeTab, setActiveTab] = useState(originalRangeValue?.type);
+  const originalRangeValue = useMemo(() => originalTimerange?.value, [originalTimerange]);
+  const nextRangeValue = useMemo(() => nextRangeProps?.value || originalRangeValue, [nextRangeProps, originalRangeValue]);
+  const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
+  const currentTimerange = useMemo(() => nextRangeValue || originalRangeValue, [nextRangeValue, originalRangeValue]);
 
-  useEffect(() => {
-    if (!nextRangeValue) {
-      nextRangeHelpers.setValue(originalRangeValue);
-    }
-  });
+  const [activeTab, setActiveTab] = useState(originalRangeValue?.type || 'disabled');
 
   const _setDisableApply = (isDisabled: boolean) => {
     if (disableApply !== isDisabled) {
@@ -122,7 +119,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
   const handleCancel = () => {
     formik.resetForm({
-      values: { timerange: originalRangeValue, tempTimeRange: null },
+      values: { timerange: originalRangeValue, tempTimeRange: undefined },
     });
 
     toggleDropdownShow();
@@ -133,10 +130,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     formik.unregisterField('tempTimeRange');
     toggleDropdownShow();
   };
-
-  const activeKey = activeTab || 'disabled';
-
-  const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
 
   const title = (
     <PopoverTitle>
@@ -150,8 +143,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     </PopoverTitle>
   );
 
-  const currentTimerange = nextRangeProps.value || originalTimerange.value;
-
   return (
     <StyledPopover id="timerange-type"
                    placement="bottom"
@@ -164,7 +155,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeKey}
+                      activeKey={activeTab}
                       onSelect={onSelect}
                       animation={false}>
             {noOverride && (
@@ -174,7 +165,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                 <p>No Override to Date.</p>
               </Tab>
             )}
-            {timeRangeTypeTabs(activeKey, originalRangeValue, limitDuration, _setDisableApply, currentTimerange)}
+            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, _setDisableApply, currentTimerange)}
           </StyledTabs>
         </Col>
       </Row>

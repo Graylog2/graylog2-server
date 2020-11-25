@@ -2,17 +2,19 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
+import moment from 'moment';
+import PropTypes from 'prop-types';
 
 import { type ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 import { type TimeRange } from 'views/logic/queries/Query';
 import DateTime from 'logic/datetimes/DateTime';
 
-import { EMPTY_OUTPUT, dateOutput } from '../TimeRangeDisplay';
+import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 
-type Props = {|
-  timerange: TimeRange,
-|};
+type Props = {
+  timerange?: TimeRange,
+};
 
 const PreviewWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;
@@ -50,7 +52,29 @@ const MiddleIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   padding: 0 15px;
 `);
 
-const dateTimeString = (value) => (DateTime.isValidDateString(value) ? value : 'Incorrect Date Format');
+const dateOutput = (timerange: TimeRange) => {
+  let range = EMPTY_RANGE;
+
+  if (!timerange) {
+    return EMPTY_OUTPUT;
+  }
+
+  if (timerange.range) {
+    range = !timerange.range ? 'All Time' : moment()
+      .subtract(timerange.range * 1000)
+      .fromNow();
+
+    return {
+      from: range,
+      until: 'Now',
+    };
+  }
+
+  return {
+    from: timerange.from || range,
+    until: timerange.to || range,
+  };
+};
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
@@ -58,21 +82,14 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
   useEffect(() => {
     const output = dateOutput(timerange);
 
-    if (timerange.type !== 'relative') {
-      setTimeOutput({
-        from: dateTimeString(output.from),
-        until: dateTimeString(output.until),
-      });
-    } else {
-      setTimeOutput(output);
-    }
+    setTimeOutput(output);
   }, [timerange]);
 
   return (
     <PreviewWrapper>
       <FromWrapper>
         <Title>From</Title>
-        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{from}</Date>
+        <Date title={`Dates Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{from}</Date>
       </FromWrapper>
 
       <MiddleIcon>
@@ -81,10 +98,22 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
 
       <UntilWrapper>
         <Title>Until</Title>
-        <Date title={`Date Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{until}</Date>
+        <Date title={`Dates Formatted as [${DateTime.Formats.TIMESTAMP}]`}>{until}</Date>
       </UntilWrapper>
     </PreviewWrapper>
   );
+};
+
+TimeRangeLivePreview.propTypes = {
+  timerange: PropTypes.shape({
+    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    from: PropTypes.string,
+    to: PropTypes.string,
+  }),
+};
+
+TimeRangeLivePreview.defaultProps = {
+  timerange: undefined,
 };
 
 export default TimeRangeLivePreview;

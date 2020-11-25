@@ -38,8 +38,12 @@ const TimeRangeWrapper: StyledComponent<{}, ThemeInterface, HTMLParagraphElement
   }
 `);
 
-export const dateOutput = (timerange: TimeRange) => {
+const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
+
+  if (!timerange) {
+    return EMPTY_OUTPUT;
+  }
 
   switch (timerange.type) {
     case 'relative':
