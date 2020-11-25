@@ -21,6 +21,7 @@ import App from 'routing/App';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
+import AppConfig from 'util/AppConfig';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
 import {
@@ -139,6 +140,8 @@ const AppRouter = () => {
   const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
 
+  const isCloud = AppConfig.isCloud();
+
   return (
     <Router history={history}>
       <RouterErrorBoundary>
@@ -160,7 +163,7 @@ const AppRouter = () => {
                         <Route exact path={Routes.GETTING_STARTED} component={GettingStartedPage} />
                         <Route exact path={Routes.STREAMS} component={StreamsPage} />
                         <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
-                        <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
+                        {!isCloud && <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
 
                         <Route exact path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
                         <Route exact path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
@@ -189,16 +192,38 @@ const AppRouter = () => {
                                path={Routes.show_alert_condition(':streamId', ':conditionId')}
                                component={EditAlertConditionPage} />
                         <Route exact path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-                        <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />
-                        <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
-                        <Route exact path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
-                        <Route exact path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage} />
-                        <Route exact path={Routes.new_extractor(':nodeId', ':inputId')} component={CreateExtractorsPage} />
-                        <Route exact
-                               path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')}
-                               component={EditExtractorsPage} />
-                        <Route exact path={Routes.import_extractors(':nodeId', ':inputId')} component={ImportExtractorsPage} />
-                        <Route exact path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage} />
+
+                        {!isCloud && <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />}
+                        {!isCloud && <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />}
+                        {!isCloud && (
+                          <Route exact path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.local_input_extractors(':nodeId', ':inputId')}
+                                 component={ExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.new_extractor(':nodeId', ':inputId')}
+                                 component={CreateExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')}
+                                 component={EditExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.import_extractors(':nodeId', ':inputId')}
+                                 component={ImportExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.export_extractors(':nodeId', ':inputId')}
+                                 component={ExportExtractorsPage} />
+                        )}
+
                         <Route exact path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage} />
 
                         <Route exact path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
@@ -211,13 +236,22 @@ const AppRouter = () => {
                                component={ShowContentPackPage} />
 
                         <Route exact path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
-                        <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
-                        <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-                        <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-                        <Route exact
-                               path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                               component={IndexSetConfigurationPage} />
-                        <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+
+                        {!isCloud && (
+                          <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                                 component={IndexSetConfigurationPage} />
+                        )}
+                        {!isCloud && <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />}
+                        {!isCloud && (
+                          <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
+                        )}
 
                         <Route exact path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} component={LUTTablesPage} />
                         <Route exact
@@ -264,7 +298,8 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
                         <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
                         <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
-                        <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
+
+                        {!isCloud && <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />}
 
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
                         <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />

@@ -18,24 +18,24 @@
 
 import AppConfig from '../AppConfig';
 
-type MenuItem = { path: string };
+type ValueAction = { type: string };
 
-function filterMenuItems(
-  menuItems: Array<MenuItem>,
+function filterValueActions(
+  items: Array<ValueAction>,
   toExclude: Array<string>,
-): Array<MenuItem> {
-  return menuItems.filter((item) => !toExclude.includes(item.path));
+): Array<ValueAction> {
+  return items.filter((item) => !toExclude.includes(item.type));
 }
 
-export function filterCloudMenuItems(
-  menuItems: Array<MenuItem>,
+export function filterCloudValueActions(
+  valueActions: Array<ValueAction>,
   toExclude: Array<string>,
-): Array<MenuItem> {
+): Array<ValueAction> {
   if (!AppConfig.isCloud()) {
-    return menuItems;
+    return valueActions;
   }
 
-  return filterMenuItems(menuItems, toExclude);
+  return filterValueActions(valueActions, toExclude);
 }
 
-export default filterMenuItems;
+export default filterValueActions;
