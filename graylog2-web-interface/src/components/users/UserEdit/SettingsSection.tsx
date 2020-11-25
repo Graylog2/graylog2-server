@@ -33,9 +33,11 @@ type Props = {
 
 const SettingsSection = ({
   user: {
+    id,
     timezone,
     sessionTimeoutMs,
     startpage,
+    permissions,
   },
   onSubmit,
 }: Props) => (
@@ -46,7 +48,7 @@ const SettingsSection = ({
         <Form className="form form-horizontal">
           <TimeoutFormGroup />
           <TimezoneFormGroup />
-          <StartpageFormGroup />
+          <StartpageFormGroup userId={id} permissions={permissions} />
 
           <Row className="no-bm">
             <Col xs={12}>

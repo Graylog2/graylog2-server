@@ -15,50 +15,122 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
+import { useState, useEffect } from 'react';
 import { Field } from 'formik';
-import { upperFirst } from 'lodash';
 import styled from 'styled-components';
 
-import { Button } from 'components/graylog';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
+import { Button, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
+import SharedEntity from 'logic/permissions/SharedEntity';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
+import Spinner from 'components/common/Spinner';
+import Select from 'components/common/Select';
+import { DashboardsActions } from 'views/stores/DashboardsStore';
+import { StreamsActions } from 'stores/streams/StreamsStore';
 
 const Container = styled.div`
   display:flex;
   align-items: center;
-  padding-top: 6px;
+`;
+
+const TypeSelect = styled(Select)`
+  width: 200px;
+  margin-right: 3px;
+`;
+
+const ValueSelect = styled(Select)`
+  width: 400px;
 `;
 
 const ResetBtn = styled(Button)`
   margin-left: 5px;
 `;
 
-const StartpageFormGroup = () => (
-  <Field name="startpage">
-    {({ field: { name, value, onChange } }) => {
-      const valueTxt = value?.type
-        ? `${upperFirst(value.type)} ${value.id}`
-        : 'No Startpage set';
-      const resetBtn = value?.type
-        ? (
-          <ResetBtn bsSize="xs"
-                    onClick={() => onChange({ target: { name, value: {} } })}>
-            Reset
-          </ResetBtn>
-        )
-        : null;
+type Props = {
+  userId: string;
+  permissions: Immutable.List<string>;
+}
 
-      return (
-        <>
-          <Input id="startpage"
-                 label="Startpage"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Container>{valueTxt}{resetBtn}</Container>
-          </Input>
-        </>
-      );
-    }}
-  </Field>
-);
+type Option = {
+  value: string;
+  label: string;
+}
+
+// We cannot ask for all since the backend did not implement something like this. So for now its 10000.
+const UNLIMITED_ENTITY_SHARE_REQ = { page: 1, perPage: 10000, query: '' };
+
+const grnId = (grn) => getValuesFromGRN(grn).id;
+const _grnOptionFormatter = ({ id, title }: SharedEntity): Option => ({ value: grnId(id), label: title });
+const typeOptions = [
+  { value: 'dashboard', label: 'Dashboard' },
+  { value: 'stream', label: 'Stream' },
+];
+
+const ADMIN_PERMISSION = '*';
+
+const StartpageFormGroup = ({ userId, permissions }: Props) => {
+  const [dashboards, setDashboards] = useState<Option[] | undefined>();
+  const [streams, setStreams] = useState<Option[] | undefined>();
+
+  useEffect(() => {
+    if (permissions.includes(ADMIN_PERMISSION)) {
+      DashboardsActions.search('', 1, 0).then(({ list }) => setDashboards(list.map(({ id, title }) => ({ value: id, label: title }))));
+
+      StreamsActions.searchPaginated(1, 0, '').then(({ streams: streamsList }) => setStreams(streamsList.map(({ id, title }) => ({ value: id, label: title }))));
+    } else {
+      EntityShareDomain.loadUserSharesPaginated(userId, {
+        ...UNLIMITED_ENTITY_SHARE_REQ,
+        additionalQueries: { entity_type: 'dashboard' },
+      }).then(({ list }) => setDashboards(list.map(_grnOptionFormatter).toArray()))
+        .then(() => EntityShareDomain.loadUserSharesPaginated(userId, {
+          ...UNLIMITED_ENTITY_SHARE_REQ,
+          additionalQueries: { entity_type: 'stream' },
+        })
+          .then(({ list }) => setStreams(list.map(_grnOptionFormatter).toArray())));
+    }
+  }, [permissions, userId]);
+
+  if (!streams || !dashboards) {
+    return <Spinner />;
+  }
+
+  return (
+    <Field name="startpage">
+      {({ field: { name, value, onChange } }) => {
+        const type = value?.type ?? 'dashboard';
+        const options = type === 'dashboard' ? dashboards : streams;
+        const resetBtn = value?.type
+          ? (
+            <ResetBtn onClick={() => onChange({ target: { name, value: {} } })}>
+              Reset
+            </ResetBtn>
+          )
+          : null;
+
+        return (
+          <>
+            <Input id="startpage"
+                   label="Start page"
+                   help="Select the page the user sees right after log in"
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9">
+              <Container>
+                <TypeSelect options={typeOptions}
+                            onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
+                            value={value?.type} />
+                <ValueSelect options={options}
+                             onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
+                             value={value?.id} />
+                {resetBtn}
+              </Container>
+            </Input>
+          </>
+        );
+      }}
+    </Field>
+  );
+};
 
 export default StartpageFormGroup;
