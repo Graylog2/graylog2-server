@@ -21,7 +21,7 @@ import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import CombinedProvider from 'injection/CombinedProvider';
-import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
+import { StreamsActions, Stream } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import { Decorator } from 'views/components/messagelist/decorators/Types';
@@ -42,7 +42,7 @@ const DecoratorsConfig = () => {
   const [types, setTypes] = useState();
   const configModal = useRef<BootstrapModalWrapper>();
 
-  useEffect(() => { StreamsStore.listStreams().then(setStreams); }, [setStreams]);
+  useEffect(() => { StreamsActions.listStreams().then(setStreams); }, [setStreams]);
   useEffect(() => { DecoratorsActions.available().then(setTypes); }, [setTypes]);
   useEffect(() => { DecoratorsActions.list().then(setDecorators); }, [setDecorators]);
 
