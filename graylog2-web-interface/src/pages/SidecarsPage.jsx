@@ -15,21 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 
 import { LinkContainer, Link } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, IfPermitted } from 'components/common';
+import { isPermitted } from 'util/PermissionsMixin';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
 
 const SidecarsPage = () => {
   const [sidecarUser, setSidecarUser] = useState();
+  const currentUser = useContext(CurrentUserContext);
+  const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokenlist:graylog-sidecar']);
 
   useEffect(() => {
-    UsersDomain.loadByUsername('graylog-sidecar').then(setSidecarUser);
-  }, []);
+    if (canCreateSidecarUserTokens) {
+      UsersDomain.loadByUsername('graylog-sidecar').then(setSidecarUser);
+    }
+  }, [canCreateSidecarUserTokens]);
 
   return (
     <DocumentTitle title="Sidecars">
@@ -39,14 +45,20 @@ const SidecarsPage = () => {
             The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
           </span>
 
-          {sidecarUser ? (
-            <span>
-              Do you need an API token for a sidecar?&ensp;
-              <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                Create or reuse a token for the <em>graylog-sidecar</em> user
-              </Link>
-            </span>
-          ) : <Spinner />}
+          {canCreateSidecarUserTokens && (
+            <>
+              {sidecarUser ? (
+                <span>
+                  Do you need an API token for a sidecar?&ensp;
+                  <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
+                    Create or reuse a token for the <em>graylog-sidecar</em> user
+                  </Link>
+                </span>
+              ) : <Spinner />}
+            </>
+          )}
+
+          {!canCreateSidecarUserTokens && <></>}
 
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
