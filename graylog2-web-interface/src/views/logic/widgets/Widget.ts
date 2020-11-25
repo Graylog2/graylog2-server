@@ -21,6 +21,8 @@ import uuid from 'uuid/v4';
 import { QueryString, TimeRange } from 'views/logic/queries/Query';
 
 import { singleton } from '../singleton';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 export type WidgetState = {
   id: string;
@@ -54,7 +56,7 @@ class Widget {
     return this._value.type;
   }
 
-  get config(): any {
+  get config() {
     return this._value.config;
   }
 

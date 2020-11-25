@@ -93,7 +93,7 @@ export type LoadActiveResponse = LoadResponse & {
 
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
-  delete: (authBackendId: $PropertyType<AuthenticationBackend | undefined | null, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
+  delete: (authBackendId: $PropertyType<AuthenticationBackend, 'id'> | undefined | null, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   load: (id: string) => Promise<LoadResponse>,
   loadActive: () => Promise<LoadActiveResponse>,
   loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,

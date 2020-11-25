@@ -45,8 +45,8 @@ export type ActionHandlerArguments = {
   contexts: ActionContexts,
 };
 
-export type ActionHandler = (ActionHandlerArguments) => Promise<unknown>;
-export type ActionHandlerCondition = (ActionHandlerArguments) => boolean;
+export type ActionHandler = (args: ActionHandlerArguments) => Promise<unknown>;
+export type ActionHandlerCondition = (args: ActionHandlerArguments) => boolean;
 
 export type ActionHandlerConditions = {
   isEnabled?: ActionHandlerCondition,

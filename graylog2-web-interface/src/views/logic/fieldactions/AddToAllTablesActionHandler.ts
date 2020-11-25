@@ -15,11 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+import * as Immutable from 'immutable';
+
 import { WidgetStore, WidgetActions } from 'views/stores/WidgetStore';
 import type { FieldActionHandler } from 'views/logic/fieldactions/FieldActionHandler';
+import Widget from 'views/logic/widgets/Widget';
 
 const AddToAllTablesActionHandler: FieldActionHandler = ({ field }) => {
-  const widgets = WidgetStore.getInitialState();
+  const widgets: Immutable.Map<string, Widget> = WidgetStore.getInitialState();
   const newWidgets = widgets.map((widget) => {
     if (widget.type.toUpperCase() === 'MESSAGES') {
       const newFields = [].concat(widget.config.fields, [field]);

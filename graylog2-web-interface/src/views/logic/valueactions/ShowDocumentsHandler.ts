@@ -29,6 +29,7 @@ import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 import { TitlesActions } from '../../stores/TitlesStore';
 import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';
+import { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 type Contexts = {
   valuePath: ValuePath,
@@ -49,7 +50,8 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
     .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 };
 
-const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
+const ShowDocumentsHandler: ValueActionHandler = (args: ActionHandlerArguments) => {
+  const { contexts: { valuePath, widget } } = args as unknown as Arguments;
   const mergedObject = valuePath.reduce((elem, acc) => ({
     ...acc,
     ...elem,
