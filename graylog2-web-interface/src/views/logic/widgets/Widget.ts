@@ -21,8 +21,6 @@ import uuid from 'uuid/v4';
 import { QueryString, TimeRange } from 'views/logic/queries/Query';
 
 import { singleton } from '../singleton';
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 export type WidgetState = {
   id: string;
@@ -92,7 +90,7 @@ class Widget {
       streams,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Map({ id, type, config, filter, timerange, query, streams }));
   }
 
@@ -218,6 +216,7 @@ class Builder {
 Widget.Builder = Builder;
 
 const SingletonWidget = singleton('views.logic.widgets.Widget', () => Widget);
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type SingletonWidget = InstanceType<typeof Widget>;
 
 export default SingletonWidget;

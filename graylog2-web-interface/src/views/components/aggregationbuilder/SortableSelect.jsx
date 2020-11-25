@@ -47,6 +47,7 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...
   const SortableMultiValue = SortableElement(Components.MultiValue);
 
   const Item = (props) => {
+    // eslint-disable-next-line react/prop-types
     const { data: { value: itemValue } } = props;
     const index = findIndex(value, (v) => v.field === itemValue);
 

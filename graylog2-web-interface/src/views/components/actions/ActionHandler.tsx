@@ -71,9 +71,9 @@ export function createHandlerFor(action: ActionDefinition, setActionComponents: 
   if (action.component) {
     const ActionComponent = action.component;
 
-    // eslint-disable-next-line no-unused-vars
     return ({ queryId, field, value, type }) => {
       const id = uuid();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const onClose = () => setActionComponents(({ [id]: _, ...rest }) => rest);
       const renderedComponent = (
         <ActionComponent key={action.title}

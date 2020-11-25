@@ -19,17 +19,16 @@ import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
+import { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import View from '../views/View';
 import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 import { TitlesActions } from '../../stores/TitlesStore';
 import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';
-import { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 type Contexts = {
   valuePath: ValuePath,
