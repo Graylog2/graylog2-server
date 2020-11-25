@@ -60,7 +60,7 @@ describe('EventDefinitionEntry', () => {
     await waitFor(() => expect(screen.queryByText('EntityShareModal content')).not.toBeNull());
   });
 
-  it('does not allow sharing for viewer', async () => {
+  it('does not allow sharing for viewer', () => {
     const grnPermissions = ['entity:view:grn::::event_definition:event-definition-id'];
     render(renderSUT(grnPermissions));
 
