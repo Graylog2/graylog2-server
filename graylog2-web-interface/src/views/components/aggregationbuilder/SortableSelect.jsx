@@ -46,7 +46,7 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...
   const values = valueTransformer(value);
   const SortableMultiValue = SortableElement(Components.MultiValue);
 
-  const Item = (props: {data: {value: string}}) => {
+  const Item = (props) => {
     const { data: { value: itemValue } } = props;
     const index = findIndex(value, (v) => v.field === itemValue);
 
