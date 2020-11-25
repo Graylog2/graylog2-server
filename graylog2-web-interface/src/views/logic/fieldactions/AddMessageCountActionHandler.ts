@@ -22,7 +22,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
 
-const AddMessageCountActionHandler: ActionHandler = () => {
+const AddMessageCountActionHandler: ActionHandler = async () => {
   const series = Series.forFunction('count()')
     .toBuilder()
     .config(new SeriesConfig('Message Count'))
