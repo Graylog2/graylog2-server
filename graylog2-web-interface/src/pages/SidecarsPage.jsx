@@ -14,53 +14,61 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { LinkContainer, Link } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
 
-class SidecarsPage extends React.Component {
-  render() {
-    return (
-      <DocumentTitle title="Sidecars">
-        <span>
-          <PageHeader title="Sidecars Overview">
-            <span>
-              The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
-            </span>
+const SidecarsPage = () => {
+  const [sidecarUser, setSidecarUser] = useState();
 
+  useEffect(() => {
+    UsersDomain.loadByUsername('graylog-sidecar').then(setSidecarUser);
+  }, []);
+
+  return (
+    <DocumentTitle title="Sidecars">
+      <span>
+        <PageHeader title="Sidecars Overview">
+          <span>
+            The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
+          </span>
+
+          {sidecarUser ? (
             <span>
               Do you need an API token for a sidecar?&ensp;
-              <Link to={Routes.SYSTEM.USERS.TOKENS.edit('graylog-sidecar')}>
+              <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
                 Create or reuse a token for the <em>graylog-sidecar</em> user
-              </Link>.
+              </Link>
             </span>
+          ) : <Spinner />}
 
-            <ButtonToolbar>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
-                <Button bsStyle="info">Overview</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
-                <Button bsStyle="info">Administration</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
-                <Button bsStyle="info">Configuration</Button>
-              </LinkContainer>
-            </ButtonToolbar>
-          </PageHeader>
+          <ButtonToolbar>
+            <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
+              <Button bsStyle="info">Overview</Button>
+            </LinkContainer>
+            <LinkContainer to={Routes.SYSTEM.SIDECARS.ADMINISTRATION}>
+              <Button bsStyle="info">Administration</Button>
+            </LinkContainer>
+            <LinkContainer to={Routes.SYSTEM.SIDECARS.CONFIGURATION}>
+              <Button bsStyle="info">Configuration</Button>
+            </LinkContainer>
+          </ButtonToolbar>
+        </PageHeader>
 
-          <Row className="content">
-            <Col md={12}>
-              <SidecarListContainer />
-            </Col>
-          </Row>
-        </span>
-      </DocumentTitle>
-    );
-  }
-}
+        <Row className="content">
+          <Col md={12}>
+            <SidecarListContainer />
+          </Col>
+        </Row>
+      </span>
+    </DocumentTitle>
+  );
+};
 
 export default SidecarsPage;
