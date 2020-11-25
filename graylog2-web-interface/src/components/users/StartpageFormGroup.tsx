@@ -21,7 +21,7 @@ import { Field } from 'formik';
 import styled from 'styled-components';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
-import { Button, Col, Row } from 'components/graylog';
+import { Button, Alert } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -101,6 +101,11 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
       {({ field: { name, value, onChange } }) => {
         const type = value?.type ?? 'dashboard';
         const options = type === 'dashboard' ? dashboards : streams;
+
+        const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
+          ? <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
+          : null;
+
         const resetBtn = value?.type
           ? (
             <ResetBtn onClick={() => onChange({ target: { name, value: {} } })}>
@@ -125,6 +130,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                              value={value?.id} />
                 {resetBtn}
               </Container>
+              {error}
             </Input>
           </>
         );
