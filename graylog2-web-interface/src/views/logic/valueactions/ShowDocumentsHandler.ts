@@ -33,7 +33,6 @@ import { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 type Contexts = {
   valuePath: ValuePath,
-  view: View,
   widget: Widget,
 };
 
@@ -50,8 +49,7 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
     .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 };
 
-const ShowDocumentsHandler: ValueActionHandler = (args: ActionHandlerArguments) => {
-  const { contexts: { valuePath, widget } } = args as unknown as Arguments;
+const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: ActionHandlerArguments & Arguments) => {
   const mergedObject = valuePath.reduce((elem, acc) => ({
     ...acc,
     ...elem,
