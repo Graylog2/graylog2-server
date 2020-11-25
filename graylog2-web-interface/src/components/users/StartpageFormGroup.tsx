@@ -31,7 +31,7 @@ import { DashboardsActions } from 'views/stores/DashboardsStore';
 import { StreamsActions } from 'stores/streams/StreamsStore';
 
 const Container = styled.div`
-  display:flex;
+  display: flex;
   align-items: center;
 `;
 
