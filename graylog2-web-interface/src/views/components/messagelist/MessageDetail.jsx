@@ -19,7 +19,6 @@ import React from 'react';
 import Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import AppConfig from 'util/AppConfig';
 import { Link } from 'components/graylog/router';
 import { Col, Label, Row } from 'components/graylog';
 import StreamLink from 'components/streams/StreamLink';
