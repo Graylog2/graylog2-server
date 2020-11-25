@@ -61,9 +61,13 @@ class MessageDetail extends React.Component {
     streams: {},
   };
 
-  state = {
-    showOriginal: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showOriginal: false,
+    };
+  }
 
   _inputName = (inputId) => {
     const { inputs } = this.props;
