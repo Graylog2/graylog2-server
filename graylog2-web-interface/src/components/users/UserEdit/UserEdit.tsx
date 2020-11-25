@@ -43,7 +43,6 @@ type Props = {
 };
 
 const _updateUser = (data, currentUser, userId) => {
-  console.log(data);
   return UsersDomain.update(userId, data).then(() => {
     if (userId === currentUser?.id) {
       CurrentUserStore.reload();

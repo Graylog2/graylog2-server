@@ -24,7 +24,6 @@ import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { StreamsActions } from 'stores/streams/StreamsStore';
-import { DashboardsActions } from 'views/stores/DashboardsStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 
 type Props = {
