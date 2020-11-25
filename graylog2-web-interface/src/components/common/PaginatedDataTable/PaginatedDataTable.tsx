@@ -39,20 +39,46 @@ const _paginatedRows = (rows: Array<unknown>, perPage: number, currentPage: numb
 };
 
 type Props = {
-  /** Element id to use in the table container */
-  id: string,
-  /** Array of objects to be rendered in the table. The render of those values is controlled by `dataRowFormatter`. */
-  rows: Array<unknown>,
-  /** Initial pagination. */
-  pagination: Pagination,
+  /** DataTable class */
+  className?: string,
+  /** Object key that should be used to display data in the data filter input. */
+  displayKey?: string,
+  /**
+   * Function that renders a row in the table. It receives two arguments: the row, and its index.
+   * It usually returns a `<tr>` element with the formatted row.
+   */
+  dataRowFormatter: (row: unknown) => React.ReactNode,
   /** Label to use next to the suggestions for the data filter input. */
   filterBy?: string,
   /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
   filterKeys?: Array<string>,
   /** Label to use next to the data filter input. */
   filterLabel?: string,
-  /** Object key that should be used to display data in the data filter input. */
-  displayKey?: string,
+  /**
+   * Function that renders a single header cell in the table. It receives two arguments: the header, and its index.
+   * It usually returns a `<th>` element with the header.
+   * Default will wrap the headers in a <th> tag.
+   */
+  headerCellFormatter?: (header: string) => React.ReactNode,
+  /** Array of values to be use as headers. The render is controlled by `headerCellFormatter`. */
+  headers: Array<string>
+  /** Element id to use in the table container */
+  id: string,
+  /** Text or element to show when there is no data. */
+  noDataText?: React.ReactNode,
+  /** Initial pagination. */
+  pagination: Pagination,
+  /** Adds a custom class to the row element. */
+  rowClassName?: string,
+  /** Array of objects to be rendered in the table. The render of those values is controlled by `dataRowFormatter`. */
+  rows: Array<unknown>,
+  /**
+   * Indicates whether the table should use a bootstrap responsive table or not:
+   * https://getbootstrap.com/docs/3.3/css/#tables-responsive
+   *
+   * The main reason to disable this is if the table is clipping a dropdown menu or another component in a table edge.
+   */
+  useResponsiveTable?: boolean,
 };
 
 type DataTablePagination = {
@@ -106,11 +132,16 @@ const PaginatedDataTable = ({ rows = [], pagination: initialPagination, filterKe
 };
 
 PaginatedDataTable.defaultProps = {
+  className: undefined,
   displayKey: undefined,
+  filterBy: undefined,
   filterKeys: undefined,
   filterLabel: 'Filter',
-  filterBy: undefined,
+  headerCellFormatter: undefined,
+  noDataText: undefined,
   pagination: DEFAULT_PAGINATION,
+  rowClassName: undefined,
+  useResponsiveTable: false,
 };
 
 PaginatedDataTable.propTypes = {
