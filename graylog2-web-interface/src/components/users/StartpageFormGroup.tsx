@@ -87,8 +87,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
         .then(() => EntityShareDomain.loadUserSharesPaginated(userId, {
           ...UNLIMITED_ENTITY_SHARE_REQ,
           additionalQueries: { entity_type: 'stream' },
-        })
-          .then(({ list }) => setStreams(list.map(_grnOptionFormatter).toArray())));
+        }).then(({ list }) => setStreams(list.map(_grnOptionFormatter).toArray())));
     }
   }, [permissions, userId]);
 
@@ -121,16 +120,18 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                    help="Select the page the user sees right after log in"
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9">
-              <Container>
-                <TypeSelect options={typeOptions}
-                            onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
-                            value={value?.type} />
-                <ValueSelect options={options}
-                             onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
-                             value={value?.id} />
-                {resetBtn}
-              </Container>
-              {error}
+              <>
+                <Container>
+                  <TypeSelect options={typeOptions}
+                              onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
+                              value={value?.type} />
+                  <ValueSelect options={options}
+                               onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
+                               value={value?.id} />
+                  {resetBtn}
+                </Container>
+                {error}
+              </>
             </Input>
           </>
         );

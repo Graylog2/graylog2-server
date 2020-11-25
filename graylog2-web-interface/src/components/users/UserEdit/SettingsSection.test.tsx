@@ -18,8 +18,32 @@ import * as React from 'react';
 import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
 import { alice } from 'fixtures/users';
 import selectEvent from 'react-select-event';
+import { List } from 'immutable';
+import mockAction from 'helpers/mocking/MockAction';
+
+import { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import SharedEntity from 'logic/permissions/SharedEntity';
+import { createGRN } from 'logic/permissions/GRN';
+import Grantee from 'logic/permissions/Grantee';
 
 import SettingsSection from './SettingsSection';
+
+const sharedEntity = SharedEntity
+  .builder()
+  .id('grn::::dashboard:57bc9188e62a2373778d9e03')
+  .type('dashboard')
+  .title('Security Data')
+  .owners(List([Grantee.builder().id('foo-id').title('alice').type('user')
+    .build()]))
+  .build();
+
+const mockList = Promise.resolve({ list: List.of(sharedEntity) });
+
+jest.mock('stores/permissions/EntityShareStore', () => ({
+  EntityShareActions: {
+    loadUserSharesPaginated: jest.fn(() => mockList),
+  },
+}));
 
 const exampleUser = alice.toBuilder()
   .sessionTimeoutMs(36000000)
