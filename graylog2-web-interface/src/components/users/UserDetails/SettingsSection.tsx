@@ -35,7 +35,7 @@ const _sessionTimeout = (sessionTimeout) => {
   return 'Sessions do not timeout';
 };
 
-const StartpageValue = ({ type, id }: { type: ?string, id: ?string }) => {
+const StartpageValue = ({ type, id }: { type: string | null | undefined, id: string | null | undefined }) => {
   if (!type || !id) {
     return <span>No Startpage set</span>;
   }
