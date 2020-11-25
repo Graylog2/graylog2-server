@@ -38,6 +38,56 @@ export type Stream = {
   creatorUser: string,
   createdAt: number,
 };
+
+type StreamRule = {
+  id: string,
+  type: string,
+  value: string,
+  inverted: boolean,
+  stream_id: string,
+  description: string,
+};
+
+type OutputSummary = {
+  id: string,
+  title: string,
+  type: string,
+  creator_user_id: string,
+  created_at: string,
+  configuration: { [key: string]: string },
+};
+
+type AlertConditionSummary = {
+  id: string,
+  type: string,
+  creator_user_id: string,
+  created_at: string,
+  parameters: { [key: string]: any },
+  in_grace: boolean | null | undefined,
+  title: string | null | undefined,
+};
+
+type AlertReceiver = {
+  emails: string[],
+  users: string[],
+};
+
+export type StreamResponse = {
+  id: string,
+  creator_user_id: string,
+  outputs: OutputSummary[],
+  matching_type: string,
+  description: string,
+  created_at: string,
+  disabled: boolean,
+  rules: StreamRule[],
+  alert_conditions: AlertConditionSummary[],
+  alert_receivers: AlertReceiver
+  title: string,
+  is_default: boolean | null | undefined,
+  remove_matches_from_default_stream: boolean,
+  index_set_id: string,
+}
 /* eslint-enable camelcase */
 
 type TestMatchResponse = {
@@ -119,7 +169,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         callback(streams);
       });
   },
-  get(streamId: string, callback: ((stream: Stream) => void)) {
+  get(streamId: string, callback: ((stream: Stream) => void)): Promise<StreamResponse> {
     const failCallback = (errorThrown) => {
       UserNotification.error(`Loading Stream failed with status: ${errorThrown}`,
         'Could not retrieve Stream');
