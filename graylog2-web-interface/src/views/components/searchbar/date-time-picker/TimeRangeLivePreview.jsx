@@ -59,7 +59,7 @@ const dateOutput = (timerange: TimeRange) => {
     return EMPTY_OUTPUT;
   }
 
-  if (timerange.range) {
+  if (timerange.range >= 0) {
     range = !timerange.range ? 'All Time' : moment()
       .subtract(timerange.range * 1000)
       .fromNow();

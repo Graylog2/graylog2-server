@@ -140,7 +140,8 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
 
           const fromValue = RANGE_TYPES.map(({ type }) => {
             const isAllTime = value === 0;
-            const diff = moment.duration(value, 'seconds').as(type);
+            const defaultValue = value || originalTimeRange.range;
+            const diff = moment.duration(defaultValue, 'seconds').as(type);
 
             if (diff - Math.floor(diff) === 0) {
               return {
@@ -148,7 +149,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
                 rangeValue: diff || 0,
                 rangeType: isAllTime ? 'seconds' : type,
                 rangeAllTime: isAllTime,
-                range: value,
+                range: defaultValue,
               };
             }
 
@@ -190,7 +191,8 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
                        value={fromValue.rangeValue}
                        title="Set the range value"
                        onChange={_onChangeTime}
-                       bsStyle={error ? 'error' : null} />
+                       bsStyle={error ? 'error' : null}
+                       min={1} />
               </InputWrap>
               <StyledSelect id="relative-timerange-from-length"
                             name="relative-timerange-from-length"

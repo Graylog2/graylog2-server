@@ -9,7 +9,7 @@ import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm.js';
+import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import { type ThemeInterface } from 'theme';
 
@@ -104,6 +104,20 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
   const currentTimerange = useMemo(() => nextRangeValue || originalRangeValue, [nextRangeValue, originalRangeValue]);
 
+  console.log({ currentTimerange });
+
+  const defaultRangeValue = {};
+
+  if (originalRangeValue?.type) {
+    defaultRangeValue.range = 300; // TODO: magic number
+  } else if (noOverride) {
+    defaultRangeValue.from = undefined;
+    defaultRangeValue.to = undefined;
+  } else {
+    defaultRangeValue.from = moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP);
+    defaultRangeValue.to = moment().format(DateTime.Formats.TIMESTAMP);
+  }
+
   const [activeTab, setActiveTab] = useState(originalRangeValue?.type || 'disabled');
 
   const _setDisableApply = (isDisabled: boolean) => {
@@ -113,7 +127,10 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   };
 
   const onSelect = (newType) => {
-    nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
+    if (nextRangeValue?.type) {
+      nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
+    }
+
     setActiveTab(newType);
   };
 
@@ -151,7 +168,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                    arrowOffsetLeft={34}>
       <Row>
         <Col md={12}>
-          <TimeRangeLivePreview timerange={currentTimerange} />
+          <TimeRangeLivePreview timerange={currentTimerange || defaultRangeValue} />
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
@@ -165,7 +182,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                 <p>No Override to Date.</p>
               </Tab>
             )}
-            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, _setDisableApply, currentTimerange)}
+            {timeRangeTypeTabs(activeTab, originalRangeValue || defaultRangeValue, limitDuration, _setDisableApply, currentTimerange)}
           </StyledTabs>
         </Col>
       </Row>
