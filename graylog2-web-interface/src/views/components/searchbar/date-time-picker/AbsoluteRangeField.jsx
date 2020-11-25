@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -21,7 +21,11 @@ import type { ThemeInterface } from 'theme';
 type Props = {
   disabled: boolean,
   from: boolean,
-  currentTimerange: {
+  currentTimerange?: {
+    from: string,
+    to: string,
+  },
+  originalTimeRange: {
     from: string,
     to: string,
   },
@@ -170,14 +174,15 @@ const _isDayAfter = ({ from, to }) => {
   return '';
 };
 
-const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, setDisableApply }: Props) => {
+const AbsoluteRangeField = ({ disabled, limitDuration, from, originalTimeRange, currentTimerange, setDisableApply }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
   const [timeRangeError, setTimeRangeError] = useState('');
+  const timerange = useMemo(() => ({ ...originalTimeRange, ...currentTimerange }), [originalTimeRange, currentTimerange]);
 
   useEffect(() => {
-    setTimeRangeError(_isDayAfter(currentTimerange));
-  }, [currentTimerange]);
+    setTimeRangeError(_isDayAfter(timerange));
+  }, [timerange]);
 
   return (
     <Field name={`tempTimeRange[${range}]`} validate={_isValidDateString}>
@@ -185,7 +190,11 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, s
         setDisableApply(!!error || !!timeRangeError);
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
-        const dateTime = error ? currentTimerange[range] : value || currentTimerange[range];
+        if (!value) {
+          _onChange(timerange[range]);
+        }
+
+        const dateTime = error ? timerange[range] : value || timerange[range];
         const {
           initialDateTime,
           handleChangeSetTime,
@@ -221,7 +230,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, s
           _onChange(newDate);
         };
 
-        let fromDate = moment(currentTimerange.from).toDate();
+        let fromDate = moment(timerange.from).toDate();
 
         if (from) {
           fromDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
@@ -232,7 +241,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, s
             <DateInputWithPicker disabled={disabled}
                                  onChange={_onChangeDate}
                                  onBlur={onBlur}
-                                 value={value || currentTimerange[range]}
+                                 value={value || timerange[range]}
                                  // $FlowFixMe - flow is mad about mixed types, ignore until we move to TSX
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
@@ -313,6 +322,10 @@ AbsoluteRangeField.propTypes = {
   currentTimerange: PropTypes.shape({
     from: PropTypes.string,
     to: PropTypes.string,
+  }),
+  originalTimeRange: PropTypes.shape({
+    from: PropTypes.string,
+    to: PropTypes.string,
   }).isRequired,
   disabled: PropTypes.bool,
   limitDuration: PropTypes.number,
@@ -322,6 +335,7 @@ AbsoluteRangeField.propTypes = {
 AbsoluteRangeField.defaultProps = {
   disabled: false,
   limitDuration: 0,
+  currentTimerange: undefined,
   setDisableApply: () => {},
 };
 

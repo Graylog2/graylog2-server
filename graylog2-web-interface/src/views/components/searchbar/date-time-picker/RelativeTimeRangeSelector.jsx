@@ -137,6 +137,11 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
       <Field name="tempTimeRange.range" validate={_isValidRange}>
         {({ field: { value, onChange, name }, meta: { error } }) => {
           setDisableApply(!!error);
+          const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+
+          // if (!value) {
+          //   _onChange(originalTimeRange.range);
+          // }
 
           const fromValue = RANGE_TYPES.map(({ type }) => {
             const isAllTime = value === 0;
@@ -159,17 +164,17 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
           const _onChangeTime = (event) => {
             const newTimeValue = moment.duration(event.target.value, fromValue.rangeType).asSeconds();
 
-            onChange({ target: { name, value: newTimeValue } });
+            _onChange(newTimeValue);
           };
 
           const _onChangeType = (type) => {
             const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
 
-            onChange({ target: { name, value: newTimeValue } });
+            _onChange(newTimeValue);
           };
 
           const _onCheckAllTime = (event) => {
-            onChange({ target: { name, value: event.target.checked ? 0 : originalTimeRange.range } });
+            _onChange(event.target.checked ? 0 : originalTimeRange.range);
           };
 
           return (

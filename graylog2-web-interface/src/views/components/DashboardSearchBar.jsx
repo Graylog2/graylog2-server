@@ -54,6 +54,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
         <Col md={12}>
           <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => {
+              // console.log({ values });
+
               return (
                 <>
                   <TopRow>
