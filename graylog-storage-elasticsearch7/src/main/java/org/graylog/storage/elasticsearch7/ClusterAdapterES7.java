@@ -137,7 +137,9 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     @Override
     public Optional<String> nodeIdToHostName(String nodeId) {
         return nodeById(nodeId)
-                .map(jsonNode -> jsonNode.get("host").asText());
+                .map(jsonNode -> jsonNode.path("host"))
+                .filter(host -> !host.isMissingNode())
+                .map(JsonNode::asText);
     }
 
     private Optional<JsonNode> nodeById(String nodeId) {
