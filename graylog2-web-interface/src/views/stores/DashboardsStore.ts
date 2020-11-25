@@ -86,7 +86,10 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
             pagination: this.pagination,
           });
 
-          return response;
+          return {
+            list: this.dashboards,
+            pagination: this.pagination,
+          };
         })
         .catch((error) => {
           UserNotification.error(`Fetching dashboards failed with status: ${error}`,
