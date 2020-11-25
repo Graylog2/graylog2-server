@@ -51,7 +51,7 @@ const widgetConfig = AggregationWidgetConfig
     PivotGenerator('bar', FieldType.Unknown),
     PivotGenerator(field, FieldType.Unknown),
   ]);
-const widget = AggregationWidget.builder().newId().config(widgetConfig).build();
+const widget: Widget = AggregationWidget.builder().newId().config(widgetConfig).build();
 
 describe('ShowDocumentsHandler', () => {
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe('ShowDocumentsHandler', () => {
   });
 
   it('adds a new message widget', () => {
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
       });

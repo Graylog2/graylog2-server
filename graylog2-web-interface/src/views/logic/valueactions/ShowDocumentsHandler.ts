@@ -19,12 +19,12 @@ import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
+import { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import View from '../views/View';
 import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 import { TitlesActions } from '../../stores/TitlesStore';
@@ -32,7 +32,6 @@ import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidget
 
 type Contexts = {
   valuePath: ValuePath,
-  view: View,
   widget: Widget,
 };
 
@@ -49,7 +48,7 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
     .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 };
 
-const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
+const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: ActionHandlerArguments & Arguments) => {
   const mergedObject = valuePath.reduce((elem, acc) => ({
     ...acc,
     ...elem,

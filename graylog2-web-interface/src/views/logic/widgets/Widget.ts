@@ -54,7 +54,7 @@ class Widget {
     return this._value.type;
   }
 
-  get config(): any {
+  get config() {
     return this._value.config;
   }
 
@@ -90,7 +90,7 @@ class Widget {
       streams,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Map({ id, type, config, filter, timerange, query, streams }));
   }
 
@@ -216,6 +216,7 @@ class Builder {
 Widget.Builder = Builder;
 
 const SingletonWidget = singleton('views.logic.widgets.Widget', () => Widget);
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type SingletonWidget = InstanceType<typeof Widget>;
 
 export default SingletonWidget;
