@@ -192,16 +192,38 @@ const AppRouter = () => {
                                path={Routes.show_alert_condition(':streamId', ':conditionId')}
                                component={EditAlertConditionPage} />
                         <Route exact path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-                        <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />
-                        <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
-                        <Route exact path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
-                        <Route exact path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage} />
-                        <Route exact path={Routes.new_extractor(':nodeId', ':inputId')} component={CreateExtractorsPage} />
-                        <Route exact
-                               path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')}
-                               component={EditExtractorsPage} />
-                        <Route exact path={Routes.import_extractors(':nodeId', ':inputId')} component={ImportExtractorsPage} />
-                        <Route exact path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage} />
+
+                        {!isCloud && <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />}
+                        {!isCloud && <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />}
+                        {!isCloud && (
+                          <Route exact path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.local_input_extractors(':nodeId', ':inputId')}
+                                 component={ExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.new_extractor(':nodeId', ':inputId')}
+                                 component={CreateExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')}
+                                 component={EditExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.import_extractors(':nodeId', ':inputId')}
+                                 component={ImportExtractorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.export_extractors(':nodeId', ':inputId')}
+                                 component={ExportExtractorsPage} />
+                        )}
+
                         <Route exact path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage} />
 
                         <Route exact path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
