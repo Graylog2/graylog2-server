@@ -17,7 +17,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppConfig from 'util/AppConfig';
 import { Link } from 'components/graylog/router';
 import { Col, Label, Row } from 'components/graylog';
 import StreamLink from 'components/streams/StreamLink';
@@ -78,6 +80,14 @@ class MessageDetail extends React.Component {
   _formatReceivedBy = (sourceNodeId, sourceInputId) => {
     if (!sourceNodeId) {
       return null;
+    }
+
+    const cloudPlugin = PluginStore.exports('cloud');
+    const ForwarderReceivedBy = cloudPlugin?.[0]?.ForwarderReceivedBy;
+    const IsLocalNode = cloudPlugin?.[0]?.IsLocalNode;
+
+    if (IsLocalNode && !IsLocalNode(sourceNodeId)) {
+      return <ForwarderReceivedBy inputId={sourceInputId} forwarderNodeId={sourceNodeId} />;
     }
 
     return (
