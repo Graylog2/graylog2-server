@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 class NotificationsFactory {
   static getForNotification(notification) {
@@ -123,8 +124,10 @@ class NotificationsFactory {
             <span>
               Input {notification.details.input_id} has failed to start on node {notification.node_id} for this reason:
               »{notification.details.reason}«. This means that you are unable to receive any messages from this input.
-              This is mostly an indication for a misconfiguration or an error. You can click {' '}
-              <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              This is mostly an indication for a misconfiguration or an error.
+              <HideOnCloud>
+                You can click <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              </HideOnCloud>
             </span>
           ),
         };
@@ -169,7 +172,9 @@ class NotificationsFactory {
             <span>
               There is a node without any running inputs. This means that you are not receiving any messages from this
               node at this point in time. This is most probably an indication of an error or misconfiguration.
-              You can click <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              <HideOnCloud>
+                You can click <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
+              </HideOnCloud>
             </span>
           ),
         };

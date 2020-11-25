@@ -7,6 +7,7 @@ import { DropdownButton, DropdownSubmenu, MenuItem, Button } from 'components/gr
 import { ExternalLinkButton, IfPermitted } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
 const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
@@ -82,11 +83,13 @@ class NodesActions extends React.Component {
             </IfPermitted>
           </IfPermitted>
 
-          <IfPermitted permissions="inputs:read">
-            <LinkContainer to={Routes.node_inputs(this.props.node.node_id)}>
-              <MenuItem>Local message inputs</MenuItem>
-            </LinkContainer>
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="inputs:read">
+              <LinkContainer to={Routes.node_inputs(this.props.node.node_id)}>
+                <MenuItem>Local message inputs</MenuItem>
+              </LinkContainer>
+            </IfPermitted>
+          </HideOnCloud>
           <IfPermitted permissions="threads:dump">
             <LinkContainer to={Routes.SYSTEM.THREADDUMP(this.props.node.node_id)}>
               <MenuItem>Get thread dump</MenuItem>
