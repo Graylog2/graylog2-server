@@ -16,26 +16,20 @@
  */
 // @flow strict
 
+import * as React from 'react';
+
 import AppConfig from '../AppConfig';
 
-type MenuItem = { path: string };
+type HideOnCloudProps = {
+  children: React.Node;
+};
 
-function filterMenuItems(
-  menuItems: Array<MenuItem>,
-  toExclude: Array<string>,
-): Array<MenuItem> {
-  return menuItems.filter((item) => !toExclude.includes(item.path));
-}
-
-export function filterCloudMenuItems(
-  menuItems: Array<MenuItem>,
-  toExclude: Array<string>,
-): Array<MenuItem> {
-  if (!AppConfig.isCloud()) {
-    return menuItems;
+function HideOnCloud({ children }: HideOnCloudProps) {
+  if (AppConfig.isCloud()) {
+    return null;
   }
 
-  return filterMenuItems(menuItems, toExclude);
+  return children;
 }
 
-export default filterMenuItems;
+export default HideOnCloud;
