@@ -44,6 +44,7 @@ import Tab from './Tab';
 import Tabs from './Tabs';
 import Tooltip from './Tooltip';
 import Well from './Well';
+import OverlayTrigger from './OverlayTrigger';
 
 export {
   Alert,
@@ -66,6 +67,7 @@ export {
   Nav,
   Navbar,
   NavDropdown,
+  OverlayTrigger,
   Panel,
   Popover,
   ProgressBar,
