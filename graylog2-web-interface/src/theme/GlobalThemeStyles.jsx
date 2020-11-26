@@ -105,6 +105,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   input.form-control,
   select.form-control,
+  textarea,
   textarea.form-control {
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
