@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { useCallback, useContext, useState } from 'react';
 
-import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
 
@@ -25,8 +23,8 @@ import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
+import CurrentUserContext from '../contexts/CurrentUserContext';
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { PreferencesStore } = CombinedProvider.get('Preferences');
 
 type CurrentUser = {
@@ -39,12 +37,10 @@ type CurrentUser = {
 
 const useCurrentThemeMode = (): [string, (newThemeMode: string) => void] => {
   const browserThemePreference = usePrefersColorScheme();
+  const userStore = useContext(CurrentUserContext);
 
-  const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
-    username: (userStore as CurrentUser)?.currentUser?.username,
-    // eslint-disable-next-line camelcase
-    userIsReadOnly: (userStore as CurrentUser)?.currentUser?.read_only ?? true,
-  }));
+  const userIsReadOnly = (userStore as CurrentUser)?.currentUser?.read_only ?? true;
+  const username = (userStore as CurrentUser)?.currentUser?.username;
 
   const userPreferences = useContext(UserPreferencesContext);
   const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
@@ -52,7 +48,6 @@ const useCurrentThemeMode = (): [string, (newThemeMode: string) => void] => {
   const [currentThemeMode, setCurrentThemeMode] = useState<string>(initialThemeMode);
 
   const changeCurrentThemeMode = useCallback((newThemeMode: string) => {
-    setCurrentThemeMode(newThemeMode);
     Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 
     if (!userIsReadOnly) {
@@ -60,6 +55,8 @@ const useCurrentThemeMode = (): [string, (newThemeMode: string) => void] => {
 
       PreferencesStore.saveUserPreferences(username, nextPreferences);
     }
+
+    setCurrentThemeMode(newThemeMode);
   }, [userIsReadOnly, userPreferences, username]);
 
   return [currentThemeMode, changeCurrentThemeMode];
