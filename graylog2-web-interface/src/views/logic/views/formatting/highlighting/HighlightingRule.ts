@@ -52,11 +52,11 @@ export default class HighlightingRule {
   }
 
   get condition() {
-    return this._value.condition;
+    return this._value.condition ?? '==';
   }
 
   get conditionFunc() {
-    return highlightConditionFunctions[this._value.condition || '=='];
+    return highlightConditionFunctions[this._value.condition ?? '=='];
   }
 
   get color() {
