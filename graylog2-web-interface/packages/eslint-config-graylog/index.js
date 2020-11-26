@@ -22,13 +22,6 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.js', '*.jsx'],
-      extends: [
-        'plugin:flowtype/recommended',
-      ],
-      plugins: ['flowtype'],
-    },
-    {
       files: ['*.ts', '*.tsx'],
       parser: '@typescript-eslint/parser',
       plugins: ['@typescript-eslint/eslint-plugin'],
@@ -127,23 +120,6 @@ module.exports = {
         next: ['block', 'multiline-block-like', 'class', 'multiline-expression', 'return'],
       },
     ],
-
-    // eslint-plugin-flowtype configs, `recommended` is too weak in a couple of places:
-    'flowtype/delimiter-dangle': [1, 'always-multiline'],
-    'flowtype/no-weak-types': [
-      2,
-      {
-        any: false,
-      },
-    ],
-    'flowtype/require-valid-file-annotation': [
-      2,
-      'never', {
-        annotationStyle: 'line',
-        strict: true,
-      },
-    ],
-    'flowtype/semi': [2, 'always'],
   },
   settings: {
     'import/resolver': {

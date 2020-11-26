@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { WidgetStore, WidgetActions } from 'views/stores/WidgetStore';
 import type { FieldActionHandler } from 'views/logic/fieldactions/FieldActionHandler';
 

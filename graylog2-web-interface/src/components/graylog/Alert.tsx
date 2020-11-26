@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports

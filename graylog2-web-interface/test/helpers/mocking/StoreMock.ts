@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 type MockMethod = string | [string, Function];
 
 export default function MockStore(...args: Array<MockMethod>) {

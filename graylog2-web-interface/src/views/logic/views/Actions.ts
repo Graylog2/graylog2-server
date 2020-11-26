@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import { newDashboardsPath } from 'views/Constants';

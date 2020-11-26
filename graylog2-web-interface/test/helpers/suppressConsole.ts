@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 
 /**
  * This helper function allows to suppress console errors which would lead to test failures in some, very rare cases.

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import { HighlightingRulesActions, HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';

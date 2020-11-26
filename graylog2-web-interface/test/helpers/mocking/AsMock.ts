@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 
 const asMock = <Fn extends ((...args: any[]) => any)>(fn: Fn) => fn as unknown as jest.Mock<ReturnType<Fn>, Parameters<Fn>>;
 
