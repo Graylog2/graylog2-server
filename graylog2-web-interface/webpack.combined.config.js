@@ -14,29 +14,47 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
 const merge = require('webpack-merge');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const TARGET = process.env.npm_lifecycle_event;
+const WEB_MODULES = path.resolve(__dirname, './web-modules.json');
 
-const pluginConfigPattern = 'graylog-plugin-*/**/webpack.config.js';
-const globCwd = '../..';
-const globOptions = {
-  ignore: '**/node_modules/**',
-  cwd: globCwd,
-  nodir: true,
+const configsFromWebModule = (webModulesFile) => {
+  const webModules = JSON.parse(fs.readFileSync(webModulesFile));
+  return webModules.modules
+    .map(({ path }) => path)
+    .filter(path => path.includes('graylog-plugin'))
+    .map(path => `${path}/webpack.config.js`);
 };
 
-function isNotDependency(pluginConfig) {
-  // Avoid including webpack configs of dependencies and built files.
-  return !pluginConfig.includes('/target/') && !pluginConfig.includes('/node_modules/');
+const configsFromGlob = () => {
+  const pluginConfigPattern = 'graylog-plugin-*/**/webpack.config.js';
+  const globCwd = '../..';
+  const globOptions = {
+    ignore: '**/node_modules/**',
+    cwd: globCwd,
+    nodir: true,
+  };
+
+  function isNotDependency(pluginConfig) {
+    // Avoid including webpack configs of dependencies and built files.
+    return !pluginConfig.includes('/target/') && !pluginConfig.includes('/node_modules/');
+  }
+
+  return glob.sync(pluginConfigPattern, globOptions)
+    .map((config) => `${globCwd}/${config}`)
+    .filter(isNotDependency);
 }
 
-const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions)
-  .map((config) => `${globCwd}/${config}`)
-  .filter(isNotDependency);
+const pluginConfigs = process.env.disable_plugins === 'true'
+  ? []
+  : fs.existsSync(WEB_MODULES)
+    ? configsFromWebModule(WEB_MODULES)
+    : configsFromGlob();
 
 process.env.web_src_path = path.resolve(__dirname);
 
