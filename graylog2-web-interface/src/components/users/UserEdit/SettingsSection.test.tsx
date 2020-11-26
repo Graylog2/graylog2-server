@@ -19,11 +19,8 @@ import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
 import { alice } from 'fixtures/users';
 import selectEvent from 'react-select-event';
 import { List } from 'immutable';
-import mockAction from 'helpers/mocking/MockAction';
 
-import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import SharedEntity from 'logic/permissions/SharedEntity';
-import { createGRN } from 'logic/permissions/GRN';
 import Grantee from 'logic/permissions/Grantee';
 
 import SettingsSection from './SettingsSection';
