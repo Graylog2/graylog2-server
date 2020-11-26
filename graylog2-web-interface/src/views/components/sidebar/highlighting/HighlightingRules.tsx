@@ -44,7 +44,7 @@ const HighlightingRules = () => {
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
         <div>Search terms</div>
       </HighlightingRuleGrid>
-      {rules.map((rule) => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}`} rule={rule} />)}
+      {rules.map((rule) => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}-${rule.condition}`} rule={rule} />)}
     </>
   );
 };

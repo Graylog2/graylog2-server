@@ -35,9 +35,16 @@ const StyledHeader = styled.h4`
   margin-bottom: 8px;
 `;
 
+const SubmitButton = styled(Button)`
+  margin-right: 3px;
+`;
+
 type Props = {
   onClose: () => void,
 };
+
+const numberConditionOptions = ['==', '!=', '<=', '>=', '<', '>'].map((cond) => ({ value: cond, label: cond }));
+const otherConditionOptions = ['==', '!='].map((cond) => ({ value: cond, label: cond }));
 
 const HighlightForm = ({ onClose }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
@@ -46,8 +53,8 @@ const HighlightForm = ({ onClose }: Props) => {
     : Immutable.List<FieldTypeMapping>();
   const fieldOptions = fields.map(({ name }) => ({ value: name, label: name })).toArray();
 
-  const onSubmit = ({ field, value, color }) => HighlightingRulesActions.add(
-    HighlightingRule.create(field, value, undefined, color),
+  const onSubmit = ({ field, value, color, condition }) => HighlightingRulesActions.add(
+    HighlightingRule.create(field, value, condition, color),
   ).then(onClose);
 
   return (
@@ -55,7 +62,12 @@ const HighlightForm = ({ onClose }: Props) => {
       <hr />
       <StyledHeader>New Highlight rule</StyledHeader>
       <Formik onSubmit={onSubmit}
-              initialValues={{ field: undefined, value: undefined, color: '#6fecc2' }}>
+              initialValues={{
+                field: undefined,
+                value: undefined,
+                condition: '==',
+                color: '#6fecc2',
+              }}>
         {() => (
           <Form className="form">
             <Field name="field">
@@ -69,6 +81,23 @@ const HighlightForm = ({ onClose }: Props) => {
                           placeholder="Pick a field" />
                 </Input>
               )}
+            </Field>
+            <Field name="condition">
+              {({ field: { name, value, onChange }, form: { values: { field: fieldValue } } }) => {
+                const fieldType = fields.find(({ name: fieldName }) => fieldName === fieldValue);
+                const { type } = fieldType?.type || { type: 'string' };
+
+                return (
+                  <Input id="condition-controls"
+                         label="Condition">
+                    <Select inputId="condition-select"
+                            onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                            options={type === 'long' ? numberConditionOptions : otherConditionOptions}
+                            value={value}
+                            placeholder="Choose a condition" />
+                  </Input>
+                );
+              }}
             </Field>
             <Field name="value">
               {({ field: { name, value, onChange } }) => (
@@ -95,7 +124,7 @@ const HighlightForm = ({ onClose }: Props) => {
                 </Input>
               )}
             </Field>
-            <Button type="submit">Create</Button>
+            <SubmitButton bsStyle="success" type="submit">Create</SubmitButton>
             <Button onClick={onClose}>Cancel</Button>
           </Form>
         )}

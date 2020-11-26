@@ -83,7 +83,7 @@ const onDelete = (e, rule) => {
 };
 
 const HighlightingRule = ({ rule }: Props) => {
-  const { field, value, color } = rule;
+  const { field, value, color, condition } = rule;
 
   return (
     <HighlightingRuleGrid>
@@ -94,7 +94,7 @@ const HighlightingRule = ({ rule }: Props) => {
                           triggerNode={<ColorPreview color={color} />}
                           onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)} />
       <div>
-        for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
+        for <strong>{field}</strong> {condition} <i>&quot;{value}&quot;</i>.
       </div>
       <DeleteIcon role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
         <Icon name="trash-alt" type="regular" />
