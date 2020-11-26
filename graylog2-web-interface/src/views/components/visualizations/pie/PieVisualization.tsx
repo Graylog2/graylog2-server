@@ -64,10 +64,8 @@ const getChartColor = (fullDataArray, name) => {
 
   if (fullData && fullData.labels && fullData.marker && fullData.marker.colors) {
     const indexOfName = fullData.labels.indexOf(name);
-    // $FlowFixMe the check above ensures the presents of marker
     const { marker: { colors } } = fullData;
 
-    // $FlowFixMe the check above ensures the presents of colors
     return colors[indexOfName];
   }
 

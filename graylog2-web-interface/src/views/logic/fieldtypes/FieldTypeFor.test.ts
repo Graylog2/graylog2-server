@@ -27,7 +27,6 @@ describe('FieldTypeFor', () => {
   });
 
   it('returns `FieldType.Unknown` if field types are `undefined`', () => {
-    // $FlowFixMe: Passing `undefined` types on purpose
     expect(fieldTypeFor('', undefined)).toEqual(FieldType.Unknown);
   });
 

@@ -84,7 +84,6 @@ describe('ActionHandler', () => {
     return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} })
       .then(() => {
         const state: ActionComponents = setState.mock.calls[0][0];
-        // $FlowFixMe: Object.value's signature is in the way
         const component: { props: ActionComponentProps } = Object.values(state)[0];
         const { onClose } = component.props;
 

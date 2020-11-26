@@ -77,7 +77,6 @@ describe('MessageTable', () => {
     suppressConsole(() => {
       const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
                                           config={config}
-                                          // $FlowFixMe: violating contract on purpose
                                           fields={undefined}
                                           onSortChange={() => Promise.resolve()}
                                           selectedFields={Immutable.Set()}

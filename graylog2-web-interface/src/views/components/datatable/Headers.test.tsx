@@ -134,7 +134,6 @@ describe('Headers', () => {
 
       mount((
         <RenderHeaders series={series}
-                       // $FlowFixMe: Passing `null` fields on purpose
                        fields={null} />
       ));
     });

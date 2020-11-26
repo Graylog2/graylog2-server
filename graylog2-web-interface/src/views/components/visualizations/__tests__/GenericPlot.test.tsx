@@ -129,7 +129,6 @@ describe('GenericPlot', () => {
       const data = fullData.find((d) => (d.name === name));
 
       if (data && data.marker && data.marker.color) {
-        // $FlowFixMe the check above ensures the presents of marker
         const { marker: { color } } = data;
 
         return color;

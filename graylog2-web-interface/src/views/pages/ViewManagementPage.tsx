@@ -18,7 +18,6 @@ import * as React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/graylog';

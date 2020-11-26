@@ -110,7 +110,6 @@ describe('DrilldownContextProvider', () => {
     it('passes values from current query if present', () => {
       const query = Query.builder()
         .query(createElasticsearchQueryString('foo:"bar"'))
-        // $FlowFixMe: We know it is defined
         .filter(filtersForQuery(['onestream', 'anotherstream']))
         .timerange({ type: 'keyword', keyword: 'last year' })
         .build();
