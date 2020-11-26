@@ -14,16 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-
 const arrowSize = 10;
-const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
+const Tooltip = styled(BootstrapTooltip)(({ theme }) => css`
   &.in {
     opacity: 1;
     filter: drop-shadow(0 0 3px ${theme.colors.variant.lighter.default});
@@ -81,64 +77,4 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 `);
 
-const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft }) => {
-  return (
-    <ThemeAndUserProvider>
-      <StyledTooltip className={className}
-                     id={id}
-                     placement={placement}
-                     positionTop={positionTop}
-                     positionLeft={positionLeft}
-                     arrowOffsetTop={arrowOffsetTop}
-                     arrowOffsetLeft={arrowOffsetLeft}>
-        {children}
-      </StyledTooltip>
-    </ThemeAndUserProvider>
-  );
-};
-
-Tooltip.propTypes = {
-  className: PropTypes.string,
-  children: PropTypes.node.isRequired,
-  /**
-   * An html id attribute, necessary for accessibility
-   * @type {string|number}
-   * @required
-   */
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-
-  /**
-   * Sets the direction the Tooltip is positioned towards.
-   */
-  placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-
-  /**
-   * The "top" position value for the Tooltip.
-   */
-  positionTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  /**
-   * The "left" position value for the Tooltip.
-   */
-  positionLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-
-  /**
-   * The "top" position value for the Tooltip arrow.
-   */
-  arrowOffsetTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  /**
-   * The "left" position value for the Tooltip arrow.
-   */
-  arrowOffsetLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-};
-
-Tooltip.defaultProps = {
-  className: undefined,
-  placement: 'right',
-  positionTop: undefined,
-  positionLeft: undefined,
-  arrowOffsetTop: undefined,
-  arrowOffsetLeft: undefined,
-};
-
-/** @component */
 export default Tooltip;
