@@ -22,8 +22,6 @@ import FetchError from 'logic/errors/FetchError';
 
 import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 
-jest.unmock('logic/rest/FetchProvider');
-
 describe('UnauthorizedErrorPage', () => {
   it('displays fetch error', () => {
     suppressConsole(async () => {

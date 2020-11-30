@@ -22,8 +22,6 @@ import FetchError from 'logic/errors/FetchError';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
-jest.unmock('logic/rest/FetchProvider');
-
 describe('StreamPermissionErrorPage', () => {
   it('displays fetch error', () => {
     const response = { status: 403, body: { message: 'The request error message', streams: ['stream-1-id', 'stream-2-id'], type: 'MissingStreamPermission' } };

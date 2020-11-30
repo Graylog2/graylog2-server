@@ -26,7 +26,6 @@ import FetchError from 'logic/errors/FetchError';
 
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
-jest.unmock('logic/rest/FetchProvider');
 jest.mock('routing/withLocation', () => (Component) => (props) => <Component {...props} location={{ pathname: '/' }} />);
 
 describe('ReportedErrorBoundary', () => {
