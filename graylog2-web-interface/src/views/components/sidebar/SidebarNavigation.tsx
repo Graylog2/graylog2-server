@@ -16,9 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
-
-import type { ThemeInterface } from 'theme';
 
 import NavItem from './NavItem';
 import { SidebarSection } from './sidebarSections';
@@ -31,7 +28,7 @@ type Props = {
   toggleSidebar: () => void,
 };
 
-const Container: StyledComponent<{isOpen: boolean, sidebarIsPinned: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ isOpen, sidebarIsPinned, theme }) => css`
+const Container = styled.div<{ isOpen: boolean, sidebarIsPinned: boolean }>(({ isOpen, sidebarIsPinned, theme }) => css`
   background: ${theme.colors.global.navigationBackground};
   color: ${theme.utils.contrastingColor(theme.colors.global.navigationBackground, 'AA')};
   box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};

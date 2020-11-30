@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 
-const Wrapper: StyledComponent<{active?: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, active }) => `
+const Wrapper = styled.div<{ active: boolean }>(({ theme, active }) => `
   color: ${active ? theme.colors.variant.success : theme.colors.variant.default};
 `);
 

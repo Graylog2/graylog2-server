@@ -16,7 +16,6 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 /**
  * This component will calculate the largest possible font size for the provided child.
@@ -27,7 +26,7 @@ import type { StyledComponent } from 'styled-components';
 const TOLERANCE = 0.05;
 const CHILD_SIZE_RATIO = 0.8; // Proportion of the child size in relation to the container
 
-const FontSize: StyledComponent<{ fontSize: number }, {}, HTMLDivElement> = styled.div`
+const FontSize = styled.div<{ fontSize: number }>`
   height: 100%;
   width: 100%;
   font-size: ${(props) => `${props.fontSize}px`};

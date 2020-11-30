@@ -16,7 +16,6 @@
  */
 import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -39,7 +38,7 @@ import AutoFontSizer from './AutoFontSizer';
 
 import type { CurrentViewType } from '../../CustomPropTypes';
 
-const GridContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const GridContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 4fr 1fr;

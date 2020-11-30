@@ -16,10 +16,8 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import type { ViewType } from 'views/logic/views/View';
-import type { ThemeInterface } from 'theme';
 import { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { IconButton } from 'components/common';
@@ -35,7 +33,7 @@ type Props = {
   viewMetadata: ViewMetadata,
 };
 
-export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => css`
+export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
   position: ${sidebarIsPinned ? 'relative' : 'fixed'};
   width: 270px;
   height:  ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; // subtract the nav height
@@ -86,7 +84,7 @@ const Header = styled.div`
   -ms-grid-row: 1;
 `;
 
-const SearchTitle: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const SearchTitle = styled.div`
   height: 35px;
   display: grid;
   display: -ms-grid;
@@ -113,7 +111,7 @@ const Title = styled.h1`
   line-height: 1.5;
 `;
 
-const OverlayToggle: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => css`
+const OverlayToggle = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
   > * {
     font-size: ${theme.fonts.size.large};
     color: ${sidebarIsPinned ? theme.colors.variant.info : theme.colors.gray[30]};

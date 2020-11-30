@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent, css } from 'styled-components';
+import styled from 'styled-components';
 import numeral from 'numeral';
 
-import type { ThemeInterface } from 'theme';
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
@@ -32,7 +31,7 @@ type Props = {
   trendPreference: TrendPreference,
 };
 
-const Background: StyledComponent<{ trend: string | undefined | null }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
+const Background = styled.div<{ trend: string | undefined | null }>(({ theme, trend }) => {
   const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 

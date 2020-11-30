@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
-
-import type { ThemeInterface } from 'theme';
+import styled from 'styled-components';
 
 import CountBadge from './CountBadge';
 
@@ -26,7 +24,7 @@ type Props = {
   listing: React.ReactElement,
 };
 
-const Listing: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Listing = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

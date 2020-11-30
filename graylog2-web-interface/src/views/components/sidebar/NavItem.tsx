@@ -17,9 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 
 type Props = {
@@ -37,7 +35,7 @@ type ContainerProps = {
   sidebarIsPinned: boolean,
 };
 
-const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const Title = styled.div(({ theme }) => css`
   display: none;
   position: absolute;
   padding: 0 10px;
@@ -60,7 +58,7 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   }
 `);
 
-const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span`
+const IconWrap = styled.span`
   display: flex;
   width: 100%;
   height: 100%;
@@ -79,8 +77,8 @@ const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.sp
   }
 `;
 
-const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover, sidebarIsPinned }) => css`
-  position: relative;
+const Container = styled.div<ContainerProps>(({ theme, isSelected, showTitleOnHover, sidebarIsPinned }) => css`
+position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
   height: 40px;

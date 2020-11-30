@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { Col, Row, HelpBlock } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
@@ -39,7 +38,7 @@ const LabelCol = styled(ValueCol)(({ theme }) => css`
   }
 `);
 
-const BooleanIcon: StyledComponent<{value?: boolean}, ThemeInterface, Icon> = styled(Icon)(({ theme, value }) => `
+const BooleanIcon = styled(Icon)(({ theme, value }) => `
   color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
 `);
 

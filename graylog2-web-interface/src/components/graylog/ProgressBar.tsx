@@ -17,10 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import chroma from 'chroma-js';
-
-import type { ThemeInterface } from 'theme';
 
 type StyledBarProps = {
   animated: boolean,
@@ -71,7 +68,7 @@ const progressBarVariants = css(({ bsStyle, theme }) => {
   `;
 });
 
-const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const ProgressWrap = styled.div(({ theme }) => css`
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
@@ -82,7 +79,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled
   align-items: center;
 `);
 
-const Bar: StyledComponent<StyledBarProps, ThemeInterface, HTMLDivElement> = styled.div(({ animated, striped, theme, value }) => {
+const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => {
   const defaultStripColor = chroma(theme.colors.global.contentBackground).alpha(0.25).css();
 
   return css`

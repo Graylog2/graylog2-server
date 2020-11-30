@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
-
-const Wrapper: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
+const Wrapper = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

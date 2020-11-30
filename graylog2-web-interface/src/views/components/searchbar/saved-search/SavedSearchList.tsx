@@ -17,7 +17,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
@@ -25,7 +24,6 @@ import connect from 'stores/connect';
 import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
 import { Icon, PaginatedList, SearchForm } from 'components/common';
 import View from 'views/logic/views/View';
-import type { ThemeInterface } from 'theme';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {
@@ -41,18 +39,18 @@ type State = {
   perPage: number,
 };
 
-const AlertIcon: StyledComponent<{}, ThemeInterface, any> = styled(Icon)(({ theme }) => css`
+const AlertIcon = styled(Icon)(({ theme }) => css`
   margin-right: 6px;
   color: ${theme.colors.variant.primary};
 `);
 
-const NoSavedSearches: StyledComponent<{}, ThemeInterface, any> = styled(Alert)`
+const NoSavedSearches = styled(Alert)`
   clear: right;
   display: flex;
   align-items: center;
 `;
 
-const DeleteButton: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span`
+const DeleteButton = styled.span`
   position: absolute;
   top: 10px;
   right: 10px;

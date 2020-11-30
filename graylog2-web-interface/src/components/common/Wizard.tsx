@@ -17,22 +17,21 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 
 import Icon from './Icon';
 
-const SubnavigationCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)(({ theme }) => css`
+const SubnavigationCol = styled(Col)(({ theme }) => css`
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
-const HorizontalCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)`
+const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme }) => css`
+const StyledNav = styled(Nav)(({ theme }) => css`
   &.nav {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};

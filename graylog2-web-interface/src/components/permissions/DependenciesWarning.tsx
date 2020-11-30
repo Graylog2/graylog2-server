@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
@@ -27,7 +27,7 @@ type Props = {
   availableGrantees: GranteesList,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
+const Container = styled(Alert)`
   margin-top: 20px;
   max-height: 240px;
   overflow: auto;

@@ -17,12 +17,11 @@
 import * as React from 'react';
 import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import { Input } from 'components/bootstrap';
 
-const Wrapper: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
+const Wrapper = styled.div`
   margin-bottom: 5px;
 
   && .form-group {

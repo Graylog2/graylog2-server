@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { ThemeInterface } from 'theme';
 import IconButton from 'components/common/IconButton';
 
 import type { DescriptiveItem } from './PaginatedItemOverview';
@@ -28,7 +27,7 @@ type Props = {
   onDeleteItem?: (descriptiveItem: DescriptiveItem) => void,
 };
 
-const Container: StyledComponent<undefined, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const Container = styled.span(({ theme }) => css`
   display: flex;
   padding: 10px;
   background-color: ${theme.colors.table.background};
