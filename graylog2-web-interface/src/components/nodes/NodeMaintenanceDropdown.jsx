@@ -22,6 +22,7 @@ import { LinkContainer } from 'components/graylog/router';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { ExternalLink, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 class NodeMaintenanceDropdown extends React.Component {
   static propTypes = {
@@ -50,11 +51,13 @@ class NodeMaintenanceDropdown extends React.Component {
             <MenuItem>Metrics</MenuItem>
           </LinkContainer>
 
-          <IfPermitted permissions="loggers:read">
-            <LinkContainer to={Routes.SYSTEM.LOGGING}>
-              <MenuItem>Configure internal logging</MenuItem>
-            </LinkContainer>
-          </IfPermitted>
+          <HideOnCloud>
+            <IfPermitted permissions="loggers:read">
+              <LinkContainer to={Routes.SYSTEM.LOGGING}>
+                <MenuItem>Configure internal logging</MenuItem>
+              </LinkContainer>
+            </IfPermitted>
+          </HideOnCloud>
 
           <MenuItem href={apiBrowserURI} target="_blank">
             <ExternalLink>API Browser</ExternalLink>
