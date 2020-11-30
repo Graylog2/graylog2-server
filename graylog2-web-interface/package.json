@@ -77,7 +77,7 @@
     "react-isolated-scroll": "^0.1.1",
     "react-leaflet": "^2.3.0",
     "react-mops": "v2.0.0-beta.0",
-    "react-overlays": "^0.7.0",
+    "react-overlays": "^4.1.1",
     "react-plotly.js": "^2.4.0",
     "react-portal": "^4.2.0",
     "react-resizable": "^1.8.0",
