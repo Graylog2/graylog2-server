@@ -1,6 +1,23 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 const glob = require('glob');
 const path = require('path');
 const merge = require('webpack-merge');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const TARGET = process.env.npm_lifecycle_event;
 
@@ -31,7 +48,15 @@ const mergedPluginConfigs = pluginConfigs
   .map((configFile) => require(configFile))
   .reduce((config, pluginConfig) => merge.smart(config, pluginConfig), {});
 
-const finalConfig = merge.smart(mergedPluginConfigs, webpackConfig);
+const mergedWebpackConfig = (TARGET === 'start')
+  ? merge(webpackConfig, {
+    plugins: [
+      new ForkTsCheckerWebpackPlugin(),
+    ],
+  })
+  : webpackConfig;
+
+const finalConfig = merge.smart(mergedPluginConfigs, mergedWebpackConfig);
 
 // We need to inject webpack-hot-middleware to all entries, ensuring the app is able to reload on changes.
 if (TARGET === 'start') {

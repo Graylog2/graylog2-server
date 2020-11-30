@@ -1,8 +1,24 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 
 import UserNotification from 'util/UserNotification';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -49,7 +65,7 @@ const RulesStore = Reflux.createStore({
         'Could not retrieve processing rules');
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.list().url);
+    const url = qualifyUrl(ApiRoutes.RulesController.list().url);
 
     return fetch('GET', url).then((response) => {
       this.rules = response;
@@ -63,7 +79,7 @@ const RulesStore = Reflux.createStore({
         `Could not retrieve processing rule "${ruleId}"`);
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.get(ruleId).url);
+    const url = qualifyUrl(ApiRoutes.RulesController.get(ruleId).url);
     const promise = fetch('GET', url);
 
     promise.then(this._updateRulesState, failCallback);
@@ -77,7 +93,7 @@ const RulesStore = Reflux.createStore({
         `Could not save processing rule "${ruleSource.title}"`);
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.create().url);
+    const url = qualifyUrl(ApiRoutes.RulesController.create().url);
     const rule = {
       title: ruleSource.title,
       description: ruleSource.description,
@@ -88,6 +104,8 @@ const RulesStore = Reflux.createStore({
     promise.then((response) => {
       this._updateRulesState(response);
       UserNotification.success(`Rule "${response.title}" created successfully`);
+
+      return response;
     }, failCallback);
 
     RulesActions.save.promise(promise);
@@ -101,7 +119,7 @@ const RulesStore = Reflux.createStore({
         `Could not update processing rule "${ruleSource.title}"`);
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.update(ruleSource.id).url);
+    const url = qualifyUrl(ApiRoutes.RulesController.update(ruleSource.id).url);
     const rule = {
       id: ruleSource.id,
       title: ruleSource.title,
@@ -113,6 +131,8 @@ const RulesStore = Reflux.createStore({
     promise.then((response) => {
       this._updateRulesState(response);
       UserNotification.success(`Rule "${response.title}" updated successfully`);
+
+      return response;
     }, failCallback);
 
     RulesActions.update.promise(promise);
@@ -125,7 +145,7 @@ const RulesStore = Reflux.createStore({
         `Could not delete processing rule "${rule.title}"`);
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
+    const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
     return fetch('DELETE', url).then(() => {
       this.rules = this.rules.filter((el) => el.id !== rule.id);
@@ -134,7 +154,7 @@ const RulesStore = Reflux.createStore({
     }, failCallback);
   },
   parse(ruleSource, callback) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.parse().url);
+    const url = qualifyUrl(ApiRoutes.RulesController.parse().url);
     const rule = {
       title: ruleSource.title,
       description: ruleSource.description,
@@ -159,7 +179,7 @@ const RulesStore = Reflux.createStore({
     );
   },
   multiple(ruleNames, callback) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.multiple().url);
+    const url = qualifyUrl(ApiRoutes.RulesController.multiple().url);
     const promise = fetch('POST', url, { rules: ruleNames });
 
     promise.then(callback);
@@ -171,13 +191,13 @@ const RulesStore = Reflux.createStore({
       return undefined;
     }
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
+    const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
 
     return fetch('GET', url)
       .then(this._updateFunctionDescriptors);
   },
   loadMetricsConfig() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
+    const url = qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
     const promise = fetch('GET', url);
 
     promise.then(
@@ -193,7 +213,7 @@ const RulesStore = Reflux.createStore({
     RulesActions.loadMetricsConfig.promise(promise);
   },
   updateMetricsConfig(nextConfig) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
+    const url = qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
     const promise = fetch('PUT', url, nextConfig);
 
     promise.then(

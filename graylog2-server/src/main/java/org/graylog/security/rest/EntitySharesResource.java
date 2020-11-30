@@ -1,22 +1,21 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.security.rest;
 
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,7 +23,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.DBGrantService;
-import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDescriptor;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntityShareResponse;
@@ -56,7 +54,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
-import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -141,19 +138,5 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         } else {
             return Response.ok(entityShareResponse).build();
         }
-    }
-
-    @GET
-    @Path("entities/{entityGRN}")
-    public Response entityShares(@PathParam("entityGRN") @NotBlank String entityGRN) {
-        final GRN grn = grnRegistry.parse(entityGRN);
-
-        checkOwnership(grn);
-
-        // TODO: We need to make the return value of this resource more useful to the frontend
-        //       (e.g. returning a list of entities with title, etc.)
-        final List<GrantDTO> grants = grantService.getForTarget(grn);
-
-        return Response.ok(ImmutableMap.of("grants", grants)).build();
     }
 }
