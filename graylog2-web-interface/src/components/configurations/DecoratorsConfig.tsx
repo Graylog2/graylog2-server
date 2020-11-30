@@ -24,6 +24,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
+import { Decorator } from 'views/components/messagelist/decorators/Types';
 
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
@@ -37,7 +38,7 @@ const { DecoratorsActions } = CombinedProvider.get('Decorators');
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState<Array<Stream> | undefined>();
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
-  const [decorators, setDecorators] = useState();
+  const [decorators, setDecorators] = useState<Array<Decorator>>();
   const [types, setTypes] = useState();
   const configModal = useRef<BootstrapModalWrapper>();
 
