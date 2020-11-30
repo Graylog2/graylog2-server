@@ -139,9 +139,11 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['roles:read']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} description="Roles" />
       </IfPermitted>
-      <IfPermitted permissions={['authentication:edit']} anyPermissions>
-        <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} description="Authentication" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['authentication:edit']} anyPermissions>
+          <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} description="Authentication" />
+        </IfPermitted>
+      </HideOnCloud>
       <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>

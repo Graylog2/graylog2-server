@@ -301,15 +301,47 @@ const AppRouter = () => {
 
                         {!isCloud && <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />}
 
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} component={AuthenticationPage} />
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE} component={AuthenticationCreatePage} />
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW} component={AuthenticationOverviewPage} />
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')} component={AuthenticationBackendDetailsPage} />
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')} component={AuthenticationBackendEditPage} />
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')} component={AuthenticationBackendCreatePage} />
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}
+                                 component={AuthenticationPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}
+                                 component={AuthenticationCreatePage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW}
+                                 component={AuthenticationOverviewPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')}
+                                 component={AuthenticationBackendDetailsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')}
+                                 component={AuthenticationBackendEditPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')}
+                                 component={AuthenticationBackendCreatePage} />
+                        )}
 
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW} component={AuthenticatorsPage} />
-                        <Route exact path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT} component={AuthenticatorsEditPage} />
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW}
+                                 component={AuthenticatorsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT}
+                                 component={AuthenticatorsEditPage} />
+                        )}
 
                         <Route exact path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
                         <Route exact path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />
