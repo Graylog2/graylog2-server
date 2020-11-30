@@ -119,7 +119,7 @@
     "copy-webpack-plugin": "^6.1.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.2",
-    "css-loader": "^0.28.10",
+    "css-loader": "^5.0.1",
     "eslint-config-graylog": "file:packages/eslint-config-graylog",
     "eslint-loader": "^4.0.2",
     "estraverse-fb": "^1.3.1",
