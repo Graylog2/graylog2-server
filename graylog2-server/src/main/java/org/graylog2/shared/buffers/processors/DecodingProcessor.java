@@ -35,6 +35,7 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
     private final Journal journal;
+    private final MessageQueueAcknowledger acknowledger;
     private final Timer parseTime;
 
     @AssistedInject
@@ -70,12 +72,14 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                              final ServerStatus serverStatus,
                              final MetricRegistry metricRegistry,
                              final Journal journal,
+                             MessageQueueAcknowledger acknowledger,
                              @Assisted("decodeTime") Timer decodeTime,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
         this.journal = journal;
+        this.acknowledger = acknowledger;
 
         // these metrics are global to all processors, thus they are passed in directly to avoid relying on the class name
         this.parseTime = parseTime;
@@ -93,6 +97,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             LOG.error("Error processing message " + rawMessage, ExceptionUtils.getRootCause(e));
 
             // Mark message as processed to avoid keeping it in the journal.
+            acknowledger.acknowledge(rawMessage.getMessageQueueId());
             journal.markJournalOffsetCommitted(rawMessage.getJournalOffset());
 
             // always clear the event fields, even if they are null, to avoid later stages to process old messages.
@@ -189,6 +194,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         message.setJournalOffset(raw.getJournalOffset());
+        message.setMessageQueueId(raw.getMessageQueueId());
         message.recordTiming(serverStatus, "parse", decodeTime);
         metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);
 

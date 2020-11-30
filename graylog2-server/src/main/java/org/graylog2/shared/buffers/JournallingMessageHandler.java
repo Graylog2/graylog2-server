@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -93,56 +92,23 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             log.debug("End of batch, journalling {} messages", batch.size());
             // write batch to journal
 
-            final Converter converter = new Converter();
+            //final Converter converter = new Converter();
             final MessageJournalConverter messageJournalConverter = new MessageJournalConverter();
             // Needs to run before the other converter because that one is setting fields to null
             final ArrayList<MessageQueue.Entry> messageQueueEntries = Lists.newArrayList(transform(batch, messageJournalConverter));
             // copy to avoid re-running this all the time
-            final List<Journal.Entry> entries = Lists.newArrayList(transform(batch, converter));
+            //final List<Journal.Entry> entries = Lists.newArrayList(transform(batch, converter));
 
             // Remove all null values returned from the converter (might happen if the Converter throws an exception)
-            entries.removeAll(NULL_SINGLETON);
+            //entries.removeAll(NULL_SINGLETON);
             messageQueueEntries.removeAll(MESSAGE_JOURNAL_NULL_SINGLETON);
 
             // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
             // objects in there have been set to null and cannot be used anymore.
             batch.clear();
 
-            // Catch all exceptions that might happen during the journal write and retry the operation.
-            // This basically blocks if the journal write always throws an exception. Once the write succeeds, we will
-            // continue.
-            try {
-                try {
-                    messageQueueWriter.write(messageQueueEntries);
-                } catch (Exception e) {
-                    log.error("Unable to write to MessageJournal", e);
-                }
-                writeToJournal(converter, entries);
-
-                // The converter computed the latest receive timestamp of all messages in the batch so we don't have to
-                // call the update on the recorder service for every message. (less contention)
-                processingStatusRecorder.updateIngestReceiveTime(converter.getLatestReceiveTime());
-            } catch (Exception e) {
-                log.error("Unable to write to journal - retrying", e);
-
-                // Use retryer with exponential back-off to avoid spamming the logs.
-                JOURNAL_WRITE_RETRYER.call(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        writeToJournal(converter, entries);
-                        return null;
-                    }
-                });
-            }
+            messageQueueWriter.write(messageQueueEntries);
         }
-    }
-
-    private void writeToJournal(Converter converter, List<Journal.Entry> entries) {
-        final long lastOffset = journal.write(entries);
-        log.debug("Processed batch, wrote {} bytes, last journal offset: {}, signalling reader.",
-                converter.getBytesWritten(),
-                lastOffset);
-        journalFilled.release();
     }
 
     private class MessageJournalConverter implements Function<RawMessageEvent, MessageQueue.Entry> {

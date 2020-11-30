@@ -1,22 +1,30 @@
 package org.graylog2.shared.messageq;
 
 import com.google.inject.Scopes;
-import com.google.inject.name.Names;
 import org.graylog2.plugin.PluginModule;
-import org.graylog2.shared.messageq.pulsar.PulsarMessageQueueReader;
-import org.graylog2.shared.messageq.pulsar.PulsarMessageQueueWriter;
+import org.graylog2.shared.messageq.kafka.KafkaMessageQueueAcknowledger;
+import org.graylog2.shared.messageq.kafka.KafkaMessageQueueReader;
+import org.graylog2.shared.messageq.kafka.KafkaMessageQueueWriter;
 
 public class MessageQueueModule extends PluginModule {
-    public static final String INPUT_MESSAGE_QUEUE_TYPE = "input-message-queue-type";
 
     @Override
     protected void configure() {
-        bind(String.class).annotatedWith(Names.named(INPUT_MESSAGE_QUEUE_TYPE)).toInstance("pulsar");
+        // TODO unify with JournalReaderModule
 
-        serviceBinder().addBinding().to(PulsarMessageQueueWriter.class).in(Scopes.SINGLETON);
-        serviceBinder().addBinding().to(PulsarMessageQueueReader.class).in(Scopes.SINGLETON);
-        bind(MessageQueueReader.class).to(PulsarMessageQueueReader.class).in(Scopes.SINGLETON);
-        bind(MessageQueueWriter.class).to(PulsarMessageQueueWriter.class).in(Scopes.SINGLETON);
+        // Journal with Pulsar
+//        serviceBinder().addBinding().to(PulsarMessageQueueWriter.class).in(Scopes.SINGLETON);
+//        serviceBinder().addBinding().to(PulsarMessageQueueReader.class).in(Scopes.SINGLETON);
+//        bind(MessageQueueReader.class).to(PulsarMessageQueueReader.class).in(Scopes.SINGLETON);
+//        bind(MessageQueueWriter.class).to(PulsarMessageQueueWriter.class).in(Scopes.SINGLETON);
+//        bind(MessageQueueAcknowledger.class).to(PulsarMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
+
+        // Journal with Kafka
+        bind(MessageQueueReader.class).to(KafkaMessageQueueReader.class).in(Scopes.SINGLETON);
+        bind(MessageQueueWriter.class).to(KafkaMessageQueueWriter.class).in(Scopes.SINGLETON);
+        bind(MessageQueueAcknowledger.class).to(KafkaMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
+
+        // TODO no Journal
     }
 
 }

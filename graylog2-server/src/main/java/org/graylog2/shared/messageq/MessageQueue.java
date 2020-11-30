@@ -1,7 +1,6 @@
 package org.graylog2.shared.messageq;
 
 import com.google.common.util.concurrent.Service;
-import org.apache.pulsar.client.api.MessageId;
 
 import javax.annotation.Nullable;
 
@@ -18,7 +17,7 @@ public interface MessageQueue extends Service {
 
     interface Entry {
         @Nullable
-        MessageId commitId();
+        Object commitId();
 
         /**
          * The journal entry ID.
