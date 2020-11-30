@@ -14,13 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.schema;
+// @flow strict
 
-public class GeoFields {
-    public static final String GEO_CITY_NAME = "geo_city_name";
-    public static final String GEO_COUNTRY_ISO = "geo_country_iso";
-    public static final String GEO_COUNTRY_NAME = "geo_country_name";
-    public static final String GEO_COORDINATES = "geo_coordinates";
-    public static final String GEO_NAME = "geo_name";
-    public static final String GEO_STATE_NAME = "geo_state_name";
+import AppConfig from '../AppConfig';
+
+type ValueAction = { type: string };
+
+function filterValueActions(
+  items: Array<ValueAction>,
+  toExclude: Array<string>,
+): Array<ValueAction> {
+  return items.filter((item) => !toExclude.includes(item.type));
 }
+
+export function filterCloudValueActions(
+  valueActions: Array<ValueAction>,
+  toExclude: Array<string>,
+): Array<ValueAction> {
+  if (!AppConfig.isCloud()) {
+    return valueActions;
+  }
+
+  return filterValueActions(valueActions, toExclude);
+}
+
+export default filterValueActions;

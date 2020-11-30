@@ -20,6 +20,12 @@ import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldT
 import bindings from './bindings';
 import type { ActionHandlerCondition } from './components/actions/ActionHandler';
 
+jest.mock('util/AppConfig', () => ({
+  gl2ServerUrl: jest.fn(() => global.api_url),
+  gl2AppPathPrefix: jest.fn(() => ''),
+  isCloud: jest.fn(() => false),
+}));
+
 describe('Views bindings value actions', () => {
   const { valueActions } = bindings;
   type ValueAction = {
