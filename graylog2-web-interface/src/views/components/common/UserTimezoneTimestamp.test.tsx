@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import asMock from 'helpers/mocking/AsMock';
 
+import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UserJSON } from 'logic/users/User';
 
 import UserTimezoneTimestamp from './UserTimezoneTimestamp';
+
+jest.mock('util/AppConfig');
 
 const createCurrentUserWithTz = (tz: string): UserJSON => ({
   timezone: tz,
@@ -28,12 +32,14 @@ describe('UserTimezoneTimestamp', () => {
   });
 
   it('should default to system timezone to render timestamp', async () => {
+    asMock(AppConfig.rootTimeZone).mockReturnValue('Asia/Tokyo');
+
     render((
       <WithTimezone tz={undefined}>
         <UserTimezoneTimestamp dateTime="2020-11-30T11:09:00.950Z" />
       </WithTimezone>
     ));
 
-    await screen.findByText('2020-11-30 12:09:00.950 +01:00');
+    await screen.findByText('2020-11-30 20:09:00.950 +09:00');
   });
 });
