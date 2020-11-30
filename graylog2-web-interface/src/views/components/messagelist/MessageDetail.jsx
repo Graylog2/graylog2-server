@@ -87,9 +87,9 @@ class MessageDetail extends React.Component {
 
     const cloudPlugin = PluginStore.exports('cloud');
     const ForwarderReceivedBy = cloudPlugin?.[0]?.ForwarderReceivedBy;
-    const IsLocalNode = cloudPlugin?.[0]?.IsLocalNode;
+    const isLocalNode = cloudPlugin?.[0]?.isLocalNode;
 
-    if (IsLocalNode && !IsLocalNode(sourceNodeId)) {
+    if (isLocalNode && !isLocalNode(sourceNodeId)) {
       return <ForwarderReceivedBy inputId={sourceInputId} forwarderNodeId={sourceNodeId} />;
     }
 
