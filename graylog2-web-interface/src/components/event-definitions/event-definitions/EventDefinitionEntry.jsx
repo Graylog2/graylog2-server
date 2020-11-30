@@ -96,7 +96,7 @@ const EventDefinitionEntry = ({
           </Button>
         </LinkContainer>
       </IfPermitted>
-      <ShareButton entryId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
+      <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
           {toggle}

@@ -74,11 +74,17 @@ public class EntityDependencyResolver {
         final Map<GRN, Set<GRN>> targetOwners = grantService.getOwnersForTargets(dependencies);
 
         return dependencies.stream()
-                .map(dependency -> EntityDescriptor.create(
-                        dependency,
-                        entityExcerpts.get(dependency),
-                        getOwners(targetOwners.get(dependency))
-                ))
+                .map(dependency -> {
+                    String title = entityExcerpts.get(dependency);
+                    if (title == null) {
+                        title = "unknown dependency: <" + dependency + ">";
+                    }
+                    return EntityDescriptor.create(
+                            dependency,
+                            title,
+                            getOwners(targetOwners.get(dependency))
+                    );
+                })
                 .collect(ImmutableSet.toImmutableSet());
     }
 

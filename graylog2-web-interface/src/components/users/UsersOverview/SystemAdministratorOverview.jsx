@@ -33,7 +33,7 @@ const SystemAdministratorOverview = ({ adminUser, dataRowFormatter, headers, hea
     <Col xs={12}>
       <h2>System Administrator</h2>
       <p className="description">
-        The system administrator can only be edited in the graylog configuration file.
+        The system administrator can only be edited in the Graylog configuration file.
       </p>
       <DataTable id="users-overview"
                  className="table-hover"
