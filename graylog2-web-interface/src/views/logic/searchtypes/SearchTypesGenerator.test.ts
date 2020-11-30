@@ -54,8 +54,8 @@ describe('SearchTypesGenerator', () => {
     const widgetWithFilterId = widgetMapping.get('widgetWithFilter').first();
     const widgetWithoutFilterId = widgetMapping.get('widgetWithoutFilter').first();
 
-    const searchTypeWithFilter = searchTypes.find((w) => (w.get('id') === widgetWithFilterId), null, Immutable.Map()).toJS();
-    const searchTypeWithoutFilter = searchTypes.find((w) => (w.get('id') === widgetWithoutFilterId), null, Immutable.Map()).toJS();
+    const searchTypeWithFilter = searchTypes.find((w) => (w.id === widgetWithFilterId));
+    const searchTypeWithoutFilter = searchTypes.find((w) => (w.id === widgetWithoutFilterId));
 
     expect(searchTypeWithFilter.filter).toEqual({ query: 'source: foo', type: 'query_string' });
     expect(searchTypeWithoutFilter.filter).toBeUndefined();
@@ -70,10 +70,10 @@ describe('SearchTypesGenerator', () => {
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([widgetWithTimerange]);
 
-    const searchType = searchTypes.first();
+    const searchType = searchTypes[0];
 
-    expect(searchType.get('timerange')).toEqual(Immutable.Map({ type: 'keyword', keyword: 'yesterday' }));
-    expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.get('id')]));
+    expect(searchType.timerange).toEqual({ type: 'keyword', keyword: 'yesterday' });
+    expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.id]));
   });
 
   it('allows search type to override id', () => {
@@ -81,10 +81,10 @@ describe('SearchTypesGenerator', () => {
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([dummyWidget]);
 
-    const searchType = searchTypes.first();
+    const searchType = searchTypes[0];
 
-    expect(searchType.get('id')).toEqual('bar');
-    expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.get('id')]));
+    expect(searchType.id).toEqual('bar');
+    expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.id]));
   });
 
   it('allows search type to override query', () => {
@@ -96,9 +96,9 @@ describe('SearchTypesGenerator', () => {
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([widgetWithTimerange]);
 
-    const searchType = searchTypes.first();
+    const searchType = searchTypes[0];
 
-    expect(searchType.get('query')).toEqual(Immutable.Map({ type: 'elasticsearch', query_string: '_exists_:src_ip AND source:foo' }));
-    expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.get('id')]));
+    expect(searchType.query).toEqual({ type: 'elasticsearch', query_string: '_exists_:src_ip AND source:foo' });
+    expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.id]));
   });
 });

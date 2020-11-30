@@ -41,7 +41,7 @@ type SearchTypeBase = {
 /* eslint-disable camelcase */
 export type AggregationSearchType = SearchTypeBase & {
   sort: Array<SortConfig>,
-  series: Array<{id: string, type: string, field: string}>,
+  series: Array<{ id: string, type: string, field: string }>,
   column_groups: Array<SearchTypePivot>,
   row_groups: Array<SearchTypePivot>,
   rollup: boolean,

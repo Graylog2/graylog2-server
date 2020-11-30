@@ -25,7 +25,7 @@ export type QueryId = string;
 
 export type FilterType = Immutable.Map<string, any>;
 
-type SearchTypeList = Array<SearchType>;
+export type SearchTypeList = Array<SearchType>;
 type InternalBuilderState = Immutable.Map<string, any>;
 
 type InternalState = {
