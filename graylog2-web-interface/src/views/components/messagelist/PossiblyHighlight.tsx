@@ -87,7 +87,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   const highlights = ranges
     .filter(({ start }) => (start >= 0))
     .filter(({ length }) => (length >= 0))
-    .reduce(([acc, i], cur, idx) => [
+    .reduce<[HighlightRange[], number]>(([acc, i], cur, idx) => [
       [...acc,
         subst(i, Math.max(0, cur.start - i)), // non-highlighted string before this range
         highlight(subst(Math.max(cur.start, i), Math.max(0, cur.length - Math.max(0, i - cur.start))), idx, style), // highlighted string in range
