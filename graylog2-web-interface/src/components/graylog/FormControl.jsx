@@ -16,9 +16,9 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { FormControl as BootstrapFormControl } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
-const FormControl = styled(BootstrapFormControl)(({ theme }) => css`
+const FormControl = styled(BootstrapFormControl)(({ theme }: { theme: DefaultTheme }) => css`
   &.form-control:not([type="range"]) {
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};

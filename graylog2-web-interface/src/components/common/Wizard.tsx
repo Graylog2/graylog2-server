@@ -17,13 +17,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 
 import Icon from './Icon';
 
-const SubnavigationCol = styled(Col)(({ theme }) => css`
+const SubnavigationCol = styled(Col)(({ theme }: { theme: DefaultTheme }) => css`
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
@@ -31,7 +31,7 @@ const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav = styled(Nav)(({ theme }) => css`
+const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
   &.nav {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};

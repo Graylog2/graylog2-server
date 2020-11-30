@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import Icon from './Icon';
 
@@ -35,7 +35,7 @@ type Props = {
   onChange: (nextPage: number) => void,
 };
 
-const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
+const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }: { theme: DefaultTheme }) => css`
   &.pagination {
     font-size: ${theme.fonts.size.small};
     margin-top: 10px;

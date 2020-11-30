@@ -44,7 +44,7 @@ const Toggle = styled.a.attrs({
   }
 `);
 
-const StyledSubmenu = styled<{ left: boolean, theme: DefaultTheme }>(Dropdown)(({ left, theme }) => css`
+const StyledSubmenu = styled(Dropdown)(({ left, theme }: { left: boolean, theme: DefaultTheme }) => css`
   position: relative;
 
   > .dropdown-menu {
