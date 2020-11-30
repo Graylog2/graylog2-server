@@ -18,6 +18,7 @@ const express = require('express');
 const webpack = require('webpack');
 const compress = require('compression');
 const history = require('connect-history-api-fallback');
+const proxy = require('express-http-proxy');
 const http = require('http');
 const yargs = require('yargs');
 const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -35,6 +36,15 @@ const appConfig = webpackConfig[1];
 const vendorCompiler = webpack(vendorConfig);
 const appCompiler = webpack(appConfig);
 
+
+// Proxy all "/api" requests to the server backend API.
+app.use('/api', proxy('localhost:9000', {
+  proxyReqPathResolver: function (req) {
+    // The proxy middleware removes the prefix from the path but we need it
+    // to make sure we hit the "/api" resources on the server.
+    return `/api${req.url}`;
+  }
+}));
 
 app.use(compress()); // Enables compression middleware
 app.use(history()); // Enables HTML5 History API middleware
