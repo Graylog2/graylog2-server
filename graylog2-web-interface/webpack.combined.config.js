@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 const fs = require('fs');
+
 const glob = require('glob');
 const path = require('path');
 const merge = require('webpack-merge');
@@ -25,10 +26,11 @@ const WEB_MODULES = path.resolve(__dirname, './web-modules.json');
 
 const configsFromWebModule = (webModulesFile) => {
   const webModules = JSON.parse(fs.readFileSync(webModulesFile));
+
   return webModules.modules
-    .map(({ path }) => path)
-    .filter(path => path.includes('graylog-plugin'))
-    .map(path => `${path}/webpack.config.js`);
+    .map(({ path: p }) => p)
+    .filter((_path) => _path.includes('graylog-plugin'))
+    .map((_path) => `${_path}/webpack.config.js`);
 };
 
 const configsFromGlob = () => {
@@ -48,8 +50,9 @@ const configsFromGlob = () => {
   return glob.sync(pluginConfigPattern, globOptions)
     .map((config) => `${globCwd}/${config}`)
     .filter(isNotDependency);
-}
+};
 
+// eslint-disable-next-line no-nested-ternary
 const pluginConfigs = process.env.disable_plugins === 'true'
   ? []
   : fs.existsSync(WEB_MODULES)
