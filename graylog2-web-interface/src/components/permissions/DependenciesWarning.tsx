@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import StringUtils from 'util/StringUtils';
 import { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
 import { Alert } from 'components/graylog';
-import { ThemeInterface } from 'theme';
 
 type Props = {
   missingDependencies: MissingDependencies,

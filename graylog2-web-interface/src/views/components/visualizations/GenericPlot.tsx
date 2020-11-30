@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withTheme } from 'styled-components';
+import { withTheme, DefaultTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
-import type { ThemeInterface } from 'theme';
 import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
@@ -70,7 +69,7 @@ type Props = {
   layout: {},
   onZoom: (from: string, to: string) => boolean,
   setChartColor?: (data: ChartConfig, color: ColorMap) => ChartColor,
-  theme: ThemeInterface,
+  theme: DefaultTheme,
 };
 
 type State = {

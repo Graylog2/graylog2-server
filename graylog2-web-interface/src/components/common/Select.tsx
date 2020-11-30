@@ -17,10 +17,10 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
-import { withTheme } from 'styled-components';
+import { withTheme, DefaultTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
-import { themePropTypes, ThemeInterface } from 'theme';
+import { themePropTypes } from 'theme';
 
 import Icon from './Icon';
 
@@ -213,7 +213,7 @@ type Props = {
   options: Array<Option>,
   placeholder: string,
   size?: 'normal' | 'small',
-  theme: ThemeInterface,
+  theme: DefaultTheme,
   value?: string,
   valueKey: string,
   valueRenderer?: (option: Option) => React.ReactElement,

@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { withTheme } from 'styled-components';
+import { withTheme, DefaultTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { ThemeInterface, themePropTypes } from 'theme';
+import { themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
@@ -36,7 +36,7 @@ type Props = {
   onChange: (query: string) => Promise<string>,
   onExecute: (query: string) => void,
   placeholder?: string,
-  theme: ThemeInterface,
+  theme: DefaultTheme,
   value: string,
 };
 

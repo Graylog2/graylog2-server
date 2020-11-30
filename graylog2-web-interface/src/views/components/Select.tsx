@@ -21,8 +21,9 @@ import ReactSelect, { components as Components, Creatable as CreatableSelect } f
 import { Overlay } from 'react-overlays';
 import { withTheme } from 'styled-components';
 import { createFilter } from 'react-select/lib/filters';
+import type { DefaultTheme } from 'styled-components';
 
-import { themePropTypes, ThemeInterface } from 'theme';
+import { themePropTypes } from 'theme';
 
 const MultiValueRemove = (props) => {
   return (
@@ -134,7 +135,7 @@ type Props = {
   styles: { [key: string]: any },
   ignoreAccents: boolean,
   ignoreCase: boolean,
-  theme: ThemeInterface,
+  theme: DefaultTheme,
 };
 
 const ValueWithTitle = (props: { data: { label: string } }) => {

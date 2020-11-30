@@ -16,18 +16,18 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, withTheme, DefaultTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
 import { Icon } from 'components/common';
-import { themePropTypes, ThemeInterface } from 'theme';
+import { themePropTypes } from 'theme';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
 } from 'theme/constants';
 
 type Props = {
-  theme: ThemeInterface,
+  theme: DefaultTheme,
 };
 
 const ThemeModeToggleWrap = styled.div`

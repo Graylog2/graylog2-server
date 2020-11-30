@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withTheme } from 'styled-components';
+import { withTheme, DefaultTheme } from 'styled-components';
 
 import connect from 'stores/connect';
-import type { ThemeInterface } from 'theme';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon, ShareButton } from 'components/common';
@@ -45,7 +44,7 @@ import SavedSearchList from './SavedSearchList';
 
 type Props = {
   viewStoreState: ViewStoreState,
-  theme: ThemeInterface,
+  theme: DefaultTheme,
 };
 
 type State = {
