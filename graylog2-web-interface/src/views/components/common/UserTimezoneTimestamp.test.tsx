@@ -1,16 +1,17 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import UserTimezoneTimestamp from './UserTimezoneTimestamp';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UserJSON } from 'logic/users/User';
+
+import UserTimezoneTimestamp from './UserTimezoneTimestamp';
 
 const createCurrentUserWithTz = (tz: string): UserJSON => ({
   timezone: tz,
 } as UserJSON);
 
 describe('UserTimezoneTimestamp', () => {
-  const WithTimezone = ({ children, tz }) => (
+  const WithTimezone = ({ children, tz }: { children: React.ReactNode, tz: string }) => (
     <CurrentUserContext.Provider value={createCurrentUserWithTz(tz)}>
       {children}
     </CurrentUserContext.Provider>
@@ -21,7 +22,7 @@ describe('UserTimezoneTimestamp', () => {
       <WithTimezone tz="America/New_York">
         <UserTimezoneTimestamp dateTime="2020-11-30T11:09:00.950Z" />
       </WithTimezone>
-    ))
+    ));
 
     await screen.findByText('2020-11-30 06:09:00.950 -05:00');
   });
@@ -31,7 +32,7 @@ describe('UserTimezoneTimestamp', () => {
       <WithTimezone tz={undefined}>
         <UserTimezoneTimestamp dateTime="2020-11-30T11:09:00.950Z" />
       </WithTimezone>
-    ))
+    ));
 
     await screen.findByText('2020-11-30 12:09:00.950 +01:00');
   });
