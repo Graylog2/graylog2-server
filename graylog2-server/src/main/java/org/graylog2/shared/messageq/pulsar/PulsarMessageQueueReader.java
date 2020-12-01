@@ -38,7 +38,6 @@ import org.graylog2.shared.messageq.MessageQueueReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -120,6 +119,9 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService imp
         // TODO pause processing when LifeCycle changes
         // TODO add metrics
         // TODO use GracefulShutdownService ?
+        // TODO the JournalReader limits the read based on the remaining capacity in the processBuffer
+        //      do we need this?   final long remainingCapacity = processBuffer.getRemainingCapacity();
+
         while (isRunning()) {
             final List<Entry> entries = read();
             entries.forEach(entry -> {
@@ -128,11 +130,6 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService imp
                 processBuffer.insertBlocking(rawMessage);
             });
         }
-    }
-
-    @Override
-    public Entry createEntry(byte[] id, @Nullable byte[] key, byte[] value, long timestamp) {
-        return new PulsarMessageQueueEntry(id, key, value, timestamp);
     }
 
     @Override

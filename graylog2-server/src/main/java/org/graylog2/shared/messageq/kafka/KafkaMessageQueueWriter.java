@@ -25,12 +25,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractService;
+import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,19 +83,19 @@ public class KafkaMessageQueueWriter extends AbstractService implements MessageQ
     }
 
     @Override
-    public void write(List<Entry> entries) throws MessageQueueException {
+    public void write(List<RawMessageEvent> entries) throws MessageQueueException {
         final Converter converter = new Converter();
         final ArrayList<Journal.Entry> journalEntries = Lists.newArrayList(transform(entries, converter));
 
         try {
-            writeToJournal(converter, journalEntries);
+            writeToJournal(journalEntries);
         } catch (Exception e) {
             LOG.error("Unable to write to journal - retrying", e);
 
             // Use retryer with exponential back-off to avoid spamming the logs.
             try {
                 JOURNAL_WRITE_RETRYER.call(() -> {
-                    writeToJournal(converter, journalEntries);
+                    writeToJournal(journalEntries);
                     return null;
                 });
             } catch (ExecutionException | RetryException ex) {
@@ -105,36 +104,18 @@ public class KafkaMessageQueueWriter extends AbstractService implements MessageQ
         }
     }
 
-    private void writeToJournal(Converter converter, List<Journal.Entry> entries) {
+    private void writeToJournal(List<Journal.Entry> entries) {
         final long lastOffset = kafkaJournal.write(entries);
-        LOG.debug("Processed batch, wrote {} bytes, last journal offset: {}, signalling reader.",
-                converter.getBytesWritten(),
+        LOG.debug("Processed batch, last journal offset: {}, signalling reader.",
                 lastOffset);
         journalFilled.release();
     }
 
-    @Override
-    public Entry createEntry(byte[] id, @Nullable byte[] key, byte[] value, long timestamp) {
-        return new KafkaMessageQueueEntry(value, Long.MIN_VALUE);
-    }
-
-    private class Converter implements Function<Entry, Journal.Entry> {
-        private DateTime latestReceiveTime = new DateTime(0L, DateTimeZone.UTC);
-        private long bytesWritten = 0;
-
+    private static class Converter implements Function<RawMessageEvent, Journal.Entry> {
         @Nullable
         @Override
-        public Journal.Entry apply(@Nullable Entry input) {
-            return new Journal.Entry(input.id(), input.value());
-        }
-
-        public long getBytesWritten() {
-            // TODO
-            return bytesWritten;
-        }
-        // TODO
-        public DateTime getLatestReceiveTime() {
-            return latestReceiveTime;
+        public Journal.Entry apply(@Nullable RawMessageEvent input) {
+            return new Journal.Entry(input.getMessageIdBytes(), input.getEncodedRawMessage());
         }
     }
 }

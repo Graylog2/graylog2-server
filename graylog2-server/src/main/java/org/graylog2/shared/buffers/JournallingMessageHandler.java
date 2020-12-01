@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -92,44 +91,18 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             log.debug("End of batch, journalling {} messages", batch.size());
             // write batch to journal
 
-            //final Converter converter = new Converter();
-            final MessageJournalConverter messageJournalConverter = new MessageJournalConverter();
-            // Needs to run before the other converter because that one is setting fields to null
-            final ArrayList<MessageQueue.Entry> messageQueueEntries = Lists.newArrayList(transform(batch, messageJournalConverter));
             // copy to avoid re-running this all the time
-            //final List<Journal.Entry> entries = Lists.newArrayList(transform(batch, converter));
-
-            // Remove all null values returned from the converter (might happen if the Converter throws an exception)
-            //entries.removeAll(NULL_SINGLETON);
-            messageQueueEntries.removeAll(MESSAGE_JOURNAL_NULL_SINGLETON);
+            final List<RawMessageEvent> entries = Lists.newArrayList(transform(batch, new Filter()));
 
             // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
             // objects in there have been set to null and cannot be used anymore.
             batch.clear();
 
-            messageQueueWriter.write(messageQueueEntries);
+            messageQueueWriter.write(entries);
         }
     }
 
-    private class MessageJournalConverter implements Function<RawMessageEvent, MessageQueue.Entry> {
-        @Nullable
-        @Override
-        public MessageQueue.Entry apply(@Nullable RawMessageEvent input) {
-            try {
-                final byte[] messageIdBytes = input.getMessageIdBytes();
-                final byte[] encodedRawMessage = input.getEncodedRawMessage();
-
-                // TODO: Check Converter implementation and copy relevant parts here (e.g. setting fields to null and metrics)
-
-                return messageQueueWriter.createEntry(messageIdBytes, encodedRawMessage);
-            } catch (Exception e) {
-                log.error("Unable to convert RawMessageEvent to MessageJournal.Entry - skipping event", e);
-                return null;
-            }
-        }
-    }
-
-    private class Converter implements Function<RawMessageEvent, Journal.Entry> {
+    private class Filter implements Function<RawMessageEvent, RawMessageEvent> {
         private long bytesWritten = 0;
         private DateTime latestReceiveTime = new DateTime(0L, DateTimeZone.UTC);
 
@@ -143,16 +116,14 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
         @Nullable
         @Override
-        public Journal.Entry apply(RawMessageEvent input) {
+        public RawMessageEvent apply(RawMessageEvent input) {
             try {
                 if (log.isTraceEnabled()) {
                     log.trace("Journalling message {}", input.getMessageId());
                 }
-                final byte[] messageIdBytes = input.getMessageIdBytes();
-                final byte[] encodedRawMessage = input.getEncodedRawMessage();
 
                 // stats
-                final int size = encodedRawMessage.length;
+                final int size = input.getEncodedRawMessage().length;
                 bytesWritten += size;
                 byteCounter.inc(size);
 
@@ -161,12 +132,7 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
                     latestReceiveTime = latestReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : latestReceiveTime;
                 }
 
-                // clear for gc and to avoid promotion to tenured space
-                input.setMessageIdBytes(null);
-                input.setEncodedRawMessage(null);
-                input.setMessageTimestamp(null);
-                // convert to journal entry
-                return journal.createEntry(messageIdBytes, encodedRawMessage);
+                return input;
             } catch (Exception e) {
                 log.error("Unable to convert RawMessageEvent to Journal.Entry - skipping event", e);
                 return null;

@@ -16,9 +16,11 @@
  */
 package org.graylog2.shared.messageq;
 
+import org.graylog2.shared.buffers.RawMessageEvent;
+
 import java.util.List;
 
 public interface MessageQueueWriter extends MessageQueue {
 
-    void write(List<MessageQueue.Entry> entries) throws MessageQueueException;
+    void write(List<RawMessageEvent> entries) throws MessageQueueException;
 }

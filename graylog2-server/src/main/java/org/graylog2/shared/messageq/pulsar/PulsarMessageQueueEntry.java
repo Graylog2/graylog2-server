@@ -43,15 +43,6 @@ public class PulsarMessageQueueEntry implements MessageQueue.Entry {
         this.timestamp = message.getEventTime();
     }
 
-    PulsarMessageQueueEntry(byte[] id, @Nullable byte[] key, byte[] value, long timestamp) {
-        this.commitId = null;
-        this.id = requireNonNull(id, "id cannot be null"); // TODO: This is different to the constructor above. Should be the same!
-                                                                    //       Can we store the actual ID?
-        this.key = key;
-        this.value = requireNonNull(value, "value cannot be null");
-        this.timestamp = timestamp;
-    }
-
     public static PulsarMessageQueueEntry fromMessage(Message<byte[]> message) {
         return new PulsarMessageQueueEntry(message);
     }
