@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withTheme, DefaultTheme } from 'styled-components';
+import { useTheme, DefaultTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
@@ -69,8 +69,9 @@ type Props = {
   layout: {},
   onZoom: (from: string, to: string) => boolean,
   setChartColor?: (data: ChartConfig, color: ColorMap) => ChartColor,
-  theme: DefaultTheme,
 };
+
+type GenericPlotProps = Props & { theme: DefaultTheme };
 
 type State = {
   legendConfig?: LegendConfig,
@@ -86,23 +87,8 @@ const nonInteractiveLayout = {
   hovermode: false,
 };
 
-class GenericPlot extends React.Component<Props, State> {
-  static propTypes = {
-    chartData: PropTypes.array.isRequired,
-    layout: PropTypes.object,
-    onZoom: PropTypes.func,
-    getChartColor: PropTypes.func,
-    setChartColor: PropTypes.func,
-  };
-
-  static defaultProps = {
-    layout: {},
-    onZoom: () => true,
-    getChartColor: undefined,
-    setChartColor: undefined,
-  };
-
-  constructor(props: Props) {
+class GenericPlot extends React.Component<GenericPlotProps, State> {
+  constructor(props: GenericPlotProps) {
     super(props);
     this.state = {};
   }
@@ -270,4 +256,25 @@ class GenericPlot extends React.Component<Props, State> {
   }
 }
 
-export default withTheme(GenericPlot);
+const GenericPlotWithTheme = (props: Props) => {
+  const theme = useTheme();
+
+  return <GenericPlot {...props} theme={theme} />;
+};
+
+GenericPlotWithTheme.propTypes = {
+  chartData: PropTypes.array.isRequired,
+  layout: PropTypes.object,
+  onZoom: PropTypes.func,
+  getChartColor: PropTypes.func,
+  setChartColor: PropTypes.func,
+};
+
+GenericPlotWithTheme.defaultProps = {
+  layout: {},
+  onZoom: () => true,
+  getChartColor: undefined,
+  setChartColor: undefined,
+};
+
+export default GenericPlotWithTheme;
