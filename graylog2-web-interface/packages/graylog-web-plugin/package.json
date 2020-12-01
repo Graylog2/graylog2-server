@@ -41,7 +41,7 @@
     "@babel/preset-typescript": "^7.12.1",
     "create-react-class": "15.6.3",
     "eslint-config-graylog": "file:../eslint-config-graylog",
-    "formik": "2.2.0",
+    "formik": "2.2.5",
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "html-webpack-plugin": "^4.2.0",
     "javascript-natural-sort": "0.7.1",
