@@ -81,6 +81,8 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
 
         this.client = PulsarClient.builder()
                 .serviceUrl(serviceUrl)
+                .startingBackoffInterval(100, TimeUnit.MILLISECONDS)
+                .maxBackoffInterval(1, TimeUnit.SECONDS)
                 .build();
         this.producer = client.newProducer(Schema.BYTES)
                 .topic(topic)
