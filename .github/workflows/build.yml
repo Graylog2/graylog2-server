@@ -1,7 +1,6 @@
-name: Build
+name: Build the repository
 
 on: 
-  push:
   pull_request:
 
 jobs:
