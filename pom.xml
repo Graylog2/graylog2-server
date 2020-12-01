@@ -123,7 +123,7 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>2.31</jersey.version>
+        <jersey.version>2.32</jersey.version>
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.10.6</joda-time.version>
         <jool.version>0.9.14</jool.version>
