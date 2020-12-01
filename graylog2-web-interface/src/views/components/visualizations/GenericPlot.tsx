@@ -162,7 +162,7 @@ class GenericPlot extends React.Component<Props, State> {
         pad: 0,
       },
       legend: {
-        orientation: 'h',
+        orientation: 'h' as const,
         font: {
           color: theme.colors.variant.darkest.default,
         },
@@ -205,7 +205,7 @@ class GenericPlot extends React.Component<Props, State> {
 
     const style = { height: '100%', width: '100%' };
 
-    const config = { displayModeBar: false, doubleClick: false, responsive: true };
+    const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
     const { legendConfig } = this.state;
 
