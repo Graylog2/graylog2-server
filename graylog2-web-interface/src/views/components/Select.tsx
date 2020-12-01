@@ -19,11 +19,10 @@ import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
 import { Overlay } from 'react-overlays';
-import { withTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 import { createFilter } from 'react-select/lib/filters';
-import type { DefaultTheme } from 'styled-components';
 
-import { themePropTypes } from 'theme';
+type Option = { [key: string]: unknown };
 
 const MultiValueRemove = (props) => {
   return (
@@ -135,7 +134,13 @@ type Props = {
   styles: { [key: string]: any },
   ignoreAccents: boolean,
   ignoreCase: boolean,
-  theme: DefaultTheme,
+  options: Array<Option>,
+  isDisabled: boolean,
+  isClearable: boolean,
+  isSearchable: boolean,
+  onChange: (value: unknown, actionType: string) => void,
+  placeholder: string,
+  value?: unknown,
 };
 
 const ValueWithTitle = (props: { data: { label: string } }) => {
@@ -170,9 +175,9 @@ const Select = ({
   ignoreCase = true,
   ignoreAccents = false,
   allowOptionCreation = false,
-  theme,
   ...rest
 }: Props) => {
+  const theme = useTheme();
   const selectRef = useRef(null);
   const Component = allowOptionCreation ? CreatableSelect : ReactSelect;
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
@@ -241,7 +246,13 @@ Select.propTypes = {
   styles: PropTypes.object,
   ignoreAccents: PropTypes.bool,
   ignoreCase: PropTypes.bool,
-  theme: themePropTypes.isRequired,
+  isDisabled: PropTypes.bool,
+  isClearable: PropTypes.bool,
+  isSearchable: PropTypes.bool,
+  options: PropTypes.array.isRequired,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string,
+  placeholder: PropTypes.string,
 };
 
 Select.defaultProps = {
@@ -250,6 +261,11 @@ Select.defaultProps = {
   styles: {},
   ignoreAccents: false,
   ignoreCase: true,
+  isDisabled: false,
+  isClearable: true,
+  isSearchable: true,
+  placeholder: undefined,
+  value: undefined,
 };
 
-export default withTheme(Select);
+export default Select;
