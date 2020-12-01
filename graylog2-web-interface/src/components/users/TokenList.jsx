@@ -14,92 +14,86 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
-import Immutable from 'immutable';
+import React, { useState } from 'react';
+import { List } from 'immutable';
 
-import ClipboardButton from 'components/common/ClipboardButton';
+import { ClipboardButton, TableList, Spinner } from 'components/common';
 import { Button, Checkbox, ButtonGroup } from 'components/graylog';
-import TableList from 'components/common/TableList';
-import Spinner from 'components/common/Spinner';
+import type { Token } from 'actions/users/UsersActions';
 
 import CreateTokenForm from './CreateTokenForm';
 
-class TokenList extends React.Component {
-  static propTypes = {
-    tokens: PropTypes.arrayOf(PropTypes.object),
-    onDelete: PropTypes.func,
-    onCreate: PropTypes.func,
-    creatingToken: PropTypes.bool,
-    deletingToken: PropTypes.string,
+type Props = {
+  creatingToken: boolean,
+  deletingToken: ?string,
+  onCreate: (tokenName: string) => void,
+  onDelete: (tokenId: string, tokenName: string) => void,
+  tokens: Token[],
+};
+
+const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
+  const [hideTokens, setHideTokens] = useState(true);
+
+  const onShowTokensChanged = (event) => {
+    setHideTokens(event.target.checked);
   };
 
-  static defaultProps = {
-    tokens: [],
-    onDelete: () => {},
-    onCreate: () => {},
-    creatingToken: false,
-    deletingToken: undefined,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      hide_tokens: true,
-    };
-
-    this._onShowTokensChanged = this._onShowTokensChanged.bind(this);
-    this.itemActionsFactory = this.itemActionsFactory.bind(this);
-  }
-
-  _onShowTokensChanged(event) {
-    this.setState({ hide_tokens: event.target.checked });
-  }
-
-  _deleteToken(token) {
+  const deleteToken = (token) => {
     return () => {
-      this.props.onDelete(token.id, token.name);
+      onDelete(token.id, token.name);
     };
-  }
+  };
 
-  itemActionsFactory(token) {
-    const deleteButton = this.props.deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete';
+  const itemActionsFactory = (token) => {
+    const deleteButton = deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete';
 
     return (
       <ButtonGroup>
         <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
         <Button bsSize="xsmall"
-                disabled={this.props.deletingToken === token.id}
+                disabled={deletingToken === token.id}
                 bsStyle="primary"
-                onClick={this._deleteToken(token)}>
+                onClick={deleteToken(token)}>
           {deleteButton}
         </Button>
       </ButtonGroup>
     );
-  }
+  };
 
-  render() {
-    const { creatingToken, onCreate, tokens } = this.props;
-    const { hide_tokens: hideTokens } = this.state;
+  return (
+    <span>
+      <CreateTokenForm onCreate={onCreate} creatingToken={creatingToken} />
+      <TableList filterKeys={['name', 'token']}
+                 items={List(tokens)}
+                 idKey="token"
+                 titleKey="name"
+                 descriptionKey="token"
+                 hideDescription={hideTokens}
+                 enableBulkActions={false}
+                 itemActionsFactory={itemActionsFactory} />
+      <Checkbox id="hide-tokens" onChange={onShowTokensChanged} checked={hideTokens}>
+        Hide Tokens
+      </Checkbox>
+    </span>
+  );
+};
 
-    return (
-      <span>
-        <CreateTokenForm onCreate={onCreate} creatingToken={creatingToken} />
-        <TableList filterKeys={['name', 'token']}
-                   items={Immutable.List(tokens)}
-                   idKey="token"
-                   titleKey="name"
-                   descriptionKey="token"
-                   hideDescription={hideTokens}
-                   enableBulkActions={false}
-                   itemActionsFactory={this.itemActionsFactory} />
-        <Checkbox id="hide-tokens" onChange={this._onShowTokensChanged} checked={hideTokens}>
-          Hide Tokens
-        </Checkbox>
-      </span>
-    );
-  }
-}
+TokenList.propTypes = {
+  tokens: PropTypes.arrayOf(PropTypes.object),
+  onDelete: PropTypes.func,
+  onCreate: PropTypes.func,
+  creatingToken: PropTypes.bool,
+  deletingToken: PropTypes.string,
+};
+
+TokenList.defaultProps = {
+  tokens: [],
+  onDelete: () => {},
+  onCreate: () => {},
+  creatingToken: false,
+  deletingToken: undefined,
+};
 
 export default TokenList;
