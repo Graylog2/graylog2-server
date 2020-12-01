@@ -89,6 +89,7 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
                 .producerName(name)
                 .compressionType(CompressionType.ZSTD)
                 .batchingMaxPublishDelay(1, TimeUnit.MILLISECONDS)
+                .sendTimeout(0, TimeUnit.SECONDS)
                 .intercept(new MessageInterceptor())
                 .create();
 
