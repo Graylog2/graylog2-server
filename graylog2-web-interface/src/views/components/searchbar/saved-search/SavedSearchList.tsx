@@ -157,7 +157,7 @@ class SavedSearchList extends React.Component<Props, State> {
                            onClick={() => this.onLoad(savedSearch.id, loaderFunc)}>
               {savedSearch.title}
               <span>
-                <DeleteButton bsSize="xsmall" bsStyle="danger" onClick={(e) => this.onDelete(e, savedSearch.id)}>
+                <DeleteButton onClick={(e) => this.onDelete(e, savedSearch.id)}>
                   <Icon name="trash" title="Delete" data-testid={`delete-${savedSearch.id}`} />
                 </DeleteButton>
               </span>
