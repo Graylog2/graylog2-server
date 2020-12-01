@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -42,7 +41,7 @@ type Props = {
   className?: string,
   pageSize: number,
   pageSizes: Array<number>,
-  onChange: (event: SyntheticEvent<HTMLOptionElement>) => void,
+  onChange: (event: React.ChangeEvent<HTMLOptionElement>) => void,
 };
 
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (
