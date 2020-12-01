@@ -19,11 +19,11 @@ import React from 'react';
 import Immutable from 'immutable';
 
 import ClipboardButton from 'components/common/ClipboardButton';
-import { Button, Row, Col, FormControl, ControlLabel, Checkbox, ButtonGroup } from 'components/graylog';
+import { Button, Checkbox, ButtonGroup } from 'components/graylog';
 import TableList from 'components/common/TableList';
 import Spinner from 'components/common/Spinner';
 
-import TokenListStyle from './TokenList.css';
+import CreateTokenForm from './CreateTokenForm';
 
 class TokenList extends React.Component {
   static propTypes = {
@@ -46,18 +46,11 @@ class TokenList extends React.Component {
     super(props);
 
     this.state = {
-      token_name: '',
       hide_tokens: true,
     };
 
-    this._onNewTokeChanged = this._onNewTokeChanged.bind(this);
     this._onShowTokensChanged = this._onShowTokensChanged.bind(this);
-    this._createToken = this._createToken.bind(this);
     this.itemActionsFactory = this.itemActionsFactory.bind(this);
-  }
-
-  _onNewTokeChanged(event) {
-    this.setState({ token_name: event.target.value });
   }
 
   _onShowTokensChanged(event) {
@@ -68,12 +61,6 @@ class TokenList extends React.Component {
     return () => {
       this.props.onDelete(token.id, token.name);
     };
-  }
-
-  _createToken(e) {
-    this.props.onCreate(this.state.token_name);
-    this.setState({ token_name: '' });
-    e.preventDefault();
   }
 
   itemActionsFactory(token) {
@@ -93,47 +80,21 @@ class TokenList extends React.Component {
   }
 
   render() {
-    const submitButton = (this.props.creatingToken ? <Spinner text="Creating..." /> : 'Create Token');
-
-    const createTokenForm = (
-      <form onSubmit={this._createToken}>
-        <div className="form-group">
-          <Row>
-            <Col sm={2}>
-              <ControlLabel className={TokenListStyle.tokenNewNameLabel}>Token Name</ControlLabel>
-            </Col>
-            <Col sm={4}>
-              <FormControl id="create-token-input"
-                           type="text"
-                           placeholder="e.g ServiceName"
-                           value={this.state.token_name}
-                           onChange={this._onNewTokeChanged} />
-            </Col>
-            <Col sm={2}>
-              <Button id="create-token"
-                      disabled={this.state.token_name === '' || this.props.creatingToken}
-                      type="submit"
-                      bsStyle="primary">{submitButton}
-              </Button>
-            </Col>
-          </Row>
-        </div>
-        <hr />
-      </form>
-    );
+    const { creatingToken, onCreate, tokens } = this.props;
+    const { hide_tokens: hideTokens } = this.state;
 
     return (
       <span>
-        {createTokenForm}
+        <CreateTokenForm onCreate={onCreate} creatingToken={creatingToken} />
         <TableList filterKeys={['name', 'token']}
-                   items={Immutable.List(this.props.tokens)}
+                   items={Immutable.List(tokens)}
                    idKey="token"
                    titleKey="name"
                    descriptionKey="token"
-                   hideDescription={this.state.hide_tokens}
+                   hideDescription={hideTokens}
                    enableBulkActions={false}
                    itemActionsFactory={this.itemActionsFactory} />
-        <Checkbox id="hide-tokens" onChange={this._onShowTokensChanged} checked={this.state.hide_tokens}>
+        <Checkbox id="hide-tokens" onChange={this._onShowTokensChanged} checked={hideTokens}>
           Hide Tokens
         </Checkbox>
       </span>
