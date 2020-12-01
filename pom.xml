@@ -130,7 +130,7 @@
         <json-path.version>2.4.0</json-path.version>
         <kafka.version>0.9.0.1</kafka.version>
         <log4j.version>2.13.3</log4j.version>
-        <metrics.version>4.1.9</metrics.version>
+        <metrics.version>4.1.16</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
         <mongojack.version>2.10.1</mongojack.version>
         <natty.version>0.13</natty.version>
