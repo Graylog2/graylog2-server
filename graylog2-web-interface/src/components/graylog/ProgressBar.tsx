@@ -57,7 +57,7 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = css(({ bsStyle, theme }) => {
+const progressBarVariants = css<StyledBarProps>(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;
   }
@@ -121,8 +121,8 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => {
         return (
           <Bar role="progressbar"
                aria-valuenow={value}
-               aria-valuemin="0"
-               aria-valuemax="100"
+               aria-valuemin={0}
+               aria-valuemax={100}
                aria-valuetext={label}
                key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
                animated={animated}
