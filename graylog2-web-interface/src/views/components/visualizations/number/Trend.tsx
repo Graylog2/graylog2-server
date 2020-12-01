@@ -68,7 +68,7 @@ const _trendIcon = (delta) => {
   return <Icon name={delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down'} />;
 };
 
-const Trend = React.forwardRef<Props, any>(({ current, previous, trendPreference }: Props, ref) => {
+const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference }: Props, ref) => {
   const difference = previous ? current - previous : NaN;
   const differencePercent = previous ? difference / previous : NaN;
 
