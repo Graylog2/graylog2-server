@@ -30,6 +30,7 @@ import org.graylog.security.authservice.AuthServiceException;
 import org.graylog.security.authservice.AuthServiceResult;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,13 +97,14 @@ public class UsernamePasswordRealm extends AuthenticatingRealm {
                         result.username(), result.userProfileId(), result.backendTitle(), result.backendType(), result.backendId());
                 return toAuthenticationInfo(result);
             } else {
-                LOG.warn("Failed to authenticate username <{}> with backend <{}/{}/{}>",
+                LOG.debug("Failed to authenticate username <{}> with backend <{}/{}/{}>",
                         result.username(), result.backendTitle(), result.backendType(), result.backendId());
                 return null;
             }
         } catch (AuthServiceException e) {
-            LOG.error("Authentication service error", e);
-            return null;
+            throw new AuthenticationServiceUnavailableException("Authentication service error", e);
+        } catch (AuthenticationServiceUnavailableException e) {
+            throw e;
         } catch (Exception e) {
             LOG.error("Unhandled authentication error", e);
             return null;
