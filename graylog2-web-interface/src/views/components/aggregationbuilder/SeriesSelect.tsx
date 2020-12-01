@@ -130,10 +130,6 @@ class SeriesSelect extends React.Component<Props, State> {
     this.setState({ options: suggester.defaults });
   };
 
-  _onClose = () => {
-    this._resetToFunctions();
-  };
-
   render() {
     const { onChange, series } = this.props;
     const { options } = this.state;
@@ -168,10 +164,8 @@ class SeriesSelect extends React.Component<Props, State> {
               options={options}
               value={series.map(_wrapOption)}
               components={_components}
-              onClose={this._onClose}
-              closeMenuOnSelect={false}
+              closeMenuOnSelect
               menuShouldScrollIntoView
-              tabSelectsValue
               escapeClearsValue
               isMulti />
     );
