@@ -65,6 +65,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
   return (
     <span>
       <CreateTokenForm onCreate={onCreate} creatingToken={creatingToken} />
+      <hr />
       <TableList filterKeys={['name', 'token']}
                  items={List(tokens)}
                  idKey="token"

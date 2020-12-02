@@ -19,15 +19,17 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'components/graylog';
+import { Button, ControlLabel, FormControl, FormGroup } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 const StyledForm: StyledComponent<{}, void, HTMLFormElement> = styled.form`
   margin-top: 10px;
-`;
-
-const StyledControlLabel: StyledComponent<{}, void, ControlLabel> = styled(ControlLabel)`
-  margin-top: 8px;
+  &.form-inline > .form-group {
+    margin-right: 10px;
+    > input {
+      width: 300px;
+    }
+  }
 `;
 
 type Props = {
@@ -45,30 +47,20 @@ const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
   };
 
   return (
-    <StyledForm onSubmit={createToken}>
-      <FormGroup>
-        <Row>
-          <Col sm={2}>
-            <StyledControlLabel>Token Name</StyledControlLabel>
-          </Col>
-          <Col sm={4}>
-            <FormControl id="create-token-input"
-                         type="text"
-                         value={tokenName}
-                         onChange={(event) => setTokenName(event.target.value)} />
-            <HelpBlock>Descriptive name for this Token.</HelpBlock>
-          </Col>
-          <Col sm={2}>
-            <Button id="create-token"
-                    disabled={tokenName === '' || creatingToken}
-                    type="submit"
-                    bsStyle="primary">
-              {(creatingToken ? <Spinner text="Creating..." /> : 'Create Token')}
-            </Button>
-          </Col>
-        </Row>
+    <StyledForm className="form-inline" onSubmit={createToken}>
+      <FormGroup controlId="create-token-input">
+        <ControlLabel>Token Name</ControlLabel>
+        <FormControl type="text"
+                     placeholder="What is this token for?"
+                     value={tokenName}
+                     onChange={(event) => setTokenName(event.target.value)} />
       </FormGroup>
-      <hr />
+      <Button id="create-token"
+              disabled={tokenName === '' || creatingToken}
+              type="submit"
+              bsStyle="primary">
+        {(creatingToken ? <Spinner text="Creating..." /> : 'Create Token')}
+      </Button>
     </StyledForm>
   );
 };
