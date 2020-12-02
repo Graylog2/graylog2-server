@@ -125,9 +125,9 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props
                               onChange={(newQuery) => {
                                 onChange({ target: { value: newQuery, name } });
 
-                                return Promise.resolve();
+                                return Promise.resolve(newQuery);
                               }}
-                              onExecute={handleSubmit} />
+                              onExecute={handleSubmit as () => void} />
                 )}
               </Field>
             </Col>

@@ -18,12 +18,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import loadable from 'loadable-components';
 
-const ErrorComponent = ({ error }) => <div>Loading component failed: {error.message}</div>;
+type Props = {
+  error: {
+    message: string;
+  };
+};
+
+const ErrorComponent: React.FC<Props> = ({ error }: Props) => <div>Loading component failed: {error.message}</div>;
 
 ErrorComponent.propTypes = {
-  error: PropTypes.shape({
+  error: PropTypes.exact({
     message: PropTypes.string,
   }).isRequired,
 };
 
-export default (f) => loadable(() => f().then((c) => c.default), { ErrorComponent });
+export default <T, >(f: () => Promise<{ default: loadable.DefaultComponent<T> }>) => loadable<T>(() => f().then((c) => c.default), { ErrorComponent });

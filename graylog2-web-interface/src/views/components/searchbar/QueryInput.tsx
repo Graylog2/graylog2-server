@@ -122,4 +122,7 @@ QueryInput.defaultProps = {
 
 const mapping = { completers: 'views.completers' };
 
-export default withPluginEntities(withTheme(QueryInput), mapping);
+// eslint-disable-next-line no-undef
+type PropsWithDefaults = JSX.LibraryManagedAttributes<typeof QueryInput, React.ComponentProps<typeof QueryInput>>;
+
+export default withPluginEntities(withTheme(QueryInput) as React.ComponentType<Omit<PropsWithDefaults, 'theme'>>, mapping);

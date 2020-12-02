@@ -91,9 +91,9 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                     onChange={(newQuery) => {
                                       onChange({ target: { value: newQuery, name } });
 
-                                      return Promise.resolve();
+                                      return Promise.resolve(newQuery);
                                     }}
-                                    onExecute={handleSubmit} />
+                                    onExecute={handleSubmit as () => void} />
                       )}
                     </Field>
                   </Col>
