@@ -19,7 +19,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-          path: ~/.m2/maven
+          path: ~/.m2/repository
       - name: Set up Yarn cache
         uses: actions/cache@v2
         with:
