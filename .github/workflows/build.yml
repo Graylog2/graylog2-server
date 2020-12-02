@@ -13,6 +13,22 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8 
+      - name: Set up Maven cache
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+          path: ~/.m2/maven
+      - name: Set up Yarn cache
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+          path: ~/.cache/yarn
+      - name: License check
+        run: mvn -B --fail-fast license:check
       - name: Build with Maven
-        run: mvn -B package
+        run: mvn -B --fail-fast -Pedantic -Dspotbugs.skip -Dit.es clean test javadoc:javadoc
 
