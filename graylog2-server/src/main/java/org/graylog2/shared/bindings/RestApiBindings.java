@@ -38,7 +38,8 @@ public class RestApiBindings extends Graylog2Module {
         // In development mode we use an external process to provide the web interface.
         // To avoid errors because of missing production web assets, we use a different implementation for
         // generating the "index.html" page.
-        if (System.getenv("DEVELOPMENT") == null) {
+        final String development = System.getenv("DEVELOPMENT");
+        if (development == null || development.equalsIgnoreCase("false")) {
             bind(IndexHtmlGenerator.class).to(ProductionIndexHtmlGenerator.class).asEagerSingleton();
         } else {
             bind(IndexHtmlGenerator.class).to(DevelopmentIndexHtmlGenerator.class).asEagerSingleton();
