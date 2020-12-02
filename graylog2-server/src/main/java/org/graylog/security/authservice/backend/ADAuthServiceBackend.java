@@ -209,7 +209,6 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
         if (testResults.stream().anyMatch(res -> !res.isSuccess())) {
             return AuthServiceBackendTestResult
                     .createFailure("Test failure",
-                            //testResults.stream().map(AuthServiceBackendTestResult::errors).flatMap(Collection::stream).collect(Collectors.toList()));
                             testResults.stream().map(r -> {
                                 if (r.isSuccess()) {
                                     return r.message();

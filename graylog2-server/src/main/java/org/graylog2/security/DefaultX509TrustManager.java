@@ -47,6 +47,16 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
         this(host, null);
     }
 
+    /**
+     * Create a X509TrustManager that verifies the certificate chain and checks whether the cert matches
+     * one of the given hosts in the list.
+     * <p>
+     * <b>Note: ANY matching host from the list is accepted. </b> <br>
+     *    E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
+     * @param hosts     The hosts to check the certificate subject against
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     */
     @AssistedInject
     public DefaultX509TrustManager(@Assisted List<String> hosts) throws NoSuchAlgorithmException, KeyStoreException {
         this(hosts, null);
@@ -57,6 +67,17 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
         this(ImmutableList.of(host), keyStore);
     }
 
+    /**
+     * Create a X509TrustManager that verifies the certificate chain and checks whether the cert matches
+     * one of the given hosts in the list.
+     * <p>
+     * <b>Note: ANY matching host from the list is accepted. </b> <br>
+     *    E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
+     * @param hosts     The hosts to check the certificate subject against
+     * @param keyStore  The trusted KeyStore
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     */
     @VisibleForTesting
     public DefaultX509TrustManager(List<String> hosts, KeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException {
         super();

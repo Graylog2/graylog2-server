@@ -80,6 +80,9 @@ public abstract class ADAuthServiceBackendConfig implements AuthServiceBackendCo
 
     @Override
     public void validate(ValidationResult result) {
+        if (servers().isEmpty()) {
+            result.addError(FIELD_SERVERS, "Server list cannot be empty.");
+        }
         if (isBlank(userSearchBase())) {
             result.addError(FIELD_USER_SEARCH_BASE, "User search base cannot be empty.");
         }
