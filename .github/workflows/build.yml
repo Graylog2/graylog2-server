@@ -31,4 +31,7 @@ jobs:
         run: mvn -B --fail-fast license:check
       - name: Build with Maven
         run: mvn -B --fail-fast -Pedantic -Dspotbugs.skip -Dit.es verify javadoc:javadoc
+        env:
+          JAVA_OPTS: -Xmx6G
+
 
