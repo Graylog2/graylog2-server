@@ -136,7 +136,6 @@ class GenericPlot extends React.Component<Props, State> {
     if (getChartColor) {
       const color = getChartColor(e.fullData, name);
 
-      /* $FlowFixMe color is already declared as optional */
       this.setState({ legendConfig: { name, target, color } });
     }
 

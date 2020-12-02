@@ -147,7 +147,6 @@ class AddWidgetButton extends React.Component<Props, State> {
     const creators: Array<Creator> = PluginStore.exports('creators');
     const presets = this._createGroup(creators, 'preset');
     const generic = this._createGroup(creators, 'generic');
-    // $FlowFixMe: Object.value signature is in the way
     const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
     return (

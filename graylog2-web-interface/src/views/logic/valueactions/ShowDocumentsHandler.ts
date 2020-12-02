@@ -40,7 +40,6 @@ type Arguments = {
 
 const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
   return valuePath.map((item) => Object.entries(item)
-    // $FlowFixMe: We know that values are strings
     .map(([key, value]: [string, string]) => (
       key === '_exists_' ? value : key)))
     .reduce((prev, cur) => [...prev, ...cur], [])

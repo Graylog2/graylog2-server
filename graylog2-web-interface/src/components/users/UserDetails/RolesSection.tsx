@@ -39,7 +39,6 @@ const RolesSection = ({ user: { username } }: Props) => {
         setLoading(false);
       }
 
-      // $FlowFixMe Roles is a DescriptiveItem
       return paginatedRoles;
     });
   }, [username]);

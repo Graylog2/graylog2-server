@@ -110,7 +110,6 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   const configBuilder = ConfigBuilder.create([chartConfig]);
 
   // TODO: This should go into a visualization config specific function
-  // $FlowFixMe: This is a NumberVisualizationConfig. We know so for config.visualization is 'numeric'.
   if (config.visualization === 'numeric' && config.visualizationConfig && (config.visualizationConfig as NumberVisualizationConfig).trend) {
     const trendConfig = {
       ...(generateConfig(uuid(), 'trend', config)),

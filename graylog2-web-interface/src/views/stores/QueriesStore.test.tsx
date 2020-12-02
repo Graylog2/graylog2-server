@@ -91,7 +91,6 @@ describe('QueriesStore', () => {
     });
 
     it('throws error if no type is given', () => {
-      // $FlowFixMe: Passing no second argument on purpose
       return QueriesActions.rangeType('query1', undefined)
         .catch((error) => expect(error).toEqual(new Error('Invalid time range type: undefined')));
     });

@@ -78,10 +78,8 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
     flatten(
       rows
         .filter(({ source }) => (source === 'leaf' || source === 'non-leaf'))
-        // $FlowFixMe: Actually filtering out rows with single values
         .map(({ values }) => values),
     )
-      // $FlowFixMe: Should be safe, even if rollup is not present
       .filter(({ rollup }) => !rollup)
       .map(({ key }) => key.slice(0, -1)),
     isEqual,

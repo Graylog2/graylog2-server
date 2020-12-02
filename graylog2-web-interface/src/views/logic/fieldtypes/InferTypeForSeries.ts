@@ -36,9 +36,7 @@ const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Arra
 
   const { type, field } = definition;
 
-  // $FlowFixMe: this check should...
   if (constantTypeFunctions[type]) {
-    // $FlowFixMe: ... guard this access!
     return newMapping(constantTypeFunctions[type]());
   }
 

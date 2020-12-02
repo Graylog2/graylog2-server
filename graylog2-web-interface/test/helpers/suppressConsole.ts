@@ -26,12 +26,10 @@
 const suppressConsole = (fn: () => void) => {
   /* eslint-disable no-console */
   const originalConsoleError = console.error;
-  // $FlowFixMe: We explicitly want to overwrite `error`
   console.error = () => {};
 
   fn();
 
-  // $FlowFixMe: We explicitly want to overwrite `error`
   console.error = originalConsoleError;
   /* eslint-enable no-console */
 };

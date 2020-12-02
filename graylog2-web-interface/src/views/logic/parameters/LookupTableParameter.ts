@@ -93,7 +93,6 @@ export default class LookupTableParameter extends Parameter {
   }
 
   // static fromJSON(json: LookupTableParameterJson): Parameter {
-  // $FlowFixMe Flow can't override statics https://github.com/facebook/flow/issues/4953
   static fromJSON(json: LookupTableParameterJson): LookupTableParameter {
     // eslint-disable-next-line camelcase
     const { name, title, description, data_type, default_value, optional, lookup_table, key } = json;

@@ -83,7 +83,6 @@ describe('Views bindings field actions', () => {
   });
 
   describe('Statistics', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const action: FieldAction = findAction('statistics');
     const { isEnabled } = action;
 
@@ -126,7 +125,6 @@ describe('Views bindings field actions', () => {
   });
 
   describe('AddToAllTables', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const action: FieldAction = findAction('add-to-all-tables');
     const { isEnabled } = action;
 
@@ -178,7 +176,6 @@ describe('Views bindings field actions', () => {
   });
 
   describe('RemoveFromAllTables', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const action: FieldAction = findAction('remove-from-all-tables');
     const { isEnabled } = action;
 

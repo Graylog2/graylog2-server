@@ -17,7 +17,6 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { EntityListItem } from 'components/common';
@@ -84,7 +83,6 @@ const Requirements = ({ requires, requirementsProvided }: RequirementsProps) => 
     ? (
       <h5>
         Missing requirement(s): {Object.values(missing)
-        // $FlowFixMe: plugin is of type Plugin, not mixed.
         .map((plugin: Plugin) => <MissingRequirement key={plugin.name} plugin={plugin} />)}
       </h5>
     )

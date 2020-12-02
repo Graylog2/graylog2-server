@@ -199,7 +199,6 @@ describe('Chart helper functions', () => {
         transformKeys(config.rowPivots, config.columnPivots),
         extractSeries(),
         formatSeries,
-        // $FlowFixMe: Returning different result type on purpose
         generateChart('scatter', generatorFunction),
       ]);
       const result = pipeline(input);

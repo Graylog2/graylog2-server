@@ -29,7 +29,6 @@ describe('Views bindings enterprise widgets', () => {
   const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 
   describe('Aggregations', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const aggregationConfig: WidgetCondig = findWidgetConfig('AGGREGATION');
 
     it('is present', () => {
