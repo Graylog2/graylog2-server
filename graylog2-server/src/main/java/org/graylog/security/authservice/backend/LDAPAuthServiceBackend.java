@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.security.authservice.backend;
 
@@ -24,6 +24,7 @@ import com.unboundid.ldap.sdk.LDAPException;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.AuthServiceCredentials;
+import org.graylog.security.authservice.AuthenticationDetails;
 import org.graylog.security.authservice.ProvisionerService;
 import org.graylog.security.authservice.UserDetails;
 import org.graylog.security.authservice.ldap.LDAPConnectorConfig;
@@ -32,6 +33,7 @@ import org.graylog.security.authservice.ldap.UnboundLDAPConfig;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
 import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
 import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +69,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     }
 
     @Override
-    public Optional<UserDetails> authenticateAndProvision(AuthServiceCredentials authCredentials, ProvisionerService provisionerService) {
+    public Optional<AuthenticationDetails> authenticateAndProvision(AuthServiceCredentials authCredentials, ProvisionerService provisionerService) {
         try (final LDAPConnection connection = ldapConnector.connect(config.getLDAPConnectorConfig())) {
             if (connection == null) {
                 return Optional.empty();
@@ -99,13 +101,13 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
                     .defaultRoles(backend.defaultRoles())
                     .build());
 
-            return Optional.of(userDetails);
+            return Optional.of(AuthenticationDetails.builder().userDetails(userDetails).build());
         } catch (GeneralSecurityException e) {
             LOG.error("Error setting up TLS connection", e);
-            return Optional.empty();
+            throw new AuthenticationServiceUnavailableException("Error setting up TLS connection", e);
         } catch (LDAPException e) {
             LOG.error("LDAP error", e);
-            return Optional.empty();
+            throw new AuthenticationServiceUnavailableException("LDAP error", e);
         }
     }
 

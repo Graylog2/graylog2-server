@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 module.exports = {
   parser: 'babel-eslint',
   env: {
@@ -6,7 +22,19 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.js', '*.jsx'],
+      files: ['*.ts', '*.tsx'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['@typescript-eslint/eslint-plugin'],
+      rules: {
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': ['error'],
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': ['error'],
+        'no-redeclare': 'off',
+        '@typescript-eslint/no-redeclare': ['error'],
+        'no-shadow': 'off',
+        '@typescript-eslint/no-shadow': ['error'],
+      },
     },
   ],
   extends: [
@@ -15,13 +43,11 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/react',
-    'plugin:flowtype/recommended',
     'plugin:jest-formatting/strict',
   ],
   plugins: [
     'import',
     'react-hooks',
-    'flowtype',
     'jest-formatting',
   ],
   rules: {
@@ -54,6 +80,7 @@ module.exports = {
     'object-shorthand': ['error', 'methods'],
     'react/forbid-prop-types': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],
+    'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
     'react/jsx-one-expression-per-line': 'off',
@@ -93,23 +120,6 @@ module.exports = {
         next: ['block', 'multiline-block-like', 'class', 'multiline-expression', 'return'],
       },
     ],
-
-    // eslint-plugin-flowtype configs, `recommended` is too weak in a couple of places:
-    'flowtype/delimiter-dangle': [1, 'always-multiline'],
-    'flowtype/no-weak-types': [
-      2,
-      {
-        any: false,
-      },
-    ],
-    'flowtype/require-valid-file-annotation': [
-      2,
-      'never', {
-        annotationStyle: 'line',
-        strict: true,
-      },
-    ],
-    'flowtype/semi': [2, 'always'],
   },
   settings: {
     'import/resolver': {

@@ -1,33 +1,31 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.schema;
 
 public class NetworkFields {
     public static final String NETWORK_APPLICATION = "network_application";
     public static final String NETWORK_BYTES = "network_bytes";
-    public static final String NETWORK_BYTES_RX = "network_bytes_rx";
-    public static final String NETWORK_BYTES_TX = "network_bytes_tx";
     public static final String NETWORK_COMMUNITY_ID = "network_community_id";
     public static final String NETWORK_DATA_BYTES = "network_data_bytes";
     public static final String NETWORK_DIRECTION = "network_direction";
     public static final String NETWORK_FORWARDED_IP = "network_forwarded_ip";
     public static final String NETWORK_HEADER_BYTES = "network_header_bytes";
     public static final String NETWORK_IANA_NUMBER = "network_iana_number";
-    public static final String NETWORK_ICMP_BYTES = "network_icmp_bytes";
+    public static final String NETWORK_ICMP_TYPE = "network_icmp_type";
     public static final String NETWORK_INNER = "network_inner";
     public static final String NETWORK_INTERFACE_IN = "network_interface_in";
     public static final String NETWORK_INTERFACE_OUT = "network_interface_out";
@@ -39,4 +37,10 @@ public class NetworkFields {
     public static final String NETWORK_TUNNEL_DURATION = "network_tunnel_duration";
     public static final String NETWORK_TUNNEL_TYPE = "network_tunnel_type";
     public static final String NETWORK_TYPE = "network_type";
+
+    // To be removed
+    @Deprecated
+    public static final String NETWORK_BYTES_RX = DestinationFields.DESTINATION_BYTES_SENT;
+    @Deprecated
+    public static final String NETWORK_BYTES_TX = SourceFields.SOURCE_BYTES_SENT;
 }
