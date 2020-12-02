@@ -58,7 +58,7 @@ describe('WidgetColorContext', () => {
       </ChartColorContext.Consumer>
     </WidgetColorContext>
   ));
-  const container = wrapper.find('Container');
+  const container = wrapper.find(Container);
 
   it('extracts coloring rules for current widget', () => {
     const { colors } = container.props();
