@@ -58,8 +58,6 @@ const SidecarsPage = () => {
             </>
           )}
 
-          {!canCreateSidecarUserTokens && <></>}
-
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
               <Button bsStyle="info">Overview</Button>
