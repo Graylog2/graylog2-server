@@ -1,0 +1,37 @@
+name: Build the repository
+
+on: 
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8 
+      - name: Set up Maven cache
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+          path: ~/.m2/repository
+      - name: Set up Yarn cache
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+          path: ~/.cache/yarn
+      - name: License check
+        run: mvn -B --fail-fast license:check
+      - name: Build with Maven
+        run: mvn -B --fail-fast -Pedantic -Dspotbugs.skip -Dit.es verify javadoc:javadoc
+        env:
+          JAVA_OPTS: -Xmx6G
+
+

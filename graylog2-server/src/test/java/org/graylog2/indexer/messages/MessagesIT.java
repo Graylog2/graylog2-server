@@ -133,7 +133,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void testIfTooLargeBatchesGetSplitUp() throws Exception {
         // This test assumes that ES is configured with bulk_max_body_size to 100MB
         // Check if we can index about 300MB of messages (once the large batch gets split up)
-        final int MESSAGECOUNT = 303;
+        final int MESSAGECOUNT = 101;
         // Each Message is about 1 MB
         final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
         final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
