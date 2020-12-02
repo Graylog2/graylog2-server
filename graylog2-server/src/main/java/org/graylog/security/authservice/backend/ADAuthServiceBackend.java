@@ -16,6 +16,7 @@
  */
 package org.graylog.security.authservice.backend;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.unboundid.ldap.sdk.Filter;
@@ -27,6 +28,7 @@ import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.AuthenticationDetails;
 import org.graylog.security.authservice.ProvisionerService;
 import org.graylog.security.authservice.UserDetails;
+import org.graylog.security.authservice.ldap.LDAPConnectorConfig;
 import org.graylog.security.authservice.ldap.LDAPUser;
 import org.graylog.security.authservice.ldap.UnboundLDAPConfig;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
@@ -40,8 +42,10 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ADAuthServiceBackend implements AuthServiceBackend {
     public static final String TYPE_NAME = "active-directory";
@@ -193,14 +197,41 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
     public AuthServiceBackendTestResult testConnection(@Nullable AuthServiceBackendDTO existingBackendConfig) {
         final ADAuthServiceBackendConfig testConfig = buildTestConfig(existingBackendConfig);
 
-        try (final LDAPConnection connection = ldapConnector.connect(testConfig.getLDAPConnectorConfig())) {
+        final LDAPConnectorConfig config = testConfig.getLDAPConnectorConfig();
+
+        if (config.serverList().size() == 1) {
+            return testSingleConnection(config, config.serverList().get(0));
+        }
+
+        // Test each server separately, so we can see the result for each
+        final List<AuthServiceBackendTestResult> testResults = config.serverList().stream().map(server -> testSingleConnection(config, server)).collect(Collectors.toList());
+
+        if (testResults.stream().anyMatch(res -> !res.isSuccess())) {
+            return AuthServiceBackendTestResult
+                    .createFailure("Test failure",
+                            testResults.stream().map(r -> {
+                                if (r.isSuccess()) {
+                                    return r.message();
+                                } else {
+                                    return r.message() + " : " + String.join(",", r.errors());
+                                }
+                            }).collect(Collectors.toList()));
+        } else {
+            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + config.serverList());
+        }
+    }
+
+    private AuthServiceBackendTestResult testSingleConnection(LDAPConnectorConfig config, LDAPConnectorConfig.LDAPServer server) {
+        final LDAPConnectorConfig singleServerConfig = config.toBuilder().serverList(ImmutableList.of(server)).build();
+
+        try (final LDAPConnection connection = ldapConnector.connect(singleServerConfig)) {
             if (connection == null) {
-                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.servers());
+                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + server);
             }
-            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + testConfig.servers());
+            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + server);
         } catch (Exception e) {
             return AuthServiceBackendTestResult.createFailure(
-                    "Couldn't establish connection to " + testConfig.servers(),
+                    "Couldn't establish connection to " + server,
                     Collections.singletonList(e.getMessage())
             );
         }

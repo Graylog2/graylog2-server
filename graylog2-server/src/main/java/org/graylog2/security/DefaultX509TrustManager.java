@@ -17,10 +17,11 @@
 package org.graylog2.security;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.bouncycastle.est.jcajce.JsseDefaultHostnameAuthorizer;
 
-import javax.inject.Inject;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedTrustManager;
@@ -34,19 +35,51 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class DefaultX509TrustManager extends X509ExtendedTrustManager {
-    private final String host;
+    private final List<String> hosts;
     private final X509TrustManager defaultTrustManager;
     private final JsseDefaultHostnameAuthorizer authorizer;
 
-    @Inject
+    @AssistedInject
     public DefaultX509TrustManager(@Assisted String host) throws NoSuchAlgorithmException, KeyStoreException {
         this(host, null);
     }
 
+    /**
+     * Create a X509TrustManager that verifies the certificate chain and checks whether the cert matches
+     * one of the given hosts in the list.
+     * <p>
+     * <b>Note: ANY matching host from the list is accepted. </b> <br>
+     *    E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
+     * @param hosts     The hosts to check the certificate subject against
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     */
+    @AssistedInject
+    public DefaultX509TrustManager(@Assisted List<String> hosts) throws NoSuchAlgorithmException, KeyStoreException {
+        this(hosts, null);
+    }
+
     @VisibleForTesting
     public DefaultX509TrustManager(String host, KeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException {
+        this(ImmutableList.of(host), keyStore);
+    }
+
+    /**
+     * Create a X509TrustManager that verifies the certificate chain and checks whether the cert matches
+     * one of the given hosts in the list.
+     * <p>
+     * <b>Note: ANY matching host from the list is accepted. </b> <br>
+     *    E.g.: Given a host list [A,B], the server B is allowed to offer a certificate issued to A
+     * @param hosts     The hosts to check the certificate subject against
+     * @param keyStore  The trusted KeyStore
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     */
+    @VisibleForTesting
+    public DefaultX509TrustManager(List<String> hosts, KeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException {
         super();
         this.authorizer = new JsseDefaultHostnameAuthorizer(Collections.emptySet());
 
@@ -59,7 +92,7 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Unable to initialize default X509 trust manager."));
 
-        this.host = host;
+        this.hosts = hosts;
     }
 
     @Override
@@ -107,10 +140,12 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     }
 
     private boolean certificateMatchesHostname(X509Certificate x509Certificate) {
-        try {
-            return this.authorizer.verify(this.host, x509Certificate);
-        } catch (IOException e) {
-            return false;
-        }
+        return this.hosts.stream().anyMatch(host -> {
+            try {
+                return this.authorizer.verify(host, x509Certificate);
+            } catch (IOException e) {
+                return false;
+            }
+        });
     }
 }

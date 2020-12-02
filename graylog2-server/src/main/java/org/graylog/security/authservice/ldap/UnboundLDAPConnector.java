@@ -111,8 +111,7 @@ public class UnboundLDAPConnector {
 
             final SSLUtil sslUtil;
             if (ldapConfig.verifyCertificates()) {
-                // TODO support multiple hosts
-                sslUtil = new SSLUtil(trustManagerProvider.create(addresses[0]));
+                sslUtil = new SSLUtil(trustManagerProvider.create(Arrays.asList(addresses)));
             } else {
                 sslUtil = new SSLUtil(new TrustAllX509TrustManager());
             }

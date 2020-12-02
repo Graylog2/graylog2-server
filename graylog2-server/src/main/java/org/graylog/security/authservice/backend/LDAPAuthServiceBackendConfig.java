@@ -84,8 +84,8 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
 
     @Override
     public void validate(ValidationResult result) {
-        if (servers().size() > 1) {
-            result.addError(FIELD_SERVERS, "Currently only a single server URL is supported.");
+        if (servers().isEmpty()) {
+            result.addError(FIELD_SERVERS, "Server list cannot be empty.");
         }
         if (isBlank(userSearchBase())) {
             result.addError(FIELD_USER_SEARCH_BASE, "User search base cannot be empty.");

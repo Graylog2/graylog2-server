@@ -16,6 +16,7 @@
  */
 package org.graylog.security.authservice.ldap;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPException;
@@ -33,6 +34,7 @@ import org.apache.directory.server.core.partition.impl.avl.AvlPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog2.ApacheDirectoryTestServiceFactory;
+import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.After;
@@ -44,10 +46,10 @@ import org.junit.runner.RunWith;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(FrameworkRunner.class)
 @CreateLdapServer(transports = {
@@ -96,16 +98,17 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
     @Before
     public void setUp() throws Exception {
         final LdapServer server = getLdapServer();
+        final LDAPConnectorConfig.LDAPServer unreachableServer = LDAPConnectorConfig.LDAPServer.create("localhost", 9);
         final LDAPConnectorConfig.LDAPServer ldapServer = LDAPConnectorConfig.LDAPServer.create("localhost", server.getPort());
         final LDAPConnectorConfig connectorConfig = LDAPConnectorConfig.builder()
                 .systemUsername(ADMIN_DN)
                 .systemPassword(encryptedValueService.encrypt(ADMIN_PASSWORD))
                 .transportSecurity(LDAPTransportSecurity.NONE)
                 .verifyCertificates(false)
-                .serverList(Collections.singletonList(ldapServer))
+                .serverList(ImmutableList.of(unreachableServer, ldapServer))
                 .build();
 
-        connector = new UnboundLDAPConnector(10000, ENABLED_TLS_PROTOCOLS, (host) -> null, encryptedValueService);
+        connector = new UnboundLDAPConnector(10000, ENABLED_TLS_PROTOCOLS, mock(TrustManagerProvider.class), encryptedValueService);
         connection = connector.connect(connectorConfig);
     }
 
