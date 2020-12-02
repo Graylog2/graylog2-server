@@ -47,7 +47,7 @@ export type NodesStoreState = {
   clusterId: string;
   nodeCount: number;
 };
-const NodesStore: Store<NodesStoreState> = Reflux.createStore({
+const NodesStore = Reflux.createStore<NodesStoreState>({
   listenables: [NodesActions],
   nodes: undefined,
   clusterId: undefined,

@@ -15,7 +15,7 @@ declare module 'reflux' {
 
   type ElementType <T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<infer E> ? E : never;
 
-  export function createStore<T, S extends StoreDefinition>(definition: S): Store<T> & S;
+  export function createStore<T>(definition: StoreDefinition): Store<T> & typeof definition;
   export function createActions<R>(definitions: ActionsDefinition): RefluxActions<R>;
   export function createActions<R>(definitions: R): RefluxActions<{ [key in ElementType<typeof definitions>]: () => Promise<unknown> }>;
   export function connect(store: Store, key?: string): void;

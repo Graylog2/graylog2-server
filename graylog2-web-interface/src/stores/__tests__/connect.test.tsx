@@ -46,7 +46,7 @@ type Actions = {
   noop: () => void,
 };
 
-const _simpleStore = {
+const SimpleStore = Reflux.createStore<{ value: number }>({
   getInitialState() {
     return this.state;
   },
@@ -59,9 +59,7 @@ const _simpleStore = {
     this.state = undefined;
     this.trigger(this.state);
   },
-};
-
-const SimpleStore = Reflux.createStore<{ value: number }, typeof _simpleStore>(_simpleStore);
+});
 
 const SimpleComponentWithDummyStore = ({ simpleStore }) => {
   if (simpleStore && simpleStore.value) {
