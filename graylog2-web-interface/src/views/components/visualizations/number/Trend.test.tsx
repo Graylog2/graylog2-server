@@ -22,7 +22,7 @@ import Trend, { TREND_BAD, TREND_GOOD, TREND_NEUTRAL } from './Trend';
 const renderTrend = ({
   current = 42,
   previous = 42,
-  trendPreference = 'NEUTRAL',
+  trendPreference = 'NEUTRAL' as const,
 } = {}) => mount(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
 
 describe('Trend', () => {
