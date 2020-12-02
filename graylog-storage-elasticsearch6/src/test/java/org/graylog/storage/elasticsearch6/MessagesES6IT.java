@@ -91,9 +91,4 @@ public class MessagesES6IT extends MessagesIT {
 
         return indexResponse.isSucceeded();
     }
-
-    @Test
-    public void enoughHeapMemoryAvailable() {
-        assertThat(Runtime.getRuntime().maxMemory()).isGreaterThan(4096 * 1024);
-    }
 }
