@@ -34,6 +34,14 @@ type Props = {
   onClose: () => void,
 };
 
+const _isRequired = (field) => (value) => {
+  if (!value || value === '') {
+    return `${field} is required`;
+  }
+
+  return undefined;
+};
+
 const numberConditionOptions = ['==', '!=', '<=', '>=', '<', '>'].map((cond) => ({ value: cond, label: cond }));
 const otherConditionOptions = ['==', '!='].map((cond) => ({ value: cond, label: cond }));
 
@@ -58,15 +66,16 @@ const HighlightForm = ({ onClose }: Props) => {
             }}>
       {() => (
         <BootstrapModalWrapper showModal
-                               onModalClose={onClose}>
+                               onClose={onClose}>
           <Form className="form">
             <Modal.Header>
               <Modal.Title>Highlighting Rule</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <Field name="field">
-                {({ field: { name, value, onChange } }) => (
+              <Field name="field" validate={_isRequired('Field')}>
+                {({ field: { name, value, onChange }, meta }) => (
                   <Input id="field_type_controls"
+                         error={meta?.error}
                          label="Field">
                     <Select inputId="field-select"
                             onChange={(newValue) => onChange({ target: { name, value: newValue } })}
@@ -76,13 +85,14 @@ const HighlightForm = ({ onClose }: Props) => {
                   </Input>
                 )}
               </Field>
-              <Field name="condition">
-                {({ field: { name, value, onChange }, form: { values: { field: fieldValue } } }) => {
+              <Field name="condition" validate={_isRequired('Condition')}>
+                {({ field: { name, value, onChange }, form: { values: { field: fieldValue } }, meta }) => {
                   const fieldType = fields.find(({ name: fieldName }) => fieldName === fieldValue);
                   const { type } = fieldType?.type || { type: 'string' };
 
                   return (
                     <Input id="condition-controls"
+                           error={meta?.error}
                            label="Condition">
                       <Select inputId="condition-select"
                               onChange={(newValue) => onChange({ target: { name, value: newValue } })}
@@ -93,10 +103,11 @@ const HighlightForm = ({ onClose }: Props) => {
                   );
                 }}
               </Field>
-              <Field name="value">
-                {({ field: { name, value, onChange } }) => (
+              <Field name="value" validate={_isRequired('Value')}>
+                {({ field: { name, value, onChange }, meta }) => (
                   <Input id={name}
                          type="text"
+                         error={meta?.error}
                          onChange={onChange}
                          value={value}
                          label="Value" />
