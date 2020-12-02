@@ -17,7 +17,7 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
-import { DefaultTheme, useTheme } from 'styled-components';
+import { DefaultTheme, withTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
 import { themePropTypes } from 'theme';
@@ -232,6 +232,99 @@ type State = {
 };
 
 class Select extends React.Component<Props & { theme: DefaultTheme }, State> {
+  static propTypes = {
+    /** Specifies if the user can create new entries in `multi` Selects. */
+    allowCreate: PropTypes.bool,
+    /** Indicates if the Select value is clearable or not. */
+    clearable: PropTypes.bool,
+    /**
+     * A collection of custom `react-select` components from https://react-select.com/components
+     */
+    components: PropTypes.objectOf(PropTypes.elementType),
+    /** Delimiter to use as value separator in `multi` Selects. */
+    delimiter: PropTypes.string,
+    /** Indicates whether the Select component is disabled or not. */
+    disabled: PropTypes.bool,
+    /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
+    displayKey: PropTypes.string,
+    /** Id of underlying input */
+    inputId: PropTypes.string,
+    /** Indicates whether the auto-completion should return results including accents/diacritics when searching for their non-accent counterpart */
+    ignoreAccents: PropTypes.bool,
+    /**
+     * @deprecated Use `inputId` or custom components with the `components` prop instead.
+     * Custom attributes for the input (inside the Select).
+     */
+    inputProps: PropTypes.object,
+    /** Indicates which option property to filter on. */
+    matchProp: PropTypes.oneOf(['any', 'label', 'value']),
+    /** Specifies if multiple values can be selected or not. */
+    multi: PropTypes.bool,
+    /** Callback when select has lost focus */
+    onBlur: PropTypes.func,
+    /**
+     * Callback when selected option changes. It receives the value of the
+     * selected option as an argument. If `multi` is enabled, the passed
+     * argument will be a string separated by `delimiter` with all selected
+     * options.
+     */
+    onChange: PropTypes.func.isRequired,
+    /**
+     * Available options shown in the select field. It should be an array of objects,
+     * each one with a display key (specified in `displayKey`), and a value key
+     * (specified in `valueKey`).
+     * Options including an optional `disabled: true` key-value pair, will be disabled in the Select component.
+     */
+    options: PropTypes.array.isRequired,
+    /** Custom function to render the options in the menu. */
+    optionRenderer: PropTypes.func,
+    /** Size of the select input. */
+    size: PropTypes.oneOf(['normal', 'small']),
+    /** @ignore */
+    theme: themePropTypes.isRequired,
+    /**
+     * String containing the selected value. If `multi` is enabled, it must
+     * be a string containing all values separated by the `delimiter`.
+     */
+    value: PropTypes.string,
+    /** Indicates which option object key contains the value of the option. */
+    valueKey: PropTypes.string,
+    /** Custom function to render the selected option in the Select. */
+    valueRenderer: PropTypes.func,
+    /** Label text for add button */
+    addLabelText: PropTypes.string,
+    /** Automatically Focus on Select */
+    autoFocus: PropTypes.bool,
+    /** special onChange handler */
+    onReactSelectChange: PropTypes.func,
+    /** select placeholder */
+    placeholder: PropTypes.string,
+  }
+
+  static defaultProps = {
+    addLabelText: undefined,
+    allowCreate: false,
+    autoFocus: false,
+    clearable: true,
+    components: null,
+    delimiter: ',',
+    disabled: false,
+    displayKey: 'label',
+    ignoreAccents: true,
+    inputId: undefined,
+    onBlur: undefined,
+    inputProps: undefined,
+    matchProp: 'any',
+    multi: false,
+    onReactSelectChange: undefined,
+    optionRenderer: undefined,
+    placeholder: undefined,
+    size: 'normal',
+    value: undefined,
+    valueKey: 'value',
+    valueRenderer: undefined,
+  };
+
   constructor(props: Props & { theme: DefaultTheme }) {
     super(props);
     const { inputProps, optionRenderer, value, valueRenderer } = props;
@@ -421,103 +514,4 @@ class Select extends React.Component<Props & { theme: DefaultTheme }, State> {
   }
 }
 
-const SelectWithTheme = (props: Props) => {
-  const theme = useTheme();
-
-  return <Select {...props} theme={theme} />;
-};
-
-SelectWithTheme.propTypes = {
-  /** Specifies if the user can create new entries in `multi` Selects. */
-  allowCreate: PropTypes.bool,
-  /** Indicates if the Select value is clearable or not. */
-  clearable: PropTypes.bool,
-  /**
-   * A collection of custom `react-select` components from https://react-select.com/components
-   */
-  components: PropTypes.objectOf(PropTypes.elementType),
-  /** Delimiter to use as value separator in `multi` Selects. */
-  delimiter: PropTypes.string,
-  /** Indicates whether the Select component is disabled or not. */
-  disabled: PropTypes.bool,
-  /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
-  displayKey: PropTypes.string,
-  /** Id of underlying input */
-  inputId: PropTypes.string,
-  /** Indicates whether the auto-completion should return results including accents/diacritics when searching for their non-accent counterpart */
-  ignoreAccents: PropTypes.bool,
-  /**
-   * @deprecated Use `inputId` or custom components with the `components` prop instead.
-   * Custom attributes for the input (inside the Select).
-   */
-  inputProps: PropTypes.object,
-  /** Indicates which option property to filter on. */
-  matchProp: PropTypes.oneOf(['any', 'label', 'value']),
-  /** Specifies if multiple values can be selected or not. */
-  multi: PropTypes.bool,
-  /** Callback when select has lost focus */
-  onBlur: PropTypes.func,
-  /**
-   * Callback when selected option changes. It receives the value of the
-   * selected option as an argument. If `multi` is enabled, the passed
-   * argument will be a string separated by `delimiter` with all selected
-   * options.
-   */
-  onChange: PropTypes.func.isRequired,
-  /**
-   * Available options shown in the select field. It should be an array of objects,
-   * each one with a display key (specified in `displayKey`), and a value key
-   * (specified in `valueKey`).
-   * Options including an optional `disabled: true` key-value pair, will be disabled in the Select component.
-   */
-  options: PropTypes.array.isRequired,
-  /** Custom function to render the options in the menu. */
-  optionRenderer: PropTypes.func,
-  /** Size of the select input. */
-  size: PropTypes.oneOf(['normal', 'small']),
-  /** @ignore */
-  theme: themePropTypes.isRequired,
-  /**
-   * String containing the selected value. If `multi` is enabled, it must
-   * be a string containing all values separated by the `delimiter`.
-   */
-  value: PropTypes.string,
-  /** Indicates which option object key contains the value of the option. */
-  valueKey: PropTypes.string,
-  /** Custom function to render the selected option in the Select. */
-  valueRenderer: PropTypes.func,
-  /** Label text for add button */
-  addLabelText: PropTypes.string,
-  /** Automatically Focus on Select */
-  autoFocus: PropTypes.bool,
-  /** special onChange handler */
-  onReactSelectChange: PropTypes.func,
-  /** select placeholder */
-  placeholder: PropTypes.string,
-};
-
-SelectWithTheme.defaultProps = {
-  addLabelText: undefined,
-  allowCreate: false,
-  autoFocus: false,
-  clearable: true,
-  components: null,
-  delimiter: ',',
-  disabled: false,
-  displayKey: 'label',
-  ignoreAccents: true,
-  inputId: undefined,
-  onBlur: undefined,
-  inputProps: undefined,
-  matchProp: 'any',
-  multi: false,
-  onReactSelectChange: undefined,
-  optionRenderer: undefined,
-  placeholder: undefined,
-  size: 'normal',
-  value: undefined,
-  valueKey: 'value',
-  valueRenderer: undefined,
-};
-
-export default SelectWithTheme;
+export default withTheme(Select);
