@@ -18,10 +18,9 @@ import * as React from 'react';
 import { useContext } from 'react';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
-import styled from 'styled-components';
 
-import { Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Input, BootstrapModalWrapper } from 'components/bootstrap';
+import { Button, Modal } from 'components/graylog';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
@@ -30,14 +29,6 @@ import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import ColorPreview from 'views/components/sidebar/highlighting/ColorPreview';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-
-const StyledHeader = styled.h4`
-  margin-bottom: 8px;
-`;
-
-const SubmitButton = styled(Button)`
-  margin-right: 3px;
-`;
 
 type Props = {
   onClose: () => void,
@@ -58,79 +49,85 @@ const HighlightForm = ({ onClose }: Props) => {
   ).then(onClose);
 
   return (
-    <>
-      <hr />
-      <StyledHeader>New Highlight rule</StyledHeader>
-      <Formik onSubmit={onSubmit}
-              initialValues={{
-                field: undefined,
-                value: undefined,
-                condition: '==',
-                color: '#6fecc2',
-              }}>
-        {() => (
+    <Formik onSubmit={onSubmit}
+            initialValues={{
+              field: undefined,
+              value: '',
+              condition: '==',
+              color: '#6fecc2',
+            }}>
+      {() => (
+        <BootstrapModalWrapper showModal
+                               onModalClose={onClose}>
           <Form className="form">
-            <Field name="field">
-              {({ field: { name, value, onChange } }) => (
-                <Input id="field_type_controls"
-                       label="Field">
-                  <Select inputId="field-select"
-                          onChange={(newValue) => onChange({ target: { name, value: newValue } })}
-                          options={fieldOptions}
-                          value={value}
-                          placeholder="Pick a field" />
-                </Input>
-              )}
-            </Field>
-            <Field name="condition">
-              {({ field: { name, value, onChange }, form: { values: { field: fieldValue } } }) => {
-                const fieldType = fields.find(({ name: fieldName }) => fieldName === fieldValue);
-                const { type } = fieldType?.type || { type: 'string' };
-
-                return (
-                  <Input id="condition-controls"
-                         label="Condition">
-                    <Select inputId="condition-select"
+            <Modal.Header>
+              <Modal.Title>Highlighting Rule</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Field name="field">
+                {({ field: { name, value, onChange } }) => (
+                  <Input id="field_type_controls"
+                         label="Field">
+                    <Select inputId="field-select"
                             onChange={(newValue) => onChange({ target: { name, value: newValue } })}
-                            options={type === 'long' ? numberConditionOptions : otherConditionOptions}
+                            options={fieldOptions}
                             value={value}
-                            placeholder="Choose a condition" />
+                            placeholder="Pick a field" />
                   </Input>
-                );
-              }}
-            </Field>
-            <Field name="value">
-              {({ field: { name, value, onChange } }) => (
-                <Input id={name}
-                       type="text"
-                       onChange={onChange}
-                       value={value}
-                       label="Value" />
-              )}
-            </Field>
-            <Field name="color">
-              {({ field: { name, value, onChange } }) => (
-                <Input id={name}
-                       label="Color">
-                  <ColorPickerPopover id="formatting-rule-color"
-                                      placement="right"
-                                      color={value}
-                                      colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                                      triggerNode={<ColorPreview color={value} />}
-                                      onChange={(newColor, _, hidePopover) => {
-                                        hidePopover();
-                                        onChange({ target: { name, value: newColor } });
-                                      }} />
-                </Input>
-              )}
-            </Field>
-            <SubmitButton bsStyle="success" type="submit">Create</SubmitButton>
-            <Button onClick={onClose}>Cancel</Button>
+                )}
+              </Field>
+              <Field name="condition">
+                {({ field: { name, value, onChange }, form: { values: { field: fieldValue } } }) => {
+                  const fieldType = fields.find(({ name: fieldName }) => fieldName === fieldValue);
+                  const { type } = fieldType?.type || { type: 'string' };
+
+                  return (
+                    <Input id="condition-controls"
+                           label="Condition">
+                      <Select inputId="condition-select"
+                              onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                              options={type === 'long' ? numberConditionOptions : otherConditionOptions}
+                              value={value}
+                              placeholder="Choose a condition" />
+                    </Input>
+                  );
+                }}
+              </Field>
+              <Field name="value">
+                {({ field: { name, value, onChange } }) => (
+                  <Input id={name}
+                         type="text"
+                         onChange={onChange}
+                         value={value}
+                         label="Value" />
+                )}
+              </Field>
+              <Field name="color">
+                {({ field: { name, value, onChange } }) => (
+                  <Input id={name}
+                         label="Color">
+                    <ColorPickerPopover id="formatting-rule-color"
+                                        placement="right"
+                                        color={value}
+                                        colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+                                        triggerNode={<ColorPreview color={value} />}
+                                        onChange={(newColor, _, hidePopover) => {
+                                          hidePopover();
+                                          onChange({ target: { name, value: newColor } });
+                                        }} />
+                  </Input>
+                )}
+              </Field>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button type="button" onClick={onClose}>Cancel</Button>
+              <Button type="submit">Save</Button>
+            </Modal.Footer>
           </Form>
-        )}
-      </Formik>
-      <hr />
-    </>
+        </BootstrapModalWrapper>
+      )}
+
+    </Formik>
   );
 };
 
