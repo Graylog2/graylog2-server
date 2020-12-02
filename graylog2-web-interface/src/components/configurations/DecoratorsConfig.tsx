@@ -38,7 +38,7 @@ const { DecoratorsActions } = CombinedProvider.get('Decorators');
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState<Array<Stream> | undefined>();
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
-  const [decorators, setDecorators] = useState<Array<Decorator>>();
+  const [decorators, setDecorators] = useState<Array<Decorator> | undefined>();
   const [types, setTypes] = useState();
   const configModal = useRef<BootstrapModalWrapper>();
 
