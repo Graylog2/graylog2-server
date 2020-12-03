@@ -7,6 +7,7 @@ import org.apache.pulsar.client.api.MessageId;
 import org.graylog2.shared.messageq.MessageQueue;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
@@ -82,9 +83,9 @@ public class PulsarMessageQueueEntry implements MessageQueue.Entry {
         if (o == null || getClass() != o.getClass()) return false;
         PulsarMessageQueueEntry that = (PulsarMessageQueueEntry) o;
         return timestamp == that.timestamp &&
-                Objects.equal(id, that.id) &&
-                Objects.equal(key, that.key) &&
-                Objects.equal(value, that.value);
+                Arrays.equals(id, that.id) &&
+                Arrays.equals(key, that.key) &&
+                Arrays.equals(value, that.value);
     }
 
     @Override
