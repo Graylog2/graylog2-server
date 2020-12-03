@@ -93,8 +93,8 @@ const HighlightingRule = ({ rule }: Props) => {
           <strong>{field}</strong> {condition} <i>&quot;{value}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
-          <IconButton name="edit" onClick={() => setShowForm(true)} />
-          <IconButton name="trash" onClick={() => onDelete(rule)} />
+          <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
+          <IconButton title="Remove this Highlighting Rule" name="trash" onClick={() => onDelete(rule)} />
         </ButtonContainer>
       </HighlightingRuleGrid>
       { showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}

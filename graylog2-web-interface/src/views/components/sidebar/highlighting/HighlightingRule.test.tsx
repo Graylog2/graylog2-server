@@ -69,6 +69,20 @@ describe('HighlightingRule', () => {
       .then(() => expect(hidePopover).toHaveBeenCalled());
   });
 
+  describe('rule edit', () => {
+
+    it('should show a edit modal', () => {
+      const wrapper = mount(<HighlightingRule rule={rule} />);
+      const editIcon = wrapper.find('button[title="Edit this Highlighting Rule"]');
+
+      expect(wrapper).not.toIncludeText('Edit Highlighting Rule');
+
+      editIcon.simulate('click');
+
+      expect(wrapper).toIncludeText('Edit Highlighting Rule');
+    });
+  });
+
   describe('rule removal:', () => {
     let oldConfirm = null;
     let deleteIcon;
@@ -80,7 +94,7 @@ describe('HighlightingRule', () => {
       HighlightingRulesActions.remove = mockAction(jest.fn(() => Promise.resolve([])));
       const wrapper = mount(<HighlightingRule rule={rule} />);
 
-      deleteIcon = wrapper.find('span[title="Remove this Highlighting Rule"]');
+      deleteIcon = wrapper.find('button[title="Remove this Highlighting Rule"]');
     });
 
     afterEach(() => {

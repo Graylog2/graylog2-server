@@ -68,6 +68,8 @@ const HighlightForm = ({ onClose, rule }: Props) => {
     ).then(onClose);
   };
 
+  const headerTxt = rule ? 'Edit' : 'New';
+
   return (
     <Formik onSubmit={onSubmit}
             initialValues={{
@@ -81,7 +83,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                                onClose={onClose}>
           <Form className="form">
             <Modal.Header>
-              <Modal.Title>Highlighting Rule</Modal.Title>
+              <Modal.Title>{headerTxt} Highlighting Rule</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Field name="field" validate={_isRequired('Field')}>
