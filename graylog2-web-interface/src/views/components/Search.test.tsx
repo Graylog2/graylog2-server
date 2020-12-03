@@ -123,8 +123,8 @@ describe('Search', () => {
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
     // @ts-ignore
     SearchActions.execute = jest.fn(() => mockPromise());
-    StreamsActions.refresh = jest.fn();
-    SearchConfigActions.refresh = jest.fn();
+    StreamsActions.refresh = mockAction(jest.fn());
+    SearchConfigActions.refresh = mockAction(jest.fn());
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
 

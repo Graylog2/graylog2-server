@@ -40,13 +40,7 @@ import connect, { useStore } from '../connect';
 
 const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
 
-type Actions = {
-  setValue: (number) => void,
-  reset: () => void,
-  noop: () => void,
-};
-
-const SimpleStore: Store<{ value: number }> & Actions = Reflux.createStore({
+const SimpleStore = Reflux.createStore<{ value: number }>({
   getInitialState() {
     return this.state;
   },

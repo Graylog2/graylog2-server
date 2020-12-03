@@ -31,7 +31,7 @@ export const RefreshActions: RefreshActionsType = singletonActions(
     'enable',
     'disable',
     'setInterval',
-  ]),
+  ] as const),
 );
 
 export const RefreshStore = singletonStore(

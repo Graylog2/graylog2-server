@@ -25,7 +25,7 @@ const { SessionActions } = CombinedProvider.get('Session');
 
 export const StreamsActions = singletonActions(
   'views.Streams',
-  () => Reflux.createActions(['refresh']),
+  () => Reflux.createActions(['refresh'] as const),
 );
 
 /* As the current implementation of the `StreamsStore` is not holding a state, using it requires to query the

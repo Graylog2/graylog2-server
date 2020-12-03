@@ -21,11 +21,10 @@ import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { Store } from '../StoreTypes';
-
 const { NodesActions } = CombinedProvider.get('Nodes');
 const { SessionStore } = CombinedProvider.get('Session');
 
+/* eslint-disable camelcase */
 type NodeInfo = {
   cluster_id: string,
   hostname: string,
@@ -36,6 +35,7 @@ type NodeInfo = {
   transport_address: string,
   type: 'server',
 };
+/* eslint-enable camelcase */
 
 type NodesListResponse = {
   nodes: Array<NodeInfo> | null | undefined,
@@ -47,7 +47,7 @@ export type NodesStoreState = {
   clusterId: string;
   nodeCount: number;
 };
-const NodesStore: Store<NodesStoreState> = Reflux.createStore({
+const NodesStore = Reflux.createStore<NodesStoreState>({
   listenables: [NodesActions],
   nodes: undefined,
   clusterId: undefined,

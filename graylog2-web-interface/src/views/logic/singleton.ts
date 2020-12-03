@@ -31,7 +31,7 @@ const singleton = <R>(key: string, supplier: () => R): R => {
 
 const singletonActions = <R>(key: string, supplier: () => R): R => singleton(`${key}Actions`, supplier);
 
-const singletonStore = <R>(key: string, supplier: () => any): R => singleton(`${key}Store`, supplier);
+const singletonStore = <R>(key: string, supplier: () => R): R => singleton(`${key}Store`, supplier);
 
 if (typeof window.singletons === 'undefined') {
   window.singletons = {};
