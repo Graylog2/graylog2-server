@@ -162,7 +162,7 @@ const Panel = ({
   onToggle,
   ...props
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(null);
 
   useEffect(() => {
     setIsExpanded((defaultExpanded && expanded)
@@ -225,7 +225,7 @@ Panel.propTypes = {
    */
   defaultExpanded: PropTypes.bool,
   /**
-   * Controls the collapsed/expanded state ofthe Panel. Requires
+   * Controls the collapsed/expanded state of the Panel. Requires
    * a `Panel.Collapse` or `<Panel.Body collapsible>` child component
    * in order to actually animate out or in.
    *
@@ -249,7 +249,7 @@ Panel.propTypes = {
 Panel.defaultProps = {
   collapsible: false,
   defaultExpanded: null,
-  expanded: false,
+  expanded: null,
   footer: undefined,
   header: undefined,
   onToggle: () => {},
