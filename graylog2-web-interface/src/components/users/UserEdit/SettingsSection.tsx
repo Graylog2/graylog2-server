@@ -21,6 +21,7 @@ import { $PropertyType } from 'utility-types';
 import { Button, Row, Col } from 'components/graylog';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import { IfPermitted } from 'components/common';
 
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
@@ -46,7 +47,9 @@ const SettingsSection = ({
             initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage }}>
       {({ isSubmitting, isValid }) => (
         <Form className="form form-horizontal">
-          <TimeoutFormGroup />
+          <IfPermitted permissions="*">
+            <TimeoutFormGroup />
+          </IfPermitted>
           <TimezoneFormGroup />
           <StartpageFormGroup userId={id} permissions={permissions} />
 
