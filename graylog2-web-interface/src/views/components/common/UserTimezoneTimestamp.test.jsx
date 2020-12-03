@@ -4,18 +4,18 @@ import asMock from 'helpers/mocking/AsMock';
 
 import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { UserJSON } from 'logic/users/User';
 
 import UserTimezoneTimestamp from './UserTimezoneTimestamp';
 
 jest.mock('util/AppConfig');
 
-const createCurrentUserWithTz = (tz: string): UserJSON => ({
+const createCurrentUserWithTz = (tz) => ({
   timezone: tz,
-} as UserJSON);
+});
 
 describe('UserTimezoneTimestamp', () => {
-  const WithTimezone = ({ children, tz }: { children: React.ReactNode, tz: string }) => (
+  // eslint-disable-next-line react/prop-types
+  const WithTimezone = ({ children, tz }) => (
     <CurrentUserContext.Provider value={createCurrentUserWithTz(tz)}>
       {children}
     </CurrentUserContext.Provider>
