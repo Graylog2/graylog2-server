@@ -66,7 +66,6 @@ public class RawMessage implements Serializable {
 
     private transient final JournalMessage.Builder msgBuilder;
     private final UUID id;
-    private final long journalOffset;
     private Object messageQueueId;
     private Configuration codecConfig;
 
@@ -98,9 +97,7 @@ public class RawMessage implements Serializable {
 
         msgBuilder = JournalMessage.newBuilder();
 
-        // TODO replace journalOffset with messageQueueId ?
-        this.journalOffset = journalOffset;
-        this.messageQueueId = null;
+        this.messageQueueId = journalOffset;
         msgBuilder.setVersion(CURRENT_VERSION);
 
         this.id = id;
@@ -123,16 +120,11 @@ public class RawMessage implements Serializable {
                   .build();
     }
 
-    public RawMessage(JournalMessage journalMessage, long journalOffset) {
-        this.journalOffset = journalOffset;
-        this.messageQueueId = null;
+    public RawMessage(JournalMessage journalMessage, Object messageQueueId) {
+        this.messageQueueId = messageQueueId;
         id = new UUID(journalMessage.getUuidTime(), journalMessage.getUuidClockseq());
         msgBuilder = JournalMessage.newBuilder(journalMessage);
         codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
-    }
-    public RawMessage(JournalMessage journalMessage, Object messageQueueId) {
-        this(journalMessage, Long.MIN_VALUE);
-        this.messageQueueId = messageQueueId;
     }
 
     @Nullable
@@ -286,7 +278,10 @@ public class RawMessage implements Serializable {
         return messageQueueId;
     }
     public long getJournalOffset() {
-        return journalOffset;
+        if (messageQueueId == null) {
+            return Long.MIN_VALUE;
+        }
+        return (long) messageQueueId;
     }
 
     public static class SourceNode {

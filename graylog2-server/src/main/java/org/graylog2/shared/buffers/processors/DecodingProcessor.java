@@ -193,7 +193,6 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             return null;
         }
 
-        message.setJournalOffset(raw.getJournalOffset());
         message.setMessageQueueId(raw.getMessageQueueId());
         message.recordTiming(serverStatus, "parse", decodeTime);
         metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);

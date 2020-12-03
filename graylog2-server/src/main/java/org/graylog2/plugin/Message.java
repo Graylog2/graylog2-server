@@ -271,8 +271,6 @@ public class Message implements Messages, Indexable {
      * The offset the message originally had in the journal it was read from. This will be MIN_VALUE if no journal
      * was involved.
      */
-    // TODO replace journalOffset with messageQueueId ?
-    private long journalOffset = Long.MIN_VALUE;
     private Object messageQueueId;
 
     private DateTime receiveTime;
@@ -808,11 +806,14 @@ public class Message implements Messages, Indexable {
     }
 
     public void setJournalOffset(long journalOffset) {
-        this.journalOffset = journalOffset;
+        this.messageQueueId = journalOffset;
     }
 
     public long getJournalOffset() {
-        return journalOffset;
+        if (messageQueueId == null) {
+            return Long.MIN_VALUE;
+        }
+        return (long) messageQueueId;
     }
 
     public void setMessageQueueId(Object messageQueueId) {
