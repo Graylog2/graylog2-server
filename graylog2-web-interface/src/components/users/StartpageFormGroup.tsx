@@ -117,15 +117,17 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
           <>
             <Input id="startpage"
                    label="Start page"
-                   help="Select the page the user sees right after log in"
+                   help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9">
               <>
                 <Container>
                   <TypeSelect options={typeOptions}
+                              placeholder="Select type"
                               onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
                               value={value?.type} />
                   <ValueSelect options={options}
+                               placeholder={`Select ${value?.type}`}
                                onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
                                value={value?.id} />
                   {resetBtn}
