@@ -81,14 +81,16 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
 
         this.client = PulsarClient.builder()
                 .serviceUrl(serviceUrl)
+                .startingBackoffInterval(100, TimeUnit.MILLISECONDS)
+                .maxBackoffInterval(1, TimeUnit.SECONDS)
                 .build();
         this.producer = client.newProducer(Schema.BYTES)
                 .topic(topic)
                 .producerName(name)
                 .compressionType(CompressionType.ZSTD)
-                .enableBatching(true)
-                .batchingMaxMessages(1000)
                 .batchingMaxPublishDelay(1, TimeUnit.MILLISECONDS)
+                .sendTimeout(0, TimeUnit.SECONDS)
+                .blockIfQueueFull(true)
                 .intercept(new MessageInterceptor())
                 .create();
 
