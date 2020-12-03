@@ -15,16 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import Reflux from 'reflux';
 
+import { useStore } from 'stores/connect';
 import { LinkContainer } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewList from 'views/components/views/ViewList';
-import { ViewStore } from 'views/stores/ViewStore';
-import { useStore } from 'stores/connect';
 
 const handleSearch = (query, page, perPage) => {
   return ViewManagementActions.search(query, page, perPage);
