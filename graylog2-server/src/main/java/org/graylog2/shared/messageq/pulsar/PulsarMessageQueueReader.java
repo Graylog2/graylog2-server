@@ -159,15 +159,15 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService imp
     }
 
     @Override
-    public void commit(Object messageId) throws MessageQueueException {
+    public void commit(Object messageId) {
         if (messageId instanceof MessageId) {
             try {
                 consumer.acknowledge((MessageId) messageId);
             } catch (PulsarClientException e) {
-                throw new MessageQueueException("Couldn't acknowledge message", e);
+                LOG.error("Couldn't acknowledge message", e);
             }
         } else {
-            throw new MessageQueueException("Couldn't acknowledge unknown message type <" + messageId + ">");
+            LOG.error("Couldn't acknowledge message. Expected <" + messageId + "> to be a MessageId");
         }
     }
 

@@ -98,7 +98,6 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
             // Mark message as processed to avoid keeping it in the journal.
             acknowledger.acknowledge(rawMessage.getMessageQueueId());
-            journal.markJournalOffsetCommitted(rawMessage.getJournalOffset());
 
             // always clear the event fields, even if they are null, to avoid later stages to process old messages.
             // basically this will make sure old messages are cleared out early.

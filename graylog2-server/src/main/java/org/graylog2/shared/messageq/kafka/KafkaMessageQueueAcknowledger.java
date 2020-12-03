@@ -18,13 +18,15 @@ package org.graylog2.shared.messageq.kafka;
 
 import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
-import org.graylog2.shared.messageq.MessageQueueException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
 public class KafkaMessageQueueAcknowledger implements MessageQueueAcknowledger {
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaMessageQueueAcknowledger.class);
     private KafkaJournal kafkaJournal;
 
     @Inject
@@ -33,16 +35,16 @@ public class KafkaMessageQueueAcknowledger implements MessageQueueAcknowledger {
     }
 
     @Override
-    public void acknowledge(Object messageId) throws MessageQueueException {
+    public void acknowledge(Object messageId) {
         if (messageId instanceof Long) {
             kafkaJournal.markJournalOffsetCommitted((Long) messageId);
         } else {
-            throw new MessageQueueException("Couldn't acknowledge unknown message type <" + messageId + ">");
+            LOG.error("Couldn't acknowledge message. Expected <" + messageId + "> to be a Long");
         }
     }
 
     @Override
-    public void acknowledge(List<Object> messageIds) throws MessageQueueException {
+    public void acknowledge(List<Object> messageIds) {
         final Optional<Long> max = messageIds.stream().filter(Long.class::isInstance).map(Long.class::cast).max(Long::compare);
         if (max.isPresent()) {
             acknowledge(max.get());
