@@ -41,7 +41,7 @@ const _headerFieldForValue = (activeQuery: string, field, value, span = 1, prefi
 
 const _spacer = (idx, span = 1) => <th colSpan={span} key={`spacer-${idx}`} className={styles.leftAligned} />;
 
-const columnPivotFieldsHeaders = (activeQuery, columnPivots, actualColumnPivotValues, series, offset = 1) => {
+const columnPivotFieldsHeaders = (activeQuery: string, columnPivots: string[], actualColumnPivotValues: any[], series: Series[], offset = 1) => {
   return columnPivots.map((columnPivot, idx) => {
     const actualValues = actualColumnPivotValues.map((key) => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
     const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {

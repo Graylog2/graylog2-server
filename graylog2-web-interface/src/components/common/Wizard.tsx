@@ -129,7 +129,7 @@ const StyledNav: StyledComponent<{}, ThemeInterface, Nav> = styled(Nav)(({ theme
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
-type StepKey = number | string;
+export type StepKey = number | string;
 
 export type Step = {
   key: StepKey,

@@ -20,6 +20,7 @@ import { FormikProps } from 'formik';
 
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
+import { StepKey } from 'components/common/Wizard';
 
 import { WizardFormValues } from './BackendWizardContext';
 import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -32,7 +33,7 @@ type Props = {
   excludedFields: { [inputName: string]: boolean },
   handleSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
   help: { [inputName: string]: React.ReactElement | string | null | undefined },
-  invalidStepKeys: Array<string>,
+  invalidStepKeys: Array<StepKey>,
   prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
   roles: Immutable.List<Role>,
   setActiveStepKey: (stepKey: string) => void,

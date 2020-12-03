@@ -29,7 +29,7 @@ import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { Row, Col, Alert } from 'components/graylog';
-import Wizard, { Step } from 'components/common/Wizard';
+import Wizard, { Step, StepKey } from 'components/common/Wizard';
 import FetchError from 'logic/errors/FetchError';
 import { LoadResponse as LoadBackendResponse } from 'actions/authentication/AuthenticationActions';
 import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
@@ -66,7 +66,7 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: st
   </Row>
 );
 
-const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string | null | undefined }) => {
+const _formatBackendValidationErrors = (backendErrors: { [inputNameJSON: string]: string[] }) => {
   const backendErrorStrings = mapValues(backendErrors, (errorArray) => `Server validation error: ${errorArray.join(' ')}`);
   const formattedBackendErrors = mapKeys(backendErrorStrings, (value, key) => camelCase(key));
 
@@ -144,7 +144,7 @@ const _prepareSubmitPayload = (stepsState, getUpdatedFormsValues) => (overrideFo
   };
 };
 
-const _getInvalidStepKeys = (formValues, newBackendValidationErrors, excludedFields) => {
+const _getInvalidStepKeys = (formValues, newBackendValidationErrors, excludedFields): StepKey[] => {
   const validation = { ...FORMS_VALIDATION, [GROUP_SYNC_KEY]: {} };
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const groupSyncValidation = enterpriseGroupSyncPlugin?.validation.GroupSyncValidation;
@@ -276,7 +276,7 @@ const BackendWizard = ({ initialValues, initialStepKey, onSubmit, authBackendMet
     return { ...stepsState.formValues, ...activeForm?.values };
   };
 
-  const _validateSteps = (formValues: WizardFormValues, newBackendValidationErrors): Array<string> => {
+  const _validateSteps = (formValues: WizardFormValues, newBackendValidationErrors): Array<StepKey> => {
     const invalidStepKeys = _getInvalidStepKeys(
       formValues,
       newBackendValidationErrors,
