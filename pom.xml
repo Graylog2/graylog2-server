@@ -102,7 +102,7 @@
         <disruptor.version>3.4.2</disruptor.version>
         <freemarker.version>2.3.29</freemarker.version>
         <gelfclient.version>1.5.0</gelfclient.version>
-        <geoip2.version>2.12.0</geoip2.version>
+        <geoip2.version>2.15.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
         <grpc.version>1.29.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
