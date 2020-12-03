@@ -70,7 +70,6 @@ describe('HighlightingRule', () => {
   });
 
   describe('rule edit', () => {
-
     it('should show a edit modal', () => {
       const wrapper = mount(<HighlightingRule rule={rule} />);
       const editIcon = wrapper.find('button[title="Edit this Highlighting Rule"]');
