@@ -19,7 +19,6 @@ import * as Immutable from 'immutable';
 
 export type AccountStatus = 'enabled' | 'disabled' | 'deleted';
 
-/* eslint-disable camelcase */
 export type UserOverviewJSON = {
   id: string;
   username: string;
@@ -36,7 +35,6 @@ export type UserOverviewJSON = {
   auth_service_uid: string;
   account_status: AccountStatus;
 };
-/* eslint-enable camelcase */
 
 type InternalState = {
   id: string;

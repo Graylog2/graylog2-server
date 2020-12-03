@@ -54,7 +54,6 @@ const ContentPacksPage = createReactClass({
         UserNotification.success('Content Pack deleted successfully.', 'Success');
         ContentPacksActions.list();
       }, (error) => {
-        /* eslint-disable camelcase */
         let err_message = error.message;
         const err_body = error.additional.body;
 
@@ -63,7 +62,6 @@ const ContentPacksPage = createReactClass({
         }
 
         UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
-        /* eslint-enable camelcase */
       });
     }
   },

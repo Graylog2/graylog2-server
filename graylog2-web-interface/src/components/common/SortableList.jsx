@@ -91,7 +91,6 @@ class SortableList extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ items: nextProps.items });
   }

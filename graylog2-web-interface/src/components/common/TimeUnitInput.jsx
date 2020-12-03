@@ -147,7 +147,6 @@ const TimeUnitInput = createReactClass({
     };
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { units } = this.props;
 

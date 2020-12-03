@@ -36,7 +36,6 @@ export type AuthenticationBackendJSON = {
   id: string,
   title: string,
   description: string,
-  // eslint-disable-next-line camelcase
   default_roles: Array<string>,
   config: unknown,
 };
@@ -140,7 +139,6 @@ export default class AuthenticationBackend {
   }
 
   static fromJSON(value: AuthenticationBackendJSON) {
-    /* eslint-disable camelcase */
     const {
       id,
       title,
@@ -151,7 +149,6 @@ export default class AuthenticationBackend {
 
     const formattedConfig = configFromJson(config);
 
-    /* eslint-enable camelcase */
     return new AuthenticationBackend(
       id,
       title,

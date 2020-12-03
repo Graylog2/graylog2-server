@@ -58,7 +58,6 @@ class QueryTitle extends React.Component<Props, State> {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
     /** TODO: Replace componentWillReceiveProps
      * https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#anti-pattern-unconditionally-copying-props-to-state

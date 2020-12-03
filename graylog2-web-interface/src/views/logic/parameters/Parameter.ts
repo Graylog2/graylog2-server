@@ -34,7 +34,6 @@ type InternalState = {
   binding: ParameterBinding | undefined | null,
 };
 
-/* eslint-disable camelcase */
 export type ParameterJson = {
   type: string,
   name: string,
@@ -45,7 +44,6 @@ export type ParameterJson = {
   optional: boolean,
   binding: ParameterBindingJsonRepresentation | undefined | null,
 };
-/* eslint-enable camelcase */
 
 type ParameterSubClass = {
   fromJSON: (json: ParameterJson) => Parameter;

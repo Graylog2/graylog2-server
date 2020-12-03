@@ -150,7 +150,6 @@ class MessageDetail extends React.Component {
       timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
     }
 
-    // eslint-disable-next-line camelcase
     const { gl2_source_node, gl2_source_input } = fields;
     const receivedBy = this._formatReceivedBy(gl2_source_node, gl2_source_input);
 

@@ -90,7 +90,6 @@ export default class GlobalOverride {
   }
 
   static fromJSON(value: JsonRepresentation): GlobalOverride {
-    // eslint-disable-next-line camelcase
     const { timerange, query, keep_search_types, search_types } = value;
 
     return GlobalOverride.create(timerange, query, keep_search_types, search_types);

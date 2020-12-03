@@ -54,7 +54,6 @@ class EditExtractor extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { exampleMessage } = this.props;
 

@@ -62,7 +62,6 @@ const EventsConfig = createReactClass({
     };
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(newProps) {
     this.setState({ config: newProps.config });
   },

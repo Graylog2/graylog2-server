@@ -49,7 +49,6 @@ const SubstringExtractorConfiguration = createReactClass({
     this.props.onChange(this.state.configuration);
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   },

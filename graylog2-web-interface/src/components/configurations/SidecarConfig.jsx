@@ -58,7 +58,6 @@ const SidecarConfig = createReactClass({
     };
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(newProps) {
     this.setState({ config: ObjectUtils.clone(newProps.config) });
   },
