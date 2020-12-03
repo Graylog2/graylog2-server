@@ -28,7 +28,7 @@ const namedProxy = (name) => new Proxy({}, {
   },
 });
 
-module.exports = new Proxy({}, {
+export default new Proxy({}, {
   get: function getter(target, key) {
     if (key === '__esModule') {
       return false;
