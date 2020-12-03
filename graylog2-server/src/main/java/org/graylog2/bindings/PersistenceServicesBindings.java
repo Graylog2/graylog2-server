@@ -17,6 +17,7 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.cluster.NodeService;
@@ -57,7 +58,8 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(LegacyMongoIndexRangeService.class).asEagerSingleton();
         bind(InputService.class).to(InputServiceImpl.class);
         bind(StreamRuleService.class).to(StreamRuleServiceImpl.class);
-        bind(UserService.class).to(UserServiceImpl.class);
+        OptionalBinder.newOptionalBinder(binder(), UserService.class)
+                      .setDefault().to(UserServiceImpl.class);
         bind(StreamService.class).to(StreamServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
