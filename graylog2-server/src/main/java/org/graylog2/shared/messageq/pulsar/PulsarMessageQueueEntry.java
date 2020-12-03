@@ -97,6 +97,6 @@ public class PulsarMessageQueueEntry implements MessageQueue.Entry {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, key, value, timestamp);
+        return Objects.hashCode(Arrays.hashCode(id), Arrays.hashCode(key), Arrays.hashCode(value), timestamp);
     }
 }
