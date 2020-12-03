@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
 import type { RefluxActions } from 'stores/StoreTypes';
 import View from 'views/logic/views/View';
@@ -72,9 +72,9 @@ const ViewManagementActions: ViewManagementActionsType = singletonActions(
   }),
 );
 
-const viewsUrl = URLUtils.qualifyUrl('/views');
-const viewsIdUrl = (id) => URLUtils.qualifyUrl(`/views/${id}`);
-const forValueUrl = () => URLUtils.qualifyUrl('/views/forValue');
+const viewsUrl = qualifyUrl('/views');
+const viewsIdUrl = (id) => qualifyUrl(`/views/${id}`);
+const forValueUrl = () => qualifyUrl('/views/forValue');
 
 type ViewManagementStoreState = {
   pagination: Pagination;
