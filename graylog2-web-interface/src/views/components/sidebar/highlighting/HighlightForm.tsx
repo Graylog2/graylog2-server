@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
+import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
 
@@ -32,6 +33,7 @@ import HighlightingRule from 'views/logic/views/formatting/highlighting/Highligh
 
 type Props = {
   onClose: () => void,
+  rule: HighlightingRule | null | undefined,
 };
 
 const _isRequired = (field) => (value) => {
@@ -45,24 +47,34 @@ const _isRequired = (field) => (value) => {
 const numberConditionOptions = ['==', '!=', '<=', '>=', '<', '>'].map((cond) => ({ value: cond, label: cond }));
 const otherConditionOptions = ['==', '!='].map((cond) => ({ value: cond, label: cond }));
 
-const HighlightForm = ({ onClose }: Props) => {
+const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const fields = fieldTypes?.all
     ? fieldTypes.all
     : Immutable.List<FieldTypeMapping>();
   const fieldOptions = fields.map(({ name }) => ({ value: name, label: name })).toArray();
 
-  const onSubmit = ({ field, value, color, condition }) => HighlightingRulesActions.add(
-    HighlightingRule.create(field, value, condition, color),
-  ).then(onClose);
+  const onSubmit = ({ field, value, color, condition }) => {
+    if (rule) {
+      HighlightingRulesActions.remove(rule).then(() => HighlightingRulesActions.add(
+        HighlightingRule.create(field, value, condition, color),
+      ).then(onClose));
+
+      return;
+    }
+
+    HighlightingRulesActions.add(
+      HighlightingRule.create(field, value, condition, color),
+    ).then(onClose);
+  };
 
   return (
     <Formik onSubmit={onSubmit}
             initialValues={{
-              field: undefined,
-              value: '',
-              condition: '==',
-              color: '#6fecc2',
+              field: rule?.field ?? undefined,
+              value: rule?.value ?? '',
+              condition: rule?.condition ?? '==',
+              color: rule?.color ?? '#6fecc2',
             }}>
       {() => (
         <BootstrapModalWrapper showModal
@@ -140,6 +152,15 @@ const HighlightForm = ({ onClose }: Props) => {
 
     </Formik>
   );
+};
+
+HighlightForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  rule: PropTypes.object,
+};
+
+HighlightForm.defaultProps = {
+  rule: undefined,
 };
 
 export default HighlightForm;

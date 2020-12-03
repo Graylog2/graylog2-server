@@ -21,7 +21,7 @@ import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import IconButton from 'components/common/IconButton';
 
-import HighlightingRule, { HighlightingRuleGrid } from './HighlightingRule';
+import HighlightingRule, { HighlightingRuleGrid, RuleContainer } from './HighlightingRule';
 import ColorPreview from './ColorPreview';
 import HighlightForm from './HighlightForm';
 
@@ -42,7 +42,7 @@ const HighlightingRules = () => {
       { showForm && <HighlightForm onClose={() => setShowForm(false)} />}
       <HighlightingRuleGrid>
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
-        <div>Search terms</div>
+        <RuleContainer>Search terms</RuleContainer>
       </HighlightingRuleGrid>
       {rules.map((rule) => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}-${rule.condition}`} rule={rule} />)}
     </>
