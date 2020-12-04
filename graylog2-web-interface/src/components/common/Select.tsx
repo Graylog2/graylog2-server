@@ -215,6 +215,7 @@ type Props = {
   options: Array<Option>,
   placeholder: string,
   size?: 'normal' | 'small',
+  theme: DefaultTheme,
   value?: string,
   valueKey: string,
   valueRenderer?: (option: Option) => React.ReactElement,
@@ -231,7 +232,7 @@ type State = {
   value: any,
 };
 
-class Select extends React.Component<Props & { theme: DefaultTheme }, State> {
+class Select extends React.Component<Props, State> {
   static propTypes = {
     /** Specifies if the user can create new entries in `multi` Selects. */
     allowCreate: PropTypes.bool,
@@ -297,7 +298,7 @@ class Select extends React.Component<Props & { theme: DefaultTheme }, State> {
     autoFocus: PropTypes.bool,
     /** special onChange handler */
     onReactSelectChange: PropTypes.func,
-    /** select placeholder */
+    /** Select placeholder text */
     placeholder: PropTypes.string,
   }
 
@@ -325,7 +326,7 @@ class Select extends React.Component<Props & { theme: DefaultTheme }, State> {
     valueRenderer: undefined,
   };
 
-  constructor(props: Props & { theme: DefaultTheme }) {
+  constructor(props: Props) {
     super(props);
     const { inputProps, optionRenderer, value, valueRenderer } = props;
 
