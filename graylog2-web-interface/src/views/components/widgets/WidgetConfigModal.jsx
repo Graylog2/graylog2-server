@@ -46,7 +46,6 @@ const WidgetConfigModal = createReactClass({
     };
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.show !== nextProps.show) {
       this.setState({ show: nextProps.show });

@@ -25,7 +25,6 @@ type InternalState = {
   chartColors: ChartColors,
 };
 
-/* eslint-disable camelcase */
 type ChartColorSettingJson = {
   field_name: string,
   chart_color: Color,
@@ -34,12 +33,10 @@ type ChartColorSettingJson = {
 export type WidgetFormattingSettingsJSON = {
   chart_colors: Array<ChartColorSettingJson>,
 };
-/* eslint-enable camelcase */
 
 export default class WidgetFormattingSettings {
   private readonly _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(chartColors: $PropertyType<InternalState, 'chartColors'>) {
     this._value = { chartColors };
   }
@@ -53,7 +50,6 @@ export default class WidgetFormattingSettings {
     return new Builder(Immutable.Map(this._value));
   }
 
-  // eslint-disable-next-line no-undef
   static create(chartColors: $PropertyType<InternalState, 'chartColors'>) {
     return new WidgetFormattingSettings(chartColors);
   }

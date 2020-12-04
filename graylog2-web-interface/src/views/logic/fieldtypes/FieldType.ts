@@ -29,7 +29,6 @@ export const Properties: { [key: string]: Property } = {
 export type FieldTypeJSON = {
   type: string,
   properties: Array<Property>,
-  // eslint-disable-next-line camelcase
   index_names: Array<string>,
 };
 
@@ -72,7 +71,6 @@ class FieldType {
   }
 
   static fromJSON(value: FieldTypeJSON) {
-    // eslint-disable-next-line camelcase
     const { type, properties, index_names } = value;
 
     return new FieldType(type, properties, index_names);

@@ -52,7 +52,6 @@ const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: str
 export default class SearchLink {
   _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(
     id: $PropertyType<InternalState, 'id'>,
     timerange: $PropertyType<InternalState, 'timerange'>,
@@ -134,7 +133,6 @@ class Builder {
     this.value = value;
   }
 
-  // eslint-disable-next-line no-undef
   id(value: $PropertyType<InternalState, 'id'>) {
     return new Builder(this.value.set('id', value));
   }

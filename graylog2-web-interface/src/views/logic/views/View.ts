@@ -57,7 +57,6 @@ type InternalState = {
   requires: Requirements,
 };
 
-/* eslint-disable camelcase */
 export type ViewJson = {
   id: string,
   type: ViewType,
@@ -71,7 +70,6 @@ export type ViewJson = {
   owner: string,
   requires: Requirements,
 };
-/* eslint-enable camelcase */
 
 export default class View {
   static Type: { Search: SearchType, Dashboard: DashboardType } = {
@@ -217,7 +215,6 @@ export default class View {
   }
 
   static fromJSON(value: ViewJson): View {
-    // eslint-disable-next-line camelcase
     const { id, type, title, summary, description, properties, state, created_at, owner, requires } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
 

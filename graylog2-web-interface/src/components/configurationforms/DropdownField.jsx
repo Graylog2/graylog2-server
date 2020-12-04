@@ -43,7 +43,6 @@ class DropdownField extends React.Component {
     value: this.props.value,
   };
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(props) {
     this.setState(props);
   }

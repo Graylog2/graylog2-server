@@ -79,7 +79,6 @@ const PipelineDetailsPage = createReactClass({
     });
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this._isNewPipeline(nextProps.params.pipelineId)) {
       PipelinesActions.get(nextProps.params.pipelineId);

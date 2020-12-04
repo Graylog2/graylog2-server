@@ -35,7 +35,6 @@ export type DirectoryServiceBackendConfig = {
   verifyCertificates: boolean,
 };
 
-/* eslint-disable camelcase */
 export type DirectoryServiceBackendConfigJson = {
   servers: Array<ServerAddress>,
   system_user_dn: string,
@@ -49,7 +48,6 @@ export type DirectoryServiceBackendConfigJson = {
   user_unique_id_attribute: string,
   verify_certificates: boolean,
 };
-/* eslint-enable camelcase */
 
 export type DirectoryServiceBackend = {
   id: $PropertyType<AuthenticationBackend, 'id'>,
@@ -59,7 +57,6 @@ export type DirectoryServiceBackend = {
   config: DirectoryServiceBackendConfig,
 };
 
-/* eslint-disable camelcase */
 export type WizardSubmitPayload = {
   title: $PropertyType<AuthenticationBackendJSON, 'title'>,
   description: $PropertyType<AuthenticationBackendJSON, 'description'>,
@@ -68,4 +65,3 @@ export type WizardSubmitPayload = {
     system_user_password: (string | { keep_value: true } | { delete_value: true } | { set_value: string | undefined }) | undefined,
   },
 };
-/* eslint-enable camelcase */

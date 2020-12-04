@@ -44,7 +44,6 @@ class CounterRate extends React.Component {
     nowTs: TimeHelper.nowInSeconds(),
   };
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps() {
     this.setState({
       prevMetric: this.props.metric,

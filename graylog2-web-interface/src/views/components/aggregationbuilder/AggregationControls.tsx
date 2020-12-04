@@ -126,7 +126,6 @@ export default class AggregationControls extends React.Component<Props, State> {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().eventAnnotation(value).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onRollupChange = (rollup: $PropertyType<$PropertyType<Props, 'config'>, 'rollup'>) => {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().rollup(rollup).build() }));
   };

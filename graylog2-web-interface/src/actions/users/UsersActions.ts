@@ -24,7 +24,6 @@ import { Pagination, PaginatedList } from 'stores/PaginationTypes';
 import User, { UserJSON } from 'logic/users/User';
 import UserOverview, { AccountStatus } from 'logic/users/UserOverview';
 
-/* eslint-disable camelcase */
 export type UserCreate = {
   email: $PropertyType<UserJSON, 'email'>;
   full_name: $PropertyType<UserJSON, 'full_name'>;
@@ -50,7 +49,6 @@ export type ChangePasswordRequest = {
   old_password: string;
   password: string;
 };
-/* eslint-enable camelcase */
 
 export type PaginatedUsers = PaginatedList<UserOverview> & {
   adminUser: UserOverview | null | undefined,

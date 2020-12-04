@@ -26,6 +26,7 @@ module.exports = {
       parser: '@typescript-eslint/parser',
       plugins: ['@typescript-eslint/eslint-plugin'],
       rules: {
+        'no-undef': 'off',
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
         'no-unused-vars': 'off',
@@ -52,6 +53,7 @@ module.exports = {
   ],
   rules: {
     'arrow-body-style': 'off',
+    camelcase: 'off',
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',

@@ -66,10 +66,8 @@ export default class Viewport {
   }
 
   static fromJSON(value: ViewportJson) {
-    // eslint-disable-next-line camelcase
     const { center_x, center_y, zoom } = value;
 
-    // eslint-disable-next-line camelcase
     return Viewport.create([center_x, center_y], zoom);
   }
 }

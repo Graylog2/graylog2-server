@@ -77,7 +77,6 @@ class JSONValueInput extends React.Component {
     wrapperClassName: undefined,
   };
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState(this._computeInitialState(nextProps));
   }

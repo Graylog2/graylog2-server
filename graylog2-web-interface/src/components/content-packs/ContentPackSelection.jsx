@@ -64,7 +64,6 @@ class ContentPackSelection extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ filteredEntities: nextProps.entities, contentPack: nextProps.contentPack });
     const { filter, isFiltered } = this.state;

@@ -38,7 +38,6 @@ type SearchTypeBase = {
   streams: Array<string>,
 };
 
-/* eslint-disable camelcase */
 export type AggregationSearchType = SearchTypeBase & {
   sort: Array<SortConfig>,
   series: Array<{ id: string, type: string, field: string }>,
@@ -46,7 +45,6 @@ export type AggregationSearchType = SearchTypeBase & {
   row_groups: Array<SearchTypePivot>,
   rollup: boolean,
 };
-/* eslint-enable camelcase */
 
 export type MessagesSearchType = SearchTypeBase & {
   sort: Array<MessageSortConfig>,

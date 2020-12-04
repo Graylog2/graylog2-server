@@ -201,7 +201,6 @@ class ReactGridContainer extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { positions } = this.props;
 

@@ -43,7 +43,6 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
 
   componentDidMount() {
     const { message } = this.context;
-    // eslint-disable-next-line camelcase
     const { gl2_source_node, gl2_source_input } = message.fields;
     const { field } = this.props;
 
