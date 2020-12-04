@@ -49,7 +49,7 @@ export type ListPagination = Pagination & {
   count: number,
 };
 
-export const DEFAULT_PAGINATION = {
+export const DEFAULT_PAGINATION: Pagination = {
   page: 1,
   perPage: 10,
   query: '',
