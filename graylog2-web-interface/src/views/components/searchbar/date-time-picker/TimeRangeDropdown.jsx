@@ -38,11 +38,11 @@ const StyledPopover: StyledComponent<{}, ThemeInterface, typeof Popover> = style
   min-width: 745px;
   
   @media (min-width: ${theme.breakpoints.min.md}) {
-    max-width: 50vw;  
+    max-width: 70vw;  
   }
   
   @media (min-width: ${theme.breakpoints.min.lg}) {
-    max-width: 35vw;  
+    max-width: 45vw;  
   }
 `);
 
@@ -74,6 +74,10 @@ const LimitLabel: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
     color: ${theme.colors.variant.darkest.warning};
   }
 `);
+
+const CancelButton: StyledComponent<{}, void, typeof Button> = styled(Button)`
+  margin-right: 6px;
+`;
 
 const DEFAULT_RANGES = {
   absolute: {
@@ -139,6 +143,14 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     setActiveTab(newType);
   };
 
+  const handleNoOverride = () => {
+    formik.resetForm({
+      values: { timerange: {}, tempTimeRange: undefined },
+    });
+
+    toggleDropdownShow();
+  };
+
   const handleCancel = () => {
     formik.resetForm({
       values: { timerange: originalRangeValue, tempTimeRange: undefined },
@@ -180,13 +192,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                       activeKey={activeTab}
                       onSelect={onSelect}
                       animation={false}>
-            {noOverride && (
-              <Tab title="No Override"
-                   key="time-range-type-selector-disabled"
-                   eventKey="disabled">
-                <p>No Override to Date.</p>
-              </Tab>
-            )}
             {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, _setDisableApply, currentTimerange)}
           </StyledTabs>
         </Col>
@@ -198,7 +203,10 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
         </Col>
         <Col md={6}>
           <div className="pull-right">
-            <Button bsStyle="link" onClick={handleCancel}>Cancel</Button>
+            {noOverride && (
+              <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
+            )}
+            <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
             <Button bsStyle="success" onClick={handleApply} disabled={disableApply}>Apply</Button>
           </div>
         </Col>

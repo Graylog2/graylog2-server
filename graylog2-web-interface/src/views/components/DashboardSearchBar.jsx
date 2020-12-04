@@ -54,18 +54,16 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
         <Col md={12}>
           <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => {
-              // console.log({ values });
-
               return (
                 <>
                   <TopRow>
-                    <FlexCol lg={4} md={6} xs={8}>
+                    <FlexCol lg={8} md={9} xs={10}>
                       <TimeRangeTypeSelector disabled={disableSearch}
                                              config={config}
                                              noOverride />
                       <TimeRangeDisplay timerange={values?.timerange} />
                     </FlexCol>
-                    <Col lg={8} md={6} xs={4}>
+                    <Col lg={4} md={3} xs={2}>
                       <RefreshControls />
                     </Col>
                   </TopRow>
