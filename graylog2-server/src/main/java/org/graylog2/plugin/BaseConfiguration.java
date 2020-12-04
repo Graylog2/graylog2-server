@@ -65,6 +65,9 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter("message_journal_enabled")
     private boolean messageJournalEnabled = true;
 
+    @Parameter("message_journal_mode")
+    private String messageJournalMode = "kafka";
+
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
 
@@ -140,6 +143,11 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public boolean isMessageJournalEnabled() {
         return messageJournalEnabled;
+    }
+
+    public String getMessageJournalMode() {
+        // TODO use enum?
+        return messageJournalMode;
     }
 
     public void setMessageJournalEnabled(boolean messageJournalEnabled) {
