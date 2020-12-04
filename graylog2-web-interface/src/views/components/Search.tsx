@@ -121,8 +121,10 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 const ViewAdditionalContextProvider = connect(
   AdditionalContext.Provider,
   { view: ViewStore, configs: SearchConfigStore },
-  ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } } as { value: object}),
+  ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields } } as { value: object}),
 );
+
+ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
 const Search = ({ location }: Props) => {
   const { pathname, search } = location;
