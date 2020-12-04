@@ -1,4 +1,3 @@
-// import original module declarations
 import 'styled-components';
 
 import type { Colors } from './colors';
