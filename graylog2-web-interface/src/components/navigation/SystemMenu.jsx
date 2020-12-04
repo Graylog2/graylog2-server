@@ -158,9 +158,11 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['inputs:create']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
-        <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['inputs:edit']}>
+          <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
+        </IfPermitted>
+      </HideOnCloud>
       {pluginSystemNavigations}
     </NavDropdown>
   );
