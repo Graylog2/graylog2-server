@@ -85,7 +85,7 @@ class SeriesSelect extends React.Component<Props, State> {
     const { suggester } = props;
 
     this.state = {
-      options: suggester.defaults,
+      options: suggester.defaults || [],
     };
   }
 
