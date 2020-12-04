@@ -41,10 +41,10 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -390,6 +390,7 @@ class Widget extends React.Component<Props, State> {
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       </IfSearch>
+                      <MenuItem onSelect={() => CurrentViewStateActions.focusWidget(id)}>Focus</MenuItem>
                       <IfDashboard>
                         <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
                       </IfDashboard>

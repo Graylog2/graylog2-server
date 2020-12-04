@@ -37,6 +37,7 @@ type CurrentViewStateActionsType = RefluxActions<{
   titles: (titles: Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<unknown>,
   widgets: (widgets: Immutable.List<Widget>) => Promise<unknown>,
   widgetPositions: (newPositions: Record<string, WidgetPosition>) => Promise<unknown>,
+  focusWidget: (widgetId: string) => Promise<unknown>,
 }>;
 
 export const CurrentViewStateActions: CurrentViewStateActionsType = singletonActions(
@@ -47,11 +48,13 @@ export const CurrentViewStateActions: CurrentViewStateActionsType = singletonAct
     titles: { asyncResult: true },
     widgets: { asyncResult: true },
     widgetPositions: { asyncResult: true },
+    focusWidget: { asyncResult: true },
   }),
 );
 
 type CurrentViewStateStoreState = {
   activeQuery: string;
+  focusedWidget: string | undefined | null,
   state: ViewState;
 };
 export type CurrentViewStateStoreType = Store<CurrentViewStateStoreState>;
@@ -62,6 +65,7 @@ export const CurrentViewStateStore: CurrentViewStateStoreType = singletonStore(
     listenables: [CurrentViewStateActions],
     states: Immutable.Map(),
     activeQuery: undefined,
+    focusedWidget: undefined,
 
     init() {
       this.listenTo(ViewStore, this.onViewStoreChange, this.onViewStoreChange);
@@ -92,6 +96,20 @@ export const CurrentViewStateStore: CurrentViewStateStoreType = singletonStore(
       if (!isEqual(activeState, newActiveState)) {
         this._trigger();
       }
+    },
+
+    focusWidget(widgetId: string | undefined | null) {
+      if (this.focusedWidget === widgetId) {
+        this.focusedWidget = undefined;
+      } else {
+        this.focusedWidget = widgetId;
+      }
+
+      const promise = ViewStatesActions.update(this.activeQuery, this._activeState());
+
+      this._trigger();
+
+      CurrentViewStateActions.focusWidget.promise(promise);
     },
 
     fields(newFields) {
@@ -145,6 +163,7 @@ export const CurrentViewStateStore: CurrentViewStateStoreType = singletonStore(
       return {
         state: this._activeState(),
         activeQuery: this.activeQuery,
+        focusedWidget: this.focusedWidget,
       };
     },
 

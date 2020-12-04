@@ -21,14 +21,16 @@ import styled, { css } from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateStore, CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { widgetDefinition } from 'views/logic/Widgets';
 import DocumentationLink from 'components/support/DocumentationLink';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
-import WidgetGrid from 'views/components/WidgetGrid';
+import WidgetGrid, { WidgetContainer } from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import WidgetComponent from 'views/components/WidgetComponent';
 
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
@@ -52,7 +54,7 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget) => {
   const widgets = {};
   const data = {};
   const errors = {};
@@ -80,6 +82,28 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
       }
     }
   });
+
+  if (focusedWidget) {
+    const widget = widgets[focusedWidget];
+
+    return (
+      <WidgetContainer>
+        <WidgetComponent widget={widget}
+                         widgetId={widget.id}
+                         data={data}
+                         errors={errors}
+                         widgetDimension={{ height: 100, width: 200 }}
+                         title="Foo"
+                         position={WidgetPosition.builder().build()}
+                         onPositionsChange={() => {
+                         }}
+                         fields={fields}
+                         allFields={allFields}
+                         onWidgetSizeChange={() => {
+                         }} />
+      </WidgetContainer>
+    );
+  }
 
   return (
     <InteractiveContext.Consumer>
@@ -129,14 +153,17 @@ const EmptyDashboardInfo = () => (
 );
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
+  const { focusedWidget } = useStore(CurrentViewStateStore);
+  console.log('query.tsx', focusedWidget);
+
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
   if (results) {
-    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
+    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields, focusedWidget);
 
-    return (<span>{content}</span>);
+    return (<>{content}</>);
   }
 
   return <Spinner />;

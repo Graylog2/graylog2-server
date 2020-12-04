@@ -39,9 +39,10 @@ const DashboardWrap = styled.div(({ theme }) => css`
   width: 100%;
 `);
 
-const WidgetContainer = styled.div`
+export const WidgetContainer = styled.div`
   z-index: auto;
   ${RowContentStyles}
+  height: 100%;
 `;
 
 const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;

@@ -65,7 +65,7 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     height: calc(100vh - 50px);
     display: flex;
     overflow: hidden;
-    
+
     > *:nth-child(2) {
       flex-grow: 1;
     }
@@ -75,6 +75,16 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
 const SearchArea = styled(AppContentGrid)`
   height: 100%;
   overflow-y: auto;
+
+  .container-fluid {
+    height: 100%;
+  }
+`;
+
+const SearchLayoutContainer = styled.div`
+  height: 100%;
+  display: grid;
+  grid-template-rows: min-content auto min-content;
 `;
 
 const ConnectedSidebar = connect(
@@ -179,25 +189,27 @@ const Search = ({ location }: Props) => {
                       </ConnectedSidebar>
                     </IfInteractive>
                     <SearchArea>
-                      <IfInteractive>
-                        <HeaderElements />
-                        <IfDashboard>
-                          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                        </IfDashboard>
-                        <IfSearch>
-                          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                        </IfSearch>
+                      <SearchLayoutContainer>
+                        <IfInteractive>
+                          <HeaderElements />
+                          <IfDashboard>
+                            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                          </IfDashboard>
+                          <IfSearch>
+                            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                          </IfSearch>
 
-                        <QueryBarElements />
+                          <QueryBarElements />
 
-                        <IfDashboard>
-                          <QueryBar />
-                        </IfDashboard>
-                      </IfInteractive>
-                      <HighlightMessageInQuery>
-                        <SearchResult />
-                      </HighlightMessageInQuery>
-                      <Footer />
+                          <IfDashboard>
+                            <QueryBar />
+                          </IfDashboard>
+                        </IfInteractive>
+                        <HighlightMessageInQuery>
+                          <SearchResult />
+                        </HighlightMessageInQuery>
+                        <Footer />
+                      </SearchLayoutContainer>
                     </SearchArea>
                   </GridContainer>
                 </HighlightingRulesProvider>

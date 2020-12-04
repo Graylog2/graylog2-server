@@ -78,8 +78,8 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   ) : <Spinner />;
 
   return (
-    <Row>
-      <Col>
+    <Row style={{ height: '100%' }}>
+      <Col style={{ height: '100%' }}>
         {content}
         <SearchLoadingIndicator />
       </Col>
