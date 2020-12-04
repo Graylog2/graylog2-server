@@ -16,10 +16,24 @@
  */
 
 declare module 'styled-components' {
+  // We need to define the theme interface here and can't use relative
+  // paths, because otherwise the paths do not get resolved properly
+  // when importing core components which are using the theme, in plugins.
+  import type { Colors } from 'src/theme/colors';
+  import type { Fonts } from 'src/theme/fonts';
+  import type { Utils } from 'src/theme/utils';
   // eslint-disable-next-line import/order
-  import { ThemeInterface } from 'src/theme/ThemeInterface';
+  import type { Breakpoints } from 'src/theme/breakpoints';
 
-  export interface DefaultTheme extends ThemeInterface {}
+  export interface DefaultTheme {
+    breakpoints: Breakpoints,
+    colors: Colors,
+    fonts: Fonts,
+    utils: Utils,
+    mode: string,
+    changeMode: (string) => void,
+    components: { [component: string]: any }
+  }
 
   // The following code is mainly a copy of @types/styled-components 5.1.4
   // because we have to adjust the return type of BaseWithThemeFnInterface
