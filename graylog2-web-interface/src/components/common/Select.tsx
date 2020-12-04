@@ -216,7 +216,7 @@ type Props = {
   placeholder: string,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
-  value?: string,
+  value?: Object | Array<Object> | null | undefined,
   valueKey: string,
   valueRenderer?: (option: Option) => React.ReactElement,
 };
@@ -284,10 +284,14 @@ class Select extends React.Component<Props, State> {
     /** @ignore */
     theme: themePropTypes.isRequired,
     /**
-     * String containing the selected value. If `multi` is enabled, it must
-     * be a string containing all values separated by the `delimiter`.
+     * Value which can be the selected option or the value of the selected option.
+     * If `multi` is enabled, it must be a string containing all values separated by the `delimiter`.
      */
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.object,
+      PropTypes.arrayOf(PropTypes.object),
+    ]),
     /** Indicates which option object key contains the value of the option. */
     valueKey: PropTypes.string,
     /** Custom function to render the selected option in the Select. */

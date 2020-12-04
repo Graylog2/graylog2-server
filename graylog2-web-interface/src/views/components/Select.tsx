@@ -22,7 +22,7 @@ import { Overlay } from 'react-overlays';
 import { useTheme } from 'styled-components';
 import { createFilter } from 'react-select/lib/filters';
 
-type Option = { [key: string]: unknown };
+export type Option = { [key: string]: any };
 
 const MultiValueRemove = (props) => {
   return (
@@ -143,9 +143,9 @@ type Props = {
   isSearchable?: boolean,
   isMulti?: boolean,
   menuShouldScrollIntoView: boolean,
-  onChange: (value: unknown, actionType: string) => void,
+  onChange: (value: any, actionType: string) => void,
   placeholder: string,
-  value?: unknown,
+  value?: Object | Array<Object> | null | undefined,
 };
 
 const ValueWithTitle = (props: { data: { label: string } }) => {
@@ -260,8 +260,12 @@ Select.propTypes = {
   isMulti: PropTypes.bool,
   menuShouldScrollIntoView: PropTypes.bool,
   options: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
+  onChange: PropTypes.func,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+    PropTypes.arrayOf(PropTypes.object),
+  ]),
   placeholder: PropTypes.string,
 };
 
@@ -281,6 +285,7 @@ Select.defaultProps = {
   // react-select uses !isMobileDevice() by default
   menuShouldScrollIntoView: undefined,
   placeholder: undefined,
+  onChange: undefined,
   value: undefined,
 };
 
