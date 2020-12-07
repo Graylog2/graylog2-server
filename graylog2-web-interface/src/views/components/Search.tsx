@@ -59,6 +59,7 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -84,7 +85,7 @@ const SearchArea = styled(AppContentGrid)`
 const SearchLayoutContainer = styled.div(({ isDashboard }) => css`
   height: 100%;
   display: grid;
-  ${isDashboard ? 'grid-template-rows: min-content auto min-content;' : 'grid-template-rows: min-content min-content auto min-content;'}
+  ${isDashboard ? 'grid-template-rows: min-content min-content auto min-content;' : 'grid-template-rows: min-content auto min-content;'}
 `);
 
 const ConnectedSidebar = connect(
@@ -189,27 +190,31 @@ const Search = ({ location }: Props) => {
                       </ConnectedSidebar>
                     </IfInteractive>
                     <SearchArea>
-                      <SearchLayoutContainer>
-                        <IfInteractive>
-                          <HeaderElements />
-                          <IfDashboard>
-                            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                          </IfDashboard>
-                          <IfSearch>
-                            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                          </IfSearch>
+                      <ViewTypeContext.Consumer>
+                        {(viewType) => (
+                          <SearchLayoutContainer isDashboard={viewType === 'DASHBOARD'}>
+                            <IfInteractive>
+                              <HeaderElements />
+                              <IfDashboard>
+                                <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                              </IfDashboard>
+                              <IfSearch>
+                                <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                              </IfSearch>
 
-                          <QueryBarElements />
+                              <QueryBarElements />
 
-                          <IfDashboard>
-                            <QueryBar />
-                          </IfDashboard>
-                        </IfInteractive>
-                        <HighlightMessageInQuery>
-                          <SearchResult />
-                        </HighlightMessageInQuery>
-                        <Footer />
-                      </SearchLayoutContainer>
+                              <IfDashboard>
+                                <QueryBar />
+                              </IfDashboard>
+                            </IfInteractive>
+                            <HighlightMessageInQuery>
+                              <SearchResult />
+                            </HighlightMessageInQuery>
+                            <Footer />
+                          </SearchLayoutContainer>
+                        )}
+                      </ViewTypeContext.Consumer>
                     </SearchArea>
                   </GridContainer>
                 </HighlightingRulesProvider>
