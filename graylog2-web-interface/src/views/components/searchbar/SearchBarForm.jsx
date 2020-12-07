@@ -26,8 +26,7 @@ type Props = {
 const validate = (values) => {
   const errors = {};
 
-  // if (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to) {
-  if (values.tempTimeRange.type === 'absolute'
+  if (values?.tempTimeRange?.type === 'absolute'
     && DateTime.isValidDateString(values.tempTimeRange.from)
     && values.tempTimeRange.from > values.tempTimeRange.to) {
     errors.tempTimeRange = {
