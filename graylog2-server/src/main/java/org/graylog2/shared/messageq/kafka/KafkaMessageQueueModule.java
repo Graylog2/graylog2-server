@@ -24,14 +24,12 @@ import org.graylog2.shared.journal.JournalReader;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.journal.KafkaJournalModule;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
-import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 
 public class KafkaMessageQueueModule extends Graylog2Module {
     @Override
     protected void configure() {
         install(new KafkaJournalModule());
-        bind(MessageQueueReader.class).to(KafkaMessageQueueReader.class).in(Scopes.SINGLETON);
         bind(MessageQueueWriter.class).to(KafkaMessageQueueWriter.class).in(Scopes.SINGLETON);
         bind(MessageQueueAcknowledger.class).to(KafkaMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
 
