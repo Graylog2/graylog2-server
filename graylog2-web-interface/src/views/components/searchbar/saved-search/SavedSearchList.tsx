@@ -58,25 +58,36 @@ const DeleteButton: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = style
   right: 10px;
 `;
 
+const DEFAULT_PAGINATION = {
+  query: '',
+  page: 1,
+  perPage: 5,
+};
+
 class SavedSearchList extends React.Component<Props, State> {
   static propTypes = {
     toggleModal: PropTypes.func.isRequired,
     deleteSavedSearch: PropTypes.func.isRequired,
-    views: PropTypes.object,
   };
 
   static defaultProps = {
-    views: {},
+    // eslint-disable-next-line react/default-props-match-prop-types
+    views: {
+      list: [],
+      pagination: {
+        ...DEFAULT_PAGINATION,
+        total: undefined,
+        count: undefined,
+      },
+    },
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
+      ...DEFAULT_PAGINATION,
       selectedSavedSearch: undefined,
-      query: '',
-      page: 1,
-      perPage: 5,
     };
   }
 
@@ -138,7 +149,7 @@ class SavedSearchList extends React.Component<Props, State> {
 
   render() {
     const { views, toggleModal } = this.props;
-    const { total, page, perPage = 5 } = views.pagination;
+    const { total, page, perPage } = views.pagination;
     const { selectedSavedSearch } = this.state;
     const savedSearchList = (views.list || []).map((savedSearch) => {
       return (
@@ -149,7 +160,7 @@ class SavedSearchList extends React.Component<Props, State> {
               {savedSearch.title}
               <span>
                 <DeleteButton bsSize="xsmall" bsStyle="danger" onClick={(e) => this.onDelete(e, savedSearch.id)}>
-                  <Icon name="trash" ttile="Delete" data-testid={`delete-${savedSearch.id}`} />
+                  <Icon name="trash" title="Delete" data-testid={`delete-${savedSearch.id}`} />
                 </DeleteButton>
               </span>
             </ListGroupItem>
