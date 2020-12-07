@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -21,12 +21,15 @@ import type { ThemeInterface } from 'theme';
 type Props = {
   disabled: boolean,
   from: boolean,
-  currentTimerange: {
+  currentTimerange?: {
+    from: string,
+    to: string,
+  },
+  originalTimeRange: {
     from: string,
     to: string,
   },
   limitDuration?: number,
-  setDisableApply: (boolean) => void,
 };
 
 const TIME_TYPES = [
@@ -68,23 +71,6 @@ const StyledButton = styled(Button)`
   padding: 6px 9px;
   line-height: 1.1;
 `;
-
-const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.tiny};
-  font-style: italic;
-  padding: 3px 3px 9px;
-`);
-
-const _isValidDateString = (dateString: string) => {
-  if (dateString === undefined) {
-    return undefined;
-  }
-
-  return DateTime.isValidDateString(dateString)
-    ? undefined
-    : 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]';
-};
 
 const _onFocusSelect = (event) => {
   event.target.select();
@@ -162,27 +148,25 @@ const fieldUpdate = (value) => {
   };
 };
 
-const _isDayAfter = ({ from, to }) => {
-  if (new Date(from) > new Date(to)) {
-    return 'From date can not be before the Until date.';
+const _isValidDateString = (dateString: string) => {
+  if (!dateString) {
+    return 'Date is required.';
   }
 
-  return '';
+  if (!DateTime.isValidDateString(dateString)) {
+    return 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
+  }
+
+  return undefined;
 };
 
-const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, setDisableApply }: Props) => {
+const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
-  const [timeRangeError, setTimeRangeError] = useState('');
-
-  useEffect(() => {
-    setTimeRangeError(_isDayAfter(currentTimerange));
-  }, [currentTimerange]);
 
   return (
     <Field name={`tempTimeRange[${range}]`} validate={_isValidDateString}>
       {({ field: { value, onChange, onBlur, name }, meta: { error } }) => {
-        setDisableApply(!!error || !!timeRangeError);
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
         const dateTime = error ? currentTimerange[range] : value || currentTimerange[range];
@@ -239,9 +223,6 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange, s
                                  title="Search end date"
                                  error={error}
                                  fromDate={fromDate} />
-
-            {from && timeRangeError && (<ErrorMessage>{timeRangeError}</ErrorMessage>)}
-
             <div>
               <SetTimeOption>
                 <FormGroup>
@@ -313,16 +294,19 @@ AbsoluteRangeField.propTypes = {
   currentTimerange: PropTypes.shape({
     from: PropTypes.string,
     to: PropTypes.string,
+  }),
+  originalTimeRange: PropTypes.shape({
+    from: PropTypes.string,
+    to: PropTypes.string,
   }).isRequired,
   disabled: PropTypes.bool,
   limitDuration: PropTypes.number,
-  setDisableApply: PropTypes.func,
 };
 
 AbsoluteRangeField.defaultProps = {
   disabled: false,
   limitDuration: 0,
-  setDisableApply: () => {},
+  currentTimerange: undefined,
 };
 
 export default AbsoluteRangeField;
