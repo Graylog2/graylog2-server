@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
+import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
@@ -38,6 +39,11 @@ type IndicatorProps = {
   };
 };
 
+const StyledRow = styled(Row)(({ hasFocusedWidget }) => css`
+  height: 100%;
+  ${hasFocusedWidget && 'overflow: auto'}
+`);
+
 const SearchLoadingIndicator = connect(
   ({ searchLoadingState }: IndicatorProps) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
   { searchLoadingState: SearchLoadingStateStore },
@@ -51,6 +57,7 @@ type Props = {
   viewState: {
     state: ViewState,
     activeQuery: QueryId,
+    focusedWidget: string | undefined | null,
   },
 };
 
@@ -63,6 +70,7 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
 
   const results = searches && searches.result;
   const widgetMapping = searches && searches.widgetMapping;
+  const hasFocusedWidget = !!viewState.focusedWidget;
 
   const currentResults = results ? results.forId(queryId) : undefined;
   const allFields = fieldTypes.all;
@@ -78,12 +86,12 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   ) : <Spinner />;
 
   return (
-    <Row style={{ height: '100%' }}>
+    <StyledRow hasFocusedWidget={hasFocusedWidget}>
       <Col style={{ height: '100%' }}>
         {content}
         <SearchLoadingIndicator />
       </Col>
-    </Row>
+    </StyledRow>
   );
 });
 
