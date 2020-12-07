@@ -17,7 +17,6 @@
 package org.graylog2.shared.messageq.pulsar;
 
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
-import org.graylog2.shared.messageq.MessageQueueException;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -31,12 +30,12 @@ public class PulsarMessageQueueAcknowledger implements MessageQueueAcknowledger 
     }
 
     @Override
-    public void acknowledge(Object messageId) throws MessageQueueException {
+    public void acknowledge(Object messageId) {
         pulsarMessageQueueReader.commit(messageId);
     }
 
     @Override
-    public void acknowledge(List<Object> messageIds) throws MessageQueueException {
+    public void acknowledge(List<Object> messageIds) {
         for (Object messageId : messageIds) {
             pulsarMessageQueueReader.commit(messageId);
         }

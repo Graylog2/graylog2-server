@@ -34,7 +34,6 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.messageq.MessageQueue;
 import org.graylog2.shared.messageq.MessageQueueException;
-import org.graylog2.shared.messageq.MessageQueueReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,7 @@ import java.util.concurrent.CountDownLatch;
 import static com.codahale.metrics.MetricRegistry.name;
 
 @Singleton
-public class PulsarMessageQueueReader extends AbstractExecutionThreadService implements MessageQueueReader {
+public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PulsarMessageQueueReader.class);
 
@@ -123,19 +122,13 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService imp
         //      do we need this?   final long remainingCapacity = processBuffer.getRemainingCapacity();
 
         while (isRunning()) {
-            final List<Entry> entries = read();
+            final List<MessageQueue.Entry> entries = read();
             entries.forEach(entry -> {
                 LOG.info("Consumed message: {}", entry);
                 final RawMessage rawMessage = RawMessage.decode(entry.value(), entry.commitId());
                 processBuffer.insertBlocking(rawMessage);
             });
         }
-    }
-
-    @Override
-    public List<Entry> read(long entries) throws MessageQueueException {
-        // TODO we don't need the MessageQueueReader interface anymore
-        return read();
     }
 
     private List<MessageQueue.Entry> read() throws MessageQueueException {
@@ -158,16 +151,15 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService imp
         return builder.build();
     }
 
-    @Override
-    public void commit(Object messageId) throws MessageQueueException {
+    public void commit(Object messageId) {
         if (messageId instanceof MessageId) {
             try {
                 consumer.acknowledge((MessageId) messageId);
             } catch (PulsarClientException e) {
-                throw new MessageQueueException("Couldn't acknowledge message", e);
+                LOG.error("Couldn't acknowledge message", e);
             }
         } else {
-            throw new MessageQueueException("Couldn't acknowledge unknown message type <" + messageId + ">");
+            LOG.error("Couldn't acknowledge message. Expected <" + messageId + "> to be a MessageId");
         }
     }
 
