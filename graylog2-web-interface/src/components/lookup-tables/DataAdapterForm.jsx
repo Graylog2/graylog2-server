@@ -108,7 +108,7 @@ class DataAdapterForm extends React.Component {
       // when creating always initially auto-generate the adapter name,
       // this will be false if the user changed the adapter name manually
       generateAdapterName: create,
-      isFormDisabled: true,
+      isFormDisabled: false,
       dataAdapter: {
         id: adapter.id,
         title: adapter.title,
@@ -363,7 +363,7 @@ class DataAdapterForm extends React.Component {
               <fieldset>
                 <Row>
                   <Col mdOffset={3} md={9}>
-                    <Button type="submit" bsStyle="success" disabled={!isFormDisabled}>{create ? 'Create Adapter'
+                    <Button type="submit" bsStyle="success" disabled={isFormDisabled}>{create ? 'Create Adapter'
                       : 'Update Adapter'}
                     </Button>
                   </Col>
