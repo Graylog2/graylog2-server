@@ -31,6 +31,8 @@ import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid, { WidgetContainer } from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetComponent from 'views/components/WidgetComponent';
+import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
+import defaultTitle from 'views/components/defaultTitle';
 
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
@@ -54,7 +56,7 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget, titles) => {
   const widgets = {};
   const data = {};
   const errors = {};
@@ -85,6 +87,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 
   if (focusedWidget) {
     const widget = widgets[focusedWidget];
+    const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
 
     return (
       <WidgetContainer>
@@ -93,14 +96,10 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
                          data={data}
                          errors={errors}
                          widgetDimension={{ height: 100, width: 200 }}
-                         title="Foo"
+                         title={title}
                          position={WidgetPosition.builder().build()}
-                         onPositionsChange={() => {
-                         }}
                          fields={fields}
-                         allFields={allFields}
-                         onWidgetSizeChange={() => {
-                         }} />
+                         allFields={allFields} />
       </WidgetContainer>
     );
   }
@@ -154,14 +153,24 @@ const EmptyDashboardInfo = () => (
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
   const { focusedWidget } = useStore(CurrentViewStateStore);
-  console.log('query.tsx', focusedWidget);
+  const titles = useStore(TitlesStore);
 
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
   if (results) {
-    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields, focusedWidget);
+    const content = _renderWidgetGrid(
+      widgets,
+      widgetMapping.toJS(),
+      results,
+      positions,
+      queryId,
+      fields,
+      allFields,
+      focusedWidget,
+      titles,
+    );
 
     return (<>{content}</>);
   }

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
@@ -45,11 +46,11 @@ const WidgetComponent = ({
   errors,
   widgetDimension: { height, width },
   position,
-  onPositionsChange,
+  onPositionsChange = () => {},
   title,
   fields,
   allFields,
-  onWidgetSizeChange,
+  onWidgetSizeChange = () => {},
 }: Props) => {
   const dataKey = widget.data || widget.id;
   const widgetData = data[dataKey];
@@ -76,6 +77,25 @@ const WidgetComponent = ({
       </WidgetContext.Provider>
     </DrilldownContextProvider>
   );
+};
+
+WidgetComponent.propTypes = {
+  widget: PropTypes.object.isRequired,
+  widgetId: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+  widgetDimension: PropTypes.object.isRequired,
+  title: PropTypes.string.isRequired,
+  position: PropTypes.object.isRequired,
+  onPositionsChange: PropTypes.func,
+  fields: PropTypes.object.isRequired,
+  allFields: PropTypes.object.isRequired,
+  onWidgetSizeChange: PropTypes.func,
+};
+
+WidgetComponent.defaultProps = {
+  onPositionsChange: () => {},
+  onWidgetSizeChange: () => {},
 };
 
 export default WidgetComponent;

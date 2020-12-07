@@ -32,6 +32,7 @@ import { RowContentStyles } from 'components/graylog/Row';
 
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import WidgetComponent from './WidgetComponent';
+import defaultTitle from './defaultTitle';
 
 const DashboardWrap = styled.div(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
@@ -45,19 +46,11 @@ export const WidgetContainer = styled.div`
   height: 100%;
 `;
 
-const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
-
 class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
     const widgetDef = widgetDefinition(type);
 
     return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
-  }
-
-  static _defaultTitle(widget) {
-    const widgetDef = widgetDefinition(widget.type);
-
-    return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);
   }
 
   static propTypes = {
@@ -116,7 +109,7 @@ class WidgetGrid extends React.Component {
 
       const { widgetDimensions = {} } = this.state;
       const { fields, allFields, titles = Immutable.Map() } = this.props;
-      const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], WidgetGrid._defaultTitle(widget));
+      const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
 
       returnedWidgets.widgets.push(
         <WidgetContainer key={widgetId}>
