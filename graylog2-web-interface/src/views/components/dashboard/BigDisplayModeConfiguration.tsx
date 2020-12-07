@@ -25,6 +25,7 @@ import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 
 export type UntypedBigDisplayModeQuery = {
   interval?: string,
@@ -141,7 +142,9 @@ type Props = {
 
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
-  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view));
+  const onSave = (config: Configuration) => CurrentViewStateActions.focusWidget(undefined).then(
+    () => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view)),
+  );
 
   return (
     <>
