@@ -26,7 +26,6 @@ import EntityShareState from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import { Select } from 'components/common';
 
 import GranteesSelector, { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
 import GranteesList from './GranteesList';
