@@ -117,26 +117,21 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
         @Nullable
         @Override
         public RawMessageEvent apply(RawMessageEvent input) {
-            try {
-                if (log.isTraceEnabled()) {
-                    log.trace("Journalling message {}", input.getMessageId());
-                }
-
-                // stats
-                final int size = input.getEncodedRawMessage().length;
-                bytesWritten += size;
-                byteCounter.inc(size);
-
-                final DateTime messageTimestamp = input.getMessageTimestamp();
-                if (messageTimestamp != null) {
-                    latestReceiveTime = latestReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : latestReceiveTime;
-                }
-
-                return input;
-            } catch (Exception e) {
-                log.error("Unable to convert RawMessageEvent to Journal.Entry - skipping event", e);
-                return null;
+            if (log.isTraceEnabled()) {
+                log.trace("Journalling message {}", input.getMessageId());
             }
+
+            // stats
+            final int size = input.getEncodedRawMessage().length;
+            bytesWritten += size;
+            byteCounter.inc(size);
+
+            final DateTime messageTimestamp = input.getMessageTimestamp();
+            if (messageTimestamp != null) {
+                latestReceiveTime = latestReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : latestReceiveTime;
+            }
+
+            return input;
         }
     }
 }
