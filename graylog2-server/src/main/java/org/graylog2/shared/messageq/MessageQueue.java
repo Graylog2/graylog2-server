@@ -21,18 +21,8 @@ import com.google.common.util.concurrent.Service;
 import javax.annotation.Nullable;
 
 public interface MessageQueue extends Service {
-    default Entry createEntry(byte[] id, byte[] value) {
-        return createEntry(id, null, value, 0);
-    }
-
-    default Entry createEntry(byte[] id, byte[] value, long timestamp) {
-        return createEntry(id, null, value, timestamp);
-    }
-
-    Entry createEntry(byte[] id, @Nullable byte[] key, byte[] value, long timestamp);
 
     interface Entry {
-        @Nullable
         Object commitId();
 
         /**

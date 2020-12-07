@@ -18,16 +18,9 @@ package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
-import org.graylog2.shared.journal.Journal;
-import org.graylog2.shared.messageq.MessageQueue;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
@@ -37,50 +30,24 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
-import static com.google.common.collect.Lists.transform;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class JournallingMessageHandler implements EventHandler<RawMessageEvent> {
     private static final Logger log = LoggerFactory.getLogger(JournallingMessageHandler.class);
 
-    private static final Set<Journal.Entry> NULL_SINGLETON = Collections.singleton(null);
-    private static final Set<MessageQueue.Entry> MESSAGE_JOURNAL_NULL_SINGLETON = Collections.singleton(null);
-    private static final Retryer<Void> JOURNAL_WRITE_RETRYER = RetryerBuilder.<Void>newBuilder()
-            .retryIfException(new Predicate<Throwable>() {
-                @Override
-                public boolean apply(@Nullable Throwable input) {
-                    log.error("Unable to write to journal - retrying with exponential back-off", input);
-                    return true;
-                }
-            })
-            .withWaitStrategy(WaitStrategies.exponentialWait(250, 1, TimeUnit.MINUTES))
-            .withStopStrategy(StopStrategies.neverStop())
-            .build();
-
     private final List<RawMessageEvent> batch = Lists.newArrayList();
     private final Counter byteCounter;
-    private final Journal journal;
     private final MessageQueueWriter messageQueueWriter;
     private final ProcessingStatusRecorder processingStatusRecorder;
-    private final Semaphore journalFilled;
 
     @Inject
     public JournallingMessageHandler(MetricRegistry metrics,
-                                     Journal journal,
                                      MessageQueueWriter messageQueueWriter,
-                                     ProcessingStatusRecorder processingStatusRecorder,
-                                     @Named("JournalSignal") Semaphore journalFilled) {
-        this.journal = journal;
+                                     ProcessingStatusRecorder processingStatusRecorder) {
         this.messageQueueWriter = messageQueueWriter;
         this.processingStatusRecorder = processingStatusRecorder;
-        this.journalFilled = journalFilled;
         byteCounter = metrics.counter(MetricRegistry.name(JournallingMessageHandler.class, "written_bytes"));
     }
 
@@ -89,47 +56,26 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
         batch.add(event);
 
         if (endOfBatch) {
-            log.debug("End of batch, journalling {} messages", batch.size());
+            log.debug("End of batch, journaling {} messages", batch.size());
             // write batch to journal
 
-            //final Converter converter = new Converter();
-            final MessageJournalConverter messageJournalConverter = new MessageJournalConverter();
-            // Needs to run before the other converter because that one is setting fields to null
-            final ArrayList<MessageQueue.Entry> messageQueueEntries = Lists.newArrayList(transform(batch, messageJournalConverter));
             // copy to avoid re-running this all the time
-            //final List<Journal.Entry> entries = Lists.newArrayList(transform(batch, converter));
+            final Filter metricsFilter = new Filter();
+            final List<RawMessageEvent> entries = batch.stream().map(metricsFilter).filter(Objects::nonNull).collect(Collectors.toList());
 
-            // Remove all null values returned from the converter (might happen if the Converter throws an exception)
-            //entries.removeAll(NULL_SINGLETON);
-            messageQueueEntries.removeAll(MESSAGE_JOURNAL_NULL_SINGLETON);
+            // The filter computed the latest receive timestamp of all messages in the batch so we don't have to
+            // call the update on the recorder service for every message. (less contention)
+            processingStatusRecorder.updateIngestReceiveTime(metricsFilter.getLatestReceiveTime());
 
             // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
             // objects in there have been set to null and cannot be used anymore.
             batch.clear();
 
-            messageQueueWriter.write(messageQueueEntries);
+            messageQueueWriter.write(entries);
         }
     }
 
-    private class MessageJournalConverter implements Function<RawMessageEvent, MessageQueue.Entry> {
-        @Nullable
-        @Override
-        public MessageQueue.Entry apply(@Nullable RawMessageEvent input) {
-            try {
-                final byte[] messageIdBytes = input.getMessageIdBytes();
-                final byte[] encodedRawMessage = input.getEncodedRawMessage();
-
-                // TODO: Check Converter implementation and copy relevant parts here (e.g. setting fields to null and metrics)
-
-                return messageQueueWriter.createEntry(messageIdBytes, encodedRawMessage);
-            } catch (Exception e) {
-                log.error("Unable to convert RawMessageEvent to MessageJournal.Entry - skipping event", e);
-                return null;
-            }
-        }
-    }
-
-    private class Converter implements Function<RawMessageEvent, Journal.Entry> {
+    private class Filter implements Function<RawMessageEvent, RawMessageEvent> {
         private long bytesWritten = 0;
         private DateTime latestReceiveTime = new DateTime(0L, DateTimeZone.UTC);
 
@@ -143,34 +89,26 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
         @Nullable
         @Override
-        public Journal.Entry apply(RawMessageEvent input) {
-            try {
-                if (log.isTraceEnabled()) {
-                    log.trace("Journalling message {}", input.getMessageId());
-                }
-                final byte[] messageIdBytes = input.getMessageIdBytes();
-                final byte[] encodedRawMessage = input.getEncodedRawMessage();
+        public RawMessageEvent apply(RawMessageEvent input) {
+            if (log.isTraceEnabled()) {
+                log.trace("Journalling message {}", input.getMessageId());
+            }
 
-                // stats
-                final int size = encodedRawMessage.length;
-                bytesWritten += size;
-                byteCounter.inc(size);
-
-                final DateTime messageTimestamp = input.getMessageTimestamp();
-                if (messageTimestamp != null) {
-                    latestReceiveTime = latestReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : latestReceiveTime;
-                }
-
-                // clear for gc and to avoid promotion to tenured space
-                input.setMessageIdBytes(null);
-                input.setEncodedRawMessage(null);
-                input.setMessageTimestamp(null);
-                // convert to journal entry
-                return journal.createEntry(messageIdBytes, encodedRawMessage);
-            } catch (Exception e) {
-                log.error("Unable to convert RawMessageEvent to Journal.Entry - skipping event", e);
+            if (input.getEncodedRawMessage() == null) {
+                log.error("Skipping RawMessageEvent with null encodedRawMessage");
                 return null;
             }
+            // stats
+            final int size = input.getEncodedRawMessage().length;
+            bytesWritten += size;
+            byteCounter.inc(size);
+
+            final DateTime messageTimestamp = input.getMessageTimestamp();
+            if (messageTimestamp != null) {
+                latestReceiveTime = latestReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : latestReceiveTime;
+            }
+
+            return input;
         }
     }
 }

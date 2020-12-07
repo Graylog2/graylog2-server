@@ -30,12 +30,12 @@ import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.client.api.TypedMessageBuilder;
+import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
@@ -43,7 +43,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Singleton
 public class PulsarMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
@@ -110,12 +109,7 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
     }
 
     @Override
-    public Entry createEntry(byte[] id, @Nullable byte[] key, byte[] value, long timestamp) {
-        return new PulsarMessageQueueEntry(id, key, value, timestamp);
-    }
-
-    @Override
-    public void write(List<Entry> entries) throws MessageQueueException {
+    public void write(List<RawMessageEvent> entries) throws MessageQueueException {
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -126,17 +120,13 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
         if (!isRunning()) {
             throw new MessageQueueException("Message queue service is not running");
         }
-        for (final Entry entry : entries) {
-            final TypedMessageBuilder<byte[]> newMessage = producer.newMessage().value(entry.value());
+        for (final RawMessageEvent entry : entries) {
+            final TypedMessageBuilder<byte[]> newMessage = producer.newMessage().value(entry.getEncodedRawMessage());
 
-            final byte[] key = entry.key();
-            if (key != null) {
-                newMessage.key(new String(key, UTF_8));
-            }
 
             // Pulsar only accepts timestamps > 0
-            if (entry.timestamp() > 0) {
-                newMessage.eventTime(entry.timestamp());
+            if (entry.getMessageTimestamp() != null) {
+                newMessage.eventTime(entry.getMessageTimestamp().getMillis());
             }
 
             LOG.info("Sending message {} (producer {})", entry, producer.getProducerName());
