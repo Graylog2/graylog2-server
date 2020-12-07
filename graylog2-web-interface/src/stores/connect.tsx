@@ -86,12 +86,6 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores 
   stores: Stores
 ): React.ComponentType<Optional<PropsWithDefaults<C>, keyof Stores>>;
 
-function connect<Props extends object, Stores extends object>(
-    Component: React.ComponentType<Props>,
-    stores: Stores
-    // @ts-ignore
-): React.ComponentType<Optional<Props, keyof Stores>>;
-
 function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object, MappedProps extends object>(
     Component: C,
     stores: Stores,
