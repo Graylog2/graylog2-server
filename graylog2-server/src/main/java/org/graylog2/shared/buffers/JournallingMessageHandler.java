@@ -85,11 +85,16 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
         batch.add(event);
 
         if (endOfBatch) {
-            log.debug("End of batch, journalling {} messages", batch.size());
+            log.debug("End of batch, journaling {} messages", batch.size());
             // write batch to journal
 
             // copy to avoid re-running this all the time
-            final List<RawMessageEvent> entries = Lists.newArrayList(transform(batch, new Filter()));
+            final Filter metricsFilter = new Filter();
+            final List<RawMessageEvent> entries = Lists.newArrayList(transform(batch, metricsFilter));
+
+            // The filter computed the latest receive timestamp of all messages in the batch so we don't have to
+            // call the update on the recorder service for every message. (less contention)
+            processingStatusRecorder.updateIngestReceiveTime(metricsFilter.getLatestReceiveTime());
 
             // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
             // objects in there have been set to null and cannot be used anymore.
