@@ -39,6 +39,7 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -58,6 +59,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.stream.IntStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
@@ -530,5 +532,45 @@ public class KafkaJournalTest {
         assertThat(entriesFromFirstSegment).hasSize(24);
         final List<Journal.JournalReadEntry> entriesFromSecondSegment = journal.read(25);
         assertThat(entriesFromSecondSegment).hasSize(25);
+    }
+
+    /**
+     * Test a race condition between reading and writing:
+     *
+     * We get an empty result back from the journal but at the time we check the last offset, more entries have been
+     * written to the journal. In that case we can't assume that the journal is corrupted, which we did with the
+     * first implementation.
+     *
+     * This is a manual test. It will always pass but you will see warnings, if the bug is triggered. You might have
+     * to run the test multiple times because as it's a race condition, it can't be triggered reliably.
+     */
+    @Test
+    @Ignore
+    public void readNext() throws Exception {
+        final KafkaJournal journal = new KafkaJournal(journalDirectory.toPath(),
+                scheduler, Size.kilobytes(1L),
+                Duration.standardHours(1),
+                Size.kilobytes(10L),
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                100,
+                new MetricRegistry(),
+                serverStatus);
+
+        final byte[] idBytes = "id".getBytes(UTF_8);
+        final byte[] messageBytes = "message".getBytes(UTF_8);
+
+         // High frequency reading with occasional writing.
+        // This doesn't trigger the bug reliably every time though.
+        IntStream.range(0, 1_000_000).parallel().forEach(
+                (i) -> {
+                    if (i % 1000 == 0) {
+                        journal.write(idBytes, messageBytes);
+                    } else {
+                        journal.read(1L).forEach(e -> journal.markJournalOffsetCommitted(e.getOffset()));
+                    }
+                }
+        );
     }
 }
