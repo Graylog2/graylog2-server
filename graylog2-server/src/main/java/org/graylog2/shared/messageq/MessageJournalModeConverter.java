@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.journal;
+package org.graylog2.shared.messageq;
 
-import com.google.common.util.concurrent.Service;
-import com.google.inject.Scopes;
-import com.google.inject.multibindings.Multibinder;
-import org.graylog2.plugin.inject.Graylog2Module;
+import com.github.joschi.jadconfig.Converter;
+import org.apache.directory.api.util.Strings;
 
-public class JournalReaderModule extends Graylog2Module {
-
+public class MessageJournalModeConverter implements Converter<MessageJournalMode> {
     @Override
-    protected void configure() {
-        final Multibinder<Service> serviceBinder = serviceBinder();
-        serviceBinder.addBinding().to(JournalReader.class).in(Scopes.SINGLETON);
-        serviceBinder.addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
-
+    public MessageJournalMode convertFrom(String value) {
+        return MessageJournalMode.valueOf(Strings.upperCase(value));
     }
 
+    @Override
+    public String convertTo(MessageJournalMode value) {
+        return value.name();
+    }
 }
