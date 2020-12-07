@@ -108,7 +108,7 @@ class DataAdapterForm extends React.Component {
       // when creating always initially auto-generate the adapter name,
       // this will be false if the user changed the adapter name manually
       generateAdapterName: create,
-      isFormExternalyValidated: true,
+      isFormDisabled: true,
       dataAdapter: {
         id: adapter.id,
         title: adapter.title,
@@ -129,8 +129,8 @@ class DataAdapterForm extends React.Component {
     }
   };
 
-  _setExternalValidationState = (formValidationState) => {
-    this.setState({ isFormExternalyValidated: formValidationState });
+  _setIsFormDisabled = (formValidationState) => {
+    this.setState({ isFormDisabled: formValidationState });
   };
 
   _validate = (adapter) => {
@@ -262,7 +262,7 @@ class DataAdapterForm extends React.Component {
   };
 
   render() {
-    const { dataAdapter, isFormExternalyValidated } = this.state;
+    const { dataAdapter, isFormDisabled } = this.state;
     const { create, type, title } = this.props;
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
@@ -282,7 +282,7 @@ class DataAdapterForm extends React.Component {
         updateConfig: this._updateConfig,
         validationMessage: this._validationMessage,
         validationState: this._validationState,
-        setIsFormExternalyValid: this._setExternalValidationState,
+        disableFormSubmission: this._setIsFormDisabled,
       });
 
       if (p.documentationComponent) {
@@ -363,7 +363,7 @@ class DataAdapterForm extends React.Component {
               <fieldset>
                 <Row>
                   <Col mdOffset={3} md={9}>
-                    <Button type="submit" bsStyle="success" disabled={!isFormExternalyValidated}>{create ? 'Create Adapter'
+                    <Button type="submit" bsStyle="success" disabled={!isFormDisabled}>{create ? 'Create Adapter'
                       : 'Update Adapter'}
                     </Button>
                   </Col>
