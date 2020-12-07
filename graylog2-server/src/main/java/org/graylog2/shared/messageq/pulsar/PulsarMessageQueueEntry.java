@@ -47,7 +47,6 @@ public class PulsarMessageQueueEntry implements MessageQueue.Entry {
         return new PulsarMessageQueueEntry(message);
     }
 
-    @Nullable
     @Override
     public MessageId commitId() {
         return commitId;

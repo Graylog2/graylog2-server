@@ -23,7 +23,6 @@ import javax.annotation.Nullable;
 public interface MessageQueue extends Service {
 
     interface Entry {
-        @Nullable
         Object commitId();
 
         /**
