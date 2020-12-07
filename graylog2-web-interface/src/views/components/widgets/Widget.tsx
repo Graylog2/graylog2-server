@@ -129,14 +129,6 @@ const _editComponentForType = (type) => {
 class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
-    view: PropTypes.object.isRequired,
-    widget: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      computationTimeRange: PropTypes.object,
-      config: PropTypes.object.isRequired,
-      filter: PropTypes.string,
-    }).isRequired,
     data: PropTypes.any,
     editing: PropTypes.bool,
     errors: WidgetErrorsList,
@@ -146,7 +138,6 @@ class Widget extends React.Component<Props, State> {
     onSizeChange: PropTypes.func.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    position: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
