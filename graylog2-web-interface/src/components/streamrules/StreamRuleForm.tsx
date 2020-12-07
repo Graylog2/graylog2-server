@@ -44,6 +44,7 @@ type StreamRuleType = {
   id: number,
   short_desc: string,
   long_desc: string,
+  name: string,
 };
 
 type Props = {
@@ -51,7 +52,7 @@ type Props = {
   streamRule: StreamRule,
   streamRuleTypes: [StreamRuleType],
   title: string,
-  inputs: [],
+  inputs: Array<unknown>,
   onClose: () => void,
 };
 
@@ -62,17 +63,16 @@ type State = {
 
 class StreamRuleForm extends React.Component<Props, State> {
   static defaultProps = {
+    // eslint-disable-next-line react/default-props-match-prop-types
     streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
+    // eslint-disable-next-line react/default-props-match-prop-types
     inputs: [],
     onClose: () => {},
   };
 
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
-    streamRule: PropTypes.object,
-    streamRuleTypes: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
-    inputs: PropTypes.array,
     onClose: PropTypes.func,
   };
 
