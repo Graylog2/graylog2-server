@@ -282,7 +282,7 @@ class DataAdapterForm extends React.Component {
         updateConfig: this._updateConfig,
         validationMessage: this._validationMessage,
         validationState: this._validationState,
-        disableFormSubmission: this._setIsFormDisabled,
+        setDisableFormSubmission: this._setIsFormDisabled,
       });
 
       if (p.documentationComponent) {
