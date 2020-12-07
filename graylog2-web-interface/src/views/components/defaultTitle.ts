@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { capitalize } from 'lodash';
+
 import { widgetDefinition } from 'views/logic/Widgets';
 
-const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
+const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
 
 const defaultTitle = (widget) => {
   const widgetDef = widgetDefinition(widget.type);
