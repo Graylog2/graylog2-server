@@ -113,11 +113,15 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
   );
 };
 
-const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery): void => history.push(
-  new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id))
-    .search(config)
-    .toString(),
-);
+const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery): void => {
+  CurrentViewStateActions.focusWidget(undefined);
+
+  history.push(
+    new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id))
+      .search(config)
+      .toString(),
+  );
+};
 
 const createQueryFromConfiguration = (
   { queryCycleInterval, queryTabs, refreshInterval }: Configuration,
@@ -142,9 +146,7 @@ type Props = {
 
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
-  const onSave = (config: Configuration) => CurrentViewStateActions.focusWidget(undefined).then(
-    () => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view)),
-  );
+  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view));
 
   return (
     <>

@@ -435,5 +435,6 @@ export default connect(Widget,
     view: ViewStore,
     currentView: CurrentViewStateStore,
   }, (props) => ({
+    ...props,
     focusedWidget: props.currentView.focusedWidget,
   }));

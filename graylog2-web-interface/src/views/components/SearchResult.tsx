@@ -39,10 +39,14 @@ type IndicatorProps = {
   };
 };
 
-const StyledRow = styled(Row)(({ hasFocusedWidget }) => css`
+const StyledRow = styled(Row)(({ overflow }) => css`
   height: 100%;
-  ${hasFocusedWidget && 'overflow: auto'}
+  ${overflow}
 `);
+
+const StyledCol = styled(Col)`
+  height: 100%;
+`;
 
 const SearchLoadingIndicator = connect(
   ({ searchLoadingState }: IndicatorProps) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
@@ -86,11 +90,11 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   ) : <Spinner />;
 
   return (
-    <StyledRow hasFocusedWidget={hasFocusedWidget}>
-      <Col style={{ height: '100%' }}>
+    <StyledRow overflow={hasFocusedWidget ? 'overflow: auto' : undefined}>
+      <StyledCol>
         {content}
         <SearchLoadingIndicator />
-      </Col>
+      </StyledCol>
     </StyledRow>
   );
 });

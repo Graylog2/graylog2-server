@@ -29,6 +29,14 @@ import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
 
+jest.mock('views/stores/CurrentViewStateStore', () => ({
+  CurrentViewStateActions: {
+    focusWidget: jest.fn(() => ({
+      then: jest.fn(),
+    })),
+  },
+}));
+
 const search = Search.create();
 const view = View.create()
   .toBuilder()
