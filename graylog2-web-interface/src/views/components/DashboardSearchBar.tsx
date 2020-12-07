@@ -33,12 +33,13 @@ import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import TopRow from 'views/components/searchbar/TopRow';
+import { SearchesConfig } from 'components/search/SearchConfig';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 
 type Props = {
-  config: any,
+  config: SearchesConfig,
   globalOverride: {
     timerange: TimeRange,
     query: QueryString,
@@ -113,7 +114,6 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
 };
 
 DashboardSearchBar.propTypes = {
-  config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
   onExecute: PropTypes.func.isRequired,
 };
