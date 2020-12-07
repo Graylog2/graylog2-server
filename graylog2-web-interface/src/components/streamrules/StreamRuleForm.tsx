@@ -50,7 +50,7 @@ type StreamRuleType = {
 type Props = {
   onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: StreamRule) => void,
   streamRule: StreamRule,
-  streamRuleTypes: [StreamRuleType],
+  streamRuleTypes: Array<StreamRuleType>,
   title: string,
   inputs: Array<unknown>,
   onClose: () => void,
@@ -72,6 +72,7 @@ class StreamRuleForm extends React.Component<Props, State> {
 
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
+    streamRuleTypes: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
     onClose: PropTypes.func,
   };
