@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';

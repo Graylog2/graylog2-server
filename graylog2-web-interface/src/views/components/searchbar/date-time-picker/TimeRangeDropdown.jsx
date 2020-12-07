@@ -117,8 +117,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const formik = useFormikContext();
   const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
-  const { value: nextRangeValue } = nextRangeProps;
-  const { value: originalRangeValue } = originalTimerange;
 
   const originalRangeValue = useMemo(() => originalTimerange?.value, [originalTimerange]);
   const nextRangeValue = useMemo(() => nextRangeProps?.value || originalRangeValue, [nextRangeProps, originalRangeValue]);
@@ -186,7 +184,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                       activeKey={activeTab}
                       onSelect={onSelect}
                       animation={false}>
-            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, _setDisableApply, currentTimerange)}
+            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, currentTimerange)}
           </StyledTabs>
         </Col>
       </Row>
