@@ -22,6 +22,7 @@ import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 
 import { createHandlerFor } from './ActionHandler';
 import type { ActionComponents, ActionDefinition } from './ActionHandler';
@@ -87,6 +88,12 @@ class FieldActions extends React.Component<Props, State> {
         const handler = createHandlerFor(action, setActionComponents);
 
         const onSelect = () => {
+          const { resetFocus = false } = action;
+
+          if (resetFocus) {
+            CurrentViewStateActions.focusWidget(undefined);
+          }
+
           this._onMenuToggle();
           handler(handlerArgs);
         };
