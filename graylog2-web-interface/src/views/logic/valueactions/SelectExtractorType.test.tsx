@@ -18,6 +18,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
+import Select from 'views/components/Select';
 
 import SelectExtractorType from './SelectExtractorType';
 
@@ -59,7 +60,7 @@ describe('SelectExtractorType', () => {
         <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
       </AdditionalContext.Provider>,
     );
-    const select = wrapper.find('Select');
+    const select = wrapper.find(Select);
     const { onChange } = select.at(0).props();
 
     const form = wrapper.find('form');
@@ -67,7 +68,7 @@ describe('SelectExtractorType', () => {
     expect(select).toExist();
     expect(select.at(0)).toHaveProp('placeholder', 'Select extractor type');
 
-    onChange('grok');
+    onChange('grok', 'set-value');
     form.simulate('submit');
 
     expect(window.open).toHaveBeenCalled();

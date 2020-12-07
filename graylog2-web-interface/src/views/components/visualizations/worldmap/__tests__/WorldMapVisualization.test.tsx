@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { mount } from 'wrappedEnzyme';
+import { HTMLAttributes, mount } from 'wrappedEnzyme';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
@@ -29,6 +29,11 @@ import { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import WorldMapVisualization from '../WorldMapVisualization';
 
 jest.mock('../MapVisualization', () => 'map-visualization');
+
+type MapVisualizationProps = HTMLAttributes & {
+  onChange: (viewPort: Viewport) => void;
+  onRenderComplete: () => void;
+};
 
 describe('WorldMapVisualization', () => {
   const config = AggregationWidgetConfig.builder().visualization(WorldMapVisualization.type).build();
@@ -51,7 +56,7 @@ describe('WorldMapVisualization', () => {
                                                  width={800} />);
     const mapVisualization = wrapper.find('map-visualization');
 
-    const { onChange: _onChange } = mapVisualization.at(0).props();
+    const { onChange: _onChange } = mapVisualization.at(0).props() as MapVisualizationProps;
 
     const viewport = Viewport.create([0, 0], 0);
 
@@ -73,7 +78,7 @@ describe('WorldMapVisualization', () => {
                                                  width={800} />);
     const mapVisualization = wrapper.find('map-visualization');
 
-    const { onChange: _onChange } = mapVisualization.at(0).props();
+    const { onChange: _onChange } = mapVisualization.at(0).props() as MapVisualizationProps;
 
     const viewport = Viewport.create([0, 0], 0);
 
@@ -98,7 +103,7 @@ describe('WorldMapVisualization', () => {
       </RenderCompletionCallback.Provider>
     ));
 
-    const { onRenderComplete } = wrapper.find('map-visualization').props();
+    const { onRenderComplete } = wrapper.find('map-visualization').props() as MapVisualizationProps;
 
     onRenderComplete();
 
