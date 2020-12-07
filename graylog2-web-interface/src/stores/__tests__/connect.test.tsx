@@ -73,6 +73,23 @@ SimpleComponentWithDummyStore.defaultProps = {
   simpleStore: undefined,
 };
 
+// eslint-disable-next-line react/prefer-stateless-function
+class SimpleClassComponent extends React.Component<{ propWithDefault: string }> {
+  static defaultProps = {
+    propWithDefault: 'default value',
+  }
+
+  static propTypes = {
+    propWithDefault: PropTypes.string,
+  }
+
+  render() {
+    const { propWithDefault } = this.props;
+
+    return <span>{propWithDefault}</span>;
+  }
+}
+
 describe('connect()', () => {
   beforeEach(() => {
     SimpleStore.reset();
@@ -142,6 +159,20 @@ describe('connect()', () => {
     const Component = connect(() => <span>hello!</span>, { simpleStore: SimpleStore });
 
     expect(Component.displayName).toEqual('ConnectStoresWrapper[Unknown/Anonymous] stores=simpleStore');
+  });
+
+  it('types store props as optional', () => {
+    const Component = connect(() => <span>hello!</span>, { simpleStore: SimpleStore });
+    mount(<Component />);
+  });
+
+  it('types mapped props as optional', () => {
+    const Component = connect(
+      () => <span>hello!</span>,
+      { simpleStore: SimpleStore },
+      ({ simpleStore }) => ({ storeValue: simpleStore.value }),
+    );
+    mount(<Component />);
   });
 
   describe('generates `shouldComponentUpdate`', () => {
