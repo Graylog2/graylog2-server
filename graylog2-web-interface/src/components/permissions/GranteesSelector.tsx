@@ -37,7 +37,7 @@ export type SelectionRequest = {
 
 export type FormValues = {
   granteeId: $PropertyType<Grantee, 'id'> | undefined,
-  capabilityId: $PropertyType<Capability, 'id'> | undefined,
+  capabilityId: $PropertyType<Capability, 'id'>,
 }
 
 type Props = {
