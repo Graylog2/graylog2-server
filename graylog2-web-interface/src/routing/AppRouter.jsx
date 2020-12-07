@@ -296,8 +296,8 @@ const AppRouter = () => {
 
                         {!isCloud && <Route exact path={Routes.SYSTEM.LOGGING} component={LoggersPage} />}
                         <Route exact path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
-                        <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />
-                        <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
+                        {!isCloud && <Route exact path={Routes.SYSTEM.NODES.LIST} component={NodesPage} />}
+                        {!isCloud && <Route exact path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />}
 
                         {!isCloud && <Route exact path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />}
 
