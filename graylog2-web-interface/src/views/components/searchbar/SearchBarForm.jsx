@@ -12,7 +12,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 
 type Values = {
-  timerange: TimeRange,
+  tempTimeRange: TimeRange,
   streams: Array<string>,
   queryString: string,
 };

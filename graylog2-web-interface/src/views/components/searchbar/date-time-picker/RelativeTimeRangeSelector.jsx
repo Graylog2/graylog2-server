@@ -121,7 +121,7 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
   return null;
 }).filter(Boolean);
 
-const RelativeTimeRangeSelector = ({ disabled, currentTimerange, originalTimeRange, limitDuration }: Props) => {
+const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
   const _isValidRange = (value) => {
@@ -135,7 +135,7 @@ const RelativeTimeRangeSelector = ({ disabled, currentTimerange, originalTimeRan
   return (
     <RelativeWrapper>
       <Field name="tempTimeRange.range" validate={_isValidRange}>
-        {({ field: { value, onChange, name }, meta: { error }, form }) => {
+        {({ field: { value, onChange, name }, meta: { error } }) => {
           const fromValue = RANGE_TYPES.map(({ type }) => {
             const isAllTime = value === 0;
             const diff = moment.duration(value, 'seconds').as(type);
