@@ -42,7 +42,7 @@ type Props = {
   newUrlEntry: string,
   onUpdate: () => void,
   configuration: {},
-  currentUser: {permissions: Array<string>},
+  currentUser: { permissions: Array<string> },
   urlType: 'regex' | 'literal' | '',
 };
 
@@ -55,15 +55,15 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     newUrlEntry: PropTypes.string,
     onUpdate: PropTypes.func,
     configuration: PropTypes.object,
-    currentUser: PropTypes.object.isRequired,
-    urlType: PropTypes.string,
+
   };
 
   static defaultProps = {
     newUrlEntry: '',
     onUpdate: () => { return undefined; },
     configuration: {},
-    urlType: '',
+    // eslint-disable-next-line react/default-props-match-prop-types
+    urlType: '' as const,
   }
 
   constructor(props) {
