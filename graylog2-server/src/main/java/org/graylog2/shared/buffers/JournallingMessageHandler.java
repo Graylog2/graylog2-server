@@ -65,18 +65,15 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
     private final List<RawMessageEvent> batch = Lists.newArrayList();
     private final Counter byteCounter;
-    private final Journal journal;
     private final MessageQueueWriter messageQueueWriter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final Semaphore journalFilled;
 
     @Inject
     public JournallingMessageHandler(MetricRegistry metrics,
-                                     Journal journal,
                                      MessageQueueWriter messageQueueWriter,
                                      ProcessingStatusRecorder processingStatusRecorder,
                                      @Named("JournalSignal") Semaphore journalFilled) {
-        this.journal = journal;
         this.messageQueueWriter = messageQueueWriter;
         this.processingStatusRecorder = processingStatusRecorder;
         this.journalFilled = journalFilled;
