@@ -27,6 +27,8 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.shared.messageq.MessageJournalMode;
+import org.graylog2.shared.messageq.MessageJournalModeConverter;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.graylog2.utilities.ProxyHostsPatternConverter;
 import org.slf4j.Logger;
@@ -65,8 +67,8 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter("message_journal_enabled")
     private boolean messageJournalEnabled = true;
 
-    @Parameter("message_journal_mode")
-    private String messageJournalMode = "kafka";
+    @Parameter(value = "message_journal_mode", converter = MessageJournalModeConverter.class)
+    private MessageJournalMode messageJournalMode = MessageJournalMode.DISK;
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
@@ -145,7 +147,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
         return messageJournalEnabled;
     }
 
-    public String getMessageJournalMode() {
+    public MessageJournalMode getMessageJournalMode() {
         // TODO use enum?
         return messageJournalMode;
     }

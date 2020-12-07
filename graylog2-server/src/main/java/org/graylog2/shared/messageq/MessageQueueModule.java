@@ -33,10 +33,10 @@ public class MessageQueueModule extends PluginModule {
     protected void configure() {
         if (configuration.isMessageJournalEnabled()) {
             switch (configuration.getMessageJournalMode()) {
-                case "kafka":
+                case DISK:
                     install(new KafkaMessageQueueModule());
                     break;
-                case "pulsar":
+                case PULSAR:
                     install(new PulsarMessageQueueModule());
                     break;
                 default:
