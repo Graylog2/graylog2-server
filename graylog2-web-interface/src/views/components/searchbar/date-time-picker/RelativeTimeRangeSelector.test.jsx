@@ -12,7 +12,6 @@ const defaultProps = {
     type: 'relative',
     range: 3600,
   },
-  setDisableApply: jest.fn(),
 };
 
 const initialValues = {
@@ -25,7 +24,6 @@ type Props = {
   originalTimeRange: {
     range: string | number,
   },
-  setDisableApply: (boolean) => void,
 };
 
 const RelativeTimeRangeSelector = (allProps: Props) => (

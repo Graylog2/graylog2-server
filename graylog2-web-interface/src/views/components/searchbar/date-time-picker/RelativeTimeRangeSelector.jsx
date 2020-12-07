@@ -8,6 +8,7 @@ import styled, { css, type StyledComponent } from 'styled-components';
 import { type ThemeInterface } from 'theme';
 import Input from 'components/bootstrap/Input';
 import { Icon, Select } from 'components/common';
+import { DEFAULT_TIMERANGE } from 'views/Constants';
 
 type Props = {
   disabled: boolean,
@@ -15,7 +16,6 @@ type Props = {
     range: string | number,
   },
   limitDuration: number,
-  setDisableApply: (boolean) => void,
 };
 
 const RANGE_TYPES = [
@@ -121,7 +121,7 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
   return null;
 }).filter(Boolean);
 
-const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration, setDisableApply }: Props) => {
+const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
   const _isValidRange = (value) => {
@@ -136,17 +136,9 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
     <RelativeWrapper>
       <Field name="tempTimeRange.range" validate={_isValidRange}>
         {({ field: { value, onChange, name }, meta: { error } }) => {
-          setDisableApply(!!error);
-          const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-
-          // if (!value) {
-          //   _onChange(originalTimeRange.range);
-          // }
-
           const fromValue = RANGE_TYPES.map(({ type }) => {
             const isAllTime = value === 0;
-            const defaultValue = value || originalTimeRange.range;
-            const diff = moment.duration(defaultValue, 'seconds').as(type);
+            const diff = moment.duration(value, 'seconds').as(type);
 
             if (diff - Math.floor(diff) === 0) {
               return {
@@ -154,7 +146,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
                 rangeValue: diff || 0,
                 rangeType: isAllTime ? 'seconds' : type,
                 rangeAllTime: isAllTime,
-                range: defaultValue,
+                range: value,
               };
             }
 
@@ -164,17 +156,19 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
           const _onChangeTime = (event) => {
             const newTimeValue = moment.duration(event.target.value, fromValue.rangeType).asSeconds();
 
-            _onChange(newTimeValue);
+            onChange({ target: { name, value: newTimeValue } });
           };
 
           const _onChangeType = (type) => {
             const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
 
-            _onChange(newTimeValue);
+            onChange({ target: { name, value: newTimeValue } });
           };
 
           const _onCheckAllTime = (event) => {
-            _onChange(event.target.checked ? 0 : originalTimeRange.range);
+            const notAllTime = originalTimeRange.range ? originalTimeRange.range : DEFAULT_TIMERANGE.range;
+
+            onChange({ target: { name, value: event.target.checked ? 0 : notAllTime } });
           };
 
           return (
@@ -196,8 +190,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration,
                        value={fromValue.rangeValue}
                        title="Set the range value"
                        onChange={_onChangeTime}
-                       bsStyle={error ? 'error' : null}
-                       min={1} />
+                       bsStyle={error ? 'error' : null} />
               </InputWrap>
               <StyledSelect id="relative-timerange-from-length"
                             name="relative-timerange-from-length"

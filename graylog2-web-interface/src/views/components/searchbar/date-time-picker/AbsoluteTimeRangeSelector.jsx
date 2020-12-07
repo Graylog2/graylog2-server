@@ -14,7 +14,6 @@ type Props = {
     from: string,
     to: string,
   },
-  setDisableApply: (boolean) => void,
   limitDuration: number,
   currentTimerange: {
     from: string,
@@ -47,7 +46,7 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange, currentTimerange, setDisableApply }: Props) => {
+const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange, currentTimerange }: Props) => {
   return (
     <AbsoluteWrapper>
       <RangeWrapper>
@@ -55,8 +54,7 @@ const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange,
                             originalTimeRange={originalTimeRange}
                             disabled={disabled}
                             limitDuration={limitDuration}
-                            currentTimerange={currentTimerange}
-                            setDisableApply={setDisableApply} />
+                            currentTimerange={currentTimerange} />
       </RangeWrapper>
 
       <IconWrap>
@@ -68,8 +66,7 @@ const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange,
                             originalTimeRange={originalTimeRange}
                             disabled={disabled}
                             limitDuration={limitDuration}
-                            currentTimerange={currentTimerange}
-                            setDisableApply={setDisableApply} />
+                            currentTimerange={currentTimerange} />
       </RangeWrapper>
     </AbsoluteWrapper>
   );
@@ -80,13 +77,11 @@ AbsoluteTimeRangeSelector.propTypes = {
   originalTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   limitDuration: PropTypes.number,
   currentTimerange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
-  setDisableApply: PropTypes.func,
 };
 
 AbsoluteTimeRangeSelector.defaultProps = {
   disabled: false,
   limitDuration: 0,
-  setDisableApply: () => {},
 };
 
 export default AbsoluteTimeRangeSelector;
