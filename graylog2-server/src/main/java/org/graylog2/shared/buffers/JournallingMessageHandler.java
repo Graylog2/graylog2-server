@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
-
-import static com.google.common.collect.Lists.transform;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class JournallingMessageHandler implements EventHandler<RawMessageEvent> {
     private static final Logger log = LoggerFactory.getLogger(JournallingMessageHandler.class);
@@ -61,7 +61,7 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
             // copy to avoid re-running this all the time
             final Filter metricsFilter = new Filter();
-            final List<RawMessageEvent> entries = Lists.newArrayList(transform(batch, metricsFilter));
+            final List<RawMessageEvent> entries = batch.stream().map(metricsFilter).filter(Objects::nonNull).collect(Collectors.toList());
 
             // The filter computed the latest receive timestamp of all messages in the batch so we don't have to
             // call the update on the recorder service for every message. (less contention)
@@ -94,6 +94,10 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
                 log.trace("Journalling message {}", input.getMessageId());
             }
 
+            if (input.getEncodedRawMessage() == null) {
+                log.error("Skipping RawMessageEvent with null encodedRawMessage");
+                return null;
+            }
             // stats
             final int size = input.getEncodedRawMessage().length;
             bytesWritten += size;
