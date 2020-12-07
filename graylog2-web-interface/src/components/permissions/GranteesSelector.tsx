@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, FormikProps, Form, Field } from 'formik';
 import { $PropertyType } from 'utility-types';
 import styled, { StyledComponent } from 'styled-components';
 
@@ -35,11 +35,16 @@ export type SelectionRequest = {
   capabilityId: $PropertyType<Capability, 'id'>,
 };
 
+export type FormValues = {
+  granteeId: $PropertyType<Grantee, 'id'> | undefined,
+  capabilityId: $PropertyType<Capability, 'id'> | undefined,
+}
+
 type Props = {
   availableGrantees: GranteesList,
   availableCapabilities: CapabilitiesList,
   className?: string,
-  granteesSelectRef: typeof Select | null | undefined,
+  formRef?: React.Ref<FormikProps<FormValues>>,
   onSubmit: (req: SelectionRequest) => Promise<EntityShareState | null | undefined>,
 };
 
@@ -107,7 +112,7 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, granteesSelectRef }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, formRef }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
@@ -118,6 +123,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
   return (
     <div className={className}>
       <Formik onSubmit={(data, { resetForm }) => _handelSubmit(data, resetForm)}
+              innerRef={formRef}
               initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
@@ -129,7 +135,6 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
                                     onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
                                     optionRenderer={_renderGranteesSelectOption}
                                     options={granteesOptions}
-                                    ref={granteesSelectRef}
                                     placeholder="Search for users and teams"
                                     value={value} />
                   )}
@@ -159,6 +164,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
 
 GranteesSelector.defaultProps = {
   className: undefined,
+  formRef: undefined,
 };
 
 export default GranteesSelector;

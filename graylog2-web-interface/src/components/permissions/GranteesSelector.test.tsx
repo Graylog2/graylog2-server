@@ -25,8 +25,7 @@ describe('GranteesSelector', () => {
     const { getByText } = render(
       <GranteesSelector availableGrantees={availableGrantees}
                         availableCapabilities={availableCapabilities}
-                        onSubmit={() => Promise.resolve(mockEntityShareState)}
-                        granteesSelectRef={undefined} />,
+                        onSubmit={() => Promise.resolve(mockEntityShareState)} />,
     );
 
     const submitButton = getByText('Add Collaborator');
