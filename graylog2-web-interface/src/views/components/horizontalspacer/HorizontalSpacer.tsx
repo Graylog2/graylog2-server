@@ -31,7 +31,7 @@ type Props = {
   className?: string,
 };
 
-const Spacer = styled.div<{ height: number }>`
+const Spacer = styled.div<Pick<Props, 'height'>>`
   width: 100%;
   height: ${(props) => props.height}px;
 `;
