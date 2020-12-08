@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 import moment from 'moment';
 
@@ -9,7 +9,7 @@ import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm.js';
+import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import { type ThemeInterface } from 'theme';
 
@@ -38,11 +38,11 @@ const StyledPopover: StyledComponent<{}, ThemeInterface, typeof Popover> = style
   min-width: 745px;
   
   @media (min-width: ${theme.breakpoints.min.md}) {
-    max-width: 50vw;  
+    max-width: 70vw;  
   }
   
   @media (min-width: ${theme.breakpoints.min.lg}) {
-    max-width: 35vw;  
+    max-width: 45vw;  
   }
 `);
 
@@ -75,6 +75,27 @@ const LimitLabel: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   }
 `);
 
+const CancelButton: StyledComponent<{}, void, typeof Button> = styled(Button)`
+  margin-right: 6px;
+`;
+
+const DEFAULT_RANGES = {
+  absolute: {
+    type: 'absolute',
+    from: moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
+    to: moment().format(DateTime.Formats.TIMESTAMP),
+  },
+  relative: {
+    type: 'relative',
+    range: 300,
+  },
+  keyword: {
+    type: 'keyword',
+    keyword: 'Last five minutes',
+  },
+  disabled: undefined,
+};
+
 const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, currentTimerange) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
@@ -84,7 +105,7 @@ const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, current
          eventKey={type}>
       {type === activeKey && (
         <RangeComponent disabled={false}
-                        originalTimeRange={originalRangeValue}
+                        originalTimeRange={originalRangeValue || DEFAULT_RANGES[type]}
                         limitDuration={limitDuration}
                         currentTimerange={currentTimerange} />
       )}
@@ -96,25 +117,35 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const formik = useFormikContext();
   const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
   const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
-  const { value: nextRangeValue } = nextRangeProps;
-  const { value: originalRangeValue } = originalTimerange;
 
-  const [activeTab, setActiveTab] = useState(originalRangeValue?.type);
+  const originalRangeValue = useMemo(() => originalTimerange?.value, [originalTimerange]);
+  const nextRangeValue = useMemo(() => nextRangeProps?.value || originalRangeValue, [nextRangeProps, originalRangeValue]);
+  const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
+  const currentTimerange = useMemo(() => nextRangeValue || originalRangeValue, [nextRangeValue, originalRangeValue]);
 
-  useEffect(() => {
-    if (!nextRangeValue) {
-      nextRangeHelpers.setValue(originalRangeValue);
-    }
-  });
+  const [activeTab, setActiveTab] = useState(originalRangeValue?.type || 'disabled');
 
   const onSelect = (newType) => {
-    nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
+    if (nextRangeValue?.type) {
+      nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
+    } else {
+      nextRangeHelpers.setValue(DEFAULT_RANGES[newType]);
+    }
+
     setActiveTab(newType);
+  };
+
+  const handleNoOverride = () => {
+    formik.resetForm({
+      values: { timerange: {}, tempTimeRange: undefined },
+    });
+
+    toggleDropdownShow();
   };
 
   const handleCancel = () => {
     formik.resetForm({
-      values: { timerange: originalRangeValue, tempTimeRange: null },
+      values: { timerange: originalRangeValue, tempTimeRange: undefined },
     });
 
     toggleDropdownShow();
@@ -125,10 +156,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     formik.unregisterField('tempTimeRange');
     toggleDropdownShow();
   };
-
-  const activeKey = activeTab || 'disabled';
-
-  const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
 
   const title = (
     <PopoverTitle>
@@ -142,8 +169,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     </PopoverTitle>
   );
 
-  const currentTimerange = nextRangeProps.value || originalTimerange.value;
-
   return (
     <StyledPopover id="timerange-type"
                    placement="bottom"
@@ -156,17 +181,10 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeKey}
+                      activeKey={activeTab}
                       onSelect={onSelect}
                       animation={false}>
-            {noOverride && (
-              <Tab title="No Override"
-                   key="time-range-type-selector-disabled"
-                   eventKey="disabled">
-                <p>No Override to Date.</p>
-              </Tab>
-            )}
-            {timeRangeTypeTabs(activeKey, originalRangeValue, limitDuration, currentTimerange)}
+            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, currentTimerange)}
           </StyledTabs>
         </Col>
       </Row>
@@ -177,7 +195,10 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
         </Col>
         <Col md={6}>
           <div className="pull-right">
-            <Button bsStyle="link" onClick={handleCancel}>Cancel</Button>
+            {noOverride && (
+              <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
+            )}
+            <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
             <Button bsStyle="success" onClick={handleApply} disabled={!formik.isValid}>Apply</Button>
           </div>
         </Col>

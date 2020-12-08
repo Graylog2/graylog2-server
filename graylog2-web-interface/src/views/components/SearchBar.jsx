@@ -60,7 +60,14 @@ const defaultProps = {
   onSubmit: defaultOnSubmit,
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = defaultProps.disableSearch, queryFilters, onSubmit = defaultProps.onSubmit }: Props) => {
+const SearchBar = ({
+  availableStreams,
+  config,
+  currentQuery,
+  disableSearch = defaultProps.disableSearch,
+  queryFilters,
+  onSubmit = defaultProps.onSubmit,
+}: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }

@@ -13,7 +13,7 @@ type Props = {
   noOverride?: boolean,
 };
 
-export default function TimeRangeTypeSelector({ config, disabled, noOverride }: Props) {
+const TimeRangeTypeSelector = ({ config, disabled, noOverride }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
@@ -27,7 +27,7 @@ export default function TimeRangeTypeSelector({ config, disabled, noOverride }: 
                          noOverride={noOverride} />
     </TimeRangeDropdownButton>
   );
-}
+};
 
 TimeRangeTypeSelector.propTypes = {
   disabled: PropTypes.bool,
@@ -38,3 +38,5 @@ TimeRangeTypeSelector.defaultProps = {
   disabled: false,
   noOverride: false,
 };
+
+export default TimeRangeTypeSelector;
