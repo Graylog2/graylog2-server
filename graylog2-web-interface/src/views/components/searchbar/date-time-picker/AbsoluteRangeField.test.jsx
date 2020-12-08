@@ -1,4 +1,3 @@
-// @flow strict
 import * as React from 'react';
 import { act, fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';

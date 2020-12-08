@@ -1,4 +1,3 @@
-// @flow strict
 import * as React from 'react';
 import styled, { css, StyledComponent } from 'styled-components';
 import { useMemo, useState } from 'react';
