@@ -164,7 +164,7 @@ class SeriesSelect extends React.Component<Props, State> {
               options={options}
               value={series.map(_wrapOption)}
               components={_components}
-              closeMenuOnSelect
+              closeMenuOnSelect={false}
               menuShouldScrollIntoView
               escapeClearsValue
               isMulti />
