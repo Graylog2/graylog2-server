@@ -2,11 +2,7 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import {
-  type RelativeTimeRange,
-  type AbsoluteTimeRange,
-  type KeywordTimeRange,
-} from 'views/logic/queries/Query';
+import type { RelativeTimeRange, AbsoluteTimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 
 import TimeRangeLivePreview from './TimeRangeLivePreview';
 
