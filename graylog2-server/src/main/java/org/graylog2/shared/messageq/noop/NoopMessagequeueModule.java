@@ -21,6 +21,7 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 
 public class NoopMessagequeueModule extends Graylog2Module {
@@ -28,6 +29,7 @@ public class NoopMessagequeueModule extends Graylog2Module {
     protected void configure() {
         binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
         bind(MessageQueueWriter.class).to(NoopMessageQueueWriter.class).in(Scopes.SINGLETON);
+        bind(MessageQueueReader.class).to(NoopMessageQueueReader.class).in(Scopes.SINGLETON);
         bind(MessageQueueAcknowledger.class).to(NoopMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
         serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
     }

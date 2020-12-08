@@ -27,6 +27,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,8 @@ import java.util.concurrent.Semaphore;
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-public class JournalReader extends AbstractExecutionThreadService {
-    private static final Logger log = LoggerFactory.getLogger(JournalReader.class);
+public class KafkaMessageQueueReader extends AbstractExecutionThreadService implements MessageQueueReader {
+    private static final Logger log = LoggerFactory.getLogger(KafkaMessageQueueReader.class);
     private final Journal journal;
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
@@ -53,7 +54,7 @@ public class JournalReader extends AbstractExecutionThreadService {
     private Thread executionThread;
 
     @Inject
-    public JournalReader(Journal journal,
+    public KafkaMessageQueueReader(Journal journal,
                          ProcessBuffer processBuffer,
                          @Named("JournalSignal") Semaphore journalFilled,
                          MetricRegistry metricRegistry,
