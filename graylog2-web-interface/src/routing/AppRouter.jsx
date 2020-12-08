@@ -358,18 +358,44 @@ const AppRouter = () => {
                         <Route exact path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
                         <Route exact path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
 
-                        <Route exact path={Routes.SYSTEM.SIDECARS.OVERVIEW} component={SidecarsPage} />
-                        <Route exact path={Routes.SYSTEM.SIDECARS.STATUS(':sidecarId')} component={SidecarStatusPage} />
-                        <Route exact path={Routes.SYSTEM.SIDECARS.ADMINISTRATION} component={SidecarAdministrationPage} />
-                        <Route exact path={Routes.SYSTEM.SIDECARS.CONFIGURATION} component={SidecarConfigurationPage} />
-                        <Route exact path={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION} component={SidecarNewConfigurationPage} />
-                        <Route exact
-                               path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')}
-                               component={SidecarEditConfigurationPage} />
-                        <Route exact path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR} component={SidecarNewCollectorPage} />
-                        <Route exact
-                               path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
-                               component={SidecarEditCollectorPage} />
+                        {!isCloud && (
+                          <Route exact path={Routes.SYSTEM.SIDECARS.OVERVIEW} component={SidecarsPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.SIDECARS.STATUS(':sidecarId')}
+                                 component={SidecarStatusPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.SIDECARS.ADMINISTRATION}
+                                 component={SidecarAdministrationPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.SIDECARS.CONFIGURATION}
+                                 component={SidecarConfigurationPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}
+                                 component={SidecarNewConfigurationPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')}
+                                 component={SidecarEditConfigurationPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR}
+                                 component={SidecarNewCollectorPage} />
+                        )}
+                        {!isCloud && (
+                          <Route exact
+                                 path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
+                                 component={SidecarEditCollectorPage} />
+                        )}
                         {standardPluginRoutes}
                         <Route path="*" component={WrappedNotFoundPage} />
                       </Switch>
