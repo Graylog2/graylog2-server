@@ -24,7 +24,7 @@ describe('SearchBarForm', () => {
   describe('with AbsoluteTimeRangeSelector', () => {
     it('renders', () => {
       const initialValues: Values = {
-        tempTimeRange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-17 10:04:30.329' },
+        timerange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-17 10:04:30.329' },
         queryString: '*',
         streams: [],
       };

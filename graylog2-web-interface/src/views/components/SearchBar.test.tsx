@@ -63,7 +63,7 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', () => {
-    const { getByText } = render(<SearchBar config={config} />);
+    const { asFragment } = render(<SearchBar config={config} />);
 
     expect(asFragment()).toMatchSnapshot();
   });

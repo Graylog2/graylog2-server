@@ -31,7 +31,7 @@ type Props = {
   disabled: boolean | undefined | null,
   error: string | undefined | null,
   value: string,
-  onChange: (event: { target: { name: string, value: string } }) => void,
+  onChange: (date: string) => void,
   name: string,
   title: string | undefined | null,
   initialDateTimeObject: {
@@ -61,6 +61,7 @@ const DateInputWithPicker = ({ disabled = false, error, fromDate, value, onChang
 
     const newDate = moment(date).toObject();
 
+    // @ts-ignore
     return onChange(moment({
       ...initialDateTimeObject,
       years: newDate.years,

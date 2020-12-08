@@ -31,6 +31,7 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
 
+import type { Values } from './searchbar/SearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
@@ -88,7 +89,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
-  const { dirty, isValid, isSubmitting, handleSubmit, values } = useFormikContext();
+  const { dirty, isValid, isSubmitting, handleSubmit, values } = useFormikContext<Values>();
 
   return (
     <>

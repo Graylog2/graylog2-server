@@ -27,7 +27,8 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 
 export type Values = {
-  tempTimeRange: TimeRange,
+  tempTimeRange?: TimeRange,
+  timerange: TimeRange,
   streams: Array<string>,
   queryString: string,
 };
@@ -39,7 +40,9 @@ type Props = {
 };
 
 const validate = (values) => {
-  const errors = {};
+  const errors = {
+    tempTimeRange: undefined,
+  };
 
   if (values?.tempTimeRange?.type === 'absolute'
     && DateTime.isValidDateString(values.tempTimeRange.from)
