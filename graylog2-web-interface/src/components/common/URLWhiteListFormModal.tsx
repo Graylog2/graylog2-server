@@ -55,7 +55,6 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     newUrlEntry: PropTypes.string,
     onUpdate: PropTypes.func,
     configuration: PropTypes.object,
-
   };
 
   static defaultProps = {
