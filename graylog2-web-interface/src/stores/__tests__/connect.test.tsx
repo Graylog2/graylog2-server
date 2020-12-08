@@ -73,23 +73,6 @@ SimpleComponentWithDummyStore.defaultProps = {
   simpleStore: undefined,
 };
 
-// eslint-disable-next-line react/prefer-stateless-function
-class SimpleClassComponent extends React.Component<{ propWithDefault: string }> {
-  static defaultProps = {
-    propWithDefault: 'default value',
-  }
-
-  static propTypes = {
-    propWithDefault: PropTypes.string,
-  }
-
-  render() {
-    const { propWithDefault } = this.props;
-
-    return <span>{propWithDefault}</span>;
-  }
-}
-
 describe('connect()', () => {
   beforeEach(() => {
     SimpleStore.reset();
