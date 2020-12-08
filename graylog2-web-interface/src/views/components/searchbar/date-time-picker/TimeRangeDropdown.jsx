@@ -169,8 +169,6 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     </PopoverTitle>
   );
 
-  const currentTimerange = nextRangeProps.value || originalTimerange.value;
-
   return (
     <StyledPopover id="timerange-type"
                    placement="bottom"
