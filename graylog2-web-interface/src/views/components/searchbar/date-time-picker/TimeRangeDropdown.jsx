@@ -169,6 +169,8 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
     </PopoverTitle>
   );
 
+  const currentTimerange = nextRangeProps.value || originalTimerange.value;
+
   return (
     <StyledPopover id="timerange-type"
                    placement="bottom"
@@ -177,7 +179,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                    arrowOffsetLeft={34}>
       <Row>
         <Col md={12}>
-          <TimeRangeLivePreview timerange={currentTimerange || DEFAULT_RANGES[activeTab]} />
+          <TimeRangeLivePreview timerange={currentTimerange} />
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
