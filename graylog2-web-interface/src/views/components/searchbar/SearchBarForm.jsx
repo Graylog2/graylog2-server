@@ -12,7 +12,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 
 type Values = {
-  timerange: TimeRange,
+  tempTimeRange: TimeRange,
   streams: Array<string>,
   queryString: string,
 };
@@ -26,8 +26,10 @@ type Props = {
 const validate = (values) => {
   const errors = {};
 
-  if (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to) {
-    errors.timerange = {
+  if (values?.tempTimeRange?.type === 'absolute'
+    && DateTime.isValidDateString(values.tempTimeRange.from)
+    && values.tempTimeRange.from > values.tempTimeRange.to) {
+    errors.tempTimeRange = {
       from: 'Start date must be before end date',
     };
   }

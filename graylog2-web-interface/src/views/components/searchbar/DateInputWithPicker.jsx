@@ -2,11 +2,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import { DateUtils } from 'react-day-picker';
+import type { StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { DatePicker, Icon } from 'components/common';
-import { Button, Tooltip } from 'components/graylog';
+import { Button } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import { Input } from 'components/bootstrap';
+import type { ThemeInterface } from 'theme';
 
 type Props = {
   disabled: ?boolean,
@@ -24,10 +28,22 @@ type Props = {
     seconds: string | number,
     milliseconds: string | number,
   },
+  fromDate?: Date,
 };
 
-const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, title, initialDateTimeObject }: Props) => {
+const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.dark.danger};
+  font-size: ${theme.fonts.size.tiny};
+  font-style: italic;
+  padding: 3px 3px 9px;
+`);
+
+const DateInputWithPicker = ({ disabled = false, error, fromDate, value, onChange, name, title, initialDateTimeObject }: Props) => {
   const _onDatePicked = (date) => {
+    if (!!fromDate && DateUtils.isDayBefore(date, fromDate)) {
+      return false;
+    }
+
     const newDate = moment(date).toObject();
 
     return onChange(moment({
@@ -43,12 +59,6 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
 
   return (
     <div>
-      {error && (
-        <Tooltip placement="top" className="in" id="tooltip-top" positionTop="20px">
-          {error}
-        </Tooltip>
-      )}
-
       <Input type="text"
              id={`date-input-${name}`}
              name={name}
@@ -70,7 +80,10 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
                   disabled={disabled}
                   title={title}
                   date={value}
-                  onChange={_onDatePicked} />
+                  onChange={_onDatePicked}
+                  fromDate={fromDate} />
+
+      {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>
   );
 };
@@ -78,6 +91,7 @@ const DateInputWithPicker = ({ disabled = false, error, value, onChange, name, t
 DateInputWithPicker.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.string,
+  fromDate: PropTypes.instanceOf(Date),
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   onChange: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
@@ -96,6 +110,7 @@ DateInputWithPicker.propTypes = {
 DateInputWithPicker.defaultProps = {
   disabled: false,
   error: undefined,
+  fromDate: undefined,
   value: undefined,
   title: '',
 };

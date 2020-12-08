@@ -14,6 +14,11 @@ type Props = {
     from: string,
     to: string,
   },
+  limitDuration: number,
+  currentTimerange: {
+    from: string,
+    to: string,
+  },
 };
 
 const AbsoluteWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
@@ -26,6 +31,12 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   flex: 4;
   align-items: center;
   min-height: 290px;
+  display: flex;
+  flex-direction: column;
+  
+  .DayPicker-wrapper {
+    padding-bottom: 0;
+  }
 `;
 
 const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
@@ -35,13 +46,15 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
+const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange, currentTimerange }: Props) => {
   return (
     <AbsoluteWrapper>
       <RangeWrapper>
         <AbsoluteRangeField from
                             originalTimeRange={originalTimeRange}
-                            disabled={disabled} />
+                            disabled={disabled}
+                            limitDuration={limitDuration}
+                            currentTimerange={currentTimerange} />
       </RangeWrapper>
 
       <IconWrap>
@@ -51,7 +64,9 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
       <RangeWrapper>
         <AbsoluteRangeField from={false}
                             originalTimeRange={originalTimeRange}
-                            disabled={disabled} />
+                            disabled={disabled}
+                            limitDuration={limitDuration}
+                            currentTimerange={currentTimerange} />
       </RangeWrapper>
     </AbsoluteWrapper>
   );
@@ -60,10 +75,13 @@ const AbsoluteTimeRangeSelector = ({ disabled, originalTimeRange }: Props) => {
 AbsoluteTimeRangeSelector.propTypes = {
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  limitDuration: PropTypes.number,
+  currentTimerange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
 };
 
 AbsoluteTimeRangeSelector.defaultProps = {
   disabled: false,
+  limitDuration: 0,
 };
 
 export default AbsoluteTimeRangeSelector;

@@ -747,6 +747,17 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   -ms-flex-align: center;
   align-items: center;
   min-height: 290px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c2 .DayPicker-wrapper {
+  padding-bottom: 0;
 }
 
 .c11 {
@@ -793,7 +804,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   name="tempTimeRange[from]"
                   placeholder="YYYY-MM-DD HH:mm:ss"
                   type="text"
-                  value="1955-05-10 06:15:00.000"
+                  value="2020-01-16 10:04:30.329"
                 />
                 <span
                   class="input-group-btn"
@@ -847,7 +858,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     role="heading"
                   >
                     <div>
-                      May 1955
+                      January 2020
                     </div>
                   </div>
                   <div
@@ -939,8 +950,38 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       role="row"
                     >
                       <div
+                        aria-disabled="true"
+                        aria-label="Sun Dec 29 2019"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--outside"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        29
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Mon Dec 30 2019"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--outside"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        30
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Tue Dec 31 2019"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--outside"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        31
+                      </div>
+                      <div
                         aria-disabled="false"
-                        aria-label="Sun May 01 1955"
+                        aria-label="Wed Jan 01 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -950,7 +991,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon May 02 1955"
+                        aria-label="Thu Jan 02 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -960,7 +1001,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Tue May 03 1955"
+                        aria-label="Fri Jan 03 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -970,7 +1011,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Wed May 04 1955"
+                        aria-label="Sat Jan 04 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -978,9 +1019,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         4
                       </div>
+                    </div>
+                    <div
+                      class="DayPicker-Week"
+                      role="row"
+                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Thu May 05 1955"
+                        aria-label="Sun Jan 05 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -990,7 +1036,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Fri May 06 1955"
+                        aria-label="Mon Jan 06 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1000,7 +1046,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Sat May 07 1955"
+                        aria-label="Tue Jan 07 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1008,14 +1054,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         7
                       </div>
-                    </div>
-                    <div
-                      class="DayPicker-Week"
-                      role="row"
-                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Sun May 08 1955"
+                        aria-label="Wed Jan 08 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1025,7 +1066,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon May 09 1955"
+                        aria-label="Thu Jan 09 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1035,9 +1076,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Tue May 10 1955"
-                        aria-selected="true"
-                        class="DayPicker-Day DayPicker-Day--selected"
+                        aria-label="Fri Jan 10 2020"
+                        aria-selected="false"
+                        class="DayPicker-Day"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1045,7 +1086,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Wed May 11 1955"
+                        aria-label="Sat Jan 11 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1053,9 +1094,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         11
                       </div>
+                    </div>
+                    <div
+                      class="DayPicker-Week"
+                      role="row"
+                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Thu May 12 1955"
+                        aria-label="Sun Jan 12 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1065,7 +1111,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Fri May 13 1955"
+                        aria-label="Mon Jan 13 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1075,7 +1121,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Sat May 14 1955"
+                        aria-label="Tue Jan 14 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1083,14 +1129,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         14
                       </div>
-                    </div>
-                    <div
-                      class="DayPicker-Week"
-                      role="row"
-                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Sun May 15 1955"
+                        aria-label="Wed Jan 15 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1100,9 +1141,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon May 16 1955"
-                        aria-selected="false"
-                        class="DayPicker-Day"
+                        aria-label="Thu Jan 16 2020"
+                        aria-selected="true"
+                        class="DayPicker-Day DayPicker-Day--selected"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1110,7 +1151,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Tue May 17 1955"
+                        aria-label="Fri Jan 17 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1120,7 +1161,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Wed May 18 1955"
+                        aria-label="Sat Jan 18 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1128,9 +1169,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         18
                       </div>
+                    </div>
+                    <div
+                      class="DayPicker-Week"
+                      role="row"
+                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Thu May 19 1955"
+                        aria-label="Sun Jan 19 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1140,7 +1186,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Fri May 20 1955"
+                        aria-label="Mon Jan 20 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1150,7 +1196,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Sat May 21 1955"
+                        aria-label="Tue Jan 21 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1158,14 +1204,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         21
                       </div>
-                    </div>
-                    <div
-                      class="DayPicker-Week"
-                      role="row"
-                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Sun May 22 1955"
+                        aria-label="Wed Jan 22 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1175,7 +1216,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon May 23 1955"
+                        aria-label="Thu Jan 23 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1185,7 +1226,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Tue May 24 1955"
+                        aria-label="Fri Jan 24 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1195,7 +1236,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Wed May 25 1955"
+                        aria-label="Sat Jan 25 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1203,9 +1244,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         25
                       </div>
+                    </div>
+                    <div
+                      class="DayPicker-Week"
+                      role="row"
+                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Thu May 26 1955"
+                        aria-label="Sun Jan 26 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1215,7 +1261,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Fri May 27 1955"
+                        aria-label="Mon Jan 27 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1225,7 +1271,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Sat May 28 1955"
+                        aria-label="Tue Jan 28 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1233,14 +1279,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         28
                       </div>
-                    </div>
-                    <div
-                      class="DayPicker-Week"
-                      role="row"
-                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Sun May 29 1955"
+                        aria-label="Wed Jan 29 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1250,7 +1291,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon May 30 1955"
+                        aria-label="Thu Jan 30 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1260,7 +1301,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Tue May 31 1955"
+                        aria-label="Fri Jan 31 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1270,43 +1311,13 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="true"
-                        aria-label="Wed Jun 01 1955"
+                        aria-label="Sat Feb 01 2020"
                         aria-selected="false"
                         class="DayPicker-Day DayPicker-Day--outside"
                         role="gridcell"
                         tabindex="-1"
                       >
                         1
-                      </div>
-                      <div
-                        aria-disabled="true"
-                        aria-label="Thu Jun 02 1955"
-                        aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--outside"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        2
-                      </div>
-                      <div
-                        aria-disabled="true"
-                        aria-label="Fri Jun 03 1955"
-                        aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--outside"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        3
-                      </div>
-                      <div
-                        aria-disabled="true"
-                        aria-label="Sat Jun 04 1955"
-                        aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--outside"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        4
                       </div>
                     </div>
                   </div>
@@ -1344,7 +1355,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="2"
                   title="from hour"
                   type="text"
-                  value="06"
+                  value="10"
                 />
                 <span
                   class="c7 input-group-addon c8"
@@ -1357,7 +1368,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="2"
                   title="from minutes"
                   type="text"
-                  value="15"
+                  value="04"
                 />
                 <span
                   class="c7 input-group-addon c8"
@@ -1370,7 +1381,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="2"
                   title="from seconds"
                   type="text"
-                  value="00"
+                  value="30"
                 />
                 <span
                   class="c7 input-group-addon c8"
@@ -1383,7 +1394,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="3"
                   title="from milliseconds"
                   type="text"
-                  value="000"
+                  value="329"
                 />
                 <span
                   class="c7 input-group-addon c8"
@@ -1429,7 +1440,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   name="tempTimeRange[to]"
                   placeholder="YYYY-MM-DD HH:mm:ss"
                   type="text"
-                  value="1985-25-11 08:18:00.000"
+                  value="2020-01-17 10:04:30.329"
                 />
                 <span
                   class="input-group-btn"
@@ -1483,7 +1494,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     role="heading"
                   >
                     <div>
-                      November 2020
+                      January 2020
                     </div>
                   </div>
                   <div
@@ -1575,149 +1586,149 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       role="row"
                     >
                       <div
-                        aria-disabled="false"
-                        aria-label="Sun Nov 01 2020"
+                        aria-disabled="true"
+                        aria-label="Sun Dec 29 2019"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        29
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Mon Dec 30 2019"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        30
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Tue Dec 31 2019"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        31
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Wed Jan 01 2020"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="0"
                       >
                         1
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Mon Nov 02 2020"
+                        aria-disabled="true"
+                        aria-label="Thu Jan 02 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         2
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Tue Nov 03 2020"
+                        aria-disabled="true"
+                        aria-label="Fri Jan 03 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         3
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Wed Nov 04 2020"
+                        aria-disabled="true"
+                        aria-label="Sat Jan 04 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         4
                       </div>
+                    </div>
+                    <div
+                      class="DayPicker-Week"
+                      role="row"
+                    >
                       <div
-                        aria-disabled="false"
-                        aria-label="Thu Nov 05 2020"
+                        aria-disabled="true"
+                        aria-label="Sun Jan 05 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         5
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Fri Nov 06 2020"
+                        aria-disabled="true"
+                        aria-label="Mon Jan 06 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         6
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Sat Nov 07 2020"
+                        aria-disabled="true"
+                        aria-label="Tue Jan 07 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         7
                       </div>
-                    </div>
-                    <div
-                      class="DayPicker-Week"
-                      role="row"
-                    >
                       <div
-                        aria-disabled="false"
-                        aria-label="Sun Nov 08 2020"
+                        aria-disabled="true"
+                        aria-label="Wed Jan 08 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         8
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Mon Nov 09 2020"
+                        aria-disabled="true"
+                        aria-label="Thu Jan 09 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         9
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Tue Nov 10 2020"
+                        aria-disabled="true"
+                        aria-label="Fri Jan 10 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         10
                       </div>
                       <div
-                        aria-disabled="false"
-                        aria-label="Wed Nov 11 2020"
+                        aria-disabled="true"
+                        aria-label="Sat Jan 11 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
                         11
-                      </div>
-                      <div
-                        aria-disabled="false"
-                        aria-label="Thu Nov 12 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        12
-                      </div>
-                      <div
-                        aria-disabled="false"
-                        aria-label="Fri Nov 13 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        13
-                      </div>
-                      <div
-                        aria-disabled="false"
-                        aria-label="Sat Nov 14 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        14
                       </div>
                     </div>
                     <div
@@ -1725,10 +1736,40 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       role="row"
                     >
                       <div
-                        aria-disabled="false"
-                        aria-label="Sun Nov 15 2020"
+                        aria-disabled="true"
+                        aria-label="Sun Jan 12 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--disabled"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        12
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Mon Jan 13 2020"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--disabled"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        13
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Tue Jan 14 2020"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--disabled"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        14
+                      </div>
+                      <div
+                        aria-disabled="true"
+                        aria-label="Wed Jan 15 2020"
+                        aria-selected="false"
+                        class="DayPicker-Day DayPicker-Day--disabled"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1736,7 +1777,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon Nov 16 2020"
+                        aria-label="Thu Jan 16 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1746,9 +1787,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Tue Nov 17 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day"
+                        aria-label="Fri Jan 17 2020"
+                        aria-selected="true"
+                        class="DayPicker-Day DayPicker-Day--selected"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1756,7 +1797,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Wed Nov 18 2020"
+                        aria-label="Sat Jan 18 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1764,9 +1805,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         18
                       </div>
+                    </div>
+                    <div
+                      class="DayPicker-Week"
+                      role="row"
+                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Thu Nov 19 2020"
+                        aria-label="Sun Jan 19 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1776,9 +1822,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Fri Nov 20 2020"
+                        aria-label="Mon Jan 20 2020"
                         aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--today"
+                        class="DayPicker-Day"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1786,7 +1832,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Sat Nov 21 2020"
+                        aria-label="Tue Jan 21 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1794,14 +1840,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         21
                       </div>
-                    </div>
-                    <div
-                      class="DayPicker-Week"
-                      role="row"
-                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Sun Nov 22 2020"
+                        aria-label="Wed Jan 22 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1811,7 +1852,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon Nov 23 2020"
+                        aria-label="Thu Jan 23 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1821,7 +1862,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Tue Nov 24 2020"
+                        aria-label="Fri Jan 24 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1831,7 +1872,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Wed Nov 25 2020"
+                        aria-label="Sat Jan 25 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1839,9 +1880,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         25
                       </div>
+                    </div>
+                    <div
+                      class="DayPicker-Week"
+                      role="row"
+                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Thu Nov 26 2020"
+                        aria-label="Sun Jan 26 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1851,7 +1897,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Fri Nov 27 2020"
+                        aria-label="Mon Jan 27 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1861,7 +1907,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Sat Nov 28 2020"
+                        aria-label="Tue Jan 28 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1869,14 +1915,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       >
                         28
                       </div>
-                    </div>
-                    <div
-                      class="DayPicker-Week"
-                      role="row"
-                    >
                       <div
                         aria-disabled="false"
-                        aria-label="Sun Nov 29 2020"
+                        aria-label="Wed Jan 29 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1886,7 +1927,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       </div>
                       <div
                         aria-disabled="false"
-                        aria-label="Mon Nov 30 2020"
+                        aria-label="Thu Jan 30 2020"
                         aria-selected="false"
                         class="DayPicker-Day"
                         role="gridcell"
@@ -1895,54 +1936,24 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                         30
                       </div>
                       <div
+                        aria-disabled="false"
+                        aria-label="Fri Jan 31 2020"
+                        aria-selected="false"
+                        class="DayPicker-Day"
+                        role="gridcell"
+                        tabindex="-1"
+                      >
+                        31
+                      </div>
+                      <div
                         aria-disabled="true"
-                        aria-label="Tue Dec 01 2020"
+                        aria-label="Sat Feb 01 2020"
                         aria-selected="false"
                         class="DayPicker-Day DayPicker-Day--outside"
                         role="gridcell"
                         tabindex="-1"
                       >
                         1
-                      </div>
-                      <div
-                        aria-disabled="true"
-                        aria-label="Wed Dec 02 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--outside"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        2
-                      </div>
-                      <div
-                        aria-disabled="true"
-                        aria-label="Thu Dec 03 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--outside"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        3
-                      </div>
-                      <div
-                        aria-disabled="true"
-                        aria-label="Fri Dec 04 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--outside"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        4
-                      </div>
-                      <div
-                        aria-disabled="true"
-                        aria-label="Sat Dec 05 2020"
-                        aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--outside"
-                        role="gridcell"
-                        tabindex="-1"
-                      >
-                        5
                       </div>
                     </div>
                   </div>
@@ -1980,7 +1991,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="2"
                   title="to hour"
                   type="text"
-                  value="NaN"
+                  value="10"
                 />
                 <span
                   class="c7 input-group-addon c8"
@@ -1993,7 +2004,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="2"
                   title="to minutes"
                   type="text"
-                  value="NaN"
+                  value="04"
                 />
                 <span
                   class="c7 input-group-addon c8"
@@ -2006,7 +2017,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="2"
                   title="to seconds"
                   type="text"
-                  value="NaN"
+                  value="30"
                 />
                 <span
                   class="c7 input-group-addon c8"
@@ -2019,7 +2030,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   size="3"
                   title="to milliseconds"
                   type="text"
-                  value="NaN"
+                  value="329"
                 />
                 <span
                   class="c7 input-group-addon c8"

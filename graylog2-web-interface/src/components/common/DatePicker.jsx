@@ -42,11 +42,7 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
-/**
- * Component that renders a given children and wraps a date picker around it. The date picker will show when
- * the children is clicked, and hidden when clicking somewhere else.
- */
-const DatePicker = ({ date, onChange }) => {
+const DatePicker = ({ date, fromDate, onChange }) => {
   let selectedDate;
 
   if (date) {
@@ -67,6 +63,9 @@ const DatePicker = ({ date, onChange }) => {
 
       return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
     },
+    disabled: {
+      before: new Date(fromDate),
+    },
   };
 
   return (
@@ -85,10 +84,13 @@ DatePicker.propTypes = {
    * `react-day-picker`'s modifiers, and the original event as arguments.
    */
   onChange: PropTypes.func.isRequired,
+  /** Earliest date possible to select in the date picker. */
+  fromDate: PropTypes.instanceOf(Date),
 };
 
 DatePicker.defaultProps = {
   date: undefined,
+  fromDate: undefined,
 };
 
 export default DatePicker;

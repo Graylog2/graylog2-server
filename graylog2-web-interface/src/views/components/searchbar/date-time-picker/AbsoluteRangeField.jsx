@@ -21,10 +21,15 @@ import type { ThemeInterface } from 'theme';
 type Props = {
   disabled: boolean,
   from: boolean,
+  currentTimerange?: {
+    from: string,
+    to: string,
+  },
   originalTimeRange: {
     from: string,
     to: string,
   },
+  limitDuration?: number,
 };
 
 const TIME_TYPES = [
@@ -67,21 +72,11 @@ const StyledButton = styled(Button)`
   line-height: 1.1;
 `;
 
-const _isValidDateString = (dateString: string) => {
-  if (dateString === undefined) {
-    return undefined;
-  }
-
-  return DateTime.isValidDateString(dateString)
-    ? undefined
-    : 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]';
-};
-
 const _onFocusSelect = (event) => {
   event.target.select();
 };
 
-const zeroPad = (data, pad = 2) => String(data).padStart(pad, '0');
+const zeroPad = (data: string | number, pad = 2) => String(data).padStart(pad, '0');
 
 const parseTimeValue = (value, type) => {
   const isNotNumeric = value.match(/[^0-9]/g);
@@ -107,7 +102,7 @@ const fieldUpdate = (value) => {
   const initialDateTime = moment(value).toObject();
 
   TIME_TYPES.forEach((type) => {
-    // $FlowFixMe - something deep down in the bowels of flow is upset with this
+    // $FlowFixMe - moment is mad about strings, ignore until we move to TSX
     initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
   });
 
@@ -153,7 +148,19 @@ const fieldUpdate = (value) => {
   };
 };
 
-const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
+const _isValidDateString = (dateString: string) => {
+  if (!dateString) {
+    return 'Date is required.';
+  }
+
+  if (!DateTime.isValidDateString(dateString)) {
+    return 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
+  }
+
+  return undefined;
+};
+
+const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
 
@@ -162,13 +169,13 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
       {({ field: { value, onChange, onBlur, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
-        const fromDateTime = error ? originalTimeRange[range] : value || originalTimeRange[range];
+        const dateTime = error ? currentTimerange[range] : value || currentTimerange[range];
         const {
           initialDateTime,
           handleChangeSetTime,
           handleClickTimeNow,
           handleTimeToggle,
-        } = fieldUpdate(fromDateTime);
+        } = fieldUpdate(dateTime);
 
         const _onChangeSetTime = (event) => {
           hourIcon.current = TIME_ICON_MID;
@@ -194,18 +201,28 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
           _onChange(handleTimeToggle(endOfDay));
         };
 
+        const _onChangeDate = (newDate) => {
+          _onChange(newDate);
+        };
+
+        let fromDate = moment(currentTimerange.from).toDate();
+
+        if (from) {
+          fromDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
+        }
+
         return (
           <>
             <DateInputWithPicker disabled={disabled}
-                                 onChange={_onChange}
+                                 onChange={_onChangeDate}
                                  onBlur={onBlur}
-                                 value={value || originalTimeRange[range]}
-                                 // $FlowFixMe - something deep down in the bowels of flow is upset with this
+                                 value={value || currentTimerange[range]}
+                                 // $FlowFixMe - flow is mad about mixed types, ignore until we move to TSX
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
-                                 error={error} />
-
+                                 error={error}
+                                 fromDate={fromDate} />
             <div>
               <SetTimeOption>
                 <FormGroup>
@@ -274,15 +291,22 @@ const AbsoluteRangeField = ({ disabled, originalTimeRange, from }: Props) => {
 
 AbsoluteRangeField.propTypes = {
   from: PropTypes.bool.isRequired,
+  currentTimerange: PropTypes.shape({
+    from: PropTypes.string,
+    to: PropTypes.string,
+  }),
   originalTimeRange: PropTypes.shape({
     from: PropTypes.string,
     to: PropTypes.string,
   }).isRequired,
   disabled: PropTypes.bool,
+  limitDuration: PropTypes.number,
 };
 
 AbsoluteRangeField.defaultProps = {
   disabled: false,
+  limitDuration: 0,
+  currentTimerange: undefined,
 };
 
 export default AbsoluteRangeField;
