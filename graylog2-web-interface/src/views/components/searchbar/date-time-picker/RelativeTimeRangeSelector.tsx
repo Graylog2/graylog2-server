@@ -3,9 +3,9 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Field } from 'formik';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import Input from 'components/bootstrap/Input';
 import { Icon, Select } from 'components/common';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
@@ -35,7 +35,7 @@ const RANGE_TYPES = [
     type: 'weeks',
     label: 'Weeks',
   },
-];
+] as const;
 
 const RelativeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;
