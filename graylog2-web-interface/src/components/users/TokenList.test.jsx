@@ -24,8 +24,8 @@ jest.mock('components/common/ClipboardButton', () => 'clipboard-button');
 
 describe('<TokenList />', () => {
   const tokens = [
-    { name: 'Acme', token: 'beef2001', id: 'abc1' },
-    { name: 'Hamfred', token: 'beef2002', id: 'abc2' },
+    { name: 'Acme', token: 'beef2001', id: 'abc1', last_access: '2020-12-08T16:46:00Z' },
+    { name: 'Hamfred', token: 'beef2002', id: 'abc2', last_access: '1970-01-01T00:00:00.000Z' },
   ];
 
   it('should render with empty tokens', () => {
@@ -69,5 +69,14 @@ describe('<TokenList />', () => {
     wrapper.find('input#hide-tokens').simulate('change', { target: { checked: false } });
 
     expect(wrapper.find('pre[children="beef2001"]').length).toEqual(1);
+  });
+
+  it('show include token last access time', () => {
+    const wrapper = mount(<TokenList tokens={tokens} />);
+
+    expect(wrapper.find(`time[dateTime="${tokens[0].last_access}"]`)).toHaveLength(1);
+    expect(wrapper.find('div[children="Never used"]')).toHaveLength(1);
+
+    expect(wrapper).toExist();
   });
 });

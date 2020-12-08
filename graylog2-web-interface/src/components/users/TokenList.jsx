@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { ClipboardButton, ControlledTableList, SearchForm, Spinner } from 'components/common';
+import { ClipboardButton, ControlledTableList, Timestamp, SearchForm, Spinner } from 'components/common';
 import { Button, ButtonGroup, Col, Checkbox, Row } from 'components/graylog';
 import type { Token } from 'actions/users/UsersActions';
 
@@ -27,6 +27,12 @@ import CreateTokenForm from './CreateTokenForm';
 
 const StyledSearchForm = styled(SearchForm)`
   margin-bottom: 10px;
+`;
+
+const StyledLastAccess = styled.div`
+  color: ${(props) => props.theme.colors.gray[60]};
+  font-size: ${(props) => props.theme.fonts.size.small};
+  margin-bottom: 5px;
 `;
 
 type Props = {
@@ -78,11 +84,16 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
           </ControlledTableList.Item>
         )}
         {effectiveTokens.map((token) => {
+          const tokenNeverUsed = Date.parse(token.last_access) === 0;
+
           return (
             <ControlledTableList.Item key={token.id}>
               <Row className="row-sm">
                 <Col md={9}>
                   {token.name}
+                  <StyledLastAccess>
+                    {tokenNeverUsed ? 'Never used' : <>Last used <Timestamp dateTime={token.last_access} relative /></>}
+                  </StyledLastAccess>
                   {!hideTokens && <pre>{token.token}</pre>}
                 </Col>
                 <Col md={3} className="text-right">
