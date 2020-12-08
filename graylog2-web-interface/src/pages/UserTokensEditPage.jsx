@@ -121,14 +121,13 @@ const UserEditPage = ({ params }: Props) => {
       <Row className="content">
         <Col lg={8}>
           <Headline>Create And Edit Tokens</Headline>
-          {loadedUser && (
+          {loadedUser ? (
             <TokenList tokens={tokens}
                        onDelete={_handleTokenDelete}
                        onCreate={_handleTokenCreate}
                        creatingToken={creatingToken}
                        deletingToken={deletingTokenId} />
-          )}
-          {!loadedUser && (
+          ) : (
             <Row>
               <Col xs={12}>
                 <Spinner />
