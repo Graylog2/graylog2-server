@@ -158,6 +158,21 @@ describe('connect()', () => {
     mount(<Component />);
   });
 
+  it('types props which have a default value (defaultProps) as optional', () => {
+    const BaseComponent = ({ exampleProp }: { exampleProp: string }) => <span>{exampleProp}</span>;
+
+    BaseComponent.defaultProps = {
+      exampleProp: 'hello!',
+    };
+
+    BaseComponent.propTypes = {
+      exampleProp: PropTypes.string,
+    };
+
+    const Component = connect(BaseComponent, { simpleStore: SimpleStore });
+    mount(<Component />);
+  });
+
   describe('generates `shouldComponentUpdate`', () => {
     const Component: React.ComponentType<{ someProp?: any, foo: number }> = jest.fn(() => <span>Hello!</span>);
     const SimplestStore: Store<number> = ({
