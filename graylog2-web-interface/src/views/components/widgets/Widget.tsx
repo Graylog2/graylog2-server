@@ -138,7 +138,6 @@ class Widget extends React.Component<Props, State> {
     onSizeChange: PropTypes.func.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    widget: PropTypes.instanceOf(WidgetModel).isRequired,
   };
 
   static defaultProps = {
