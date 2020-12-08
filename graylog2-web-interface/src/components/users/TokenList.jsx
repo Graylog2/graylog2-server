@@ -16,14 +16,18 @@
  */
 // @flow strict
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
-import { List } from 'immutable';
+import React, { useMemo, useState } from 'react';
+import styled from 'styled-components';
 
-import { ClipboardButton, TableList, Spinner } from 'components/common';
-import { Button, Checkbox, ButtonGroup } from 'components/graylog';
+import { ClipboardButton, ControlledTableList, SearchForm, Spinner } from 'components/common';
+import { Button, ButtonGroup, Col, Checkbox, Row } from 'components/graylog';
 import type { Token } from 'actions/users/UsersActions';
 
 import CreateTokenForm from './CreateTokenForm';
+
+const StyledSearchForm = styled(SearchForm)`
+  margin-bottom: 10px;
+`;
 
 type Props = {
   creatingToken: boolean,
@@ -34,7 +38,14 @@ type Props = {
 };
 
 const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
+  const [query, setQuery] = useState('');
   const [hideTokens, setHideTokens] = useState(true);
+
+  const effectiveTokens = useMemo(() => {
+    const queryRegex = new RegExp(query, 'i');
+
+    return tokens.filter(({ name }) => queryRegex.test(name));
+  }, [query, tokens]);
 
   const onShowTokensChanged = (event) => {
     setHideTokens(event.target.checked);
@@ -46,34 +57,50 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
     };
   };
 
-  const itemActionsFactory = (token) => {
-    const deleteButton = deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete';
-
-    return (
-      <ButtonGroup>
-        <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
-        <Button bsSize="xsmall"
-                disabled={deletingToken === token.id}
-                bsStyle="primary"
-                onClick={deleteToken(token)}>
-          {deleteButton}
-        </Button>
-      </ButtonGroup>
-    );
-  };
+  const updateQuery = (nextQuery: ?string) => setQuery(nextQuery || '');
 
   return (
     <span>
       <CreateTokenForm onCreate={onCreate} creatingToken={creatingToken} />
       <hr />
-      <TableList filterKeys={['name', 'token']}
-                 items={List(tokens)}
-                 idKey="token"
-                 titleKey="name"
-                 descriptionKey="token"
-                 hideDescription={hideTokens}
-                 enableBulkActions={false}
-                 itemActionsFactory={itemActionsFactory} />
+      <StyledSearchForm onSearch={updateQuery}
+                        onReset={updateQuery}
+                        searchButtonLabel="Find"
+                        searchBsStyle="info"
+                        label="Filter"
+                        useLoadingState={false} />
+
+      <ControlledTableList>
+        <ControlledTableList.Header />
+        {effectiveTokens.length === 0 && query !== '' && (
+          <ControlledTableList.Item>
+            <p>No tokens match the filter.</p>
+          </ControlledTableList.Item>
+        )}
+        {effectiveTokens.map((token) => {
+          return (
+            <ControlledTableList.Item key={token.id}>
+              <Row className="row-sm">
+                <Col md={9}>
+                  {token.name}
+                  {!hideTokens && <pre>{token.token}</pre>}
+                </Col>
+                <Col md={3} className="text-right">
+                  <ButtonGroup>
+                    <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
+                    <Button bsSize="xsmall"
+                            disabled={deletingToken === token.id}
+                            bsStyle="primary"
+                            onClick={deleteToken(token)}>
+                      {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
+                    </Button>
+                  </ButtonGroup>
+                </Col>
+              </Row>
+            </ControlledTableList.Item>
+          );
+        })}
+      </ControlledTableList>
       <Checkbox id="hide-tokens" onChange={onShowTokensChanged} checked={hideTokens}>
         Hide Tokens
       </Checkbox>
