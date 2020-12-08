@@ -34,6 +34,7 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.messageq.MessageQueue;
 import org.graylog2.shared.messageq.MessageQueueException;
+import org.graylog2.shared.messageq.MessageQueueReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ import java.util.concurrent.CountDownLatch;
 import static com.codahale.metrics.MetricRegistry.name;
 
 @Singleton
-public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
+public class PulsarMessageQueueReader extends AbstractExecutionThreadService implements MessageQueueReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(PulsarMessageQueueReader.class);
 
@@ -117,7 +118,6 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
     protected void run() throws Exception {
         // TODO pause processing when LifeCycle changes
         // TODO add metrics
-        // TODO use GracefulShutdownService ?
         // TODO the JournalReader limits the read based on the remaining capacity in the processBuffer
         //      do we need this?   final long remainingCapacity = processBuffer.getRemainingCapacity();
 
@@ -126,6 +126,8 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
             entries.forEach(entry -> {
                 LOG.info("Consumed message: {}", entry);
                 final RawMessage rawMessage = RawMessage.decode(entry.value(), entry.commitId());
+                // TODO: we need to interrupt the execution thread on shutdown to not inhibit server shutdown when
+                //  the buffer is full
                 processBuffer.insertBlocking(rawMessage);
             });
         }
