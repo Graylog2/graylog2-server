@@ -101,7 +101,6 @@ const fieldUpdate = (value) => {
   const initialDateTime = moment(value).toObject();
 
   TIME_TYPES.forEach((type) => {
-    // $FlowFixMe - moment is mad about strings, ignore until we move to TSX
     initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
   });
 
