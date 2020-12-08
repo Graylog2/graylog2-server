@@ -1,13 +1,13 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
-import { type TimeRange } from 'views/logic/queries/Query';
 import DateTime from 'logic/datetimes/DateTime';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
@@ -59,7 +59,7 @@ const dateOutput = (timerange: TimeRange) => {
     return EMPTY_OUTPUT;
   }
 
-  if (timerange.range >= 0) {
+  if ('range' in timerange) {
     range = !timerange.range ? 'All Time' : moment()
       .subtract(timerange.range * 1000)
       .fromNow();
