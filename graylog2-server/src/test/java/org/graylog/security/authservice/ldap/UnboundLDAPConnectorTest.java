@@ -1,21 +1,22 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.security.authservice.ldap;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPException;
@@ -33,6 +34,7 @@ import org.apache.directory.server.core.partition.impl.avl.AvlPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.graylog.testing.ldap.LDAPTestUtils;
 import org.graylog2.ApacheDirectoryTestServiceFactory;
+import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.After;
@@ -44,10 +46,10 @@ import org.junit.runner.RunWith;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(FrameworkRunner.class)
 @CreateLdapServer(transports = {
@@ -96,16 +98,17 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
     @Before
     public void setUp() throws Exception {
         final LdapServer server = getLdapServer();
+        final LDAPConnectorConfig.LDAPServer unreachableServer = LDAPConnectorConfig.LDAPServer.create("localhost", 9);
         final LDAPConnectorConfig.LDAPServer ldapServer = LDAPConnectorConfig.LDAPServer.create("localhost", server.getPort());
         final LDAPConnectorConfig connectorConfig = LDAPConnectorConfig.builder()
                 .systemUsername(ADMIN_DN)
                 .systemPassword(encryptedValueService.encrypt(ADMIN_PASSWORD))
                 .transportSecurity(LDAPTransportSecurity.NONE)
                 .verifyCertificates(false)
-                .serverList(Collections.singletonList(ldapServer))
+                .serverList(ImmutableList.of(unreachableServer, ldapServer))
                 .build();
 
-        connector = new UnboundLDAPConnector(10000, ENABLED_TLS_PROTOCOLS, (host) -> null, encryptedValueService);
+        connector = new UnboundLDAPConnector(10000, ENABLED_TLS_PROTOCOLS, mock(TrustManagerProvider.class), encryptedValueService);
         connection = connector.connect(connectorConfig);
     }
 

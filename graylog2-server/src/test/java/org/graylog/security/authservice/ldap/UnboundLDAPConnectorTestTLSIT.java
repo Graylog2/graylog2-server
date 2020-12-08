@@ -1,22 +1,22 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.security.authservice.ldap;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPException;
 import org.assertj.core.api.Assertions;
@@ -25,6 +25,7 @@ import org.graylog.testing.ldap.OpenLDAPContainer;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.shared.security.tls.DefaultTLSProtocolProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
@@ -37,12 +38,14 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.security.authservice.ldap.LDAPConnectorConfig.LDAPServer.fromUrl;
 import static org.graylog.security.authservice.ldap.LDAPTransportSecurity.START_TLS;
 import static org.graylog.security.authservice.ldap.LDAPTransportSecurity.TLS;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,7 +53,6 @@ import static org.mockito.Mockito.when;
 @Testcontainers
 public class UnboundLDAPConnectorTestTLSIT {
     private static final int DEFAULT_TIMEOUT = 60 * 1000;
-    private static final Set<String> ENABLED_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2");
 
     @Container
     private static final OpenLDAPContainer container = OpenLDAPContainer.createWithTLS();
@@ -67,7 +69,7 @@ public class UnboundLDAPConnectorTestTLSIT {
 
         mockTrustManagerWithSystemKeystore();
 
-        this.ldapConnector = new UnboundLDAPConnector(DEFAULT_TIMEOUT, ENABLED_TLS_PROTOCOLS, trustManagerProvider, encryptedValueService);
+        this.ldapConnector = new UnboundLDAPConnector(DEFAULT_TIMEOUT, DefaultTLSProtocolProvider.getDefaultSupportedTlsProtocols(), trustManagerProvider, encryptedValueService);
     }
 
     @Test
@@ -128,6 +130,18 @@ public class UnboundLDAPConnectorTestTLSIT {
     }
 
     @Test
+    void shouldConnectViaTLSToTrustedCertWithMatchingCommonNamesIfValidationIsRequested() throws Exception {
+        mockTrustManagerWithKeystore(singleCA());
+
+        LDAPConnectorConfig config = createConfig(hostnameURI(), START_TLS, true);
+        List<LDAPConnectorConfig.LDAPServer> servers = ImmutableList.of(fromUrl(dummyHostnameURI().toString()), fromUrl(hostnameURI().toString()));
+        config = config.toBuilder().serverList(servers).build();
+
+        assertConnectionSuccess(config);
+    }
+
+
+    @Test
     void shouldConnectViaSSLToSelfSignedCertIfValidationIsNotRequested() throws Exception {
         assertConnectionSuccess(createTLSConfig(false));
     }
@@ -144,7 +158,7 @@ public class UnboundLDAPConnectorTestTLSIT {
         return LDAPConnectorConfig.builder()
                 .systemUsername(container.bindDn())
                 .systemPassword(encryptedValueService.encrypt(container.bindPassword()))
-                .serverList(Collections.singletonList(LDAPConnectorConfig.LDAPServer.fromUrl(uri.toString())))
+                .serverList(Collections.singletonList(fromUrl(uri.toString())))
                 .transportSecurity(transportSecurity)
                 .verifyCertificates(verifyCertificates)
                 .build();
@@ -171,7 +185,9 @@ public class UnboundLDAPConnectorTestTLSIT {
 
     private void mockTrustManagerWithKeystore(KeyStore keyStore) throws KeyStoreException, NoSuchAlgorithmException {
         when(this.trustManagerProvider.create(anyString()))
-                .then((invocation) -> provideTrustManager(invocation.getArgument(0), keyStore));
+                .then((invocation) -> provideTrustManager((String) invocation.getArgument(0), keyStore));
+        when(this.trustManagerProvider.create(anyList()))
+                .then((invocation) -> provideTrustManager((List<String>) invocation.getArgument(0), keyStore));
     }
 
     private KeyStore singleCA() {
@@ -179,11 +195,19 @@ public class UnboundLDAPConnectorTestTLSIT {
     }
 
     private TrustManager provideTrustManager(String host, KeyStore keyStore) {
+        return provideTrustManager(ImmutableList.of(host), keyStore);
+    }
+
+    private TrustManager provideTrustManager(List<String> hosts, KeyStore keyStore) {
         try {
-            return new DefaultX509TrustManager(host, keyStore);
+            return new DefaultX509TrustManager(hosts, keyStore);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private URI dummyHostnameURI() {
+        return URI.create(String.format(Locale.US, "ldap://0.0.0.0:9"));
     }
 
     private URI hostnameURI() {

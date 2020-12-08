@@ -17,7 +17,7 @@
     "webpack"
   ],
   "author": "Graylog, Inc. <hello@graylog.com>",
-  "license": "MIT",
+  "license": "SSPL-1.0",
   "bugs": {
     "url": "https://github.com/Graylog2/graylog-web-manifests/issues"
   },

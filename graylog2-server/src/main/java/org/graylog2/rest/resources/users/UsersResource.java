@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.rest.resources.users;
 
@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -90,6 +91,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -329,6 +331,17 @@ public class UsersResource extends RestResource {
         if (roles != null) {
             try {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+                List<String> unknownRoles = new ArrayList<>();
+                roles.forEach(roleName -> {
+                    if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
+                        unknownRoles.add(roleName);
+                    }
+                });
+                if (!unknownRoles.isEmpty()) {
+                    throw new BadRequestException(
+                        String.format(Locale.ENGLISH,"Invalid role names: %s", StringUtils.join(unknownRoles, ", "))
+                    );
+                }
                 final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
                 user.setRoleIds(Sets.newHashSet(roleIds));
             } catch (org.graylog2.database.NotFoundException e) {
@@ -556,10 +569,16 @@ public class UsersResource extends RestResource {
     @ApiOperation("Update the account status for a user")
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
     public Response updateAccountStatus(
-            @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true) @PathParam("userId") String userId,
+            @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true)
+            @PathParam("userId") @NotBlank String userId,
             @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
-                    defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
-            @PathParam("newStatus") @NotBlank String newStatusString) throws ValidationException {
+                      defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
+            @PathParam("newStatus") @NotBlank String newStatusString,
+            @Context UserContext userContext) throws ValidationException {
+
+        if (userId.equalsIgnoreCase(userContext.getUserId())) {
+            throw new BadRequestException("Users are not allowed to set their own status");
+        }
 
         final User.AccountStatus newStatus = User.AccountStatus.valueOf(newStatusString.toUpperCase(Locale.US));
         final User user = loadUserById(userId);

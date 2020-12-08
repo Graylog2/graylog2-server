@@ -1,21 +1,22 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.security.authservice.backend;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.unboundid.ldap.sdk.Filter;
@@ -24,13 +25,16 @@ import com.unboundid.ldap.sdk.LDAPException;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.AuthServiceCredentials;
+import org.graylog.security.authservice.AuthenticationDetails;
 import org.graylog.security.authservice.ProvisionerService;
 import org.graylog.security.authservice.UserDetails;
+import org.graylog.security.authservice.ldap.LDAPConnectorConfig;
 import org.graylog.security.authservice.ldap.LDAPUser;
 import org.graylog.security.authservice.ldap.UnboundLDAPConfig;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
 import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
 import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +42,10 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ADAuthServiceBackend implements AuthServiceBackend {
     public static final String TYPE_NAME = "active-directory";
@@ -78,7 +84,7 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
     }
 
     @Override
-    public Optional<UserDetails> authenticateAndProvision(AuthServiceCredentials authCredentials, ProvisionerService provisionerService) {
+    public Optional<AuthenticationDetails> authenticateAndProvision(AuthServiceCredentials authCredentials, ProvisionerService provisionerService) {
         try (final LDAPConnection connection = ldapConnector.connect(config.getLDAPConnectorConfig())) {
             if (connection == null) {
                 return Optional.empty();
@@ -114,13 +120,13 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
                     .defaultRoles(backend.defaultRoles())
                     .build());
 
-            return Optional.of(userDetails);
+            return Optional.of(AuthenticationDetails.builder().userDetails(userDetails).build());
         } catch (GeneralSecurityException e) {
             LOG.error("Error setting up TLS connection", e);
-            return Optional.empty();
+            throw new AuthenticationServiceUnavailableException("Error setting up TLS connection", e);
         } catch (LDAPException e) {
             LOG.error("ActiveDirectory error", e);
-            return Optional.empty();
+            throw new AuthenticationServiceUnavailableException("ActiveDirectory error", e);
         }
     }
 
@@ -191,14 +197,41 @@ public class ADAuthServiceBackend implements AuthServiceBackend {
     public AuthServiceBackendTestResult testConnection(@Nullable AuthServiceBackendDTO existingBackendConfig) {
         final ADAuthServiceBackendConfig testConfig = buildTestConfig(existingBackendConfig);
 
-        try (final LDAPConnection connection = ldapConnector.connect(testConfig.getLDAPConnectorConfig())) {
+        final LDAPConnectorConfig config = testConfig.getLDAPConnectorConfig();
+
+        if (config.serverList().size() == 1) {
+            return testSingleConnection(config, config.serverList().get(0));
+        }
+
+        // Test each server separately, so we can see the result for each
+        final List<AuthServiceBackendTestResult> testResults = config.serverList().stream().map(server -> testSingleConnection(config, server)).collect(Collectors.toList());
+
+        if (testResults.stream().anyMatch(res -> !res.isSuccess())) {
+            return AuthServiceBackendTestResult
+                    .createFailure("Test failure",
+                            testResults.stream().map(r -> {
+                                if (r.isSuccess()) {
+                                    return r.message();
+                                } else {
+                                    return r.message() + " : " + String.join(",", r.errors());
+                                }
+                            }).collect(Collectors.toList()));
+        } else {
+            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + config.serverList());
+        }
+    }
+
+    private AuthServiceBackendTestResult testSingleConnection(LDAPConnectorConfig config, LDAPConnectorConfig.LDAPServer server) {
+        final LDAPConnectorConfig singleServerConfig = config.toBuilder().serverList(ImmutableList.of(server)).build();
+
+        try (final LDAPConnection connection = ldapConnector.connect(singleServerConfig)) {
             if (connection == null) {
-                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.servers());
+                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + server);
             }
-            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + testConfig.servers());
+            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + server);
         } catch (Exception e) {
             return AuthServiceBackendTestResult.createFailure(
-                    "Couldn't establish connection to " + testConfig.servers(),
+                    "Couldn't establish connection to " + server,
                     Collections.singletonList(e.getMessage())
             );
         }

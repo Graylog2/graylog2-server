@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
@@ -60,7 +76,7 @@ const StreamControls = createReactClass({
 
   _setStartpage() {
     const { user, stream } = this.props;
-    StartpageStore.set(user.username, 'stream', stream.id);
+    StartpageStore.set(user.id, 'stream', stream.id);
   },
 
   render() {
@@ -70,16 +86,21 @@ const StreamControls = createReactClass({
       <span>
         <DropdownButton title="More Actions"
                         pullRight
-                        id={`more-actions-dropdown-${stream.id}`}
-                        disabled={isDefaultStream}>
+                        id={`more-actions-dropdown-${stream.id}`}>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
-            <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit}>Edit stream</MenuItem>
+            <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit} disabled={isDefaultStream}>
+              Edit stream
+            </MenuItem>
           </IfPermitted>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
-            <MenuItem key={`quickAddRule-${stream.id}`} onSelect={this._onQuickAdd}>Quick add rule</MenuItem>
+            <MenuItem key={`quickAddRule-${stream.id}`} onSelect={this._onQuickAdd} disabled={isDefaultStream}>
+              Quick add rule
+            </MenuItem>
           </IfPermitted>
           <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
-            <MenuItem key={`cloneStream-${stream.id}`} onSelect={this._onClone}>Clone this stream</MenuItem>
+            <MenuItem key={`cloneStream-${stream.id}`} onSelect={this._onClone} disabled={isDefaultStream}>
+              Clone this stream
+            </MenuItem>
           </IfPermitted>
           <IfPermitted permissions="stream_outputs:read">
             <MenuItem key={`manageOutputs-${stream.id}`} href={Routes.stream_outputs(stream.id)}>
@@ -94,7 +115,7 @@ const StreamControls = createReactClass({
             <MenuItem key={`divider-${stream.id}`} divider />
           </IfPermitted>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
-            <MenuItem key={`deleteStream-${stream.id}`} onSelect={this._onDelete}>
+            <MenuItem key={`deleteStream-${stream.id}`} onSelect={this._onDelete} disabled={isDefaultStream}>
               Delete this stream
             </MenuItem>
           </IfPermitted>
