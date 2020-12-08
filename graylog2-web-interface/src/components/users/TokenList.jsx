@@ -78,9 +78,9 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
 
       <ControlledTableList>
         <ControlledTableList.Header />
-        {effectiveTokens.length === 0 && query !== '' && (
+        {effectiveTokens.length === 0 && (
           <ControlledTableList.Item>
-            <p>No tokens match the filter.</p>
+            <p>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</p>
           </ControlledTableList.Item>
         )}
         {effectiveTokens.map((token) => {
