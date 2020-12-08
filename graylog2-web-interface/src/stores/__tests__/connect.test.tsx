@@ -153,7 +153,7 @@ describe('connect()', () => {
     const Component = connect(
       () => <span>hello!</span>,
       { simpleStore: SimpleStore },
-      ({ simpleStore }) => ({ storeValue: simpleStore.value }),
+      ({ simpleStore }) => (simpleStore && { storeValue: simpleStore.value }),
     );
     mount(<Component />);
   });
