@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.List;
@@ -68,13 +69,14 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
 
     @Inject
     public PulsarMessageQueueReader(MetricRegistry metricRegistry,
-                                    Provider<ProcessBuffer> processBufferProvider) {
+                                    Provider<ProcessBuffer> processBufferProvider,
+                                    @Named("pulsar_service_url") String serviceUrl) {
         // Using a ProcessBuffer directly will lead to guice error:
         // "Please wait until after injection has completed to use this object."
         this.processBufferProvider = processBufferProvider;
         this.name = "input"; // TODO: use cluster-id?
         this.topic = name + "-message-queue"; // TODO: Make configurable
-        this.serviceUrl = "pulsar://localhost:6650"; // TODO: Make configurable
+        this.serviceUrl = serviceUrl;
 
         this.messageMeter = metricRegistry.meter(name("system.message-queue.pulsar", name, "reader.messages"));
         this.byteCounter = metricRegistry.counter(name("system.message-queue.pulsar", name, "reader.byte-count"));

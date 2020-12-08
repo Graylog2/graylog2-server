@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -63,10 +64,11 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
     private Producer<byte[]> producer;
 
     @Inject
-    public PulsarMessageQueueWriter(MetricRegistry metricRegistry) {
+    public PulsarMessageQueueWriter(MetricRegistry metricRegistry,
+                                    @Named("pulsar_service_url") String serviceUrl) {
         this.name = "input"; // TODO: use cluster-id?
         this.topic = name + "-message-queue"; // TODO: Make configurable
-        this.serviceUrl = "pulsar://localhost:6650"; // TODO: Make configurable
+        this.serviceUrl = serviceUrl;
 
         this.messageMeter = metricRegistry.meter(name("system.message-queue.pulsar", name, "writer.messages"));
         this.byteCounter = metricRegistry.counter(name("system.message-queue.pulsar", name, "writer.byte-count"));

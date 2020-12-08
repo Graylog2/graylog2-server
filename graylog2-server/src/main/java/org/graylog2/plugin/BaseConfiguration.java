@@ -29,6 +29,7 @@ import com.lmax.disruptor.YieldingWaitStrategy;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.shared.messageq.MessageJournalMode;
 import org.graylog2.shared.messageq.MessageJournalModeConverter;
+import org.graylog2.shared.messageq.pulsar.PulsarServiceUrlValidator;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.graylog2.utilities.ProxyHostsPatternConverter;
 import org.slf4j.Logger;
@@ -69,6 +70,9 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     @Parameter(value = "message_journal_mode", converter = MessageJournalModeConverter.class)
     private MessageJournalMode messageJournalMode = MessageJournalMode.DISK;
+
+    @Parameter(value = "pulsar_service_url", validators = PulsarServiceUrlValidator.class)
+    private String pulsarServiceUrl = "pulsar://localhost:6650";
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
@@ -148,8 +152,11 @@ public abstract class BaseConfiguration extends PathConfiguration {
     }
 
     public MessageJournalMode getMessageJournalMode() {
-        // TODO use enum?
         return messageJournalMode;
+    }
+
+    public String getPulsarServiceUrl() {
+        return pulsarServiceUrl;
     }
 
     public void setMessageJournalEnabled(boolean messageJournalEnabled) {
