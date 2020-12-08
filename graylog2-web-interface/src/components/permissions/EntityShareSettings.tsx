@@ -19,15 +19,15 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
+import { FormikProps } from 'formik';
 
 import type { GRN } from 'logic/permissions/types';
 import EntityShareState from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import { Select } from 'components/common';
 
-import GranteesSelector, { SelectionRequest } from './GranteesSelector';
+import GranteesSelector, { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
 import GranteesList from './GranteesList';
 import DependenciesWarning from './DependenciesWarning';
 import ValidationError from './ValidationError';
@@ -40,7 +40,7 @@ type Props = {
   entityTitle: $PropertyType<SharedEntity, 'title'>,
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
-  granteesSelectRef: typeof Select | null | undefined,
+  granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>,
 };
 
 const Section = styled.div`
@@ -76,7 +76,7 @@ const EntityShareSettings = ({
   entityType,
   entityTitle,
   setDisableSubmit,
-  granteesSelectRef,
+  granteesSelectFormRef,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
@@ -120,7 +120,7 @@ const EntityShareSettings = ({
         <GranteesSelector availableGrantees={filteredGrantees}
                           availableCapabilities={availableCapabilities}
                           onSubmit={_handleSelection}
-                          granteesSelectRef={granteesSelectRef} />
+                          formRef={granteesSelectFormRef} />
       </Section>
       <Section>
         <GranteesList activeShares={activeShares}
