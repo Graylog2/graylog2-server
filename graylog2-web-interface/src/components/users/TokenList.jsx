@@ -19,11 +19,27 @@ import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { ClipboardButton, ControlledTableList, Timestamp, SearchForm, Spinner } from 'components/common';
-import { Button, ButtonGroup, Col, Checkbox, Row } from 'components/graylog';
+import { ClipboardButton, ControlledTableList, Icon, Timestamp, SearchForm, Spinner } from 'components/common';
+import { Button, ButtonGroup, Col, Checkbox, Panel, Row } from 'components/graylog';
 import type { Token } from 'actions/users/UsersActions';
 
 import CreateTokenForm from './CreateTokenForm';
+
+const StyledTokenPanel = styled(Panel)`
+  &.panel {
+    margin: 10px 0;
+    background-color: ${(props) => props.theme.colors.global.contentBackground};
+
+    .panel-heading {
+      color: ${(props) => props.theme.colors.gray[30]};
+    }
+  }
+`;
+
+const StyledCopyTokenButton = styled(ClipboardButton)`
+  vertical-align: baseline;
+  margin-left: 1em;
+`;
 
 const StyledSearchForm = styled(SearchForm)`
   margin-bottom: 10px;
@@ -38,12 +54,13 @@ const StyledLastAccess = styled.div`
 type Props = {
   creatingToken: boolean,
   deletingToken: ?string,
-  onCreate: (tokenName: string) => void,
+  onCreate: (tokenName: string) => Promise<Token>,
   onDelete: (tokenId: string, tokenName: string) => void,
   tokens: Token[],
 };
 
 const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
+  const [createdToken, setCreatedToken] = useState<?Token>();
   const [query, setQuery] = useState('');
   const [hideTokens, setHideTokens] = useState(true);
 
@@ -52,6 +69,16 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
 
     return tokens.filter(({ name }) => queryRegex.test(name));
   }, [query, tokens]);
+
+  const handleTokenCreation = (tokenName) => {
+    const promise = onCreate(tokenName);
+
+    promise.then((token) => {
+      setCreatedToken(token);
+
+      return token;
+    });
+  };
 
   const onShowTokensChanged = (event) => {
     setHideTokens(event.target.checked);
@@ -67,7 +94,22 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
 
   return (
     <span>
-      <CreateTokenForm onCreate={onCreate} creatingToken={creatingToken} />
+      <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+      {createdToken && (
+        <StyledTokenPanel bsStyle="success">
+          <Panel.Heading>
+            <Panel.Title>Token <em>{createdToken.name}</em> created!</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            <p>This is your new token.</p>
+            <pre>
+              {createdToken.token}
+              <StyledCopyTokenButton title={<Icon name="clipboard" fixedWidth />} text={createdToken.token} bsSize="xsmall" />
+            </pre>
+            <Button bsStyle="primary" onClick={() => setCreatedToken()}>Done</Button>
+          </Panel.Body>
+        </StyledTokenPanel>
+      )}
       <hr />
       <StyledSearchForm onSearch={updateQuery}
                         onReset={updateQuery}

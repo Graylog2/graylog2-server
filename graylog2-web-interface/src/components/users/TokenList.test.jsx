@@ -17,6 +17,7 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
+import { act } from 'react-dom/test-utils';
 
 import TokenList from 'components/users/TokenList';
 
@@ -40,25 +41,40 @@ describe('<TokenList />', () => {
     expect(wrapper).toExist();
   });
 
-  it('should add new token and delete existing ones', () => {
+  it('should add new token and display it', async () => {
     const createFn = jest.fn((tokenName) => {
       expect(tokenName).toEqual('hans');
+
+      return Promise.resolve({ name: 'hans', token: 'beef2003', id: 'abc3', last_access: '1970-01-01T00:00:00.000Z' });
     });
+    const wrapper = mount(<TokenList tokens={tokens}
+                                     onCreate={createFn}
+                                     onDelete={() => {}} />);
+
+    wrapper.find('input#create-token-input').simulate('change', { target: { value: 'hans' } });
+
+    await act(async () => {
+      wrapper.find('form').at(0).simulate('submit');
+    });
+
+    wrapper.setProps({}); // Force re-render
+    const tokenContainer = wrapper.find('pre').first();
+
+    expect(createFn.mock.calls.length).toBe(1);
+    expect(tokenContainer.props().children).toContain('beef2003');
+  });
+
+  it('should delete a token', async () => {
     const deleteFn = jest.fn((tokenId) => {
       expect(tokenId).toEqual('abc1');
     });
     const wrapper = mount(<TokenList tokens={tokens}
-                                     onCreate={createFn}
+                                     onCreate={() => {}}
                                      onDelete={deleteFn} />);
-
-    wrapper.find('input#create-token-input').simulate('change', { target: { value: 'hans' } });
-    wrapper.find('form').at(0).simulate('submit');
-
-    expect(createFn.mock.calls.length).toBe(1);
 
     wrapper.find('button[children="Delete"]').at(0).simulate('click');
 
-    expect(createFn.mock.calls.length).toBe(1);
+    expect(deleteFn.mock.calls.length).toBe(1);
   });
 
   it('should display tokens if "Hide tokens" was unchecked', () => {

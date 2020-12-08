@@ -74,9 +74,11 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken) => {
 
   setCreatingToken(true);
 
-  promise.then(() => {
+  return promise.then((token) => {
     loadTokens();
     setCreatingToken(false);
+
+    return token;
   });
 };
 
