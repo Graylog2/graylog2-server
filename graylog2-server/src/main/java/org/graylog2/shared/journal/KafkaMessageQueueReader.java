@@ -34,12 +34,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+@Singleton
 public class KafkaMessageQueueReader extends AbstractExecutionThreadService implements MessageQueueReader {
     private static final Logger log = LoggerFactory.getLogger(KafkaMessageQueueReader.class);
     private final Journal journal;
