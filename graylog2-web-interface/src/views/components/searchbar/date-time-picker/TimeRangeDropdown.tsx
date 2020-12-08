@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 import { useMemo, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 import moment from 'moment';
@@ -11,7 +11,7 @@ import { availableTimeRangeTypes } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
@@ -28,10 +28,8 @@ const timeRangeTypes = {
 type Props = {
   config: SearchesConfig,
   noOverride?: boolean,
-  toggleDropdownShow: (void) => void,
+  toggleDropdownShow: () => void,
 };
-
-type RangeType = React.Element<Tab>;
 
 const StyledPopover: StyledComponent<{}, ThemeInterface, typeof Popover> = styled(Popover)(({ theme }) => css`
   max-width: 100%; 
@@ -96,7 +94,7 @@ const DEFAULT_RANGES = {
   disabled: undefined,
 };
 
-const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, currentTimerange) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, currentTimerange) => availableTimeRangeTypes.map(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
