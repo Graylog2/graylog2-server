@@ -166,7 +166,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }:
 
   return (
     <Field name={`tempTimeRange[${range}]`} validate={_isValidDateString}>
-      {({ field: { value, onChange, onBlur, name }, meta: { error } }) => {
+      {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
         const dateTime = error ? currentTimerange[range] : value || currentTimerange[range];
@@ -215,9 +215,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }:
           <>
             <DateInputWithPicker disabled={disabled}
                                  onChange={_onChangeDate}
-                                 onBlur={onBlur}
                                  value={value || currentTimerange[range]}
-                                 // $FlowFixMe - flow is mad about mixed types, ignore until we move to TSX
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
