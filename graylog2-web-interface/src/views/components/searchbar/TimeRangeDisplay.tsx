@@ -1,16 +1,16 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css, StyledComponent } from 'styled-components';
 import moment from 'moment';
 
-import { type ThemeInterface } from 'theme';
-import { type TimeRange } from 'views/logic/queries/Query';
+import type { ThemeInterface } from 'theme';
+import type { TimeRange } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 
-type Props = {|
-  timerange: ?TimeRange,
-|};
+type Props = {
+  timerange: TimeRange | null | undefined,
+};
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
 export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
