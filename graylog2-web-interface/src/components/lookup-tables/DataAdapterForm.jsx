@@ -129,8 +129,8 @@ class DataAdapterForm extends React.Component {
     }
   };
 
-  _setIsFormDisabled = (formValidationState) => {
-    this.setState({ isFormDisabled: formValidationState });
+  _setIsFormDisabled = (isDisabled) => {
+    this.setState({ isFormDisabled: isDisabled });
   };
 
   _validate = (adapter) => {
