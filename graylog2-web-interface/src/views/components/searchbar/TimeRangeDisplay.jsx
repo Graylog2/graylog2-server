@@ -45,23 +45,22 @@ const dateOutput = (timerange: TimeRange) => {
     return EMPTY_OUTPUT;
   }
 
-  switch (timerange.type) {
-    case 'relative':
-      from = !timerange.range ? 'All Time' : moment()
-        .subtract(timerange.range * 1000)
-        .fromNow();
+  if (timerange?.range >= 0) {
+    from = !timerange.range ? 'All Time' : moment()
+      .subtract(timerange.range * 1000)
+      .fromNow();
 
-      return {
-        from,
-        until: 'Now',
-      };
-
-    case 'absolute':
-    case 'keyword':
-      return { from: timerange.from, until: timerange.to };
-    default:
-      throw new Error('Invalid Timerange Type');
+    return {
+      from,
+      until: 'Now',
+    };
   }
+
+  if (timerange?.from && timerange?.to) {
+    return { from: timerange.from, until: timerange.to };
+  }
+
+  throw new Error('Invalid Timerange Type');
 };
 
 const TimeRangeDisplay = ({ timerange }: Props) => {
@@ -69,7 +68,7 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   const dateTested = useRef(false);
 
   useEffect(() => {
-    if (timerange?.type === 'keyword' && !timerange.from) {
+    if (timerange?.keyword && !timerange.from) {
       if (!dateTested.current) {
         ToolsStore.testNaturalDate(timerange.keyword)
           .then((response) => {
@@ -83,14 +82,14 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
             setTimeOutput(EMPTY_OUTPUT);
           });
       }
-    } else if (timerange?.type) {
+    } else {
       setTimeOutput(dateOutput(timerange));
     }
   }, [dateTested, timerange]);
 
   return (
     <TimeRangeWrapper>
-      {!timerange?.type
+      {(!timerange || !Object.keys(timerange).length)
         ? <span><code>No Override</code></span>
         : (
           <>

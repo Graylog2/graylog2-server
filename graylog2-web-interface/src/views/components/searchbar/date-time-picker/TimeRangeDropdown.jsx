@@ -1,13 +1,13 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFormikContext, useField } from 'formik';
 import moment from 'moment';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
-import { availableTimeRangeTypes } from 'views/Constants';
+import { availableTimeRangeTypes, DEFAULT_RANGES } from 'views/Constants';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
@@ -16,7 +16,6 @@ import { type ThemeInterface } from 'theme';
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from './RelativeTimeRangeSelector';
-import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
 
 const timeRangeTypes = {
@@ -79,25 +78,24 @@ const CancelButton: StyledComponent<{}, void, typeof Button> = styled(Button)`
   margin-right: 6px;
 `;
 
-const DEFAULT_RANGES = {
-  absolute: {
-    type: 'absolute',
-    from: moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: moment().format(DateTime.Formats.TIMESTAMP),
-  },
-  relative: {
-    type: 'relative',
-    range: 300,
-  },
-  keyword: {
-    type: 'keyword',
-    keyword: 'Last five minutes',
-  },
-  disabled: undefined,
+const tabNames = (timerange) => {
+  if (!timerange || Object.is(timerange, {})) {
+    return '';
+  }
+
+  if (timerange?.range >= 0) {
+    return 'relative';
+  }
+
+  if (timerange?.keyword) {
+    return 'keyword';
+  }
+
+  return 'absolute';
 };
 
-const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, currentTimerange) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
-  const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
+const timeRangeTypeTabs = (activeKey, nextRangeValue, limitDuration, currentTimerange) => availableTimeRangeTypes.map<RangeType>(({ type, name }) => {
+  const RangeComponent = timeRangeTypes?.[type];
 
   return (
     <Tab title={name}
@@ -105,7 +103,7 @@ const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, current
          eventKey={type}>
       {type === activeKey && (
         <RangeComponent disabled={false}
-                        originalTimeRange={originalRangeValue || DEFAULT_RANGES[type]}
+                        originalTimeRange={nextRangeValue || DEFAULT_RANGES[type]}
                         limitDuration={limitDuration}
                         currentTimerange={currentTimerange} />
       )}
@@ -115,44 +113,40 @@ const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, current
 
 const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) => {
   const formik = useFormikContext();
-  const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
-  const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+  const originalTimerange = useField('timerange')[0];
+  const nextRangeProps = useField('tempTimeRange')[0];
 
   const originalRangeValue = useMemo(() => originalTimerange?.value, [originalTimerange]);
   const nextRangeValue = useMemo(() => nextRangeProps?.value || originalRangeValue, [nextRangeProps, originalRangeValue]);
   const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
   const currentTimerange = useMemo(() => nextRangeValue || originalRangeValue, [nextRangeValue, originalRangeValue]);
 
-  const [activeTab, setActiveTab] = useState(originalRangeValue?.type || 'disabled');
+  const [activeTab, setActiveTab] = useState(tabNames(originalRangeValue));
 
-  const onSelect = (newType) => {
+  useEffect(() => {
     if (nextRangeValue?.type) {
-      nextRangeHelpers.setValue(migrateTimeRangeToNewType(nextRangeValue.type, newType));
+      formik.setFieldValue('tempTimeRange', migrateTimeRangeToNewType(nextRangeValue.type, activeTab));
     } else {
-      nextRangeHelpers.setValue(DEFAULT_RANGES[newType]);
+      formik.setFieldValue('tempTimeRange', DEFAULT_RANGES[activeTab]);
     }
-
-    setActiveTab(newType);
-  };
+  }, [activeTab, formik, nextRangeValue.type]);
 
   const handleNoOverride = () => {
-    formik.resetForm({
-      values: { timerange: {}, tempTimeRange: undefined },
-    });
+    formik.setFieldValue('timerange', {});
+    formik.setFieldValue('tempTimeRange', {});
 
     toggleDropdownShow();
   };
 
   const handleCancel = () => {
-    formik.resetForm({
-      values: { timerange: originalRangeValue, tempTimeRange: undefined },
-    });
+    formik.setFieldValue('timerange', originalRangeValue);
+    formik.setFieldValue('tempTimeRange', originalRangeValue);
 
     toggleDropdownShow();
   };
 
   const handleApply = () => {
-    originalTimerangeHelpers.setValue(nextRangeValue);
+    formik.setFieldValue('timerange', nextRangeValue);
     formik.unregisterField('tempTimeRange');
     toggleDropdownShow();
   };
@@ -182,9 +176,9 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
                       activeKey={activeTab}
-                      onSelect={onSelect}
+                      onSelect={setActiveTab}
                       animation={false}>
-            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, currentTimerange)}
+            {timeRangeTypeTabs(activeTab, nextRangeValue, limitDuration, currentTimerange)}
           </StyledTabs>
         </Col>
       </Row>

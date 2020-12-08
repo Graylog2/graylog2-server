@@ -3,6 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled from 'styled-components';
+import moment from 'moment';
 
 import { Col, Row } from 'components/graylog';
 import connect from 'stores/connect';
@@ -52,7 +53,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
     <ScrollToHint value={queryString}>
       <Row className="content">
         <Col md={12}>
-          <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm}>
+          <DashboardSearchForm initialValues={{ timerange, queryString, limitDuration: moment.duration(config.query_time_range_limit).asSeconds() }} onSubmit={submitForm}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => {
               return (
                 <>

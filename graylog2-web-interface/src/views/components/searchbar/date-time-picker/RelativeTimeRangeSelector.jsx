@@ -124,29 +124,21 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
 const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
-  const _isValidRange = (value) => {
-    if (!(limitDuration === 0 || (value <= limitDuration && limitDuration !== 0))) {
-      return 'Range is outside limit duration.';
-    }
-
-    return undefined;
-  };
-
   return (
     <RelativeWrapper>
-      <Field name="tempTimeRange.range" validate={_isValidRange}>
+      <Field name="tempTimeRange.range">
         {({ field: { value, onChange, name }, meta: { error } }) => {
           const fromValue = RANGE_TYPES.map(({ type }) => {
-            const isAllTime = value === 0;
-            const diff = moment.duration(value, 'seconds').as(type);
+            const timerangeValue = value ?? originalTimeRange.range;
+            const isAllTime = timerangeValue === 0;
+            const diff = moment.duration(timerangeValue, 'seconds').as(type);
 
             if (diff - Math.floor(diff) === 0) {
               return {
-                ...originalTimeRange,
                 rangeValue: diff || 0,
                 rangeType: isAllTime ? 'seconds' : type,
                 rangeAllTime: isAllTime,
-                range: value,
+                range: timerangeValue,
               };
             }
 
@@ -248,7 +240,7 @@ RelativeTimeRangeSelector.propTypes = {
   limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({
-    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }).isRequired,
 };
 

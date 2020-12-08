@@ -13,8 +13,10 @@ import { onInitializingTimerange, onSubmittingTimerange } from 'views/components
 
 type Values = {
   tempTimeRange: TimeRange,
+  timerange: TimeRange,
   streams: Array<string>,
   queryString: string,
+  limitDuration: number,
 };
 
 type Props = {
@@ -23,10 +25,21 @@ type Props = {
   children: ((props: FormikProps<Values>) => React$Node) | React$Node,
 };
 
-const validate = (values) => {
-  const errors = {};
+const StyledForm = styled(Form)`
+  height: 100%;
+`;
 
-  if (values?.tempTimeRange?.type === 'absolute'
+export const validateTimeRanges = (values) => {
+  const errors = { };
+
+  if (values.tempTimeRange?.type === 'relative'
+    && !(values.limitDuration === 0 || (values.tempTimeRange?.range <= values.limitDuration && values.limitDuration !== 0))) {
+    errors.tempTimeRange = {
+      range: 'Range is outside limit duration.',
+    };
+  }
+
+  if (values.tempTimeRange?.type === 'absolute'
     && DateTime.isValidDateString(values.tempTimeRange.from)
     && values.tempTimeRange.from > values.tempTimeRange.to) {
     errors.tempTimeRange = {
@@ -36,10 +49,6 @@ const validate = (values) => {
 
   return errors;
 };
-
-const StyledForm = styled(Form)`
-  height: 100%;
-`;
 
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
@@ -51,18 +60,21 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
       queryString,
     });
   }, [onSubmit]);
-  const { timerange, streams, queryString } = initialValues;
-  const _initialValues = {
+  const { limitDuration, timerange, streams, queryString } = initialValues;
+  const initialTimeRange = onInitializingTimerange(timerange);
+  const _initialValues: Values = {
     queryString,
     streams,
-    timerange: onInitializingTimerange(timerange),
+    timerange: initialTimeRange,
+    tempTimeRange: initialTimeRange,
+    limitDuration,
   };
 
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
-            validate={validate}>
+            validate={validateTimeRanges}>
       {(...args) => (
         <StyledForm>
           {isFunction(children) ? children(...args) : children}
@@ -76,6 +88,7 @@ SearchBarForm.propTypes = {
   initialValues: PropTypes.shape({
     timerange: PropTypes.object.isRequired,
     queryString: PropTypes.string.isRequired,
+    limitDuration: PropTypes.number.isRequired,
     streams: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   onSubmit: PropTypes.func.isRequired,

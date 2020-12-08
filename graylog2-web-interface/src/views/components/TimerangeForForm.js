@@ -39,7 +39,11 @@ export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
         range: timerange.range,
       };
     case 'keyword':
-      return timerange;
+      return {
+        type: timerange.type,
+        from: formatDatetime(DateTime.parseFromString(timerange.from)),
+        to: formatDatetime(DateTime.parseFromString(timerange.to)),
+      };
     default: throw new Error(`Invalid time range type: ${timerange.type}`);
   }
 };

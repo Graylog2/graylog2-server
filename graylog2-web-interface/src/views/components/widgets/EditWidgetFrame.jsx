@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useContext, useEffect, useCallback } from 'react';
+import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { Modal } from 'components/graylog';
@@ -71,14 +71,14 @@ const EditWidgetFrame = ({ children }: Props) => {
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
-  const _onSubmit = useCallback((values) => onSubmit(values, widget), [widget]);
+  const _onSubmit = (values) => onSubmit(values, widget);
 
   return (
     <Modal show
            animation={false}
            dialogComponentClass={EditWidgetDialog}
            enforceFocus={false}>
-      <SearchBarForm initialValues={{ timerange, streams, queryString }}
+      <SearchBarForm initialValues={{ timerange, streams, queryString, limitDuration: 0 }}
                      onSubmit={_onSubmit}>
         <div className={styles.gridContainer}>
           <IfDashboard>
