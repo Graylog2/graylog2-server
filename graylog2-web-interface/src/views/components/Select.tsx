@@ -144,6 +144,7 @@ type Props = {
   isMulti?: boolean,
   menuShouldScrollIntoView: boolean,
   onChange: (value: any, actionType: string) => void,
+  onMenuClose: () => void,
   placeholder: string,
   value?: Object | Array<Object> | null | undefined,
 };
@@ -261,6 +262,7 @@ Select.propTypes = {
   menuShouldScrollIntoView: PropTypes.bool,
   options: PropTypes.array.isRequired,
   onChange: PropTypes.func,
+  onMenuClose: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.object,
@@ -286,6 +288,7 @@ Select.defaultProps = {
   menuShouldScrollIntoView: undefined,
   placeholder: undefined,
   onChange: undefined,
+  onMenuClose: undefined,
   value: undefined,
 };
 
