@@ -27,8 +27,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.ArrayList;
-import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -93,6 +91,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -334,7 +333,7 @@ public class UsersResource extends RestResource {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
                 List<String> unknownRoles = new ArrayList<>();
                 roles.forEach(roleName -> {
-                    if (!nameMap.containsKey(roleName)) {
+                    if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
                         unknownRoles.add(roleName);
                     }
                 });
