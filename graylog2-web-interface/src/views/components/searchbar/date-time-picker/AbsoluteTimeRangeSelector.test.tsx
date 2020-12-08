@@ -16,7 +16,7 @@ const defaultProps = {
     from: '1955-05-11 06:15:00.000',
     to: '1985-25-10 08:18:00.000',
   },
-};
+} as const;
 
 const renderWithForm = (element) => render((
   <Formik initialValues={{ tempTimeRange: defaultProps.originalTimeRange }}

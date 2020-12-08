@@ -19,21 +19,16 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 
+import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 
 import AbsoluteRangeField from './AbsoluteRangeField';
 
 type Props = {
   disabled: boolean,
-  originalTimeRange: {
-    from: string,
-    to: string,
-  },
+  originalTimeRange: TimeRange,
   limitDuration: number,
-  currentTimerange: {
-    from: string,
-    to: string,
-  },
+  currentTimerange: AbsoluteTimeRange,
 };
 
 const AbsoluteWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`

@@ -16,18 +16,13 @@ import {
 } from 'components/graylog';
 import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
 import type { ThemeInterface } from 'theme';
+import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 type Props = {
   disabled: boolean,
   from: boolean,
-  currentTimerange?: {
-    from: string,
-    to: string,
-  },
-  originalTimeRange: {
-    from: string,
-    to: string,
-  },
+  currentTimerange?: AbsoluteTimeRange,
+  originalTimeRange: TimeRange,
   limitDuration?: number,
 };
 
