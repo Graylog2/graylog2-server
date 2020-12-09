@@ -130,7 +130,4 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: [
-    'flow-typed/npm/*',
-  ],
 };
