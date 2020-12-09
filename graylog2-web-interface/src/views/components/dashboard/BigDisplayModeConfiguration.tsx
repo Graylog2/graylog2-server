@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 import URI from 'urijs';
 
 import history from 'util/History';
@@ -26,6 +26,7 @@ import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 export type UntypedBigDisplayModeQuery = {
   interval?: string,
@@ -113,8 +114,8 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
   );
 };
 
-const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery): void => {
-  CurrentViewStateActions.focusWidget(undefined);
+const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery, setFocusedWidget): void => {
+  setFocusedWidget(undefined);
 
   history.push(
     new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id))
@@ -146,7 +147,8 @@ type Props = {
 
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
-  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view));
+  const { setFocusedWidget } = useContext(WidgetFocusContext);
+  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view), setFocusedWidget);
 
   return (
     <>

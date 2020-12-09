@@ -44,8 +44,9 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
-import { CurrentViewStateActions, CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { IconButton } from 'components/common';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -146,7 +147,6 @@ class Widget extends React.Component<Props, State> {
     onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     position: PropTypes.instanceOf(WidgetPosition).isRequired,
-    focusedWidget: PropTypes.string,
   };
 
   static defaultProps = {
@@ -155,7 +155,6 @@ class Widget extends React.Component<Props, State> {
     data: undefined,
     errors: undefined,
     editing: false,
-    focusedWidget: undefined,
   };
 
   constructor(props) {
@@ -336,9 +335,10 @@ class Widget extends React.Component<Props, State> {
 
   // TODO: Clean up different code paths for normal/edit modes
   render() {
-    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, focusedWidget } = this.props;
+    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
     const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config, type } = widget;
+    const { focusedWidget, setFocusedWidget } = this.context;
     const visualization = this.visualize();
 
     if (editing) {
@@ -387,7 +387,7 @@ class Widget extends React.Component<Props, State> {
                     </IfDashboard>
                     <IconButton name={focusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
                                 title={focusedWidget ? 'Un-focus widget' : 'Focus this widget'}
-                                onClick={() => CurrentViewStateActions.focusWidget(id)} />
+                                onClick={() => setFocusedWidget(id)} />
                     <WidgetHorizontalStretch widgetId={widget.id}
                                              widgetType={widget.type}
                                              onStretch={onPositionsChange}
@@ -432,11 +432,6 @@ class Widget extends React.Component<Props, State> {
   }
 }
 
-export default connect(Widget,
-  {
-    view: ViewStore,
-    currentView: CurrentViewStateStore,
-  }, (props) => ({
-    ...props,
-    focusedWidget: props.currentView.focusedWidget,
-  }));
+Widget.contextType = WidgetFocusContext;
+
+export default connect(Widget, { view: ViewStore });

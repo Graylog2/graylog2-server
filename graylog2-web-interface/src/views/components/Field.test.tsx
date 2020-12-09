@@ -18,6 +18,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import Field from './Field';
 import InteractiveContext from './contexts/InteractiveContext';
@@ -25,11 +26,14 @@ import InteractiveContext from './contexts/InteractiveContext';
 describe('Field', () => {
   describe('handles value action menu depending on interactive context', () => {
     const component = (interactive) => ({ children, ...props }: React.ComponentProps<typeof Field>) => (
-      <InteractiveContext.Provider value={interactive}>
-        <Field {...props}>
-          {children}
-        </Field>
-      </InteractiveContext.Provider>
+
+      <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => undefined }}>
+        <InteractiveContext.Provider value={interactive}>
+          <Field {...props}>
+            {children}
+          </Field>
+        </InteractiveContext.Provider>
+      </WidgetFocusContext.Provider>
     );
 
     it('does not show value actions if interactive context is `false`', () => {

@@ -32,6 +32,7 @@ import TSearchResult from 'views/logic/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/graylog';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 type IndicatorProps = {
   searchLoadingState: {
@@ -61,12 +62,12 @@ type Props = {
   viewState: {
     state: ViewState,
     activeQuery: QueryId,
-    focusedWidget: string | undefined | null,
   },
 };
 
 const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
+  const focusedWidget = useContext(WidgetFocusContext);
 
   if (!fieldTypes) {
     return <Spinner />;
@@ -74,7 +75,8 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
 
   const results = searches && searches.result;
   const widgetMapping = searches && searches.widgetMapping;
-  const hasFocusedWidget = !!viewState.focusedWidget;
+
+  const hasFocusedWidget = !!focusedWidget;
 
   const currentResults = results ? results.forId(queryId) : undefined;
   const allFields = fieldTypes.all;

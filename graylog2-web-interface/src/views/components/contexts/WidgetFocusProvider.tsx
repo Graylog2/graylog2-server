@@ -23,8 +23,13 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const [focusedWidget, setFocusedWidget] = useState(undefined);
 
+  const updateFocus = (widgetId: string | undefined | null) => (
+    widgetId === focusedWidget
+      ? setFocusedWidget(undefined)
+      : setFocusedWidget(widgetId));
+
   return (
-    <WidgetFocusContext.Provider value={{ focusedWidget, setFocusedWidget }}>
+    <WidgetFocusContext.Provider value={{ focusedWidget, setFocusedWidget: updateFocus }}>
       {children}
     </WidgetFocusContext.Provider>
   );

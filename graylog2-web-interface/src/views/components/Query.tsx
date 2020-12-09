@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
@@ -36,6 +37,7 @@ import defaultTitle from 'views/components/defaultTitle';
 
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   .container-fluid & {
@@ -152,7 +154,7 @@ const EmptyDashboardInfo = () => (
 );
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
-  const { focusedWidget } = useStore(CurrentViewStateStore);
+  const { focusedWidget } = useContext(WidgetFocusContext);
   const titles = useStore(TitlesStore);
 
   if (!widgets || widgets.isEmpty()) {

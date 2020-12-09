@@ -24,18 +24,11 @@ import View, { ViewStateMap } from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
-
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateActions: {
-    focusWidget: jest.fn(() => ({
-      then: jest.fn(),
-    })),
-  },
-}));
 
 const search = Search.create();
 const view = View.create()
@@ -67,14 +60,20 @@ const createViewWithQueries = () => {
 };
 
 describe('BigDisplayModeConfiguration', () => {
+  const SUT = (props) => (
+    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
+      <BigDisplayModeConfiguration {...props} />
+    </WidgetFocusContext.Provider>
+  );
+
   it('generates markup that matches snapshot', () => {
-    const { container } = render(<BigDisplayModeConfiguration view={view} />);
+    const { container } = render(<SUT view={view} />);
 
     expect(container).toMatchSnapshot();
   });
 
   it('disables menu item if `disabled` prop is `true`', () => {
-    const { getByText, queryByText } = render(<BigDisplayModeConfiguration view={view} disabled />);
+    const { getByText, queryByText } = render(<SUT view={view} disabled />);
     const menuItem = getByText('Full Screen');
 
     fireEvent.submit(menuItem);
@@ -83,7 +82,7 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   it('opens modal when menu item is clicked', async () => {
-    const { findByText, getByText } = render(<BigDisplayModeConfiguration view={view} />);
+    const { findByText, getByText } = render(<SUT view={view} />);
     const menuItem = getByText('Full Screen');
 
     fireEvent.click(menuItem);
@@ -92,14 +91,14 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   it('shows open modal per default if `open` prop is `true`', () => {
-    const { getByText } = render(<BigDisplayModeConfiguration view={view} show />);
+    const { getByText } = render(<SUT view={view} show />);
 
     expect(getByText('Configuring Full Screen')).not.toBeNull();
   });
 
   it('shows all query titles in modal', () => {
     const viewWithQueries = createViewWithQueries();
-    const { getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
+    const { getByText } = render(<SUT view={viewWithQueries} show />);
 
     expect(getByText('Page#1')).not.toBeNull();
     expect(getByText('My awesome Query tab')).not.toBeNull();
@@ -107,7 +106,7 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   it('should not allow strings for the refresh interval', () => {
-    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
+    const { getByLabelText } = render(<SUT view={view} show />);
 
     const refreshInterval = asElement(getByLabelText('Refresh Interval'), HTMLInputElement);
 
@@ -117,7 +116,7 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   it('should not allow strings for the cycle interval', () => {
-    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
+    const { getByLabelText } = render(<SUT view={view} show />);
 
     const cycleInterval = asElement(getByLabelText('Tab cycle interval'), HTMLInputElement);
 
@@ -133,7 +132,7 @@ describe('BigDisplayModeConfiguration', () => {
     });
 
     it('on form submit', () => {
-      const { getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
+      const { getByTestId } = render(<SUT view={view} show />);
       const form = getByTestId('modal-form');
 
       expect(form).not.toBeNull();
@@ -145,7 +144,7 @@ describe('BigDisplayModeConfiguration', () => {
     });
 
     it('including changed refresh interval', () => {
-      const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
+      const { getByLabelText, getByTestId } = render(<SUT view={view} show />);
 
       const refreshInterval = getByLabelText('Refresh Interval');
 
@@ -160,7 +159,7 @@ describe('BigDisplayModeConfiguration', () => {
     });
 
     it('including tab cycle interval setting', () => {
-      const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
+      const { getByLabelText, getByTestId } = render(<SUT view={view} show />);
 
       const cycleInterval = getByLabelText('Tab cycle interval');
 
@@ -176,7 +175,7 @@ describe('BigDisplayModeConfiguration', () => {
 
     it('including selected tabs', () => {
       const viewWithQueries = createViewWithQueries();
-      const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
+      const { getByLabelText, getByTestId } = render(<SUT view={viewWithQueries} show />);
 
       const query1 = getByLabelText('Page#1');
 

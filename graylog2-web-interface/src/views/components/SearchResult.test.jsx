@@ -25,6 +25,8 @@ import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
+import WidgetFocusContext from './contexts/WidgetFocusContext';
+
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: jest.fn(() => Promise.resolve()),
@@ -68,9 +70,11 @@ describe('SearchResult', () => {
 
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleSearchResult = ({ fieldTypes }) => (
-    <FieldTypesContext.Provider value={fieldTypes}>
-      <SearchResult />
-    </FieldTypesContext.Provider>
+    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <SearchResult />
+      </FieldTypesContext.Provider>
+    </WidgetFocusContext.Provider>
   );
 
   SimpleSearchResult.propTypes = {

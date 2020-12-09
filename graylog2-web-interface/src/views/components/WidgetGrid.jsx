@@ -44,6 +44,7 @@ export const WidgetContainer = styled.div`
   z-index: auto;
   ${RowContentStyles}
   height: 100%;
+  margin-bottom: 0;
 `;
 
 class WidgetGrid extends React.Component {
