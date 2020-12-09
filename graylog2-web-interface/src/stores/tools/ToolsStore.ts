@@ -93,7 +93,7 @@ const ToolsStore = Reflux.createStore({
 
     return promise;
   },
-  // eslint-disable-next-line flowtype/no-weak-types
+
   testRegexValidity(regex: string): Promise<Object> {
     const encodedRegex = URI.encode(regex);
     const { url } = ApiRoutes.ToolsApiController.regexValidate(encodedRegex);

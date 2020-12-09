@@ -67,11 +67,11 @@ const CustomOption = (optionRenderer: (Option) => React.ReactElement) => (
     );
   }
 );
-/* eslint-enable react/prop-types */
 
 const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (
   ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
 );
+/* eslint-enable react/prop-types */
 
 const CustomInput = (inputProps: { [key: string]: any }) => (
   (props) => <Components.Input {...props} {...inputProps} />
@@ -383,8 +383,8 @@ class Select extends React.Component<Props, State> {
 
     this.setState({ value: value });
 
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
-    const { onChange = (v: string) => {} } = this.props;
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    const { onChange = () => {} } = this.props;
 
     onChange(value);
   };
@@ -455,7 +455,7 @@ class Select extends React.Component<Props, State> {
 
     let formattedValue = value;
 
-    if (value && allowCreate) {
+    if (formattedValue && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
       formattedValue = (value || '').split(delimiter).map((v) => options.find((option) => option[valueKey || ''] === v));

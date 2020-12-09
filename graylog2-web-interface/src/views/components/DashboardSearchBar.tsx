@@ -83,16 +83,16 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                     </Col>
                   </TopRow>
 
-                <Row className="no-bm">
-                  <Col md={8} lg={9}>
-                    <div className="pull-right search-help">
-                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                         title="Search query syntax documentation"
-                                         text={<Icon name="lightbulb" />} />
-                    </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                  glyph="filter"
-                                  dirty={dirty} />
+                  <Row className="no-bm">
+                    <Col md={8} lg={9}>
+                      <div className="pull-right search-help">
+                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                           title="Search query syntax documentation"
+                                           text={<Icon name="lightbulb" />} />
+                      </div>
+                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                                    glyph="filter"
+                                    dirty={dirty} />
 
                       <Field name="queryString">
                         {({ field: { name, value, onChange } }) => (
@@ -101,20 +101,21 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                       onChange={(newQuery) => {
                                         onChange({ target: { value: newQuery, name } });
 
-                                      return Promise.resolve(newQuery);
-                                    }}
-                                    onExecute={handleSubmit as () => void} />
-                      )}
-                    </Field>
-                  </Col>
-                  <Col md={4} lg={3}>
-                    <div className="pull-right">
-                      <ViewActionsMenu />
-                    </div>
-                  </Col>
-                </Row>
-              </>
-            )}}
+                                        return Promise.resolve(newQuery);
+                                      }}
+                                      onExecute={handleSubmit as () => void} />
+                        )}
+                      </Field>
+                    </Col>
+                    <Col md={4} lg={3}>
+                      <div className="pull-right">
+                        <ViewActionsMenu />
+                      </div>
+                    </Col>
+                  </Row>
+                </>
+              );
+            }}
           </DashboardSearchForm>
         </Col>
       </Row>
