@@ -31,15 +31,15 @@ type Props = {
 };
 
 const StyledPopover: StyledComponent<{}, ThemeInterface, typeof Popover> = styled(Popover)(({ theme }) => css`
-  max-width: 100%; 
+  max-width: 100%;
   min-width: 745px;
   
   @media (min-width: ${theme.breakpoints.min.md}) {
-    max-width: 70vw;  
+    max-width: 70vw;
   }
   
   @media (min-width: ${theme.breakpoints.min.lg}) {
-    max-width: 45vw;  
+    max-width: 45vw;
   }
 `);
 
