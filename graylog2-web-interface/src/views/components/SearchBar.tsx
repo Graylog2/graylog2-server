@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
+import moment from 'moment';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -91,6 +92,7 @@ const SearchBar = ({
   const { query_string: queryString } = query;
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
 
   const _onSubmit = (values) => onSubmit(values, currentQuery);
 
@@ -98,14 +100,13 @@ const SearchBar = ({
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
-          <SearchBarForm initialValues={{ timerange, streams, queryString }}
+          <SearchBarForm initialValues={{ limitDuration, timerange, streams, queryString }}
                          onSubmit={_onSubmit}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
               <>
                 <TopRow>
                   <FlexCol md={6}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           config={config} />
+                    <TimeRangeTypeSelector disabled={disableSearch} />
                     <TimeRangeDisplay timerange={values?.timerange} />
                     <RefreshControls />
                   </FlexCol>

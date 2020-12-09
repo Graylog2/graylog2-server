@@ -27,6 +27,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 
 export type Values = {
+  limitDuration: number,
   nextTimeRange?: TimeRange,
   timerange: TimeRange,
   streams: Array<string>,
@@ -40,9 +41,9 @@ type Props = {
 };
 
 const validate = (values) => {
-  const errors: { nextTimeRange?: { from: string } } = {};
+  const errors: { nextTimeRange?: { from?: string } } = {};
 
-  if (values?.nextTimeRange?.type === 'absolute'
+  if (values.nextTimeRange?.type === 'absolute'
     && DateTime.isValidDateString(values.nextTimeRange.from)
     && values.nextTimeRange.from > values.nextTimeRange.to) {
     errors.nextTimeRange = {
@@ -69,11 +70,14 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
       queryString,
     });
   }, [onSubmit]);
-  const { timerange, streams, queryString } = initialValues;
+  const { limitDuration, timerange, streams, queryString } = initialValues;
+  const initialTimeRange = onInitializingTimerange(timerange);
   const _initialValues = {
+    limitDuration,
     queryString,
     streams,
-    timerange: onInitializingTimerange(timerange),
+    timerange: initialTimeRange,
+    nextTimeRange: initialTimeRange,
   };
 
   return (
@@ -92,6 +96,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
 
 SearchBarForm.propTypes = {
   initialValues: PropTypes.shape({
+    limitDuration: PropTypes.number.isRequired,
     timerange: PropTypes.object.isRequired,
     queryString: PropTypes.string.isRequired,
     streams: PropTypes.arrayOf(PropTypes.string).isRequired,

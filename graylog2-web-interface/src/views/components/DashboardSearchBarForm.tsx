@@ -26,6 +26,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
 type Values = {
+  limitDuration: number,
   timerange: TimeRange | undefined | null,
   queryString: string | undefined | null,
 };
@@ -45,9 +46,12 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
       queryString,
     });
   }, [onSubmit]);
-  const { timerange, queryString } = initialValues;
+  const { limitDuration, timerange, queryString } = initialValues;
+  const initialTimeRange = timerange ? onInitializingTimerange(timerange) : timerange;
   const _initialValues = {
-    timerange: timerange ? onInitializingTimerange(timerange) : timerange,
+    limitDuration,
+    timerange: initialTimeRange,
+    nextTimeRange: initialTimeRange,
     queryString,
   };
 
@@ -66,6 +70,7 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
 
 DashboardSearchForm.propTypes = {
   initialValues: PropTypes.shape({
+    limitDuration: PropTypes.number,
     timerange: PropTypes.object,
     queryString: PropTypes.string,
   }).isRequired,

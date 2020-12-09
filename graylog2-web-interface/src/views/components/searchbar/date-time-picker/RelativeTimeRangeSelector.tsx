@@ -165,7 +165,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
           };
 
           const _onCheckAllTime = (event) => {
-            const notAllTime = originalTimeRange.range ? originalTimeRange.range : DEFAULT_TIMERANGE.range;
+            const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
 
             onChange({ target: { name, value: event.target.checked ? 0 : notAllTime } });
           };

@@ -70,7 +70,7 @@ describe('WidgetQueryControls', () => {
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <WrappingContainer>
-      <SearchBarForm initialValues={{ timerange: DEFAULT_TIMERANGE, queryString: '', streams: [] }} onSubmit={() => {}}>
+      <SearchBarForm initialValues={{ limitDuration: 0, timerange: DEFAULT_TIMERANGE, queryString: '', streams: [] }} onSubmit={() => {}}>
         {children}
       </SearchBarForm>
     </WrappingContainer>
