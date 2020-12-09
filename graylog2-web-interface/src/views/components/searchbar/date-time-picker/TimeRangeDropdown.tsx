@@ -113,7 +113,7 @@ const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, current
 const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) => {
   const formik = useFormikContext();
   const [originalTimerange, , originalTimerangeHelpers] = useField('timerange');
-  const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+  const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
 
   const originalRangeValue = useMemo(() => originalTimerange?.value, [originalTimerange]);
   const nextRangeValue = useMemo(() => nextRangeProps?.value || originalRangeValue, [nextRangeProps, originalRangeValue]);
@@ -134,7 +134,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
   const handleNoOverride = () => {
     formik.resetForm({
-      values: { timerange: {}, tempTimeRange: undefined },
+      values: { timerange: {}, nextTimeRange: undefined },
     });
 
     toggleDropdownShow();
@@ -142,7 +142,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
   const handleCancel = () => {
     formik.resetForm({
-      values: { timerange: originalRangeValue, tempTimeRange: undefined },
+      values: { timerange: originalRangeValue, nextTimeRange: undefined },
     });
 
     toggleDropdownShow();
@@ -150,7 +150,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
 
   const handleApply = () => {
     originalTimerangeHelpers.setValue(nextRangeValue);
-    formik.unregisterField('tempTimeRange');
+    formik.unregisterField('nextTimeRange');
     toggleDropdownShow();
   };
 

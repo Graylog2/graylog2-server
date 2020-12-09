@@ -158,7 +158,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }:
   const hourIcon = useRef(TIME_ICON_MID);
 
   return (
-    <Field name={`tempTimeRange[${range}]`} validate={_isValidDateString}>
+    <Field name={`nextTimeRange[${range}]`} validate={_isValidDateString}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 

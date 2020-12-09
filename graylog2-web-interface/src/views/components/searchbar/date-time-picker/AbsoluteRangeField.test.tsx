@@ -19,7 +19,7 @@ const defaultProps = {
 } as const;
 
 const initialValues = {
-  tempTimeRange: defaultProps.originalTimeRange,
+  nextTimeRange: defaultProps.originalTimeRange,
 };
 
 const renderWithForm = (element) => render((

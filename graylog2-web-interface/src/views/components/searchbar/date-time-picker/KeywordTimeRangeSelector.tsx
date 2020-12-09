@@ -69,7 +69,7 @@ const _validateKeyword = (
 };
 
 const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
-  const [nextRangeProps, , nextRangeHelpers] = useField('tempTimeRange');
+  const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const keywordRef = useRef();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
 
@@ -116,7 +116,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   return (
     <Row className="no-bm" style={{ marginLeft: 50 }}>
       <Col xs={3} style={{ padding: 0 }}>
-        <Field name="tempTimeRange.keyword" validate={_validate}>
+        <Field name="nextTimeRange.keyword" validate={_validate}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}

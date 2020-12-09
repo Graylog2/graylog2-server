@@ -19,7 +19,7 @@ const defaultProps = {
 } as const;
 
 const renderWithForm = (element) => render((
-  <Formik initialValues={{ tempTimeRange: defaultProps.originalTimeRange }}
+  <Formik initialValues={{ nextTimeRange: defaultProps.originalTimeRange }}
           onSubmit={() => {}}>
     <Form>
       {element}
