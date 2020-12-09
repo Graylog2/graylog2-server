@@ -26,6 +26,11 @@ import org.graylog2.plugin.database.users.User;
  * remain unchanged.
  */
 public interface UserManagementService extends UserService {
+
+    /**
+     * Additional method allows explicit update operations to be carried out
+     * (as opposed to calling .save)
+     */
     String update(User model) throws ValidationException;
 
     String changePassword(String id, String oldPassword, String newPassword) throws ValidationException;
