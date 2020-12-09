@@ -116,7 +116,9 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['clusterconfigentry:read']}>
         <NavigationLink path={Routes.SYSTEM.CONFIGURATIONS} description="Configurations" />
       </IfPermitted>
-      <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
+      <HideOnCloud>
+        <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
+      </HideOnCloud>
       <HideOnCloud>
         <IfPermitted permissions={['inputs:read']}>
           <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" />
