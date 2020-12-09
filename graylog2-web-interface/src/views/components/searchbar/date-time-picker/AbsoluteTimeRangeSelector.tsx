@@ -28,7 +28,7 @@ type Props = {
   disabled: boolean,
   originalTimeRange: TimeRange,
   limitDuration: number,
-  currentTimerange: AbsoluteTimeRange,
+  currentTimeRange: AbsoluteTimeRange,
 };
 
 const AbsoluteWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
@@ -56,7 +56,7 @@ const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   justify-content: center;
 `;
 
-const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange, currentTimerange }: Props) => {
+const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange, currentTimeRange }: Props) => {
   return (
     <AbsoluteWrapper>
       <RangeWrapper>
@@ -64,7 +64,7 @@ const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange,
                             originalTimeRange={originalTimeRange}
                             disabled={disabled}
                             limitDuration={limitDuration}
-                            currentTimerange={currentTimerange} />
+                            currentTimeRange={currentTimeRange} />
       </RangeWrapper>
 
       <IconWrap>
@@ -76,7 +76,7 @@ const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange,
                             originalTimeRange={originalTimeRange}
                             disabled={disabled}
                             limitDuration={limitDuration}
-                            currentTimerange={currentTimerange} />
+                            currentTimeRange={currentTimeRange} />
       </RangeWrapper>
     </AbsoluteWrapper>
   );
@@ -86,7 +86,7 @@ AbsoluteTimeRangeSelector.propTypes = {
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   limitDuration: PropTypes.number,
-  currentTimerange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  currentTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
 };
 
 AbsoluteTimeRangeSelector.defaultProps = {

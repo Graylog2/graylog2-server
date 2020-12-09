@@ -93,7 +93,7 @@ const DEFAULT_RANGES = {
   disabled: undefined,
 };
 
-const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, currentTimerange) => availableTimeRangeTypes.map(({ type, name }) => {
+const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, currentTimeRange) => availableTimeRangeTypes.map(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
@@ -104,7 +104,7 @@ const timeRangeTypeTabs = (activeKey, originalRangeValue, limitDuration, current
         <RangeComponent disabled={false}
                         originalTimeRange={originalRangeValue || DEFAULT_RANGES[type]}
                         limitDuration={limitDuration}
-                        currentTimerange={currentTimerange} />
+                        currentTimeRange={currentTimeRange} />
       )}
     </Tab>
   );
@@ -118,7 +118,7 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
   const originalRangeValue = useMemo(() => originalTimerange?.value, [originalTimerange]);
   const nextRangeValue = useMemo(() => nextRangeProps?.value || originalRangeValue, [nextRangeProps, originalRangeValue]);
   const limitDuration = useMemo(() => moment.duration(config.query_time_range_limit).asSeconds(), [config.query_time_range_limit]);
-  const currentTimerange = useMemo(() => nextRangeValue || originalRangeValue, [nextRangeValue, originalRangeValue]);
+  const currentTimeRange = useMemo(() => nextRangeValue || originalRangeValue, [nextRangeValue, originalRangeValue]);
 
   const [activeTab, setActiveTab] = useState(originalRangeValue?.type || 'disabled');
 
@@ -174,14 +174,14 @@ const TimeRangeDropdown = ({ config, noOverride, toggleDropdownShow }: Props) =>
                    arrowOffsetLeft={34}>
       <Row>
         <Col md={12}>
-          <TimeRangeLivePreview timerange={currentTimerange} />
+          <TimeRangeLivePreview timerange={currentTimeRange} />
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
                       activeKey={activeTab}
                       onSelect={onSelect}
                       animation={false}>
-            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, currentTimerange)}
+            {timeRangeTypeTabs(activeTab, originalRangeValue, limitDuration, currentTimeRange)}
           </StyledTabs>
         </Col>
       </Row>

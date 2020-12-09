@@ -21,7 +21,7 @@ import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 type Props = {
   disabled: boolean,
   from: boolean,
-  currentTimerange?: AbsoluteTimeRange,
+  currentTimeRange?: AbsoluteTimeRange,
   originalTimeRange: TimeRange,
   limitDuration?: number,
 };
@@ -153,7 +153,7 @@ const _isValidDateString = (dateString: string) => {
   return undefined;
 };
 
-const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }: Props) => {
+const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
 
@@ -162,7 +162,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }:
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
-        const dateTime = error ? currentTimerange[range] : value || currentTimerange[range];
+        const dateTime = error ? currentTimeRange[range] : value || currentTimeRange[range];
         const {
           initialDateTime,
           handleChangeSetTime,
@@ -198,7 +198,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }:
           _onChange(newDate);
         };
 
-        let fromDate = moment(currentTimerange.from).toDate();
+        let fromDate = moment(currentTimeRange.from).toDate();
 
         if (from) {
           fromDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
@@ -208,7 +208,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }:
           <>
             <DateInputWithPicker disabled={disabled}
                                  onChange={_onChangeDate}
-                                 value={value || currentTimerange[range]}
+                                 value={value || currentTimeRange[range]}
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
@@ -282,7 +282,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimerange }:
 
 AbsoluteRangeField.propTypes = {
   from: PropTypes.bool.isRequired,
-  currentTimerange: PropTypes.shape({
+  currentTimeRange: PropTypes.shape({
     from: PropTypes.string,
     to: PropTypes.string,
   }),
@@ -297,7 +297,7 @@ AbsoluteRangeField.propTypes = {
 AbsoluteRangeField.defaultProps = {
   disabled: false,
   limitDuration: 0,
-  currentTimerange: undefined,
+  currentTimeRange: undefined,
 };
 
 export default AbsoluteRangeField;
