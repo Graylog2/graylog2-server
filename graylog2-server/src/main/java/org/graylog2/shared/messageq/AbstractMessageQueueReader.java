@@ -30,29 +30,18 @@ public abstract class AbstractMessageQueueReader extends AbstractExecutionThread
     public void listenForLifecycleChanges(Lifecycle lifecycle) {
         switch (lifecycle) {
             case UNINITIALIZED:
-                shouldBeReading = false;
-                break;
             case STARTING:
+            case PAUSED:
+            case HALTING:
                 shouldBeReading = false;
                 break;
             case RUNNING:
-                shouldBeReading = true;
-                break;
             case THROTTLED:
                 shouldBeReading = true;
-                break;
-            case PAUSED:
-                shouldBeReading = false;
-                break;
-            case HALTING:
-                shouldBeReading = false;
                 break;
             case FAILED:
                 triggerShutdown();
                 break;
-            case OVERRIDE_LB_DEAD:
-            case OVERRIDE_LB_ALIVE:
-            case OVERRIDE_LB_THROTTLED:
             default:
                 // don't care, keep processing journal
                 break;
