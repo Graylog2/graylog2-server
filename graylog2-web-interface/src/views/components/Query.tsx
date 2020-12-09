@@ -58,7 +58,7 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget, titles) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget, setFocusWidget, titles) => {
   const widgets = {};
   const data = {};
   const errors = {};
@@ -89,21 +89,27 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 
   if (focusedWidget) {
     const widget = widgets[focusedWidget];
-    const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
 
-    return (
-      <WidgetContainer>
-        <WidgetComponent widget={widget}
-                         widgetId={widget.id}
-                         data={data}
-                         errors={errors}
-                         widgetDimension={{ height: 100, width: 200 }}
-                         title={title}
-                         position={WidgetPosition.builder().build()}
-                         fields={fields}
-                         allFields={allFields} />
-      </WidgetContainer>
-    );
+    if (widget) {
+      const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
+
+      return (
+        <WidgetContainer>
+          <WidgetComponent widget={widget}
+                           widgetId={widget.id}
+                           data={data}
+                           errors={errors}
+                           widgetDimension={{ height: 100, width: 200 }}
+                           title={title}
+                           position={WidgetPosition.builder().build()}
+                           fields={fields}
+                           allFields={allFields} />
+        </WidgetContainer>
+      );
+    }
+
+    // The focused widget does not exists anymore. So we unset it.
+    setFocusWidget(undefined);
   }
 
   return (
@@ -154,7 +160,7 @@ const EmptyDashboardInfo = () => (
 );
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
-  const { focusedWidget } = useContext(WidgetFocusContext);
+  const { focusedWidget, setFocusedWidget } = useContext(WidgetFocusContext);
   const titles = useStore(TitlesStore);
 
   if (!widgets || widgets.isEmpty()) {
@@ -171,6 +177,7 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
       fields,
       allFields,
       focusedWidget,
+      setFocusedWidget,
       titles,
     );
 
