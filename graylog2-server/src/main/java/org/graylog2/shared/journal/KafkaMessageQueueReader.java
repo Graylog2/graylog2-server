@@ -21,13 +21,10 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.plugin.journal.RawMessage;
-import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.messageq.MessageQueueReader;
+import org.graylog2.shared.messageq.AbstractMessageQueueReader;
 import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +39,13 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Singleton
-public class KafkaMessageQueueReader extends AbstractExecutionThreadService implements MessageQueueReader {
+public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
     private static final Logger log = LoggerFactory.getLogger(KafkaMessageQueueReader.class);
     private final Journal journal;
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
     private final MetricRegistry metricRegistry;
-    private final EventBus eventBus;
     private final Meter readMessages;
-    private volatile boolean shouldBeReading;
     private Histogram requestedReadCount;
     private final Counter readBlocked;
     private Thread executionThread;
@@ -61,63 +56,31 @@ public class KafkaMessageQueueReader extends AbstractExecutionThreadService impl
                          @Named("JournalSignal") Semaphore journalFilled,
                          MetricRegistry metricRegistry,
                          EventBus eventBus) {
+
+        super(eventBus);
+
         this.journal = journal;
         this.processBuffer = processBuffer;
         this.journalFilled = journalFilled;
         this.metricRegistry = metricRegistry;
-        this.eventBus = eventBus;
-        shouldBeReading = false;
         readBlocked = metricRegistry.counter(name(this.getClass(), "readBlocked"));
         readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
     }
 
     @Override
     protected void startUp() throws Exception {
-        eventBus.register(this);
+        super.startUp();
         executionThread = Thread.currentThread();
     }
 
     @Override
     protected void shutDown() throws Exception {
-        eventBus.unregister(this);
+        super.shutDown();
     }
 
     @Override
     protected void triggerShutdown() {
         executionThread.interrupt();
-    }
-
-    @Subscribe
-    public void listenForLifecycleChanges(Lifecycle lifecycle) {
-        switch (lifecycle) {
-            case UNINITIALIZED:
-                shouldBeReading = false;
-                break;
-            case STARTING:
-                shouldBeReading = false;
-                break;
-            case RUNNING:
-                shouldBeReading = true;
-                break;
-            case THROTTLED:
-                shouldBeReading = true;
-                break;
-            case PAUSED:
-                shouldBeReading = false;
-                break;
-            case HALTING:
-                shouldBeReading = false;
-                break;
-            case FAILED:
-                triggerShutdown();
-                break;
-            case OVERRIDE_LB_DEAD:
-            case OVERRIDE_LB_ALIVE:
-            case OVERRIDE_LB_THROTTLED:
-            default:
-                // don't care, keep processing journal
-                break;
-        }
     }
 
     @Override
@@ -131,7 +94,7 @@ public class KafkaMessageQueueReader extends AbstractExecutionThreadService impl
 
         while (isRunning()) {
             // TODO interfere with reading if we are not 100% certain we should be reading, see #listenForLifecycleChanges
-            if (!shouldBeReading) {
+            if (!shouldBeReading()) {
                 Uninterruptibles.sleepUninterruptibly(100, MILLISECONDS);
                 // don't read immediately, but check if we should be shutting down.
                 continue;
