@@ -39,7 +39,7 @@ public class PulsarServiceUrlValidator implements Validator<String> {
         try {
             final URI uri = new URI(value);
 
-            if (!validScheme.contains(uri.getScheme())) {
+            if (!validSchemes.contains(uri.getScheme())) {
                 throw new ValidationException("Parameter " + name + " is not a valid Pulsar service URL scheme");
             }
             if (uri.getHost() == null) {
