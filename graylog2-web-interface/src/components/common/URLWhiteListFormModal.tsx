@@ -55,13 +55,16 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     newUrlEntry: PropTypes.string,
     onUpdate: PropTypes.func,
     configuration: PropTypes.object,
+    currentUser: PropTypes.exact({
+      permissions: PropTypes.arrayOf(PropTypes.string),
+    }).isRequired,
+    urlType: PropTypes.oneOf(['regex', 'literal', ''] as const),
   };
 
   static defaultProps = {
     newUrlEntry: '',
     onUpdate: () => { return undefined; },
     configuration: {},
-    // eslint-disable-next-line react/default-props-match-prop-types
     urlType: '' as const,
   }
 
