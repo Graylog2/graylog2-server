@@ -40,9 +40,7 @@ type Props = {
 };
 
 const validate = (values) => {
-  const errors = {
-    tempTimeRange: undefined,
-  };
+  const errors: { tempTimeRange?: { from: string } } = {};
 
   if (values?.tempTimeRange?.type === 'absolute'
     && DateTime.isValidDateString(values.tempTimeRange.from)
