@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import { ClipboardButton, ControlledTableList, Icon, Timestamp, SearchForm, Spinner } from 'components/common';
 import { Button, Col, Panel, Row } from 'components/graylog';
-import type { Token } from 'actions/users/UsersActions';
+import type { Token, TokenSummary } from 'actions/users/UsersActions';
 import { sortByDate } from 'util/SortUtils';
 
 import CreateTokenForm from './CreateTokenForm';
@@ -57,7 +57,7 @@ type Props = {
   deletingToken: ?string,
   onCreate: (tokenName: string) => Promise<Token>,
   onDelete: (tokenId: string, tokenName: string) => void,
-  tokens: Token[],
+  tokens: TokenSummary[],
 };
 
 const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {

@@ -46,6 +46,7 @@ import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
+import org.graylog2.rest.models.users.responses.TokenSummary;
 import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.search.SearchQuery;
@@ -587,9 +588,9 @@ public class UsersResource extends RestResource {
             throw new ForbiddenException("Not allowed to list tokens for user " + username);
         }
 
-        final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
+        final ImmutableList.Builder<TokenSummary> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
-            tokenList.add(Token.create(token.getId(), token.getName(), token.getToken(), token.getLastAccess()));
+            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess()));
         }
 
         return TokenList.create(tokenList.build());

@@ -21,18 +21,25 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-
-import java.util.List;
+import org.joda.time.DateTime;
 
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class TokenList {
+public abstract class TokenSummary {
     @JsonProperty
-    public abstract List<TokenSummary> tokens();
+    public abstract String id();
+
+    @JsonProperty
+    public abstract String name();
+
+    @JsonProperty
+    public abstract DateTime lastAccess();
 
     @JsonCreator
-    public static TokenList create(@JsonProperty("tokens") List<TokenSummary> tokens) {
-        return new AutoValue_TokenList(tokens);
+    public static TokenSummary create(@JsonProperty("id") String id,
+                                      @JsonProperty("name") String name,
+                                      @JsonProperty("last_access") DateTime lastAccess) {
+        return new AutoValue_TokenSummary(id, name, lastAccess);
     }
 }

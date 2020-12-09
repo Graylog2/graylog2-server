@@ -28,7 +28,7 @@ import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
 import User from 'logic/users/User';
 import UsersActions from 'actions/users/UsersActions';
-import type { ChangePasswordRequest, Token, PaginatedUsers, UserCreate, UserUpdate } from 'actions/users/UsersActions';
+import type { ChangePasswordRequest, Token, TokenSummary, PaginatedUsers, UserCreate, UserUpdate } from 'actions/users/UsersActions';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
 export type PaginatedUsersResponse = PaginatedListJSON & {
@@ -103,7 +103,7 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadTokens(userId: string): Promise<Token[]> {
+    loadTokens(userId: string): Promise<TokenSummary[]> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(userId)).url);
       const promise = fetch('GET', url).then((response) => response.tokens);
       UsersActions.loadTokens.promise(promise);
