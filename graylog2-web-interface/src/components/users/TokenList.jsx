@@ -22,6 +22,7 @@ import styled from 'styled-components';
 import { ClipboardButton, ControlledTableList, Icon, Timestamp, SearchForm, Spinner } from 'components/common';
 import { Button, ButtonGroup, Col, Checkbox, Panel, Row } from 'components/graylog';
 import type { Token } from 'actions/users/UsersActions';
+import { sortByDate } from 'util/SortUtils';
 
 import CreateTokenForm from './CreateTokenForm';
 
@@ -67,7 +68,9 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
   const effectiveTokens = useMemo(() => {
     const queryRegex = new RegExp(query, 'i');
 
-    return tokens.filter(({ name }) => queryRegex.test(name));
+    return tokens
+      .filter(({ name }) => queryRegex.test(name))
+      .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
   const handleTokenCreation = (tokenName) => {
