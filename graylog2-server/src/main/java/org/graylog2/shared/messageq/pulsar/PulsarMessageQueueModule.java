@@ -21,6 +21,7 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 
 public class PulsarMessageQueueModule extends PluginModule {
@@ -28,6 +29,7 @@ public class PulsarMessageQueueModule extends PluginModule {
     protected void configure() {
         serviceBinder().addBinding().to(PulsarMessageQueueWriter.class).in(Scopes.SINGLETON);
         serviceBinder().addBinding().to(PulsarMessageQueueReader.class).in(Scopes.SINGLETON);
+        bind(MessageQueueReader.class).to(PulsarMessageQueueReader.class).in(Scopes.SINGLETON);
         bind(MessageQueueWriter.class).to(PulsarMessageQueueWriter.class).in(Scopes.SINGLETON);
         bind(MessageQueueAcknowledger.class).to(PulsarMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
 

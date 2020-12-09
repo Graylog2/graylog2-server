@@ -21,7 +21,8 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.apache.pulsar.client.api.BatchReceivePolicy;
 import org.apache.pulsar.client.api.ConsumerInterceptor;
 import org.apache.pulsar.client.api.Message;
@@ -32,6 +33,7 @@ import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.messageq.AbstractMessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueue;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.slf4j.Logger;
@@ -46,10 +48,10 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Singleton
-public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
-
+public class PulsarMessageQueueReader extends AbstractMessageQueueReader {
     private static final Logger LOG = LoggerFactory.getLogger(PulsarMessageQueueReader.class);
 
     private final String name;
@@ -70,7 +72,10 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
     @Inject
     public PulsarMessageQueueReader(MetricRegistry metricRegistry,
                                     Provider<ProcessBuffer> processBufferProvider,
+                                    EventBus eventBus,
                                     @Named("pulsar_service_url") String serviceUrl) {
+        super(eventBus);
+
         // Using a ProcessBuffer directly will lead to guice error:
         // "Please wait until after injection has completed to use this object."
         this.processBufferProvider = processBufferProvider;
@@ -86,6 +91,8 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
 
     @Override
     protected void startUp() throws Exception {
+        super.startUp();
+
         LOG.info("Starting pulsar message queue reader service: {}", name);
 
         this.client = PulsarClient.builder()
@@ -113,21 +120,28 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService {
             client.close();
             client.shutdown();
         }
+
+        super.shutDown();
     }
 
     @Override
     protected void run() throws Exception {
-        // TODO pause processing when LifeCycle changes
         // TODO add metrics
-        // TODO use GracefulShutdownService ?
         // TODO the JournalReader limits the read based on the remaining capacity in the processBuffer
         //      do we need this?   final long remainingCapacity = processBuffer.getRemainingCapacity();
 
         while (isRunning()) {
+            if (!shouldBeReading()) {
+                Uninterruptibles.sleepUninterruptibly(100, MILLISECONDS);
+                continue;
+            }
             final List<MessageQueue.Entry> entries = read();
             entries.forEach(entry -> {
                 LOG.info("Consumed message: {}", entry);
                 final RawMessage rawMessage = RawMessage.decode(entry.value(), entry.commitId());
+                // FIXME: on a full process buffer, where not a single entry is ever taken out again, this call will
+                //  block (obviously) forever. But it can't even be unblocked by interrupting the thread, e.g. for
+                //  shutting down the server. This will inhibit server shutdown when elastic search is down.
                 processBuffer.insertBlocking(rawMessage);
             });
         }
