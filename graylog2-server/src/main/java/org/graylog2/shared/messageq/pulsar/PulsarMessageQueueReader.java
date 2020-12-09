@@ -126,8 +126,9 @@ public class PulsarMessageQueueReader extends AbstractExecutionThreadService imp
             entries.forEach(entry -> {
                 LOG.info("Consumed message: {}", entry);
                 final RawMessage rawMessage = RawMessage.decode(entry.value(), entry.commitId());
-                // TODO: we need to interrupt the execution thread on shutdown to not inhibit server shutdown when
-                //  the buffer is full
+                // FIXME: on a full process buffer, where not a single entry is ever taken out again, this call will
+                //  block (obviously) forever. But it can't even be unblocked by interrupting the thread, e.g. for
+                //  shutting down the server. This will inhibit server shutdown when elastic search is down.
                 processBuffer.insertBlocking(rawMessage);
             });
         }
