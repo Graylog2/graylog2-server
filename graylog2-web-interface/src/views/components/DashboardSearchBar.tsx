@@ -25,7 +25,7 @@ import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
-import { Icon } from 'components/common';
+import { Icon, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
@@ -55,6 +55,10 @@ type Props = {
 };
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
+  if (!config) {
+    return <Spinner />;
+  }
+
   const submitForm = ({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
     .then(() => performSearch());
 
