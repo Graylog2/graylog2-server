@@ -61,10 +61,10 @@ const _isFunction = (children: Props['children']): children is (props: FormikPro
 
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
-    const newTimerange = onSubmittingTimerange(timerange);
+    const newTimeRange = onSubmittingTimerange(timerange);
 
     return onSubmit({
-      timerange: newTimerange,
+      timerange: newTimeRange,
       streams,
       queryString,
     });
