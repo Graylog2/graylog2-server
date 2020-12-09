@@ -31,7 +31,7 @@ import java.util.List;
  *          <pre>pulsar+ssl://localhost:6550</pre>
  */
 public class PulsarServiceUrlValidator implements Validator<String> {
-    private static final List<String> validScheme = Arrays.asList("pulsar", "pulsar+ssl");
+    private static final List<String> validSchemes = Arrays.asList("pulsar", "pulsar+ssl");
 
     @Override
     public void validate(String name, String value) throws ValidationException {
