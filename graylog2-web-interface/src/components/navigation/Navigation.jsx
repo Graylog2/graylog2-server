@@ -145,9 +145,7 @@ const Navigation = ({ location }: Props) => {
 
         <Nav navbar pullRight className="header-meta-nav">
           {AppConfig.isCloud() ? (
-            <div style={{ pointerEvents: 'none' }}>
-              <GlobalThroughput />
-            </div>
+            <GlobalThroughput disabled />
           ) : (
             <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
               <GlobalThroughput />
