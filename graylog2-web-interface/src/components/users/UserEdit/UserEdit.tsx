@@ -42,8 +42,8 @@ type Props = {
   user: User,
 };
 
-const _updateUser = (data, currentUser, userId) => {
-  return UsersDomain.update(userId, data).then(() => {
+const _updateUser = (data, currentUser, userId, fullName) => {
+  return UsersDomain.update(userId, data, fullName).then(() => {
     if (userId === currentUser?.id) {
       CurrentUserStore.reload();
     }
@@ -75,10 +75,10 @@ const UserEdit = ({ user }: Props) => {
           ) }
           { !user.external && (
           <ProfileSection user={user}
-                          onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
+                          onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           ) }
           <SettingsSection user={user}
-                           onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
+                           onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           <IfPermitted permissions={`users:passwordchange:${user.username}`}>
             { !user.external && <PasswordSection user={user} /> }
           </IfPermitted>
@@ -88,7 +88,7 @@ const UserEdit = ({ user }: Props) => {
           <PermissionsUpdateInfo />
           <IfPermitted permissions="users:rolesedit">
             <RolesSection user={user}
-                          onSubmit={(data) => _updateUser(data, currentUser, user.id)} />
+                          onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           </IfPermitted>
           <IfPermitted permissions="teams:edit">
             <TeamsSection user={user} />
