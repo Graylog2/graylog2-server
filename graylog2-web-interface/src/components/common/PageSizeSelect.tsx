@@ -24,11 +24,13 @@ const Wrapper = styled.div`
   margin-bottom: 5px;
 
   && .form-group {
-    margin-bottom: 0
+    margin-bottom: 0;
   }
+
   .control-label {
     padding-top: 0;
   }
+
   .page-size-select {
     display: flex;
     align-items: baseline;

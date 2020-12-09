@@ -36,7 +36,7 @@ type Props = {
 export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
   position: ${sidebarIsPinned ? 'relative' : 'fixed'};
   width: 270px;
-  height:  ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; // subtract the nav height
+  height: ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
   top: ${sidebarIsPinned ? 0 : '50px'};
   left: ${sidebarIsPinned ? 0 : '50px'};
 
@@ -56,7 +56,7 @@ export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, side
       width: 6px;
       border-top-left-radius: 50%;
       background: transparent;
-      box-shadow: -6px -6px 0px 3px ${theme.colors.global.contentBackground};
+      box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
       z-index: 4; /* to render over Sidebar ContentColumn */
     }
   `}
@@ -138,9 +138,9 @@ const SectionContent = styled.div`
   grid-row: 2;
   -ms-grid-row: 2;
 
-  // Fixes padding problem with padding-bottom from container
+  /* Fixes padding problem with padding-bottom from container */
   > *:last-child {
-    padding-bottom: 15px;;
+    padding-bottom: 15px;
   }
 `;
 

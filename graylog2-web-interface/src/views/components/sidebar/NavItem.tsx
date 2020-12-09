@@ -78,7 +78,7 @@ const IconWrap = styled.span`
 `;
 
 const Container = styled.div<ContainerProps>(({ theme, isSelected, showTitleOnHover, sidebarIsPinned }) => css`
-position: relative;
+  position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
   height: 40px;

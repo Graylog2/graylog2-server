@@ -67,11 +67,11 @@ const CustomOption = (optionRenderer: (Option) => React.ReactElement) => (
     );
   }
 );
-/* eslint-enable react/prop-types */
 
 const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement) => (
   ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
 );
+/* eslint-enable react/prop-types */
 
 const CustomInput = (inputProps: { [key: string]: any }) => (
   (props) => <Components.Input {...props} {...inputProps} />

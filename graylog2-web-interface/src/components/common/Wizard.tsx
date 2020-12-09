@@ -98,7 +98,8 @@ const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
         border-right: 0;
         border-left: 0;
 
-        &:last-child a, &:first-child a {
+        &:last-child a,
+        &:first-child a {
           border-radius: 0;
         }
 

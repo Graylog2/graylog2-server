@@ -34,19 +34,19 @@ const Container = styled.div<{ isOpen: boolean, sidebarIsPinned: boolean }>(({ i
   box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
   width: 50px;
   height: 100%;
-  position:relative;
+  position: relative;
   z-index: 1031;
 
   ::before {
     content: '';
     position: absolute;
-    top: 0px;
+    top: 0;
     right: -6px;
     height: 6px;
     width: 6px;
     border-top-left-radius: 50%;
     background: transparent;
-    box-shadow: -6px -6px 0px 3px ${theme.colors.global.navigationBackground};
+    box-shadow: -6px -6px 0 3px ${theme.colors.global.navigationBackground};
     z-index: 4; /* to render over Sidebar ContentColumn */
   }
 `);

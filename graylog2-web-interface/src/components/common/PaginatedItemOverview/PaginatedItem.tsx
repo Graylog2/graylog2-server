@@ -34,7 +34,7 @@ const Container = styled.span(({ theme }) => css`
 
   :nth-of-type(even) {
     background-color: ${theme.colors.table.backgroundAlt};
-  };
+  }
 `);
 
 const Header = styled.div`

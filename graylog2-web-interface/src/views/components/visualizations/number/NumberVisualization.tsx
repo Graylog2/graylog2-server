@@ -27,10 +27,7 @@ import DecoratedValue from 'views/components/messagelist/decoration/DecoratedVal
 import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import type {
-  VisualizationComponent,
-  VisualizationComponentProps,
-} from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import Trend from './Trend';

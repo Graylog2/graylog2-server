@@ -47,6 +47,7 @@ const List = styled.div(({ theme }) => `
 const PaginationWrapper = styled.ul`
   display: flex;
   justify-content: center;
+
   .pagination {
     margin: 10px 0 0 0;
   }
