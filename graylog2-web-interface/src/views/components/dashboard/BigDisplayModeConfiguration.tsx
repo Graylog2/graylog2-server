@@ -25,7 +25,6 @@ import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 export type UntypedBigDisplayModeQuery = {

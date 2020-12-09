@@ -21,6 +21,7 @@ import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import FieldsOverview from './FieldsOverview';
+
 import WidgetFocusContext from '../../contexts/WidgetFocusContext';
 
 jest.mock('views/stores/ViewMetadataStore', () => ({

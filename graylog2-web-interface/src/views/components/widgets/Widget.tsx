@@ -44,7 +44,6 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { IconButton } from 'components/common';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 

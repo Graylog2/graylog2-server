@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
-import { CurrentViewStateStore, CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -34,10 +34,10 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetComponent from 'views/components/WidgetComponent';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   .container-fluid & {
