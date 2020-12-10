@@ -14,7 +14,7 @@ const defaultProps = {
 };
 
 const initialValues = {
-  tempTimeRange: defaultProps.originalTimeRange,
+  nextTimeRange: defaultProps.originalTimeRange,
 };
 
 type Props = {

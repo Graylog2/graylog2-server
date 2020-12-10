@@ -133,7 +133,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
 
   return (
     <RelativeWrapper>
-      <Field name="tempTimeRange.range" validate={_isValidRange}>
+      <Field name="nextTimeRange.range" validate={_isValidRange}>
         {({ field: { value, onChange, name }, meta: { error } }) => {
           const fromValue = RANGE_TYPES.map(({ type }) => {
             const isAllTime = value === 0;
