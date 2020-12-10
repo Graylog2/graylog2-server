@@ -21,7 +21,7 @@ import lodash from 'lodash';
 import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { MultiSelect, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
-import FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
 // TODO: Default body template should come from the server
@@ -79,7 +79,7 @@ class EmailNotificationForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
 
-    this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
+    this.propagateChange(name, getValueFromInput(event.target));
   };
 
   handleBodyTemplateChange = (nextValue) => {
