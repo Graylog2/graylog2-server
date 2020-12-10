@@ -20,6 +20,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
@@ -61,7 +62,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -108,8 +108,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                 }
 
                 @Override
-                public List<String> streamIds() {
-                    return Collections.singletonList(STREAM_ID);
+                public Set<String> streamIds() {
+                    return ImmutableSet.of(STREAM_ID);
                 }
 
                 @Override

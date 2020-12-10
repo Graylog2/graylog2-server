@@ -17,27 +17,27 @@
 package org.graylog2.indexer.searches;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
 public abstract class IndexRangeStats {
-    public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), Collections.emptyList());
+    public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), ImmutableSet.of());
 
     public abstract DateTime min();
 
     public abstract DateTime max();
 
     @Nullable
-    public abstract List<String> streamIds();
+    public abstract Set<String> streamIds();
 
-    public static IndexRangeStats create(DateTime min, DateTime max, @Nullable List<String> streamIds) {
+    public static IndexRangeStats create(DateTime min, DateTime max, @Nullable Set<String> streamIds) {
         return new AutoValue_IndexRangeStats(min, max, streamIds);
     }
 

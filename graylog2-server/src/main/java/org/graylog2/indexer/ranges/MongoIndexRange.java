@@ -27,7 +27,7 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Set;
 
 
 @AutoValue
@@ -74,7 +74,7 @@ public abstract class MongoIndexRange implements IndexRange {
     @JsonProperty(FIELD_STREAM_IDS)
     @Override
     @Nullable
-    public abstract List<String> streamIds();
+    public abstract Set<String> streamIds();
 
     public static MongoIndexRange create(ObjectId id,
                                          String indexName,
@@ -82,7 +82,7 @@ public abstract class MongoIndexRange implements IndexRange {
                                          DateTime end,
                                          DateTime calculatedAt,
                                          int calculationDuration,
-                                         List<String> streamIds) {
+                                         Set<String> streamIds) {
         return new AutoValue_MongoIndexRange(id, indexName, begin, end, calculatedAt, calculationDuration, streamIds);
     }
 
@@ -93,7 +93,7 @@ public abstract class MongoIndexRange implements IndexRange {
                                          @JsonProperty(FIELD_END) long endMillis,
                                          @JsonProperty(FIELD_CALCULATED_AT) long calculatedAtMillis,
                                          @JsonProperty(FIELD_TOOK_MS) int calculationDuration,
-                                         @JsonProperty(FIELD_STREAM_IDS) @Nullable List<String> streamIds) {
+                                         @JsonProperty(FIELD_STREAM_IDS) @Nullable Set<String> streamIds) {
         final DateTime begin = new DateTime(beginMillis, DateTimeZone.UTC);
         final DateTime end = new DateTime(endMillis, DateTimeZone.UTC);
         final DateTime calculatedAt = new DateTime(calculatedAtMillis, DateTimeZone.UTC);
@@ -105,7 +105,7 @@ public abstract class MongoIndexRange implements IndexRange {
                                          DateTime end,
                                          DateTime calculatedAt,
                                          int calculationDuration,
-                                         List<String> streamIds) {
+                                         Set<String> streamIds) {
         return create(null, indexName, begin, end, calculatedAt, calculationDuration, streamIds);
     }
 
