@@ -139,7 +139,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     return {};
   };
 
-  closeOnChildrenSelect = (children: React.ReactElement | Array<React.ReactElement>, updateDepth: number) => {
+  closeOnChildrenSelect = (children: React.ReactNode, updateDepth: number) => {
     const maxChildDepth = 2;
 
     if (updateDepth > maxChildDepth) {
@@ -148,10 +148,10 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
     return React.Children.map(
       children,
-      (child: React.ReactElement) => child && React.cloneElement(child, {
+      (child: React.ReactElement) => (child?.props ? React.cloneElement(child, {
         ...child.props,
         ...this.closeOnChildSelect(child, updateDepth + 1),
-      }),
+      }) : child),
     );
   }
 
