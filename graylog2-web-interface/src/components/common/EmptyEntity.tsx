@@ -16,11 +16,9 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
-
-const Container: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;

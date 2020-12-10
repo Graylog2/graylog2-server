@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-const ColorPreview: StyledComponent<{ color: string }, void, HTMLDivElement> = styled.div(({ color }) => css`
+const ColorPreview = styled.div<{ color: string }>(({ color }) => css`
   height: 2rem;
   width: 2rem;
   margin-right: 0.4rem;

@@ -17,12 +17,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import Icon from 'components/common/Icon';
 
-const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.button(({ theme }) => css`
+const Wrapper = styled.button(({ theme }) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;

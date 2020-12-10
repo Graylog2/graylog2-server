@@ -17,10 +17,10 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
-import { withTheme } from 'styled-components';
+import { DefaultTheme, withTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
-import { themePropTypes, ThemeInterface } from 'theme';
+import { themePropTypes } from 'theme';
 
 import Icon from './Icon';
 
@@ -204,17 +204,19 @@ type Props = {
   disabled?: boolean,
   displayKey: string,
   ignoreAccents?: boolean,
+  inputId?: string,
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
   onChange: (string) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
   size?: 'normal' | 'small',
-  theme: ThemeInterface,
-  value?: string,
+  theme: DefaultTheme,
+  value?: Object | Array<Object> | null | undefined,
   valueKey: string,
   valueRenderer?: (option: Option) => React.ReactElement,
 };
@@ -246,6 +248,8 @@ class Select extends React.Component<Props, State> {
     disabled: PropTypes.bool,
     /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
     displayKey: PropTypes.string,
+    /** Id of underlying input */
+    inputId: PropTypes.string,
     /** Indicates whether the auto-completion should return results including accents/diacritics when searching for their non-accent counterpart */
     ignoreAccents: PropTypes.bool,
     /**
@@ -257,6 +261,8 @@ class Select extends React.Component<Props, State> {
     matchProp: PropTypes.oneOf(['any', 'label', 'value']),
     /** Specifies if multiple values can be selected or not. */
     multi: PropTypes.bool,
+    /** Callback when select has lost focus */
+    onBlur: PropTypes.func,
     /**
      * Callback when selected option changes. It receives the value of the
      * selected option as an argument. If `multi` is enabled, the passed
@@ -278,10 +284,14 @@ class Select extends React.Component<Props, State> {
     /** @ignore */
     theme: themePropTypes.isRequired,
     /**
-     * String containing the selected value. If `multi` is enabled, it must
-     * be a string containing all values separated by the `delimiter`.
+     * Value which can be the selected option or the value of the selected option.
+     * If `multi` is enabled, it must be a string containing all values separated by the `delimiter`.
      */
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.object,
+      PropTypes.arrayOf(PropTypes.object),
+    ]),
     /** Indicates which option object key contains the value of the option. */
     valueKey: PropTypes.string,
     /** Custom function to render the selected option in the Select. */
@@ -292,7 +302,9 @@ class Select extends React.Component<Props, State> {
     autoFocus: PropTypes.bool,
     /** special onChange handler */
     onReactSelectChange: PropTypes.func,
-  };
+    /** Select placeholder text */
+    placeholder: PropTypes.string,
+  }
 
   static defaultProps = {
     addLabelText: undefined,
@@ -304,11 +316,14 @@ class Select extends React.Component<Props, State> {
     disabled: false,
     displayKey: 'label',
     ignoreAccents: true,
+    inputId: undefined,
+    onBlur: undefined,
     inputProps: undefined,
     matchProp: 'any',
     multi: false,
     onReactSelectChange: undefined,
     optionRenderer: undefined,
+    placeholder: undefined,
     size: 'normal',
     value: undefined,
     valueKey: 'value',

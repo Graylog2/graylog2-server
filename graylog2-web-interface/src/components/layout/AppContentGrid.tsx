@@ -17,7 +17,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { Grid } from 'components/graylog';
 
@@ -25,7 +24,7 @@ type Props = {
   children: React.ReactNode,
 };
 
-const Container: StyledComponent<Props, void, HTMLDivElement> = styled.div`
+const Container = styled.div`
   padding: 15px 12px;
 `;
 

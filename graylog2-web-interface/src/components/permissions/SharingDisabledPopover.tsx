@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import HoverForHelp from 'components/common/HoverForHelp';
 
 type Props = {
@@ -25,7 +24,7 @@ type Props = {
   description?: string,
 };
 
-const StyledHoverForHelp: StyledComponent<{}, ThemeInterface, typeof HoverForHelp> = styled(HoverForHelp)`
+const StyledHoverForHelp = styled(HoverForHelp)`
   margin-left: 8px;
 `;
 

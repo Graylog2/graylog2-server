@@ -38,7 +38,7 @@ describe('PivotSelect', () => {
   };
   const SimplePivotSelect = ({ fieldTypes }: SimplePivotProps) => (
     <FieldTypesContext.Provider value={fieldTypes}>
-      <PivotSelect onChange={() => {}} value={[]} />
+      <PivotSelect onChange={() => {}} value={[]} options={[]} />
     </FieldTypesContext.Provider>
   );
 
@@ -54,7 +54,7 @@ describe('PivotSelect', () => {
 
   it('renders properly with `undefined` fields', () => {
     suppressConsole(() => {
-      const wrapper = mount(<PivotSelect onChange={() => {}} value={[]} />);
+      const wrapper = mount(<PivotSelect onChange={() => {}} value={[]} options={[]} />);
 
       expect(wrapper).not.toBeEmptyRender();
     });

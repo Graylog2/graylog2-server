@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
 import { Field, useField } from 'formik';
@@ -26,13 +25,12 @@ import { Field, useField } from 'formik';
 import { Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
-import type { ThemeInterface } from 'theme';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, typeof FormControl> = styled(FormControl)(({ theme }) => css`
+const KeywordInput = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);
