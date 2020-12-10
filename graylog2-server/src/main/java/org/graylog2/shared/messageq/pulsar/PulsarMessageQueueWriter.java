@@ -27,7 +27,6 @@ import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.Producer;
 import org.apache.pulsar.client.api.ProducerInterceptor;
 import org.apache.pulsar.client.api.PulsarClient;
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.client.api.TypedMessageBuilder;
 import org.graylog2.shared.buffers.RawMessageEvent;
@@ -40,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -134,9 +134,11 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
             LOG.debug("Sending message {} (producer {})", entry, producer.getProducerName());
 
             try (final Timer.Context ignored = writeTimer.time()) {
-                newMessage.send();
-            } catch (PulsarClientException e) {
-                throw new MessageQueueException("Couldn't send entry <" + entry.toString() + ">", e);
+                final CompletableFuture<MessageId> sendFuture = newMessage.sendAsync();
+                sendFuture.exceptionally(ex -> {
+                    LOG.warn("sendAsync exception", ex);
+                    return null;
+                });
             }
         }
     }
