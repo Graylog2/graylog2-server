@@ -155,24 +155,12 @@ const fieldUpdate = (value) => {
   };
 };
 
-const _isValidDateString = (dateString: string) => {
-  if (!dateString) {
-    return 'Date is required.';
-  }
-
-  if (!DateTime.isValidDateString(dateString)) {
-    return 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
-  }
-
-  return undefined;
-};
-
 const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
 
   return (
-    <Field name={`nextTimeRange[${range}]`} validate={_isValidDateString}>
+    <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
