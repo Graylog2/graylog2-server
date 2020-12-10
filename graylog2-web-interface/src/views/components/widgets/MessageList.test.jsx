@@ -110,8 +110,7 @@ describe('MessageList', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
-    const wrapper1 = mount(<MessageList editing
-                                        data={data}
+    const wrapper1 = mount(<MessageList data={data}
                                         config={config}
                                         fields={Immutable.List(fields)}
                                         setLoadingState={() => {}} />);
@@ -120,8 +119,7 @@ describe('MessageList', () => {
 
     const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
-    const wrapper2 = mount(<MessageList editing
-                                        data={data}
+    const wrapper2 = mount(<MessageList data={data}
                                         config={emptyConfig}
                                         fields={Immutable.List(fields)}
                                         setLoadingState={() => {}} />);
@@ -131,8 +129,7 @@ describe('MessageList', () => {
   it('provides a message context for each individual entry', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
-    const wrapper = mount(<MessageList editing
-                                       data={data}
+    const wrapper = mount(<MessageList data={data}
                                        fields={Immutable.List(fields)}
                                        config={config}
                                        setLoadingState={() => {}} />);
@@ -144,8 +141,7 @@ describe('MessageList', () => {
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
-    mount(<MessageList editing
-                       data={data}
+    mount(<MessageList data={data}
                        fields={Immutable.List([])}
                        config={config}
                        setLoadingState={() => {}} />);
@@ -154,8 +150,7 @@ describe('MessageList', () => {
   it('refreshs Inputs list upon mount', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (
-      <MessageList editing
-                   data={data}
+      <MessageList data={data}
                    fields={Immutable.List([])}
                    config={config}
                    setLoadingState={() => {}} />
@@ -168,8 +163,7 @@ describe('MessageList', () => {
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList editing
-                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
@@ -180,8 +174,7 @@ describe('MessageList', () => {
   it('disables refresh actions, when using pagination', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList editing
-                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
@@ -196,8 +189,7 @@ describe('MessageList', () => {
 
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList editing
-                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        onSortChange={() => {}}
@@ -212,8 +204,7 @@ describe('MessageList', () => {
   it('calls render completion callback after first render', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (
-      <MessageList editing
-                   data={data}
+      <MessageList data={data}
                    fields={Immutable.List([])}
                    config={config}
                    onSortChange={() => {}}
