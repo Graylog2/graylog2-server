@@ -38,8 +38,7 @@ type ContainerProps = {
   setColor: ChangeColorFunction,
 };
 
-// eslint-disable-next-line no-unused-vars
-const Container = ({ colors, setColor }: ContainerProps) => <div>Hello!</div>;
+const Container: React.FC<ContainerProps> = () => <div>Hello!</div>;
 
 describe('WidgetColorContext', () => {
   const colorRules: Array<ColorRule> = [
