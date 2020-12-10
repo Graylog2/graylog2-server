@@ -19,24 +19,25 @@ import styled, { StyledComponent } from 'styled-components';
 import { ThemeInterface } from 'theme';
 
 const ConfigSummaryDefinitionListWrapper: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
-    dl {
-        margin-top: 10px;
-        dt {
-            float: left;
-            clear: left;
-        }
+  dl {
+    margin-top: 10px;
 
-        dd {
-            margin-left: 185px;
-            word-wrap: break-word;
-            &:not(:last-child) {
-                border-bottom: 1px solid #ececec;
-                margin-bottom: 5px;
-                padding-bottom: 5px;
-            }
-        }
+    dt {
+      float: left;
+      clear: left;
     }
-    
+
+    dd {
+      margin-left: 185px;
+      word-wrap: break-word;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid #ececec;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+      }
+    }
+  }
 `;
 
 export default ConfigSummaryDefinitionListWrapper;

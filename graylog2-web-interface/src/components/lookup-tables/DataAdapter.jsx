@@ -22,7 +22,7 @@ import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ContentPackMarker } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -35,13 +35,17 @@ class DataAdapter extends React.Component {
     dataAdapter: PropTypes.object.isRequired,
   };
 
-  state = {
-    lookupKey: null,
-    lookupResult: null,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      lookupKey: null,
+      lookupResult: null,
+    };
+  }
 
   _onChange = (event) => {
-    this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
+    this.setState({ lookupKey: getValueFromInput(event.target) });
   };
 
   _lookupKey = (e) => {
