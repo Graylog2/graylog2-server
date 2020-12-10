@@ -122,6 +122,4 @@ QueryInput.defaultProps = {
 
 const mapping = { completers: 'views.completers' };
 
-type PropsWithDefaults = JSX.LibraryManagedAttributes<typeof QueryInput, React.ComponentProps<typeof QueryInput>>;
-
-export default withPluginEntities(withTheme(QueryInput) as React.ComponentType<Omit<PropsWithDefaults, 'theme'>>, mapping);
+export default withPluginEntities(withTheme(QueryInput), mapping);
