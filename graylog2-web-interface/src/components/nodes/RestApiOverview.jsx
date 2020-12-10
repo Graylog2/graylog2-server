@@ -16,19 +16,33 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
+
+const StyledDl = styled.dl`
+  margin-top: 5px;
+  margin-bottom: 0;
+
+  dt {
+    float: left;
+  }
+
+  dd {
+    margin-left: 150px;
+  }
+`;
 
 const RestApiOverview = ({ node }) => {
   const { transport_address, last_seen } = node;
 
   return (
-    <dl className="system-rest">
+    <StyledDl>
       <dt>Transport address:</dt>
       <dd>{transport_address}</dd>
       <dt>Last seen:</dt>
       <dd><Timestamp dateTime={last_seen} relative /></dd>
-    </dl>
+    </StyledDl>
   );
 };
 

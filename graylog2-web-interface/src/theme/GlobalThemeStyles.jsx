@@ -371,14 +371,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-left: 180px;
   }
 
-  .system-rest dt {
-    float: left;
-  }
-
-  .system-rest dd {
-    margin-left: 120px;
-  }
-
   .search-help {
     margin: 0 5px;
     line-height: 34px;
@@ -559,11 +551,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   div.row-sm {
     margin-bottom: 5px;
-  }
-
-  dl.system-rest {
-    margin-top: 5px;
-    margin-bottom: 0;
   }
 
   .table-sm {
