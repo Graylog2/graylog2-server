@@ -68,7 +68,7 @@ describe('SelectExtractorType', () => {
     expect(select).toExist();
     expect(select.at(0)).toHaveProp('placeholder', 'Select extractor type');
 
-    onChange('grok', 'set-value');
+    onChange('grok');
     form.simulate('submit');
 
     expect(window.open).toHaveBeenCalled();
