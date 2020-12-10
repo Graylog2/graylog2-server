@@ -16,7 +16,15 @@
  */
 import chroma from 'chroma-js';
 
-import { RelativeTimeRange } from 'views/logic/queries/Query';
+import { RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
+
+export type FormikValues = {
+  limitDuration: number,
+  nextTimeRange?: TimeRange,
+  timerange: TimeRange,
+  streams: Array<string>,
+  queryString: string,
+};
 
 export const TIMESTAMP_FIELD = 'timestamp';
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, 'source'];

@@ -18,14 +18,15 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { FormikValues } from 'views/Constants';
 
-import SearchBarForm, { Values } from './SearchBarForm';
+import SearchBarForm from './SearchBarForm';
 import AbsoluteTimeRangeSelector from './date-time-picker/AbsoluteTimeRangeSelector';
 
 describe('SearchBarForm', () => {
   describe('with AbsoluteTimeRangeSelector', () => {
     it('renders', () => {
-      const initialValues: Values & { timerange: AbsoluteTimeRange } = {
+      const initialValues: FormikValues & { timerange: AbsoluteTimeRange } = {
         limitDuration: 0,
         timerange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-17 10:04:30.329' },
         queryString: '*',

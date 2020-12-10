@@ -22,7 +22,7 @@ import moment from 'moment';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
-import { availableTimeRangeTypes } from 'views/Constants';
+import { availableTimeRangeTypes, FormikValues } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { ThemeInterface } from 'theme';
@@ -125,7 +125,7 @@ const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, curren
 });
 
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
-  const { initialValues, isValid, setFieldValue, unregisterField, values } = useFormikContext();
+  const { initialValues, isValid, setFieldValue, unregisterField, values } = useFormikContext<FormikValues>();
   const limitDuration = initialValues?.limitDuration;
   const originalTimeRange = initialValues?.timerange;
   const currentTimeRange = values?.nextTimeRange;

@@ -23,21 +23,13 @@ import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
 
 import DateTime from 'logic/datetimes/DateTime';
-import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
-
-export type Values = {
-  limitDuration: number,
-  nextTimeRange?: TimeRange,
-  timerange: TimeRange,
-  streams: Array<string>,
-  queryString: string,
-};
+import type { FormikValues } from 'views/Constants';
 
 type Props = {
-  initialValues: Values,
+  initialValues: FormikValues,
   onSubmit: (Values) => void | Promise<any>,
-  children: ((props: FormikProps<Values>) => React.ReactNode) | React.ReactNode,
+  children: ((props: FormikProps<FormikValues>) => React.ReactNode) | React.ReactNode,
 };
 
 const validate = (values) => {
@@ -58,7 +50,7 @@ const StyledForm = styled(Form)`
   height: 100%;
 `;
 
-const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
+const _isFunction = (children: Props['children']): children is (props: FormikProps<FormikValues>) => React.ReactElement => isFunction(children);
 
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
