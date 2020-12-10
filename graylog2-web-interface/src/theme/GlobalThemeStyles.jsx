@@ -345,14 +345,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
   }
 
-  .system-system dt {
-    float: left;
-  }
-
-  .system-system dd {
-    margin-left: 75px;
-  }
-
   dl.system-journal {
     margin-top: 5px;
     margin-bottom: 0;
@@ -569,7 +561,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 5px;
   }
 
-  dl.system-system,
   dl.system-rest {
     margin-top: 5px;
     margin-bottom: 0;

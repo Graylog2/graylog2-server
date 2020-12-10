@@ -26,6 +26,19 @@ const _getInitialState = () => {
   return { time: moment() };
 };
 
+const StyledDl = styled.dl`
+  margin-top: 5px;
+  margin-bottom: 0;
+
+  dt {
+    float: left;
+  }
+
+  dd {
+    margin-left: 95px;
+  }
+`;
+
 class SystemInformation extends React.Component {
   static propTypes = {
     node: PropTypes.object.isRequired,
@@ -62,7 +75,7 @@ class SystemInformation extends React.Component {
     }
 
     return (
-      <dl className="system-system">
+      <StyledDl>
         <dt>Hostname:</dt>
         <dd>{hostname}</dd>
         <dt>Node ID:</dt>
@@ -73,7 +86,7 @@ class SystemInformation extends React.Component {
         <dd>{jvmInformationText}</dd>
         <dt>Time:</dt>
         <dd><Timestamp dateTime={time} format={DateTime.Formats.DATETIME_TZ} tz={timezone} /></dd>
-      </dl>
+      </StyledDl>
     );
   }
 }
