@@ -146,23 +146,28 @@ class EventNotificationForm extends React.Component {
 
             {notificationFormComponent}
 
-            <FormGroup>
-              <ControlLabel>Test Notification <small className="text-muted">(Optional)</small></ControlLabel>
-              <FormControl.Static>
-                <Button bsStyle="info" bsSize="small" disabled={testResult.isLoading} onClick={this.handleTestTrigger}>
-                  {testButtonText}
-                </Button>
-              </FormControl.Static>
-              {testResult.message && (
-                <Alert bsStyle={testResult.error ? 'danger' : 'success'}>
-                  <b>{testResult.error ? 'Error: ' : 'Success: '}</b>
-                  {testResult.message}
-                </Alert>
-              )}
-              <HelpBlock>
-                Execute this Notification with a test Alert.
-              </HelpBlock>
-            </FormGroup>
+            {notificationFormComponent && (
+              <FormGroup>
+                <ControlLabel>Test Notification <small className="text-muted">(Optional)</small></ControlLabel>
+                <FormControl.Static>
+                  <Button bsStyle="info"
+                          bsSize="small"
+                          disabled={testResult.isLoading}
+                          onClick={this.handleTestTrigger}>
+                    {testButtonText}
+                  </Button>
+                </FormControl.Static>
+                {testResult.message && (
+                  <Alert bsStyle={testResult.error ? 'danger' : 'success'}>
+                    <b>{testResult.error ? 'Error: ' : 'Success: '}</b>
+                    {testResult.message}
+                  </Alert>
+                )}
+                <HelpBlock>
+                  Execute this Notification with a test Alert.
+                </HelpBlock>
+              </FormGroup>
+            )}
 
             {!embedded && (
               <ButtonToolbar>
