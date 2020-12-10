@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import Select from 'views/components/Select';
+import Select from 'components/common/Select';
 
 import StreamsFilter from './StreamsFilter';
 
