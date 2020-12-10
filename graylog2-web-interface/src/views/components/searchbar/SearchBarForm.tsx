@@ -32,7 +32,7 @@ type Props = {
   children: ((props: FormikProps<FormikValues>) => React.ReactNode) | React.ReactNode,
 };
 
-const validate = (values) => {
+export const dateTimeValidate = (values) => {
   const errors: { nextTimeRange?: { from?: string } } = {};
 
   if (values.nextTimeRange?.type === 'absolute'
@@ -76,7 +76,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
-            validate={validate}>
+            validate={dateTimeValidate}>
       {(...args) => (
         <StyledForm>
           {_isFunction(children) ? children(...args) : children}
