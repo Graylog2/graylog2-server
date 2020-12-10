@@ -60,6 +60,7 @@ const TrafficGraph = ({ width, traffic }: Props) => {
         text: 'Bytes',
       },
       rangemode: 'tozero',
+      hoverformat: '.4s',
       tickformat: 's',
     },
   };
