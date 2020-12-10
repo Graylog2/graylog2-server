@@ -29,7 +29,7 @@ import StopPropagation from './StopPropagation';
  */
 
 type ActionToggleProps = {
-  children: React.ReactElement,
+  children: React.ReactElement | Array<React.ReactElement>,
   onClick: (event: SyntheticEvent) => void,
   // eslint-disable-next-line react/no-unused-prop-types
   bsRole?: string,
@@ -120,10 +120,10 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     this.setState(({ show }) => ({ show: !show }));
   };
 
-  adjustChildOnSelectProp = (child: React.Element<*>, updateDepth: number) => {
+  closeOnChildSelect = (child: React.ReactElement, updateDepth: number) => {
     if (child.props?.onSelect) {
       return {
-        onSelect: (eventKey: ?string, event: SyntheticInputEvent<HTMLButtonElement>) => {
+        onSelect: (eventKey: string | null | undefined, event: SyntheticEvent<HTMLButtonElement>) => {
           child.props.onSelect();
           this._onToggle(event);
         },
@@ -132,14 +132,14 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
     if (child.props?.children) {
       return {
-        children: this.adjustChildProps(child.props.children, updateDepth + 1),
+        children: this.closeOnChildrenSelect(child.props.children, updateDepth + 1),
       };
     }
 
     return {};
   };
 
-  adjustChildProps = (children: React.Node, updateDepth: number) => {
+  closeOnChildrenSelect = (children: React.ReactElement | Array<React.ReactElement>, updateDepth: number) => {
     const maxChildDepth = 2;
 
     if (updateDepth > maxChildDepth) {
@@ -150,7 +150,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
       children,
       (child: React.ReactElement) => child && React.cloneElement(child, {
         ...child.props,
-        ...this.adjustChildOnSelectProp(child, updateDepth + 1),
+        ...this.closeOnChildSelect(child, updateDepth + 1),
       }),
     );
   }
@@ -158,7 +158,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
   render() {
     const { children, container, element } = this.props;
     const { show } = this.state;
-    const mappedChildren = this.adjustChildProps(children, 0);
+    const mappedChildren = this.closeOnChildrenSelect(children, 0);
 
     return (
       <StopPropagation>
