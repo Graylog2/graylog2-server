@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { HTMLAttributes, mount } from 'wrappedEnzyme';
+import type { HTMLAttributes } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import { PlotParams } from 'react-plotly.js';
 
 import ChartColorContext from '../ChartColorContext';
