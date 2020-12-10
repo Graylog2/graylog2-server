@@ -183,10 +183,6 @@ class SavedSearchControls extends React.Component<Props, State> {
       .catch((error) => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
-  loadSavedSearch = () => {
-    this.toggleListModal();
-  };
-
   deleteSavedSearch = (deletedView) => {
     const { viewStoreState } = this.props;
     const { view } = viewStoreState;
@@ -260,8 +256,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                       <Icon name="folder" type="regular" /> Load
                     </Button>
                     {showList && (
-                      <SavedSearchList loadSavedSearch={this.loadSavedSearch}
-                                       deleteSavedSearch={this.deleteSavedSearch}
+                      <SavedSearchList deleteSavedSearch={this.deleteSavedSearch}
                                        toggleModal={this.toggleListModal} />
                     )}
                     <ShareButton entityType="search"
