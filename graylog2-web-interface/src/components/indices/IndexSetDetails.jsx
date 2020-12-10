@@ -20,7 +20,7 @@ import React from 'react';
 import { Row, Col } from 'components/graylog';
 import { IndicesConfiguration } from 'components/indices';
 
-const style = require('!style/useable!css!./IndexSetDetails.css');
+import StyledIndexSetDetailsRow from './StyledIndexSetDetailsRow';
 
 class IndexSetDetails extends React.Component {
   static propTypes = {
@@ -28,18 +28,18 @@ class IndexSetDetails extends React.Component {
   };
 
   componentDidMount() {
-    style.use();
+    // style.use();
   }
 
   componentWillUnmount() {
-    style.unuse();
+    // style.unuse();
   }
 
   render() {
     const { indexSet } = this.props;
 
     return (
-      <Row className="index-set-details">
+      <StyledIndexSetDetailsRow>
         <Col md={3}>
           <dl>
             <dt>Index prefix:</dt>
@@ -59,7 +59,7 @@ class IndexSetDetails extends React.Component {
         <Col md={6}>
           <IndicesConfiguration indexSet={indexSet} />
         </Col>
-      </Row>
+      </StyledIndexSetDetailsRow>
     );
   }
 }
