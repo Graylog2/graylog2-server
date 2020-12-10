@@ -89,7 +89,7 @@ class MessageList extends React.Component<Props, State> {
 
   static contextType = RenderCompletionCallback;
 
-  constructor(props: Props, context: any) {
+  constructor(props: Props, context?: any) {
     super(props, context);
 
     this.state = {
