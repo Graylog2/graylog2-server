@@ -168,7 +168,6 @@ type State = {
 type Props = {
   activeQueryId: string,
   config: MessagesWidgetConfig,
-  editing?: boolean,
   fields: Immutable.List<FieldTypeMapping>,
   messages: Array<BackendMessage>,
   onSortChange: (SortConfig[]) => Promise<void>,
@@ -184,7 +183,6 @@ class MessageTable extends React.Component<Props, State> {
   static propTypes = {
     activeQueryId: PropTypes.string.isRequired,
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-    editing: PropTypes.bool,
     fields: CustomPropTypes.FieldListType.isRequired,
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSortChange: PropTypes.func.isRequired,
@@ -192,8 +190,7 @@ class MessageTable extends React.Component<Props, State> {
     setLoadingState: PropTypes.func.isRequired,
   };
 
-  static defaultProps: DefaultProps = {
-    editing: false,
+  static defaultProps = {
     selectedFields: Immutable.Set<string>(),
   };
 
