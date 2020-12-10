@@ -26,12 +26,11 @@ import DocsHelper from 'util/DocsHelper';
 import Button from 'components/graylog/Button';
 import TopRow from 'views/components/searchbar/TopRow';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
+import type { FormikValues } from 'views/Constants';
 
-import type { Values } from './searchbar/SearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
@@ -40,7 +39,6 @@ import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<any>,
-  config: any,
   globalOverride: GlobalOverride | undefined | null,
 };
 
@@ -84,12 +82,12 @@ const ResetOverrideHint = () => (
   </CenteredBox>
 );
 
-const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props) => {
+const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const isGloballyOverridden: boolean = globalOverride !== undefined
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
-  const { dirty, isValid, isSubmitting, handleSubmit, values } = useFormikContext<Values>();
+  const { dirty, isValid, isSubmitting, handleSubmit, values } = useFormikContext<FormikValues>();
 
   return (
     <>
@@ -98,9 +96,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props
         <>
           <TopRow>
             <FlexCol md={4}>
-              <TimeRangeTypeSelector disabled={isGloballyOverridden}
-                                     config={config} />
-
+              <TimeRangeTypeSelector disabled={isGloballyOverridden} />
               <TimeRangeDisplay timerange={values?.timerange} />
             </FlexCol>
 
@@ -153,12 +149,10 @@ export default connect(
   WidgetQueryControls,
   {
     availableStreams: StreamsStore,
-    configurations: SearchConfigStore,
     globalOverride: GlobalOverrideStore,
   },
-  ({ availableStreams: { streams = [] }, configurations, ...rest }) => ({
+  ({ availableStreams: { streams = [] }, ...rest }) => ({
     ...rest,
     availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
-    config: configurations.searchesClusterConfig,
   }),
 );

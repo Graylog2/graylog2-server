@@ -23,26 +23,19 @@ import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
 
 import DateTime from 'logic/datetimes/DateTime';
-import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
-
-export type Values = {
-  nextTimeRange?: TimeRange,
-  timerange: TimeRange,
-  streams: Array<string>,
-  queryString: string,
-};
+import type { FormikValues } from 'views/Constants';
 
 type Props = {
-  initialValues: Values,
+  initialValues: FormikValues,
   onSubmit: (Values) => void | Promise<any>,
-  children: ((props: FormikProps<Values>) => React.ReactNode) | React.ReactNode,
+  children: ((props: FormikProps<FormikValues>) => React.ReactNode) | React.ReactNode,
 };
 
 const validate = (values) => {
-  const errors: { nextTimeRange?: { from: string } } = {};
+  const errors: { nextTimeRange?: { from?: string } } = {};
 
-  if (values?.nextTimeRange?.type === 'absolute'
+  if (values.nextTimeRange?.type === 'absolute'
     && DateTime.isValidDateString(values.nextTimeRange.from)
     && values.nextTimeRange.from > values.nextTimeRange.to) {
     errors.nextTimeRange = {
@@ -57,7 +50,7 @@ const StyledForm = styled(Form)`
   height: 100%;
 `;
 
-const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
+const _isFunction = (children: Props['children']): children is (props: FormikProps<FormikValues>) => React.ReactElement => isFunction(children);
 
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
@@ -69,11 +62,14 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
       queryString,
     });
   }, [onSubmit]);
-  const { timerange, streams, queryString } = initialValues;
+  const { limitDuration, timerange, streams, queryString } = initialValues;
+  const initialTimeRange = onInitializingTimerange(timerange);
   const _initialValues = {
+    limitDuration,
     queryString,
     streams,
-    timerange: onInitializingTimerange(timerange),
+    timerange: initialTimeRange,
+    nextTimeRange: initialTimeRange,
   };
 
   return (
@@ -92,6 +88,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
 
 SearchBarForm.propTypes = {
   initialValues: PropTypes.shape({
+    limitDuration: PropTypes.number.isRequired,
     timerange: PropTypes.object.isRequired,
     queryString: PropTypes.string.isRequired,
     streams: PropTypes.arrayOf(PropTypes.string).isRequired,
