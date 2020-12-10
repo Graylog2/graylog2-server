@@ -26,7 +26,6 @@ type StartPage = {
   type: string;
 };
 
-/* eslint-disable camelcase */
 export type UserJSON = {
   client_address: string;
   email: string;
@@ -46,7 +45,6 @@ export type UserJSON = {
   username: string;
   account_status: AccountStatus;
 };
-/* eslint-enable camelcase */
 
 type InternalState = {
   id: string;
@@ -289,26 +287,19 @@ export default class User {
     const {
       id,
       username,
-      // eslint-disable-next-line camelcase
       full_name,
       email,
       permissions,
       timezone,
       preferences,
       roles,
-      // eslint-disable-next-line camelcase
       read_only,
       external,
-      // eslint-disable-next-line camelcase
       session_timeout_ms,
       startpage,
-      // eslint-disable-next-line camelcase
       session_active,
-      // eslint-disable-next-line camelcase
       client_address,
-      // eslint-disable-next-line camelcase
       last_activity,
-      // eslint-disable-next-line camelcase
       account_status,
     } = value;
 

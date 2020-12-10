@@ -132,7 +132,6 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   return configBuilder.build();
 };
 
-/* eslint-disable camelcase */
 type Config = {
   id: string,
   name: string,
@@ -151,7 +150,6 @@ type Config = {
     id: string,
   },
 };
-/* eslint-enable camelcase */
 
 class ConfigBuilder {
   value: Set<Config>;

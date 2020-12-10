@@ -26,17 +26,14 @@ type InternalState = {
   trendPreference: TrendPreference,
 };
 
-/* eslint-disable camelcase */
 export type NumberVisualizationConfigJSON = {
   trend: boolean,
   trend_preference: TrendPreference,
 };
-/* eslint-enable camelcase */
 
 export default class NumberVisualizationConfig extends VisualizationConfig {
   private readonly _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(
     trend: $PropertyType<InternalState, 'trend'>,
     trendPreference: $PropertyType<InternalState, 'trendPreference'>,

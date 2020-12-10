@@ -58,7 +58,6 @@ class FilterAggregationForm extends React.Component {
   constructor(props) {
     super(props);
 
-    // eslint-disable-next-line camelcase
     const { group_by, series, conditions } = props.eventDefinition.config;
     const expression = lodash.get(conditions, 'expression', {});
     const defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(series) && lodash.isEmpty(expression)

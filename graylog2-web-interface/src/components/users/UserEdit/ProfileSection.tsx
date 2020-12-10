@@ -29,7 +29,6 @@ import EmailFormGroup from '../UserCreate/EmailFormGroup';
 type Props = {
   user: User,
   onSubmit: (payload: {
-    // eslint-disable-next-line camelcase
     full_name: $PropertyType<User, 'fullName'>,
     email: $PropertyType<User, 'email'>,
   }) => Promise<void>,

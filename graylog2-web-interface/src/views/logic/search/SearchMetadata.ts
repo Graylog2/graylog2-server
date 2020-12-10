@@ -32,12 +32,10 @@ type State = {
   undeclared: Immutable.Set<string>,
 };
 
-/* eslint-disable camelcase */
 export type SearchMetadataJson = {
   query_metadata: { [key: string]: QueryMetadataJson },
   declared_parameters: { [key: string]: ParameterJson },
 };
-/* eslint-enable camelcase */
 
 export default class SearchMetadata {
   _value: State;
@@ -74,7 +72,6 @@ export default class SearchMetadata {
   }
 
   static fromJSON(value: SearchMetadataJson) {
-    // eslint-disable-next-line camelcase
     const { query_metadata, declared_parameters } = value;
     const queryMetadata = Immutable.Map(query_metadata)
       .map((metadata: QueryMetadataJson) => QueryMetadata.fromJSON(metadata)).toMap();

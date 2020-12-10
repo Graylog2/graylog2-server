@@ -195,19 +195,14 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 
   static fromJSON(value: AggregationWidgetConfigJson) {
     const {
-      // eslint-disable-next-line camelcase
       column_pivots,
-      // eslint-disable-next-line camelcase
       formatting_settings,
       rollup,
-      // eslint-disable-next-line camelcase
       row_pivots,
       series,
       sort,
       visualization,
-      // eslint-disable-next-line camelcase
       visualization_config,
-      // eslint-disable-next-line camelcase
       event_annotation,
     } = value;
 
@@ -219,9 +214,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .sort(sort.map(SortConfig.fromJSON))
       .visualization(visualization)
       .rollup(rollup)
-      // eslint-disable-next-line camelcase
       .visualizationConfig(visualization_config !== null ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
-      // eslint-disable-next-line camelcase
       .formattingSettings(formatting_settings === null ? undefined : WidgetFormattingSettings.fromJSON(formatting_settings))
       .eventAnnotation(event_annotation)
       .build();

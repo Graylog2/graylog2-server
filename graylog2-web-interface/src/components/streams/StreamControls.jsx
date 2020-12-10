@@ -76,7 +76,7 @@ const StreamControls = createReactClass({
 
   _setStartpage() {
     const { user, stream } = this.props;
-    StartpageStore.set(user.username, 'stream', stream.id);
+    StartpageStore.set(user.id, 'stream', stream.id);
   },
 
   render() {

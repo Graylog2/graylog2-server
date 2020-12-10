@@ -45,7 +45,6 @@ const NodeThroughput = createReactClass({
     };
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     this.metricNames = {
       totalIn: 'org.graylog2.throughput.input.1-sec-rate',

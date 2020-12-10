@@ -66,7 +66,6 @@ class ContentPacksList extends React.Component {
     this._onChangePage = this._onChangePage.bind(this);
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ filteredContentPacks: nextProps.contentPacks });
   }

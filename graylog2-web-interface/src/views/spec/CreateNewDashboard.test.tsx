@@ -62,7 +62,6 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore(
 declare global {
   namespace NodeJS {
     interface Global {
-      // eslint-disable-next-line camelcase
       api_url: string
     }
   }

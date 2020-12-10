@@ -31,7 +31,6 @@ import { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 export type PaginatedUsersResponse = PaginatedListJSON & {
   users: Array<UserOverviewJSON>;
   context: {
-    // eslint-disable-next-line camelcase
     admin_user: UserOverviewJSON;
   };
 };

@@ -42,7 +42,6 @@ const _searchTypePlugin = (type) => {
 
 export default class QueryResult {
   constructor(queryResult) {
-    // eslint-disable-next-line camelcase
     const { duration, timestamp, effective_timerange } = queryResult.execution_stats;
 
     this._state = {

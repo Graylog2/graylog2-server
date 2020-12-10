@@ -24,7 +24,6 @@ type InternalState = {
 
 export type HTTPHeaderAuthConfigJSON = {
   enabled: boolean,
-  // eslint-disable-next-line camelcase
   username_header: string,
 };
 

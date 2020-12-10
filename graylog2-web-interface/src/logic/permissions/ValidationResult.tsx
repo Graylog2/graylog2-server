@@ -33,7 +33,6 @@ type InternalState = {
   failed: boolean,
 };
 
-/* eslint-disable camelcase */
 export type ValidationResultJSON = {
   errors: {
     selected_grantee_capabilities: string[],
@@ -43,7 +42,6 @@ export type ValidationResultJSON = {
   },
   failed: boolean,
 };
-/* eslint-enable camelcase */
 
 export default class ValidationResult {
   _value: InternalState;
@@ -87,7 +85,6 @@ export default class ValidationResult {
     }));
   }
 
-  // eslint-disable-next-line no-undef
   static create(
     errors: $PropertyType<InternalState, 'errors'>,
     errorContext: $PropertyType<InternalState, 'errorContext'>,
@@ -123,7 +120,6 @@ export default class ValidationResult {
       return ValidationResult.createSuccess();
     }
 
-    // eslint-disable-next-line camelcase
     const { errors: errorsJson, error_context, failed } = value;
     const errors = {
       selectedGranteeCapabilities: Immutable.List(errorsJson.selected_grantee_capabilities),

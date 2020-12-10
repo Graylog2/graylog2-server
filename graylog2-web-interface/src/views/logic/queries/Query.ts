@@ -186,7 +186,6 @@ export default class Query {
   }
 
   static fromJSON(value: QueryJson): Query {
-    // eslint-disable-next-line camelcase
     const { id, query, timerange, filter, search_types } = value;
 
     return new Query(id, query, timerange, Immutable.fromJS(filter), search_types);

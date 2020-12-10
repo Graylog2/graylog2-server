@@ -31,7 +31,6 @@ const { PreferencesStore } = CombinedProvider.get('Preferences');
 type CurrentUser = {
   currentUser?: {
     username: string;
-    // eslint-disable-next-line camelcase
     read_only: boolean;
   };
 };
@@ -41,7 +40,6 @@ const useCurrentThemeMode = (): [string, (newThemeMode: string) => void] => {
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
     username: (userStore as CurrentUser)?.currentUser?.username,
-    // eslint-disable-next-line camelcase
     userIsReadOnly: (userStore as CurrentUser)?.currentUser?.read_only ?? true,
   }));
 

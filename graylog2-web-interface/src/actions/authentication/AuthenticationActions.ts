@@ -46,7 +46,6 @@ export type PaginatedBackends = PaginatedList<AuthenticationBackend> & {
   },
 };
 
-/* eslint-disable camelcase */
 export type ConnectionTestPayload = {
   backend_configuration: AuthenticationBackendCreate,
   backend_id: string | undefined | null,
@@ -91,7 +90,6 @@ export type LoadActiveResponse = LoadResponse & {
     backendsTotal: number,
   },
 };
-/* eslint-enable camelcase */
 
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
