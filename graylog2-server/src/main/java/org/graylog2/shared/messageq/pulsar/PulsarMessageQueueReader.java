@@ -137,7 +137,7 @@ public class PulsarMessageQueueReader extends AbstractMessageQueueReader {
             }
             final List<MessageQueue.Entry> entries = read();
             entries.forEach(entry -> {
-                LOG.info("Consumed message: {}", entry);
+                LOG.debug("Consumed message: {}", entry);
                 final RawMessage rawMessage = RawMessage.decode(entry.value(), entry.commitId());
                 // FIXME: on a full process buffer, where not a single entry is ever taken out again, this call will
                 //  block (obviously) forever. But it can't even be unblocked by interrupting the thread, e.g. for

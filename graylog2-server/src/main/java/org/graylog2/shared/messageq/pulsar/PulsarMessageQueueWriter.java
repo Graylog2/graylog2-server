@@ -131,7 +131,8 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
                 newMessage.eventTime(entry.getMessageTimestamp().getMillis());
             }
 
-            LOG.info("Sending message {} (producer {})", entry, producer.getProducerName());
+            LOG.debug("Sending message {} (producer {})", entry, producer.getProducerName());
+
             try (final Timer.Context ignored = writeTimer.time()) {
                 newMessage.send();
             } catch (PulsarClientException e) {
