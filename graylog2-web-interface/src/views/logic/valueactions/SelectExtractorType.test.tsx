@@ -18,7 +18,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
-import Select from 'views/components/Select';
+import Select from 'components/common/Select';
 
 import SelectExtractorType from './SelectExtractorType';
 
