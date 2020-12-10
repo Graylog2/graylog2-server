@@ -240,37 +240,37 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                         <Icon name={hourIcon.current} />
                       </StyledButton>
                     </StyledInputAddon>
-                    <StyledFormControl type="number"
+                    <StyledFormControl type="text"
                                        id={`${range}-time-hours`}
                                        title={`${range} hour`}
-                                       value={initialDateTime.hours}
+                                       value={initialDateTime.hours ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
                                        size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>:</StyledInputAddon>
-                    <StyledFormControl type="number"
+                    <StyledFormControl type="text"
                                        id={`${range}-time-minutes`}
                                        title={`${range} minutes`}
-                                       value={initialDateTime.minutes}
+                                       value={initialDateTime.minutes ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
                                        size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>:</StyledInputAddon>
-                    <StyledFormControl type="number"
+                    <StyledFormControl type="text"
                                        id={`${range}-time-seconds`}
                                        title={`${range} seconds`}
-                                       value={initialDateTime.seconds}
+                                       value={initialDateTime.seconds ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
                                        size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>.</StyledInputAddon>
-                    <StyledFormControl type="number"
+                    <StyledFormControl type="text"
                                        id={`${range}-time-milliseconds`}
                                        title={`${range} milliseconds`}
-                                       value={initialDateTime.milliseconds}
+                                       value={initialDateTime.milliseconds ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
                                        size={3}

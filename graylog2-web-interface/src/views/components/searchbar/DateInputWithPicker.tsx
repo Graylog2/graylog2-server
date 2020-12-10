@@ -125,7 +125,7 @@ DateInputWithPicker.defaultProps = {
   disabled: false,
   error: undefined,
   fromDate: undefined,
-  value: undefined,
+  value: '',
   title: '',
 };
 
