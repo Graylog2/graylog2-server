@@ -74,7 +74,7 @@ const ProgressWrap = styled.div(({ theme }) => css`
   overflow: hidden;
   background-color: ${theme.colors.gray[90]};
   border-radius: 4px;
-  ${boxShadow('inset 0 1px 2px')};
+  ${boxShadow('inset 0 1px 2px')}
   display: flex;
   align-items: center;
 `);
@@ -87,7 +87,7 @@ const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => 
     font-size: ${theme.fonts.size.small};
     line-height: 20px;
     text-align: center;
-    ${boxShadow('inset 0 -1px 0')};
+    ${boxShadow('inset 0 -1px 0')}
     transition: width 500ms ease-in-out;
     width: ${value}%;
     max-width: 100%;
