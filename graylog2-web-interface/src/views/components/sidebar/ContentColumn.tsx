@@ -16,10 +16,8 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import type { ViewType } from 'views/logic/views/View';
-import type { ThemeInterface } from 'theme';
 import { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { IconButton } from 'components/common';
@@ -35,10 +33,10 @@ type Props = {
   viewMetadata: ViewMetadata,
 };
 
-export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => css`
+export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
   position: ${sidebarIsPinned ? 'relative' : 'fixed'};
   width: 270px;
-  height:  ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; // subtract the nav height
+  height: ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
   top: ${sidebarIsPinned ? 0 : '50px'};
   left: ${sidebarIsPinned ? 0 : '50px'};
 
@@ -58,7 +56,7 @@ export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInter
       width: 6px;
       border-top-left-radius: 50%;
       background: transparent;
-      box-shadow: -6px -6px 0px 3px ${theme.colors.global.contentBackground};
+      box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
       z-index: 4; /* to render over Sidebar ContentColumn */
     }
   `}
@@ -86,7 +84,7 @@ const Header = styled.div`
   -ms-grid-row: 1;
 `;
 
-const SearchTitle: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const SearchTitle = styled.div`
   height: 35px;
   display: grid;
   display: -ms-grid;
@@ -113,7 +111,7 @@ const Title = styled.h1`
   line-height: 1.5;
 `;
 
-const OverlayToggle: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => css`
+const OverlayToggle = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
   > * {
     font-size: ${theme.fonts.size.large};
     color: ${sidebarIsPinned ? theme.colors.variant.info : theme.colors.gray[30]};
@@ -140,9 +138,9 @@ const SectionContent = styled.div`
   grid-row: 2;
   -ms-grid-row: 2;
 
-  // Fixes padding problem with padding-bottom from container
+  /* Fixes padding problem with padding-bottom from container */
   > *:last-child {
-    padding-bottom: 15px;;
+    padding-bottom: 15px;
   }
 `;
 

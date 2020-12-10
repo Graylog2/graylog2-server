@@ -17,9 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -27,7 +25,7 @@ import { ColorPickerPopover, Icon } from 'components/common';
 
 import ColorPreview from './ColorPreview';
 
-export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+export const HighlightingRuleGrid = styled.div`
   display: grid;
   display: -ms-grid;
   grid-template-columns: max-content 1fr max-content;
@@ -51,7 +49,7 @@ export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = s
   }
 `;
 
-const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const DeleteIcon = styled.span(({ theme }) => css`
   width: 2rem;
   height: 2rem;
   margin-left: 0.4rem;

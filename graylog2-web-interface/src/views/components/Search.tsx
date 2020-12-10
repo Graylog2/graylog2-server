@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
@@ -61,8 +60,8 @@ import HighlightingRulesProvider from 'views/components/contexts/HighlightingRul
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
-const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
-  ${({ interactive }) => (interactive ? css`
+const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
+  return interactive ? css`
     height: calc(100vh - 50px);
     display: flex;
     overflow: hidden;
@@ -70,10 +69,10 @@ const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElem
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : '')}
-`;
+  ` : '';
+});
 
-const SearchArea: StyledComponent<{}, void, any> = styled(AppContentGrid)`
+const SearchArea = styled(AppContentGrid)`
   height: 100%;
   overflow-y: auto;
 `;

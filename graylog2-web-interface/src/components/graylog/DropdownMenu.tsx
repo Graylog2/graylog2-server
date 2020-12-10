@@ -17,18 +17,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
-
-import type { ThemeInterface } from 'theme';
 
 type Props = {
   children: React.ReactNode,
   show: boolean,
 };
 
-const StyledDropdownMenu: StyledComponent<{show: boolean}, ThemeInterface, HTMLUListElement> = styled.ul.attrs(() => ({
+const StyledDropdownMenu = styled.ul.attrs(() => ({
   className: 'dropdown-menu', /* stylelint-disable-line property-no-unknown */
-}))(({ show, theme }) => css`
+}))<{ show: boolean }>(({ show, theme }) => css`
   display: ${show ? 'block' : 'none'};
   min-width: max-content;
   color: ${theme.colors.variant.dark.default};

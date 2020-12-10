@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-import type { ThemeInterface } from 'theme/types';
-
-const Alert: StyledComponent<{bsStyle: string}, ThemeInterface, typeof BootstrapAlert> = styled(BootstrapAlert)(({ bsStyle = 'default', theme }) => {
+const Alert = styled(BootstrapAlert)(({ bsStyle = 'default', theme }: { bsStyle: string, theme: DefaultTheme }) => {
   const borderColor = theme.colors.variant.lighter[bsStyle];
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
 

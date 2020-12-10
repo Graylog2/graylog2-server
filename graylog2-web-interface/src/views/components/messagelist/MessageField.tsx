@@ -17,9 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import connect from 'stores/connect';
 import Field from 'views/components/Field';
 import Value from 'views/components/Value';
@@ -44,7 +42,7 @@ type Props = {
   },
 };
 
-const DecoratedField: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.small(({ theme }) => css`
+const DecoratedField = styled.small(({ theme }) => css`
   color: ${theme.colors.gray[70]};
   font-weight: normal;
 `);

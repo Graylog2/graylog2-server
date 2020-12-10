@@ -16,12 +16,11 @@
  */
 import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { PaginatedUsers } from 'actions/users/UsersActions';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
-import { ThemeInterface } from 'theme';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/graylog';
@@ -41,7 +40,7 @@ const DEFAULT_PAGINATION = {
 
 const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Enabled', 'Role', 'Actions'];
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Container = styled.div`
   .data-table {
     overflow-x: visible;
   }
@@ -52,7 +51,7 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => `
+const LoadingSpinner = styled(Spinner)(({ theme }) => css`
   margin-left: 10px;
   font-size: ${theme.fonts.size.h3};
 `);
