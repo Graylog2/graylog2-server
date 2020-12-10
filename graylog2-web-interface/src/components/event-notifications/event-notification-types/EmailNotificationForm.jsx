@@ -98,15 +98,6 @@ class EmailNotificationForm extends React.Component {
 
     return (
       <>
-        <Input id="notification-sender"
-               name="sender"
-               label="Sender"
-               type="text"
-               bsStyle={validation.errors.sender ? 'error' : null}
-               help={lodash.get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender.')}
-               value={config.sender || ''}
-               onChange={this.handleChange}
-               required />
         <Input id="notification-subject"
                name="subject"
                label="Subject"
@@ -116,6 +107,15 @@ class EmailNotificationForm extends React.Component {
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
+        <Input id="notification-sender"
+               name="sender"
+               label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
+               type="text"
+               bsStyle={validation.errors.sender ? 'error' : null}
+               help={lodash.get(validation, 'errors.sender[0]',
+                 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
+               value={config.sender || ''}
+               onChange={this.handleChange} />
         <FormGroup controlId="notification-user-recipients"
                    validationState={validation.errors.recipients ? 'error' : null}>
           <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
