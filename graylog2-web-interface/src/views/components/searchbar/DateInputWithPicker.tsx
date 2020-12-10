@@ -18,14 +18,12 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { DateUtils } from 'react-day-picker';
-import type { StyledComponent } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import { Input } from 'components/bootstrap';
-import type { ThemeInterface } from 'theme';
 
 type Props = {
   disabled: boolean | undefined | null,
@@ -46,7 +44,7 @@ type Props = {
   fromDate?: Date,
 };
 
-const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
   font-size: ${theme.fonts.size.tiny};
   font-style: italic;

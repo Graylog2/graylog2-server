@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import type { ThemeInterface } from 'theme';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
@@ -31,7 +30,7 @@ type Props = {
   timerange?: TimeRange,
 };
 
-const PreviewWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const PreviewWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -39,29 +38,29 @@ const PreviewWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   transform: translateY(-3px);
 `;
 
-const FromWrapper: StyledComponent<{}, void, HTMLSpanElement> = styled.span`
+const FromWrapper = styled.span`
   text-align: right;
 `;
 
-const UntilWrapper: StyledComponent<{}, void, HTMLSpanElement> = styled.span`
+const UntilWrapper = styled.span`
   text-align: left;
 `;
 
-const Title: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const Title = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
   color: ${theme.colors.variant.dark.info};
   display: block;
   font-style: italic;
 `);
 
-const Date: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const Date = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   color: ${theme.colors.variant.primary};
   display: block;
   font-weight: bold;
 `);
 
-const MiddleIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const MiddleIcon = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
   color: ${theme.colors.variant.default};
   padding: 0 15px;

@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 import moment from 'moment';
 
-import type { ThemeInterface } from 'theme';
 import type { TimeRange } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -32,7 +31,7 @@ export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const TimeRangeWrapper: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
+const TimeRangeWrapper = styled.p(({ theme }) => css`
   width: 100%;
   padding: 3px 9px;
   margin: 0 12px;

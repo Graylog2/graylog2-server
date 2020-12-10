@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
-import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -31,7 +30,6 @@ import {
   FormControl,
 } from 'components/graylog';
 import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
-import type { ThemeInterface } from 'theme';
 import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 type Props = {
@@ -53,7 +51,7 @@ const TIME_ICON_BOD = 'hourglass-start';
 const TIME_ICON_MID = 'hourglass-half';
 const TIME_ICON_EOD = 'hourglass-end';
 
-const SetTimeOption: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const SetTimeOption = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,7 +60,7 @@ const SetTimeOption: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   b { padding: 0 3px; }
 `;
 
-const StyledInputAddon: StyledComponent<{}, ThemeInterface, typeof InputGroup.Addon> = styled(InputGroup.Addon)(({ theme }) => css`
+const StyledInputAddon = styled(InputGroup.Addon)(({ theme }: {theme:DefaultTheme}) => css`
   padding: 0;
   background: ${theme.colors.variant.lightest.default};
 
@@ -73,7 +71,7 @@ const StyledInputAddon: StyledComponent<{}, ThemeInterface, typeof InputGroup.Ad
   }
 `);
 
-const StyledFormControl: StyledComponent<{}, void, typeof FormControl> = styled(FormControl)`
+const StyledFormControl = styled(FormControl)`
   padding: 0 9px;
 `;
 
@@ -242,7 +240,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                         <Icon name={hourIcon.current} />
                       </StyledButton>
                     </StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-hours`}
                                        title={`${range} hour`}
                                        value={initialDateTime.hours}
@@ -251,7 +249,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                                        size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>:</StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-minutes`}
                                        title={`${range} minutes`}
                                        value={initialDateTime.minutes}
@@ -260,7 +258,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                                        size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>:</StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-seconds`}
                                        title={`${range} seconds`}
                                        value={initialDateTime.seconds}
@@ -269,7 +267,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                                        size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>.</StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-milliseconds`}
                                        title={`${range} milliseconds`}
                                        value={initialDateTime.milliseconds}

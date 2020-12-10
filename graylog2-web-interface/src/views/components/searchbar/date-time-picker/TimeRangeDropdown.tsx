@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import moment from 'moment';
@@ -25,7 +25,6 @@ import { Icon } from 'components/common';
 import { availableTimeRangeTypes, FormikValues } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
-import type { ThemeInterface } from 'theme';
 
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
@@ -44,7 +43,7 @@ type Props = {
   toggleDropdownShow: () => void,
 };
 
-const StyledPopover: StyledComponent<{}, ThemeInterface, typeof Popover> = styled(Popover)(({ theme }) => css`
+const StyledPopover = styled(Popover)(({ theme }) => css`
   max-width: 100%;
   min-width: 745px;
   
@@ -57,24 +56,24 @@ const StyledPopover: StyledComponent<{}, ThemeInterface, typeof Popover> = style
   }
 `);
 
-const StyledTabs: StyledComponent<{}, void, typeof Tabs> = styled(Tabs)`
+const StyledTabs = styled(Tabs)`
   margin-top: 1px;
 `;
 
-const Timezone: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
+const Timezone = styled.p(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
   padding-left: 3px;
   margin: 0;
   line-height: 34px;
 `);
 
-const PopoverTitle: StyledComponent<{}, void, HTMLSpanElement> = styled.span`
+const PopoverTitle = styled.span`
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
-const LimitLabel: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const LimitLabel = styled.span(({ theme }) => css`
   > svg {
     margin-right: 3px;
     color: ${theme.colors.variant.dark.warning};
@@ -86,7 +85,7 @@ const LimitLabel: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   }
 `);
 
-const CancelButton: StyledComponent<{}, void, typeof Button> = styled(Button)`
+const CancelButton = styled(Button)`
   margin-right: 6px;
 `;
 
@@ -163,7 +162,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
   const title = (
     <PopoverTitle>
-      <span>Search Timerange</span>
+      <span>Search Time Range</span>
       {limitDuration > 0 && (
         <LimitLabel>
           <Icon name="exclamation-triangle" />

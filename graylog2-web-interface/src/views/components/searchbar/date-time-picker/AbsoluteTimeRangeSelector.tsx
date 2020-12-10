@@ -17,7 +17,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
@@ -31,13 +30,13 @@ type Props = {
   currentTimeRange: AbsoluteTimeRange,
 };
 
-const AbsoluteWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const AbsoluteWrapper = styled.div`
   display: flex;
   align-items: stretch;
   justify-content: space-around;
 `;
 
-const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const RangeWrapper = styled.div`
   flex: 4;
   align-items: center;
   min-height: 290px;
@@ -49,7 +48,7 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   }
 `;
 
-const IconWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const IconWrap = styled.div`
   flex: 0.75;
   display: flex;
   align-items: center;

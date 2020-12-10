@@ -18,9 +18,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Field } from 'formik';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import Input from 'components/bootstrap/Input';
 import { Icon, Select } from 'components/common';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
@@ -52,13 +51,13 @@ const RANGE_TYPES = [
   },
 ] as const;
 
-const RelativeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const RelativeWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
 `;
 
-const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const RangeWrapper = styled.div`
   flex: 4;
   align-items: center;
   display: grid;
@@ -69,7 +68,7 @@ const RangeWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   
 `;
 
-const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const InputWrap = styled.div`
   grid-area: 2 / 1 / 3 / 3;
   position: relative;
   
@@ -78,12 +77,12 @@ const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   }
 `;
 
-const StyledSelect: StyledComponent<{}, void, typeof Select> = styled(Select)`
+const StyledSelect = styled(Select)`
   grid-area: 2 / 3 / 3 / 7;
   margin: 0 12px;
 `;
 
-const StyledIcon: StyledComponent<{}, void, typeof Icon> = styled(Icon)`
+const StyledIcon = styled(Icon)`
   flex: 0.75;
 `;
 
@@ -91,7 +90,7 @@ const RangeTitle = styled.h3`
   grid-area: 1 / 1 / 2 / 2;
 `;
 
-const Ago: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const Ago = styled.span(({ theme }) => css`
   grid-area: 2 / 7 / 3 / 8;
   font-size: ${theme.fonts.size.large};
 
@@ -100,7 +99,7 @@ const Ago: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({
   }
 `);
 
-const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.label(({ theme }) => css`
+const RangeCheck = styled.label(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
   grid-area: 1 / 2 / 2 / 8;
   margin-left: 15px;
@@ -118,7 +117,7 @@ const RangeCheck: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled
   }
 `);
 
-const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
   grid-area: 3 / 1 / 3 / 8;
   font-size: ${theme.fonts.size.tiny};

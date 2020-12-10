@@ -203,11 +203,13 @@ type Props = {
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
+  id?: string,
   ignoreAccents?: boolean,
   inputId?: string,
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  name?: string,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
   onChange: (string) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
@@ -248,7 +250,9 @@ class Select extends React.Component<Props, State> {
     disabled: PropTypes.bool,
     /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
     displayKey: PropTypes.string,
-    /** Id of underlying input */
+    /** ID of Select container component */
+    id: PropTypes.string,
+    /** ID of underlying input */
     inputId: PropTypes.string,
     /** Indicates whether the auto-completion should return results including accents/diacritics when searching for their non-accent counterpart */
     ignoreAccents: PropTypes.bool,
@@ -261,6 +265,8 @@ class Select extends React.Component<Props, State> {
     matchProp: PropTypes.oneOf(['any', 'label', 'value']),
     /** Specifies if multiple values can be selected or not. */
     multi: PropTypes.bool,
+    /** name attribute for Select element */
+    name: PropTypes.string,
     /** Callback when select has lost focus */
     onBlur: PropTypes.func,
     /**
@@ -315,12 +321,14 @@ class Select extends React.Component<Props, State> {
     delimiter: ',',
     disabled: false,
     displayKey: 'label',
+    id: undefined,
     ignoreAccents: true,
     inputId: undefined,
     onBlur: undefined,
     inputProps: undefined,
     matchProp: 'any',
     multi: false,
+    name: undefined,
     onReactSelectChange: undefined,
     optionRenderer: undefined,
     placeholder: undefined,
