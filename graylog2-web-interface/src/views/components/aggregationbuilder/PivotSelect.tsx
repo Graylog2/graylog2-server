@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
+import type { Option } from 'src/views/components/Select';
 
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -57,6 +58,7 @@ const newPivotConfigChange = (values, value, newPivotConfig, onChange) => {
 type Props = {
   onChange: (newPivots: Array<Pivot>) => void,
   value: Array<Pivot>,
+  options: Array<Option>
 };
 
 const PivotSelect = ({ onChange, value, ...props }: Props) => {

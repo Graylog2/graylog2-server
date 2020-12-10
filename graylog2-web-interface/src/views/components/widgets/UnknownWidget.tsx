@@ -17,14 +17,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';
 
 import type { WidgetProps } from './Widget';
 
-const Container: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const Container = styled.div`
   height: 100%;
   display: flex;
   justify-content: center;

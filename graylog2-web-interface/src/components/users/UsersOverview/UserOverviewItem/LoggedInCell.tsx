@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import UserOverview from 'logic/users/UserOverview';
-import type { ThemeInterface } from 'theme';
 import { OverlayTrigger, Popover } from 'components/graylog';
 import { Timestamp } from 'components/common';
 
@@ -31,7 +30,7 @@ type Props = {
   sessionActive: $PropertyType<UserOverview, 'sessionActive'>,
 };
 
-const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
+const Td = styled.td`
   width: 35px;
   text-align: right;
 `;

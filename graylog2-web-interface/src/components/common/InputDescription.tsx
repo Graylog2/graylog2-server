@@ -24,7 +24,7 @@ const ErrorMessage = styled.span(({ theme }) => `
   color: ${theme.colors.variant.danger};
 `);
 
-const HelpMessage = styled.span(({ theme, hasError }) => `
+const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => `
   color: ${hasError ? theme.colors.gray[50] : 'inherit'};
 `);
 

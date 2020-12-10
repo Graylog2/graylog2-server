@@ -15,22 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { SyntheticEvent } from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import { Input } from 'components/bootstrap';
 
-const Wrapper: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
+const Wrapper = styled.div`
   margin-bottom: 5px;
 
   && .form-group {
-    margin-bottom: 0
+    margin-bottom: 0;
   }
+
   .control-label {
     padding-top: 0;
   }
+
   .page-size-select {
     display: flex;
     align-items: baseline;
@@ -43,7 +43,7 @@ type Props = {
   className?: string,
   pageSize: number,
   pageSizes: Array<number>,
-  onChange: (event: SyntheticEvent<HTMLOptionElement>) => void,
+  onChange: (event: React.ChangeEvent<HTMLOptionElement>) => void,
 };
 
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (

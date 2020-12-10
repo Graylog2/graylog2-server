@@ -18,9 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -37,14 +35,14 @@ import Field from 'views/components/Field';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 import InteractiveContext from '../contexts/InteractiveContext';
 
-const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const TableWrapper = styled.div`
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;
   -ms-grid-column: 1;
 `;
 
-const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.table(({ theme }) => css`
+const Table = styled.table(({ theme }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
   margin-top: 0;
@@ -145,7 +143,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
   }
 `);
 
-const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = styled.thead(({ theme }) => css`
+const TableHead = styled.thead(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
 

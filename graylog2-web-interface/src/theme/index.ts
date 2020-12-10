@@ -20,7 +20,6 @@ import breakpoints, { breakpointPropTypes } from './breakpoints';
 import colors, { colorsPropTypes } from './colors';
 import fonts, { fontsPropTypes } from './fonts';
 import utils, { utilsPropTypes } from './utils';
-import type { ThemeInterface } from './types';
 
 const themePropTypes = PropTypes.shape({
   breakpoints: breakpointPropTypes,
@@ -36,5 +35,3 @@ export {
   utils,
   themePropTypes,
 };
-
-export type { ThemeInterface };

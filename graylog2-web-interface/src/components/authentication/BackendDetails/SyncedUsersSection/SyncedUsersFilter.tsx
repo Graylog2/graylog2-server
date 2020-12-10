@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
 import UserQueryHelper from 'components/users/UsersQueryHelper';
 
@@ -25,7 +24,7 @@ type Props = {
   onSearch: (query: string) => void,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Container = styled.div`
   margin-bottom: 10px;
 `;
 
