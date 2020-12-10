@@ -22,6 +22,7 @@ import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
+import InteractiveContext from '../contexts/InteractiveContext';
 
 const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   grid-row: 1;
@@ -234,7 +235,7 @@ class MessageTable extends React.Component<Props, State> {
 
   render() {
     const { expandedMessages } = this.state;
-    const { fields, activeQueryId, config, editing, onSortChange, setLoadingState } = this.props;
+    const { fields, activeQueryId, config, onSortChange, setLoadingState } = this.props;
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     return (
@@ -251,12 +252,14 @@ class MessageTable extends React.Component<Props, State> {
                            queryId={activeQueryId}>
                       {selectedFieldName}
                     </Field>
-                    {editing && (
-                      <FieldSortIcon fieldName={selectedFieldName}
-                                     onSortChange={onSortChange}
-                                     setLoadingState={setLoadingState}
-                                     config={config} />
-                    )}
+                    <InteractiveContext.Consumer>
+                      {(interactive) => (interactive && (
+                        <FieldSortIcon fieldName={selectedFieldName}
+                                       onSortChange={onSortChange}
+                                       setLoadingState={setLoadingState}
+                                       config={config} />
+                      ))}
+                    </InteractiveContext.Consumer>
                   </th>
                 );
               })}
