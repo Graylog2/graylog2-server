@@ -160,22 +160,24 @@ const RelativeTimeRangeSelector = ({ disabled, limitDuration }: Props) => {
             return null;
           }).filter(Boolean).pop();
 
+          const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
+
           const _onChangeTime = (event) => {
             const newTimeValue = moment.duration(event.target.value, fromValue.rangeType).asSeconds();
 
-            onChange({ target: { name, value: newTimeValue } });
+            _onChange(newTimeValue);
           };
 
           const _onChangeType = (type) => {
             const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
 
-            onChange({ target: { name, value: newTimeValue } });
+            _onChange(newTimeValue);
           };
 
           const _onCheckAllTime = (event) => {
-            const notAllTime = nextTimeRange.range ?? DEFAULT_TIMERANGE.range;
+            const newTimeValue = event.target.checked ? 0 : DEFAULT_TIMERANGE.range;
 
-            onChange({ target: { name, value: event.target.checked ? 0 : notAllTime } });
+            _onChange(newTimeValue);
           };
 
           return (
