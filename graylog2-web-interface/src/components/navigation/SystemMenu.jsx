@@ -116,7 +116,9 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['clusterconfigentry:read']}>
         <NavigationLink path={Routes.SYSTEM.CONFIGURATIONS} description="Configurations" />
       </IfPermitted>
-      <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
+      <HideOnCloud>
+        <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
+      </HideOnCloud>
       <HideOnCloud>
         <IfPermitted permissions={['inputs:read']}>
           <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" />
@@ -158,9 +160,11 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['inputs:create']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
-        <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
-      </IfPermitted>
+      <HideOnCloud>
+        <IfPermitted permissions={['inputs:edit']}>
+          <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
+        </IfPermitted>
+      </HideOnCloud>
       {pluginSystemNavigations}
     </NavDropdown>
   );

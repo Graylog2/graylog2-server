@@ -103,8 +103,8 @@ public class NotificationDtoTest {
         final NotificationDto emptyNotification = getEmailNotification().toBuilder().config(emptyConfig).build();
         final ValidationResult validationResult = emptyNotification.validate();
         assertThat(validationResult.failed()).isTrue();
-        assertThat(validationResult.getErrors().size()).isEqualTo(4);
-        assertThat(validationResult.getErrors()).containsOnlyKeys("subject", "sender", "body_template", "recipients");
+        assertThat(validationResult.getErrors().size()).isEqualTo(3);
+        assertThat(validationResult.getErrors()).containsOnlyKeys("subject", "body_template", "recipients");
     }
 
     @Test
