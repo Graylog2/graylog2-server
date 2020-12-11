@@ -81,7 +81,7 @@ const aceEditorStyles = ({ colors }) => {
       .ace_storage,
       .ace_storage.ace_type,
       .ace_support.ace_type {
-        color: ${colors.variant.primary};
+        color: ${colors.global.link};
       }
 
       .ace_keyword.ace_operator {
