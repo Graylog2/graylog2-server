@@ -254,7 +254,7 @@ RelativeTimeRangeSelector.propTypes = {
   limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({
-    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }).isRequired,
 };
 
