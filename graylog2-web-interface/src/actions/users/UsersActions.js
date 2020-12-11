@@ -40,7 +40,8 @@ export type UserUpdate = $Shape<UserCreate & {
 }>;
 
 export type Token = {
-  token_name: string,
+  id: string,
+  name: string,
   token: string,
   last_access: string,
 };

@@ -172,11 +172,13 @@ public class EmailAlarmCallback implements AlarmCallback {
     // I am truly sorry about this, but leaking the user list is not okay...
     private ConfigurationRequest getConfigurationRequest(Map<String, String> userNames) {
         ConfigurationRequest configurationRequest = new ConfigurationRequest();
-        configurationRequest.addField(new TextField("sender",
-                "Sender",
-                "",
-                "The sender of sent out mail alerts",
-                ConfigurationField.Optional.OPTIONAL));
+        if (!graylogConfig.isCloud()) {
+            configurationRequest.addField(new TextField("sender",
+                    "Sender",
+                    "",
+                    "The sender of sent out mail alerts",
+                    ConfigurationField.Optional.OPTIONAL));
+        }
 
         configurationRequest.addField(new TextField("subject",
                 "E-Mail Subject",

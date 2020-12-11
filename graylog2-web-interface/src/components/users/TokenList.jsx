@@ -14,131 +14,170 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
-import Immutable from 'immutable';
+import React, { useMemo, useState } from 'react';
+import styled from 'styled-components';
 
-import ClipboardButton from 'components/common/ClipboardButton';
-import { Button, Row, Col, FormControl, ControlLabel, Checkbox, ButtonGroup } from 'components/graylog';
-import TableList from 'components/common/TableList';
-import Spinner from 'components/common/Spinner';
+import { ClipboardButton, ControlledTableList, Icon, Timestamp, SearchForm, Spinner } from 'components/common';
+import { Button, ButtonGroup, Col, Checkbox, Panel, Row } from 'components/graylog';
+import type { Token } from 'actions/users/UsersActions';
+import { sortByDate } from 'util/SortUtils';
 
-import TokenListStyle from './TokenList.css';
+import CreateTokenForm from './CreateTokenForm';
 
-class TokenList extends React.Component {
-  static propTypes = {
-    tokens: PropTypes.arrayOf(PropTypes.object),
-    onDelete: PropTypes.func,
-    onCreate: PropTypes.func,
-    creatingToken: PropTypes.bool,
-    deletingToken: PropTypes.string,
+const StyledTokenPanel = styled(Panel)`
+  &.panel {
+    margin: 10px 0;
+    background-color: ${(props) => props.theme.colors.global.contentBackground};
+
+    .panel-heading {
+      color: ${(props) => props.theme.colors.gray[30]};
+    }
+  }
+`;
+
+const StyledCopyTokenButton = styled(ClipboardButton)`
+  vertical-align: baseline;
+  margin-left: 1em;
+`;
+
+const StyledSearchForm = styled(SearchForm)`
+  margin-bottom: 10px;
+`;
+
+const StyledLastAccess = styled.div`
+  color: ${(props) => props.theme.colors.gray[60]};
+  font-size: ${(props) => props.theme.fonts.size.small};
+  margin-bottom: 5px;
+`;
+
+type Props = {
+  creatingToken: boolean,
+  deletingToken: ?string,
+  onCreate: (tokenName: string) => Promise<Token>,
+  onDelete: (tokenId: string, tokenName: string) => void,
+  tokens: Token[],
+};
+
+const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
+  const [createdToken, setCreatedToken] = useState<?Token>();
+  const [query, setQuery] = useState('');
+  const [hideTokens, setHideTokens] = useState(true);
+
+  const effectiveTokens = useMemo(() => {
+    const queryRegex = new RegExp(query, 'i');
+
+    return tokens
+      .filter(({ name }) => queryRegex.test(name))
+      .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
+  }, [query, tokens]);
+
+  const handleTokenCreation = (tokenName) => {
+    const promise = onCreate(tokenName);
+
+    promise.then((token) => {
+      setCreatedToken(token);
+
+      return token;
+    });
   };
 
-  static defaultProps = {
-    tokens: [],
-    onDelete: () => {},
-    onCreate: () => {},
-    creatingToken: false,
-    deletingToken: undefined,
+  const onShowTokensChanged = (event) => {
+    setHideTokens(event.target.checked);
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      token_name: '',
-      hide_tokens: true,
-    };
-
-    this._onNewTokeChanged = this._onNewTokeChanged.bind(this);
-    this._onShowTokensChanged = this._onShowTokensChanged.bind(this);
-    this._createToken = this._createToken.bind(this);
-    this.itemActionsFactory = this.itemActionsFactory.bind(this);
-  }
-
-  _onNewTokeChanged(event) {
-    this.setState({ token_name: event.target.value });
-  }
-
-  _onShowTokensChanged(event) {
-    this.setState({ hide_tokens: event.target.checked });
-  }
-
-  _deleteToken(token) {
+  const deleteToken = (token) => {
     return () => {
-      this.props.onDelete(token.id, token.name);
+      onDelete(token.id, token.name);
     };
-  }
+  };
 
-  _createToken(e) {
-    this.props.onCreate(this.state.token_name);
-    this.setState({ token_name: '' });
-    e.preventDefault();
-  }
+  const updateQuery = (nextQuery: ?string) => setQuery(nextQuery || '');
 
-  itemActionsFactory(token) {
-    const deleteButton = this.props.deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete';
+  return (
+    <span>
+      <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+      {createdToken && (
+        <StyledTokenPanel bsStyle="success">
+          <Panel.Heading>
+            <Panel.Title>Token <em>{createdToken.name}</em> created!</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+            <p>This is your new token.</p>
+            <pre>
+              {createdToken.token}
+              <StyledCopyTokenButton title={<Icon name="clipboard" fixedWidth />} text={createdToken.token} bsSize="xsmall" />
+            </pre>
+            <Button bsStyle="primary" onClick={() => setCreatedToken()}>Done</Button>
+          </Panel.Body>
+        </StyledTokenPanel>
+      )}
+      <hr />
+      <StyledSearchForm onSearch={updateQuery}
+                        onReset={updateQuery}
+                        searchButtonLabel="Find"
+                        searchBsStyle="info"
+                        label="Filter"
+                        useLoadingState={false} />
 
-    return (
-      <ButtonGroup>
-        <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
-        <Button bsSize="xsmall"
-                disabled={this.props.deletingToken === token.id}
-                bsStyle="primary"
-                onClick={this._deleteToken(token)}>
-          {deleteButton}
-        </Button>
-      </ButtonGroup>
-    );
-  }
+      <ControlledTableList>
+        <ControlledTableList.Header />
+        {effectiveTokens.length === 0 && (
+          <ControlledTableList.Item>
+            <p>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</p>
+          </ControlledTableList.Item>
+        )}
+        {effectiveTokens.map((token) => {
+          const tokenNeverUsed = Date.parse(token.last_access) === 0;
 
-  render() {
-    const submitButton = (this.props.creatingToken ? <Spinner text="Creating..." /> : 'Create Token');
+          return (
+            <ControlledTableList.Item key={token.id}>
+              <Row className="row-sm">
+                <Col md={9}>
+                  {token.name}
+                  <StyledLastAccess>
+                    {tokenNeverUsed ? 'Never used' : <>Last used <Timestamp dateTime={token.last_access} relative /></>}
+                  </StyledLastAccess>
+                  {!hideTokens && <pre>{token.token}</pre>}
+                </Col>
+                <Col md={3} className="text-right">
+                  <ButtonGroup>
+                    <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
+                    <Button bsSize="xsmall"
+                            disabled={deletingToken === token.id}
+                            bsStyle="primary"
+                            onClick={deleteToken(token)}>
+                      {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
+                    </Button>
+                  </ButtonGroup>
+                </Col>
+              </Row>
+            </ControlledTableList.Item>
+          );
+        })}
+      </ControlledTableList>
+      <Checkbox id="hide-tokens" onChange={onShowTokensChanged} checked={hideTokens}>
+        Hide Tokens
+      </Checkbox>
+    </span>
+  );
+};
 
-    const createTokenForm = (
-      <form onSubmit={this._createToken}>
-        <div className="form-group">
-          <Row>
-            <Col sm={2}>
-              <ControlLabel className={TokenListStyle.tokenNewNameLabel}>Token Name</ControlLabel>
-            </Col>
-            <Col sm={4}>
-              <FormControl id="create-token-input"
-                           type="text"
-                           placeholder="e.g ServiceName"
-                           value={this.state.token_name}
-                           onChange={this._onNewTokeChanged} />
-            </Col>
-            <Col sm={2}>
-              <Button id="create-token"
-                      disabled={this.state.token_name === '' || this.props.creatingToken}
-                      type="submit"
-                      bsStyle="primary">{submitButton}
-              </Button>
-            </Col>
-          </Row>
-        </div>
-        <hr />
-      </form>
-    );
+TokenList.propTypes = {
+  tokens: PropTypes.arrayOf(PropTypes.object),
+  onDelete: PropTypes.func,
+  onCreate: PropTypes.func,
+  creatingToken: PropTypes.bool,
+  deletingToken: PropTypes.string,
+};
 
-    return (
-      <span>
-        {createTokenForm}
-        <TableList filterKeys={['name', 'token']}
-                   items={Immutable.List(this.props.tokens)}
-                   idKey="token"
-                   titleKey="name"
-                   descriptionKey="token"
-                   hideDescription={this.state.hide_tokens}
-                   enableBulkActions={false}
-                   itemActionsFactory={this.itemActionsFactory} />
-        <Checkbox id="hide-tokens" onChange={this._onShowTokensChanged} checked={this.state.hide_tokens}>
-          Hide Tokens
-        </Checkbox>
-      </span>
-    );
-  }
-}
+TokenList.defaultProps = {
+  tokens: [],
+  onDelete: () => {},
+  onCreate: () => {},
+  creatingToken: false,
+  deletingToken: undefined,
+};
 
 export default TokenList;
