@@ -138,17 +138,9 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
 const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
-  const _isValidRange = (value) => {
-    if (!(limitDuration === 0 || (value <= limitDuration && limitDuration !== 0))) {
-      return 'Range is outside limit duration.';
-    }
-
-    return undefined;
-  };
-
   return (
     <RelativeWrapper>
-      <Field name="nextTimeRange.range" validate={_isValidRange}>
+      <Field name="nextTimeRange.range">
         {({ field: { value, onChange, name }, meta: { error } }) => {
           const fromValue = RANGE_TYPES.map(({ type }) => {
             const isAllTime = value === 0;

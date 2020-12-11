@@ -124,7 +124,7 @@ const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, curren
 });
 
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
-  const { initialValues, isValid, setFieldValue, values } = useFormikContext<FormikValues>();
+  const { initialValues, isValid, setFieldValue, validateForm, values } = useFormikContext<FormikValues>();
   const limitDuration = initialValues?.limitDuration;
   const originalTimeRange = initialValues?.timerange;
   const initialTimeRange = values?.timerange;
@@ -138,7 +138,9 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
     } else {
       setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
     }
-  }, [activeTab, setFieldValue, currentTimeRange]);
+
+    validateForm();
+  }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
 
   const handleNoOverride = () => {
     setFieldValue('timerange', {});
@@ -148,7 +150,6 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
   };
 
   const handleCancel = () => {
-    setFieldValue('timerange', initialTimeRange);
     setFieldValue('nextTimeRange', initialTimeRange);
 
     toggleDropdownShow();
@@ -156,7 +157,6 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
   const handleApply = () => {
     setFieldValue('timerange', currentTimeRange);
-    setFieldValue('nextTimeRange', currentTimeRange);
 
     toggleDropdownShow();
   };

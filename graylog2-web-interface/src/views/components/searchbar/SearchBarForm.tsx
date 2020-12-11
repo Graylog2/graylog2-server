@@ -33,14 +33,32 @@ type Props = {
 };
 
 export const dateTimeValidate = (values) => {
-  const errors: { nextTimeRange?: { from?: string } } = {};
+  const errors: { nextTimeRange?: {
+    from?: string,
+    to?: string,
+    range?: string,
+  } } = {};
 
-  if (values.nextTimeRange?.type === 'absolute'
-    && DateTime.isValidDateString(values.nextTimeRange.from)
-    && values.nextTimeRange.from > values.nextTimeRange.to) {
-    errors.nextTimeRange = {
-      from: 'Start date must be before end date',
-    };
+  const { limitDuration, nextTimeRange } = values;
+
+  if (nextTimeRange?.type === 'absolute') {
+    if (!DateTime.isValidDateString(nextTimeRange.from)) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].' };
+    }
+
+    if (!DateTime.isValidDateString(nextTimeRange.to)) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].' };
+    }
+
+    if (nextTimeRange.from > nextTimeRange.to) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Start date must be before end date' };
+    }
+  }
+
+  if (nextTimeRange?.type === 'relative') {
+    if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
+      errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+    }
   }
 
   return errors;
