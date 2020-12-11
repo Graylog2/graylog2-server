@@ -22,6 +22,7 @@ import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
+import { dateTimeValidate } from 'views/components/searchbar/SearchBarForm';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
@@ -58,7 +59,8 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}>
+            onSubmit={_onSubmit}
+            validate={dateTimeValidate}>
       {(...args) => (
         <Form>
           {_isFunction(children) ? children(...args) : children}
