@@ -17,18 +17,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
+import { RelativeTimeRange } from 'views/logic/queries/Query';
 import Input from 'components/bootstrap/Input';
 import { Icon, Select } from 'components/common';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
+import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
+
 type Props = {
   disabled: boolean,
-  originalTimeRange: {
-    range: string | number,
-  },
   limitDuration: number,
 };
 
@@ -135,8 +135,9 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
   return null;
 }).filter(Boolean);
 
-const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
+const RelativeTimeRangeSelector = ({ disabled, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
+  const { values: { nextTimeRange }, initialValues } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: RelativeTimeRange }>();
 
   return (
     <RelativeWrapper>
@@ -148,7 +149,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
 
             if (diff - Math.floor(diff) === 0) {
               return {
-                ...originalTimeRange,
+                ...nextTimeRange,
                 rangeValue: diff || 0,
                 rangeType: isAllTime ? 'seconds' : type,
                 rangeAllTime: isAllTime,
@@ -172,8 +173,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
           };
 
           const _onCheckAllTime = (event) => {
-            const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
-
+            const notAllTime = initialValues.nextTimeRange?.range ?? DEFAULT_TIMERANGE.range;
             onChange({ target: { name, value: event.target.checked ? 0 : notAllTime } });
           };
 
@@ -193,6 +193,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                        name="relative-timerange-from-value"
                        disabled={disabled || fromValue.rangeAllTime}
                        type="number"
+                       min={1}
                        value={fromValue.rangeValue}
                        title="Set the range value"
                        onChange={_onChangeTime}
@@ -253,9 +254,6 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
 RelativeTimeRangeSelector.propTypes = {
   limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
-  originalTimeRange: PropTypes.shape({
-    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  }).isRequired,
 };
 
 RelativeTimeRangeSelector.defaultProps = {

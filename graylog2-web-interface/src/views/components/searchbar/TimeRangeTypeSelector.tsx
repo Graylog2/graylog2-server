@@ -18,16 +18,20 @@ import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
+import type { TimeRange } from 'views/logic/queries/Query';
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 
 import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 
 type Props = {
+  currentTimeRange: TimeRange,
   disabled?: boolean,
+  limitDuration: number,
   noOverride?: boolean,
+  setCurrentTimeRange: (nextTimeRange: TimeRange) => void,
 };
 
-const TimeRangeTypeSelector = ({ disabled, noOverride }: Props) => {
+const TimeRangeTypeSelector = ({ disabled, noOverride, currentTimeRange, setCurrentTimeRange, limitDuration }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
@@ -37,6 +41,9 @@ const TimeRangeTypeSelector = ({ disabled, noOverride }: Props) => {
                              show={show}
                              toggleShow={toggleShow}>
       <TimeRangeDropdown toggleDropdownShow={toggleShow}
+                         currentTimeRange={currentTimeRange}
+                         limitDuration={limitDuration}
+                         setCurrentTimeRange={setCurrentTimeRange}
                          noOverride={noOverride} />
     </TimeRangeDropdownButton>
   );

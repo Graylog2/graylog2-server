@@ -22,12 +22,10 @@ import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
-import { dateTimeValidate } from 'views/components/searchbar/SearchBarForm';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
 type Values = {
-  limitDuration: number,
   timerange: TimeRange | undefined | null,
   queryString: string | undefined | null,
 };
@@ -47,20 +45,17 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
       queryString,
     });
   }, [onSubmit]);
-  const { limitDuration, timerange, queryString } = initialValues;
+  const { timerange, queryString } = initialValues;
   const initialTimeRange = timerange ? onInitializingTimerange(timerange) : {};
   const _initialValues = {
-    limitDuration,
     timerange: initialTimeRange,
-    nextTimeRange: initialTimeRange,
     queryString,
   };
 
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}
-            validate={dateTimeValidate}>
+            onSubmit={_onSubmit}>
       {(...args) => (
         <Form>
           {_isFunction(children) ? children(...args) : children}
@@ -72,7 +67,6 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
 
 DashboardSearchForm.propTypes = {
   initialValues: PropTypes.shape({
-    limitDuration: PropTypes.number,
     timerange: PropTypes.object,
     queryString: PropTypes.string,
   }).isRequired,

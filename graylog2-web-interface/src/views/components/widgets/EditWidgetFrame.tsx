@@ -93,7 +93,7 @@ const EditWidgetFrame = ({ children }: Props) => {
            animation={false}
            dialogComponentClass={EditWidgetDialog}
            enforceFocus={false}>
-      <SearchBarForm initialValues={{ limitDuration: 0, timerange, streams, queryString }}
+      <SearchBarForm initialValues={{ timerange, streams, queryString }}
                      onSubmit={_onSubmit}>
         <div className={styles.gridContainer}>
           <IfDashboard>

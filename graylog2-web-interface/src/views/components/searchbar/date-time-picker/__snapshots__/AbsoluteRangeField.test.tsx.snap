@@ -1288,7 +1288,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               id="from-time-hours"
               size="2"
               title="from hour"
-              type="number"
+              type="text"
               value="06"
             />
             <span
@@ -1301,7 +1301,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               id="from-time-minutes"
               size="2"
               title="from minutes"
-              type="number"
+              type="text"
               value="15"
             />
             <span
@@ -1314,7 +1314,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               id="from-time-seconds"
               size="2"
               title="from seconds"
-              type="number"
+              type="text"
               value="00"
             />
             <span
@@ -1327,7 +1327,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               id="from-time-milliseconds"
               size="3"
               title="from milliseconds"
-              type="number"
+              type="text"
               value="000"
             />
             <span

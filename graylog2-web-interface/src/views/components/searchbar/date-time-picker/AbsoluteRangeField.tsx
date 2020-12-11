@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import styled, { css, DefaultTheme } from 'styled-components';
 import moment from 'moment';
 
@@ -29,14 +29,14 @@ import {
   InputGroup,
   FormControl,
 } from 'components/graylog';
+import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import DateInputWithPicker from 'views/components/searchbar/DateInputWithPicker';
-import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
+
+import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 
 type Props = {
   disabled: boolean,
   from: boolean,
-  currentTimeRange?: AbsoluteTimeRange,
-  originalTimeRange: TimeRange,
   limitDuration?: number,
 };
 
@@ -155,16 +155,18 @@ const fieldUpdate = (value) => {
   };
 };
 
-const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }: Props) => {
+const AbsoluteRangeField = ({ disabled, limitDuration, from }: Props) => {
   const range = from ? 'from' : 'to';
   const hourIcon = useRef(TIME_ICON_MID);
+
+  const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
 
   return (
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
 
-        const dateTime = error ? currentTimeRange[range] : value || currentTimeRange[range];
+        const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
         const {
           initialDateTime,
           handleChangeSetTime,
@@ -200,7 +202,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
           _onChange(newDate);
         };
 
-        let fromDate = moment(currentTimeRange.from).toDate();
+        let fromDate = moment(nextTimeRange?.from).toDate();
 
         if (from) {
           fromDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
@@ -210,7 +212,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
           <>
             <DateInputWithPicker disabled={disabled}
                                  onChange={_onChangeDate}
-                                 value={value || currentTimeRange[range]}
+                                 value={value || nextTimeRange[range]}
                                  initialDateTimeObject={initialDateTime}
                                  name={name}
                                  title="Search end date"
@@ -284,14 +286,6 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
 
 AbsoluteRangeField.propTypes = {
   from: PropTypes.bool.isRequired,
-  currentTimeRange: PropTypes.shape({
-    from: PropTypes.string,
-    to: PropTypes.string,
-  }),
-  originalTimeRange: PropTypes.shape({
-    from: PropTypes.string,
-    to: PropTypes.string,
-  }).isRequired,
   disabled: PropTypes.bool,
   limitDuration: PropTypes.number,
 };
@@ -299,7 +293,6 @@ AbsoluteRangeField.propTypes = {
 AbsoluteRangeField.defaultProps = {
   disabled: false,
   limitDuration: 0,
-  currentTimeRange: undefined,
 };
 
 export default AbsoluteRangeField;
