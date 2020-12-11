@@ -337,6 +337,7 @@ class Widget extends React.Component<Props, State> {
     const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config, type } = widget;
     const { focusedWidget, setFocusedWidget } = this.context;
+    const isFocusedWidget = focusedWidget === id;
     const visualization = this.visualize();
 
     if (editing) {
@@ -374,7 +375,7 @@ class Widget extends React.Component<Props, State> {
           <InteractiveContext.Consumer>
             {(interactive) => (
               <WidgetHeader title={title}
-                            hideDragHandle={!interactive}
+                            hideDragHandle={!interactive || isFocusedWidget}
                             loading={loading}
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
@@ -383,13 +384,15 @@ class Widget extends React.Component<Props, State> {
                     <IfDashboard>
                       <ReplaySearchButton />
                     </IfDashboard>
-                    <IconButton name={focusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
-                                title={focusedWidget ? 'Un-focus widget' : 'Focus this widget'}
+                    <IconButton name={isFocusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
+                                title={isFocusedWidget ? 'Un-focus widget' : 'Focus this widget'}
                                 onClick={() => setFocusedWidget(id)} />
+                    {!isFocusedWidget && (
                     <WidgetHorizontalStretch widgetId={widget.id}
                                              widgetType={widget.type}
                                              onStretch={onPositionsChange}
                                              position={position} />
+                    )}
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>

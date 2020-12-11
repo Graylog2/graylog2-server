@@ -67,7 +67,7 @@ type Props = {
 
 const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
-  const focusedWidget = useContext(WidgetFocusContext);
+  const { focusedWidget } = useContext(WidgetFocusContext);
 
   if (!fieldTypes) {
     return <Spinner />;
