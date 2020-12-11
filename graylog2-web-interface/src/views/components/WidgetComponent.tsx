@@ -16,27 +16,29 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import * as Immutable from 'immutable';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import WidgetClass from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
+import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
 type Props = {
   widget: WidgetClass & { data: string };
   widgetId: string,
-  data: { [dataKey: string]: unknown };
-  errors: { [widgetId: string]: unknown };
+  data: WidgetDataMap,
+  errors: WidgetErrorsMap,
   widgetDimension: { height: number | null | undefined, width: number | null | undefined },
   title: string,
   position: WidgetPosition,
-  onPositionsChange: (position: WidgetPosition) => void,
-  fields: unknown,
-  allFields: unknown,
-  onWidgetSizeChange: (widgetId: string, dimensions: { height: number, width: number }) => void,
+  onPositionsChange: (position?: WidgetPosition) => void,
+  fields: Immutable.List<TFieldTypeMapping>,
+  onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
 };
 
 const WidgetComponent = ({
@@ -46,10 +48,9 @@ const WidgetComponent = ({
   errors,
   widgetDimension: { height, width },
   position,
-  onPositionsChange = () => {},
+  onPositionsChange = () => undefined,
   title,
   fields,
-  allFields,
   onWidgetSizeChange = () => {},
 }: Props) => {
   const dataKey = widget.data || widget.id;
@@ -68,7 +69,6 @@ const WidgetComponent = ({
                   height={height}
                   position={position}
                   width={width}
-                  allFields={allFields}
                   fields={fields}
                   onPositionsChange={onPositionsChange}
                   onSizeChange={onWidgetSizeChange}
@@ -89,7 +89,6 @@ WidgetComponent.propTypes = {
   position: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
   fields: PropTypes.object.isRequired,
-  allFields: PropTypes.object.isRequired,
   onWidgetSizeChange: PropTypes.func,
 };
 

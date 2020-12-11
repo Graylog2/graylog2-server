@@ -92,7 +92,6 @@ type Props = {
   position: WidgetPosition,
   onSizeChange: () => void,
   onPositionsChange: () => void,
-  focusedWidget: string | null | undefined,
 };
 type State = {
   editing: boolean,

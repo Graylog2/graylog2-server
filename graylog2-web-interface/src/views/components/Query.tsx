@@ -102,8 +102,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
                            widgetDimension={{ height: 100, width: 200 }}
                            title={title}
                            position={WidgetPosition.builder().build()}
-                           fields={fields}
-                           allFields={allFields} />
+                           fields={fields} />
         </WidgetContainer>
       );
     }

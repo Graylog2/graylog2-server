@@ -84,7 +84,7 @@ const SearchArea = styled(AppContentGrid)`
   }
 `;
 
-const SearchLayoutContainer = styled.div(({ isDashboard }) => {
+const SearchLayoutContainer = styled.div(({ isDashboard }: { isDashboard: boolean }) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   const grid = isDashboard
