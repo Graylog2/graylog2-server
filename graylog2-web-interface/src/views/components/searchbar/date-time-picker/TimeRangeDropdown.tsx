@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import moment from 'moment';
+import Mousetrap from 'mousetrap';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -149,17 +150,26 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
     toggleDropdownShow();
   };
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setFieldValue('nextTimeRange', initialTimeRange);
 
     toggleDropdownShow();
-  };
+  }, [initialTimeRange, setFieldValue, toggleDropdownShow]);
 
-  const handleApply = () => {
+  const handleApply = useCallback(() => {
     setFieldValue('timerange', currentTimeRange);
 
     toggleDropdownShow();
-  };
+  }, [currentTimeRange, setFieldValue, toggleDropdownShow]);
+
+  useEffect(() => {
+    Mousetrap.bind('enter', isValid ? handleApply : () => {});
+    Mousetrap.bind('esc', handleCancel);
+
+    return () => {
+      Mousetrap.reset();
+    };
+  }, [isValid, handleApply, handleCancel]);
 
   const title = (
     <PopoverTitle>
