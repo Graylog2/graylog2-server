@@ -17,7 +17,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import Select from 'components/common/Select';
 import type { Stream } from 'stores/streams/StreamsStore';
@@ -26,7 +25,7 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 export const DEFAULT_STREAM_ID = '000000000000000000000001';
 export const DEFAULT_SEARCH_ID = 'DEFAULT_SEARCH';
 
-const SelectContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const SelectContainer = styled.div`
   margin-bottom: 10px;
 `;
 

@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import { Col, Row } from 'components/graylog';
@@ -51,7 +50,7 @@ type State = {
   config: AggregationWidgetConfig,
 };
 
-const Container: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const Container = styled.div`
   display: grid;
   display: -ms-grid;
   grid-template-rows: auto minmax(10px, 1fr);

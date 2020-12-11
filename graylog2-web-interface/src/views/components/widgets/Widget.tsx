@@ -62,6 +62,7 @@ import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import ReplaySearchButton from './ReplaySearchButton';
 
+import CustomPropTypes from '../CustomPropTypes';
 import IfDashboard from '../dashboard/IfDashboard';
 import InteractiveContext from '../contexts/InteractiveContext';
 import IfInteractive from '../dashboard/IfInteractive';
@@ -129,14 +130,8 @@ const _editComponentForType = (type) => {
 class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
-    view: PropTypes.object.isRequired,
-    widget: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      computationTimeRange: PropTypes.object,
-      config: PropTypes.object.isRequired,
-      filter: PropTypes.string,
-    }).isRequired,
+    view: CustomPropTypes.CurrentView.isRequired,
+    widget: PropTypes.instanceOf(WidgetModel).isRequired,
     data: PropTypes.any,
     editing: PropTypes.bool,
     errors: WidgetErrorsList,
@@ -146,7 +141,7 @@ class Widget extends React.Component<Props, State> {
     onSizeChange: PropTypes.func.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    position: PropTypes.object.isRequired,
+    position: PropTypes.instanceOf(WidgetPosition).isRequired,
   };
 
   static defaultProps = {

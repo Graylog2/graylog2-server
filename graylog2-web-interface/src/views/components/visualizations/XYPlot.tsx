@@ -43,7 +43,7 @@ export type Props = {
     from: string,
     to: string,
   },
-  getChartColor?: (data: Array<ChartConfig>, name: string) => (string | undefined | null | void),
+  getChartColor?: (data: Array<ChartConfig>, name: string) => (string | undefined | null),
   height?: number;
   setChartColor?: (config: ChartConfig, color: ColorMap) => ChartColor,
   plotLayout?: any,

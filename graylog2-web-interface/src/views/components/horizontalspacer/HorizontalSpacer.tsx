@@ -17,10 +17,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 /**
- * Component to display horisontal space.
+ * Component to display horizontal space.
  * Mainly needed for responsive bootstrap grids.
  * Can be used in combination with bootstrap Cols to show horizontal space only for specific viewports.
  */
@@ -32,7 +31,7 @@ type Props = {
   className?: string,
 };
 
-const Spacer: StyledComponent<Props, {}, HTMLDivElement> = styled.div`
+const Spacer = styled.div<Pick<Props, 'height'>>`
   width: 100%;
   height: ${(props) => props.height}px;
 `;

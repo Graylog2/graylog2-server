@@ -25,7 +25,7 @@ import ViewState from 'views/logic/views/ViewState';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
-const TitleWrap = styled.span(({ active }) => css`
+const TitleWrap = styled.span<{ active: boolean }>(({ active }) => css`
   padding-right: ${active ? '6px' : '0'};
 `);
 
