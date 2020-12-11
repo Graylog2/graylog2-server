@@ -16,13 +16,14 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useEffect, useState } from 'react';
-import { useFormikContext } from 'formik';
+import { useState } from 'react';
+import { Form, Formik } from 'formik';
 import moment from 'moment';
 
+import type { TimeRange } from 'views/logic/queries/Query';
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
-import { availableTimeRangeTypes, FormikValues } from 'views/Constants';
+import { availableTimeRangeTypes, DEFAULT_RANGE_TYPE } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -38,9 +39,35 @@ const timeRangeTypes = {
   keyword: KeywordTimeRangeSelector,
 };
 
+export type TimeRangeDropDownFormValues = {
+  nextTimeRange?: TimeRange,
+};
+
+const DEFAULT_RANGES = {
+  absolute: {
+    type: 'absolute',
+    from: moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
+    to: moment().format(DateTime.Formats.TIMESTAMP),
+  },
+  relative: {
+    type: 'relative',
+    range: 300,
+  },
+  keyword: {
+    type: 'keyword',
+    keyword: 'Last five minutes',
+  },
+  disabled: undefined,
+} as const;
+
+type NoTimeRangeOverride = {};
+
 type Props = {
   noOverride?: boolean,
   toggleDropdownShow: () => void,
+  limitDuration: number,
+  currentTimeRange: TimeRange | NoTimeRangeOverride,
+  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
 };
 
 const StyledPopover = styled(Popover)(({ theme }) => css`
@@ -89,24 +116,7 @@ const CancelButton = styled(Button)`
   margin-right: 6px;
 `;
 
-const DEFAULT_RANGES = {
-  absolute: {
-    type: 'absolute',
-    from: moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: moment().format(DateTime.Formats.TIMESTAMP),
-  },
-  relative: {
-    type: 'relative',
-    range: 300,
-  },
-  keyword: {
-    type: 'keyword',
-    keyword: 'Last five minutes',
-  },
-  disabled: undefined,
-};
-
-const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, currentTimeRange }) => availableTimeRangeTypes.map(({ type, name }) => {
+const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTypes.map(({ type, name }) => {
   const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
 
   return (
@@ -115,49 +125,21 @@ const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, curren
          eventKey={type}>
       {type === activeTab && (
         <RangeComponent disabled={false}
-                        originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
-                        limitDuration={limitDuration}
-                        currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
+                        limitDuration={limitDuration} />
       )}
     </Tab>
   );
 });
 
-const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
-  const { initialValues, isValid, setFieldValue, validateForm, values } = useFormikContext<FormikValues>();
-  const limitDuration = initialValues?.limitDuration;
-  const originalTimeRange = initialValues?.timerange;
-  const initialTimeRange = values?.timerange;
-  const currentTimeRange = values?.nextTimeRange;
-
-  const [activeTab, setActiveTab] = useState(currentTimeRange?.type);
-
-  useEffect(() => {
-    if (currentTimeRange?.type) {
-      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, activeTab), false);
-    } else {
-      setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
-    }
-
-    validateForm();
-  }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
+const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, setCurrentTimeRange, currentTimeRange, limitDuration }: Props) => {
+  const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : DEFAULT_RANGE_TYPE);
 
   const handleNoOverride = () => {
-    setFieldValue('timerange', {});
-    setFieldValue('nextTimeRange', {});
-
+    setCurrentTimeRange({});
     toggleDropdownShow();
   };
 
   const handleCancel = () => {
-    setFieldValue('nextTimeRange', initialTimeRange);
-
-    toggleDropdownShow();
-  };
-
-  const handleApply = () => {
-    setFieldValue('timerange', currentTimeRange);
-
     toggleDropdownShow();
   };
 
@@ -179,39 +161,62 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
                    positionTop={36}
                    title={title}
                    arrowOffsetLeft={34}>
-      <Row>
-        <Col md={12}>
-          <TimeRangeLivePreview timerange={currentTimeRange} />
+      <Formik initialValues={{ nextTimeRange: 'type' in currentTimeRange ? currentTimeRange : DEFAULT_RANGES[activeTab] }}
+              onSubmit={({ nextTimeRange }) => {
+                setCurrentTimeRange(nextTimeRange);
+                toggleDropdownShow();
+              }}>
+        {(({ values: { nextTimeRange }, isValid, setFieldValue, validateForm }) => {
+          const changeTab = (nextTimeRangeType) => {
+            if (nextTimeRangeType !== nextTimeRange?.type) {
+              if (nextTimeRange?.type) {
+                setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange, nextTimeRangeType), false);
+              } else {
+                setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
+              }
+            }
 
-          <StyledTabs id="dateTimeTypes"
-                      defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeTab}
-                      onSelect={setActiveTab}
-                      animation={false}>
-            {timeRangeTypeTabs({
-              activeTab,
-              originalTimeRange,
-              limitDuration,
-              currentTimeRange,
-            })}
-          </StyledTabs>
-        </Col>
-      </Row>
+            setActiveTab(nextTimeRangeType);
+            validateForm();
+          };
 
-      <Row className="row-sm">
-        <Col md={6}>
-          <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
-        </Col>
-        <Col md={6}>
-          <div className="pull-right">
-            {noOverride && (
-              <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
-            )}
-            <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
-            <Button bsStyle="success" onClick={handleApply} disabled={!isValid}>Apply</Button>
-          </div>
-        </Col>
-      </Row>
+          return (
+            <Form>
+              <Row>
+                <Col md={12}>
+                  <TimeRangeLivePreview timerange={nextTimeRange} />
+
+                  <StyledTabs id="dateTimeTypes"
+                              defaultActiveKey={availableTimeRangeTypes[0].type}
+                              activeKey={activeTab}
+                              onSelect={changeTab}
+                              animation={false}>
+                    {timeRangeTypeTabs({
+                      activeTab,
+                      limitDuration,
+                    })}
+                  </StyledTabs>
+                </Col>
+              </Row>
+
+              <Row className="row-sm">
+                <Col md={6}>
+                  <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
+                </Col>
+                <Col md={6}>
+                  <div className="pull-right">
+                    {noOverride && (
+                      <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
+                    )}
+                    <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
+                    <Button bsStyle="success" type="submit" disabled={!isValid}>Apply</Button>
+                  </div>
+                </Col>
+              </Row>
+            </Form>
+          );
+        })}
+      </Formik>
     </StyledPopover>
   );
 };

@@ -23,22 +23,18 @@ import OriginalRelativeTimeRangeSelector from './RelativeTimeRangeSelector';
 const defaultProps = {
   limitDuration: 0,
   disabled: false,
-  originalTimeRange: {
+};
+
+const initialValues = {
+  nextTimeRange: {
     type: 'relative',
     range: 3600,
   },
 };
 
-const initialValues = {
-  nextTimeRange: defaultProps.originalTimeRange,
-};
-
 type Props = {
   disabled: boolean,
   limitDuration: number,
-  originalTimeRange: {
-    range: string | number,
-  },
 };
 
 const RelativeTimeRangeSelector = (allProps: Props) => (
@@ -52,7 +48,7 @@ const RelativeTimeRangeSelector = (allProps: Props) => (
 );
 
 describe('RelativeTimeRangeSelector', () => {
-  it('renders originalTimeRange value', () => {
+  it('renders nextTimeRange value', () => {
     render(<RelativeTimeRangeSelector {...defaultProps} />);
 
     const spinbutton = screen.getByRole('spinbutton', { name: /set the range value/i });
@@ -61,7 +57,7 @@ describe('RelativeTimeRangeSelector', () => {
     expect(spinbutton).toHaveValue(1);
   });
 
-  it('renders originalTimeRange type', () => {
+  it('renders nextTimeRange type', () => {
     render(<RelativeTimeRangeSelector {...defaultProps} />);
 
     expect(screen.getByText(/Hours/i)).toBeInTheDocument();

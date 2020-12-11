@@ -100,13 +100,14 @@ const SearchBar = ({
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
-          <SearchBarForm initialValues={{ limitDuration, timerange, streams, queryString }}
+          <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                         limitDuration={limitDuration}
                          onSubmit={_onSubmit}>
-            {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
+            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
               <>
                 <TopRow>
                   <FlexCol md={6}>
-                    <TimeRangeTypeSelector disabled={disableSearch} />
+                    <TimeRangeTypeSelector disabled={disableSearch} setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)} currentTimeRange={values?.timerange} limitDuration={limitDuration} />
                     <TimeRangeDisplay timerange={values?.timerange} />
                     <RefreshControls />
                   </FlexCol>

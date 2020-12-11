@@ -27,32 +27,30 @@ import { dateTimeValidate } from 'views/components/searchbar/SearchBarForm';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
 type Values = {
-  limitDuration: number,
   timerange: TimeRange | undefined | null,
   queryString: string | undefined | null,
 };
 
 type Props = {
   initialValues: Values,
+  limitDuration: number,
   onSubmit: (Values) => void | Promise<any>,
   children: ((props: FormikProps<Values>) => React.ReactElement) | React.ReactElement,
 };
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
 
-const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
+const DashboardSearchForm = ({ initialValues, onSubmit, children, limitDuration }: Props) => {
   const _onSubmit = useCallback(({ timerange, queryString }) => {
     return onSubmit({
       timerange: Object.keys(timerange).length ? onSubmittingTimerange(timerange) : undefined,
       queryString,
     });
   }, [onSubmit]);
-  const { limitDuration, timerange, queryString } = initialValues;
+  const { timerange, queryString } = initialValues;
   const initialTimeRange = timerange ? onInitializingTimerange(timerange) : {};
   const _initialValues = {
-    limitDuration,
     timerange: initialTimeRange,
-    nextTimeRange: initialTimeRange,
     queryString,
   };
 
@@ -60,7 +58,7 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
-            validate={dateTimeValidate}>
+            validate={(values) => dateTimeValidate(values, limitDuration)}>
       {(...args) => (
         <Form>
           {_isFunction(children) ? children(...args) : children}

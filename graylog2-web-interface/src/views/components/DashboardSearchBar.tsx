@@ -70,54 +70,55 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
     <ScrollToHint value={queryString}>
       <Row className="content">
         <Col md={12}>
-          <DashboardSearchForm initialValues={{ limitDuration, timerange, queryString }} onSubmit={submitForm}>
-            {({ dirty, isSubmitting, isValid, handleSubmit, values }) => {
-              return (
-                <>
-                  <TopRow>
-                    <FlexCol lg={8} md={9} xs={10}>
-                      <TimeRangeTypeSelector disabled={disableSearch}
-                                             noOverride />
-                      <TimeRangeDisplay timerange={values?.timerange} />
-                    </FlexCol>
-                    <Col lg={4} md={3} xs={2}>
-                      <RefreshControls />
-                    </Col>
-                  </TopRow>
+          <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm} limitDuration={limitDuration}>
+            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+              <>
+                <TopRow>
+                  <FlexCol lg={8} md={9} xs={10}>
+                    <TimeRangeTypeSelector disabled={disableSearch}
+                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                           currentTimeRange={values?.timerange}
+                                           limitDuration={limitDuration}
+                                           noOverride />
+                    <TimeRangeDisplay timerange={values?.timerange} />
+                  </FlexCol>
+                  <Col lg={4} md={3} xs={2}>
+                    <RefreshControls />
+                  </Col>
+                </TopRow>
 
-                  <Row className="no-bm">
-                    <Col md={8} lg={9}>
-                      <div className="pull-right search-help">
-                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                           title="Search query syntax documentation"
-                                           text={<Icon name="lightbulb" />} />
-                      </div>
-                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                    glyph="filter"
-                                    dirty={dirty} />
+                <Row className="no-bm">
+                  <Col md={8} lg={9}>
+                    <div className="pull-right search-help">
+                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                         title="Search query syntax documentation"
+                                         text={<Icon name="lightbulb" />} />
+                    </div>
+                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                                  glyph="filter"
+                                  dirty={dirty} />
 
-                      <Field name="queryString">
-                        {({ field: { name, value, onChange } }) => (
-                          <QueryInput value={value}
-                                      placeholder="Apply filter to all widgets"
-                                      onChange={(newQuery) => {
-                                        onChange({ target: { value: newQuery, name } });
+                    <Field name="queryString">
+                      {({ field: { name, value, onChange } }) => (
+                        <QueryInput value={value}
+                                    placeholder="Apply filter to all widgets"
+                                    onChange={(newQuery) => {
+                                      onChange({ target: { value: newQuery, name } });
 
-                                        return Promise.resolve(newQuery);
-                                      }}
-                                      onExecute={handleSubmit as () => void} />
-                        )}
-                      </Field>
-                    </Col>
-                    <Col md={4} lg={3}>
-                      <div className="pull-right">
-                        <ViewActionsMenu />
-                      </div>
-                    </Col>
-                  </Row>
-                </>
-              );
-            }}
+                                      return Promise.resolve(newQuery);
+                                    }}
+                                    onExecute={handleSubmit as () => void} />
+                      )}
+                    </Field>
+                  </Col>
+                  <Col md={4} lg={3}>
+                    <div className="pull-right">
+                      <ViewActionsMenu />
+                    </div>
+                  </Col>
+                </Row>
+              </>
+            )}
           </DashboardSearchForm>
         </Col>
       </Row>
