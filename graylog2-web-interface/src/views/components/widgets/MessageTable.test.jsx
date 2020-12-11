@@ -30,9 +30,10 @@ const activeQueryId = 'some-query-id';
 
 
 const SimpleMessageTable = (props) => (
+  // $FlowFixMe: allow breaking contract on purpose.
   <MessageTable activeQueryId={activeQueryId}
                 config={config}
-                fields={Immutable.List(fields)}
+                fields={Immutable.List<FieldTypeMapping>(fields)}
                 messages={messages}
                 onSortChange={() => Promise.resolve()}
                 selectedFields={Immutable.Set()}
@@ -57,7 +58,6 @@ describe('MessageTable', () => {
   it('renders a table entry for messages, even if fields are `undefined`', () => {
     // Suppressing console to disable props warning because of `fields` being `undefined`.
     suppressConsole(() => {
-      // $FlowFixMe: violating contract on purpose
       const wrapper = mount(<SimpleMessageTable fields={undefined} />);
       const messageTableEntry = wrapper.find('MessageTableEntry');
       expect(messageTableEntry).not.toBeEmptyRender();

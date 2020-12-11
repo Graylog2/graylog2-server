@@ -176,8 +176,8 @@ class MessageTable extends React.Component<Props, State> {
     setLoadingState: PropTypes.func.isRequired,
   };
 
-  static defaultProps = {
-    selectedFields: Immutable.Set<string>(),
+  static defaultProps: DefaultProps = {
+    selectedFields: new Immutable.Set<string>(),
   };
 
   constructor(props: Props) {
