@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
-import { ThemeInterface } from 'theme';
 import { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/graylog';
 import { Step } from 'components/common/Wizard';
@@ -30,7 +29,7 @@ import BackendWizardContext, { WizardFormValues } from './BackendWizardContext';
 import ServerConnectionTest from './ServerConnectionTest';
 import UserLoginTest from './UserLoginTest';
 
-const StyledPanelGroup: StyledComponent<{}, ThemeInterface, PanelGroup> = styled(PanelGroup)`
+const StyledPanelGroup = styled(PanelGroup)`
   &.panel-group .panel {
     margin-top: 0;
     border-color: ${(props) => props.theme.colors.input.border};

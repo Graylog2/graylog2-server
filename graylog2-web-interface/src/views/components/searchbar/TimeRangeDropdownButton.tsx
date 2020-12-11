@@ -16,12 +16,11 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { DropdownButton } from 'components/graylog';
 import { Icon } from 'components/common';
 
-const StyledDropdownButton: StyledComponent<{}, void, DropdownButton> = styled(DropdownButton)`
+const StyledDropdownButton = styled(DropdownButton)`
   padding: 6px 7px;
   margin-right: 5px;
 `;

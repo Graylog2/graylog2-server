@@ -27,7 +27,7 @@ import Select from 'views/components/Select';
 
 type Props = {
   fields: Immutable.List<FieldTypeMapping>,
-  onChange: (newSort: Array<SortConfig>) => any,
+  onChange: (newSort: Array<SortConfig>) => void,
   sort: Array<SortConfig>,
 };
 
@@ -73,7 +73,7 @@ const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
   return (
     <Select placeholder="None: click to add fields"
             onChange={(newValue, reason) => onOptionChange(options, onChange, newValue, reason)}
-            options={options}
+            options={options.toJS()}
             isClearable
             value={currentValue(sort, options)} />
   );

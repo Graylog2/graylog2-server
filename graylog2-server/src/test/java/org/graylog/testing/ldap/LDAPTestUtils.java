@@ -17,6 +17,7 @@
 package org.graylog.testing.ldap;
 
 import com.google.common.io.Resources;
+import org.graylog.testing.ResourceUtil;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -29,13 +30,8 @@ public class LDAPTestUtils {
     public static final String BASE_LDIF = RESOURCE_ROOT + "/ldif/base.ldif";
     public static final String NESTED_GROUPS_LDIF = RESOURCE_ROOT + "/ldif/nested-groups.ldif";
 
-    public static String testTLSCertsPath() {
-        final URL resourceUrl = Resources.getResource(RESOURCE_ROOT + "/certs");
-        try {
-            return Paths.get(resourceUrl.toURI()).toAbsolutePath().toString();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+    public static String testTLSCertsPath(String filename) {
+        return getResourcePath(RESOURCE_ROOT + "/certs/" + filename);
     }
 
     public static KeyStore getKeystore(String filename) {
@@ -51,6 +47,11 @@ public class LDAPTestUtils {
     public static String getResourcePath(String resourcePath) {
         final URL resourceUrl = Resources.getResource(resourcePath);
         try {
+            // If the resource is located inside a JAR file, we need to write it to a temporary file to make it
+            // accessible in the file system. (e.g. to mount it into a Docker container)
+            if ("jar".equals(resourceUrl.getProtocol())) {
+                return ResourceUtil.resourceURLToTmpFile(resourceUrl).toAbsolutePath().toString();
+            }
             return Paths.get(resourceUrl.toURI()).toAbsolutePath().toString();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);

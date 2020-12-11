@@ -16,10 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
-
-import type { ThemeInterface } from 'theme';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import { Dropdown } from './bootstrap-import';
 
@@ -29,7 +26,7 @@ type Props = {
   title: string,
 };
 
-const Toggle: StyledComponent<{}, ThemeInterface, HTMLAnchorElement> = styled.a.attrs({
+const Toggle = styled.a.attrs({
   href: '#', /* stylelint-disable-line property-no-unknown */
 })(({ theme }) => css`
   &::after {
@@ -47,7 +44,7 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLAnchorElement> = styled.a.
   }
 `);
 
-const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, Dropdown> = styled(Dropdown)(({ left, theme }) => css`
+const StyledSubmenu = styled(Dropdown)(({ left, theme }: { left: boolean, theme: DefaultTheme }) => css`
   position: relative;
 
   > .dropdown-menu {

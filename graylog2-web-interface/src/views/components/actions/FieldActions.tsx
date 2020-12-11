@@ -16,17 +16,15 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
-import type { ThemeInterface } from 'theme';
 
 import { createHandlerFor } from './ActionHandler';
-import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
+import type { ActionComponents, ActionDefinition } from './ActionHandler';
 
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Field.css';
@@ -51,9 +49,9 @@ type FieldElementProps = {
   disabled: boolean,
 };
 
-const FieldElement: StyledComponent<FieldElementProps, ThemeInterface, HTMLSpanElement> = styled.span.attrs({
-  className: 'field-element',
-})(({ active, disabled, theme }) => css`
+const FieldElement = styled.span.attrs({
+  className: 'field-element', /* stylelint-disable-line property-no-unknown */
+})<FieldElementProps>(({ active, disabled, theme }) => css`
   color: ${active ? theme.colors.variant.info : 'currentColor'};
   opacity: ${disabled ? '0.3' : '1'};
 `);

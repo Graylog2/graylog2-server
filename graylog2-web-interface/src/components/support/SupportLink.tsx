@@ -16,17 +16,16 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
-import type { ThemeInterface } from 'theme/types';
 
 type Props = {
   children: React.ReactNode,
   small: boolean,
 };
 
-const IconStack: StyledComponent<{small: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ small, theme }) => css`
+const IconStack = styled.div<{ small: boolean }>(({ small, theme }) => css`
   position: relative;
   min-width: 2.5em;
   font-size: ${small ? theme.fonts.size.body : theme.fonts.size.large};
