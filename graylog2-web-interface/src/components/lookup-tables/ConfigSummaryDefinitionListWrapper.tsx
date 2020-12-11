@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { ThemeInterface } from 'theme';
-
-const ConfigSummaryDefinitionListWrapper: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const ConfigSummaryDefinitionListWrapper = styled.div`
   dl {
     margin-top: 10px;
 
