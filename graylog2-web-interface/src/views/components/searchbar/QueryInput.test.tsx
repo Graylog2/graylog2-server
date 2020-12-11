@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
+import ReactAce from 'react-ace';
 
 import QueryInput from './QueryInput';
 
@@ -48,7 +49,7 @@ describe('QueryInput', () => {
   const _mount = (component) => {
     const wrapper = mount(component);
 
-    return wrapper.find('ReactAce');
+    return wrapper.find(ReactAce);
   };
 
   it('renders with minimal props', () => {
@@ -72,7 +73,7 @@ describe('QueryInput', () => {
     const aceEditor = _mount(<SimpleQueryInput onBlur={_onBlur} />);
     const { onBlur } = aceEditor.props();
 
-    onBlur();
+    onBlur({ target: aceEditor });
 
     expect(_onBlur).toHaveBeenCalled();
   });

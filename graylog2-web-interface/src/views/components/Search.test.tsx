@@ -36,6 +36,7 @@ import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvi
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import Search from './Search';
+import DashboardSearchBar from './DashboardSearchBar';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
@@ -281,12 +282,12 @@ describe('Search', () => {
   it('refreshing after query change parses search metadata first', (done) => {
     const wrapper = mount(<SimpleSearch />);
 
-    const searchBar = wrapper.find('DashboardSearchBar');
-    const cb = searchBar.at(0).props().onExecute;
+    const searchBar = wrapper.find(DashboardSearchBar);
+    const cb = searchBar.at(0).props().onExecute as (view?: View) => Promise<void>;
 
     const view = { search: {} };
 
-    const promise = cb(view);
+    const promise = cb(view as View);
 
     promise.then(() => {
       expect(SearchMetadataActions.parseSearch).toHaveBeenCalled();
