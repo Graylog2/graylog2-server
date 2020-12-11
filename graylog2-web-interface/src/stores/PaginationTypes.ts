@@ -19,19 +19,13 @@ import { $PropertyType } from 'utility-types';
 
 import type { AdditionalQueries } from 'util/PaginationURL';
 
+/* eslint-disable camelcase */
 export type PaginatedResponseType = {
   count: number,
   total: number,
   page: number,
   per_page: number,
   query: string,
-};
-
-export type Pagination = {
-  page: number,
-  perPage: number,
-  query: string,
-  additionalQueries?: AdditionalQueries,
 };
 
 export type PaginatedListJSON = {
@@ -41,10 +35,24 @@ export type PaginatedListJSON = {
   total: number,
   count: number,
 };
+/* eslint-enable camelcase */
+
+export type Pagination = {
+  page: number,
+  perPage: number,
+  query: string,
+  additionalQueries?: AdditionalQueries,
+};
 
 export type ListPagination = Pagination & {
   total: number,
   count: number,
+};
+
+export const DEFAULT_PAGINATION: Pagination = {
+  page: 1,
+  perPage: 10,
+  query: '',
 };
 
 export type PaginatedList<ItemType> = {
