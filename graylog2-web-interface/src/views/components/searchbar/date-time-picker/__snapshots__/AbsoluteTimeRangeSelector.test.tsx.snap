@@ -384,6 +384,7 @@ fieldset[disabled] .c2.form-control:not([type="range"]) {
 .c7 {
   padding: 0;
   background: #f3f3f3;
+  font-weight: bold;
 }
 
 .c7:not(:first-child):not(:last-child) {
@@ -393,7 +394,8 @@ fieldset[disabled] .c2.form-control:not([type="range"]) {
 }
 
 .c9 {
-  padding: 0 9px;
+  padding: 0 6px 0 9px;
+  width: 50px !important;
 }
 
 .c9.form-control:not([type="range"]) {
@@ -432,6 +434,10 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
 
 .c9.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
   display: none;
+}
+
+.c9:last-of-type {
+  width: 60px !important;
 }
 
 .c8 {
@@ -1347,7 +1353,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="from-time-hours"
-                  size="2"
                   title="from hour"
                   type="number"
                   value="06"
@@ -1360,7 +1365,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="from-time-minutes"
-                  size="2"
                   title="from minutes"
                   type="number"
                   value="15"
@@ -1373,7 +1377,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="from-time-seconds"
-                  size="2"
                   title="from seconds"
                   type="number"
                   value="00"
@@ -1386,7 +1389,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="from-time-milliseconds"
-                  size="3"
                   title="from milliseconds"
                   type="number"
                   value="000"
@@ -1699,7 +1701,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Thu Dec 10 2020"
                         aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--today"
+                        class="DayPicker-Day"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1709,7 +1711,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Fri Dec 11 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--today"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1983,7 +1985,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="to-time-hours"
-                  size="2"
                   title="to hour"
                   type="number"
                   value="NaN"
@@ -1996,7 +1997,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="to-time-minutes"
-                  size="2"
                   title="to minutes"
                   type="number"
                   value="NaN"
@@ -2009,7 +2009,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="to-time-seconds"
-                  size="2"
                   title="to seconds"
                   type="number"
                   value="NaN"
@@ -2022,7 +2021,6 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                 <input
                   class="c9 form-control input-sm"
                   id="to-time-milliseconds"
-                  size="3"
                   title="to milliseconds"
                   type="number"
                   value="NaN"

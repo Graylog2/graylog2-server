@@ -388,6 +388,7 @@ fieldset[disabled] .c3.form-control:not([type="range"]) {
 .c8 {
   padding: 0;
   background: #f3f3f3;
+  font-weight: bold;
 }
 
 .c8:not(:first-child):not(:last-child) {
@@ -397,7 +398,8 @@ fieldset[disabled] .c3.form-control:not([type="range"]) {
 }
 
 .c10 {
-  padding: 0 9px;
+  padding: 0 6px 0 9px;
+  width: 50px !important;
 }
 
 .c10.form-control:not([type="range"]) {
@@ -436,6 +438,10 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
 
 .c10.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
   display: none;
+}
+
+.c10:last-of-type {
+  width: 60px !important;
 }
 
 .c9 {
@@ -1352,7 +1358,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="from-time-hours"
-                  size="2"
                   title="from hour"
                   type="number"
                   value="10"
@@ -1365,7 +1370,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="from-time-minutes"
-                  size="2"
                   title="from minutes"
                   type="number"
                   value="04"
@@ -1378,7 +1382,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="from-time-seconds"
-                  size="2"
                   title="from seconds"
                   type="number"
                   value="30"
@@ -1391,7 +1394,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="from-time-milliseconds"
-                  size="3"
                   title="from milliseconds"
                   type="number"
                   value="329"
@@ -1988,7 +1990,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="to-time-hours"
-                  size="2"
                   title="to hour"
                   type="number"
                   value="10"
@@ -2001,7 +2002,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="to-time-minutes"
-                  size="2"
                   title="to minutes"
                   type="number"
                   value="04"
@@ -2014,7 +2014,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="to-time-seconds"
-                  size="2"
                   title="to seconds"
                   type="number"
                   value="30"
@@ -2027,7 +2026,6 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 <input
                   class="c10 form-control input-sm"
                   id="to-time-milliseconds"
-                  size="3"
                   title="to milliseconds"
                   type="number"
                   value="329"
