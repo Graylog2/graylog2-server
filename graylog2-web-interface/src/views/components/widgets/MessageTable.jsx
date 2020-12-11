@@ -22,6 +22,7 @@ import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
+import InteractiveContext from '../contexts/InteractiveContext';
 
 const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   grid-row: 1;
@@ -153,7 +154,6 @@ type State = {
 type Props = {
   activeQueryId: string,
   config: MessagesWidgetConfig,
-  editing?: boolean,
   fields: Immutable.List<FieldTypeMapping>,
   messages: Array<BackendMessage>,
   onSortChange: (SortConfig[]) => Promise<void>,
@@ -169,7 +169,6 @@ class MessageTable extends React.Component<Props, State> {
   static propTypes = {
     activeQueryId: PropTypes.string.isRequired,
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-    editing: PropTypes.bool,
     fields: CustomPropTypes.FieldListType.isRequired,
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSortChange: PropTypes.func.isRequired,
@@ -178,8 +177,7 @@ class MessageTable extends React.Component<Props, State> {
   };
 
   static defaultProps: DefaultProps = {
-    editing: false,
-    selectedFields: Immutable.Set<string>(),
+    selectedFields: new Immutable.Set<string>(),
   };
 
   constructor(props: Props) {
@@ -234,7 +232,7 @@ class MessageTable extends React.Component<Props, State> {
 
   render() {
     const { expandedMessages } = this.state;
-    const { fields, activeQueryId, config, editing, onSortChange, setLoadingState } = this.props;
+    const { fields, activeQueryId, config, onSortChange, setLoadingState } = this.props;
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     return (
@@ -251,12 +249,14 @@ class MessageTable extends React.Component<Props, State> {
                            queryId={activeQueryId}>
                       {selectedFieldName}
                     </Field>
-                    {editing && (
-                      <FieldSortIcon fieldName={selectedFieldName}
-                                     onSortChange={onSortChange}
-                                     setLoadingState={setLoadingState}
-                                     config={config} />
-                    )}
+                    <InteractiveContext.Consumer>
+                      {(interactive) => (interactive && (
+                        <FieldSortIcon fieldName={selectedFieldName}
+                                       onSortChange={onSortChange}
+                                       setLoadingState={setLoadingState}
+                                       config={config} />
+                      ))}
+                    </InteractiveContext.Consumer>
                   </th>
                 );
               })}

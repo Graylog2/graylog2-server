@@ -59,7 +59,6 @@ type Props = {
   config: MessagesWidgetConfig,
   currentView: ViewStoreState,
   data: { messages: Array<Object>, total: number, id: string },
-  editing: boolean,
   fields: FieldTypeMappingsList,
   onConfigChange: (MessagesWidgetConfig) => Promise<void>,
   pageSize: number,
@@ -77,7 +76,6 @@ class MessageList extends React.Component<Props, State> {
       total: PropTypes.number.isRequired,
       id: PropTypes.string.isRequired,
     }).isRequired,
-    editing: PropTypes.bool.isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onConfigChange: PropTypes.func,
     pageSize: PropTypes.number,
@@ -92,10 +90,16 @@ class MessageList extends React.Component<Props, State> {
     selectedFields: Immutable.Set(),
   };
 
-  state = {
-    errors: [],
-    currentPage: 1,
-  };
+  static contextType = RenderCompletionCallback;
+
+  constructor(props: Props, context: any) {
+    super(props, context);
+
+    this.state = {
+      errors: [],
+      currentPage: 1,
+    };
+  }
 
   componentDidMount() {
     const onRenderComplete = this.context;
@@ -144,14 +148,11 @@ class MessageList extends React.Component<Props, State> {
     return onConfigChange(newConfig);
   }
 
-  static contextType = RenderCompletionCallback;
-
   render() {
     const {
       config,
       currentView: { activeQuery: activeQueryId },
       data: { messages, total: totalMessages },
-      editing,
       fields,
       pageSize,
       selectedFields,
@@ -171,7 +172,6 @@ class MessageList extends React.Component<Props, State> {
           {!hasError ? (
             <MessageTable activeQueryId={activeQueryId}
                           config={config}
-                          editing={editing}
                           fields={fields}
                           key={listKey}
                           onSortChange={this._onSortChange}
