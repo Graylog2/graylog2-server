@@ -16,31 +16,32 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css, withTheme, StyledComponent } from 'styled-components';
+import styled, { css, withTheme, DefaultTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
 import { Icon } from 'components/common';
-import { themePropTypes, ThemeInterface } from 'theme';
+import { themePropTypes } from 'theme';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
 } from 'theme/constants';
 
 type Props = {
-  theme: ThemeInterface,
+  theme: DefaultTheme,
 };
 
-const ThemeModeToggleWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const ThemeModeToggleWrap = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const ModeIcon: StyledComponent<{currentMode: boolean}, ThemeInterface, typeof Icon> = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const ModeIcon = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
   opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
   color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default)};
 `;
 
-const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.label(({ theme }) => css`
+const Toggle = styled.label(({ theme }) => css`
   display: flex;
   align-items: center;
   margin: 0;

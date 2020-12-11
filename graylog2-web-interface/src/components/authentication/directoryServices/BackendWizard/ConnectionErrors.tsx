@@ -16,17 +16,16 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import { Alert } from 'components/graylog';
 
-export const NotificationContainer: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
+export const NotificationContainer = styled(Alert)`
   margin-top: 10px;
   word-break: break-word;
 `;
 
-export const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+export const Title = styled.div`
   font-weight: bold;
   margin-bottom: 5px;
 `;

@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import { MessageDetailsDefinitionList } from 'components/graylog';
-import type { ThemeInterface } from 'theme';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
@@ -33,7 +31,7 @@ type Props = {
   fields: FieldTypeMappingsList,
 };
 
-const MessageDetailsDL: StyledComponent<{}, ThemeInterface, MessageDetailsDefinitionList> = styled(MessageDetailsDefinitionList)(({ theme }) => css`
+const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }: { theme: DefaultTheme }) => css`
   color: ${theme.colors.gray[40]};
 
   dd {

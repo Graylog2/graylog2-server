@@ -15,16 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
-
-import { ThemeInterface } from 'theme';
+import styled from 'styled-components';
 
 type Props = {
   children: React.ReactNode,
   className?: string,
 };
 
-const Conainter: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = styled.div`
+const Container = styled.div`
   display: flex;
 
   > div:first-child > div {
@@ -46,7 +44,7 @@ const Conainter: StyledComponent<undefined, ThemeInterface, HTMLDivElement> = st
   }
 `;
 
-const SelectGroup = ({ children, className }: Props) => <Conainter className={className}>{children}</Conainter>;
+const SelectGroup = ({ children, className }: Props) => <Container className={className}>{children}</Container>;
 
 SelectGroup.defaultProps = {
   className: undefined,

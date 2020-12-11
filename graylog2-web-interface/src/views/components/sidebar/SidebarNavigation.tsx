@@ -16,9 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
-
-import type { ThemeInterface } from 'theme';
 
 import NavItem from './NavItem';
 import { SidebarSection } from './sidebarSections';
@@ -31,25 +28,25 @@ type Props = {
   toggleSidebar: () => void,
 };
 
-const Container: StyledComponent<{isOpen: boolean, sidebarIsPinned: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ isOpen, sidebarIsPinned, theme }) => css`
+const Container = styled.div<{ isOpen: boolean, sidebarIsPinned: boolean }>(({ isOpen, sidebarIsPinned, theme }) => css`
   background: ${theme.colors.global.navigationBackground};
   color: ${theme.utils.contrastingColor(theme.colors.global.navigationBackground, 'AA')};
   box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
   width: 50px;
   height: 100%;
-  position:relative;
+  position: relative;
   z-index: 1031;
 
   ::before {
     content: '';
     position: absolute;
-    top: 0px;
+    top: 0;
     right: -6px;
     height: 6px;
     width: 6px;
     border-top-left-radius: 50%;
     background: transparent;
-    box-shadow: -6px -6px 0px 3px ${theme.colors.global.navigationBackground};
+    box-shadow: -6px -6px 0 3px ${theme.colors.global.navigationBackground};
     z-index: 4; /* to render over Sidebar ContentColumn */
   }
 `);
