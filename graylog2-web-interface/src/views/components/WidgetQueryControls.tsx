@@ -87,7 +87,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
-  const { dirty, isValid, isSubmitting, handleSubmit, values } = useFormikContext<SearchBarFormValues>();
+  const { dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue } = useFormikContext<SearchBarFormValues>();
 
   return (
     <>
@@ -96,7 +96,10 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
         <>
           <TopRow>
             <FlexCol md={4}>
-              <TimeRangeTypeSelector disabled={isGloballyOverridden} />
+              <TimeRangeTypeSelector disabled={isGloballyOverridden}
+                                     setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                     currentTimeRange={values?.timerange}
+                                     noOverride />
               <TimeRangeDisplay timerange={values?.timerange} />
             </FlexCol>
 

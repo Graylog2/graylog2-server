@@ -107,7 +107,10 @@ const SearchBar = ({
               <>
                 <TopRow>
                   <FlexCol md={6}>
-                    <TimeRangeTypeSelector disabled={disableSearch} setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)} currentTimeRange={values?.timerange} limitDuration={limitDuration} />
+                    <TimeRangeTypeSelector disabled={disableSearch}
+                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                           currentTimeRange={values?.timerange}
+                                           limitDuration={limitDuration} />
                     <TimeRangeDisplay timerange={values?.timerange} />
                     <RefreshControls />
                   </FlexCol>

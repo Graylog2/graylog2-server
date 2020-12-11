@@ -26,7 +26,7 @@ import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 type Props = {
   currentTimeRange: TimeRange,
   disabled?: boolean,
-  limitDuration: number,
+  limitDuration?: number,
   noOverride?: boolean,
   setCurrentTimeRange: (nextTimeRange: TimeRange) => void,
 };
@@ -52,11 +52,13 @@ const TimeRangeTypeSelector = ({ disabled, noOverride, currentTimeRange, setCurr
 TimeRangeTypeSelector.propTypes = {
   disabled: PropTypes.bool,
   noOverride: PropTypes.bool,
+  limitDuration: PropTypes.number,
 };
 
 TimeRangeTypeSelector.defaultProps = {
   disabled: false,
   noOverride: false,
+  limitDuration: 0,
 };
 
 export default TimeRangeTypeSelector;
