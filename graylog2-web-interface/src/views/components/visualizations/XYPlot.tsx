@@ -122,6 +122,7 @@ XYPlot.propTypes = {
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   currentQuery: CustomPropTypes.instanceOf(Query).isRequired,
   effectiveTimerange: PropTypes.exact({
+    // eslint-disable-next-line react/no-unused-prop-types
     type: PropTypes.string.isRequired,
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,

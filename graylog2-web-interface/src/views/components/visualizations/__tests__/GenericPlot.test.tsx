@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { HTMLAttributes } from 'enzyme';
 import { mount } from 'wrappedEnzyme';
+import { PlotParams } from 'react-plotly.js';
 
 import ChartColorContext from '../ChartColorContext';
 import GenericPlot from '../GenericPlot';
@@ -28,6 +30,10 @@ jest.mock('components/graylog/Popover');
 // eslint-disable-next-line global-require
 jest.mock('views/components/visualizations/plotly/AsyncPlot', () => require('views/components/visualizations/plotly/Plot').default);
 jest.mock('components/common/ColorPicker', () => 'color-picker');
+
+type ColorPickerProps = HTMLAttributes & {
+  onChange: (color: string, event?: any) => void;
+};
 
 describe('GenericPlot', () => {
   describe('adds onRelayout handler', () => {
@@ -118,7 +124,7 @@ describe('GenericPlot', () => {
       </ChartColorContext.Provider>
     ));
 
-    const newChartData = wrapper.find('PlotlyComponent').props().data;
+    const { data: newChartData } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & PlotParams;
 
     expect(newChartData.find((chart) => chart.name === 'count()').marker.color).toEqual('#783a8e');
     expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toBeUndefined();
@@ -201,7 +207,7 @@ describe('GenericPlot', () => {
       openLegend(wrapper, genericPlot);
 
       const colorPicker = wrapper.find('color-picker');
-      const { onChange } = colorPicker.props();
+      const { onChange } = colorPicker.props() as ColorPickerProps;
 
       onChange('#141414');
 
@@ -216,7 +222,7 @@ describe('GenericPlot', () => {
         <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} />
       </RenderCompletionCallback.Provider>
     ));
-    const { onAfterPlot } = wrapper.find('PlotlyComponent').props();
+    const { onAfterPlot } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & PlotParams;
 
     onAfterPlot();
 

@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
+import Select from 'components/common/Select';
+
 import StreamsFilter from './StreamsFilter';
 
 describe('StreamsFilter', () => {
@@ -28,7 +30,7 @@ describe('StreamsFilter', () => {
       { key: '101 Stream', value: 'streamId4' },
     ];
     const wrapper = mount(<StreamsFilter streams={streams} onChange={() => {}} />);
-    const { options } = wrapper.find('Select').first().props();
+    const { options } = wrapper.find(Select).first().props();
 
     expect(options).toEqual([
       { key: '101 Stream', value: 'streamId4' },

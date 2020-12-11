@@ -63,7 +63,7 @@ describe('PivotSelect', () => {
   describe('upon pivot list change, field types are passed for new pivot generation', () => {
     it('using Unknown if field is not found', () => {
       const wrapper = mount(<SimplePivotSelect fieldTypes={{ ...initialFieldTypes, all: Immutable.List() }} />);
-      const cb = wrapper.find('SortableSelect').at(0).props().onChange;
+      const cb = wrapper.find('SortableSelect').at(0).props().onChange as (value: any) => void;
 
       cb([{ value: 'foo' }]);
 
@@ -77,7 +77,7 @@ describe('PivotSelect', () => {
         fieldTypeMapping,
       ]);
       const wrapper = mount(<SimplePivotSelect fieldTypes={{ ...initialFieldTypes, all: fields }} />);
-      const cb = wrapper.find('SortableSelect').at(0).props().onChange;
+      const cb = wrapper.find('SortableSelect').at(0).props().onChange as (value: any) => void;
 
       cb([{ value: 'foo' }]);
 
