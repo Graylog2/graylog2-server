@@ -254,28 +254,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 15px !important;
   }
 
-  dl.metric-def dt {
-    float: left;
-  }
-
   dl.metric-timer dd {
-    margin-left: 125px;
-  }
-
-  dl.metric-meter dd {
-    margin-left: 95px;
-  }
-
-  dl.metric-gauge dd {
-    margin-left: 80px;
-  }
-
-  dl.metric-counter dd {
-    margin-left: 80px;
-  }
-
-  dl.metric-histogram dd {
-    margin-left: 125px;
+    margin-left: 145px;
   }
 
   td.centered {

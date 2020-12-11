@@ -18,12 +18,40 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
+import styled from 'styled-components';
 
 import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 
 const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
+const StyledMetricDetail = styled.div`
+  dl {
+    > dt {
+      float: left;
+    }
+
+    &.metric-timer > dd {
+      margin-left: 145px;
+    }
+
+    &.metric-meter > dd {
+      margin-left: 115px;
+    }
+
+    &.metric-gauge > dd {
+      margin-left: 90px;
+    }
+
+    &.metric-counter > dd {
+      margin-left: 90px;
+    }
+
+    &.metric-histogram > dd {
+      margin-left: 145px;
+    }
+  }
+`;
 
 class MetricDetails extends React.Component {
  static propTypes = {
@@ -73,8 +101,9 @@ class MetricDetails extends React.Component {
    return (
      <div className="metric">
        <h3>{type}</h3>
-
-       {details}
+       <StyledMetricDetail>
+         {details}
+       </StyledMetricDetail>
      </div>
    );
  }
