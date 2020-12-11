@@ -58,7 +58,7 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget, setFocusWidget, titles) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget, titles) => {
   const widgets = {};
   const data = {};
   const errors = {};
@@ -106,9 +106,6 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
         </WidgetContainer>
       );
     }
-
-    // The focused widget does not exists anymore. So we unset it.
-    setFocusWidget(undefined);
   }
 
   return (
@@ -159,7 +156,7 @@ const EmptyDashboardInfo = () => (
 );
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
-  const { focusedWidget, setFocusedWidget } = useContext(WidgetFocusContext);
+  const { focusedWidget } = useContext(WidgetFocusContext);
   const titles = useStore(TitlesStore);
 
   if (!widgets || widgets.isEmpty()) {
@@ -176,7 +173,6 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
       fields,
       allFields,
       focusedWidget,
-      setFocusedWidget,
       titles,
     );
 
