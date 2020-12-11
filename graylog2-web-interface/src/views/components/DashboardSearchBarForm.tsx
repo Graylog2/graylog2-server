@@ -43,12 +43,12 @@ const _isFunction = (children: Props['children']): children is (props: FormikPro
 const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, queryString }) => {
     return onSubmit({
-      timerange: timerange ? onSubmittingTimerange(timerange) : undefined,
+      timerange: Object.keys(timerange).length ? onSubmittingTimerange(timerange) : undefined,
       queryString,
     });
   }, [onSubmit]);
   const { limitDuration, timerange, queryString } = initialValues;
-  const initialTimeRange = timerange ? onInitializingTimerange(timerange) : timerange;
+  const initialTimeRange = timerange ? onInitializingTimerange(timerange) : {};
   const _initialValues = {
     limitDuration,
     timerange: initialTimeRange,
