@@ -22,10 +22,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.Email;
+import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.EmailConstants;
 import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
 import org.graylog.events.notifications.EventBacklogService;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
@@ -104,6 +103,21 @@ public class EmailSender {
         return this.templateEngine.transform(template, model);
     }
 
+    @VisibleForTesting
+    private String buildHtmlBody(EmailEventNotificationConfig config, Map<String, Object> model) {
+        final String template;
+        if (isNullOrEmpty(config.htmlBodyTemplate())) {
+            template = formatHtmlBody(EmailEventNotificationConfig.DEFAULT_HTML_BODY_TEMPLATE);
+        } else {
+            template = formatHtmlBody(config.htmlBodyTemplate());
+        }
+        return this.templateEngine.transform(template, model);
+    }
+
+    private String formatHtmlBody(String bodyContent) {
+        return "<html><body>" + bodyContent + "</body></html>";
+    }
+
     private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) {
         final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
         return objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
@@ -115,7 +129,7 @@ public class EmailSender {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
-        final Email email = new SimpleEmail();
+        final HtmlEmail email = new HtmlEmail();
         email.setCharset(EmailConstants.UTF_8);
 
         if (isNullOrEmpty(emailConfig.getHostname())) {
@@ -145,7 +159,8 @@ public class EmailSender {
         email.setSSLOnConnect(emailConfig.isUseSsl());
         email.setStartTLSEnabled(emailConfig.isUseTls());
         email.setSubject(buildSubject(config, model));
-        email.setMsg(buildBody(config, model));
+        email.setTextMsg(buildBody(config, model));
+        email.setHtmlMsg(buildHtmlBody(config, model));
         email.addTo(emailAddress);
 
         email.send();

@@ -71,9 +71,39 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             "${end}\n" +
             "\n";
 
+    static final String DEFAULT_HTML_BODY_TEMPLATE = "<table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color:#f9f9f9;border:none;line-height:1.2\"><tbody>" +
+            "<tr style=\"line-height:1.5\"><th colspan=\"2\" style=\"background-color:#e6e6e6\">Event Definition</th></tr>" +
+            "<tr><td width=\"200px\">Title</td><td>${event_definition_title}</td></tr>" +
+            "<tr><td>Description</td><td>${event_definition_description}</td></tr>" +
+            "<tr><td>Type</td><td>${event_definition_type}</td></tr>" +
+            "</tbody></table>" +
+            "<br /><table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color:#f9f9f9;border:none;line-height:1.2\"><tbody>" +
+            "<tr><th colspan=\"2\" style=\"background-color:#e6e6e6;line-height:1.5\">Event</th></tr>" +
+            "<tr><td width=\"200px\">Timestamp</td><td>${event.timestamp}</td></tr>" +
+            "<tr><td>Message</td><td>${event.message}</td></tr>" +
+            "<tr><td>Source</td><td>${event.source}</td></tr>" +
+            "<tr><td>Key</td><td>${event.key}</td></tr>" +
+            "<tr><td>Priority</td><td>${event.priority}</td></tr>" +
+            "<tr><td>Alert</td><td>${event.alert}</td></tr>" +
+            "<tr><td>Timestamp Processing</td><td>${event.timestamp}</td></tr>" +
+            "<tr><td>Timerange Start</td><td>${event.timerange_start}</td></tr>" +
+            "<tr><td>Timerange End</td><td>${event.timerange_end}</td></tr>" +
+            "<tr><td>Source Streams</td><td>${event.source_streams}</td></tr>" +
+            "<tr><td>Fields</td><td><ul style=\"list-style-type:square;\">${foreach event.fields field}<li>${field.key}:${field.value}</li>${end}<ul></td></tr>" +
+            "</tbody></table>" +
+            "${if backlog}" +
+            "<br /><table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color:#f9f9f9;border:none;line-height:1.2\"><tbody>" +
+            "<tr><th style=\"background-color:#e6e6e6;line-height:1.5\">Backlog (Last messages accounting for this alert)</th></tr>" +
+            "${foreach backlog message}" +
+            "<tr><td>${message}</td></tr>" +
+            "${end}" +
+            "</tbody></table>" +
+            "${end}";
+
     private static final String FIELD_SENDER = "sender";
     private static final String FIELD_SUBJECT = "subject";
     private static final String FIELD_BODY_TEMPLATE = "body_template";
+    private static final String FIELD_HTML_BODY_TEMPLATE = "html_body_template";
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
 
@@ -86,8 +116,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     public abstract String subject();
 
     @JsonProperty(FIELD_BODY_TEMPLATE)
-    @NotBlank
     public abstract String bodyTemplate();
+
+    @JsonProperty(FIELD_HTML_BODY_TEMPLATE)
+    public abstract String htmlBodyTemplate();
 
     @JsonProperty(FIELD_EMAIL_RECIPIENTS)
     public abstract Set<String> emailRecipients();
@@ -114,8 +146,8 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         if (subject().isEmpty()) {
             validation.addError(FIELD_SUBJECT, "Email Notification subject cannot be empty.");
         }
-        if (bodyTemplate().isEmpty()) {
-            validation.addError(FIELD_BODY_TEMPLATE, "Email Notification body template cannot be empty.");
+        if (bodyTemplate().isEmpty() && htmlBodyTemplate().isEmpty()) {
+            validation.addError("body", "One of Email Notification body template or Email Notification HTML body must not be empty.");
         }
         if (emailRecipients().isEmpty() && userRecipients().isEmpty()) {
             validation.addError("recipients", "Email Notification must have email recipients or user recipients.");
@@ -134,7 +166,8 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .subject(DEFAULT_SUBJECT)
                     .emailRecipients(ImmutableSet.of())
                     .userRecipients(ImmutableSet.of())
-                    .bodyTemplate(DEFAULT_BODY_TEMPLATE);
+                    .bodyTemplate(DEFAULT_BODY_TEMPLATE)
+                    .htmlBodyTemplate(DEFAULT_HTML_BODY_TEMPLATE);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -145,6 +178,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
 
         @JsonProperty(FIELD_BODY_TEMPLATE)
         public abstract Builder bodyTemplate(String bodyTemplate);
+
+        @JsonProperty(FIELD_HTML_BODY_TEMPLATE)
+        public abstract Builder htmlBodyTemplate(String htmlBodyTemplate);
 
         @JsonProperty(FIELD_EMAIL_RECIPIENTS)
         public abstract Builder emailRecipients(Set<String> emailRecipients);
@@ -161,6 +197,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             .sender(ValueReference.of(sender()))
             .subject(ValueReference.of(subject()))
             .bodyTemplate(ValueReference.of(bodyTemplate()))
+            .htmlBodyTemplate(ValueReference.of(htmlBodyTemplate()))
             .emailRecipients(emailRecipients())
             .userRecipients(userRecipients())
             .build();

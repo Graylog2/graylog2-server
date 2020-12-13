@@ -38,6 +38,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_SENDER = "sender";
     private static final String FIELD_SUBJECT = "subject";
     private static final String FIELD_BODY_TEMPLATE = "body_template";
+    private static final String FIELD_HTML_BODY_TEMPLATE = "html_body_template";
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
 
@@ -49,6 +50,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
 
     @JsonProperty(FIELD_BODY_TEMPLATE)
     public abstract ValueReference bodyTemplate();
+
+    @JsonProperty(FIELD_HTML_BODY_TEMPLATE)
+    public abstract ValueReference htmlBodyTemplate();
 
     @JsonProperty(FIELD_EMAIL_RECIPIENTS)
     public abstract Set<String> emailRecipients();
@@ -80,6 +84,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_BODY_TEMPLATE)
         public abstract Builder bodyTemplate(ValueReference bodyTemplate);
 
+        @JsonProperty(FIELD_HTML_BODY_TEMPLATE)
+        public abstract Builder htmlBodyTemplate(ValueReference htmlBodyTemplate);
+
         @JsonProperty(FIELD_EMAIL_RECIPIENTS)
         public abstract Builder emailRecipients(Set<String> emailRecipients);
 
@@ -95,6 +102,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .sender(sender().asString(parameters))
                 .subject(subject().asString(parameters))
                 .bodyTemplate(bodyTemplate().asString())
+                .htmlBodyTemplate(htmlBodyTemplate().asString())
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
                 .build();
