@@ -48,11 +48,11 @@ const loadByUsername: $PropertyType<ActionsType, 'loadByUsername'> = notifyingAc
 
 const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   action: UsersActions.update,
-  success: (userId, payload) => ({
-    message: `User "${payload.full_name}" was updated successfully`,
+  success: (userId, payload, fullName) => ({
+    message: `User "${fullName}" was updated successfully`,
   }),
-  error: (error, userId, payload) => ({
-    message: `Updating user "${payload.full_name}" failed with status: ${error}`,
+  error: (error, userId, payload, fullName) => ({
+    message: `Updating user "${fullName}" failed with status: ${error}`,
   }),
 });
 
