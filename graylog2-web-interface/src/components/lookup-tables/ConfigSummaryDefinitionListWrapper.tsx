@@ -29,7 +29,7 @@ const ConfigSummaryDefinitionListWrapper = styled.div`
       margin-left: 185px;
       word-wrap: break-word;
 
-      &:not(:last-child) {
+      :not(:last-child) {
         border-bottom: 1px solid #ececec;
         margin-bottom: 5px;
         padding-bottom: 5px;

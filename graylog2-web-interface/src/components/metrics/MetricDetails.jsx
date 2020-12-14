@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
@@ -93,8 +92,7 @@ class MetricDetails extends React.Component {
 
  render() {
    const { nodeId, metric, metric: { full_name: metricName }, metrics } = this.props;
-   const currentMetric = metrics && metrics[nodeId] && metrics[nodeId][metricName]
-     ? metrics[nodeId][metricName] : metric;
+   const currentMetric = metrics?.[nodeId]?.[metricName] ?? metric;
    const type = lodash.capitalize(currentMetric.type);
    const details = this._formatDetailsForType(type, currentMetric);
 
