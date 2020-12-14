@@ -570,8 +570,7 @@ public class UsersResource extends RestResource {
             return Response.notModified().build();
         }
 
-        user.setAccountStatus(newStatus);
-        userManagementService.save(user);
+        userManagementService.setUserStatus(user, newStatus);
         return Response.ok().build();
     }
 

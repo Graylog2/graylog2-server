@@ -55,6 +55,12 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
     }
 
     @Override
+    public void setUserStatus(User user, User.AccountStatus status) throws ValidationException {
+        user.setAccountStatus(status);
+        super.save(user);
+    }
+
+    @Override
     public String changePassword(String id, String oldPassword, String newPassword) throws ValidationException {
         // TODO: Implement.
         return null;
