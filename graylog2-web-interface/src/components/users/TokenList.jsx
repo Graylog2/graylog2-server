@@ -20,8 +20,8 @@ import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { ClipboardButton, ControlledTableList, Icon, Timestamp, SearchForm, Spinner } from 'components/common';
-import { Button, ButtonGroup, Col, Checkbox, Panel, Row } from 'components/graylog';
-import type { Token } from 'actions/users/UsersActions';
+import { Button, Col, Panel, Row } from 'components/graylog';
+import type { Token, TokenSummary } from 'actions/users/UsersActions';
 import { sortByDate } from 'util/SortUtils';
 
 import CreateTokenForm from './CreateTokenForm';
@@ -57,13 +57,12 @@ type Props = {
   deletingToken: ?string,
   onCreate: (tokenName: string) => Promise<Token>,
   onDelete: (tokenId: string, tokenName: string) => void,
-  tokens: Token[],
+  tokens: TokenSummary[],
 };
 
 const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
   const [createdToken, setCreatedToken] = useState<?Token>();
   const [query, setQuery] = useState('');
-  const [hideTokens, setHideTokens] = useState(true);
 
   const effectiveTokens = useMemo(() => {
     const queryRegex = new RegExp(query, 'i');
@@ -83,10 +82,6 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
     });
   };
 
-  const onShowTokensChanged = (event) => {
-    setHideTokens(event.target.checked);
-  };
-
   const deleteToken = (token) => {
     return () => {
       onDelete(token.id, token.name);
@@ -104,7 +99,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
             <Panel.Title>Token <em>{createdToken.name}</em> created!</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
-            <p>This is your new token.</p>
+            <p>This is your new token. Make sure to copy it now, you will not be able to see it again.</p>
             <pre>
               {createdToken.token}
               <StyledCopyTokenButton title={<Icon name="clipboard" fixedWidth />} text={createdToken.token} bsSize="xsmall" />
@@ -139,27 +134,20 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
                   <StyledLastAccess>
                     {tokenNeverUsed ? 'Never used' : <>Last used <Timestamp dateTime={token.last_access} relative /></>}
                   </StyledLastAccess>
-                  {!hideTokens && <pre>{token.token}</pre>}
                 </Col>
                 <Col md={3} className="text-right">
-                  <ButtonGroup>
-                    <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
-                    <Button bsSize="xsmall"
-                            disabled={deletingToken === token.id}
-                            bsStyle="primary"
-                            onClick={deleteToken(token)}>
-                      {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
-                    </Button>
-                  </ButtonGroup>
+                  <Button bsSize="xsmall"
+                          disabled={deletingToken === token.id}
+                          bsStyle="primary"
+                          onClick={deleteToken(token)}>
+                    {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
+                  </Button>
                 </Col>
               </Row>
             </ControlledTableList.Item>
           );
         })}
       </ControlledTableList>
-      <Checkbox id="hide-tokens" onChange={onShowTokensChanged} checked={hideTokens}>
-        Hide Tokens
-      </Checkbox>
     </span>
   );
 };

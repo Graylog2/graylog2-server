@@ -77,16 +77,6 @@ describe('<TokenList />', () => {
     expect(deleteFn.mock.calls.length).toBe(1);
   });
 
-  it('should display tokens if "Hide tokens" was unchecked', () => {
-    const wrapper = mount(<TokenList tokens={tokens} />);
-
-    expect(wrapper.find('pre[children="beef2001"]').length).toEqual(0);
-
-    wrapper.find('input#hide-tokens').simulate('change', { target: { checked: false } });
-
-    expect(wrapper.find('pre[children="beef2001"]').length).toEqual(1);
-  });
-
   it('show include token last access time', () => {
     const wrapper = mount(<TokenList tokens={tokens} />);
 
