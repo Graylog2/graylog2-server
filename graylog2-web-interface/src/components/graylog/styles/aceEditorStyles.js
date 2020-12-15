@@ -64,12 +64,12 @@ const aceEditorStyles = ({ colors }) => {
         }
 
         .ace_active-line {
-          background: ${colors.gray[90]};
+          background: ${colors.variant.lighter.default};
         }
       }
 
       .ace_gutter-active-line {
-        background-color: ${colors.gray[80]};
+        background-color: ${colors.variant.lighter.default};
       }
 
       .ace_invisible {
