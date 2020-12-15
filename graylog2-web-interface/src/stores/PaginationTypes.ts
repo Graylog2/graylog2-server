@@ -19,7 +19,6 @@ import { $PropertyType } from 'utility-types';
 
 import type { AdditionalQueries } from 'util/PaginationURL';
 
-/* eslint-disable camelcase */
 export type PaginatedResponseType = {
   count: number,
   total: number,
@@ -35,7 +34,6 @@ export type PaginatedListJSON = {
   total: number,
   count: number,
 };
-/* eslint-enable camelcase */
 
 export type Pagination = {
   page: number,
