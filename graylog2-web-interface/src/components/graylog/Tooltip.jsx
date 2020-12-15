@@ -1,46 +1,81 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 
+const arrowSize = 10;
 const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
-  &.top .tooltip-arrow {
-    bottom: 0;
+  &.in {
+    opacity: 1;
+    filter: drop-shadow(0 0 3px ${theme.colors.variant.lighter.default});
   }
 
-  &.top .tooltip-arrow,
-  &.top-left .tooltip-arrow,
-  &.top-right .tooltip-arrow {
-    border-top-color: ${theme.colors.gray[10]};
+  &.top {
+    .tooltip-arrow {
+      border-top-color: ${theme.colors.global.contentBackground};
+      border-width: ${arrowSize}px ${arrowSize}px 0;
+      margin-left: -${arrowSize}px;
+      bottom: -${arrowSize / 2}px;
+    }
+  }
+  
+  &.right {
+    .tooltip-arrow {
+      border-right-color: ${theme.colors.global.contentBackground};
+      border-width: ${arrowSize}px ${arrowSize}px ${arrowSize}px 0;
+      margin-top: -${arrowSize}px;
+      left: -${arrowSize / 2}px;
+    }
   }
 
-  &.right .tooltip-arrow {
-    border-right-color: ${theme.colors.gray[10]};
+  &.bottom {
+    .tooltip-arrow {
+      border-bottom-color: ${theme.colors.global.contentBackground};
+      border-width: 0 ${arrowSize}px ${arrowSize}px;
+      margin-left: -${arrowSize}px;
+      top: -${arrowSize / 2}px;
+    }
   }
-
-  &.left .tooltip-arrow {
-    border-left-color: ${theme.colors.gray[10]};
+  
+  &.left {
+    .tooltip-arrow {
+      border-left-color: ${theme.colors.global.contentBackground};
+      border-width: ${arrowSize}px 0 ${arrowSize}px ${arrowSize}px;
+      margin-top: -${arrowSize}px;
+      right: -${arrowSize / 2}px;
+    }
   }
-
-  &.bottom .tooltip-arrow,
-  &.bottom-left .tooltip-arrow,
-  &.bottom-right .tooltip-arrow {
-    border-bottom-color: ${theme.colors.gray[10]};
-  }
-
+  
   .tooltip-inner {
-    color: ${theme.utils.readableColor(theme.colors.gray[10])};
-    background-color: ${theme.colors.gray[10]};
+    color: ${theme.colors.global.textDefault};
+    background-color: ${theme.colors.global.contentBackground};
     max-width: 300px;
+    opacity: 1;
 
     .datapoint-info {
       text-align: left;
 
       .date {
-        color: ${theme.colors.gray[90]};
+        color: ${theme.colors.variant.darkest.default};
       }
     }
   }
@@ -48,7 +83,7 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
 
 const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft }) => {
   return (
-    <GraylogThemeProvider>
+    <ThemeAndUserProvider>
       <StyledTooltip className={className}
                      id={id}
                      placement={placement}
@@ -58,7 +93,7 @@ const Tooltip = ({ children, className, id, placement, positionTop, positionLeft
                      arrowOffsetLeft={arrowOffsetLeft}>
         {children}
       </StyledTooltip>
-    </GraylogThemeProvider>
+    </ThemeAndUserProvider>
   );
 };
 

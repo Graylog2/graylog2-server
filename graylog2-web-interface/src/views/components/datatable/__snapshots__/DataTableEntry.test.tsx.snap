@@ -1,0 +1,112 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DataTableEntry provides valuePath in context for each value 1`] = `
+Array [
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "_exists_": "timestamp",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "_exists_": "timestamp",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "TCP",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "TCP",
+      },
+      Object {
+        "_exists_": "timestamp",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "TCP",
+      },
+      Object {
+        "_exists_": "timestamp",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "UDP",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "UDP",
+      },
+      Object {
+        "_exists_": "timestamp",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "UDP",
+      },
+      Object {
+        "_exists_": "timestamp",
+      },
+    ],
+  },
+]
+`;

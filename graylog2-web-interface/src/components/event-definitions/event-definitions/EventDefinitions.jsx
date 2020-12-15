@@ -1,22 +1,35 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import lodash from 'lodash';
 
-import { Button, Col, DropdownButton, Label, MenuItem, Row } from 'components/graylog';
+import { LinkContainer } from 'components/graylog/router';
+import { Button, Col, Row } from 'components/graylog';
 import Routes from 'routing/Routes';
 import {
   EmptyEntity,
   EntityList,
-  EntityListItem,
   IfPermitted,
   PaginatedList,
   SearchForm,
 } from 'components/common';
 
-import EventDefinitionDescription from './EventDefinitionDescription';
 import styles from './EventDefinitions.css';
+import EventDefinitionEntry from './EventDefinitionEntry';
 
 class EventDefinitions extends React.Component {
   static propTypes = {
@@ -33,14 +46,6 @@ class EventDefinitions extends React.Component {
 
   static defaultProps = {
     context: {},
-  };
-
-  getConditionPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
   renderEmptyContent = () => {
@@ -63,10 +68,6 @@ class EventDefinitions extends React.Component {
     );
   };
 
-  renderDescription = (definition, context) => {
-    return <EventDefinitionDescription definition={definition} context={context} />;
-  };
-
   render() {
     const { eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onEnable, onDisable } = this.props;
 
@@ -74,48 +75,13 @@ class EventDefinitions extends React.Component {
       return this.renderEmptyContent();
     }
 
-    const items = eventDefinitions.map((definition) => {
-      const isScheduled = lodash.get(context, `scheduler.${definition.id}.is_scheduled`, true);
-
-      let toggle = <MenuItem onClick={onDisable(definition)}>Disable</MenuItem>;
-
-      if (!isScheduled) {
-        toggle = <MenuItem onClick={onEnable(definition)}>Enable</MenuItem>;
-      }
-
-      const actions = (
-        <React.Fragment key={`actions-${definition.id}`}>
-          <IfPermitted permissions={`eventdefinitions:edit:${definition.id}`}>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(definition.id)}>
-              <Button bsStyle="info">Edit</Button>
-            </LinkContainer>
-          </IfPermitted>
-          <IfPermitted permissions={`eventdefinitions:delete:${definition.id}`}>
-            <DropdownButton id="more-dropdown" title="More" pullRight>
-              {toggle}
-              <MenuItem divider />
-              <MenuItem onClick={onDelete(definition)}>Delete</MenuItem>
-            </DropdownButton>
-          </IfPermitted>
-        </React.Fragment>
-      );
-
-      const plugin = this.getConditionPlugin(definition.config.type);
-      let titleSuffix = plugin.displayName || definition.config.type;
-
-      if (!isScheduled) {
-        titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
-      }
-
-      return (
-        <EntityListItem key={`event-definition-${definition.id}`}
-                        title={definition.title}
-                        titleSuffix={titleSuffix}
-                        description={this.renderDescription(definition, context)}
-                        noItemsText="Could not find any items with the given filter."
-                        actions={actions} />
-      );
-    });
+    const items = eventDefinitions.map((definition) => (
+      <EventDefinitionEntry context={context}
+                            eventDefinition={definition}
+                            onDisable={onDisable}
+                            onEnable={onEnable}
+                            onDelete={onDelete} />
+    ));
 
     return (
       <Row>

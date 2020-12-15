@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.processor;
 
@@ -29,6 +29,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -53,6 +54,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -92,7 +94,7 @@ public class EventDefinitionHandlerTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService));
+        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class)));
         this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock));
 
@@ -116,7 +118,7 @@ public class EventDefinitionHandlerTest {
                 .notifications(ImmutableList.of())
                 .build();
 
-        final EventDefinitionDto dto = handler.create(newDto);
+        final EventDefinitionDto dto = handler.create(newDto, Optional.empty());
 
         // Handler should create the event definition
         assertThat(eventDefinitionService.get(dto.id())).isPresent();
@@ -167,7 +169,7 @@ public class EventDefinitionHandlerTest {
                 .notifications(ImmutableList.of())
                 .build();
 
-        final EventDefinitionDto dto = handler.createWithoutSchedule(newDto);
+        final EventDefinitionDto dto = handler.createWithoutSchedule(newDto, Optional.empty());
 
         // Handler should create the event definition
         assertThat(eventDefinitionService.get(dto.id())).isPresent();

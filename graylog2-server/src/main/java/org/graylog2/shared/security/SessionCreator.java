@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.shared.security;
 
@@ -28,14 +28,16 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.SESSION_CREATE;
 
@@ -79,15 +81,17 @@ public class SessionCreator {
 
             subject.login(authToken);
 
-            String username = subject.getPrincipal().toString();
-            final User user = userService.load(username);
+            String userId = subject.getPrincipal().toString();
+            final User user = userService.loadById(userId);
 
             if (user != null) {
                 long timeoutInMillis = user.getSessionTimeoutMs();
                 session.setTimeout(timeoutInMillis);
+                session.setAttribute("username", user.getName());
+                getSessionAttributes(subject).forEach(session::setAttribute);
             } else {
                 // set a sane default. really we should be able to load the user from above.
-                session.setTimeout(TimeUnit.HOURS.toMillis(8));
+                session.setTimeout(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
             }
             session.touch();
 
@@ -98,7 +102,7 @@ public class SessionCreator {
                     "session_id", session.getId(),
                     "remote_address", host
             );
-            auditEventSender.success(AuditActor.user(username), SESSION_CREATE, auditEventContext);
+            auditEventSender.success(AuditActor.user(user.getName()), SESSION_CREATE, auditEventContext);
 
             return Optional.of(session);
         } catch (AuthenticationServiceUnavailableException e) {
@@ -118,5 +122,23 @@ public class SessionCreator {
             auditEventSender.failure(authToken.getActor(), SESSION_CREATE, auditEventContext);
             return Optional.empty();
         }
+    }
+
+    /**
+     * Extract additional session attributes out of a subject's principal collection. We assume that if there is a
+     * second principal, that this would be a map of session attributes.
+     */
+    private Map<?, ?> getSessionAttributes(Subject subject) {
+        final List<?> principals = subject.getPrincipals().asList();
+        if (principals.size() < 2) {
+            return Collections.emptyMap();
+        }
+        Object sessionAttributes = principals.get(1);
+        if (sessionAttributes instanceof Map) {
+            return (Map<?,?>) sessionAttributes;
+        }
+        log.error("Unable to extract session attributes from subject. Expected <Map.class> but got <{}>.",
+                sessionAttributes.getClass().getSimpleName());
+        return Collections.emptyMap();
     }
 }

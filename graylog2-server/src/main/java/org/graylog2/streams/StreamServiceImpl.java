@@ -1,21 +1,22 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.streams;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -26,6 +27,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -46,6 +48,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -83,6 +86,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
     private final NotificationService notificationService;
+    private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
@@ -94,6 +98,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
                              NotificationService notificationService,
+                             EntityOwnershipService entityOwnershipService,
                              ClusterEventBus clusterEventBus,
                              AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
         super(mongoConnection);
@@ -103,6 +108,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.notificationService = notificationService;
+        this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
@@ -218,13 +224,21 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             final Set<Output> outputs = outputIdsForRawStream(o)
                     .stream()
                     .map(ObjectId::toHexString)
-                    .map(outputsById::get)
+                    .map(outputId -> {
+                        final Output output = outputsById.get(outputId);
+                        if (output == null) {
+                            final String streamTitle = Strings.nullToEmpty((String) o.get(StreamImpl.FIELD_TITLE));
+                            LOG.warn("Stream \"" + streamTitle + "\" <" + id + "> references missing output <" + outputId + "> - ignoring output.");
+                        }
+                        return output;
+                    })
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
 
             @SuppressWarnings("unchecked")
             final Map<String, Object> fields = o.toMap();
 
-            final String indexSetId = (String)fields.get(StreamImpl.FIELD_INDEX_SET_ID);
+            final String indexSetId = (String) fields.get(StreamImpl.FIELD_INDEX_SET_ID);
 
             streams.add(new StreamImpl(objectId, fields, streamRules, outputs, indexSets.get(indexSetId)));
         }
@@ -239,7 +253,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     private Map<String, IndexSet> indexSetsForStreams(List<DBObject> streams) {
         final Set<String> indexSetIds = streams.stream()
-                .map(stream -> (String)stream.get(StreamImpl.FIELD_INDEX_SET_ID))
+                .map(stream -> (String) stream.get(StreamImpl.FIELD_INDEX_SET_ID))
                 .filter(s -> !isNullOrEmpty(s))
                 .collect(Collectors.toSet());
         return indexSetService.findByIds(indexSetIds)
@@ -272,8 +286,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public List<Stream> loadAllWithConfiguredAlertConditions() {
         final DBObject query = QueryBuilder.start().and(
-            QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
-            QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).not().size(0).get()
+                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
+                QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).not().size(0).get()
         ).get();
 
         return loadAll(query);
@@ -283,13 +297,15 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         List<ObjectId> outputIds = outputIdsForRawStream(stream);
 
         Set<Output> result = new HashSet<>();
-        if (outputIds != null)
-            for (ObjectId outputId : outputIds)
+        if (outputIds != null) {
+            for (ObjectId outputId : outputIds) {
                 try {
                     result.add(outputService.load(outputId.toHexString()));
                 } catch (NotFoundException e) {
                     LOG.warn("Non-existing output <{}> referenced from stream <{}>!", outputId.toHexString(), stream.get("_id"));
                 }
+            }
+        }
 
         return result;
     }
@@ -317,6 +333,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
         clusterEventBus.post(StreamDeletedEvent.create(streamId));
+        entityOwnershipService.unregisterStream(streamId);
     }
 
     public void update(Stream stream, String title, String description) throws ValidationException {
@@ -538,13 +555,14 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public String saveWithRules(Stream stream, Collection<StreamRule> streamRules) throws ValidationException {
+    public String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException {
         final String savedStreamId = super.save(stream);
         final Set<StreamRule> rules = streamRules.stream()
                 .map(rule -> streamRuleService.copy(savedStreamId, rule))
                 .collect(Collectors.toSet());
         streamRuleService.save(rules);
 
+        entityOwnershipService.registerNewStream(savedStreamId, user);
         clusterEventBus.post(StreamsChangedEvent.create(savedStreamId));
 
         return savedStreamId;

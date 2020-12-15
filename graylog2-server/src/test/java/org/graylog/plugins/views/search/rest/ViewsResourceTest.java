@@ -1,31 +1,35 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
+import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,13 +75,7 @@ public class ViewsResourceTest {
     private ViewService viewService;
 
     @Mock
-    private ViewSharingService viewSharingService;
-
-    @Mock
     private ViewDTO view;
-
-    @Mock
-    private IsViewSharedForUser isViewSharedForUser;
 
     @Mock
     private ClusterEventBus clusterEventBus;
@@ -88,8 +86,8 @@ public class ViewsResourceTest {
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser, ClusterEventBus clusterEventBus, UserService userService) {
-            super(viewService, viewSharingService, isViewSharedForUser, clusterEventBus);
+        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService) {
+            super(viewService, clusterEventBus);
             this.userService = userService;
         }
 
@@ -107,7 +105,7 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, viewSharingService, isViewSharedForUser, clusterEventBus, userService);
+        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService);
         when(subject.isPermitted("dashboards:create")).thenReturn(true);
     }
 
@@ -120,23 +118,28 @@ public class ViewsResourceTest {
         when(builder.owner(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);
 
-        when(currentUser.getName()).thenReturn("basti");
+        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+
+        final UserContext userContext = mock(UserContext.class);
+        when(userContext.getUser()).thenReturn(testUser);
+        when(userContext.getUserId()).thenReturn("testuser");
+        when(currentUser.getName()).thenReturn("testuser");
         when(currentUser.isLocalAdmin()).thenReturn(true);
 
-        this.viewsResource.create(view);
+        this.viewsResource.create(view, userContext);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
-        assertThat(ownerCaptor.getValue()).isEqualTo("basti");
+        assertThat(ownerCaptor.getValue()).isEqualTo("testuser");
     }
 
     @Test
-    public void shouldNotCreateADashboardWithoutPermission() throws Exception {
+    public void shouldNotCreateADashboardWithoutPermission() {
         when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 
-        assertThatThrownBy(() -> this.viewsResource.create(view))
+        assertThatThrownBy(() -> this.viewsResource.create(view, null))
                 .isInstanceOf(ForbiddenException.class);
     }
 

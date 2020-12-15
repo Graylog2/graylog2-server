@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.search;
 
@@ -28,10 +28,14 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -84,6 +88,8 @@ public class SearchQueryParser {
     public static final SearchQueryOperator DEFAULT_STRING_OPERATOR = SearchQueryOperators.REGEXP;
     public static final SearchQueryOperator DEFAULT_OPERATOR = SearchQueryOperators.EQUALS;
 
+    private static final Logger LOG = LoggerFactory.getLogger(SearchQueryParser.class);
+
     // We parse all date strings in UTC because we store and show all dates in UTC as well.
     private static final ImmutableList<DateTimeFormatter> DATE_TIME_FORMATTERS = ImmutableList.of(
             DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZoneUTC(),
@@ -127,9 +133,17 @@ public class SearchQueryParser {
         return QUERY_SPLITTER_PATTERN.matcher(queryString);
     }
 
-    public SearchQuery parse(String queryString) {
+    public SearchQuery parse(String encodedQueryString) {
+        String queryString = encodedQueryString;
+
         if (Strings.isNullOrEmpty(queryString) || "*".equals(queryString)) {
             return new SearchQuery(queryString);
+        }
+
+        try {
+            queryString = URLDecoder.decode(encodedQueryString, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            LOG.warn("Could not find correct character set for decoding: {}", e.getMessage());
         }
 
         final Matcher matcher = querySplitterMatcher(requireNonNull(queryString).trim());

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import chroma from 'chroma-js';
 import { css } from 'styled-components';
 
@@ -32,13 +48,13 @@ const buttonStyles = ({ colors, utils }) => {
     const disabledBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
     const disabledColor = isLink ? colors.global.link : utils.contrastingColor(disabledBackground, 'AA');
 
-    const hoverBackground = mixColor(defaultBackground);
-    const hoverBorderColor = mixColor(defaultBorder);
-    const hoverColor = mixColor(defaultColor);
+    const hoverBackground = isLink ? 'transparent' : mixColor(defaultBackground);
+    const hoverBorderColor = isLink ? 'transparent' : mixColor(defaultBorder);
+    const hoverColor = isLink ? colors.global.linkHover : mixColor(defaultColor);
 
-    const activeHoverBackground = mixColor(activeBackground);
-    const activeHoverBorderColor = mixColor(activeBorder);
-    const activeHoverColor = mixColor(activeColor);
+    const activeHoverBackground = isLink ? 'transparent' : mixColor(activeBackground);
+    const activeHoverBorderColor = isLink ? 'transparent' : mixColor(activeBorder);
+    const activeHoverColor = isLink ? colors.global.linkHover : mixColor(activeColor);
 
     return css`
       &.btn-${variant} {

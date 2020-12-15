@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.storage.elasticsearch6;
 
 import com.codahale.metrics.MetricRegistry;
@@ -114,6 +130,38 @@ class MessagesAdapterES6Test {
         assertThat(result).hasSize(1)
                 .extracting(indexingError -> indexingError.message().getId(), Messages.IndexingError::errorType, Messages.IndexingError::errorMessage)
                 .containsExactly(tuple(messageId, Messages.IndexingError.ErrorType.MappingError, "failed to parse [http_response_code]"));
+    }
+
+    @Test
+    public void bulkIndexingParsesPrimaryShardUnavailableErrors() throws Exception {
+        final String messageId = "BOOMID";
+
+        final BulkResult failedJestResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem bulkResultItem = new MockedBulkResult().createResultItem(
+                "index",
+                "someindex",
+                "message",
+                messageId,
+                400,
+                "{\"type\":\"unavailable_shards_exception\",\"reason\":\"primary shard is not active\"\"}}",
+                null,
+                "unavailable_shards_exception",
+                "primary shard is not active"
+        );
+        when(failedJestResult.isSucceeded()).thenReturn(false);
+        when(failedJestResult.getFailedItems()).thenReturn(ImmutableList.of(bulkResultItem));
+
+        when(jestClient.execute(any()))
+            .thenReturn(failedJestResult)
+            .thenThrow(new IllegalStateException("JestResult#execute should not be called twice."));
+
+        final List<IndexingRequest> messageList = messageListWith(messageWithId(messageId));
+
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messageList);
+
+        assertThat(result).hasSize(1)
+                .extracting(indexingError -> indexingError.message().getId(), Messages.IndexingError::errorType, Messages.IndexingError::errorMessage)
+                .containsExactly(tuple(messageId, Messages.IndexingError.ErrorType.IndexBlocked, "primary shard is not active"));
     }
 
     @Test

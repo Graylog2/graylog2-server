@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import { mount, shallow } from 'wrappedEnzyme';
 
@@ -6,6 +22,8 @@ import URLUtils from 'util/URLUtils';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
 describe('<ContentPacksList />', () => {
+  // TODO: Should be replaced with call to `jest.mock` instead.
+  // eslint-disable-next-line import/no-named-as-default-member
   URLUtils.areCredentialsInURLSupported = jest.fn(() => { return false; });
 
   const contentPacks = [
@@ -29,7 +47,7 @@ describe('<ContentPacksList />', () => {
   it('should render with empty content packs', () => {
     const wrapper = mount(<ContentPacksList contentPacks={[]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with content packs', () => {
@@ -39,7 +57,7 @@ describe('<ContentPacksList />', () => {
     };
     const wrapper = mount(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should do pagination', () => {

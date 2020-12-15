@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.contentpack.facade;
 
@@ -48,6 +48,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -62,8 +63,12 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -82,6 +87,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionFacadeTest {
@@ -109,6 +116,10 @@ public class EventDefinitionFacadeTest {
     private DBEventDefinitionService eventDefinitionService;
     @Mock
     private EventDefinitionHandler eventDefinitionHandler;
+    @Mock
+    private UserService userService;
+    @Mock
+    private EntityOwnershipService entityOwnershipService;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -122,11 +133,11 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService);
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, entityOwnershipService);
         eventDefinitionHandler = new EventDefinitionHandler(
                 eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService);
+        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService);
     }
 
     @Test
@@ -236,6 +247,9 @@ public class EventDefinitionFacadeTest {
         when(jobSchedulerClock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
+        final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "kmerz"));
+        when(userService.load("kmerz")).thenReturn(kmerzUser);
+
 
         final NativeEntity<EventDefinitionDto> nativeEntity = facade.createNativeEntity(
                 entityV1,
@@ -248,6 +262,8 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto.title()).isEqualTo("title");
         assertThat(eventDefinitionDto.description()).isEqualTo("description");
         assertThat(eventDefinitionDto.config().type()).isEqualTo("aggregation-v1");
+        // verify that ownership was registered for this entity
+        verify(entityOwnershipService, times(1)).registerNewEventDefinition(nativeEntity.entity().id(), kmerzUser);
     }
 
     @Test

@@ -1,9 +1,25 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Label, Tooltip, Button } from 'components/graylog';
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
@@ -11,6 +27,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import withParams from 'routing/withParams';
 
 import style from './ShowAlertPage.css';
 
@@ -135,7 +152,7 @@ const ShowAlertPage = createReactClass({
             <span>
               <ButtonToolbar>
                 <LinkContainer to={Routes.LEGACY_ALERTS.LIST}>
-                  <Button bsStyle="info" className="active">Alerts</Button>
+                  <Button bsStyle="info">Alerts</Button>
                 </LinkContainer>
                 <OverlayElement overlay={conditionDetailsTooltip}
                                 placement="top"
@@ -156,4 +173,4 @@ const ShowAlertPage = createReactClass({
   },
 });
 
-export default ShowAlertPage;
+export default withParams(ShowAlertPage);

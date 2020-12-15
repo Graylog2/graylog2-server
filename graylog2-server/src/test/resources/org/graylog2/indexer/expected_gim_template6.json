@@ -1,0 +1,889 @@
+{
+  "order": -2147483648,
+  "template": "myindex*",
+  "settings": {
+    "index.mapping.ignore_malformed": true,
+    "analysis": {
+      "normalizer": {
+        "loweronly": {
+          "type": "custom",
+          "char_filter": [],
+          "filter": [
+            "lowercase"
+          ]
+        }
+      },
+      "analyzer": {
+        "analyzer_keyword": {
+          "filter": "lowercase",
+          "tokenizer": "keyword"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "message": {
+      "dynamic_templates": [
+        {
+          "internal_fields" : {
+            "match" : "gl2_*",
+            "match_mapping_type" : "string",
+            "mapping" : {
+              "type" : "keyword"
+            }
+          }
+        }, {
+          "store_generic" : {
+            "match_mapping_type" : "string",
+            "mapping" : {
+              "type" : "keyword"
+            }
+          }
+        },
+        {
+          "winlogbeat_fields": {
+            "match": "winlogbeat_*",
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        }
+      ],
+      "_source": {
+        "enabled": true
+      },
+      "properties": {
+        "message" : {
+          "type" : "text",
+          "analyzer" : "standard",
+          "fielddata" : false
+        },
+        "full_message" : {
+          "type" : "text",
+          "analyzer" : "standard",
+          "fielddata" : false
+        },
+        "timestamp" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd HH:mm:ss.SSS"
+        },
+        "gl2_accounted_message_size" : {
+          "type" : "long"
+        },
+        "gl2_receive_timestamp" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd HH:mm:ss.SSS"
+        },
+        "gl2_processing_timestamp" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd HH:mm:ss.SSS"
+        },
+        "source" : {
+          "type" : "text",
+          "analyzer" : "analyzer_keyword",
+          "fielddata" : true
+        },
+        "streams" : {
+          "type" : "keyword"
+        },
+        "gl2_gims_version": {
+          "type": "keyword"
+        },
+        "gl2_tags": {
+          "type": "keyword"
+        },
+        "gl2_event_category": {
+          "type": "keyword"
+        },
+        "gl2_event_subcategory": {
+          "type": "keyword"
+        },
+        "gl2_event_type": {
+          "type": "keyword"
+        },
+        "user_command": {
+          "type": "keyword"
+        },
+        "gl2_event_type_code": {
+          "type": "integer"
+        },
+        "user_command_path": {
+          "type": "keyword"
+        },
+        "user_name": {
+          "type": "keyword",
+          "normalizer": "loweronly",
+          "copy_to": "associated_user_name"
+        },
+        "user_previous_name": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "previous_user_name": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "user_name_mapped": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "user_session_id": {
+          "type": "keyword",
+          "copy_to": "associated_session_id"
+        },
+        "user_domain": {
+          "type": "keyword"
+        },
+        "user_email": {
+          "type": "keyword"
+        },
+        "user_id": {
+          "type": "keyword"
+        },
+        "user_category": {
+          "type": "keyword"
+        },
+        "user_type": {
+          "type": "keyword"
+        },
+        "user_priority": {
+          "type": "keyword"
+        },
+        "user_priority_level": {
+          "type": "byte"
+        },
+        "source_user_name": {
+          "type": "keyword",
+          "normalizer": "loweronly",
+          "copy_to": "associated_user_name"
+        },
+        "source_user_name_mapped": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "source_user_domain": {
+          "type": "keyword"
+        },
+        "source_user_email": {
+          "type": "keyword"
+        },
+        "source_user_session_id": {
+          "type": "keyword",
+          "copy_to": "associated_session_id"
+        },
+        "source_user_id": {
+          "type": "keyword"
+        },
+        "source_user_category": {
+          "type": "keyword"
+        },
+        "source_user_type": {
+          "type": "keyword"
+        },
+        "source_user_priority": {
+          "type": "keyword"
+        },
+        "source_user_priority_level": {
+          "type": "byte"
+        },
+        "target_user_name": {
+          "type": "keyword",
+          "normalizer": "loweronly",
+          "copy_to": "associated_user_name"
+        },
+        "target_user_name_mapped": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "target_user_domain": {
+          "type": "keyword"
+        },
+        "target_user_email": {
+          "type": "keyword"
+        },
+        "target_user_session_id": {
+          "type": "keyword",
+          "copy_to": "associated_session_id"
+        },
+        "target_user_id": {
+          "type": "keyword"
+        },
+        "target_user_category": {
+          "type": "keyword"
+        },
+        "target_user_type": {
+          "type": "keyword"
+        },
+        "target_user_priority": {
+          "type": "keyword"
+        },
+        "target_user_priority_level": {
+          "type": "byte"
+        },
+        "http_application": {
+          "type": "keyword"
+        },
+        "http_bytes": {
+          "type": "long"
+        },
+        "http_content_type": {
+          "type": "keyword"
+        },
+        "http_headers": {
+          "type": "text",
+          "analyzer": "standard",
+          "norms": false,
+          "index_options": "freqs"
+        },
+        "http_host": {
+          "type": "keyword"
+        },
+        "http_path": {
+          "type": "keyword"
+        },
+        "http_referrer": {
+          "type": "keyword"
+        },
+        "http_request_bytes": {
+          "type": "long"
+        },
+        "http_method": {
+          "type": "keyword"
+        },
+        "http_response_bytes": {
+          "type": "long"
+        },
+        "http_response": {
+          "type": "keyword"
+        },
+        "http_response_code": {
+          "type": "integer"
+        },
+        "http_user_agent": {
+          "type": "keyword"
+        },
+        "http_user_agent_analyzed": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "http_user_agent_name": {
+          "type": "keyword"
+        },
+        "http_url": {
+          "type": "keyword"
+        },
+        "http_url_analyzed": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "http_url_category": {
+          "type": "keyword"
+        },
+        "http_url_length": {
+          "type": "long"
+        },
+        "http_user_agent_os": {
+          "type": "keyword"
+        },
+        "http_user_agent_length": {
+          "type": "long"
+        },
+        "http_version": {
+          "type": "keyword"
+        },
+        "http_xff": {
+          "type": "keyword"
+        },
+        "host_as_domain": {
+          "type": "keyword"
+        },
+        "host_as_isp": {
+          "type": "keyword"
+        },
+        "host_as_organization": {
+          "type": "keyword"
+        },
+        "host_as_number": {
+          "type": "keyword"
+        },
+        "host_geo_city": {
+          "type": "keyword"
+        },
+        "host_geo_country": {
+          "type": "keyword"
+        },
+        "host_geo_name": {
+          "type": "keyword"
+        },
+        "host_geo_country_iso": {
+          "type": "keyword"
+        },
+        "host_geo_coordinates": {
+          "type": "keyword"
+        },
+        "host_location_name": {
+          "type": "keyword"
+        },
+        "host_mac": {
+          "type": "keyword"
+        },
+        "host_reference": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "host_ip": {
+          "type": "ip",
+          "copy_to": "associated_ip"
+        },
+        "host_hostname": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "host_category": {
+          "type": "keyword"
+        },
+        "host_priority": {
+          "type": "keyword"
+        },
+        "host_priority_level": {
+          "type": "byte"
+        },
+        "host_id": {
+          "type": "keyword"
+        },
+        "host_type": {
+          "type": "keyword"
+        },
+        "host_type_version": {
+          "type": "keyword"
+        },
+        "host_virtfw_hostname": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "host_virtfw_id": {
+          "type": "keyword"
+        },
+        "host_virtfw_uid": {
+          "type": "keyword"
+        },
+        "source_as_organization": {
+          "type": "keyword"
+        },
+        "source_as_domain": {
+          "type": "keyword"
+        },
+        "source_as_number": {
+          "type": "keyword"
+        },
+        "source_bytes_sent": {
+          "type": "long"
+        },
+        "source_geo_city": {
+          "type": "keyword"
+        },
+        "source_geo_country": {
+          "type": "keyword"
+        },
+        "source_geo_name": {
+          "type": "keyword"
+        },
+        "source_geo_country_iso": {
+          "type": "keyword"
+        },
+        "source_geo_coordinates": {
+          "type": "keyword"
+        },
+        "source_reference": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "source_ip": {
+          "type": "ip",
+          "copy_to": "associated_ip"
+        },
+        "source_hostname": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "source_category": {
+          "type": "keyword"
+        },
+        "source_location_name": {
+          "type": "keyword"
+        },
+        "source_mac": {
+          "type": "keyword"
+        },
+        "source_nat_ip": {
+          "type": "ip",
+          "copy_to": "associated_ip"
+        },
+        "source_nat_port": {
+          "type": "integer"
+        },
+        "source_priority": {
+          "type": "keyword"
+        },
+        "source_priority_level": {
+          "type": "byte"
+        },
+        "source_id": {
+          "type": "keyword"
+        },
+        "source_packets": {
+          "type": "long"
+        },
+        "source_type": {
+          "type": "keyword"
+        },
+        "source_vsys_uuid": {
+          "type": "keyword"
+        },
+        "source_zone": {
+          "type": "keyword"
+        },
+        "destination_application_name": {
+          "type": "keyword"
+        },
+        "destination_as_domain": {
+          "type": "keyword"
+        },
+        "destination_as_isp": {
+          "type": "keyword"
+        },
+        "destination_as_organization": {
+          "type": "keyword"
+        },
+        "destination_as_number": {
+          "type": "keyword"
+        },
+        "destination_bytes_sent": {
+          "type": "long"
+        },
+        "destination_domain": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "destination_geo_city_name": {
+          "type": "keyword"
+        },
+        "destination_geo_country_name": {
+          "type": "keyword"
+        },
+        "destination_geo_name": {
+          "type": "keyword"
+        },
+        "destination_geo_state_name": {
+          "type": "keyword"
+        },
+        "destination_geo_country_iso": {
+          "type": "keyword"
+        },
+        "destination_geo_coordinates": {
+          "type": "keyword"
+        },
+        "destination_reference": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "destination_ip": {
+          "type": "ip",
+          "copy_to": "associated_ip"
+        },
+        "destination_nat_ip": {
+          "type": "ip",
+          "copy_to": "associated_ip"
+        },
+        "destination_nat_port": {
+          "type": "integer"
+        },
+        "destination_packets_sent": {
+          "type": "long"
+        },
+        "destination_port": {
+          "type": "integer"
+        },
+        "destination_hostname": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "destination_category": {
+          "type": "keyword"
+        },
+        "destination_location_name": {
+          "type": "keyword"
+        },
+        "destination_mac": {
+          "type": "keyword"
+        },
+        "destination_priority": {
+          "type": "keyword"
+        },
+        "destination_priority_level": {
+          "type": "byte"
+        },
+        "destination_id": {
+          "type": "keyword"
+        },
+        "destination_type": {
+          "type": "keyword"
+        },
+        "destination_vsys_uuid": {
+          "type": "keyword"
+        },
+        "destination_zone": {
+          "type": "keyword"
+        },
+        "event_action": {
+          "type": "keyword"
+        },
+        "event_created": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        },
+        "event_source": {
+          "type": "keyword"
+        },
+        "event_source_api_version": {
+          "type": "keyword"
+        },
+        "event_source_product": {
+          "type": "keyword"
+        },
+        "event_start": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        },
+        "event_code": {
+          "type": "keyword"
+        },
+        "event_duration": {
+          "type": "long"
+        },
+        "event_error_code": {
+          "type": "keyword"
+        },
+        "event_error_description": {
+          "type": "keyword"
+        },
+        "event_log_name": {
+          "type": "keyword"
+        },
+        "event_reporter": {
+          "type": "keyword"
+        },
+        "event_uid": {
+          "type": "keyword"
+        },
+        "event_observer_hostname": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "event_observer_ip": {
+          "type": "ip",
+          "copy_to": "associated_ip"
+        },
+        "event_observer_uid": {
+          "type": "keyword"
+        },
+        "event_outcome": {
+          "type": "keyword"
+        },
+        "event_received_time": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        },
+        "event_repeat_count": {
+          "type": "long"
+        },
+        "event_severity": {
+          "type": "keyword"
+        },
+        "event_severity_level": {
+          "type": "byte"
+        },
+        "email_message_id": {
+          "type": "keyword"
+        },
+        "email_subject": {
+          "type": "keyword"
+        },
+        "file_company": {
+          "type": "keyword"
+        },
+        "file_created_date": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+        },
+        "file_name": {
+          "type": "keyword"
+        },
+        "file_path": {
+          "type": "keyword"
+        },
+        "file_size": {
+          "type": "keyword"
+        },
+        "file_type": {
+          "type": "keyword"
+        },
+        "hash_md5": {
+          "type": "keyword"
+        },
+        "hash_sha1": {
+          "type": "keyword"
+        },
+        "hash_sha256": {
+          "type": "keyword"
+        },
+        "hash_sha512": {
+          "type": "keyword"
+        },
+        "hash_imphash": {
+          "type": "keyword"
+        },
+        "alert_definitions_version": {
+          "type": "keyword"
+        },
+        "alert_category": {
+          "type": "keyword"
+        },
+        "alert_indicator": {
+          "type": "keyword"
+        },
+        "alert_signature": {
+          "type": "keyword"
+        },
+        "alert_signature_id": {
+          "type": "keyword"
+        },
+        "alert_severity": {
+          "type": "keyword"
+        },
+        "alert_severity_level": {
+          "type": "byte"
+        },
+        "associated_ip": {
+          "type": "ip"
+        },
+        "associated_host": {
+          "type": "keyword"
+        },
+        "associated_mac": {
+          "type": "keyword"
+        },
+        "associated_hash": {
+          "type": "keyword"
+        },
+        "associated_category": {
+          "type": "keyword"
+        },
+        "associated_session_id": {
+          "type": "keyword"
+        },
+        "associated_user_name": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "associated_user_id": {
+          "type": "keyword"
+        },
+        "session_id": {
+          "type": "keyword",
+          "copy_to": "associated_session_id"
+        },
+        "service_version": {
+          "type": "keyword"
+        },
+        "service_name": {
+          "type": "keyword"
+        },
+        "vendor_alert_severity": {
+          "type": "keyword"
+        },
+        "vendor_alert_severity_level": {
+          "type": "integer"
+        },
+        "vendor_event_action": {
+          "type": "keyword"
+        },
+        "vendor_event_description": {
+          "type": "keyword"
+        },
+        "vendor_event_outcome": {
+          "type": "keyword"
+        },
+        "vendor_event_outcome_reason": {
+          "type": "keyword"
+        },
+        "vendor_event_severity_level": {
+          "type": "integer"
+        },
+        "vendor_event_severity": {
+          "type": "keyword"
+        },
+        "vendor_private_ip": {
+          "type": "ip"
+        },
+        "vendor_private_ipv6": {
+          "type": "ip"
+        },
+        "vendor_public_ip": {
+          "type": "ip"
+        },
+        "vendor_public_ipv6": {
+          "type": "ip"
+        },
+        "vendor_signin_protocol": {
+          "type": "keyword"
+        },
+        "vendor_threat_suspected": {
+          "type": "keyword"
+        },
+        "vendor_transaction_id": {
+          "type": "keyword"
+        },
+        "vendor_transaction_type": {
+          "type": "keyword"
+        },
+        "vendor_user_type": {
+          "type": "keyword"
+        },
+        "windows_logon_type": {
+          "type": "byte"
+        },
+        "windows_logon_type_description": {
+          "type": "keyword"
+        },
+        "windows_kerberos_encryption": {
+          "type": "keyword"
+        },
+        "windows_kerberos_encryption_type": {
+          "type": "keyword"
+        },
+        "windows_kerberos_service_name": {
+          "type": "keyword"
+        },
+        "windows_authentication_package_name": {
+          "type": "keyword"
+        },
+        "windows_authentication_lmpackage_name": {
+          "type": "keyword"
+        },
+        "windows_authentication_process_name": {
+          "type": "keyword"
+        },
+        "source_user_sid_authority1": {
+          "type": "keyword"
+        },
+        "source_user_sid_authority2": {
+          "type": "keyword"
+        },
+        "source_user_sid_rid": {
+          "type": "keyword"
+        },
+        "user_sid_authority1": {
+          "type": "keyword"
+        },
+        "user_sid_authority2": {
+          "type": "keyword"
+        },
+        "user_sid_rid": {
+          "type": "keyword"
+        },
+        "target_sid_authority1": {
+          "type": "keyword"
+        },
+        "target_sid_authority2": {
+          "type": "keyword"
+        },
+        "target_sid_rid": {
+          "type": "keyword"
+        },
+        "network_application": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "network_bytes": {
+          "type": "long"
+        },
+        "network_bytes_rx": {
+          "type": "long"
+        },
+        "network_bytes_tx": {
+          "type": "long"
+        },
+        "network_name": {
+          "type": "keyword"
+        },
+        "network_community_id": {
+          "type": "keyword"
+        },
+        "network_data_bytes": {
+          "type": "long"
+        },
+        "network_direction": {
+          "type": "keyword"
+        },
+        "network_forwarded_ip": {
+          "type": "ip",
+          "copy_to": "associated_ip"
+        },
+        "network_header_bytes": {
+          "type": "long"
+        },
+        "network_iana_number": {
+          "type": "integer"
+        },
+        "network_icmp_type": {
+          "type": "keyword"
+        },
+        "network_interface_in": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "network_interface_out": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "network_ip_version": {
+          "type": "keyword"
+        },
+        "network_packets": {
+          "type": "long"
+        },
+        "network_protocol": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "network_transport": {
+          "type": "keyword"
+        },
+        "network_tunnel_type": {
+          "type": "keyword"
+        },
+        "network_tunnel_duration": {
+          "type": "long"
+        },
+        "application_name": {
+          "type": "keyword",
+          "normalizer": "loweronly"
+        },
+        "application_sso_signonmode": {
+          "type": "keyword"
+        },
+        "application_sso_target_name": {
+          "type": "keyword"
+        },
+        "threat_category": {
+          "type": "keyword"
+        },
+        "threat_detected": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

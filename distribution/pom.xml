@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2020 Graylog, Inc.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the Server Side Public License, version 1,
+    as published by MongoDB, Inc.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    Server Side Public License for more details.
+
+    You should have received a copy of the Server Side Public License
+    along with this program. If not, see
+    <http://www.mongodb.com/licensing/server-side-public-license>.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>graylog-parent</artifactId>
         <groupId>org.graylog</groupId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,6 +32,15 @@
     <description>Module solely performing final assembly step after all other modules artifacts have been built</description>
 
     <properties>
+        <!--
+           We don't need to sign anything in this module. This fixes a release build error related to setting
+           the <outputDirectory> to a different path: https://issues.apache.org/jira/browse/MGPG-44
+        -->
+        <gpg.skip>true</gpg.skip>
+        <maven.source.skip>true</maven.source.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.install.skip>true</maven.install.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
     </properties>
 

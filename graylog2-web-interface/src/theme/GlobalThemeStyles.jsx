@@ -1,6 +1,22 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import { createGlobalStyle, css } from 'styled-components';
 
-const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
+const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
     height: 256px;
   }
@@ -89,6 +105,7 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
 
   input.form-control,
   select.form-control,
+  textarea,
   textarea.form-control {
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
@@ -110,10 +127,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
       background-color: ${theme.colors.input.backgroundDisabled};
       color: ${theme.colors.input.colorDisabled};
     }
-  }
-
-  label {
-    font-size: ${theme.fonts.size.large};
   }
 
   legend small {
@@ -144,7 +157,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
   }
 
   .actions-lg .actions-container {
-    height: 60px;
     margin-top: 10px;
     padding-left: 50px;
   }
@@ -163,6 +175,10 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
 
   .no-bm {
     margin-bottom: 0;
+  }
+
+  .has-bm {
+    margin-bottom: 10px;
   }
 
   .alert {
@@ -260,10 +276,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
 
   dl.metric-histogram dd {
     margin-left: 125px;
-  }
-
-  #user-list th.user-type {
-    width: 50px;
   }
 
   td.centered {
@@ -613,6 +625,19 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     vertical-align: middle;
     width: auto;
   }
+  
+  .typeahead-wrapper .tt-menu {
+    background-color: ${theme.colors.global.contentBackground};
+    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
+    color: ${theme.colors.global.textDefault};
+    
+    .tt-suggestion:hover,
+    .tt-suggestion.tt-cursor {
+      color: ${theme.colors.variant.darkest.info};
+      background-color: ${theme.colors.variant.lighter.info};
+      background-image: none;
+    }
+  }
 
   .form-group-inline {
     display: inline-block;
@@ -691,8 +716,12 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     background-color: ${theme.colors.variant.lightest.default};
     border-color: ${theme.colors.variant.lighter.default};
   }
-
-  ${additionalStyles}
+  
+  input[type="range"],
+  input[type="range"]:focus {
+    box-shadow: none;
+    height: auto;
+  }
 `);
 
 export default GlobalThemeStyles;

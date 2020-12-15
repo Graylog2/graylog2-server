@@ -1,15 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ProgressBar /> properly renders with animated 1`] = `
+.c0 {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c1 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 45%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-image: linear-gradient( 45deg,rgba(255,255,255,0.25) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.25) 50%,rgba(255,255,255,0.25) 75%,transparent 75%,transparent );
+  background-size: 40px 40px;
+  -webkit-animation: jWjlvG 2s linear infinite;
+  animation: jWjlvG 2s linear infinite;
+  background-color: #0063be;
+  color: #fff;
+}
+
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 jYjmPQ"
+    class="c0"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="45"
-      class="ProgressBar__Bar-fsyx32-1 IzZdh"
+      class="c1"
       role="progressbar"
       value="45"
     />
@@ -18,15 +54,47 @@ exports[`<ProgressBar /> properly renders with animated 1`] = `
 `;
 
 exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
+.c0 {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c1 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 67%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-color: #ad0707;
+  color: #fff;
+}
+
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 jYjmPQ"
+    class="c0"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="67"
-      class="ProgressBar__Bar-fsyx32-1 ffWWxz"
+      class="c1"
       role="progressbar"
       value="67"
     />
@@ -35,16 +103,48 @@ exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
 `;
 
 exports[`<ProgressBar /> properly renders with label 1`] = `
+.c0 {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c1 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 23%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-color: #0063be;
+  color: #fff;
+}
+
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 jYjmPQ"
+    class="c0"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="23"
       aria-valuetext="Example ProgressBar"
-      class="ProgressBar__Bar-fsyx32-1 kyXMlg"
+      class="c1"
       role="progressbar"
       value="23"
     >
@@ -55,15 +155,62 @@ exports[`<ProgressBar /> properly renders with label 1`] = `
 `;
 
 exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
+.c0 {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c1 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 35%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-color: #0063be;
+  color: #fff;
+}
+
+.c2 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 55%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-color: #0063be;
+  color: #fff;
+}
+
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 jYjmPQ"
+    class="c0"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="35"
-      class="ProgressBar__Bar-fsyx32-1 eoITWv"
+      class="c1"
       role="progressbar"
       value="35"
     />
@@ -71,7 +218,7 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="55"
-      class="ProgressBar__Bar-fsyx32-1 kWuRZx"
+      class="c2"
       role="progressbar"
       value="55"
     />
@@ -80,15 +227,47 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
 `;
 
 exports[`<ProgressBar /> properly renders with no props 1`] = `
+.c0 {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c1 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 0%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-color: #0063be;
+  color: #fff;
+}
+
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 jYjmPQ"
+    class="c0"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="0"
-      class="ProgressBar__Bar-fsyx32-1 detMcl"
+      class="c1"
       role="progressbar"
       value="0"
     />
@@ -97,15 +276,47 @@ exports[`<ProgressBar /> properly renders with no props 1`] = `
 `;
 
 exports[`<ProgressBar /> properly renders with one bar 1`] = `
+.c0 {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c1 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 35%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-color: #0063be;
+  color: #fff;
+}
+
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 jYjmPQ"
+    class="c0"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="35"
-      class="ProgressBar__Bar-fsyx32-1 eoITWv"
+      class="c1"
       role="progressbar"
       value="35"
     />
@@ -114,15 +325,49 @@ exports[`<ProgressBar /> properly renders with one bar 1`] = `
 `;
 
 exports[`<ProgressBar /> properly renders with striped 1`] = `
+.c0 {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c1 {
+  height: 100%;
+  font-size: 0.889rem;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.1);
+  -webkit-transition: width 500ms ease-in-out;
+  transition: width 500ms ease-in-out;
+  width: 56%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(31,31,31,0.4),2px -1px 3px rgba(255,255,255,0.5);
+  background-image: linear-gradient( 45deg,rgba(255,255,255,0.25) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.25) 50%,rgba(255,255,255,0.25) 75%,transparent 75%,transparent );
+  background-size: 40px 40px;
+  background-color: #0063be;
+  color: #fff;
+}
+
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 jYjmPQ"
+    class="c0"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="56"
-      class="ProgressBar__Bar-fsyx32-1 fAOhVs"
+      class="c1"
       role="progressbar"
       value="56"
     />

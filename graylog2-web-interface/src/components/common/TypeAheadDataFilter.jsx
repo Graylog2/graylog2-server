@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
@@ -55,7 +71,8 @@ class TypeAheadDataFilter extends React.Component {
     label: PropTypes.string,
     /**
      * Function that will be called when the user changes the filter.
-     * The function receives an array of data that matches the filter.
+     * The function receives an array of data that matches the filter
+     * and filter input value.
      */
     onDataFiltered: PropTypes.func,
     /**
@@ -100,6 +117,7 @@ class TypeAheadDataFilter extends React.Component {
 
   _onSearchTextChanged = (event) => {
     event.preventDefault();
+    event.stopPropagation();
     this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
   };
 
@@ -174,6 +192,7 @@ class TypeAheadDataFilter extends React.Component {
 
   filterData = () => {
     const { filterData, data, onDataFiltered } = this.props;
+    const { filterText } = this.state;
 
     if (typeof filterData === 'function') {
       return filterData(data);
@@ -183,7 +202,7 @@ class TypeAheadDataFilter extends React.Component {
       return this._matchFilters(datum) && this._matchStringSearch(datum);
     }, this);
 
-    onDataFiltered(filteredData);
+    onDataFiltered(filteredData, filterText);
 
     return true;
   };
@@ -196,7 +215,7 @@ class TypeAheadDataFilter extends React.Component {
         <li key={`li-${filter}`}>
           <span className="pill label label-default">
             {filterBy}: {filter}
-            <button type="button" className="tag-remove" data-target={filter} onClick={this._onFilterRemoved} />
+            <button type="button" className="tag-remove" data-target={filter} onClick={this._onFilterRemoved} aria-label={`Remove filter ${filter}`} />
           </span>
         </li>
       );
@@ -214,10 +233,11 @@ class TypeAheadDataFilter extends React.Component {
 
     return (
       <div className="filter">
-        <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline' }}>
+        <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline-flex', alignItems: 'flex-end' }}>
           <TypeAheadInput id={id}
                           ref={(typeAheadInput) => { this.typeAheadInput = typeAheadInput; }}
                           onSuggestionSelected={this._onFilterAdded}
+                          formGroupClassName=""
                           suggestionText={`Filter by ${filterBy}: `}
                           suggestions={suggestions}
                           label={label}

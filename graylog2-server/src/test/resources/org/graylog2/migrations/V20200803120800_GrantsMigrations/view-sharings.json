@@ -1,0 +1,169 @@
+{
+  "view_sharings": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "type": "users",
+      "view_id": "54e3deadbeefdeadbeef0001",
+      "users": [
+        "jane",
+        "john"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "type": "roles",
+      "view_id": "54e3deadbeefdeadbeef0002",
+      "roles": [
+        "role1",
+        "role2"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "type": "all_of_instance",
+      "view_id": "54e3deadbeefdeadbeef0003"
+    }
+  ],
+  "views": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "title": "Search 1",
+      "summary": "",
+      "description": "",
+      "search_id": "54e3deadbeefdeadbeef0001",
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2016-08-24T12:13:47.628Z"
+      },
+      "type": "SEARCH",
+      "properties": [],
+      "requires": {}
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "title": "Dashboard 1",
+      "summary": "",
+      "description": "",
+      "search_id": "54e3deadbeefdeadbeef0002",
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2016-08-24T12:13:47.628Z"
+      },
+      "type": "DASHBOARD",
+      "properties": [],
+      "requires": {}
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "title": "Dashboard 2",
+      "summary": "",
+      "description": "",
+      "search_id": "54e3deadbeefdeadbeef0003",
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2016-08-24T12:13:47.628Z"
+      },
+      "type": "DASHBOARD",
+      "properties": [],
+      "requires": {}
+    }
+  ],
+  "searches": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "queries": [
+        {
+          "id": "36a1962b-af0f-4562-8c31-2ab8a58cabc8",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "search_types": [
+            {
+              "type": "messages",
+              "id": "20a66f1d-2678-4408-95dc-6b9242892216",
+              "limit": 150,
+              "offset": 0
+            }
+          ]
+        }
+      ],
+      "parameters": []
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "queries": [
+        {
+          "id": "36a1962b-af0f-4562-8c31-2ab8a58cabc8",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "search_types": [
+            {
+              "type": "messages",
+              "id": "20a66f1d-2678-4408-95dc-6b9242892216",
+              "limit": 150,
+              "offset": 0
+            }
+          ]
+        }
+      ],
+      "parameters": []
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "queries": [
+        {
+          "id": "36a1962b-af0f-4562-8c31-2ab8a58cabc8",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "search_types": [
+            {
+              "type": "messages",
+              "id": "20a66f1d-2678-4408-95dc-6b9242892216",
+              "limit": 150,
+              "offset": 0
+            }
+          ]
+        }
+      ],
+      "parameters": []
+    }
+  ]
+}

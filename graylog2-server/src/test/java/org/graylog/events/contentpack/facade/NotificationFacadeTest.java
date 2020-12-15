@@ -1,24 +1,25 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.contentpack.facade;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
@@ -28,20 +29,30 @@ import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
-import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.*;
+import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,6 +92,9 @@ public class NotificationFacadeTest {
     @Mock
     private NotificationResourceHandler notificationResourceHandler;
 
+    @Mock
+    private UserService userService;
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -97,11 +111,11 @@ public class NotificationFacadeTest {
         );
         jobDefinitionService = mock(DBJobDefinitionService.class);
         stateService = mock(DBEventProcessorStateService.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService);
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class));
 
-        notificationService = new DBNotificationService(mongodb.mongoConnection(), mapperProvider);
+        notificationService = new DBNotificationService(mongodb.mongoConnection(), mapperProvider, mock(EntityOwnershipService.class));
         notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());
-        facade = new NotificationFacade(objectMapper, notificationResourceHandler, notificationService);
+        facade = new NotificationFacade(objectMapper, notificationResourceHandler, notificationService, userService);
     }
 
     @Test
@@ -145,6 +159,8 @@ public class NotificationFacadeTest {
         final JobDefinitionDto jobDefinitionDto = mock(JobDefinitionDto.class);
 
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
+        final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "kmerz"));
+        when(userService.load("kmerz")).thenReturn(kmerzUser);
 
         final NativeEntity<NotificationDto> nativeEntity = facade.createNativeEntity(
             entityV1,

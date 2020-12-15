@@ -1,9 +1,25 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import Reflux from 'reflux';
 
+import { LinkContainer } from 'components/graylog/router';
 import { DocumentTitle, Spinner } from 'components/common';
 import PageHeader from 'components/common/PageHeader';
 import ExtractorsList from 'components/extractors/ExtractorsList';
@@ -13,6 +29,7 @@ import StoreProvider from 'injection/StoreProvider';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import withParams from 'routing/withParams';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -96,4 +113,4 @@ const ExtractorsPage = createReactClass({
   },
 });
 
-export default ExtractorsPage;
+export default withParams(ExtractorsPage);

@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.notifications;
 
@@ -21,6 +21,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,12 +54,18 @@ public class NotificationResourceHandler {
      * Creates a new notification definition and a corresponding scheduler job definition.
      *
      * @param unsavedDto the notification definition to save
+     * @param user
      * @return the created event definition
      */
-    public NotificationDto create(NotificationDto unsavedDto) {
-        final NotificationDto dto = notificationService.save(unsavedDto);
-
-        LOG.debug("Created notification definition <{}/{}>", dto.id(), dto.title());
+    public NotificationDto create(NotificationDto unsavedDto, Optional<User> user) {
+        final NotificationDto dto;
+        if (user.isPresent()) {
+            dto = notificationService.saveWithOwnership(unsavedDto, user.get());
+            LOG.debug("Created notification definition <{}/{}> with user <{}>", dto.id(), dto.title(), user.get());
+        } else {
+            dto = notificationService.save(unsavedDto);
+            LOG.debug("Created notification definition <{}/{}> without user", dto.id(), dto.title());
+        }
 
         try {
             final JobDefinitionDto unsavedJobDefinition = JobDefinitionDto.builder()

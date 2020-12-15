@@ -1,0 +1,52 @@
+{
+  "users": [
+    {
+      "_id" : {
+        "$oid": "5b8e4ef17ad37b64ee87eb57"
+      },
+      "full_name" : "Testuser1",
+      "username" : "testuser1",
+      "email" : "testuser1@graylog.org",
+      "password" : "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions" : [
+        "dashboards:read:5e2afc66cd19517ec2dabadd",
+        "dashboards:read:5e2afc66cd19517ec2dabadf",
+        "dashboards:edit:5e2afc66cd19517ec2dabadf",
+        "streams:read:5c40ad603c034441a56942bd",
+        "streams:read:5e2f5cfb4868e67ad4da562d",
+        "view:read:5c40ad603c034441a56943be",
+        "view:edit:5c40ad603c034441a56943be",
+        "view:read:5c40ad603c034441a56943c0",
+        "eventdefinitions:edit:5c40ad603c034441a56942bf",
+        "eventdefinitions:read:5c40ad603c034441a56942bf",
+        "eventdefinitions:read:5c40ad603c034441a56942c0"
+      ],
+      "timezone" : "UTC",
+      "roles" : [
+        { "$oid": "54e3deadbeefdeadbeef0001" }
+      ]
+    },
+    {
+      "_id" : {
+        "$oid": "5b8e4ef17ad37b64ee87eb58"
+      },
+      "full_name" : "Testuser2",
+      "email" : "testuser2@graylog.org",
+      "username" : "testuser2",
+      "password" : "{bcrypt}$2a$10$7kEUkcibcUkUKs2q9OHCpumI5XcBPHVmO37/D0YBYtWgR/Jisqkyi{salt}$2a$10$7kEUkcibcUkUKs2q9OHCpu",
+      "permissions" : [
+        "streams:read",
+        "streams:read:4e40ad603c034441a56942b0",
+        "streams:changestate:4e40ad603c034441a56942b0",
+        "dashboards:edit",
+        "dashboards:read:5e2afc66cd19517ec2dabadf",
+        "dashboards:edit:5e2afc66cd19517ec2dabadf"
+      ],
+      "timezone" : "UTC",
+      "roles" : [
+        { "$oid": "54e3deadbeefdeadbeef0001" },
+        { "$oid": "54e3deadbeefdeadbeef0008" }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,0 @@
-:local(.component) {
-    text-align: center;
-    font-size: 1rem; /* theme.fonts.size.body */
-}
-
-:local(.component) h3 {
-    margin-top: 5px;
-    margin-bottom: 10px;
-}

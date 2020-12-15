@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.rest.resources.system;
 
@@ -30,15 +30,20 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
+import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
+import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
 import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
 import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.graylog2.shared.security.SessionCreator;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
@@ -81,12 +86,18 @@ public class SessionsResource extends RestResource {
     private final SessionCreator sessionCreator;
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
     private final SessionResponseFactory sessionResponseFactory;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SessionsResource(UserService userService, DefaultSecurityManager securityManager,
-            ShiroAuthenticationFilter authenticationFilter, @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
-            @Context Request grizzlyRequest, SessionCreator sessionCreator,
-            ActorAwareAuthenticationTokenFactory tokenFactory, SessionResponseFactory sessionResponseFactory) {
+    public SessionsResource(UserService userService,
+                            DefaultSecurityManager securityManager,
+                            ShiroAuthenticationFilter authenticationFilter,
+                            @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
+                            @Context Request grizzlyRequest,
+                            SessionCreator sessionCreator,
+                            ActorAwareAuthenticationTokenFactory tokenFactory,
+                            SessionResponseFactory sessionResponseFactory,
+                            ClusterConfigService clusterConfigService) {
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
@@ -95,6 +106,7 @@ public class SessionsResource extends RestResource {
         this.sessionCreator = sessionCreator;
         this.tokenFactory = tokenFactory;
         this.sessionResponseFactory = sessionResponseFactory;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @POST
@@ -154,16 +166,35 @@ public class SessionsResource extends RestResource {
             return SessionValidationResponse.invalid();
         }
 
-        // there's no valid session, but the authenticator would like us to create one
+        // There's no valid session, but the authenticator would like us to create one.
+        // This is the "Trusted Header Authentication" scenario, where the browser performs this request to check if a
+        // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
+        // user based on the trusted header and request a session to be created transparently. The UI will take the
+        // session information from the response to perform subsequent requests to the backend using this session.
         if (subject.getSession(false) == null && ShiroSecurityContext.isSessionCreationRequested()) {
             final Session session = subject.getSession();
+
+            final String userId = subject.getPrincipal().toString();
+            final User user = userService.loadById(userId);
+            if (user == null) {
+                throw new InternalServerErrorException("Unable to load user with ID <" + userId + ">.");
+            }
+
+            session.setAttribute("username", user.getName());
+
+            final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
+            final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
+            if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
+                session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
+            }
+
             LOG.debug("Session created {}", session.getId());
             session.touch();
             // save subject in session, otherwise we can't get the username back in subsequent requests.
             ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
             return SessionValidationResponse.validWithNewSession(String.valueOf(session.getId()),
-                                                                 String.valueOf(subject.getPrincipal()));
+                                                                 String.valueOf(user.getName()));
         }
         return SessionValidationResponse.valid();
     }
@@ -176,5 +207,9 @@ public class SessionsResource extends RestResource {
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
+    }
+
+    private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
+        return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
     }
 }

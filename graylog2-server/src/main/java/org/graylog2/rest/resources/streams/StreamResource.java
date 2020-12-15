@@ -1,24 +1,23 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -32,6 +31,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
+import org.graylog.security.UserContext;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
@@ -47,7 +47,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -96,6 +95,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -160,7 +160,8 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr) throws ValidationException {
+    public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
@@ -172,9 +173,7 @@ public class StreamResource extends RestResource {
         final Set<StreamRule> streamRules = cr.rules().stream()
                 .map(streamRule -> streamRuleService.create(null, streamRule))
                 .collect(Collectors.toSet());
-        final String id = streamService.saveWithRules(stream, streamRules);
-
-        ensureUserHasPermissionsForStream(getCurrentUser(), id);
+        final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
 
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
@@ -182,31 +181,6 @@ public class StreamResource extends RestResource {
             .build(id);
 
         return Response.created(streamUri).entity(result).build();
-    }
-
-    private boolean ensureUserHasPermissionsForStream(User user, String id) throws ValidationException {
-        boolean permissionsChanged = false;
-        final ImmutableList.Builder<String> permissionsBuilder = ImmutableList.<String>builder()
-                .addAll(user.getPermissions());
-        if (!isPermitted(RestPermissions.STREAMS_READ, id)) {
-            permissionsChanged = true;
-            permissionsBuilder.add(RestPermissions.STREAMS_READ + ":" + id);
-        }
-        if (!isPermitted(RestPermissions.STREAMS_EDIT, id)) {
-            permissionsChanged = true;
-            permissionsBuilder.add(RestPermissions.STREAMS_EDIT + ":" + id);
-        }
-        if (!isPermitted(RestPermissions.STREAMS_CHANGESTATE, id)) {
-            permissionsChanged = true;
-            permissionsBuilder.add(RestPermissions.STREAMS_CHANGESTATE + ":" + id);
-        }
-
-        if (permissionsChanged) {
-            user.setPermissions(permissionsBuilder.build());
-            userService.save(user);
-        }
-
-        return permissionsChanged;
     }
 
     @GET
@@ -463,7 +437,8 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
     public Response cloneStream(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
-                                @ApiParam(name = "JSON body", required = true) @Valid @NotNull CloneStreamRequest cr) throws ValidationException, NotFoundException {
+                                @ApiParam(name = "JSON body", required = true) @Valid @NotNull CloneStreamRequest cr,
+                                @Context UserContext userContext) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
         checkNotDefaultStream(streamId, "The default stream cannot be cloned.");
@@ -497,7 +472,7 @@ public class StreamResource extends RestResource {
         streamData.put(StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId());
 
         final Stream stream = streamService.create(streamData);
-        final String savedStreamId = streamService.saveWithRules(stream, newStreamRules.build());
+        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules.build(), userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
         for (AlertCondition alertCondition : streamService.getAlertConditions(sourceStream)) {
@@ -524,8 +499,6 @@ public class StreamResource extends RestResource {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(savedStreamObjectId, outputIds);
-
-        ensureUserHasPermissionsForStream(getCurrentUser(), savedStreamId);
 
         final Map<String, String> result = ImmutableMap.of("stream_id", savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
@@ -558,10 +531,7 @@ public class StreamResource extends RestResource {
             stream.getDisabled(),
             stream.getStreamRules(),
             alertConditions,
-            AlertReceivers.create(
-                firstNonNull(emailAlertReceivers, Collections.emptyList()),
-                firstNonNull(usersAlertReceivers, Collections.emptyList())
-            ),
+            AlertReceivers.create(emailAlertReceivers, usersAlertReceivers),
             stream.getTitle(),
             stream.getContentPack(),
             stream.isDefaultStream(),

@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.legacy;
 
@@ -38,16 +38,17 @@ import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -56,6 +57,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,6 +66,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LegacyAlertConditionMigratorTest {
     private static final int CHECK_INTERVAL = 60;
@@ -80,6 +83,7 @@ public class LegacyAlertConditionMigratorTest {
     private EventDefinitionHandler eventDefinitionHandler;
     private DBNotificationService notificationService;
     private NotificationResourceHandler notificationResourceHandler;
+    private UserService userService;
 
     @Mock
     private Map<String, EventNotification.Factory> eventNotificationFactories;
@@ -103,12 +107,15 @@ public class LegacyAlertConditionMigratorTest {
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoConnection, mongoJackObjectMapperProvider);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoConnection, mongoJackObjectMapperProvider, mock(NodeId.class), clock);
-        notificationService = new DBNotificationService(mongoConnection, mongoJackObjectMapperProvider);
+        notificationService = new DBNotificationService(mongoConnection, mongoJackObjectMapperProvider, mock(EntityOwnershipService.class));
 
-        this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class));
+        this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class));
         this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock));
         this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, eventNotificationFactories));
-        this.migrator = new LegacyAlertConditionMigrator(mongoConnection, eventDefinitionHandler, notificationResourceHandler, notificationService, CHECK_INTERVAL);
+        this.userService = mock(UserService.class);
+        when(userService.getRootUser()).thenReturn(Optional.empty());
+
+        this.migrator = new LegacyAlertConditionMigrator(mongoConnection, eventDefinitionHandler, notificationResourceHandler, notificationService, userService, CHECK_INTERVAL);
     }
 
     @Test
@@ -139,10 +146,10 @@ public class LegacyAlertConditionMigratorTest {
         });
 
         // Make sure we use the EventDefinitionHandler to create the event definitions
-        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class));
+        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class), any(Optional.class));
 
         // Make sure we use the NotificationResourceHandler to create the notifications
-        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class));
+        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class), any(Optional.class));
 
         assertThat(eventDefinitionService.streamAll().count()).isEqualTo(migratedConditions);
         assertThat(notificationService.streamAll().count()).isEqualTo(migratedCallbacks);
@@ -614,10 +621,10 @@ public class LegacyAlertConditionMigratorTest {
         });
 
         // Make sure we use the EventDefinitionHandler to create the event definitions
-        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class));
+        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class), any(Optional.class));
 
         // Make sure we use the NotificationResourceHandler to create the notifications
-        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class));
+        verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class), any(Optional.class));
 
         assertThat(eventDefinitionService.streamAll().count()).isEqualTo(migratedConditions);
         assertThat(notificationService.streamAll().count()).isEqualTo(migratedCallbacks);

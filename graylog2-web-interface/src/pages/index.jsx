@@ -1,24 +1,44 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import loadAsync from 'routing/loadAsync';
 
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
+const AuthenticationBackendCreatePage = loadAsync(() => import('./AuthenticationBackendCreatePage'));
+const AuthenticationBackendDetailsPage = loadAsync(() => import('./AuthenticationBackendDetailsPage'));
+const AuthenticationBackendEditPage = loadAsync(() => import('./AuthenticationBackendEditPage'));
+const AuthenticationCreatePage = loadAsync(() => import('./AuthenticationCreatePage'));
+const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverviewPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
+const AuthenticatorsPage = loadAsync(() => import('./AuthenticatorsPage'));
+const AuthenticatorsEditPage = loadAsync(() => import('./AuthenticatorsEditPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
-const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
-const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
-const EditUsersPage = loadAsync(() => import('./EditUsersPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
 const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
@@ -47,11 +67,14 @@ const NodesPage = loadAsync(() => import('./NodesPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
-const RolesPage = loadAsync(() => import('./RolesPage'));
+const RoleDetailsPage = loadAsync(() => import('./RoleDetailsPage'));
+const RoleEditPage = loadAsync(() => import('./RoleEditPage'));
+const RolesOverviewPage = loadAsync(() => import('./RolesOverviewPage'));
 const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
 const ShowAlertPage = loadAsync(() => import('./ShowAlertPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
+const ShowEventNotificationPage = loadAsync(() => import('./ShowEventNotificationPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
 const ShowMetricsPage = loadAsync(() => import('./ShowMetricsPage'));
 const ShowNodePage = loadAsync(() => import('./ShowNodePage'));
@@ -73,28 +96,37 @@ const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
 const ProcessBufferDumpPage = loadAsync(() => import('./ProcessBufferDumpPage'));
-const UsersPage = loadAsync(() => import('./UsersPage'));
+const UserCreatePage = loadAsync(() => import('./UserCreatePage'));
+const UserDetailsPage = loadAsync(() => import('./UserDetailsPage'));
+const UserEditPage = loadAsync(() => import('./UserEditPage'));
+const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
+const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
+const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
 
 export {
   AlertConditionsPage,
   AlertNotificationsPage,
   AlertsPage,
+  AuthenticationCreatePage,
   AuthenticationPage,
+  AuthenticationBackendCreatePage,
+  AuthenticationBackendDetailsPage,
+  AuthenticationBackendEditPage,
+  AuthenticationOverviewPage,
+  AuthenticatorsPage,
+  AuthenticatorsEditPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
-  CreateUsersPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
   EditContentPackPage,
   EditExtractorsPage,
-  EditTokensPage,
-  EditUsersPage,
   EnterprisePage,
   EventDefinitionsPage,
   EventNotificationsPage,
@@ -124,11 +156,14 @@ export {
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,
-  RolesPage,
+  RoleDetailsPage,
+  RoleEditPage,
+  RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
   ShowAlertPage,
   ShowContentPackPage,
+  ShowEventNotificationPage,
   ShowMessagePage,
   ShowMetricsPage,
   ShowNodePage,
@@ -149,5 +184,10 @@ export {
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
-  UsersPage,
+  UsersOverviewPage,
+  UserCreatePage,
+  UserDetailsPage,
+  UserEditPage,
+  UserTokensEditPage,
+  ViewEventDefinitionPage,
 };

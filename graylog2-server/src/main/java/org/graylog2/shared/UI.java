@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.shared;
 
@@ -23,7 +23,7 @@ public class UI {
 
     private static final String HELP_DOCS = "http://docs.graylog.org/";
     private static final String HELP_COMMUNITY = "https://www.graylog.org/community-support/";
-    private static final String HELP_COMMERCIAL = "https://www.graylog.com/support/";
+    private static final String HELP_COMMERCIAL = "https://www.graylog.com/technical-support/";
 
     private static final Logger LOG = LoggerFactory.getLogger(UI.class);
 
@@ -41,21 +41,20 @@ public class UI {
 
         sb.append("\n").append(wall("#")).append("\n");
 
-        sb.append("ERROR: ").append(msg).append("\n\n");
-
-        sb.append("Need help?").append("\n\n");
-        sb.append("* Official documentation: ").append(HELP_DOCS).append("\n");
-        sb.append("* Community support: ").append(HELP_COMMUNITY).append("\n");
-        sb.append("* Commercial support: ").append(HELP_COMMERCIAL).append("\n");
+        sb.append("ERROR: ").append(msg).append("\n");
 
         if (docLinks != null && docLinks.length > 0) {
-            sb.append("\n").append("But we also got some specific help " +
-                                           "pages that might help you in this case:").append("\n\n");
+            sb.append("\n").append("Please see the following link(s) to help you with this error:").append("\n\n");
 
             for (final String docLink : docLinks) {
                 sb.append("* ").append(docLink).append("\n");
             }
         }
+
+        sb.append("\nNeed further help?").append("\n\n");
+        sb.append("* Official documentation: ").append(HELP_DOCS).append("\n");
+        sb.append("* Community support: ").append(HELP_COMMUNITY).append("\n");
+        sb.append("* Commercial support: ").append(HELP_COMMERCIAL).append("\n");
 
         sb.append("\n").append("Terminating. :(").append("\n\n");
         sb.append(wall("#"));

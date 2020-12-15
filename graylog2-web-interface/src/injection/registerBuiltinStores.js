@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import CombinedProvider from './CombinedProvider';
 
 /* eslint-disable global-require */
@@ -35,8 +51,6 @@ const actions = {
   IndicesConfiguration: () => require('actions/indices/IndicesConfigurationActions'),
   Inputs: () => require('actions/inputs/InputsActions'),
   InputTypes: () => require('actions/inputs/InputTypesActions'),
-  Ldap: () => require('actions/ldap/LdapActions'),
-  LdapGroups: () => require('actions/ldap/LdapGroupsActions'),
   Loggers: () => require('actions/system/LoggersActions'),
   LookupTableCaches: () => require('actions/lookup-tables/LookupTableCachesActions'),
   LookupTableDataAdapters: () => require('actions/lookup-tables/LookupTableDataAdaptersActions'),
@@ -101,8 +115,6 @@ const stores = {
   InputStaticFields: () => require('stores/inputs/InputStaticFieldsStore'),
   InputTypes: () => require('stores/inputs/InputTypesStore'),
   Journal: () => require('stores/journal/JournalStore'),
-  LdapGroups: () => require('stores/ldap/LdapGroupsStore'),
-  Ldap: () => require('stores/ldap/LdapStore'),
   Loggers: () => require('stores/system/LoggersStore'),
   LookupTables: () => require('stores/lookup-tables/LookupTablesStore'),
   LookupTableCaches: () => require('stores/lookup-tables/LookupTableCachesStore'),

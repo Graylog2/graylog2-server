@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -8,6 +24,10 @@ import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const NotificationsActions = ActionsProvider.getActions('Notifications');
+
+const StyledButton = styled(Button)`
+  float: right;
+`;
 
 const StyledAlert = styled(Alert)(({ theme }) => css`
   margin-top: 10px;
@@ -50,7 +70,9 @@ class Notification extends React.Component {
 
     return (
       <StyledAlert bsStyle="danger">
-        <Button className="close delete-notification" onClick={this._onClose}>&times;</Button>
+        <StyledButton className="delete-notification" bsStyle="link" onClick={this._onClose}>
+          <Icon name="times" />
+        </StyledButton>
 
         <NotificationHead>
           <Icon name="bolt" />{' '}

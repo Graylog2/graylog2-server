@@ -1,8 +1,52 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Pagination /> should display Pagination 1`] = `
+.c0.pagination {
+  font-size: 0.889rem;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.c0.pagination > li > a,
+.c0.pagination > li > span {
+  color: rgb(81,81,81);
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c0.pagination > li > a:hover,
+.c0.pagination > li > span:hover,
+.c0.pagination > li > a:focus,
+.c0.pagination > li > span:focus {
+  color: rgb(47,47,47);
+  background-color: #d0d0d0;
+  border-color: #a6a6a6;
+}
+
+.c0.pagination > li.active > a,
+.c0.pagination > li.active > span,
+.c0.pagination > li.active > a:hover,
+.c0.pagination > li.active > span:hover,
+.c0.pagination > li.active > a:focus,
+.c0.pagination > li.active > span:focus {
+  color: rgb(76,77,78);
+  background-color: #eff2f8;
+  border-color: #bdc8e4;
+}
+
+.c0.pagination > li.disabled > a,
+.c0.pagination > li.disabled > a:hover,
+.c0.pagination > li.disabled > a:focus,
+.c0.pagination > li.disabled > span,
+.c0.pagination > li.disabled > span:hover,
+.c0.pagination > li.disabled > span:focus {
+  color: #a6a6a6;
+  background-color: #fff;
+  border-color: #d0d0d0;
+}
+
 <ul
-  class="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz pagination"
+  class="c0 pagination"
   data-testid="graylog-pagination"
 >
   <li

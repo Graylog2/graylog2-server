@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
 
@@ -22,11 +38,13 @@ const Routes = {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
       edit: (definitionId) => `/alerts/definitions/${definitionId}/edit`,
+      show: (definitionId) => `/alerts/definitions/${definitionId}`,
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',
       edit: (notificationId) => `/alerts/notifications/${notificationId}/edit`,
+      show: (notificationId) => `/alerts/notifications/${notificationId}`,
     },
   },
   SOURCES: '/sources',
@@ -69,20 +87,38 @@ const Routes = {
     OVERVIEW: '/system/overview',
     PROCESSBUFFERDUMP: (nodeId) => `/system/processbufferdump/${nodeId}`,
     AUTHENTICATION: {
-      OVERVIEW: '/system/authentication',
-      ROLES: '/system/authentication/roles',
-      USERS: {
-        CREATE: '/system/authentication/users/new',
-        edit: (username) => `/system/authentication/users/edit/${username}`,
-        TOKENS: {
-          edit: (username) => `/system/authentication/users/tokens/${username}`,
+      BACKENDS: {
+        OVERVIEW: '/system/authentication/services',
+        ACTIVE: '/system/authentication/services/active',
+        CREATE: '/system/authentication/services/create',
+        createBackend: (name) => `/system/authentication/services/create/${name}`,
+        show: (id) => `/system/authentication/services/${id}`,
+        edit: (id, initialStepKey) => {
+          const editUrl = `/system/authentication/services/edit/${id}`;
+
+          if (initialStepKey) return `${editUrl}?initialStepKey=${initialStepKey}`;
+
+          return editUrl;
         },
-        LIST: '/system/authentication/users',
       },
-      PROVIDERS: {
-        CONFIG: '/system/authentication/config',
-        provider: (name) => `/system/authentication/config/${name}`,
+      AUTHENTICATORS: {
+        SHOW: '/system/authentication/authenticator',
+        EDIT: '/system/authentication/authenticator/edit',
       },
+    },
+    USERS: {
+      CREATE: '/system/users/new',
+      edit: (userId) => `/system/users/edit/${userId}`,
+      TOKENS: {
+        edit: (userId) => `/system/users/tokens/${userId}`,
+      },
+      OVERVIEW: '/system/users',
+      show: (userId) => `/system/users/${userId}`,
+    },
+    AUTHZROLES: {
+      OVERVIEW: '/system/roles',
+      show: (roleId) => `/system/roles/${roleId}`,
+      edit: (roleId) => `/system/roles/edit/${roleId}`,
     },
     LOOKUPTABLES: {
       OVERVIEW: '/system/lookuptables',
@@ -251,7 +287,7 @@ defaultExport.unqualified = Routes;
  * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
  *
  */
-defaultExport.pluginRoute = (routeKey) => {
+defaultExport.pluginRoute = (routeKey, throwError = true) => {
   const pluginRoutes = {};
 
   PluginStore.exports('routes').forEach((pluginRoute) => {
@@ -279,11 +315,15 @@ defaultExport.pluginRoute = (routeKey) => {
 
   const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
 
-  if (!route) {
+  if (!route && throwError) {
     throw new Error(`Could not find plugin route '${routeKey}'.`);
   }
 
   return route;
+};
+
+defaultExport.getPluginRoute = (routeKey) => {
+  return defaultExport.pluginRoute(routeKey, false);
 };
 
 export default defaultExport;

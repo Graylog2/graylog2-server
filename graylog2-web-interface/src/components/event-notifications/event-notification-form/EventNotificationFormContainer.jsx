@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
@@ -30,8 +46,6 @@ class EventNotificationFormContainer extends React.Component {
     embedded: PropTypes.bool,
     /** Controls the ID of the form, so it can be controlled externally */
     formId: PropTypes.string,
-    /** Route needed for ConfirmLeaveDialog to work. This is not needed when embedded in another form. */
-    route: PropTypes.object,
     onSubmit: PropTypes.func,
   };
 
@@ -44,7 +58,6 @@ class EventNotificationFormContainer extends React.Component {
     },
     embedded: false,
     formId: undefined,
-    route: undefined,
     onSubmit: () => {},
   };
 
@@ -162,14 +175,13 @@ class EventNotificationFormContainer extends React.Component {
   };
 
   render() {
-    const { action, embedded, formId, route } = this.props;
+    const { action, embedded, formId } = this.props;
     const { notification, validation, testResult, isDirty } = this.state;
 
     return (
       <>
         {!embedded && isDirty && (
-          <ConfirmLeaveDialog route={route}
-                              question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
+          <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
         )}
         <EventNotificationForm action={action}
                                notification={notification}

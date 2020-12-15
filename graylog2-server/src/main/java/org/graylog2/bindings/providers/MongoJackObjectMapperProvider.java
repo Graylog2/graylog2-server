@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.bindings.providers;
 
@@ -24,22 +24,21 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.SimpleType;
-
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
 import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
 import org.graylog2.jackson.MongoJodaDateTimeSerializer;
 import org.graylog2.jackson.MongoZonedDateTimeDeserializer;
 import org.graylog2.jackson.MongoZonedDateTimeSerializer;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.joda.time.DateTime;
 import org.mongojack.internal.MongoJackModule;
-
-import java.io.IOException;
-import java.time.ZonedDateTime;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.time.ZonedDateTime;
 
 @Singleton
 public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
@@ -58,6 +57,7 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
                         .addDeserializer(DateTime.class, new MongoJodaDateTimeDeserializer()));
 
         MongoJackModule.configure(this.objectMapper);
+        EncryptedValueMapperConfig.enableDatabase(this.objectMapper);
     }
 
     @Override

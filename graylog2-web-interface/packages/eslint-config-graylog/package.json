@@ -11,17 +11,19 @@
     "eslint"
   ],
   "author": "Graylog, Inc. <hello@graylog.com>",
-  "license": "MIT",
+  "license": "SSPL-1.0",
   "dependencies": {
-    "eslint": "7.6.0",
+    "@typescript-eslint/parser": "4.9.1",
+    "@typescript-eslint/eslint-plugin": "4.9.1",
+    "babel-eslint": "10.1.0",
+    "eslint": "7.15.0",
     "eslint-config-airbnb": "18.2.0",
-    "eslint-import-resolver-webpack": "0.12.2",
-    "eslint-plugin-flowtype": "5.2.0",
-    "eslint-plugin-import": "2.22.0",
+    "eslint-import-resolver-webpack": "0.13.0",
+    "eslint-plugin-import": "2.22.1",
     "eslint-plugin-jest-formatting": "2.0.0",
     "eslint-plugin-jsx-a11y": "6.3.1",
-    "eslint-plugin-react": "7.20.5",
-    "eslint-plugin-react-hooks": "4.0.8"
+    "eslint-plugin-react": "7.21.5",
+    "eslint-plugin-react-hooks": "4.2.0"
   },
   "peerDependencies": {
     "eslint": "^5.16.0",

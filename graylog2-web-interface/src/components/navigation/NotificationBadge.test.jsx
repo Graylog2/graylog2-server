@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
@@ -21,7 +37,7 @@ describe('NotificationBadge', () => {
     jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
 
     // eslint-disable-next-line global-require
-    NotificationBadge = require('./NotificationBadge');
+    NotificationBadge = require('./NotificationBadge').default;
   });
 
   it('triggers update of notifications', () => {
@@ -41,7 +57,7 @@ describe('NotificationBadge', () => {
   it('renders count when there are notifications', () => {
     const wrapper = mount(<NotificationBadge total={42} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.find('#notification-badge')).toExist();
   });
 
   it('updates notification count when triggered by store', () => {

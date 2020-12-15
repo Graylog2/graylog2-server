@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.storage.elasticsearch7.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,6 +23,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRespo
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.ActiveShardCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;
@@ -103,7 +120,11 @@ public class FixtureImporterES7 implements FixtureImporter {
             }
         }
 
-        createIndices(targetIndices);
+        for (String indexName : targetIndices) {
+            if (!indexExists(indexName)) {
+                createIndex(indexName);
+            }
+        }
 
         final BulkResponse result = client.execute((c, requestOptions) -> c.bulk(bulkRequest, requestOptions),
                 "Unable to import fixtures.");
@@ -112,11 +133,14 @@ public class FixtureImporterES7 implements FixtureImporter {
         }
     }
 
-    private void createIndices(Set<String> targetIndices) {
-        targetIndices.forEach(indexName -> {
-            final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
-                    .waitForActiveShards(ActiveShardCount.ONE);
-            client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
-        });
+    private void createIndex(String indexName) {
+        final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
+                .waitForActiveShards(ActiveShardCount.ONE);
+        client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
+    }
+
+    private boolean indexExists(String indexName) {
+        final GetIndexRequest indexExistsRequest = new GetIndexRequest(indexName);
+        return client.execute((c, requestOptions) -> c.indices().exists(indexExistsRequest, requestOptions));
     }
 }

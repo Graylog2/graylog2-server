@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.notifications.types;
 
@@ -30,8 +30,6 @@ import org.graylog.events.notifications.EventBacklogService;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.jackson.TypeReferences;
@@ -46,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -54,7 +51,6 @@ import static java.util.Objects.requireNonNull;
 
 public class EmailSender {
     private static final Logger LOG = LoggerFactory.getLogger(EmailSender.class);
-    private static final String UNKNOWN = "<unknown>";
 
     private final EmailConfiguration emailConfig;
     private final EmailRecipients.Factory emailRecipientsFactory;
@@ -109,21 +105,7 @@ public class EmailSender {
     }
 
     private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) {
-        final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
-        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
-
-        // TODO: This needs at search URL, event definition URL, anything else?
-        final EventNotificationModelData modelData = EventNotificationModelData.builder()
-                .eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN))
-                .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
-                .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
-                .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
-                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
-                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
-                .event(ctx.event())
-                .backlog(backlog)
-                .build();
-
+        final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
         return objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
     }
 

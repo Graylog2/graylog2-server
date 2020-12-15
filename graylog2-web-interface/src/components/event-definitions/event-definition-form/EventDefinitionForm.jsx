@@ -1,10 +1,25 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Button, ButtonToolbar, Col, Nav, Row } from 'components/graylog';
+import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { Wizard } from 'components/common';
 
 import EventDetailsForm from './EventDetailsForm';
@@ -12,68 +27,6 @@ import EventConditionForm from './EventConditionForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
-
-const StyledNav = styled(Nav)(({ theme }) => css`
-  &.nav {
-    > li {
-      border: 1px solid ${theme.colors.variant.lighter.default};
-      border-left: 0;
-
-      &:first-child {
-        border-left: 1px solid ${theme.colors.variant.lighter.default};
-        border-radius: 4px 0 0 4px;
-
-        > a {
-          border-radius: 4px 0 0 4px;
-        }
-      }
-
-      &:last-child {
-        border-radius: 0 4px 4px 0;
-
-        > a {
-          border-radius: 0 4px 4px 0;
-        }
-      }
-
-      &:not(:last-child) > a {
-        ::after {
-          transition: background-color 150ms ease-in-out;
-          background-color: ${theme.colors.global.contentBackground};
-          border-color: ${theme.colors.variant.lighter.default};
-          border-style: solid;
-          border-width: 0 1px 1px 0;
-          content: '';
-          display: block;
-          height: 15px;
-          position: absolute;
-          right: -1px;
-          top: 50%;
-          transform: translateY(-50%) translateX(50%) rotate(-45deg);
-          width: 15px;
-          z-index: 2;
-        }
-
-        :hover::after {
-          background-color: ${theme.colors.variant.lightest.default};
-        }
-      }
-
-      &.active a {
-        &,
-        &:hover,
-        &::after,
-        &:hover::after {
-          background-color: ${theme.colors.global.link};
-        }
-      }
-
-      > a {
-        border-radius: 0;
-      }
-    }
-  }
-`);
 
 const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 
@@ -232,7 +185,6 @@ class EventDefinitionForm extends React.Component {
                   onStepChange={this.handleStepChange}
                   horizontal
                   justified
-                  NavigationComponent={StyledNav}
                   containerClassName=""
                   hidePreviousNextButtons />
           {this.renderButtons(activeStep)}

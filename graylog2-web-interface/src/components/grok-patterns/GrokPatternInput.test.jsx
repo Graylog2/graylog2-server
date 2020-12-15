@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
@@ -14,13 +30,13 @@ describe('<GrokPatternInput />', () => {
   it('should render grok pattern input without patterns', () => {
     const wrapper = mount(<GrokPatternInput patterns={[]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render grok pattern input with patterns', () => {
     const wrapper = mount(<GrokPatternInput patterns={grokPatterns} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should add a grok pattern when selected', () => {

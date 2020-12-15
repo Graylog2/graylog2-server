@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.contentpack.facade;
 
@@ -45,6 +45,8 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,18 +64,21 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private final DBJobDefinitionService jobDefinitionService;
     private final DBEventDefinitionService eventDefinitionService;
     private final Set<PluginMetaData> pluginMetaData;
+    private final UserService userService;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
                                  EventDefinitionHandler eventDefinitionHandler,
                                  Set<PluginMetaData> pluginMetaData,
                                  DBJobDefinitionService jobDefinitionService,
-                                 DBEventDefinitionService eventDefinitionService) {
+                                 DBEventDefinitionService eventDefinitionService,
+                                 UserService userService) {
         this.objectMapper = objectMapper;
         this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
+        this.userService = userService;
     }
 
     @VisibleForTesting
@@ -120,7 +125,8 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                                                                Map<EntityDescriptor, Object> nativeEntities,
                                                                String username) {
         if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters, nativeEntities);
+            final User user = Optional.ofNullable(userService.load(username)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + username + "> from db"));
+            return decode((EntityV1) entity, parameters, nativeEntities, user);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
@@ -128,15 +134,15 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     private NativeEntity<EventDefinitionDto> decode(EntityV1 entity,
                                                     Map<String, ValueReference> parameters,
-                                                    Map<EntityDescriptor, Object> nativeEntities) {
+                                                    Map<EntityDescriptor, Object> nativeEntities, User user) {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entity.data(),
                 EventDefinitionEntity.class);
         final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
         final EventDefinitionDto savedDto;
         if (eventDefinitionEntity.isScheduled().asBoolean(parameters)) {
-            savedDto = eventDefinitionHandler.create(eventDefinition);
+            savedDto = eventDefinitionHandler.create(eventDefinition, Optional.ofNullable(user));
         } else {
-            savedDto = eventDefinitionHandler.createWithoutSchedule(eventDefinition);
+            savedDto = eventDefinitionHandler.createWithoutSchedule(eventDefinition, Optional.ofNullable(user));
         }
         return NativeEntity.create(entity.id(), savedDto.id(), ModelTypes.EVENT_DEFINITION_V1, savedDto.title(), savedDto);
     }

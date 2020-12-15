@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.storage.elasticsearch7;
 
 import org.junit.jupiter.api.Test;
@@ -32,6 +48,21 @@ class ParsedElasticsearchExceptionTest {
         assertThat(parsed).satisfies(p -> {
             assertThat(p.type()).isEqualTo("cluster_block_exception");
             assertThat(p.reason()).isEqualTo("index [messages_it_deflector] blocked by: [TOO_MANY_REQUESTS/12/index read-only / allow delete (api)");
+        });
+    }
+
+    @Test
+    void parsingPrimaryShardIsNotAvailable() {
+        final String exception = "Elasticsearch exception: ElasticsearchException[Elasticsearch exception [type=unavailable_shards_exception, " +
+                "reason=[graylog_0][2] primary shard is not active Timeout: [1m], request: [BulkShardRequest [[graylog_0][2]] containing [125] " +
+                "requests]]]";
+
+        final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
+
+        assertThat(parsed).satisfies(p -> {
+            assertThat(p.type()).isEqualTo("unavailable_shards_exception");
+            assertThat(p.reason()).isEqualTo("[graylog_0][2] primary shard is not active Timeout: [1m], " +
+                    "request: [BulkShardRequest [[graylog_0][2]] containing [125] requests]]");
         });
     }
 }

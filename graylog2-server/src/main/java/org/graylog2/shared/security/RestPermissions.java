@@ -1,22 +1,23 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.authzroles.BuiltinRole;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
@@ -30,8 +31,15 @@ public class RestPermissions implements PluginPermissions {
      * These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
-    public static final String AUTHENTICATION_READ = "authentication:read";
-    public static final String AUTHENTICATION_EDIT = "authentication:edit";
+    public static final String AUTH_HTTP_HEADER_CONFIG_EDIT = "authhttpheaderconfig:edit";
+    public static final String AUTH_HTTP_HEADER_CONFIG_READ = "authhttpheaderconfig:read";
+    public static final String AUTH_SERVICE_BACKEND_CREATE = "authservicebackend:create";
+    public static final String AUTH_SERVICE_BACKEND_DELETE = "authservicebackend:delete";
+    public static final String AUTH_SERVICE_BACKEND_EDIT = "authservicebackend:edit";
+    public static final String AUTH_SERVICE_BACKEND_READ = "authservicebackend:read";
+    public static final String AUTH_SERVICE_GLOBAL_CONFIG_READ = "authserviceglobalconfig:read";
+    public static final String AUTH_SERVICE_GLOBAL_CONFIG_EDIT = "authserviceglobalconfig:edit";
+    public static final String AUTH_SERVICE_TEST_BACKEND_EXECUTE = "authservicetestbackend:execute";
     public static final String BUFFERS_READ = "buffers:read";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
@@ -64,6 +72,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String EVENT_NOTIFICATIONS_EDIT = "eventnotifications:edit";
     public static final String EVENT_NOTIFICATIONS_READ = "eventnotifications:read";
     public static final String FIELDNAMES_READ = "fieldnames:read";
+    public static final String GRANTS_OVERVIEW_READ = "grantsoverview:read";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
@@ -84,9 +93,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String JOURNAL_READ = "journal:read";
     public static final String JVMSTATS_READ = "jvmstats:read";
     public static final String LBSTATUS_CHANGE = "lbstatus:change";
-    public static final String LDAP_EDIT = "ldap:edit";
-    public static final String LDAPGROUPS_EDIT = "ldapgroups:edit";
-    public static final String LDAPGROUPS_READ = "ldapgroups:read";
     public static final String LOOKUP_TABLES_CREATE = "lookuptables:create";
     public static final String LOOKUP_TABLES_DELETE = "lookuptables:delete";
     public static final String LOOKUP_TABLES_EDIT = "lookuptables:edit";
@@ -115,9 +121,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String ROLES_DELETE = "roles:delete";
     public static final String ROLES_EDIT = "roles:edit";
     public static final String ROLES_READ = "roles:read";
-    public static final String SAVEDSEARCHES_CREATE = "savedsearches:create";
-    public static final String SAVEDSEARCHES_EDIT = "savedsearches:edit";
-    public static final String SAVEDSEARCHES_READ = "savedsearches:read";
     public static final String SEARCHES_ABSOLUTE = "searches:absolute";
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
@@ -141,6 +144,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
+    public static final String USERS_READ = "users:read";
     public static final String USERS_LIST = "users:list";
     public static final String USERS_PASSWORDCHANGE = "users:passwordchange";
     public static final String USERS_PERMISSIONSEDIT = "users:permissionsedit";
@@ -149,9 +153,20 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
+    // This is a special permission that ONLY works with GRNs as ID/target
+    // TODO does this belong here?
+    public static final String ENTITY_OWN = "entity:own";
+
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
-            .add(create(AUTHENTICATION_EDIT, ""))
-            .add(create(AUTHENTICATION_READ, ""))
+            .add(create(AUTH_HTTP_HEADER_CONFIG_EDIT, ""))
+            .add(create(AUTH_HTTP_HEADER_CONFIG_READ, ""))
+            .add(create(AUTH_SERVICE_BACKEND_CREATE, ""))
+            .add(create(AUTH_SERVICE_BACKEND_DELETE, ""))
+            .add(create(AUTH_SERVICE_BACKEND_EDIT, ""))
+            .add(create(AUTH_SERVICE_BACKEND_READ, ""))
+            .add(create(AUTH_SERVICE_GLOBAL_CONFIG_READ, ""))
+            .add(create(AUTH_SERVICE_GLOBAL_CONFIG_EDIT, ""))
+            .add(create(AUTH_SERVICE_TEST_BACKEND_EXECUTE, ""))
             .add(create(BUFFERS_READ, ""))
             .add(create(CONTENT_PACK_CREATE, ""))
             .add(create(CONTENT_PACK_DELETE, ""))
@@ -182,6 +197,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
             .add(create(EVENT_NOTIFICATIONS_READ, ""))
             .add(create(FIELDNAMES_READ, ""))
+            .add(create(GRANTS_OVERVIEW_READ, ""))
             .add(create(INDEXERCLUSTER_READ, ""))
             .add(create(INDEXRANGES_READ, ""))
             .add(create(INDEXRANGES_REBUILD, ""))
@@ -202,9 +218,6 @@ public class RestPermissions implements PluginPermissions {
             .add(create(JOURNAL_READ, ""))
             .add(create(JVMSTATS_READ, ""))
             .add(create(LBSTATUS_CHANGE, ""))
-            .add(create(LDAP_EDIT, ""))
-            .add(create(LDAPGROUPS_EDIT, ""))
-            .add(create(LDAPGROUPS_READ, ""))
             .add(create(LOOKUP_TABLES_CREATE, ""))
             .add(create(LOOKUP_TABLES_DELETE, ""))
             .add(create(LOOKUP_TABLES_EDIT, ""))
@@ -233,9 +246,6 @@ public class RestPermissions implements PluginPermissions {
             .add(create(ROLES_DELETE, ""))
             .add(create(ROLES_EDIT, ""))
             .add(create(ROLES_READ, ""))
-            .add(create(SAVEDSEARCHES_CREATE, ""))
-            .add(create(SAVEDSEARCHES_EDIT, ""))
-            .add(create(SAVEDSEARCHES_READ, ""))
             .add(create(SEARCHES_ABSOLUTE, ""))
             .add(create(SEARCHES_KEYWORD, ""))
             .add(create(SEARCHES_RELATIVE, ""))
@@ -259,6 +269,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(URL_WHITELIST_WRITE, ""))
             .add(create(USERS_CREATE, ""))
             .add(create(USERS_EDIT, ""))
+            .add(create(USERS_READ, ""))
             .add(create(USERS_LIST, ""))
             .add(create(USERS_PASSWORDCHANGE, ""))
             .add(create(USERS_PERMISSIONSEDIT, ""))
@@ -282,9 +293,6 @@ public class RestPermissions implements PluginPermissions {
             MESSAGES_ANALYZE,
             MESSAGES_READ,
             METRICS_READ,
-            SAVEDSEARCHES_CREATE,
-            SAVEDSEARCHES_EDIT,
-            SAVEDSEARCHES_READ,
             SYSTEM_READ,
             THROUGHPUT_READ
     ).build();
@@ -292,6 +300,21 @@ public class RestPermissions implements PluginPermissions {
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
             .filter(permission -> READER_BASE_PERMISSION_SELECTION.contains(permission.permission()))
             .collect(Collectors.toSet());
+
+    protected static final ImmutableSet<BuiltinRole> BUILTIN_ROLES = ImmutableSet.<BuiltinRole>builder().add(
+            BuiltinRole.create("Dashboard Creator", "Allows creation of Dashboards (built-in)", ImmutableSet.of(
+                    RestPermissions.DASHBOARDS_CREATE
+            )),
+            BuiltinRole.create("Event Definition Creator", "Allows creation of Event Definitions (built-in)", ImmutableSet.of(
+                    RestPermissions.EVENT_DEFINITIONS_CREATE
+            )),
+            BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
+                    RestPermissions.EVENT_NOTIFICATIONS_CREATE
+            )),
+            BuiltinRole.create("User Inspector", "Allows listing all user accounts (built-in)", ImmutableSet.of(
+                    RestPermissions.USERS_READ
+            ))
+    ).build();
 
     @Override
     public Set<Permission> readerBasePermissions() {
@@ -301,5 +324,10 @@ public class RestPermissions implements PluginPermissions {
     @Override
     public Set<Permission> permissions() {
         return PERMISSIONS;
+    }
+
+    @Override
+    public Set<BuiltinRole> builtinRoles() {
+        return BUILTIN_ROLES;
     }
 }

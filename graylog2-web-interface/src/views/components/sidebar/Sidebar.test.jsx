@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import PropTypes from 'prop-types';
@@ -343,5 +359,26 @@ describe('<Sidebar />', () => {
     wrapper.find('h1').simulate('click');
 
     expect(wrapper.find('SearchResultOverview')).not.toExist();
+  });
+
+  it('should close an active section when clicking on its navigation item', () => {
+    const wrapper = mount(
+      <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
+               toggleOpen={jest.fn}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>,
+    );
+
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    wrapper.find('div[aria-label="Create"]').simulate('click');
+
+    expect(wrapper.find('h2').text()).toBe('Create');
+
+    wrapper.find('div[aria-label="Create"]').simulate('click');
+
+    expect(wrapper.find('h2')).not.toExist();
   });
 });

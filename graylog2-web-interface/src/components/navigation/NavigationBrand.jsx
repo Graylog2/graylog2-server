@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
@@ -8,7 +24,7 @@ import { themePropTypes } from 'theme';
 // eslint-disable-next-line no-unused-vars
 function BrandComponent({ active, theme, ...props }) {
   return (
-    <a {...props}>
+    <a {...props} className="navbar-brand">
       <svg height="26" width="90" viewBox="0 0 891 260" role="img" aria-labelledby="logoTitleId">
         <title id="logoTitleId">Graylog Logo</title>
         <g fill={theme.colors.variant.darker.default}>

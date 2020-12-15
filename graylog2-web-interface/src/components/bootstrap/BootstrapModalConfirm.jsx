@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -30,7 +46,7 @@ class BootstrapModalConfirm extends React.Component {
     /** Function to call when the modal is closed. The function does not receive any arguments. */
     onModalClose: PropTypes.func,
     /** Function to call when the action is not confirmed. The function does not receive any arguments. */
-    onCancel: PropTypes.func.isRequired,
+    onCancel: PropTypes.func,
     /**
      * Function to call when the action is confirmed. The function receives a callback function to close the modal
      * dialog box as first argument.
@@ -52,6 +68,7 @@ class BootstrapModalConfirm extends React.Component {
     confirmButtonText: 'Confirm',
     cancelButtonDisabled: false,
     confirmButtonDisabled: false,
+    onCancel: () => {},
     onModalOpen: () => {},
     onModalClose: () => {},
   };
@@ -60,6 +77,7 @@ class BootstrapModalConfirm extends React.Component {
     const { onCancel } = this.props;
 
     onCancel();
+
     this.close();
   };
 
