@@ -1293,7 +1293,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               class="c7 form-control input-sm"
               id="from-time-hours"
               title="from hour"
-              type="text"
+              type="number"
               value="06"
             />
             <span
@@ -1305,7 +1305,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               class="c7 form-control input-sm"
               id="from-time-minutes"
               title="from minutes"
-              type="text"
+              type="number"
               value="15"
             />
             <span
@@ -1317,7 +1317,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               class="c7 form-control input-sm"
               id="from-time-seconds"
               title="from seconds"
-              type="text"
+              type="number"
               value="00"
             />
             <span
@@ -1329,7 +1329,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
               class="c7 form-control input-sm"
               id="from-time-milliseconds"
               title="from milliseconds"
-              type="text"
+              type="number"
               value="000"
             />
             <span

@@ -1359,7 +1359,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="from-time-hours"
                   title="from hour"
-                  type="text"
+                  type="number"
                   value="10"
                 />
                 <span
@@ -1371,7 +1371,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="from-time-minutes"
                   title="from minutes"
-                  type="text"
+                  type="number"
                   value="04"
                 />
                 <span
@@ -1383,7 +1383,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="from-time-seconds"
                   title="from seconds"
-                  type="text"
+                  type="number"
                   value="30"
                 />
                 <span
@@ -1395,7 +1395,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="from-time-milliseconds"
                   title="from milliseconds"
-                  type="text"
+                  type="number"
                   value="329"
                 />
                 <span
@@ -1991,7 +1991,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="to-time-hours"
                   title="to hour"
-                  type="text"
+                  type="number"
                   value="10"
                 />
                 <span
@@ -2003,7 +2003,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="to-time-minutes"
                   title="to minutes"
-                  type="text"
+                  type="number"
                   value="04"
                 />
                 <span
@@ -2015,7 +2015,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="to-time-seconds"
                   title="to seconds"
-                  type="text"
+                  type="number"
                   value="30"
                 />
                 <span
@@ -2027,7 +2027,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   class="c10 form-control input-sm"
                   id="to-time-milliseconds"
                   title="to milliseconds"
-                  type="text"
+                  type="number"
                   value="329"
                 />
                 <span

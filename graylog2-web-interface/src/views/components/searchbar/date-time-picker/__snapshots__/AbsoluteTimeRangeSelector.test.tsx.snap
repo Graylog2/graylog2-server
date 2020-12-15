@@ -1354,7 +1354,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="from-time-hours"
                   title="from hour"
-                  type="text"
+                  type="number"
                   value="06"
                 />
                 <span
@@ -1366,7 +1366,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="from-time-minutes"
                   title="from minutes"
-                  type="text"
+                  type="number"
                   value="15"
                 />
                 <span
@@ -1378,7 +1378,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="from-time-seconds"
                   title="from seconds"
-                  type="text"
+                  type="number"
                   value="00"
                 />
                 <span
@@ -1390,7 +1390,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="from-time-milliseconds"
                   title="from milliseconds"
-                  type="text"
+                  type="number"
                   value="000"
                 />
                 <span
@@ -1711,7 +1711,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Fri Dec 11 2020"
                         aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--today"
+                        class="DayPicker-Day"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1986,7 +1986,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="to-time-hours"
                   title="to hour"
-                  type="text"
+                  type="number"
                   value="NaN"
                 />
                 <span
@@ -1998,7 +1998,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="to-time-minutes"
                   title="to minutes"
-                  type="text"
+                  type="number"
                   value="NaN"
                 />
                 <span
@@ -2010,7 +2010,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="to-time-seconds"
                   title="to seconds"
-                  type="text"
+                  type="number"
                   value="NaN"
                 />
                 <span
@@ -2022,7 +2022,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   class="c9 form-control input-sm"
                   id="to-time-milliseconds"
                   title="to milliseconds"
-                  type="text"
+                  type="number"
                   value="NaN"
                 />
                 <span
