@@ -1349,7 +1349,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="from-time-hours"
                   size="2"
                   title="from hour"
-                  type="number"
+                  type="text"
                   value="06"
                 />
                 <span
@@ -1362,7 +1362,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="from-time-minutes"
                   size="2"
                   title="from minutes"
-                  type="number"
+                  type="text"
                   value="15"
                 />
                 <span
@@ -1375,7 +1375,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="from-time-seconds"
                   size="2"
                   title="from seconds"
-                  type="number"
+                  type="text"
                   value="00"
                 />
                 <span
@@ -1388,7 +1388,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="from-time-milliseconds"
                   size="3"
                   title="from milliseconds"
-                  type="number"
+                  type="text"
                   value="000"
                 />
                 <span
@@ -1699,7 +1699,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Thu Dec 10 2020"
                         aria-selected="false"
-                        class="DayPicker-Day DayPicker-Day--today"
+                        class="DayPicker-Day"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1754,7 +1754,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Tue Dec 15 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--today"
                         role="gridcell"
                         tabindex="-1"
                       >
@@ -1985,7 +1985,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="to-time-hours"
                   size="2"
                   title="to hour"
-                  type="number"
+                  type="text"
                   value="NaN"
                 />
                 <span
@@ -1998,7 +1998,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="to-time-minutes"
                   size="2"
                   title="to minutes"
-                  type="number"
+                  type="text"
                   value="NaN"
                 />
                 <span
@@ -2011,7 +2011,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="to-time-seconds"
                   size="2"
                   title="to seconds"
-                  type="number"
+                  type="text"
                   value="NaN"
                 />
                 <span
@@ -2024,7 +2024,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                   id="to-time-milliseconds"
                   size="3"
                   title="to milliseconds"
-                  type="number"
+                  type="text"
                   value="NaN"
                 />
                 <span
