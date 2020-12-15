@@ -15,18 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import Input from 'components/bootstrap/Input';
+const Wrapper = styled.div`
+  padding: 12px 6px;
+  
+  h5 {
+    font-weight: bold;
+    margin: 0 0 6px;
+  }
+`;
 
 const DisabledTimeRangeSelector = () => (
-  <Input id="no-override-timerange-selector"
-         type="select"
-         disabled
-         value="disabled"
-         title="There is no override for the timerange currently selected"
-         name="no-override">
-    <option value="disabled">No Override</option>
-  </Input>
+  <Wrapper>
+    <h5>No Date/Time Override chosen.</h5>
+    <p>Use the tabs above to choose a Date & Time Range to Search.</p>
+  </Wrapper>
 );
 
 export default DisabledTimeRangeSelector;
