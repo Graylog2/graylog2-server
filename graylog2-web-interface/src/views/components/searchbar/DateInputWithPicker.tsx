@@ -49,6 +49,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.tiny};
   font-style: italic;
   padding: 3px 3px 9px;
+  display: block;
 `);
 
 const DateInputWithPicker = ({ disabled = false, error, fromDate, value, onChange, name, title, initialDateTimeObject }: Props) => {

@@ -22,7 +22,7 @@ import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
 import { Field, useField } from 'formik';
 
-import { Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
+import { Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -35,9 +35,13 @@ const KeywordInput = styled(FormControl)(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
 `);
 
-const StyledTooltip = styled(Tooltip)`
-  white-space: nowrap;
-`;
+const ErrorMessage = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.dark.danger};
+  font-size: ${theme.fonts.size.tiny};
+  font-style: italic;
+  padding: 3px 3px 9px;
+  display: block;
+`);
 
 const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();
@@ -120,11 +124,6 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
                        validationState={error ? 'error' : null}>
               <InputGroup>
-                {error && (
-                  <StyledTooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
-                    {error}
-                  </StyledTooltip>
-                )}
                 <KeywordInput type="text"
                               className="input-sm"
                               name={name}
@@ -133,6 +132,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
                               onChange={onChange}
                               required
                               value={value || defaultValue} />
+                {error && (<ErrorMessage>{error}</ErrorMessage>)}
               </InputGroup>
             </FormGroup>
           )}
