@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { Modal } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
@@ -26,6 +27,9 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import type { SearchesConfig } from 'components/search/SearchConfig';
+import connect from 'stores/connect';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -57,6 +61,7 @@ EditWidgetDialog.propTypes = {
 
 type Props = {
   children: Array<React.ReactNode>,
+  config: SearchesConfig;
 };
 
 const onSubmit = (values, widget: Widget) => {
@@ -70,7 +75,7 @@ const onSubmit = (values, widget: Widget) => {
   return WidgetActions.update(widget.id, newWidget);
 };
 
-const EditWidgetFrame = ({ children }: Props) => {
+const EditWidgetFrame = ({ config, children }: Props) => {
   useEffect(() => {
     globalStyles.use();
 
@@ -83,6 +88,7 @@ const EditWidgetFrame = ({ children }: Props) => {
     return <Spinner text="Loading widget ..." />;
   }
 
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
@@ -93,7 +99,7 @@ const EditWidgetFrame = ({ children }: Props) => {
            animation={false}
            dialogComponentClass={EditWidgetDialog}
            enforceFocus={false}>
-      <SearchBarForm initialValues={{ limitDuration: 0, timerange, streams, queryString }}
+      <SearchBarForm initialValues={{ limitDuration, timerange, streams, queryString }}
                      onSubmit={_onSubmit}>
         <div className={styles.gridContainer}>
           <IfDashboard>
@@ -124,4 +130,8 @@ EditWidgetFrame.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default EditWidgetFrame;
+export default connect(EditWidgetFrame, {
+  configurations: SearchConfigStore,
+}, ({ configurations }) => ({
+  config: configurations.searchesClusterConfig,
+}));
