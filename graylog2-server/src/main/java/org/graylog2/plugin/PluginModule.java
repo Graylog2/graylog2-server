@@ -323,4 +323,12 @@ public abstract class PluginModule extends Graylog2Module {
         authServiceBackendBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(configClass, name);
     }
+
+    /**
+     * @return A boolean indicating if the plugin is being loaded on Graylog Cloud.
+     * The graylog.cloud system property is set in the startup sequence of the Graylog Cloud Plugin.
+     */
+    protected boolean isCloud() {
+        return Boolean.parseBoolean(System.getProperty("graylog.cloud"));
+    }
 }
