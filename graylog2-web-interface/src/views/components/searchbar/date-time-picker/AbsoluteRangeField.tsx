@@ -63,6 +63,7 @@ const SetTimeOption = styled.div`
 const StyledInputAddon = styled(InputGroup.Addon)(({ theme }: {theme:DefaultTheme}) => css`
   padding: 0;
   background: ${theme.colors.variant.lightest.default};
+  font-weight: bold;
 
   &:not(:first-child):not(:last-child) {
     border-right: 0;
@@ -72,7 +73,12 @@ const StyledInputAddon = styled(InputGroup.Addon)(({ theme }: {theme:DefaultThem
 `);
 
 const StyledFormControl = styled(FormControl)`
-  padding: 0 9px;
+  padding: 0 6px 0 9px;
+  width: 50px !important;
+  
+  &:last-of-type {
+    width: 60px !important;
+  }
 `;
 
 const StyledButton = styled(Button)`
@@ -228,40 +234,36 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                         <Icon name={hourIcon.current} />
                       </StyledButton>
                     </StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-hours`}
                                        title={`${range} hour`}
                                        value={initialDateTime.hours ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
-                                       size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>:</StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-minutes`}
                                        title={`${range} minutes`}
                                        value={initialDateTime.minutes ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
-                                       size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>:</StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-seconds`}
                                        title={`${range} seconds`}
                                        value={initialDateTime.seconds ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
-                                       size={2}
                                        bsSize="sm" />
                     <StyledInputAddon>.</StyledInputAddon>
-                    <StyledFormControl type="text"
+                    <StyledFormControl type="number"
                                        id={`${range}-time-milliseconds`}
                                        title={`${range} milliseconds`}
                                        value={initialDateTime.milliseconds ?? ''}
                                        onChange={_onChangeSetTime}
                                        onFocus={_onFocusSelect}
-                                       size={3}
                                        bsSize="sm" />
                     <StyledInputAddon>
                       <StyledButton bsStyle="link"

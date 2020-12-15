@@ -384,6 +384,7 @@ fieldset[disabled] .c0.form-control:not([type="range"]) {
 .c5 {
   padding: 0;
   background: #f3f3f3;
+  font-weight: bold;
 }
 
 .c5:not(:first-child):not(:last-child) {
@@ -393,7 +394,8 @@ fieldset[disabled] .c0.form-control:not([type="range"]) {
 }
 
 .c7 {
-  padding: 0 9px;
+  padding: 0 6px 0 9px;
+  width: 50px !important;
 }
 
 .c7.form-control:not([type="range"]) {
@@ -432,6 +434,10 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
 
 .c7.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
   display: none;
+}
+
+.c7:last-of-type {
+  width: 60px !important;
 }
 
 .c6 {
@@ -1286,7 +1292,6 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
             <input
               class="c7 form-control input-sm"
               id="from-time-hours"
-              size="2"
               title="from hour"
               type="number"
               value="06"
@@ -1299,7 +1304,6 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
             <input
               class="c7 form-control input-sm"
               id="from-time-minutes"
-              size="2"
               title="from minutes"
               type="number"
               value="15"
@@ -1312,7 +1316,6 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
             <input
               class="c7 form-control input-sm"
               id="from-time-seconds"
-              size="2"
               title="from seconds"
               type="number"
               value="00"
@@ -1325,7 +1328,6 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
             <input
               class="c7 form-control input-sm"
               id="from-time-milliseconds"
-              size="3"
               title="from milliseconds"
               type="number"
               value="000"
