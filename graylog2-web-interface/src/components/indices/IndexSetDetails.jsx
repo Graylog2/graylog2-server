@@ -25,7 +25,7 @@ import StyledIndexSetDetailsRow from './StyledIndexSetDetailsRow';
 const IndexSetDetails = ({ indexSet }) => {
   return (
     <StyledIndexSetDetailsRow>
-      <Col md={3}>
+      <Col lg={3}>
         <dl>
           <dt>Index prefix:</dt>
           <dd>{indexSet.index_prefix}</dd>
@@ -41,7 +41,7 @@ const IndexSetDetails = ({ indexSet }) => {
         </dl>
       </Col>
 
-      <Col md={6}>
+      <Col lg={6}>
         <IndicesConfiguration indexSet={indexSet} />
       </Col>
     </StyledIndexSetDetailsRow>
