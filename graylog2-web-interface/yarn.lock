@@ -1674,9 +1674,9 @@
     "@fortawesome/fontawesome-common-types" "^0.2.28"
 
 "@fortawesome/react-fontawesome@^0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@fortawesome/react-fontawesome/-/react-fontawesome-0.1.9.tgz#c865b9286c707407effcec99958043711367cd02"
-  integrity sha512-49V3WNysLZU5fZ3sqSuys4nGRytsrxJktbv3vuaXkEoxv22C6T7TEG0TW6+nqVjMnkfCQd5xOnmJoZHMF78tOw==
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/@fortawesome/react-fontawesome/-/react-fontawesome-0.1.13.tgz#ce9654bf4e537108014ec022f2423dbe8114fd62"
+  integrity sha512-/HrLnIft5Ks2511Pz6TxHBIctC9QalVscAC64sufQ4sJH/sXaQlG3uR9LCu6VpEwkBemgcBLrz/QPNP/ddbjDg==
   dependencies:
     prop-types "^15.7.2"
 
