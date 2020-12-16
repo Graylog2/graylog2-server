@@ -19,6 +19,7 @@ import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
+import { useStore } from 'stores/connect';
 import { Modal } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import WidgetContext from 'views/components/contexts/WidgetContext';
@@ -29,7 +30,6 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import connect from 'stores/connect';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -61,7 +61,6 @@ EditWidgetDialog.propTypes = {
 
 type Props = {
   children: Array<React.ReactNode>,
-  config: SearchesConfig;
 };
 
 const onSubmit = (values, widget: Widget) => {
@@ -75,7 +74,9 @@ const onSubmit = (values, widget: Widget) => {
   return WidgetActions.update(widget.id, newWidget);
 };
 
-const EditWidgetFrame = ({ config, children }: Props) => {
+const EditWidgetFrame = ({ children }: Props) => {
+  const config: SearchesConfig = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
+
   useEffect(() => {
     globalStyles.use();
 
@@ -130,8 +131,4 @@ EditWidgetFrame.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default connect(EditWidgetFrame, {
-  configurations: SearchConfigStore,
-}, ({ configurations }) => ({
-  config: configurations.searchesClusterConfig,
-}));
+export default EditWidgetFrame;
