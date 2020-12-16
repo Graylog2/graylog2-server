@@ -89,7 +89,7 @@ const EditWidgetFrame = ({ children }: Props) => {
     return <Spinner text="Loading widget ..." />;
   }
 
-  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
+  const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds();
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
