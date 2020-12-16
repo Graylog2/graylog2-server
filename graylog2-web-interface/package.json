@@ -63,6 +63,7 @@
     "md5": "^2.2.1",
     "moment": "^2.24.0",
     "moment-duration-format": "2.3.2",
+    "mousetrap": "^1.6.5",
     "numeral": "^2.0.6",
     "opensans-npm-webfont": "1.0.0",
     "plotly.js": "^1.52.2",

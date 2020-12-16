@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import moment from 'moment';
+import Mousetrap from 'mousetrap';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -107,17 +108,17 @@ const DEFAULT_RANGES = {
 };
 
 const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, currentTimeRange }) => availableTimeRangeTypes.map(({ type, name }) => {
-  const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
+  const TimeRangeComponent = timeRangeTypes[type];
 
   return (
     <Tab title={name}
          key={`time-range-type-selector-${type}`}
          eventKey={type}>
       {type === activeTab && (
-        <RangeComponent disabled={false}
-                        originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
-                        limitDuration={limitDuration}
-                        currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
+        <TimeRangeComponent disabled={false}
+                            originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
+                            limitDuration={limitDuration}
+                            currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
       )}
     </Tab>
   );
@@ -149,17 +150,26 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
     toggleDropdownShow();
   };
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setFieldValue('nextTimeRange', initialTimeRange);
 
     toggleDropdownShow();
-  };
+  }, [initialTimeRange, setFieldValue, toggleDropdownShow]);
 
-  const handleApply = () => {
+  const handleApply = useCallback(() => {
     setFieldValue('timerange', currentTimeRange);
 
     toggleDropdownShow();
-  };
+  }, [currentTimeRange, setFieldValue, toggleDropdownShow]);
+
+  useEffect(() => {
+    Mousetrap.bind('enter', isValid ? handleApply : () => {});
+    Mousetrap.bind('esc', handleCancel);
+
+    return () => {
+      Mousetrap.reset();
+    };
+  }, [isValid, handleApply, handleCancel]);
 
   const title = (
     <PopoverTitle>
@@ -185,7 +195,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeTab}
+                      activeKey={activeTab ?? -1}
                       onSelect={setActiveTab}
                       animation={false}>
             {timeRangeTypeTabs({
@@ -194,6 +204,9 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
               limitDuration,
               currentTimeRange,
             })}
+
+            {!activeTab && (<DisabledTimeRangeSelector />)}
+
           </StyledTabs>
         </Col>
       </Row>
