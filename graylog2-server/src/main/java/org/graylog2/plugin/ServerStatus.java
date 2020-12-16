@@ -153,7 +153,9 @@ public class ServerStatus {
      * Blocks until the server enters the RUNNING state and then executes the given Runnable.
      * <p>
      * <b>This method is not interruptible while waiting for the server to enter the RUNNING state.</b>
+     * @deprecated Preferably use {@link #awaitRunning()} instead, which is interruptible.
      */
+    @Deprecated
     public void awaitRunning(final Runnable runnable) {
         LOG.debug("Waiting for server to enter RUNNING state");
         Uninterruptibles.awaitUninterruptibly(runningLatch);
