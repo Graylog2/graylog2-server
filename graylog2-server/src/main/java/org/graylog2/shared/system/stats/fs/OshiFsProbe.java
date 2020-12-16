@@ -69,15 +69,15 @@ public class OshiFsProbe implements FsProbe {
             Path path = location.toAbsolutePath();
             oshiFileSystems.put(location,
                     fs.getFileStores().stream()
-                            .filter(it -> Paths.get(it.getMount()).startsWith(path))
-                            // We want the mountpoint closest to out location
+                            .filter(it -> path.startsWith(it.getMount()))
+                            // We want the mountpoint closest to our location
                             .max(Comparator.comparingInt(p -> Paths.get(p.getMount()).getNameCount()))
                             .map(it -> {
                                 //Search for the diskstore with the partition of our mountpoint
                                 return new Pair<>(it, hardware.getDiskStores().stream()
-                                        .filter(ds -> ds.getPartitions().stream().anyMatch(part -> Paths.get(part.getMountPoint()).startsWith(path)))
+                                        .filter(ds -> ds.getPartitions().stream().anyMatch(part -> path.startsWith(part.getMountPoint())))
                                         .max(Comparator.comparingInt(ds -> ds.getPartitions().stream()
-                                                .filter(part -> Paths.get(part.getMountPoint()).startsWith(path))
+                                                .filter(part -> path.startsWith(part.getMountPoint()))
                                                 .mapToInt(part -> Paths.get(part.getMountPoint()).getNameCount())
                                                 .max().orElse(0)))
                                         .orElse(generateDummyDiskStore()));
