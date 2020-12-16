@@ -531,10 +531,7 @@ public class StreamResource extends RestResource {
             stream.getDisabled(),
             stream.getStreamRules(),
             alertConditions,
-            AlertReceivers.create(
-                firstNonNull(emailAlertReceivers, Collections.emptyList()),
-                firstNonNull(usersAlertReceivers, Collections.emptyList())
-            ),
+            AlertReceivers.create(emailAlertReceivers, usersAlertReceivers),
             stream.getTitle(),
             stream.getContentPack(),
             stream.isDefaultStream(),

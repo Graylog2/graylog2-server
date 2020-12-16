@@ -48,6 +48,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private final Duration loopSleepDuration;
     private final InterruptibleSleeper sleeper = new InterruptibleSleeper();
+    private Thread executionThread;
 
     @Inject
     public JobSchedulerService(JobExecutionEngine.Factory engineFactory,
@@ -69,14 +70,21 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     @Override
     protected void startUp() throws Exception {
         schedulerEventBus.register(this);
+        this.executionThread = Thread.currentThread();
     }
 
     @Override
     protected void run() throws Exception {
         // Safety measure to make sure everything is started before we start job scheduling.
         LOG.debug("Waiting for server to enter RUNNING status before starting the scheduler loop");
-        serverStatus.awaitRunning(() -> LOG.debug("Server entered RUNNING state, starting scheduler loop"));
-
+        try {
+            serverStatus.awaitRunning();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOG.debug("Was interrupted while waiting for server to enter RUNNING state. Aborting.");
+            return;
+        }
+        LOG.debug("Server entered RUNNING state, starting scheduler loop");
 
         if (schedulerConfig.canStart()) {
             boolean executionEnabled = true;
@@ -124,6 +132,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
         schedulerEventBus.unregister(this);
         shutdownLatch.countDown();
         jobExecutionEngine.shutdown();
+        executionThread.interrupt();
     }
 
     /**

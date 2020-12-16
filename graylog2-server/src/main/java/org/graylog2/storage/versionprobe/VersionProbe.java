@@ -97,21 +97,12 @@ public class VersionProbe {
     }
 
     private Optional<Version> parseVersion(String versionString) {
-        final String[] versionParts = versionString.split("\\.");
-        if (versionParts.length != 3) {
-            LOG.error("Unable to parse version retrieved from Elasticsearch node: " + versionString);
-            return Optional.empty();
-        }
         try {
-            final int major = Integer.parseUnsignedInt(versionParts[0]);
-            final int minor = Integer.parseUnsignedInt(versionParts[1]);
-            final int patch = Integer.parseUnsignedInt(versionParts[2]);
-
-            final Version version = Version.from(major, minor, patch);
-
-            return Optional.of(version);
-        } catch (NumberFormatException e) {
-            throw new ElasticsearchProbeException("Unable to parse version retrieved from Elasticsearch node: " + versionString, e);
+            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionString);
+            return Optional.of(new Version(version));
+        } catch (Exception e) {
+            LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionString, e);
+            return Optional.empty();
         }
     }
 
