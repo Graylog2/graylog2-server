@@ -41,14 +41,11 @@ jest.mock('views/logic/Widgets', () => ({
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 describe('ViewStore', () => {
-  const dummySearch = Search.create()
-    .toBuilder()
-    .queries([
-      Query.builder().id('firstQueryId').build(),
-      Query.builder().id('secondQueryId').build(),
-    ])
-    .build();
-  const dummyView = View.builder().search(dummySearch).build();
+  const dummyState = Immutable.OrderedMap({
+    firstQueryId: ViewState.builder().build(),
+    secondQueryId: ViewState.builder().build(),
+  });
+  const dummyView = View.builder().state(dummyState).build();
 
   it('.load should select first query if activeQuery is not set', () => ViewActions.load(dummyView)
     .then((state) => expect(state.activeQuery).toBe('firstQueryId')));
@@ -78,6 +75,7 @@ describe('ViewStore', () => {
       .newId()
       .title('Initial title')
       .description('Initail description')
+      .state(dummyState)
       .summary('Initial summary')
       .build();
 
@@ -106,7 +104,10 @@ describe('ViewStore', () => {
 
     it('resets dirty flag when an existing view is updated', () => {
       const search = Search.create();
-      const newView = View.builder().newId().search(search).build();
+      const newView = View.builder().newId()
+        .search(search)
+        .state(dummyState)
+        .build();
 
       return ViewActions.load(newView)
         .then(() => ViewActions.search(search.toBuilder().newId().build()))
