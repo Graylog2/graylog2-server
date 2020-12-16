@@ -13118,10 +13118,10 @@ re-resizable@6.2.0:
   dependencies:
     fast-memoize "^2.5.1"
 
-react-ace@9.1.1:
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/react-ace/-/react-ace-9.1.1.tgz#fe27e1c668b0186dc1609c422198d1c2df34d2bf"
-  integrity sha512-dL0w6GwtnS1opsOoWhJaF7rF7xCM+NOEOfePmDfiaeU+EyZQ6nRWDBgyzKsuiB3hyXH3G9D6FX37ur/LKUdKjA==
+react-ace@9.2.1:
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/react-ace/-/react-ace-9.2.1.tgz#1efaa0476c77649136def50e5c4ca30c7e546036"
+  integrity sha512-2arIeMER/W6/h+QGHs0YJ0pEJo5AmBOUs/R72Poa6eXSOSTpJPp/WkwD/KE7BgNy9vZ7YjlbqA+2ZcoVf6AjsQ==
   dependencies:
     ace-builds "^1.4.6"
     diff-match-patch "^1.0.4"
