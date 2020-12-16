@@ -35,7 +35,9 @@ public interface UserManagementService extends UserService {
 
     void setUserStatus(User user, User.AccountStatus status) throws ValidationException;
 
-    String changePassword(String id, String oldPassword, String newPassword) throws ValidationException;
+    boolean isUserPassword(User user, String password);
 
-    boolean isUserPassword(String id, String newPassword);
+    void changePassword(User user, String oldPassword, String newPassword) throws ValidationException;
+
+    void changePassword(User user, String newPassword) throws ValidationException;
 }

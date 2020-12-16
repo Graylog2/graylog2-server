@@ -51,7 +51,7 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
 
     @Override
     public String update(User model) throws ValidationException {
-        return this.save(model);
+        return super.save(model);
     }
 
     @Override
@@ -61,15 +61,18 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
     }
 
     @Override
-    public String changePassword(String id, String oldPassword, String newPassword) throws ValidationException {
-        // TODO: Implement.
-        return null;
+    public boolean isUserPassword(User user, String password) {
+        return user.isUserPassword(password);
     }
 
     @Override
-    public boolean isUserPassword(String id, String newPassword) {
+    public void changePassword(User user, String oldPassword, String newPassword) throws ValidationException {
+        changePassword(user, newPassword);
+    }
 
-        // TODO: Implement.
-        return false;
+    @Override
+    public void changePassword(User user, String newPassword) throws ValidationException {
+        user.setPassword(newPassword);
+        super.save(user);
     }
 }

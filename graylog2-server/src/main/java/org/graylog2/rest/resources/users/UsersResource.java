@@ -535,7 +535,7 @@ public class UsersResource extends RestResource {
 
         boolean changeAllowed = false;
         if (checkOldPassword) {
-            if (user.isUserPassword(cr.oldPassword())) {
+            if (userManagementService.isUserPassword(user, cr.oldPassword())) {
                 changeAllowed = true;
             }
         } else {
@@ -543,8 +543,11 @@ public class UsersResource extends RestResource {
         }
 
         if (changeAllowed) {
-            user.setPassword(cr.password());
-            userManagementService.save(user);
+            if (checkOldPassword) {
+                userManagementService.changePassword(user, cr.oldPassword(), cr.password());
+            } else {
+                userManagementService.changePassword(user, cr.password());
+            }
         } else {
             throw new BadRequestException("Old password is missing or incorrect.");
         }
