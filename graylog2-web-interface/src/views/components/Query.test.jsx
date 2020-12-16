@@ -51,7 +51,15 @@ const widgets = Immutable.Map({ widget1, widget2 });
 describe('Query', () => {
   const SUT = (props) => (
     <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-      <Query {...props} />
+      <Query results={{ errors: [], searchTypes: {} }}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()}
+             {...props} />
     </WidgetFocusContext.Provider>
   );
 
@@ -64,14 +72,7 @@ describe('Query', () => {
       },
     };
     const wrapper = mount((
-      <SUT results={results}
-           widgetMapping={widgetMapping}
-           widgets={widgets}
-           onToggleMessages={() => {}}
-           queryId="someQueryId"
-           showMessages
-           allFields={Immutable.List()}
-           fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -90,14 +91,7 @@ describe('Query', () => {
       },
     };
     const wrapper = mount((
-      <SUT results={results}
-           widgetMapping={widgetMapping}
-           widgets={widgets}
-           onToggleMessages={() => {}}
-           queryId="someQueryId"
-           showMessages
-           allFields={Immutable.List()}
-           fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -117,14 +111,7 @@ describe('Query', () => {
       },
     };
     const wrapper = mount((
-      <SUT results={results}
-           widgetMapping={widgetMapping}
-           widgets={widgets}
-           onToggleMessages={() => {}}
-           queryId="someQueryId"
-           showMessages
-           allFields={Immutable.List()}
-           fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -142,14 +129,7 @@ describe('Query', () => {
       searchTypes: {},
     };
     const wrapper = mount((
-      <SUT results={results}
-           widgetMapping={widgetMapping}
-           widgets={widgets}
-           onToggleMessages={() => {}}
-           queryId="someQueryId"
-           showMessages
-           allFields={Immutable.List()}
-           fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -167,13 +147,7 @@ describe('Query', () => {
     const wrapper = mount((
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <SUT results={results}
-             widgetMapping={widgetMapping}
-             widgets={Immutable.Map()}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+             widgets={Immutable.Map()} />
       </ViewTypeContext.Provider>
     ));
 
@@ -189,13 +163,7 @@ describe('Query', () => {
     const wrapper = mount((
       <ViewTypeContext.Provider value={View.Type.Search}>
         <SUT results={results}
-             widgetMapping={widgetMapping}
-             widgets={Immutable.Map()}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+             widgets={Immutable.Map()} />
       </ViewTypeContext.Provider>
     ));
 
@@ -209,14 +177,7 @@ describe('Query', () => {
       searchTypes: {},
     };
     const wrapper = mount((
-      <SUT results={results}
-           widgetMapping={widgetMapping}
-           widgets={widgets}
-           onToggleMessages={() => {}}
-           queryId="someQueryId"
-           showMessages
-           allFields={Immutable.List()}
-           fields={Immutable.List()} />
+      <SUT results={results} />
     ));
 
     expect(wrapper.contains('You can create a new widget by selecting a widget type')).toEqual(false);

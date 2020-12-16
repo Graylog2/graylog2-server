@@ -23,7 +23,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DataTableEntry from './DataTableEntry';
 
@@ -68,23 +67,22 @@ const seriesWithName = (fn, name) => Series.forFunction(fn)
 
 describe('DataTableEntry', () => {
   const SUT = (props) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-      <table>
-        <DataTableEntry {...props} />
-      </table>
-    </WidgetFocusContext.Provider>
+    <table>
+      <DataTableEntry columnPivots={columnPivots}
+                      columnPivotValues={columnPivotValues}
+                      currentView={currentView}
+                      fields={fields}
+                      item={item}
+                      series={series}
+                      types={List([])}
+                      valuePath={valuePath}
+                      {...props} />
+    </table>
   );
 
   it('does not fail without types', () => {
     const wrapper = mount((
-      <SUT columnPivots={columnPivots}
-           columnPivotValues={columnPivotValues}
-           currentView={currentView}
-           fields={fields}
-           item={item}
-           series={series}
-           types={List([])}
-           valuePath={valuePath} />
+      <SUT />
     ));
 
     expect(wrapper).not.toBeEmptyRender();
@@ -98,14 +96,7 @@ describe('DataTableEntry', () => {
     ];
 
     const wrapper = mount((
-      <SUT columnPivots={columnPivots}
-           columnPivotValues={columnPivotValues}
-           currentView={currentView}
-           fields={fields}
-           item={item}
-           series={series}
-           types={List(types)}
-           valuePath={valuePath} />
+      <SUT types={List(types)} />
     ));
 
     const fieldTypeFor = (fieldName) => wrapper.find(`Value[field="${fieldName}"]`).first().props().type;
@@ -118,14 +109,7 @@ describe('DataTableEntry', () => {
 
   it('provides valuePath in context for each value', () => {
     const wrapper = mount((
-      <SUT columnPivots={columnPivots}
-           columnPivotValues={columnPivotValues}
-           currentView={currentView}
-           fields={fields}
-           item={item}
-           series={series}
-           types={List([])}
-           valuePath={valuePath} />
+      <SUT />
     ));
 
     expect(wrapper.find('Provider')
@@ -139,14 +123,8 @@ describe('DataTableEntry', () => {
       nf_dst_port: 443,
     };
     const wrapper = mount((
-      <SUT columnPivots={columnPivots}
-           columnPivotValues={columnPivotValues}
-           currentView={currentView}
-           fields={fieldsWithDeduplicatedValues}
-           item={itemWithDeduplicatedValues}
-           series={series}
-           types={List([])}
-           valuePath={valuePath} />
+      <SUT fields={fieldsWithDeduplicatedValues}
+           item={itemWithDeduplicatedValues} />
     ));
 
     expect(wrapper).not.toContainReact(<EmptyValue />);
@@ -157,14 +135,7 @@ describe('DataTableEntry', () => {
 
     it('for non-renamed functions', () => {
       const wrapper = mount((
-        <SUT columnPivots={columnPivots}
-             columnPivotValues={columnPivotValues}
-             currentView={currentView}
-             fields={fields}
-             item={item}
-             series={series}
-             types={List([timestampTypeMapping])}
-             valuePath={valuePath} />
+        <SUT types={List([timestampTypeMapping])} />
       ));
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
@@ -181,7 +152,6 @@ describe('DataTableEntry', () => {
       const wrapper = mount((
         <SUT columnPivots={[]}
              columnPivotValues={[]}
-             currentView={currentView}
              fields={fieldsWithRenamedSeries}
              item={itemWithRenamedSeries}
              series={renamedSeries}
@@ -219,14 +189,10 @@ describe('DataTableEntry', () => {
       ]);
 
       const wrapper = mount((
-        <SUT columnPivots={columnPivots}
-             columnPivotValues={columnPivotValues}
-             currentView={currentView}
-             fields={fieldsWithRenamedSeries}
+        <SUT fields={fieldsWithRenamedSeries}
              item={itemWithRenamedSeries}
              series={renamedSeries}
-             types={List([timestampTypeMapping])}
-             valuePath={valuePath} />
+             types={List([timestampTypeMapping])} />
       ));
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 

@@ -23,7 +23,6 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import Headers from './Headers';
 
@@ -58,20 +57,17 @@ describe('Headers', () => {
     actualColumnPivotFields = [],
     fields = [],
   }: RenderHeadersProps) => (
-
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-      <table>
-        <thead>
-          <Headers activeQuery="queryId"
-                   columnPivots={columnPivots}
-                   rowPivots={rowPivots}
-                   series={series}
-                   rollup={rollup}
-                   actualColumnPivotFields={actualColumnPivotFields}
-                   fields={Immutable.List(fields)} />
-        </thead>
-      </table>
-    </WidgetFocusContext.Provider>
+    <table>
+      <thead>
+        <Headers activeQuery="queryId"
+                 columnPivots={columnPivots}
+                 rowPivots={rowPivots}
+                 series={series}
+                 rollup={rollup}
+                 actualColumnPivotFields={actualColumnPivotFields}
+                 fields={Immutable.List(fields)} />
+      </thead>
+    </table>
   );
 
   it('renders a header for every series', () => {

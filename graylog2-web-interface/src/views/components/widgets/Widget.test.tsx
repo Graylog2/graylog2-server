@@ -146,18 +146,16 @@ describe('<Widget />', () => {
   });
 
   const DummyWidget = (props) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-      <WidgetContext.Provider value={widget}>
-        <Widget widget={widget}
-                id="widgetId"
-                fields={[]}
-                onPositionsChange={() => {}}
-                onSizeChange={() => {}}
-                title="Widget Title"
-                position={new WidgetPosition(1, 1, 1, 1)}
-                {...props} />
-      </WidgetContext.Provider>
-    </WidgetFocusContext.Provider>
+    <WidgetContext.Provider value={widget}>
+      <Widget widget={widget}
+              id="widgetId"
+              fields={[]}
+              onPositionsChange={() => {}}
+              onSizeChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props} />
+    </WidgetContext.Provider>
   );
 
   it('should render with empty props', () => {

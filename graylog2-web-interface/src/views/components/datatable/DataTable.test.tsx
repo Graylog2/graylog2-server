@@ -25,7 +25,6 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
@@ -56,22 +55,20 @@ describe('DataTable', () => {
   const series = new Series('count()');
 
   const SimplifiedDataTable = (props) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-      <DataTable config={AggregationWidgetConfig.builder().build()}
-                 currentView={currentView}
-                 data={{}}
-                 fields={Immutable.List([])}
-                 effectiveTimerange={{
-                   from: '2020-01-10T13:23:42.000Z',
-                   to: '2020-01-10T14:23:42.000Z',
-                   type: 'absolute',
-                 }}
-                 toggleEdit={() => {}}
-                 onChange={() => {}}
-                 height={200}
-                 width={300}
-                 {...props} />
-    </WidgetFocusContext.Provider>
+    <DataTable config={AggregationWidgetConfig.builder().build()}
+               currentView={currentView}
+               data={{}}
+               fields={Immutable.List([])}
+               effectiveTimerange={{
+                 from: '2020-01-10T13:23:42.000Z',
+                 to: '2020-01-10T14:23:42.000Z',
+                 type: 'absolute',
+               }}
+               toggleEdit={() => {}}
+               onChange={() => {}}
+               height={200}
+               width={300}
+               {...props} />
   );
 
   it('should render with empty data', () => {

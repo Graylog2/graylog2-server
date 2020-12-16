@@ -22,8 +22,6 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import FieldsOverview from './FieldsOverview';
 
-import WidgetFocusContext from '../../contexts/WidgetFocusContext';
-
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: {
     getInitialState: () => ({
@@ -37,11 +35,9 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 describe('<FieldsOverview />', () => {
   const fieldTypesStoreState = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleFieldsOverview = () => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-      <FieldTypesContext.Provider value={fieldTypesStoreState}>
-        <FieldsOverview listHeight={1000} />
-      </FieldTypesContext.Provider>
-    </WidgetFocusContext.Provider>
+    <FieldTypesContext.Provider value={fieldTypesStoreState}>
+      <FieldsOverview listHeight={1000} />
+    </FieldTypesContext.Provider>
   );
 
   it('should render a FieldsOverview', () => {

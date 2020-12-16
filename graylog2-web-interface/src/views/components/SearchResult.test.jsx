@@ -70,11 +70,9 @@ describe('SearchResult', () => {
 
   const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleSearchResult = ({ fieldTypes }) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <SearchResult />
-      </FieldTypesContext.Provider>
-    </WidgetFocusContext.Provider>
+    <FieldTypesContext.Provider value={fieldTypes}>
+      <SearchResult />
+    </FieldTypesContext.Provider>
   );
 
   SimpleSearchResult.propTypes = {

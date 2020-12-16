@@ -23,6 +23,8 @@ type WidgetFocusContextType = {
   setFocusedWidget: (focusedWidget: string | undefined | null) => void,
 };
 
-const WidgetFocus = React.createContext<WidgetFocusContextType | undefined>(undefined);
+const defaultContext = { focusedWidget: undefined, setFocusedWidget: () => {} };
+
+const WidgetFocus = React.createContext<WidgetFocusContextType>(defaultContext);
 
 export default singleton('contexts.WidgetFocus', () => WidgetFocus);

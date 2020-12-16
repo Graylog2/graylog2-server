@@ -22,7 +22,6 @@ import suppressConsole from 'helpers/suppressConsole';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import MessageTable from './MessageTable';
 
@@ -46,16 +45,14 @@ const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
 const activeQueryId = 'some-query-id';
 
 const SimpleMessageTable = (props) => (
-  <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-    <MessageTable activeQueryId={activeQueryId}
-                  config={config}
-                  fields={Immutable.List(fields)}
-                  messages={messages}
-                  onSortChange={() => Promise.resolve()}
-                  selectedFields={Immutable.Set()}
-                  setLoadingState={() => {}}
-                  {...props} />
-  </WidgetFocusContext.Provider>
+  <MessageTable activeQueryId={activeQueryId}
+                config={config}
+                fields={Immutable.List(fields)}
+                messages={messages}
+                onSortChange={() => Promise.resolve()}
+                selectedFields={Immutable.Set()}
+                setLoadingState={() => {}}
+                {...props} />
 );
 
 describe('MessageTable', () => {

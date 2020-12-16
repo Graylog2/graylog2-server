@@ -31,7 +31,6 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
 import InputsStore from 'stores/inputs/InputsStore';
 import { SearchExecutionResult } from 'views/actions/SearchActions';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import MessageList from './MessageList';
 import RenderCompletionCallback from './RenderCompletionCallback';
@@ -138,12 +137,10 @@ describe('MessageList', () => {
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
     const wrapper1 = mount(
-      <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-        <MessageList data={data}
-                     config={config}
-                     fields={Immutable.List(fields)}
-                     setLoadingState={() => {}} />
-      </WidgetFocusContext.Provider>,
+      <MessageList data={data}
+                   config={config}
+                   fields={Immutable.List(fields)}
+                   setLoadingState={() => {}} />,
     );
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
@@ -152,12 +149,10 @@ describe('MessageList', () => {
 
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(
-      <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-        <MessageList data={data}
-                     config={emptyConfig}
-                     fields={Immutable.List(fields)}
-                     setLoadingState={() => {}} />
-      </WidgetFocusContext.Provider>,
+      <MessageList data={data}
+                   config={emptyConfig}
+                   fields={Immutable.List(fields)}
+                   setLoadingState={() => {}} />,
     );
 
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
@@ -167,12 +162,10 @@ describe('MessageList', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
     const wrapper = mount(
-      <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-        <MessageList data={data}
-                     fields={Immutable.List(fields)}
-                     config={config}
-                     setLoadingState={() => {}} />
-      </WidgetFocusContext.Provider>,
+      <MessageList data={data}
+                   fields={Immutable.List(fields)}
+                   config={config}
+                   setLoadingState={() => {}} />,
     );
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
