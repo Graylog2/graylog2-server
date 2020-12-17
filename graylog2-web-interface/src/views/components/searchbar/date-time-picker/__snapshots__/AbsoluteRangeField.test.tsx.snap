@@ -381,18 +381,6 @@ fieldset[disabled] .c0.form-control:not([type="range"]) {
   padding: 0 3px;
 }
 
-.c5 {
-  padding: 0;
-  background: #f3f3f3;
-  font-weight: bold;
-}
-
-.c5:not(:first-child):not(:last-child) {
-  border-right: 0;
-  border-left: 0;
-  padding: 0 3px;
-}
-
 .c7 {
   padding: 0 6px 0 9px;
   width: 50px !important;
@@ -438,6 +426,18 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
 
 .c7:last-of-type {
   width: 60px !important;
+}
+
+.c5 {
+  padding: 0;
+  background: #f3f3f3;
+  font-weight: bold;
+}
+
+.c5:not(:first-child):not(:last-child) {
+  border-right: 0;
+  border-left: 0;
+  padding: 0 3px;
 }
 
 .c6 {
@@ -728,537 +728,535 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
 <form
     action="#"
   >
-    <div>
-      <div
-        class="form-group"
-      >
-        <span>
+    <div
+      class="form-group"
+    >
+      <span>
+        <span
+          class="input-group"
+        >
+          <input
+            autocomplete="off"
+            class="c0 form-control"
+            id="date-input-nextTimeRange[from]"
+            label=""
+            name="nextTimeRange[from]"
+            placeholder="YYYY-MM-DD HH:mm:ss"
+            type="text"
+            value="1955-05-11 06:15:00.000"
+          />
           <span
-            class="input-group"
+            class="input-group-btn"
           >
-            <input
-              autocomplete="off"
-              class="c0 form-control"
-              id="date-input-nextTimeRange[from]"
-              label=""
-              name="nextTimeRange[from]"
-              placeholder="YYYY-MM-DD HH:mm:ss"
-              type="text"
-              value="1955-05-11 06:15:00.000"
-            />
-            <span
-              class="input-group-btn"
+            <button
+              class="c1 btn btn-default"
+              title="Insert current date"
+              type="button"
             >
-              <button
-                class="c1 btn btn-default"
-                title="Insert current date"
-                type="button"
-              >
-                <svg
-                  class="svg-inline--fa fa-magic"
-                />
-              </button>
-            </span>
+              <svg
+                class="svg-inline--fa fa-magic"
+              />
+            </button>
           </span>
         </span>
-      </div>
+      </span>
+    </div>
+    <div
+      class="DayPicker c2"
+      lang="en"
+    >
       <div
-        class="DayPicker c2"
-        lang="en"
+        class="DayPicker-wrapper"
+        tabindex="0"
       >
         <div
-          class="DayPicker-wrapper"
-          tabindex="0"
+          class="DayPicker-NavBar"
+        >
+          <span
+            aria-label="Previous Month"
+            class="DayPicker-NavButton DayPicker-NavButton--prev"
+            role="button"
+            tabindex="0"
+          />
+          <span
+            aria-label="Next Month"
+            class="DayPicker-NavButton DayPicker-NavButton--next"
+            role="button"
+            tabindex="0"
+          />
+        </div>
+        <div
+          class="DayPicker-Months"
         >
           <div
-            class="DayPicker-NavBar"
-          >
-            <span
-              aria-label="Previous Month"
-              class="DayPicker-NavButton DayPicker-NavButton--prev"
-              role="button"
-              tabindex="0"
-            />
-            <span
-              aria-label="Next Month"
-              class="DayPicker-NavButton DayPicker-NavButton--next"
-              role="button"
-              tabindex="0"
-            />
-          </div>
-          <div
-            class="DayPicker-Months"
+            class="DayPicker-Month"
+            role="grid"
           >
             <div
-              class="DayPicker-Month"
-              role="grid"
+              class="DayPicker-Caption"
+              role="heading"
+            >
+              <div>
+                May 1955
+              </div>
+            </div>
+            <div
+              class="DayPicker-Weekdays"
+              role="rowgroup"
             >
               <div
-                class="DayPicker-Caption"
-                role="heading"
+                class="DayPicker-WeekdaysRow"
+                role="row"
               >
-                <div>
-                  May 1955
+                <div
+                  class="DayPicker-Weekday"
+                  role="columnheader"
+                >
+                  <abbr
+                    title="Sunday"
+                  >
+                    Su
+                  </abbr>
+                </div>
+                <div
+                  class="DayPicker-Weekday"
+                  role="columnheader"
+                >
+                  <abbr
+                    title="Monday"
+                  >
+                    Mo
+                  </abbr>
+                </div>
+                <div
+                  class="DayPicker-Weekday"
+                  role="columnheader"
+                >
+                  <abbr
+                    title="Tuesday"
+                  >
+                    Tu
+                  </abbr>
+                </div>
+                <div
+                  class="DayPicker-Weekday"
+                  role="columnheader"
+                >
+                  <abbr
+                    title="Wednesday"
+                  >
+                    We
+                  </abbr>
+                </div>
+                <div
+                  class="DayPicker-Weekday"
+                  role="columnheader"
+                >
+                  <abbr
+                    title="Thursday"
+                  >
+                    Th
+                  </abbr>
+                </div>
+                <div
+                  class="DayPicker-Weekday"
+                  role="columnheader"
+                >
+                  <abbr
+                    title="Friday"
+                  >
+                    Fr
+                  </abbr>
+                </div>
+                <div
+                  class="DayPicker-Weekday"
+                  role="columnheader"
+                >
+                  <abbr
+                    title="Saturday"
+                  >
+                    Sa
+                  </abbr>
+                </div>
+              </div>
+            </div>
+            <div
+              class="DayPicker-Body"
+              role="rowgroup"
+            >
+              <div
+                class="DayPicker-Week"
+                role="row"
+              >
+                <div
+                  aria-disabled="true"
+                  aria-label="Sun May 01 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="0"
+                >
+                  1
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Mon May 02 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  2
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Tue May 03 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  3
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Wed May 04 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  4
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Thu May 05 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  5
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Fri May 06 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  6
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Sat May 07 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  7
                 </div>
               </div>
               <div
-                class="DayPicker-Weekdays"
-                role="rowgroup"
+                class="DayPicker-Week"
+                role="row"
               >
                 <div
-                  class="DayPicker-WeekdaysRow"
-                  role="row"
+                  aria-disabled="true"
+                  aria-label="Sun May 08 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
                 >
-                  <div
-                    class="DayPicker-Weekday"
-                    role="columnheader"
-                  >
-                    <abbr
-                      title="Sunday"
-                    >
-                      Su
-                    </abbr>
-                  </div>
-                  <div
-                    class="DayPicker-Weekday"
-                    role="columnheader"
-                  >
-                    <abbr
-                      title="Monday"
-                    >
-                      Mo
-                    </abbr>
-                  </div>
-                  <div
-                    class="DayPicker-Weekday"
-                    role="columnheader"
-                  >
-                    <abbr
-                      title="Tuesday"
-                    >
-                      Tu
-                    </abbr>
-                  </div>
-                  <div
-                    class="DayPicker-Weekday"
-                    role="columnheader"
-                  >
-                    <abbr
-                      title="Wednesday"
-                    >
-                      We
-                    </abbr>
-                  </div>
-                  <div
-                    class="DayPicker-Weekday"
-                    role="columnheader"
-                  >
-                    <abbr
-                      title="Thursday"
-                    >
-                      Th
-                    </abbr>
-                  </div>
-                  <div
-                    class="DayPicker-Weekday"
-                    role="columnheader"
-                  >
-                    <abbr
-                      title="Friday"
-                    >
-                      Fr
-                    </abbr>
-                  </div>
-                  <div
-                    class="DayPicker-Weekday"
-                    role="columnheader"
-                  >
-                    <abbr
-                      title="Saturday"
-                    >
-                      Sa
-                    </abbr>
-                  </div>
+                  8
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Mon May 09 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  9
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Tue May 10 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--disabled"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  10
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Wed May 11 1955"
+                  aria-selected="true"
+                  class="DayPicker-Day DayPicker-Day--selected"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  11
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Thu May 12 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  12
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Fri May 13 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  13
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Sat May 14 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  14
                 </div>
               </div>
               <div
-                class="DayPicker-Body"
-                role="rowgroup"
+                class="DayPicker-Week"
+                role="row"
               >
                 <div
-                  class="DayPicker-Week"
-                  role="row"
+                  aria-disabled="false"
+                  aria-label="Sun May 15 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
                 >
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sun May 01 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="0"
-                  >
-                    1
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Mon May 02 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    2
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Tue May 03 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    3
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Wed May 04 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    4
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Thu May 05 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    5
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Fri May 06 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    6
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sat May 07 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    7
-                  </div>
+                  15
                 </div>
                 <div
-                  class="DayPicker-Week"
-                  role="row"
+                  aria-disabled="false"
+                  aria-label="Mon May 16 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
                 >
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sun May 08 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    8
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Mon May 09 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    9
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Tue May 10 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    10
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Wed May 11 1955"
-                    aria-selected="true"
-                    class="DayPicker-Day DayPicker-Day--selected"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    11
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Thu May 12 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    12
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Fri May 13 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    13
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sat May 14 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    14
-                  </div>
+                  16
                 </div>
                 <div
-                  class="DayPicker-Week"
-                  role="row"
+                  aria-disabled="false"
+                  aria-label="Tue May 17 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
                 >
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sun May 15 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    15
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Mon May 16 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    16
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Tue May 17 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    17
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Wed May 18 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    18
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Thu May 19 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    19
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Fri May 20 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    20
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sat May 21 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    21
-                  </div>
+                  17
                 </div>
                 <div
-                  class="DayPicker-Week"
-                  role="row"
+                  aria-disabled="false"
+                  aria-label="Wed May 18 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
                 >
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sun May 22 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    22
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Mon May 23 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    23
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Tue May 24 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    24
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Wed May 25 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    25
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Thu May 26 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    26
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Fri May 27 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    27
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sat May 28 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    28
-                  </div>
+                  18
                 </div>
                 <div
-                  class="DayPicker-Week"
-                  role="row"
+                  aria-disabled="false"
+                  aria-label="Thu May 19 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
                 >
-                  <div
-                    aria-disabled="false"
-                    aria-label="Sun May 29 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    29
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Mon May 30 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    30
-                  </div>
-                  <div
-                    aria-disabled="false"
-                    aria-label="Tue May 31 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    31
-                  </div>
-                  <div
-                    aria-disabled="true"
-                    aria-label="Wed Jun 01 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day DayPicker-Day--outside"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    1
-                  </div>
-                  <div
-                    aria-disabled="true"
-                    aria-label="Thu Jun 02 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day DayPicker-Day--outside"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    2
-                  </div>
-                  <div
-                    aria-disabled="true"
-                    aria-label="Fri Jun 03 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day DayPicker-Day--outside"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    3
-                  </div>
-                  <div
-                    aria-disabled="true"
-                    aria-label="Sat Jun 04 1955"
-                    aria-selected="false"
-                    class="DayPicker-Day DayPicker-Day--outside"
-                    role="gridcell"
-                    tabindex="-1"
-                  >
-                    4
-                  </div>
+                  19
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Fri May 20 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  20
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Sat May 21 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  21
+                </div>
+              </div>
+              <div
+                class="DayPicker-Week"
+                role="row"
+              >
+                <div
+                  aria-disabled="false"
+                  aria-label="Sun May 22 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  22
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Mon May 23 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  23
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Tue May 24 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  24
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Wed May 25 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  25
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Thu May 26 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  26
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Fri May 27 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  27
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Sat May 28 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  28
+                </div>
+              </div>
+              <div
+                class="DayPicker-Week"
+                role="row"
+              >
+                <div
+                  aria-disabled="false"
+                  aria-label="Sun May 29 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  29
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Mon May 30 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  30
+                </div>
+                <div
+                  aria-disabled="false"
+                  aria-label="Tue May 31 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  31
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Wed Jun 01 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--outside"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  1
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Thu Jun 02 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--outside"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  2
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Fri Jun 03 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--outside"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  3
+                </div>
+                <div
+                  aria-disabled="true"
+                  aria-label="Sat Jun 04 1955"
+                  aria-selected="false"
+                  class="DayPicker-Day DayPicker-Day--outside"
+                  role="gridcell"
+                  tabindex="-1"
+                >
+                  4
                 </div>
               </div>
             </div>
@@ -1266,87 +1264,85 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
         </div>
       </div>
     </div>
-    <div>
+    <div
+      class="c3"
+    >
       <div
-        class="c3"
+        class="form-group"
       >
-        <div
-          class="form-group"
+        <span
+          class="input-group"
         >
           <span
-            class="input-group"
+            class="c4 input-group-addon c5"
           >
-            <span
-              class="c4 input-group-addon c5"
+            <button
+              class="c6 btn btn-sm btn-link"
+              title="Toggle between beginning and end of day"
+              type="button"
             >
-              <button
-                class="c6 btn btn-sm btn-link"
-                title="Toggle between beginning and end of day"
-                type="button"
-              >
-                <svg
-                  class="svg-inline--fa fa-hourglass-half"
-                />
-              </button>
-            </span>
-            <input
-              class="c7 form-control input-sm"
-              id="from-time-hours"
-              title="from hour"
-              type="number"
-              value="06"
-            />
-            <span
-              class="c4 input-group-addon c5"
-            >
-              :
-            </span>
-            <input
-              class="c7 form-control input-sm"
-              id="from-time-minutes"
-              title="from minutes"
-              type="number"
-              value="15"
-            />
-            <span
-              class="c4 input-group-addon c5"
-            >
-              :
-            </span>
-            <input
-              class="c7 form-control input-sm"
-              id="from-time-seconds"
-              title="from seconds"
-              type="number"
-              value="00"
-            />
-            <span
-              class="c4 input-group-addon c5"
-            >
-              .
-            </span>
-            <input
-              class="c7 form-control input-sm"
-              id="from-time-milliseconds"
-              title="from milliseconds"
-              type="number"
-              value="000"
-            />
-            <span
-              class="c4 input-group-addon c5"
-            >
-              <button
-                class="c6 btn btn-sm btn-link"
-                title="Set to current local time"
-                type="button"
-              >
-                <svg
-                  class="svg-inline--fa fa-magic"
-                />
-              </button>
-            </span>
+              <svg
+                class="svg-inline--fa fa-hourglass-half"
+              />
+            </button>
           </span>
-        </div>
+          <input
+            class="c7 form-control input-sm"
+            id="from-time-hours"
+            title="from hour"
+            type="number"
+            value="06"
+          />
+          <span
+            class="c4 input-group-addon c5"
+          >
+            :
+          </span>
+          <input
+            class="c7 form-control input-sm"
+            id="from-time-minutes"
+            title="from minutes"
+            type="number"
+            value="15"
+          />
+          <span
+            class="c4 input-group-addon c5"
+          >
+            :
+          </span>
+          <input
+            class="c7 form-control input-sm"
+            id="from-time-seconds"
+            title="from seconds"
+            type="number"
+            value="00"
+          />
+          <span
+            class="c4 input-group-addon c5"
+          >
+            .
+          </span>
+          <input
+            class="c7 form-control input-sm"
+            id="from-time-milliseconds"
+            title="from milliseconds"
+            type="number"
+            value="000"
+          />
+          <span
+            class="c4 input-group-addon c5"
+          >
+            <button
+              class="c6 btn btn-sm btn-link"
+              title="Set to current local time"
+              type="button"
+            >
+              <svg
+                class="svg-inline--fa fa-magic"
+              />
+            </button>
+          </span>
+        </span>
       </div>
     </div>
   </form>
