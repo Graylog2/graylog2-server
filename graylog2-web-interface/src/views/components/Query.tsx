@@ -106,6 +106,8 @@ const _renderFocusedWidget = (focusedWidget, widgetDefs, titles, widgetMapping, 
       </WidgetContainer>
     );
   }
+
+  return undefined;
 };
 
 const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields) => {
@@ -178,9 +180,13 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
   }
 
   if (results) {
-    const content = focusedWidget
-      ? _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results)
-      : _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
+    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
+
+    if (focusedWidget) {
+      const focusedContent = _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results) || content;
+
+      return (<>{focusedContent}</>);
+    }
 
     return (<>{content}</>);
   }
