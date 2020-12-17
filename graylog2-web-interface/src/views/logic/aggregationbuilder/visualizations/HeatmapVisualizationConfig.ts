@@ -42,49 +42,60 @@ export const COLORSCALES = ['Greys', 'YlGnBu', 'Greens', 'YlOrRd', 'Bluered', 'R
 
 type InternalState = {
   colorScale: ColorScale;
+  reverseScale: boolean;
 };
 
 export type HeatmapVisualizationConfigJSON = {
   color_scale: ColorScale;
+  reverse_scale: boolean;
 }
 
 export default class HeatmapVisualizationConfig extends VisualizationConfig {
   private readonly _value: InternalState;
 
-  constructor(colorScale: InternalState['colorScale']) {
+  constructor(colorScale: InternalState['colorScale'], reverseScale: InternalState['reverseScale']) {
     super();
 
-    this._value = { colorScale };
+    this._value = { colorScale, reverseScale };
   }
 
   get colorScale() {
     return this._value.colorScale;
   }
 
+  get reverseScale () {
+    return this._value.reverseScale;
+  }
+
   toBuilder() {
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(colorScale: InternalState['colorScale']) {
-    return new HeatmapVisualizationConfig(colorScale);
+  static create(colorScale: InternalState['colorScale'], reverseScale: InternalState['reverseScale']) {
+    return new HeatmapVisualizationConfig(colorScale, reverseScale);
   }
 
   static empty() {
-    return new HeatmapVisualizationConfig('Viridis');
+    return new HeatmapVisualizationConfig('Viridis', false);
   }
 
-  toJSON() {
-    const { colorScale } = this._value;
+  toJSON(): HeatmapVisualizationConfigJSON {
+    const {
+      colorScale: color_scale,
+      reverseScale: reverse_scale,
+    } = this._value;
 
-    return { colorScale };
+    return { color_scale, reverse_scale };
   }
 
-  static fromJSON(type: string, value: HeatmapVisualizationConfigJSON = { color_scale: 'Viridis' }) {
-    const { color_scale: colorScale } = value;
+  static fromJSON(type: string, value: HeatmapVisualizationConfigJSON = { color_scale: 'Viridis', reverse_scale: false }) {
+    const {
+      color_scale: colorScale,
+      reverse_scale: reverseScale,
+    } = value;
 
-    return HeatmapVisualizationConfig.create(colorScale);
+    return HeatmapVisualizationConfig.create(colorScale, reverseScale);
   }
-
 }
 
 type BuilderState = Immutable.Map<string, any>;
@@ -100,9 +111,13 @@ class Builder {
     return new Builder(this.value.set('colorScale', value));
   }
 
-  build() {
-    const { colorScale } = this.value.toObject();
+  reverseScale(value: InternalState['reverseScale']) {
+    return new Builder(this.value.set('reverseScale', value));
+  }
 
-    return new HeatmapVisualizationConfig(colorScale);
+  build() {
+    const { colorScale, reverseScale } = this.value.toObject();
+
+    return new HeatmapVisualizationConfig(colorScale, reverseScale);
   }
 }

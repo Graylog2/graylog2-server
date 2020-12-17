@@ -39,7 +39,7 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _heatmapGenerateSeries = (type, name, x, y, z, idx, total, config, colorscale): ChartDefinition => {
+const _heatmapGenerateSeries = (type, name, x, y, z, idx, total, config, visualizationConfig): ChartDefinition => {
   const xAxisTitle = get(config, ['rowPivots', idx, 'field']);
   const yAxisTitle = get(config, ['columnPivots', idx, 'field']);
   const zSeriesTitles = _generateSeriesTitles(config, y, x);
@@ -54,11 +54,12 @@ const _heatmapGenerateSeries = (type, name, x, y, z, idx, total, config, colorsc
     text: zSeriesTitles,
     customdata: z,
     hovertemplate,
-    colorscale: colorscale,
+    colorscale: visualizationConfig.colorScale,
+    reversescale: visualizationConfig.reverseScale,
   };
 };
 
-const _generateSeries = (colorscale) => (type, name, x, y, z, idx, total, config) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, colorscale);
+const _generateSeries = (visualizationConfig) => (type, name, x, y, z, idx, total, config) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
 
 const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>) => {
   const defaultValue = 'None';
@@ -124,7 +125,7 @@ const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !==
 const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = data.chart || Object.values(data)[0];
-  const heatmapData = chartData(config, rows, 'heatmap', _generateSeries(visualizationConfig.colorScale), _formatSeries, _leafSourceMatcher);
+  const heatmapData = chartData(config, rows, 'heatmap', _generateSeries(visualizationConfig), _formatSeries, _leafSourceMatcher);
   const layout = _chartLayout(heatmapData);
 
   return (

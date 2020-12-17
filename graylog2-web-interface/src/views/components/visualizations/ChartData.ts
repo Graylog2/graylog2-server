@@ -39,6 +39,7 @@ export type ChartDefinition = {
   },
   customdata?: any,
   colorscale?: [number, string][],
+  reversescale?: boolean,
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];

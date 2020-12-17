@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
-import { capitalize } from 'lodash';
+
+import { Checkbox } from 'components/graylog';
 
 import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
@@ -30,15 +31,19 @@ const _makeOption = (value) => ({ label: value, value });
 const colorScalesOptions = COLORSCALES.map(_makeOption);
 
 const HeatmapVisualizationConfiguration = ({ config = HeatmapVisualizationConfig.empty(), onChange }: Props) => {
-  const _onChange = useCallback(({ value }) => onChange(config.toBuilder().colorScale(value).build()), [config, onChange]);
+  const _onColorScaleChange = useCallback(({ value }) => onChange(config.toBuilder().colorScale(value).build()), [config, onChange]);
+  const _onReverseScaleChange = useCallback((e) => onChange(config.toBuilder().reverseScale(e.target.checked).build()), [config, onChange]);
 
   return (
     <>
       <span>Color Scheme</span>
       <Select placeholder="Select Color Scheme"
-              onChange={_onChange}
+              onChange={_onColorScaleChange}
               options={colorScalesOptions}
               value={_makeOption(config.colorScale)} />
+      <span>Reverse Scale</span>
+      <Checkbox onChange={_onReverseScaleChange}
+                checked={config.reverseScale} />
     </>
   );
 };
