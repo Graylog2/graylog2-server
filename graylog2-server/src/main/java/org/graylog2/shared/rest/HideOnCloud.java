@@ -14,25 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.users.responses;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+package org.graylog2.shared.rest;
 
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@JsonAutoDetect
-@AutoValue
-@WithBeanGetter
-public abstract class TokenList {
-    @JsonProperty
-    public abstract List<TokenSummary> tokens();
-
-    @JsonCreator
-    public static TokenList create(@JsonProperty("tokens") List<TokenSummary> tokens) {
-        return new AutoValue_TokenList(tokens);
-    }
+/**
+ * Annotation to not bind a REST resource annotated with @Path in Graylog Cloud.
+ */
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HideOnCloud {
 }

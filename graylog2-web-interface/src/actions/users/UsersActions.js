@@ -46,6 +46,12 @@ export type Token = {
   last_access: string,
 };
 
+export type TokenSummary = {
+  id: string,
+  name: string,
+  last_access: string,
+};
+
 export type ChangePasswordRequest = {
   old_password: string,
   password: string,
@@ -59,11 +65,11 @@ export type ActionsType = {
   create: (user: UserCreate) => Promise<void>,
   load: (userId: string) => Promise<User>,
   loadByUsername: (username: string) => Promise<User>,
-  update: (userId: string, request: any) => Promise<void>,
+  update: (userId: string, request: any, fullName: string) => Promise<void>,
   delete: (userId: string, fullName: string) => Promise<void>,
   changePassword: (userId: string, request: ChangePasswordRequest) => Promise<void>,
   createToken: (userId: string, tokenName: string) => Promise<Token>,
-  loadTokens: (userId: string) => Promise<Token[]>,
+  loadTokens: (userId: string) => Promise<TokenSummary[]>,
   deleteToken: (userId: string, tokenId: string, tokenName: string) => Promise<void>,
   loadUsers: () => Promise<Immutable.List<User>>,
   loadUsersPaginated: (pagination: Pagination) => Promise<PaginatedUsers>,
