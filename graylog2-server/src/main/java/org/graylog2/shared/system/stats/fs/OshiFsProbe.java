@@ -98,7 +98,7 @@ public class OshiFsProbe implements FsProbe {
                     OSFileStore fileStore = it.getValue().getA();
                     return FsStats.Filesystem.create(it.getKey().toString(), fileStore.getMount(),
                             Optional.of(fileStore.getLogicalVolume()).orElse(fileStore.getVolume()),
-                            fileStore.getType(), null, fileStore.getTotalSpace(), fileStore.getUsableSpace(),
+                            fileStore.getDescription(), fileStore.getType(), fileStore.getTotalSpace(), fileStore.getUsableSpace(),
                             fileStore.getUsableSpace(), fileStore.getTotalSpace() - fileStore.getUsableSpace(),
                             (short) (((fileStore.getTotalSpace() - fileStore.getUsableSpace()) / fileStore.getTotalSpace()) * 100L),
                             fileStore.getTotalInodes(), fileStore.getFreeInodes(), fileStore.getTotalInodes() - fileStore.getFreeInodes(),
