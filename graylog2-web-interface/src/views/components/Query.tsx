@@ -180,13 +180,9 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
   }
 
   if (results) {
-    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
-
-    if (focusedWidget) {
-      const focusedContent = _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results) || content;
-
-      return (<>{focusedContent}</>);
-    }
+    const content = focusedWidget
+      ? _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results) || content
+      : _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
 
     return (<>{content}</>);
   }
