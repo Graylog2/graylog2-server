@@ -40,7 +40,6 @@ import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { TitlesMap } from 'views/stores/TitleTypes';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import Widget from './Widget';
 
@@ -219,9 +218,7 @@ describe('<Widget />', () => {
 
     );
     const { findByText } = render(
-      <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-        <UnknownWidget data={[]} />
-      </WidgetFocusContext.Provider>,
+      <UnknownWidget data={[]} />,
     );
 
     await findByText('Unknown widget');
@@ -234,19 +231,17 @@ describe('<Widget />', () => {
       .config({})
       .build();
     const UnknownWidget = (props) => (
-      <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-        <WidgetContext.Provider value={unknownWidget}>
-          <Widget widget={unknownWidget}
-                  editing
-                  id="widgetId"
-                  fields={[]}
-                  onPositionsChange={() => {}}
-                  onSizeChange={() => {}}
-                  title="Widget Title"
-                  position={new WidgetPosition(1, 1, 1, 1)}
-                  {...props} />
-        </WidgetContext.Provider>
-      </WidgetFocusContext.Provider>
+      <WidgetContext.Provider value={unknownWidget}>
+        <Widget widget={unknownWidget}
+                editing
+                id="widgetId"
+                fields={[]}
+                onPositionsChange={() => {}}
+                onSizeChange={() => {}}
+                title="Widget Title"
+                position={new WidgetPosition(1, 1, 1, 1)}
+                {...props} />
+      </WidgetContext.Provider>
     );
     const { findByText } = render(
       <UnknownWidget data={[]} />,

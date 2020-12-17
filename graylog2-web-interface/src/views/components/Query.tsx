@@ -58,59 +58,69 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderFocusedWidget = (widget, titles, data, errors, fields) => {
-  const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
+const _getDataAndErrors = (widget, widgetMapping, results) => {
+  const { searchTypes } = results;
+  const widgetType = widgetDefinition(widget.type);
+  const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
+  const searchTypeIds = (widgetMapping[widget.id] || []);
+  const widgetData = searchTypeIds.map((searchTypeId) => searchTypes[searchTypeId]).filter((result) => result);
+  const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
+  let error;
 
-  return (
-    <WidgetContainer>
-      <WidgetComponent widget={widget}
-                       widgetId={widget.id}
-                       data={data}
-                       errors={errors}
-                       widgetDimension={{ height: 100, width: 200 }}
-                       title={title}
-                       position={WidgetPosition.builder().build()}
-                       fields={fields} />
-    </WidgetContainer>
-  );
+  const data = dataTransformer(widgetData, widget);
+
+  if (widgetErrors && widgetErrors.length > 0) {
+    error = widgetErrors;
+  }
+
+  if (!widgetData || widgetData.length === 0) {
+    const queryErrors = results.errors.filter((e) => e.type === 'query');
+
+    if (queryErrors.length > 0) {
+      error = error ? [].concat(error, queryErrors) : queryErrors;
+    }
+  }
+
+  return { widgetData: data, error };
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget, titles) => {
+const _renderFocusedWidget = (focusedWidget, widgetDefs, titles, widgetMapping, fields, results) => {
+  const widget = widgetDefs.find((w) => w.id === focusedWidget);
+
+  if (widget) {
+    const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
+    const { widgetData, error } = _getDataAndErrors(widget, widgetMapping, results);
+    const data = { [widget.id]: widgetData };
+    const errors = { [widget.id]: error };
+
+    return (
+      <WidgetContainer>
+        <WidgetComponent widget={widget}
+                         widgetId={widget.id}
+                         data={data}
+                         errors={errors}
+                         widgetDimension={{ height: 100, width: 200 }}
+                         title={title}
+                         position={WidgetPosition.builder().build()}
+                         fields={fields} />
+      </WidgetContainer>
+    );
+  }
+};
+
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields) => {
   const widgets = {};
   const data = {};
   const errors = {};
-  const { searchTypes } = results;
 
   widgetDefs.forEach((widget) => {
-    const widgetType = widgetDefinition(widget.type);
-    const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
-    const searchTypeIds = (widgetMapping[widget.id] || []);
-    const widgetData = searchTypeIds.map((searchTypeId) => searchTypes[searchTypeId]).filter((result) => result);
-    const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
-
     widgets[widget.id] = widget;
-    data[widget.id] = dataTransformer(widgetData, widget);
 
-    if (widgetErrors && widgetErrors.length > 0) {
-      errors[widget.id] = widgetErrors;
-    }
+    const { widgetData, error } = _getDataAndErrors(widget, widgetMapping, results);
 
-    if (!widgetData || widgetData.length === 0) {
-      const queryErrors = results.errors.filter((e) => e.type === 'query');
-
-      if (queryErrors.length > 0) {
-        errors[widget.id] = errors[widget.id] ? [].concat(errors[widget.id], queryErrors) : queryErrors;
-      }
-    }
+    data[widget.id] = widgetData;
+    errors[widget.id] = error;
   });
-
-  if (focusedWidget) {
-    const widget = widgets[focusedWidget];
-
-    if (widget) {
-      return _renderFocusedWidget(widget, titles, data, errors, fields);
-    }
-  }
 
   return (
     <InteractiveContext.Consumer>
@@ -168,17 +178,9 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
   }
 
   if (results) {
-    const content = _renderWidgetGrid(
-      widgets,
-      widgetMapping.toJS(),
-      results,
-      positions,
-      queryId,
-      fields,
-      allFields,
-      focusedWidget,
-      titles,
-    );
+    const content = focusedWidget
+      ? _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results)
+      : _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
 
     return (<>{content}</>);
   }
