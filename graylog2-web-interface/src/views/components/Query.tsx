@@ -181,7 +181,7 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
 
   if (results) {
     const content = focusedWidget
-      ? _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results) || content
+      ? _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results)
       : _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
 
     return (<>{content}</>);
