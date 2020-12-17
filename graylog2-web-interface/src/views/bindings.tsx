@@ -79,6 +79,7 @@ import {
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -338,6 +339,10 @@ export default {
     {
       type: NumberVisualization.type,
       component: NumberVisualizationConfiguration,
+    },
+    {
+      type: HeatmapVisualization.type,
+      component: HeatmapVisualizationConfiguration,
     },
   ],
   creators: [
