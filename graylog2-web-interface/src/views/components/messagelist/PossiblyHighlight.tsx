@@ -57,7 +57,7 @@ function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
 const shouldBeFormatted = (field, value) => isFunction(field) && isNumeric(value);
 
 const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {}, theme }: Props) => {
-  if (value === undefined || value == null) {
+  if (value === undefined || value === null) {
     return '';
   }
 
