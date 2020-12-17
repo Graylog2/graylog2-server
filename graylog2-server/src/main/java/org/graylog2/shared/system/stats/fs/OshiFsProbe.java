@@ -67,7 +67,7 @@ public class OshiFsProbe implements FsProbe {
 
         for (Path location : locations) {
             Path path = location.toAbsolutePath();
-            oshiFileSystems.put(location,
+            oshiFileSystems.put(path,
                     fs.getFileStores().stream()
                             .filter(it -> path.startsWith(it.getMount()))
                             // We want the mountpoint closest to our location
