@@ -43,58 +43,155 @@ export const COLORSCALES = ['Greys', 'YlGnBu', 'Greens', 'YlOrRd', 'Bluered', 'R
 type InternalState = {
   colorScale: ColorScale;
   reverseScale: boolean;
+  autoScale: boolean,
+  zMin: number | undefined | null,
+  zMid: number | undefined | null,
+  zMax: number | undefined | null,
+  defaultValue: number | undefined | null,
 };
 
 export type HeatmapVisualizationConfigJSON = {
   color_scale: ColorScale;
   reverse_scale: boolean;
+  auto_scale: boolean,
+  z_min: number | undefined | null,
+  z_mid: number | undefined | null,
+  z_max: number | undefined | null,
+  default_value: number | undefined | null,
 }
 
 export default class HeatmapVisualizationConfig extends VisualizationConfig {
   private readonly _value: InternalState;
 
-  constructor(colorScale: InternalState['colorScale'], reverseScale: InternalState['reverseScale']) {
+  constructor(
+    colorScale: InternalState['colorScale'],
+    reverseScale: InternalState['reverseScale'],
+    autoScale: InternalState['autoScale'],
+    zMin: InternalState['zMin'],
+    zMid: InternalState['zMid'],
+    zMax: InternalState['zMax'],
+    defaultValue: InternalState['defaultValue'],
+  ) {
     super();
 
-    this._value = { colorScale, reverseScale };
+    this._value = {
+      colorScale,
+      reverseScale,
+      autoScale,
+      zMax,
+      zMid,
+      zMin,
+      defaultValue,
+    };
   }
 
   get colorScale() {
     return this._value.colorScale;
   }
 
-  get reverseScale () {
+  get reverseScale() {
     return this._value.reverseScale;
   }
 
+  get autoScale() {
+    return this._value.autoScale;
+  }
+
+  get zMin() {
+    return this._value.zMin;
+  }
+
+  get zMid() {
+    return this._value.zMid;
+  }
+
+  get zMax() {
+    return this._value.zMax;
+  }
+
+  get defaultValue() {
+    return this._value.defaultValue;
+  }
+
   toBuilder() {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(colorScale: InternalState['colorScale'], reverseScale: InternalState['reverseScale']) {
-    return new HeatmapVisualizationConfig(colorScale, reverseScale);
+  static create(
+    colorScale: InternalState['colorScale'],
+    reverseScale: InternalState['reverseScale'],
+    autoScale: InternalState['autoScale'],
+    zMin: InternalState['zMin'],
+    zMid: InternalState['zMid'],
+    zMax: InternalState['zMax'],
+    defaultValue: InternalState['defaultValue'],
+  ) {
+    return new HeatmapVisualizationConfig(
+      colorScale,
+      reverseScale,
+      autoScale,
+      zMin,
+      zMid,
+      zMax,
+      defaultValue,
+    );
   }
 
   static empty() {
-    return new HeatmapVisualizationConfig('Viridis', false);
+    return new HeatmapVisualizationConfig(
+      'Viridis',
+      false,
+      true,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    );
   }
 
   toJSON(): HeatmapVisualizationConfigJSON {
     const {
       colorScale: color_scale,
       reverseScale: reverse_scale,
+      autoScale: auto_scale,
+      zMin: z_min,
+      zMid: z_mid,
+      zMax: z_max,
+      defaultValue: default_value,
     } = this._value;
 
-    return { color_scale, reverse_scale };
+    return {
+      color_scale,
+      reverse_scale,
+      auto_scale,
+      z_min,
+      z_mid,
+      z_max,
+      default_value,
+    };
   }
 
-  static fromJSON(type: string, value: HeatmapVisualizationConfigJSON = { color_scale: 'Viridis', reverse_scale: false }) {
+  static fromJSON(type: string, value: HeatmapVisualizationConfigJSON = {
+    color_scale: 'Viridis',
+    reverse_scale: false,
+    auto_scale: true,
+    z_min: undefined,
+    z_mid: undefined,
+    z_max: undefined,
+    default_value: undefined,
+  }) {
     const {
       color_scale: colorScale,
       reverse_scale: reverseScale,
+      auto_scale: autoScale,
+      z_min: zMin,
+      z_mid: zMid,
+      z_max: zMax,
+      default_value: defaultValue,
     } = value;
 
-    return HeatmapVisualizationConfig.create(colorScale, reverseScale);
+    return HeatmapVisualizationConfig.create(colorScale, reverseScale, autoScale, zMin, zMid, zMax, defaultValue);
   }
 }
 
@@ -115,9 +212,37 @@ class Builder {
     return new Builder(this.value.set('reverseScale', value));
   }
 
-  build() {
-    const { colorScale, reverseScale } = this.value.toObject();
+  autoScale(value: InternalState['autoScale']) {
+    return new Builder(this.value.set('autoScale', value));
+  }
 
-    return new HeatmapVisualizationConfig(colorScale, reverseScale);
+  zMin(value: InternalState['zMin']) {
+    return new Builder(this.value.set('zMin', value));
+  }
+
+  zMid(value: InternalState['zMid']) {
+    return new Builder(this.value.set('zMid', value));
+  }
+
+  zMax(value: InternalState['zMax']) {
+    return new Builder(this.value.set('zMax', value));
+  }
+
+  defaultValue(value: InternalState['defaultValue']) {
+    return new Builder(this.value.set('defaultValue', value));
+  }
+
+  build() {
+    const {
+      colorScale,
+      reverseScale,
+      autoScale,
+      zMin,
+      zMid,
+      zMax,
+      defaultValue,
+    } = this.value.toObject();
+
+    return new HeatmapVisualizationConfig(colorScale, reverseScale, autoScale, zMin, zMid, zMax, defaultValue);
   }
 }
