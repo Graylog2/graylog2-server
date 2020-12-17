@@ -25,8 +25,6 @@ import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
-import WidgetFocusContext from './contexts/WidgetFocusContext';
-
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: jest.fn(() => Promise.resolve()),
@@ -85,9 +83,7 @@ describe('SearchResult', () => {
 
   it('should show spinner with undefined fields', () => {
     const { getByText } = render(
-      <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
-        <SearchResult />
-      </WidgetFocusContext.Provider>,
+      <SearchResult />,
     );
 
     act(() => jest.advanceTimersByTime(200));
