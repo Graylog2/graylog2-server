@@ -58,6 +58,23 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
+const _renderFocusedWidget = (widget, titles, data, errors, fields) => {
+  const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
+
+  return (
+    <WidgetContainer>
+      <WidgetComponent widget={widget}
+                       widgetId={widget.id}
+                       data={data}
+                       errors={errors}
+                       widgetDimension={{ height: 100, width: 200 }}
+                       title={title}
+                       position={WidgetPosition.builder().build()}
+                       fields={fields} />
+    </WidgetContainer>
+  );
+};
+
 const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, focusedWidget, titles) => {
   const widgets = {};
   const data = {};
@@ -91,20 +108,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
     const widget = widgets[focusedWidget];
 
     if (widget) {
-      const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
-
-      return (
-        <WidgetContainer>
-          <WidgetComponent widget={widget}
-                           widgetId={widget.id}
-                           data={data}
-                           errors={errors}
-                           widgetDimension={{ height: 100, width: 200 }}
-                           title={title}
-                           position={WidgetPosition.builder().build()}
-                           fields={fields} />
-        </WidgetContainer>
-      );
+      return _renderFocusedWidget(widget, titles, data, errors, fields);
     }
   }
 
