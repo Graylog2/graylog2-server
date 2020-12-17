@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState } from 'react';
+import { useContext, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import type { ActionDefinition } from './ActionHandler';
 import { createHandlerFor } from './ActionHandler';
@@ -56,15 +56,16 @@ const FieldElement = styled.span.attrs({
 const FieldActions = ({ children, disabled, element, menuContainer, name, type, queryId }: Props) => {
   const actionContext = useContext(ActionContext);
   const { setFocusedWidget } = useContext(WidgetFocusContext);
+  const allFieldActions = usePluginEntities('fieldActions');
 
   const [open, setOpen] = useState(false);
   const [overflowingComponents, setOverflowingComponents] = useState({});
 
-  const _onMenuToggle = () => setOpen(!open);
+  const _onMenuToggle = useCallback(() => setOpen(!open), [open]);
 
   const wrappedElement = <FieldElement active={open} disabled={disabled}>{element}</FieldElement>;
   const handlerArgs = { queryId, field: name, type, contexts: actionContext };
-  const fieldActions: Array<ActionDefinition> = PluginStore.exports('fieldActions')
+  const fieldActions = allFieldActions
     .filter((action: ActionDefinition) => {
       const { isHidden = () => false } = action;
 
