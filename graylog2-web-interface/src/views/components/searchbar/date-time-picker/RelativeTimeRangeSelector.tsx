@@ -24,6 +24,8 @@ import Input from 'components/bootstrap/Input';
 import { Icon, Select } from 'components/common';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
+import ConfiguredRelativeTimeRangeSelector from './ConfiguredRelativeTimeRangeSelector';
+
 type Props = {
   disabled: boolean,
   originalTimeRange: {
@@ -54,6 +56,7 @@ const RANGE_TYPES = [
 const RelativeWrapper = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: space-around;
 `;
 
@@ -134,122 +137,134 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
 
   return null;
 }).filter(Boolean);
+const getFromValue = (value: number, originalTimeRange) => RANGE_TYPES.map(({ type }) => {
+  const isAllTime = value === 0;
+  const diff = moment.duration(value, 'seconds').as(type);
+
+  if (diff - Math.floor(diff) === 0) {
+    return {
+      ...originalTimeRange,
+      rangeValue: diff || 0,
+      rangeType: isAllTime ? 'seconds' : type,
+      rangeAllTime: isAllTime,
+      range: value,
+    };
+  }
+
+  return null;
+}).filter(Boolean).pop();
 
 const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
   return (
-    <RelativeWrapper>
-      <Field name="nextTimeRange.range">
-        {({ field: { value, onChange, name }, meta: { error } }) => {
-          const fromValue = RANGE_TYPES.map(({ type }) => {
-            const isAllTime = value === 0;
-            const diff = moment.duration(value, 'seconds').as(type);
+    <>
+      <RelativeWrapper>
+        <Field name="nextTimeRange.range">
+          {({ field: { value, onChange, name }, meta: { error } }) => {
+            const fromValue = getFromValue(value, originalTimeRange);
 
-            if (diff - Math.floor(diff) === 0) {
-              return {
-                ...originalTimeRange,
-                rangeValue: diff || 0,
-                rangeType: isAllTime ? 'seconds' : type,
-                rangeAllTime: isAllTime,
-                range: value,
-              };
-            }
+            const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
 
-            return null;
-          }).filter(Boolean).pop();
+            const _onChangeTime = (event) => {
+              const newTimeValue = moment.duration(event.target.value || 1, fromValue.rangeType).asSeconds();
 
-          const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
+              _onChange(newTimeValue);
+            };
 
-          const _onChangeTime = (event) => {
-            const newTimeValue = moment.duration(event.target.value || 1, fromValue.rangeType).asSeconds();
+            const _onChangeType = (type) => {
+              const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
+              _onChange(newTimeValue);
+            };
 
-            _onChange(newTimeValue);
-          };
+            const _onCheckAllTime = (event) => {
+              const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
 
-          const _onChangeType = (type) => {
-            const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
+              _onChange(event.target.checked ? 0 : notAllTime);
+            };
 
-            _onChange(newTimeValue);
-          };
+            const _onChangeExisting = (range) => {
+              const newFromValue = getFromValue(range, originalTimeRange);
 
-          const _onCheckAllTime = (event) => {
-            const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
+              _onChange(newFromValue.range);
+            };
 
-            _onChange(event.target.checked ? 0 : notAllTime);
-          };
+            return (
 
-          return (
-            <RangeWrapper>
-              <RangeTitle>From:</RangeTitle>
-              <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
-                <input type="checkbox"
-                       id="relative-all-time"
-                       value="0"
-                       checked={fromValue.rangeAllTime}
-                       onChange={_onCheckAllTime}
-                       disabled={limitDuration !== 0} />All Time
-              </RangeCheck>
-              <InputWrap>
-                <Input id="relative-timerange-from-value"
-                       name="relative-timerange-from-value"
-                       disabled={disabled || fromValue.rangeAllTime}
-                       type="number"
-                       min="1"
-                       value={fromValue.rangeValue}
-                       title="Set the range value"
-                       onChange={_onChangeTime}
-                       bsStyle={error ? 'error' : null} />
-              </InputWrap>
-              <StyledSelect id="relative-timerange-from-length"
-                            name="relative-timerange-from-length"
-                            disabled={disabled || fromValue.rangeAllTime}
-                            value={fromValue.rangeType}
-                            options={availableRangeTypes}
-                            placeholder="Select a range length"
-                            onChange={_onChangeType}
-                            clearable={false} />
+              <>
+                <ConfiguredRelativeTimeRangeSelector onChange={_onChangeExisting} />
+                <RangeWrapper>
+                  <RangeTitle>From:</RangeTitle>
+                  <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
+                    <input type="checkbox"
+                           id="relative-all-time"
+                           value="0"
+                           checked={fromValue.rangeAllTime}
+                           onChange={_onCheckAllTime}
+                           disabled={limitDuration !== 0} />All Time
+                  </RangeCheck>
+                  <InputWrap>
+                    <Input id="relative-timerange-from-value"
+                           name="relative-timerange-from-value"
+                           disabled={disabled || fromValue.rangeAllTime}
+                           type="number"
+                           min="1"
+                           value={fromValue.rangeValue}
+                           title="Set the range value"
+                           onChange={_onChangeTime}
+                           bsStyle={error ? 'error' : null} />
+                  </InputWrap>
+                  <StyledSelect id="relative-timerange-from-length"
+                                name="relative-timerange-from-length"
+                                disabled={disabled || fromValue.rangeAllTime}
+                                value={fromValue.rangeType}
+                                options={availableRangeTypes}
+                                placeholder="Select a range length"
+                                onChange={_onChangeType}
+                                clearable={false} />
 
-              <Ago />
-              {error && (
-                <ErrorMessage>
-                  Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
-                </ErrorMessage>
-              )}
-            </RangeWrapper>
-          );
-        }}
-      </Field>
+                  <Ago />
+                  {error && (
+                  <ErrorMessage>
+                    Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
+                  </ErrorMessage>
+                  )}
+                </RangeWrapper>
+              </>
+            );
+          } }
+        </Field>
 
-      <StyledIcon name="arrow-right" />
+        <StyledIcon name="arrow-right" />
 
-      <RangeWrapper>
-        <RangeTitle>Until:</RangeTitle>
-        <RangeCheck htmlFor="relative-offset">
-          <input type="checkbox" id="relative-offset" checked disabled />Now
-        </RangeCheck>
+        <RangeWrapper>
+          <RangeTitle>Until:</RangeTitle>
+          <RangeCheck htmlFor="relative-offset">
+            <input type="checkbox" id="relative-offset" checked disabled />Now
+          </RangeCheck>
 
-        <InputWrap>
-          <Input id="relative-timerange-until-value"
-                 disabled
-                 type="number"
-                 value="0"
-                 min="1"
-                 title="Set the offset value"
-                 name="relative-timerange-until-value"
-                 onChange={() => {}} />
-        </InputWrap>
+          <InputWrap>
+            <Input id="relative-timerange-until-value"
+                   disabled
+                   type="number"
+                   value="0"
+                   min="1"
+                   title="Set the offset value"
+                   name="relative-timerange-until-value"
+                   onChange={() => { }} />
+          </InputWrap>
 
-        <StyledSelect id="relative-timerange-until-length"
-                      disabled
-                      value={RANGE_TYPES[0].type}
-                      options={availableRangeTypes}
-                      placeholder="Select an offset"
-                      name="relative-timerange-until-length"
-                      onChange={() => {}} />
-        <Ago />
-      </RangeWrapper>
-    </RelativeWrapper>
+          <StyledSelect id="relative-timerange-until-length"
+                        disabled
+                        value={RANGE_TYPES[0].type}
+                        options={availableRangeTypes}
+                        placeholder="Select an offset"
+                        name="relative-timerange-until-length"
+                        onChange={() => { }} />
+          <Ago />
+        </RangeWrapper>
+      </RelativeWrapper>
+    </>
   );
 };
 
