@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render } from 'wrappedTestingLibrary';
 
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 
 import CustomHighlighting from './CustomHighlighting';
 
@@ -48,59 +49,71 @@ describe('CustomHighlighting', () => {
     </HighlightingRulesContext.Provider>
   );
 
-  it('renders value when HighlightingRulesContext is not provided', () => {
-    const wrapper = mount(<SimpleCustomHighlighting />);
+  it('renders value when HighlightingRulesContext is not provided', async () => {
+    const { findByText } = render(<SimpleCustomHighlighting />);
 
-    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
+    const elem = await findByText('42');
+
+    expect(elem).not.toHaveStyleRule('background-color');
   });
 
-  it('renders value as is when no rules exist', () => {
-    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[]} />);
+  it('renders value as is when no rules exist', async () => {
+    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[]} />);
 
-    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
+    const elem = await findByText('42');
+
+    expect(elem).not.toHaveStyleRule('background-color');
   });
 
-  it('renders value as is when no rule for this field exists', () => {
+  it('renders value as is when no rule for this field exists', async () => {
     const rule = HighlightingRule.builder()
       .field('bar')
       .value(String(value))
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
+    const elem = await findByText('42');
+
+    expect(elem).not.toHaveStyleRule('background-color');
   });
 
-  it('renders highlighted value if rule for value exists', () => {
+  it('renders highlighted value if rule for value exists', async () => {
     const rule = HighlightingRule.builder()
       .field(field)
       .value(String(value))
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
+    const elem = await findByText('42');
+
+    expect(elem).toHaveStyle('background-color: rgb(188, 152, 253)');
   });
 
-  it('does not render highlight if rule value only matches substring', () => {
+  it('does not render highlight if rule value only matches substring', async () => {
     const rule = HighlightingRule.builder()
       .field(field)
       .value('2')
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
+    const elem = await findByText('42');
+
+    expect(elem).not.toHaveStyleRule('background-color');
   });
 
-  it('does not render highlight if rule value does not match', () => {
+  it('does not render highlight if rule value does not match', async () => {
     const rule = HighlightingRule.builder()
       .field(field)
       .value('23')
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
+    const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
-    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
+    const elem = await findByText('42');
+
+    expect(elem).not.toHaveStyleRule('background-color');
   });
 });
