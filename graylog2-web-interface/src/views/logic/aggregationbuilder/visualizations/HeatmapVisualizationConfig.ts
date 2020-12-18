@@ -45,7 +45,6 @@ type InternalState = {
   reverseScale: boolean;
   autoScale: boolean,
   zMin: number | undefined | null,
-  zMid: number | undefined | null,
   zMax: number | undefined | null,
   defaultValue: number | undefined | null,
 };
@@ -55,7 +54,6 @@ export type HeatmapVisualizationConfigJSON = {
   reverse_scale: boolean;
   auto_scale: boolean,
   z_min: number | undefined | null,
-  z_mid: number | undefined | null,
   z_max: number | undefined | null,
   default_value: number | undefined | null,
 }
@@ -68,7 +66,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     reverseScale: InternalState['reverseScale'],
     autoScale: InternalState['autoScale'],
     zMin: InternalState['zMin'],
-    zMid: InternalState['zMid'],
     zMax: InternalState['zMax'],
     defaultValue: InternalState['defaultValue'],
   ) {
@@ -79,7 +76,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       reverseScale,
       autoScale,
       zMax,
-      zMid,
       zMin,
       defaultValue,
     };
@@ -101,10 +97,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     return this._value.zMin;
   }
 
-  get zMid() {
-    return this._value.zMid;
-  }
-
   get zMax() {
     return this._value.zMax;
   }
@@ -123,7 +115,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     reverseScale: InternalState['reverseScale'],
     autoScale: InternalState['autoScale'],
     zMin: InternalState['zMin'],
-    zMid: InternalState['zMid'],
     zMax: InternalState['zMax'],
     defaultValue: InternalState['defaultValue'],
   ) {
@@ -132,7 +123,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       reverseScale,
       autoScale,
       zMin,
-      zMid,
       zMax,
       defaultValue,
     );
@@ -146,7 +136,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       undefined,
       undefined,
       undefined,
-      undefined,
     );
   }
 
@@ -156,7 +145,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       reverseScale: reverse_scale,
       autoScale: auto_scale,
       zMin: z_min,
-      zMid: z_mid,
       zMax: z_max,
       defaultValue: default_value,
     } = this._value;
@@ -166,7 +154,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       reverse_scale,
       auto_scale,
       z_min,
-      z_mid,
       z_max,
       default_value,
     };
@@ -177,7 +164,6 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     reverse_scale: false,
     auto_scale: true,
     z_min: undefined,
-    z_mid: undefined,
     z_max: undefined,
     default_value: undefined,
   }) {
@@ -186,12 +172,11 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       reverse_scale: reverseScale,
       auto_scale: autoScale,
       z_min: zMin,
-      z_mid: zMid,
       z_max: zMax,
       default_value: defaultValue,
     } = value;
 
-    return HeatmapVisualizationConfig.create(colorScale, reverseScale, autoScale, zMin, zMid, zMax, defaultValue);
+    return HeatmapVisualizationConfig.create(colorScale, reverseScale, autoScale, zMin, zMax, defaultValue);
   }
 }
 
@@ -220,10 +205,6 @@ class Builder {
     return new Builder(this.value.set('zMin', value));
   }
 
-  zMid(value: InternalState['zMid']) {
-    return new Builder(this.value.set('zMid', value));
-  }
-
   zMax(value: InternalState['zMax']) {
     return new Builder(this.value.set('zMax', value));
   }
@@ -238,11 +219,10 @@ class Builder {
       reverseScale,
       autoScale,
       zMin,
-      zMid,
       zMax,
       defaultValue,
     } = this.value.toObject();
 
-    return new HeatmapVisualizationConfig(colorScale, reverseScale, autoScale, zMin, zMid, zMax, defaultValue);
+    return new HeatmapVisualizationConfig(colorScale, reverseScale, autoScale, zMin, zMax, defaultValue);
   }
 }
