@@ -26,14 +26,10 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.UserManagementService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
 public class UserManagementServiceImpl extends UserServiceImpl implements UserManagementService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(UserManagementServiceImpl.class);
 
     @Inject
     public UserManagementServiceImpl(final MongoConnection mongoConnection,
