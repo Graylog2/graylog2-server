@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Panel } from 'components/graylog';
+import Panel from './Panel';
 
 const Accordion = ({ children, name }) => {
   if (!name) {

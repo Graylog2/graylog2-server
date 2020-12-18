@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { PanelGroup } from 'components/graylog';
+import { PanelGroup } from 'components/graylog/bootstrap-import';
 
 const AccordionGroup = ({ children, ...restProps }) => {
   return (
