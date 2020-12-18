@@ -179,11 +179,13 @@ class Widget extends React.Component<Props, State> {
     }
   };
 
-  _onDuplicate = (widgetId) => {
+  _onDuplicate = (widgetId, setFocusWidget) => {
     const { title } = this.props;
 
     WidgetActions.duplicate(widgetId).then((newWidget) => {
-      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`);
+      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
+        setFocusWidget(undefined);
+      });
     });
   };
 
@@ -393,7 +395,7 @@ class Widget extends React.Component<Props, State> {
                     )}
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                      <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
                       {type === MessagesWidget.type && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
