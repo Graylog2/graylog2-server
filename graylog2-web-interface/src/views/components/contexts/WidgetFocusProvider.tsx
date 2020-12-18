@@ -15,13 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
+import { useStore } from 'stores/connect';
+import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const [focusedWidget, setFocusedWidget] = useState(undefined);
+  const widgets = useStore(WidgetStore);
+
+  useEffect(() => {
+    if (focusedWidget && !widgets.has(focusedWidget)) {
+      setFocusedWidget(undefined);
+    }
+  }, [focusedWidget, widgets]);
 
   const updateFocus = (widgetId: string | undefined | null) => (
     widgetId === focusedWidget
