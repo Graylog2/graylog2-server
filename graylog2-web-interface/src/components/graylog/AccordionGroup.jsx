@@ -14,24 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 
-class BootstrapAccordion extends React.Component {
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-  };
+import { PanelGroup } from 'components/graylog';
 
-  render() {
-    return (
-      <div id="bundles" className="panel-group">
-        {this.props.children}
-      </div>
-    );
-  }
-}
+const AccordionGroup = ({ children, ...restProps }) => {
+  return (
+    <PanelGroup {...restProps} accordion>
+      {children}
+    </PanelGroup>
+  );
+};
 
-export default BootstrapAccordion;
+AccordionGroup.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element,
+  ]).isRequired,
+};
+
+export default AccordionGroup;
