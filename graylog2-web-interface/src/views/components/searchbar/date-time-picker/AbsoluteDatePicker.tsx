@@ -22,7 +22,7 @@ import moment from 'moment';
 import { DatePicker } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
-const AbsoluteDatePicker = ({ name, disabled, value, dateTime, onChange, startDate }) => {
+const AbsoluteDatePicker = ({ name, disabled, dateTime, onChange, startDate }) => {
   const initialDateTime = moment(dateTime).toObject();
 
   const _onDatePicked = (date) => {
@@ -44,7 +44,7 @@ const AbsoluteDatePicker = ({ name, disabled, value, dateTime, onChange, startDa
     <DatePicker id={`date-input-datepicker-${name}`}
                 disabled={disabled}
                 title={`Search ${name} date`}
-                date={value}
+                date={dateTime}
                 onChange={_onDatePicked}
                 fromDate={startDate} />
   );
@@ -54,14 +54,12 @@ AbsoluteDatePicker.propTypes = {
   name: PropTypes.string.isRequired,
   dateTime: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
-  value: PropTypes.string,
   onChange: PropTypes.func,
   startDate: PropTypes.instanceOf(Date).isRequired,
 };
 
 AbsoluteDatePicker.defaultProps = {
   disabled: false,
-  value: undefined,
   onChange: () => {},
 };
 

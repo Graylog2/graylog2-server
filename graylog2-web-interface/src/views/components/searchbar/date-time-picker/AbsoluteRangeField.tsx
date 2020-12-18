@@ -21,6 +21,8 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
+// import { ExpandableList, ExpandableListItem, Icon } from 'components/common';
+import { Accordion, AccordionGroup } from 'components/graylog';
 
 import AbsoluteDateInput from './AbsoluteDateInput';
 import AbsoluteDatePicker from './AbsoluteDatePicker';
@@ -33,6 +35,10 @@ type Props = {
   originalTimeRange: TimeRange,
   limitDuration?: number,
 };
+
+const StyledAccordionGroup = styled(AccordionGroup)`
+  width: 100%;
+`;
 
 const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
@@ -57,21 +63,26 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
 
         return (
           <>
-            <AbsoluteDateInput name={name}
-                               disabled={disabled}
-                               value={value}
-                               onChange={_onChange} />
+            <StyledAccordionGroup>
+              <Accordion name="Text Input">
+                <AbsoluteDateInput name={name}
+                                   disabled={disabled}
+                                   value={dateTime}
+                                   onChange={_onChange} />
+              </Accordion>
 
-            <AbsoluteDatePicker name={name}
-                                disabled={disabled}
-                                value={value}
-                                onChange={_onChange}
-                                startDate={startDate}
-                                dateTime={dateTime} />
+              <Accordion name="Calendar Input">
+                <AbsoluteDatePicker name={name}
+                                    disabled={disabled}
+                                    onChange={_onChange}
+                                    startDate={startDate}
+                                    dateTime={dateTime} />
 
-            <AbsoluteTimeInput onChange={_onChange}
-                               range={range}
-                               dateTime={dateTime} />
+                <AbsoluteTimeInput onChange={_onChange}
+                                   range={range}
+                                   dateTime={dateTime} />
+              </Accordion>
+            </StyledAccordionGroup>
 
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </>
