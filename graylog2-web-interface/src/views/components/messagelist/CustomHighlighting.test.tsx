@@ -21,7 +21,6 @@ import HighlightingRulesContext from 'views/components/contexts/HighlightingRule
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 
 import CustomHighlighting from './CustomHighlighting';
 
