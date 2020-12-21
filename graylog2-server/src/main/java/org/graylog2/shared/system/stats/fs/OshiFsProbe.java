@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.shared.system.stats.OshiService;
@@ -73,14 +74,10 @@ public class OshiFsProbe implements FsProbe {
                             // We want the mountpoint closest to our location
                             .max(Comparator.comparingInt(p -> Paths.get(p.getMount()).getNameCount()))
                             .map(it -> {
-                                //Search for the diskstore with the partition of our mountpoint
+                                //Search for the diskstore with the logical volume or volume name
                                 return new Pair<>(it, hardware.getDiskStores().stream()
-                                        .filter(ds -> ds.getPartitions().stream().anyMatch(part -> path.startsWith(part.getMountPoint())))
-                                        .max(Comparator.comparingInt(ds -> ds.getPartitions().stream()
-                                                .filter(part -> path.startsWith(part.getMountPoint()))
-                                                .mapToInt(part -> Paths.get(part.getMountPoint()).getNameCount())
-                                                .max().orElse(0)))
-                                        .orElse(generateDummyDiskStore()));
+                                        .filter(ds -> ds.getName().equals(StringUtils.defaultIfEmpty(it.getLogicalVolume(), it.getVolume())))
+                                        .findFirst().orElse(generateDummyDiskStore()));
                             }).orElse(new Pair<>(generateDummyFileStore(), generateDummyDiskStore())));
         }
     }
