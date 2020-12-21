@@ -16,21 +16,24 @@
  */
 package org.graylog2.shared.system.stats.network;
 
+import org.apache.logging.log4j.util.Strings;
 import org.graylog2.shared.system.stats.OshiService;
+import org.graylog2.utilities.IpSubnet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import oshi.hardware.NetworkIF;
 import oshi.software.os.InternetProtocolStats;
+import oshi.software.os.NetworkParams;
 
 import javax.inject.Inject;
-import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.nullToEmpty;
-
 public class OshiNetworkProbe implements NetworkProbe {
+    private static final Logger LOG = LoggerFactory.getLogger(OshiNetworkProbe.class);
 
     private final OshiService service;
 
@@ -42,25 +45,26 @@ public class OshiNetworkProbe implements NetworkProbe {
 
     @Override
     public NetworkStats networkStats() {
-        final String localAddress;
-        String localAddress1;
-        try {
-            localAddress1 = nullToEmpty(InetAddress.getLocalHost().getHostAddress());
-        } catch (UnknownHostException e) {
-            localAddress1 = "0.0.0.0";
-        }
-        localAddress = localAddress1;
         String primaryInterface = "";
 
+        final NetworkParams networkParams = service.getOs().getNetworkParams();
+        final String defaultGateway = networkParams.getIpv4DefaultGateway();
 
         Map<String, NetworkStats.Interface> ifaces = new HashMap<>();
         for (NetworkIF it : service.getHal().getNetworkIFs()) {
-            for (InterfaceAddress that : it.queryNetworkInterface().getInterfaceAddresses()) {
-                if (localAddress.equalsIgnoreCase(that.getAddress().getHostAddress())) {
-                    primaryInterface = it.getName();
-                    break;
+            if (Strings.isNotBlank(defaultGateway)) {
+                for (InterfaceAddress that : it.queryNetworkInterface().getInterfaceAddresses()) {
+                    try {
+                        final IpSubnet ipSubnet = new IpSubnet(that.getAddress().getHostAddress() + "/" + that.getNetworkPrefixLength());
+                        if (ipSubnet.contains(defaultGateway)) {
+                            primaryInterface = it.getName();
+                        }
+                    } catch (UnknownHostException e) {
+                        LOG.warn("Couldn't find primary interface", e);
+                    }
                 }
             }
+
             NetworkStats.Interface anInterface = NetworkStats.Interface.create(
                     it.getName(),
                     it.queryNetworkInterface().getInterfaceAddresses().stream().map(address -> address.getAddress().getHostAddress()).collect(Collectors.toSet()),
