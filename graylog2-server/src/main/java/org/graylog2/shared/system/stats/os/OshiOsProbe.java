@@ -68,9 +68,9 @@ public class OshiOsProbe implements OsProbe {
         final CentralProcessor.ProcessorIdentifier processorIdentifier = centralProcessor.getProcessorIdentifier();
 
         final Processor proc = Processor.create(
-                processorIdentifier.getModel(),
+                processorIdentifier.getName(),
                 processorIdentifier.getVendor(),
-                ((int) processorIdentifier.getVendorFreq() / 1000),
+                ((int) processorIdentifier.getVendorFreq() / 1000000),
                 centralProcessor.getLogicalProcessorCount(),
                 centralProcessor.getPhysicalPackageCount(),
                 centralProcessor.getLogicalProcessorCount() / centralProcessor.getPhysicalPackageCount(),
