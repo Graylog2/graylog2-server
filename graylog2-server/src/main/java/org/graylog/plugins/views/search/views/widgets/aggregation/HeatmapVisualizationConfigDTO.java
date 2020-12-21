@@ -36,6 +36,7 @@ public abstract class HeatmapVisualizationConfigDTO implements VisualizationConf
     private static final String FIELD_Z_MIN = "z_min";
     private static final String FIELD_Z_MAX = "z_max";
     private static final String FIELD_DEFAULT_VALUE = "default_value";
+    private static final String FIELD_USE_SMALLEST_AS_DEFAULT = "use_smallest_as_default";
 
     @JsonProperty(FIELD_COLOR_SCALE)
     public abstract String colorScale();
@@ -55,11 +56,11 @@ public abstract class HeatmapVisualizationConfigDTO implements VisualizationConf
     @JsonProperty(FIELD_DEFAULT_VALUE)
     public abstract Optional<Long> defaultValue();
 
+    @JsonProperty(FIELD_USE_SMALLEST_AS_DEFAULT)
+    public abstract boolean useSmallestAsDefault();
+
     public static Builder builder() {
-        return Builder.create()
-                .colorScale("Viridis")
-                .reverseScale(false)
-                .autoScale(true);
+        return Builder.create();
     }
 
     public abstract Builder toBuilder();
@@ -69,7 +70,11 @@ public abstract class HeatmapVisualizationConfigDTO implements VisualizationConf
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_HeatmapVisualizationConfigDTO.Builder();
+            return new AutoValue_HeatmapVisualizationConfigDTO.Builder()
+                    .colorScale("Viridis")
+                    .reverseScale(false)
+                    .useSmallestAsDefault(false)
+                    .autoScale(true);
         }
 
         @JsonProperty(FIELD_COLOR_SCALE)
@@ -89,6 +94,9 @@ public abstract class HeatmapVisualizationConfigDTO implements VisualizationConf
 
         @JsonProperty(FIELD_DEFAULT_VALUE)
         public abstract Builder defaultValue(@Nullable Long defaultValue);
+
+        @JsonProperty(FIELD_USE_SMALLEST_AS_DEFAULT)
+        public abstract Builder useSmallestAsDefault(boolean useSmallestAsDefault);
 
         public abstract HeatmapVisualizationConfigDTO build();
     }
