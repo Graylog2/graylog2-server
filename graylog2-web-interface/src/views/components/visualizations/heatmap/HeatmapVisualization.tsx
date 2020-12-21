@@ -78,11 +78,17 @@ const _transposeMatrix = (z: Array<Array<any>> = []) => {
   return z[0].map((_, c) => { return z.map((r) => { return r[c]; }); });
 };
 
+const _findSmallestValue = (valuesFound: Array<Array<number>>) => valuesFound.reduce((result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result), valuesFound[0][0]);
+
 const _formatSeries = (visualizationConfig) => ({ valuesBySeries, xLabels }: {valuesBySeries: ValuesBySeries, xLabels: Array<any>}): ExtractedSeries => {
+  const valuesFoundBySeries = values(valuesBySeries);
   // When using the hovertemplate, we need to provie a value for empty z values.
   // Otherwise plotly would throw errors when hovering over a field.
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
-  const z = _transposeMatrix(_fillUpMatrix(values(valuesBySeries), xLabels, visualizationConfig.defaultValue));
+  const defaultValue = visualizationConfig.useSmallestAsDefault
+    ? _findSmallestValue(valuesFoundBySeries)
+    : visualizationConfig.defaultValue ?? 'None';
+  const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
   const yLabels = Object.keys(valuesBySeries);
 
   return [[

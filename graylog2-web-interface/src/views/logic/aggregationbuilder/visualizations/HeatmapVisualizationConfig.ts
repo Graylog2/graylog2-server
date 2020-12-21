@@ -46,6 +46,7 @@ type InternalState = {
   autoScale: boolean,
   zMin: number | undefined | null,
   zMax: number | undefined | null,
+  useSmallestAsDefault: boolean,
   defaultValue: number | undefined | null,
 };
 
@@ -55,6 +56,7 @@ export type HeatmapVisualizationConfigJSON = {
   auto_scale: boolean,
   z_min: number | undefined | null,
   z_max: number | undefined | null,
+  use_smallest_as_default: boolean,
   default_value: number | undefined | null,
 }
 
@@ -67,6 +69,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     autoScale: InternalState['autoScale'],
     zMin: InternalState['zMin'],
     zMax: InternalState['zMax'],
+    useSmallestAsDefault: InternalState['useSmallestAsDefault'],
     defaultValue: InternalState['defaultValue'],
   ) {
     super();
@@ -77,6 +80,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       autoScale,
       zMax,
       zMin,
+      useSmallestAsDefault,
       defaultValue,
     };
   }
@@ -105,6 +109,10 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     return this._value.defaultValue;
   }
 
+  get useSmallestAsDefault() {
+    return this._value.useSmallestAsDefault;
+  }
+
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
@@ -116,6 +124,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     autoScale: InternalState['autoScale'],
     zMin: InternalState['zMin'],
     zMax: InternalState['zMax'],
+    useSmallestAsDefault: InternalState['useSmallestAsDefault'],
     defaultValue: InternalState['defaultValue'],
   ) {
     return new HeatmapVisualizationConfig(
@@ -124,6 +133,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       autoScale,
       zMin,
       zMax,
+      useSmallestAsDefault,
       defaultValue,
     );
   }
@@ -135,6 +145,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       true,
       undefined,
       undefined,
+      false,
       undefined,
     );
   }
@@ -146,6 +157,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       autoScale: auto_scale,
       zMin: z_min,
       zMax: z_max,
+      useSmallestAsDefault: use_smallest_as_default,
       defaultValue: default_value,
     } = this._value;
 
@@ -155,6 +167,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       auto_scale,
       z_min,
       z_max,
+      use_smallest_as_default,
       default_value,
     };
   }
@@ -165,6 +178,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     auto_scale: true,
     z_min: undefined,
     z_max: undefined,
+    use_smallest_as_default: false,
     default_value: undefined,
   }) {
     const {
@@ -173,10 +187,11 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       auto_scale: autoScale,
       z_min: zMin,
       z_max: zMax,
+      use_smallest_as_default: useSmallestAsDefault,
       default_value: defaultValue,
     } = value;
 
-    return HeatmapVisualizationConfig.create(colorScale, reverseScale, autoScale, zMin, zMax, defaultValue);
+    return HeatmapVisualizationConfig.create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue);
   }
 }
 
@@ -209,6 +224,10 @@ class Builder {
     return new Builder(this.value.set('zMax', value));
   }
 
+  useSmallestAsDefault(value: InternalState['useSmallestAsDefault']) {
+    return new Builder(this.value.set('useSmallestAsDefault', value));
+  }
+
   defaultValue(value: InternalState['defaultValue']) {
     return new Builder(this.value.set('defaultValue', value));
   }
@@ -220,9 +239,10 @@ class Builder {
       autoScale,
       zMin,
       zMax,
+      useSmallestAsDefault,
       defaultValue,
     } = this.value.toObject();
 
-    return new HeatmapVisualizationConfig(colorScale, reverseScale, autoScale, zMin, zMax, defaultValue);
+    return new HeatmapVisualizationConfig(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue);
   }
 }

@@ -90,6 +90,7 @@ const HeatmapVisualizationConfiguration = ({ config = HeatmapVisualizationConfig
   const _onAutoScaleChange = useCallback((e) => onChange(config.toBuilder().autoScale(e.target.checked).build()), [config, onChange]);
   const _onZminChange = useCallback((e) => onChange(config.toBuilder().zMin(_parseEvent(e)).build()), [config, onChange]);
   const _onZmaxChange = useCallback((e) => onChange(config.toBuilder().zMax(_parseEvent(e)).build()), [config, onChange]);
+  const _onUseSmallestAsDefaultChange = useCallback((e) => onChange(config.toBuilder().useSmallestAsDefault(e.target.checked).build()), [config, onChange]);
   const _onDefaultValueChange = useCallback((e) => onChange(config.toBuilder().defaultValue(_parseEvent(e)).build()), [config, onChange]);
 
   return (
@@ -121,9 +122,14 @@ const HeatmapVisualizationConfiguration = ({ config = HeatmapVisualizationConfig
                    error={errors.zmax}
                    onChange={_onZmaxChange}
                    label="Max" />
+      <Checkbox onChange={_onUseSmallestAsDefaultChange}
+                checked={config.useSmallestAsDefault}>
+        Use smallest as default
+      </Checkbox>
       <StyledInput type="number"
                    id="default_value"
                    error={errors.defaultValue}
+                   disabled={config.useSmallestAsDefault}
                    onChange={_onDefaultValueChange}
                    label="Default Value" />
     </>
