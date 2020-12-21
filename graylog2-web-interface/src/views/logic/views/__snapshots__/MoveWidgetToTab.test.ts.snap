@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MoveWidgetToTab should copy a Widget to a dashboard 1`] = `
+exports['MoveWidgetToTab should copy a Widget to a dashboard 1'] = `
 Object {
   "created_at": "2020-05-27T12:32:49.786Z",
   "description": "move widget to tab",
@@ -116,7 +116,7 @@ Object {
 }
 `;
 
-exports[`MoveWidgetToTab should move a Widget to a dashboard 1`] = `
+exports['MoveWidgetToTab should move a Widget to a dashboard 1'] = `
 Object {
   "created_at": "2020-05-27T12:32:49.786Z",
   "description": "move widget to tab",
@@ -194,7 +194,85 @@ Object {
 }
 `;
 
-exports[`MoveWidgetToTab should work when titles are empty 1`] = `
+exports['MoveWidgetToTab should provide a default position in case the widgets position cannot be found 1'] = `
+Object {
+  "created_at": "2020-05-27T12:32:49.786Z",
+  "description": "move widget to tab",
+  "id": "5ece5e1b74ff709b0b0dc69b",
+  "owner": "admin",
+  "properties": Immutable.List [],
+  "search_id": "new-search-id",
+  "state": Immutable.Map {
+    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be": Object {
+      "formatting": Object {
+        "highlighting": Array [],
+      },
+      "positions": Immutable.Map {},
+      "selected_fields": undefined,
+      "titles": Immutable.Map {
+        "widget": Immutable.Map {},
+      },
+      "widget_mapping": Immutable.Map {},
+      "widgets": Immutable.List [],
+    },
+    "5faea09b-4187-4eda-9d59-7a86d4774c73": Object {
+      "formatting": Object {
+        "highlighting": Array [],
+      },
+      "positions": Immutable.Map {
+        "dead-beef": Object {
+          "col": 1,
+          "height": undefined,
+          "row": 1,
+          "width": undefined,
+        },
+      },
+      "selected_fields": undefined,
+      "titles": Immutable.Map {
+        "widget": Immutable.Map {
+          "dead-beef": "Widget Title",
+        },
+      },
+      "widget_mapping": Immutable.Map {
+        "dead-beef": Immutable.Set [
+          "dead-beef",
+        ],
+      },
+      "widgets": Immutable.List [
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "event_annotation": false,
+            "rollup": true,
+            "row_pivots": Array [],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": "Message Count",
+                },
+                "function": "count()",
+              },
+            ],
+            "sort": Array [],
+            "visualization": "numeric",
+          },
+          "filter": undefined,
+          "id": "dead-beef",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+      ],
+    },
+  },
+  "summary": "move widget to tab",
+  "title": "MoveWidgetToTab",
+  "type": "DASHBOARD",
+}
+`;
+
+exports['MoveWidgetToTab should work when titles are empty 1'] = `
 Object {
   "created_at": "2020-05-27T12:32:49.786Z",
   "description": "move widget to tab",

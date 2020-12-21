@@ -52,7 +52,8 @@ const dashboard = dashboardFixture.toBuilder()
   .build();
 
 const widgetId = 'b34c3c6f-c49d-41d3-a65a-f746134f8f3e';
-const queryId = '5faea09b-4187-4eda-9d59-7a86d4774c73';
+const targetQueryId = '5faea09b-4187-4eda-9d59-7a86d4774c73';
+const sourceQueryId = 'fa247d8f-7afa-45b7-b57e-3cdef4ee53be';
 
 describe('MoveWidgetToTab', () => {
   beforeEach(() => {
@@ -60,13 +61,12 @@ describe('MoveWidgetToTab', () => {
   });
 
   it('should move a Widget to a dashboard', () => {
-    const newDashboard = MoveWidgetToTab(widgetId, queryId, dashboard, false);
+    const newDashboard = MoveWidgetToTab(widgetId, targetQueryId, dashboard, false);
 
     expect(newDashboard).toMatchSnapshot();
   });
 
   it('should work when titles are empty', () => {
-    const sourceQueryId = 'fa247d8f-7afa-45b7-b57e-3cdef4ee53be';
     const newStates = dashboard.state.update(
       sourceQueryId,
       (query) => query.toBuilder().titles(Immutable.Map()).build(),
@@ -74,13 +74,27 @@ describe('MoveWidgetToTab', () => {
     const dashboardWithoutTitles = dashboard.toBuilder()
       .state(newStates)
       .build();
-    const newDashboard = MoveWidgetToTab(widgetId, queryId, dashboardWithoutTitles, false);
+    const newDashboard = MoveWidgetToTab(widgetId, targetQueryId, dashboardWithoutTitles, false);
 
     expect(newDashboard).toMatchSnapshot();
   });
 
   it('should copy a Widget to a dashboard', () => {
-    const newDashboard = MoveWidgetToTab(widgetId, queryId, dashboard, true);
+    const newDashboard = MoveWidgetToTab(widgetId, targetQueryId, dashboard, true);
+
+    expect(newDashboard).toMatchSnapshot();
+  });
+
+  it('should provide a default position in case the widgets position cannot be found', () => {
+    const { state } = dashboard;
+    const viewState = state.get(sourceQueryId);
+    const positions = Immutable.Map(viewState.widgetPositions);
+    const newPositions = positions.delete(widgetId);
+    const newViewState = viewState.toBuilder().widgetPositions(newPositions.toJS()).build();
+    const newState = state.set(sourceQueryId, newViewState);
+    const dashboardWithMissingPosition = dashboard.toBuilder().state(newState).build();
+
+    const newDashboard = MoveWidgetToTab(widgetId, targetQueryId, dashboardWithMissingPosition, false);
 
     expect(newDashboard).toMatchSnapshot();
   });

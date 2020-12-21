@@ -21,6 +21,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { TitlesMap } from 'views/stores/TitleTypes';
+import { widgetDefinition } from 'views/logic/Widgets';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
@@ -93,7 +94,13 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
 };
 
 const _getWidgetPosition = (widgetId: WidgetId, queryId: QueryId, view: View): WidgetPosition => {
-  return view.state.get(queryId).widgetPositions[widgetId];
+  const widget = view.state.get(queryId).widgets.find((w) => w.id === widgetId);
+  const widgetDef = widgetDefinition(widget.type);
+
+  const widgetBuilder = view.state.get(queryId).widgetPositions[widgetId]?.toBuilder()
+    || WidgetPosition.builder().width(widgetDef.defaultWidth).height(widgetDef.defaultHeight);
+
+  return widgetBuilder.col(1).row(1).build();
 };
 
 const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => {
@@ -110,10 +117,7 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
   if (match) {
     const [widget, queryId] = match;
     const widgetTitle = _getWidgetTitle(widgetId, queryId, dashboard);
-    const newWidgetPosition = _getWidgetPosition(widgetId, queryId, dashboard).toBuilder()
-      .col(1)
-      .row(1)
-      .build();
+    const newWidgetPosition = _getWidgetPosition(widgetId, queryId, dashboard);
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
 
     return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, newWidgetPosition, widgetTitle));
