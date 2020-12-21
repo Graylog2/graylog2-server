@@ -124,7 +124,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   static builder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder()
       .rowPivots([])
       .columnPivots([])
@@ -135,7 +135,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   toBuilder() {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
@@ -206,7 +206,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       event_annotation,
     } = value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder()
       .columnPivots(column_pivots.map(Pivot.fromJSON))
       .rowPivots(row_pivots.map(Pivot.fromJSON))
