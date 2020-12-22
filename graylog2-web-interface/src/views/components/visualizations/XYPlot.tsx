@@ -28,6 +28,7 @@ import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
+import PlotLegend from 'views/components/visualizations/PlotLegend';
 
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
@@ -80,7 +81,8 @@ const XYPlot = ({
   const defaultLayout: {
     yaxis: { fixedrange?: boolean},
     legend?: {y?: number},
-  } = { yaxis };
+    showlegend: boolean,
+  } = { yaxis, showlegend: false };
 
   if (height) {
     defaultLayout.legend = { y: yLegendPosition(height) };
@@ -110,11 +112,13 @@ const XYPlot = ({
   }
 
   return (
-    <GenericPlot chartData={chartData}
-                 layout={layout}
-                 onZoom={_onZoom}
-                 getChartColor={getChartColor}
-                 setChartColor={setChartColor} />
+    <PlotLegend config={config} chartData={chartData}>
+      <GenericPlot chartData={chartData}
+                   layout={layout}
+                   onZoom={_onZoom}
+                   getChartColor={getChartColor}
+                   setChartColor={setChartColor} />
+    </PlotLegend>
   );
 };
 
