@@ -62,22 +62,36 @@ public class OshiFsProbe implements FsProbe {
     private void init() {
         final OperatingSystem os = service.getOs();
 
-        final FileSystem fs = os.getFileSystem();
+        final FileSystem fileSystem = os.getFileSystem();
 
         final HardwareAbstractionLayer hardware = service.getHal();
 
         for (Path location : locations) {
             Path path = location.toAbsolutePath();
             oshiFileSystems.put(path,
-                    fs.getFileStores().stream()
-                            .filter(it -> path.startsWith(it.getMount()))
+                    fileSystem.getFileStores().stream()
+                            .filter(fs -> path.startsWith(fs.getMount()))
                             // We want the mountpoint closest to our location
                             .max(Comparator.comparingInt(p -> Paths.get(p.getMount()).getNameCount()))
-                            .map(it -> {
-                                //Search for the diskstore with the logical volume or volume name
-                                return new Pair<>(it, hardware.getDiskStores().stream()
-                                        .filter(ds -> ds.getName().equals(StringUtils.defaultIfEmpty(it.getLogicalVolume(), it.getVolume())))
-                                        .findFirst().orElse(generateDummyDiskStore()));
+                            .map(fs -> {
+                                // First try search for the diskstore with the logical volume or volume name
+                                Optional<HWDiskStore> diskStore = hardware.getDiskStores().stream()
+                                        .filter(ds -> ds.getName().equals(StringUtils.defaultIfEmpty(fs.getLogicalVolume(), fs.getVolume())))
+                                        .findFirst(); //.orElse(generateDummyDiskStore());
+                                if (diskStore.isPresent()) {
+                                    return new Pair<>(fs, diskStore.get());
+                                }
+                                // Try to search for the diskstore with the partition of our mountpoint
+                                diskStore = hardware.getDiskStores().stream()
+                                        .filter(ds -> ds.getPartitions().stream().anyMatch(part -> path.startsWith(part.getMountPoint())))
+                                        .max(Comparator.comparingInt(ds -> ds.getPartitions().stream()
+                                                .filter(part -> path.startsWith(part.getMountPoint()))
+                                                .mapToInt(part -> Paths.get(part.getMountPoint()).getNameCount())
+                                                .max().orElse(0)));
+                                if (diskStore.isPresent()) {
+                                    return new Pair<>(fs, diskStore.get());
+                                }
+                                return new Pair<>(fs, generateDummyDiskStore());
                             }).orElse(new Pair<>(generateDummyFileStore(), generateDummyDiskStore())));
         }
     }
