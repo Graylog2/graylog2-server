@@ -73,7 +73,7 @@ const getChartColor = (fullDataArray, name) => {
 };
 
 const setChartColor = (chart, colorMap) => {
-  const colors = chart.labels.map((label) => colorMap[label]);
+  const colors = chart.labels.map((label) => colorMap.get(label));
 
   return { marker: { colors } };
 };

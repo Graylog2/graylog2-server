@@ -17,12 +17,13 @@
 import * as React from 'react';
 
 import { singleton } from 'views/logic/singleton';
+import ColorMapper from 'views/components/visualizations/ColorMapper';
 
-export type ChartColorMap = { [key: string]: string };
+export type ChartColorMap = ColorMapper;
 export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
 
 const ChartColorContext = React.createContext<{ colors: ChartColorMap, setColor: ChangeColorFunction }>({
-  colors: {},
+  colors: ColorMapper.create(),
   setColor: () => Promise.resolve([]),
 });
 export default singleton('views.components.visualizations.ChartColorContext', () => ChartColorContext);
