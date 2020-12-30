@@ -37,7 +37,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@babel/preset-env": "7.12.10",
+    "@babel/preset-env": "7.12.11",
     "@babel/preset-typescript": "^7.12.1",
     "create-react-class": "15.6.3",
     "eslint-config-graylog": "file:../eslint-config-graylog",
