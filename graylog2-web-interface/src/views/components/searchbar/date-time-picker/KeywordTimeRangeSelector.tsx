@@ -129,7 +129,7 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
               </StyledTooltip>
               )}
               <KeywordInput type="text"
-                            className="input-sm"
+                            className="input-sm mousetrap"
                             name={name}
                             disabled={disabled}
                             placeholder="Last week"

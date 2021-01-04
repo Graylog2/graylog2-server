@@ -133,16 +133,6 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
   const [activeTab, setActiveTab] = useState(currentTimeRange?.type);
 
-  useEffect(() => {
-    if (currentTimeRange?.type) {
-      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, activeTab), false);
-    } else {
-      setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
-    }
-
-    validateForm();
-  }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
-
   const handleNoOverride = () => {
     setFieldValue('timerange', {});
     setFieldValue('nextTimeRange', {});
@@ -162,14 +152,34 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
     toggleDropdownShow();
   }, [currentTimeRange, setFieldValue, toggleDropdownShow]);
 
+  const handleEnterKeyPress = useCallback(() => {
+    if (isValid) {
+      handleApply();
+    }
+  }, [isValid, handleApply]);
+
+  const handleEscKeyPress = useCallback(() => {
+    handleCancel();
+  }, [handleCancel]);
+
   useEffect(() => {
-    Mousetrap.bind('enter', isValid ? handleApply : () => {});
-    Mousetrap.bind('esc', handleCancel);
+    if (currentTimeRange?.type) {
+      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, activeTab), false);
+    } else {
+      setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
+    }
+
+    validateForm();
+  }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
+
+  useEffect(() => {
+    Mousetrap.bind('enter', handleEnterKeyPress);
+    Mousetrap.bind('esc', handleEscKeyPress);
 
     return () => {
       Mousetrap.reset();
     };
-  }, [isValid, handleApply, handleCancel]);
+  }, [handleEnterKeyPress, handleEscKeyPress]);
 
   const title = (
     <PopoverTitle>
