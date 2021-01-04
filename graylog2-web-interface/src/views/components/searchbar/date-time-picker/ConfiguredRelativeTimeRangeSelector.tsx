@@ -18,23 +18,30 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Field } from 'formik';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import Input from 'components/bootstrap/Input';
+import { Icon, IfPermitted } from 'components/common';
+import { DropdownButton, MenuItem } from 'components/graylog';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import TimerangeSelector from '../TimerangeSelector';
 
 type Props = {
-  disabled: boolean,
-  onChange: (range: number) => void,
+  disabled?: boolean,
+  onChange?: (range: number) => void,
 };
-const StyledInput = styled(Input)`
-  margin-bottom: 10px;
-`;
+
 const StyledTimerangeSelector = styled(TimerangeSelector)`
-  flex-basis: 100%;
+  align-self: flex-end;
 `;
+
+const ExternalIcon = styled(Icon)`
+  margin-left: 6px;
+`;
+
+const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
+  font-size: ${theme.fonts.size.small};
+`);
 
 export default function ConfiguredRelativeTimeRangeSelector({ disabled, onChange }: Props) {
   const { config } = useSearchConfiguration();
@@ -48,11 +55,12 @@ export default function ConfiguredRelativeTimeRangeSelector({ disabled, onChange
     options = Object.keys(availableOptions).map((key) => {
       const seconds = moment.duration(key).asSeconds();
 
-      if (timeRangeLimit.seconds() > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
+      if (timeRangeLimit.asSeconds() > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
         return null;
       }
 
-      const option = (<option key={`relative-option-${key}`} value={seconds}>{availableOptions[key]}</option>);
+      const optionLabel = availableOptions[key].replace(/Search\sin(\sthe\slast)?\s/, '');
+      const option = (<MenuItem eventKey={seconds} key={`relative-option-${key}`} disabled={disabled}>{optionLabel}</MenuItem>);
 
       // The "search in all messages" option should be the last one.
       if (key === 'PT0S') {
@@ -68,31 +76,30 @@ export default function ConfiguredRelativeTimeRangeSelector({ disabled, onChange
       options.push(all);
     }
   } else {
-    options = (<option value="300">Loading...</option>);
+    options = (<MenuItem eventKey="300" disabled>Loading...</MenuItem>);
   }
 
   return (
     <Field name="timerange-existing-range">
-      {({ field: { name, value } }) => {
-        const _onChange = (e) => {
-          const { target: { value: newValue } } = e;
-
+      {() => {
+        const _onChange = (newValue) => {
           onChange(Number.parseInt(newValue, 10));
         };
 
         return (
           <StyledTimerangeSelector className="relative">
-            <StyledInput id="relative-timerange-selector"
-                         disabled={disabled}
-                         type="select"
-                         label="Choose existing relative time range:"
-                         value={value}
-                         title="Select a relative time range"
-                         className="relative"
-                         name={name}
-                         onChange={_onChange}>
+
+            <DropdownButton title={availableOptions ? 'Preset Times' : 'Loading Ranges...'}
+                            id="relative-timerange-selector"
+                            bsSize="small"
+                            onSelect={_onChange}>
               {options}
-            </StyledInput>
+              <IfPermitted permissions="*">
+                <MenuItem divider />
+                <AdminMenuItem href="/system/configurations" target="_blank">Configure Ranges <ExternalIcon name="external-link-alt" /></AdminMenuItem>
+              </IfPermitted>
+            </DropdownButton>
+
           </StyledTimerangeSelector>
         );
       }}

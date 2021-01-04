@@ -65,10 +65,9 @@ const RangeWrapper = styled.div`
   align-items: center;
   display: grid;
   grid-template-columns: max-content repeat(5, 1fr) max-content;
-  grid-template-rows: repeat(2, 1fr) auto;
+  grid-template-rows: repeat(2, 1fr) minmax(1.5em, auto);
   grid-column-gap: 0;
   grid-row-gap: 0;
-  
 `;
 
 const InputWrap = styled.div`
@@ -122,11 +121,17 @@ const RangeCheck = styled.label(({ theme }) => css`
 
 const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
-  grid-area: 3 / 1 / 3 / 8;
+  grid-area: 3 / 1 / 3 / 5;
   font-size: ${theme.fonts.size.tiny};
   font-style: italic;
   padding: 3px;
 `);
+
+const ConfiguredWrapper = styled.div`
+  grid-area: 3 / 5 / 3 / 7;
+  margin: 3px 12px 3px 0;
+  text-align: right;
+`;
 
 const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => {
   const typeDuration = moment.duration(1, type).asSeconds();
@@ -192,7 +197,6 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
             return (
 
               <>
-                <ConfiguredRelativeTimeRangeSelector onChange={_onChangeExisting} />
                 <RangeWrapper>
                   <RangeTitle>From:</RangeTitle>
                   <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
@@ -224,11 +228,16 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                                 clearable={false} />
 
                   <Ago />
+
                   {error && (
                   <ErrorMessage>
                     Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
                   </ErrorMessage>
                   )}
+
+                  <ConfiguredWrapper>
+                    <ConfiguredRelativeTimeRangeSelector onChange={_onChangeExisting} />
+                  </ConfiguredWrapper>
                 </RangeWrapper>
               </>
             );
