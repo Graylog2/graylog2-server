@@ -167,23 +167,6 @@ describe('Search', () => {
     expect(SearchConfigActions.refresh).toHaveBeenCalled();
   });
 
-  it('does not register to WidgetStore upon mount', () => {
-    mount(<SimpleSearch />);
-
-    expect(WidgetStore.listen).not.toHaveBeenCalled();
-  });
-
-  it('does not unregister from Widget store upon unmount', () => {
-    const unsubscribe = jest.fn();
-
-    WidgetStore.listen = jest.fn(() => unsubscribe);
-    const wrapper = mount(<SimpleSearch />);
-
-    wrapper.unmount();
-
-    expect(unsubscribe).not.toHaveBeenCalled();
-  });
-
   it('does not register to QueryFiltersStore upon mount', () => {
     mount(<SimpleSearch />);
 

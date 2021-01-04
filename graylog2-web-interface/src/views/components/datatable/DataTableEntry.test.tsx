@@ -66,18 +66,23 @@ const seriesWithName = (fn, name) => Series.forFunction(fn)
   .build();
 
 describe('DataTableEntry', () => {
+  const SUT = (props) => (
+    <table>
+      <DataTableEntry columnPivots={columnPivots}
+                      columnPivotValues={columnPivotValues}
+                      currentView={currentView}
+                      fields={fields}
+                      item={item}
+                      series={series}
+                      types={List([])}
+                      valuePath={valuePath}
+                      {...props} />
+    </table>
+  );
+
   it('does not fail without types', () => {
     const wrapper = mount((
-      <table>
-        <DataTableEntry columnPivots={columnPivots}
-                        columnPivotValues={columnPivotValues}
-                        currentView={currentView}
-                        fields={fields}
-                        item={item}
-                        series={series}
-                        types={List([])}
-                        valuePath={valuePath} />
-      </table>
+      <SUT />
     ));
 
     expect(wrapper).not.toBeEmptyRender();
@@ -91,16 +96,7 @@ describe('DataTableEntry', () => {
     ];
 
     const wrapper = mount((
-      <table>
-        <DataTableEntry columnPivots={columnPivots}
-                        columnPivotValues={columnPivotValues}
-                        currentView={currentView}
-                        fields={fields}
-                        item={item}
-                        series={series}
-                        types={List(types)}
-                        valuePath={valuePath} />
-      </table>
+      <SUT types={List(types)} />
     ));
 
     const fieldTypeFor = (fieldName) => wrapper.find(`Value[field="${fieldName}"]`).first().props().type;
@@ -113,16 +109,7 @@ describe('DataTableEntry', () => {
 
   it('provides valuePath in context for each value', () => {
     const wrapper = mount((
-      <table>
-        <DataTableEntry columnPivots={columnPivots}
-                        columnPivotValues={columnPivotValues}
-                        currentView={currentView}
-                        fields={fields}
-                        item={item}
-                        series={series}
-                        types={List([])}
-                        valuePath={valuePath} />
-      </table>
+      <SUT />
     ));
 
     expect(wrapper.find('Provider')
@@ -136,16 +123,8 @@ describe('DataTableEntry', () => {
       nf_dst_port: 443,
     };
     const wrapper = mount((
-      <table>
-        <DataTableEntry columnPivots={columnPivots}
-                        columnPivotValues={columnPivotValues}
-                        currentView={currentView}
-                        fields={fieldsWithDeduplicatedValues}
-                        item={itemWithDeduplicatedValues}
-                        series={series}
-                        types={List([])}
-                        valuePath={valuePath} />
-      </table>
+      <SUT fields={fieldsWithDeduplicatedValues}
+           item={itemWithDeduplicatedValues} />
     ));
 
     expect(wrapper).not.toContainReact(<EmptyValue />);
@@ -156,16 +135,7 @@ describe('DataTableEntry', () => {
 
     it('for non-renamed functions', () => {
       const wrapper = mount((
-        <table>
-          <DataTableEntry columnPivots={columnPivots}
-                          columnPivotValues={columnPivotValues}
-                          currentView={currentView}
-                          fields={fields}
-                          item={item}
-                          series={series}
-                          types={List([timestampTypeMapping])}
-                          valuePath={valuePath} />
-        </table>
+        <SUT types={List([timestampTypeMapping])} />
       ));
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
@@ -180,16 +150,13 @@ describe('DataTableEntry', () => {
       const fieldsWithRenamedSeries = OrderedSet([f('max(timestamp)', 'Last Timestamp')]);
 
       const wrapper = mount((
-        <table>
-          <DataTableEntry columnPivots={[]}
-                          columnPivotValues={[]}
-                          currentView={currentView}
-                          fields={fieldsWithRenamedSeries}
-                          item={itemWithRenamedSeries}
-                          series={renamedSeries}
-                          types={List([timestampTypeMapping])}
-                          valuePath={[]} />
-        </table>
+        <SUT columnPivots={[]}
+             columnPivotValues={[]}
+             fields={fieldsWithRenamedSeries}
+             item={itemWithRenamedSeries}
+             series={renamedSeries}
+             types={List([timestampTypeMapping])}
+             valuePath={[]} />
       ));
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
@@ -222,16 +189,10 @@ describe('DataTableEntry', () => {
       ]);
 
       const wrapper = mount((
-        <table>
-          <DataTableEntry columnPivots={columnPivots}
-                          columnPivotValues={columnPivotValues}
-                          currentView={currentView}
-                          fields={fieldsWithRenamedSeries}
-                          item={itemWithRenamedSeries}
-                          series={renamedSeries}
-                          types={List([timestampTypeMapping])}
-                          valuePath={valuePath} />
-        </table>
+        <SUT fields={fieldsWithRenamedSeries}
+             item={itemWithRenamedSeries}
+             series={renamedSeries}
+             types={List([timestampTypeMapping])} />
       ));
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 

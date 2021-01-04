@@ -52,7 +52,8 @@ const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
                        title="Insert current date">
                  <Icon name="magic" />
                </Button>
-           )}
+             )}
+             className="mousetrap"
              bsStyle={hasError ? 'error' : null} />
     </Wrapper>
   );

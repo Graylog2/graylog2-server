@@ -71,7 +71,7 @@ describe('Views bindings field actions', () => {
         .toEqual(false);
     });
 
-    it('should be disabled when field analisys is disabled', () => {
+    it('should be disabled when field analysis is disabled', () => {
       expect(isEnabled({
         ...defaultArguments,
         field: 'something',

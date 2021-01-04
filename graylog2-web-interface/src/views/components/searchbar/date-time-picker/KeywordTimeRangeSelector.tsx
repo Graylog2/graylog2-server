@@ -22,9 +22,11 @@ import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
 import { Field, useField } from 'formik';
 
-import { Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
+import { Col, FormControl, FormGroup, Row, Panel, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
+import DocumentationLink from 'components/support/DocumentationLink';
+import DocsHelper from 'util/DocsHelper';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -112,31 +114,50 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
 
   return (
-    <Row className="no-bm" style={{ marginLeft: 50 }}>
-      <Col xs={3} style={{ padding: 0 }}>
+    <Row className="no-bm">
+      <Col sm={5}>
         <Field name="nextTimeRange.keyword" validate={_validate}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
                        validationState={error ? 'error' : null}>
-              <InputGroup>
-                {error && (
-                  <StyledTooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
-                    {error}
-                  </StyledTooltip>
-                )}
-                <KeywordInput type="text"
-                              className="input-sm"
-                              name={name}
-                              disabled={disabled}
-                              placeholder="Last week"
-                              onChange={onChange}
-                              required
-                              value={value || defaultValue} />
-              </InputGroup>
+
+              <p><strong>Specify the time frame for the search in natural language.</strong></p>
+              {error && (
+              <StyledTooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
+                {error}
+              </StyledTooltip>
+              )}
+              <KeywordInput type="text"
+                            className="input-sm mousetrap"
+                            name={name}
+                            disabled={disabled}
+                            placeholder="Last week"
+                            onChange={onChange}
+                            required
+                            value={value || defaultValue} />
             </FormGroup>
           )}
         </Field>
+      </Col>
+
+      <Col sm={7}>
+        <Panel>
+          <Panel.Body>
+            <p><code>last month</code> searches between one month ago and now</p>
+
+            <p><code>4 hours ago</code> searches between four hours ago and now</p>
+
+            <p><code>1st of april to 2 days ago</code> searches between 1st of April and 2 days ago</p>
+
+            <p><code>yesterday midnight +0200 to today midnight +0200</code> searches between yesterday midnight and today midnight in timezone +0200 - will be 22:00 in UTC</p>
+
+            <p>Please consult the <DocumentationLink page={DocsHelper.PAGES.TIME_FRAME_SELECTOR}
+                                                     title="Keyword Time Range Documentation"
+                                                     text="documentation" /> for more details.
+            </p>
+          </Panel.Body>
+        </Panel>
       </Col>
     </Row>
   );
