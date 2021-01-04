@@ -62,10 +62,9 @@ const RangeWrapper = styled.div`
   align-items: center;
   display: grid;
   grid-template-columns: max-content repeat(5, 1fr) max-content;
-  grid-template-rows: repeat(2, 1fr) auto;
+  grid-template-rows: repeat(2, 1fr) minmax(1.5em, auto);
   grid-column-gap: 0;
   grid-row-gap: 0;
-  
 `;
 
 const InputWrap = styled.div`
