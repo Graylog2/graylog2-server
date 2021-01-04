@@ -217,7 +217,9 @@ describe('<Widget />', () => {
               {...props} />
 
     );
-    const { findByText } = render(<UnknownWidget data={[]} />);
+    const { findByText } = render(
+      <UnknownWidget data={[]} />,
+    );
 
     await findByText('Unknown widget');
   });
@@ -241,7 +243,9 @@ describe('<Widget />', () => {
                 {...props} />
       </WidgetContext.Provider>
     );
-    const { findByText } = render(<UnknownWidget data={[]} />);
+    const { findByText } = render(
+      <UnknownWidget data={[]} />,
+    );
 
     await findByText('Unknown widget in edit mode');
   });

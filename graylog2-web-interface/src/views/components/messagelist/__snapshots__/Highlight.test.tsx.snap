@@ -1,284 +1,103 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Highlight does not highlight string if length is negative 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": -3,
-          "start": 3,
-        },
-      ],
-    }
-  }
-  value="foobar"
->
+<div>
   foobar
-</PossiblyHighlight>
+</div>
 `;
 
 exports[`Highlight does not highlight string if range for field is absent 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "bar": Array [
-        Object {
-          "length": 6,
-          "start": 0,
-        },
-      ],
-    }
-  }
-  value="foobar"
->
+<div>
   foobar
-</PossiblyHighlight>
+</div>
 `;
 
 exports[`Highlight does not highlight string if start is negative 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": 3,
-          "start": -3,
-        },
-      ],
-    }
-  }
-  value="foobar"
->
+<div>
   foobar
-</PossiblyHighlight>
+</div>
 `;
 
 exports[`Highlight highlights remainder of string if length of range exceeds length of string 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": 256,
-          "start": 3,
-        },
-      ],
-    }
-  }
-  value="foobar"
->
+<div>
   foo
   <span
-    key="highlight-0"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   >
     bar
   </span>
-</PossiblyHighlight>
+  
+</div>
 `;
 
 exports[`Highlight highlights string for multiple highlight ranges 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": 5,
-          "start": 4,
-        },
-        Object {
-          "length": 10,
-          "start": 14,
-        },
-      ],
-    }
-  }
-  value="the brown fox jumps over the lazy dog"
->
+<div>
   the 
   <span
-    key="highlight-0"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   >
     brown
   </span>
    fox 
   <span
-    key="highlight-1"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   >
     jumps over
   </span>
    the lazy dog
-</PossiblyHighlight>
+</div>
 `;
 
 exports[`Highlight highlights string for multiple highlight ranges where one is a complete subset of the other 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": 5,
-          "start": 4,
-        },
-        Object {
-          "length": 1,
-          "start": 7,
-        },
-      ],
-    }
-  }
-  value="the brown fox jumps over the lazy dog"
->
+<div>
   the 
   <span
-    key="highlight-0"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   >
     brown
   </span>
+  
   <span
-    key="highlight-1"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   />
    fox jumps over the lazy dog
-</PossiblyHighlight>
+</div>
 `;
 
 exports[`Highlight highlights string for multiple, overlapping highlight ranges 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": 5,
-          "start": 4,
-        },
-        Object {
-          "length": 10,
-          "start": 7,
-        },
-      ],
-    }
-  }
-  value="the brown fox jumps over the lazy dog"
->
+<div>
   the 
   <span
-    key="highlight-0"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   >
     brown
   </span>
+  
   <span
-    key="highlight-1"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   >
      fox jum
   </span>
   ps over the lazy dog
-</PossiblyHighlight>
+</div>
 `;
 
 exports[`Highlight highlights string for single highlight range 1`] = `
-<PossiblyHighlight
-  color="#ffec3d"
-  field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": 6,
-          "start": 0,
-        },
-      ],
-    }
-  }
-  value="foobar"
+<span
+  style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
 >
-  <span
-    key="highlight-0"
-    style={
-      Object {
-        "backgroundColor": "#ffec3d",
-      }
-    }
-  >
-    foobar
-  </span>
-</PossiblyHighlight>
+  foobar
+</span>
 `;
 
 exports[`Highlight returns unmodified string without ranges 1`] = `
-<Highlight
-  field="foo"
-  value="bar"
->
-  <PossiblyHighlight
-    color="#ffec3d"
-    field="foo"
-    highlightRanges={Object {}}
-    value="bar"
-  >
-    bar
-  </PossiblyHighlight>
-</Highlight>
+<div>
+  bar
+</div>
 `;
 
 exports[`Highlight works for empty field & value 1`] = `
-<Highlight
-  field=""
-  value=""
->
-  <PossiblyHighlight
-    color="#ffec3d"
-    field=""
-    highlightRanges={Object {}}
-    value=""
-  />
-</Highlight>
+<div>
+  
+</div>
 `;
