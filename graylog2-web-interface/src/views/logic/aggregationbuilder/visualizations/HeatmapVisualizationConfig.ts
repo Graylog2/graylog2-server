@@ -18,27 +18,10 @@ import * as Immutable from 'immutable';
 
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
-type ColorScale =
-    'Greys'
-  | 'YlGnBu'
-  | 'Greens'
-  | 'YlOrRd'
-  | 'Bluered'
-  | 'RdBu'
-  | 'Reds'
-  | 'Blues'
-  | 'Picnic'
-  | 'Rainbow'
-  | 'Portland'
-  | 'Jet'
-  | 'Hot'
-  | 'Blackbody'
-  | 'Earth'
-  | 'Electric'
-  | 'Viridis'
-  | 'Cividis';
+export const COLORSCALES = ['Greys', 'YlGnBu', 'Greens', 'YlOrRd', 'Bluered', 'RdBu', 'Reds', 'Blues', 'Picnic',
+  'Rainbow', 'Portland', 'Jet', 'Hot', 'Blackbody', 'Earth', 'Electric', 'Viridis', 'Cividis'];
 
-export const COLORSCALES = ['Greys', 'YlGnBu', 'Greens', 'YlOrRd', 'Bluered', 'RdBu', 'Reds', 'Blues', 'Picnic', 'Rainbow', 'Portland', 'Jet', 'Hot', 'Blackbody', 'Earth', 'Electric', 'Viridis', 'Cividis'];
+type ColorScale = typeof COLORSCALES[number];
 
 type InternalState = {
   colorScale: ColorScale;
@@ -197,7 +180,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
 
 type BuilderState = Immutable.Map<string, any>;
 
-class Builder {
+export class Builder {
   value: BuilderState;
 
   constructor(value: BuilderState = Immutable.Map()) {

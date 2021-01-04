@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Checkbox } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import HeatmapVisualizationConfig, { COLORSCALES, Builder as HeatmapConfigBuilder } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 import Select from '../Select';
 
@@ -85,13 +85,17 @@ const HeatmapVisualizationConfiguration = ({ config = HeatmapVisualizationConfig
       onChangeFunc(newConfig);
     }
   }, [onChangeFunc]);
-  const _onColorScaleChange = useCallback(({ value }) => onChange(config.toBuilder().colorScale(value).build()), [config, onChange]);
-  const _onReverseScaleChange = useCallback((e) => onChange(config.toBuilder().reverseScale(e.target.checked).build()), [config, onChange]);
-  const _onAutoScaleChange = useCallback((e) => onChange(config.toBuilder().autoScale(e.target.checked).build()), [config, onChange]);
-  const _onZminChange = useCallback((e) => onChange(config.toBuilder().zMin(_parseEvent(e)).build()), [config, onChange]);
-  const _onZmaxChange = useCallback((e) => onChange(config.toBuilder().zMax(_parseEvent(e)).build()), [config, onChange]);
-  const _onUseSmallestAsDefaultChange = useCallback((e) => onChange(config.toBuilder().useSmallestAsDefault(e.target.checked).build()), [config, onChange]);
-  const _onDefaultValueChange = useCallback((e) => onChange(config.toBuilder().defaultValue(_parseEvent(e)).build()), [config, onChange]);
+  const modifyConfig = useCallback((fn: (HeatmapConfigBuilder) => HeatmapConfigBuilder) => {
+    onChange(fn(config.toBuilder()).build());
+  }, [config, onChange]);
+
+  const _onColorScaleChange = useCallback(({ value }) => modifyConfig((builder: HeatmapConfigBuilder) => builder.colorScale(value)), [modifyConfig]);
+  const _onReverseScaleChange = useCallback((e) => modifyConfig((builder: HeatmapConfigBuilder) => builder.reverseScale(e.target.checked)), [modifyConfig]);
+  const _onAutoScaleChange = useCallback((e) => modifyConfig((builder: HeatmapConfigBuilder) => builder.autoScale(e.target.checked)), [modifyConfig]);
+  const _onZminChange = useCallback((e) => modifyConfig((builder: HeatmapConfigBuilder) => builder.zMin(_parseEvent(e))), [modifyConfig]);
+  const _onZmaxChange = useCallback((e) => modifyConfig((builder: HeatmapConfigBuilder) => builder.zMax(_parseEvent(e))), [modifyConfig]);
+  const _onUseSmallestAsDefaultChange = useCallback((e) => modifyConfig((builder: HeatmapConfigBuilder) => builder.useSmallestAsDefault(e.target.checked)), [modifyConfig]);
+  const _onDefaultValueChange = useCallback((e) => modifyConfig((builder: HeatmapConfigBuilder) => builder.defaultValue(_parseEvent(e))), [modifyConfig]);
 
   return (
     <>

@@ -87,7 +87,7 @@ const _formatSeries = (visualizationConfig) => ({ valuesBySeries, xLabels }: {va
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
   const defaultValue = visualizationConfig.useSmallestAsDefault
     ? _findSmallestValue(valuesFoundBySeries)
-    : visualizationConfig.defaultValue ?? 'None';
+    : (visualizationConfig.defaultValue ?? 'None');
   const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
   const yLabels = Object.keys(valuesBySeries);
 
@@ -120,7 +120,6 @@ const _chartLayout = (heatmapData) => {
   return {
     yaxis: axisConfig,
     xaxis: axisConfig,
-    // plot_bgcolor: hasContent ? BG_COLOR : 'transparent',
     margin: {
       b: 40,
     },
