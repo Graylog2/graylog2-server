@@ -17,26 +17,32 @@ Object {
         "546b13fe-eae7-4fb8-abb9-e0e3a907c3e6": Object {
           "col": 1,
           "height": 3,
-          "row": 5,
+          "row": NaN,
           "width": "Infinity",
         },
         "32889f0b-fe5a-4f18-baa0-773869d49af3": Object {
           "col": 1,
           "height": 6,
-          "row": 10,
+          "row": NaN,
           "width": "Infinity",
         },
         "8532ff94-2881-42b4-b26d-080d09305e95": Object {
           "col": 1,
           "height": 2,
-          "row": 8,
+          "row": NaN,
           "width": "Infinity",
         },
         "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": Object {
           "col": 1,
           "height": 4,
-          "row": 1,
+          "row": NaN,
           "width": "Infinity",
+        },
+        "4d73ccaa-aabf-451a-b36e-309f55798e04": Object {
+          "col": 1,
+          "height": 4,
+          "row": 1,
+          "width": 4,
         },
       },
       "selected_fields": Array [

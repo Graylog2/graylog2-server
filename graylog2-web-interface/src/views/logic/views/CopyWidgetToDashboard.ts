@@ -19,17 +19,25 @@ import { List, Map } from 'immutable';
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
+import GetPositionForNewWidget from 'views/logic/views/GetPositionForNewWidget';
+import AddNewWidgetsToPositions from 'views/logic/views/AddNewWidgetsToPositions';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
-import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
+import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
 type QueryId = string;
 
-const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
+const _addWidgetToDashboard = (widget: Widget, dashboard: View, widgetPosition: WidgetPosition): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
   const viewState = dashboard.state.get(dashboardQueryId);
+  const widgets = viewState.widgets.push(widget);
+  const { widgetPositions } = viewState;
+  const overrideWidget = Map({ [widget.id]: widgetPosition });
+  const newWidgetPositions = AddNewWidgetsToPositions(Map(widgetPositions), widgets.toArray(), overrideWidget);
   const newViewState = viewState.toBuilder()
-    .widgets(viewState.widgets.push(widget))
+    .widgets(widgets)
+    .widgetPositions(newWidgetPositions)
     .build();
 
   return dashboard.toBuilder()
@@ -49,6 +57,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
     const [widget, queryId] = match;
     const { timerange, query, filter = Map() } = queryMap.get(queryId);
 
+    const newPosition = GetPositionForNewWidget(widget, queryId, search);
     const streams = (filter ? filter.get('filters', List.of()) : List.of())
       .filter((value) => Map.isMap(value) && value.get('type') === 'stream')
       .map((value) => value.get('id'))
@@ -61,7 +70,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .streams(streams)
       .build();
 
-    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard));
+    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, newPosition));
   }
 
   return undefined;

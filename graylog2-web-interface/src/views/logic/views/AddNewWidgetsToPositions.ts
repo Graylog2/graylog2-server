@@ -21,9 +21,11 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import Widget from '../widgets/Widget';
 
-export default (positionsMap: Immutable.Map<string, WidgetPosition>,
+export default (
+  positionsMap: Immutable.Map<string, WidgetPosition>,
   widgets: Array<Widget>,
-  overrideWidgetPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map()): Immutable.Map<string, WidgetPosition> => {
+  overrideWidgetPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map()
+): Immutable.Map<string, WidgetPosition> => {
   const newWidgets = widgets.filter((widget) => !positionsMap.get(widget.id));
 
   return newWidgets.reduce((nextPositionsMap, widget) => {

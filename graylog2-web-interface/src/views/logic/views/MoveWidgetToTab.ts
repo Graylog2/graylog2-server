@@ -21,7 +21,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { TitlesMap } from 'views/stores/TitleTypes';
-import { widgetDefinition } from 'views/logic/Widgets';
+import GetPositionForNewWidget from 'views/logic/views/GetPositionForNewWidget';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
@@ -95,12 +95,8 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
 
 const _getWidgetPosition = (widgetId: WidgetId, queryId: QueryId, view: View): WidgetPosition => {
   const widget = view.state.get(queryId).widgets.find((w) => w.id === widgetId);
-  const widgetDef = widgetDefinition(widget.type);
 
-  const widgetBuilder = view.state.get(queryId).widgetPositions[widgetId]?.toBuilder()
-    || WidgetPosition.builder().width(widgetDef.defaultWidth).height(widgetDef.defaultHeight);
-
-  return widgetBuilder.col(1).row(1).build();
+  return GetPositionForNewWidget(widget, queryId, view);
 };
 
 const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => {
