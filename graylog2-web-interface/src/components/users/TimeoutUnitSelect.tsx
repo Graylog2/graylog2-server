@@ -25,27 +25,17 @@ const TimeoutSelect = styled(Select)`
   width: 150px;
 `;
 
-class TimeoutUnitSelect extends React.Component {
-  options = [
-    { value: `${MS_SECOND}`, label: 'Seconds' },
-    { value: `${MS_MINUTE}`, label: 'Minutes' },
-    { value: `${MS_HOUR}`, label: 'Hours' },
-    { value: `${MS_DAY}`, label: 'Days' },
-  ];
+const OPTIONS = [
+  { value: `${MS_SECOND}`, label: 'Seconds' },
+  { value: `${MS_MINUTE}`, label: 'Minutes' },
+  { value: `${MS_HOUR}`, label: 'Hours' },
+  { value: `${MS_DAY}`, label: 'Days' },
+];
 
-  sessionTimeoutUnit: undefined | { value: string };
-
-  getValue = () => {
-    return this.sessionTimeoutUnit.value;
-  };
-
-  render() {
-    return (
-      <TimeoutSelect ref={(sessionTimeoutUnit) => { this.sessionTimeoutUnit = sessionTimeoutUnit; }}
-                     options={this.options}
-                     {...this.props} />
-    );
-  }
-}
+const TimeoutUnitSelect = (props) => (
+  <TimeoutSelect {...props}
+                 inputProps={{ 'aria-label': 'Timeout unit' }}
+                 options={OPTIONS} />
+);
 
 export default TimeoutUnitSelect;

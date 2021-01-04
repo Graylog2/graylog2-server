@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
@@ -39,8 +38,7 @@ type ContainerProps = {
   setColor: ChangeColorFunction,
 };
 
-// eslint-disable-next-line no-unused-vars
-const Container = ({ colors, setColor }: ContainerProps) => <div>Hello!</div>;
+const Container: React.FC<ContainerProps> = () => <div>Hello!</div>;
 
 describe('WidgetColorContext', () => {
   const colorRules: Array<ColorRule> = [
@@ -59,7 +57,7 @@ describe('WidgetColorContext', () => {
       </ChartColorContext.Consumer>
     </WidgetColorContext>
   ));
-  const container = wrapper.find('Container');
+  const container = wrapper.find(Container);
 
   it('extracts coloring rules for current widget', () => {
     const { colors } = container.props();

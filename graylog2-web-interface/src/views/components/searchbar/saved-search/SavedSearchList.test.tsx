@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 
@@ -44,6 +43,7 @@ const createViewsResponse = (count = 1) => {
       total: count,
       page: count > 0 ? count : 0,
       perPage: 5,
+      count,
     },
     list: views,
   };
@@ -54,8 +54,7 @@ describe('SavedSearchList', () => {
     it('should render empty', () => {
       const views = createViewsResponse(0);
       const { baseElement } = render(<SavedSearchList toggleModal={() => {}}
-                                                      showModal
-                                                      deleteSavedSearch={() => {}}
+                                                      deleteSavedSearch={() => Promise.resolve(views[0])}
                                                       views={views} />);
 
       expect(baseElement).not.toBeNull();
@@ -64,8 +63,7 @@ describe('SavedSearchList', () => {
     it('should render with views', () => {
       const views = createViewsResponse(1);
       const { baseElement } = render(<SavedSearchList toggleModal={() => {}}
-                                                      showModal
-                                                      deleteSavedSearch={() => {}}
+                                                      deleteSavedSearch={() => Promise.resolve(views[0])}
                                                       views={views} />);
 
       expect(baseElement).not.toBeNull();
@@ -76,8 +74,7 @@ describe('SavedSearchList', () => {
       const views = createViewsResponse(1);
 
       const { getByText } = render(<SavedSearchList toggleModal={onToggleModal}
-                                                    showModal
-                                                    deleteSavedSearch={() => {}}
+                                                    deleteSavedSearch={() => Promise.resolve(views[0])}
                                                     views={views} />);
 
       const cancel = getByText('Cancel');
@@ -89,12 +86,9 @@ describe('SavedSearchList', () => {
 
     it('should call `onDelete` if saved search is deleted', () => {
       window.confirm = jest.fn(() => true);
-      const onDelete = jest.fn(() => {
-        return new Promise(() => {});
-      });
       const views = createViewsResponse(1);
+      const onDelete = jest.fn(() => Promise.resolve(views[0]));
       const { getByTestId } = render(<SavedSearchList toggleModal={() => {}}
-                                                      showModal
                                                       deleteSavedSearch={onDelete}
                                                       views={views} />);
       const deleteBtn = getByTestId('delete-foo-bar-0');
@@ -112,8 +106,7 @@ describe('SavedSearchList', () => {
       const { getByText } = render(
         <ViewLoaderContext.Provider value={onLoad}>
           <SavedSearchList toggleModal={() => {}}
-                           showModal
-                           deleteSavedSearch={() => {}}
+                           deleteSavedSearch={() => Promise.resolve(views[0])}
                            views={views} />
         </ViewLoaderContext.Provider>,
       );

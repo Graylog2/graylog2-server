@@ -35,7 +35,6 @@ const StreamThroughput = createReactClass({
 
   mixins: [Reflux.connect(MetricsStore)],
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     MetricsActions.addGlobal(this._metricName());
   },

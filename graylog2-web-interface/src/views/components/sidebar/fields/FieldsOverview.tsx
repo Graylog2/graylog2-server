@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { List as ImmutableList } from 'immutable';
 
 import connect from 'stores/connect';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import type { ThemeInterface } from 'theme';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/graylog';
 
@@ -39,7 +36,7 @@ type Props = {
   viewMetadata: ViewMetadata,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Container = styled.div`
   white-space: break-spaces;
   height: 100%;
   display: grid;

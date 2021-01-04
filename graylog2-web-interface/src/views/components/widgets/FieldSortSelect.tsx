@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
@@ -28,7 +27,7 @@ import Select from 'views/components/Select';
 
 type Props = {
   fields: Immutable.List<FieldTypeMapping>,
-  onChange: (newSort: Array<SortConfig>) => any,
+  onChange: (newSort: Array<SortConfig>) => void,
   sort: Array<SortConfig>,
 };
 
@@ -74,7 +73,7 @@ const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
   return (
     <Select placeholder="None: click to add fields"
             onChange={(newValue, reason) => onOptionChange(options, onChange, newValue, reason)}
-            options={options}
+            options={options.toJS()}
             isClearable
             value={currentValue(sort, options)} />
   );

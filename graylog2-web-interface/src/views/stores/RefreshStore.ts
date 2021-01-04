@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Reflux from 'reflux';
 
 import SearchActions from 'views/actions/SearchActions';
@@ -32,7 +31,7 @@ export const RefreshActions: RefreshActionsType = singletonActions(
     'enable',
     'disable',
     'setInterval',
-  ]),
+  ] as const),
 );
 
 export const RefreshStore = singletonStore(

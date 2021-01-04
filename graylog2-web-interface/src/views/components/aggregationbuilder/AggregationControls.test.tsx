@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
@@ -70,7 +69,6 @@ describe('AggregationControls', () => {
     suppressConsole(() => {
       const { getByTestId } = render((
         <AggregationControls config={config}
-                             // $FlowFixMe: Passing `undefined` fields on purpose
                              fields={undefined}
                              onChange={() => {}}>
           {children}

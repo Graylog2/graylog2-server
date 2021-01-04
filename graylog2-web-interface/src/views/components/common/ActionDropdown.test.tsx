@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
@@ -62,6 +61,27 @@ describe('ActionDropdown', () => {
     const wrapper = mount((
       <ActionDropdown element={<div>Trigger!</div>}>
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
+      </ActionDropdown>
+    ));
+    const trigger = wrapper.find('ActionToggle');
+
+    trigger.simulate('click');
+
+    const menuItem = wrapper.find('a[children="Foo"]');
+
+    menuItem.simulate('click');
+
+    expect(onSelect).toHaveBeenCalled();
+    expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
+  });
+
+  it('closes menu when MenuItem with a parent element is clicked', () => {
+    const onSelect = jest.fn();
+    const wrapper = mount((
+      <ActionDropdown element={<div>Trigger!</div>}>
+        <div>
+          <MenuItem onSelect={onSelect}>Foo</MenuItem>
+        </div>
       </ActionDropdown>
     ));
     const trigger = wrapper.find('ActionToggle');

@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { compact } from 'lodash';
 import * as Immutable from 'immutable';
 
@@ -28,7 +26,6 @@ import Role from 'logic/roles/Role';
 import { PaginatedListType } from 'components/common/PaginatedItemOverview';
 import UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { ThemeInterface } from 'theme';
 import { Button } from 'components/graylog';
 import { Select, ErrorAlert } from 'components/common';
 
@@ -45,7 +42,7 @@ const FormElements = styled.div`
   display: flex;
 `;
 
-const Errors: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const Errors = styled.div(({ theme }) => css`
   width: 100%;
   margin-top: 3px;
   color: ${theme.colors.variant.danger};

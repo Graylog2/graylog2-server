@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import Version from 'util/Version';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
@@ -45,7 +43,7 @@ type Jvm = {
   info: string;
 };
 
-const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.footer(({ theme }) => css`
+const StyledFooter = styled.footer(({ theme }) => css`
   text-align: center;
   font-size: ${theme.fonts.size.small};
   color: ${theme.colors.gray[70]};

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
 import { mount } from 'wrappedEnzyme';
@@ -111,7 +110,6 @@ describe('DrilldownContextProvider', () => {
     it('passes values from current query if present', () => {
       const query = Query.builder()
         .query(createElasticsearchQueryString('foo:"bar"'))
-        // $FlowFixMe: We know it is defined
         .filter(filtersForQuery(['onestream', 'anotherstream']))
         .timerange({ type: 'keyword', keyword: 'last year' })
         .build();

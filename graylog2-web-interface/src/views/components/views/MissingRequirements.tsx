@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'components/graylog/router';
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import { Col, Row, Button } from 'components/graylog';
@@ -39,7 +37,6 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => (
       <p>Unfortunately executing this view is not possible. It uses the following capabilities which are not available:</p>
 
       <ul>
-        {/* $FlowFixMe: Object.entries returns value as `mixed` */}
         {Object.entries(missingRequirements).map(([require, plugin]: [string, PluginMetadata]) => (
           <li key={require}>
             <strong>{require}</strong> - included in <a href={plugin.url} target="_blank" rel="noopener noreferrer">{plugin.name}</a>

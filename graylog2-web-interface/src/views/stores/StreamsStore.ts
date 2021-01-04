@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Reflux from 'reflux';
 
 import { Store } from 'stores/StoreTypes';
@@ -26,7 +25,7 @@ const { SessionActions } = CombinedProvider.get('Session');
 
 export const StreamsActions = singletonActions(
   'views.Streams',
-  () => Reflux.createActions(['refresh']),
+  () => Reflux.createActions(['refresh'] as const),
 );
 
 /* As the current implementation of the `StreamsStore` is not holding a state, using it requires to query the

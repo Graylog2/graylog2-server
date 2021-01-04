@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 
 type Center = [number, number];
@@ -67,10 +66,8 @@ export default class Viewport {
   }
 
   static fromJSON(value: ViewportJson) {
-    // eslint-disable-next-line camelcase
     const { center_x, center_y, zoom } = value;
 
-    // eslint-disable-next-line camelcase
     return Viewport.create([center_x, center_y], zoom);
   }
 }

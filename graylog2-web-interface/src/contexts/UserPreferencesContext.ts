@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 
 import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';

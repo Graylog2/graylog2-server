@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useState } from 'react';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import uuid from 'uuid/v4';
 import { Set } from 'immutable';
 import { $Shape } from 'utility-types';
@@ -111,7 +110,6 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   const configBuilder = ConfigBuilder.create([chartConfig]);
 
   // TODO: This should go into a visualization config specific function
-  // $FlowFixMe: This is a NumberVisualizationConfig. We know so for config.visualization is 'numeric'.
   if (config.visualization === 'numeric' && config.visualizationConfig && (config.visualizationConfig as NumberVisualizationConfig).trend) {
     const trendConfig = {
       ...(generateConfig(uuid(), 'trend', config)),
@@ -134,7 +132,6 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   return configBuilder.build();
 };
 
-/* eslint-disable camelcase */
 type Config = {
   id: string,
   name: string,
@@ -153,7 +150,6 @@ type Config = {
     id: string,
   },
 };
-/* eslint-enable camelcase */
 
 class ConfigBuilder {
   value: Set<Config>;

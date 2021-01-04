@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
@@ -35,7 +34,6 @@ describe('Views bindings value actions', () => {
   const findAction = (type) => valueActions.find((binding) => binding.type === type);
 
   describe('CreateExtractor', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const action: ValueAction = findAction('create-extractor');
     const { isEnabled } = action;
 

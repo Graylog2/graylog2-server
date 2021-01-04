@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useRef } from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
 import { Alert, FormGroup, InputGroup, FormControl } from 'components/graylog';
-import { ThemeInterface } from 'theme';
 import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
-const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
+const Container = styled(Alert)`
   display: flex;
   margin-top: 20px;
 `;
@@ -40,15 +38,15 @@ const URLColumn = styled.div`
   flex: 1;
 `;
 
-const StyledFormControl: StyledComponent<{}, ThemeInterface, FormControl> = styled(FormControl)(({ theme }) => `
+const StyledFormControl = styled(FormControl)(({ theme }) => css`
   &[readonly] {
     background-color: ${theme.colors.input.background};
   }
 `);
 
-const InputGroupAddon = styled(InputGroup.Addon)(() => `
+const InputGroupAddon = styled(InputGroup.Addon)`
   padding: 0;
-`);
+`;
 
 const StyledClipboardButton = styled(ClipboardButton)`
   border-radius: 0;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 
 import type { QueryString, TimeRange } from '../queries/Query';
@@ -91,7 +90,6 @@ export default class GlobalOverride {
   }
 
   static fromJSON(value: JsonRepresentation): GlobalOverride {
-    // eslint-disable-next-line camelcase
     const { timerange, query, keep_search_types, search_types } = value;
 
     return GlobalOverride.create(timerange, query, keep_search_types, search_types);

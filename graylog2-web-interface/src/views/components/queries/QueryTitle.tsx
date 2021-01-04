@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
@@ -26,7 +25,7 @@ import ViewState from 'views/logic/views/ViewState';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
-const TitleWrap = styled.span(({ active }) => css`
+const TitleWrap = styled.span<{ active: boolean }>(({ active }) => css`
   padding-right: ${active ? '6px' : '0'};
 `);
 
@@ -59,7 +58,6 @@ class QueryTitle extends React.Component<Props, State> {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
     /** TODO: Replace componentWillReceiveProps
      * https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#anti-pattern-unconditionally-copying-props-to-state

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -61,6 +60,7 @@ const TrafficGraph = ({ width, traffic }: Props) => {
         text: 'Bytes',
       },
       rangemode: 'tozero',
+      hoverformat: '.4s',
       tickformat: 's',
     },
   };

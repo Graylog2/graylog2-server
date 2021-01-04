@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent, Styles } from 'styled-components';
 import { List } from 'immutable';
 
-import type { ThemeInterface } from 'theme';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Field from 'views/components/Field';
 
@@ -30,10 +27,10 @@ type Props = {
   activeQueryFields: List<FieldTypeMapping>,
   fieldType: FieldTypeMapping,
   selectedQuery: string,
-  style: Styles,
+  style: React.CSSProperties,
 };
 
-const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = styled.li(({ theme }) => css`
+const StyledListItem = styled.li(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   display: table-row;
   white-space: nowrap;

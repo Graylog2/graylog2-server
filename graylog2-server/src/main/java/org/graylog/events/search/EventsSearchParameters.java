@@ -70,6 +70,10 @@ public abstract class EventsSearchParameters {
         return Builder.create();
     }
 
+    public static EventsSearchParameters empty() {
+        return builder().build();
+    }
+
     public abstract Builder toBuilder();
 
     @AutoValue.Builder

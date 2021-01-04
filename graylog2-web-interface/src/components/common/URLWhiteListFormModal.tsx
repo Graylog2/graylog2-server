@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
@@ -43,7 +42,7 @@ type Props = {
   newUrlEntry: string,
   onUpdate: () => void,
   configuration: {},
-  currentUser: {permissions: Array<string>},
+  currentUser: { permissions: Array<string> },
   urlType: 'regex' | 'literal' | '',
 };
 
@@ -56,15 +55,17 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     newUrlEntry: PropTypes.string,
     onUpdate: PropTypes.func,
     configuration: PropTypes.object,
-    currentUser: PropTypes.object.isRequired,
-    urlType: PropTypes.string,
+    currentUser: PropTypes.exact({
+      permissions: PropTypes.arrayOf(PropTypes.string),
+    }).isRequired,
+    urlType: PropTypes.oneOf(['regex', 'literal', ''] as const),
   };
 
   static defaultProps = {
     newUrlEntry: '',
     onUpdate: () => { return undefined; },
     configuration: {},
-    urlType: '',
+    urlType: '' as const,
   }
 
   constructor(props) {

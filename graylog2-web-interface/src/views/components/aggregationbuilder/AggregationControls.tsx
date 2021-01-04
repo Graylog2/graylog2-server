@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import { Col, Row } from 'components/graylog';
@@ -52,7 +50,7 @@ type State = {
   config: AggregationWidgetConfig,
 };
 
-const Container: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const Container = styled.div`
   display: grid;
   display: -ms-grid;
   grid-template-rows: auto minmax(10px, 1fr);
@@ -127,7 +125,6 @@ export default class AggregationControls extends React.Component<Props, State> {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().eventAnnotation(value).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onRollupChange = (rollup: $PropertyType<$PropertyType<Props, 'config'>, 'rollup'>) => {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().rollup(rollup).build() }));
   };

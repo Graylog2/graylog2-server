@@ -18,7 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
-import { Step } from 'components/common/Wizard';
+import { Step, StepKey } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
 export type WizardFormValues = {
@@ -57,7 +57,7 @@ export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
   backendValidationErrors: { [inputName: string]: React.ReactElement | string | null | undefined } | null | undefined,
   formValues: WizardFormValues,
-  invalidStepKeys: Array<string>,
+  invalidStepKeys: Array<StepKey>,
   authBackendMeta: AuthBackendMeta,
 };
 

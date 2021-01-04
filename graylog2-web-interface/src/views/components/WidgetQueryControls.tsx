@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
 import { Field, useFormikContext } from 'formik';
@@ -126,9 +125,9 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props
                               onChange={(newQuery) => {
                                 onChange({ target: { value: newQuery, name } });
 
-                                return Promise.resolve();
+                                return Promise.resolve(newQuery);
                               }}
-                              onExecute={handleSubmit} />
+                              onExecute={handleSubmit as () => void} />
                 )}
               </Field>
             </Col>

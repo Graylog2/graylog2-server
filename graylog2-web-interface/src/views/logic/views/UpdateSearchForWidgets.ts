@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { get } from 'lodash';
 
 import View from 'views/logic/views/View';
-import SearchTypesGenerator, { ResultType } from 'views/logic/searchtypes/SearchTypesGenerator';
+import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 
 const UpdateSearchForWidgets = (view: View): View => {
   const { state: states } = view;
@@ -26,8 +25,8 @@ const UpdateSearchForWidgets = (view: View): View => {
 
   const search = get(view, 'search');
   const newQueries = search.queries
-    .map((q) => q.toBuilder().searchTypes(searchTypes.get(q.id, {} as ResultType).searchTypes).build());
-  const newSearch = search.toBuilder().newId().queries(newQueries).build();
+    .map((q) => q.toBuilder().searchTypes(searchTypes.get(q.id)?.searchTypes ?? []).build());
+  const newSearch = search.toBuilder().newId().queries(newQueries.toSet()).build();
   let newView = view.toBuilder().search(newSearch).build();
 
   searchTypes.map(({ widgetMapping }) => widgetMapping)

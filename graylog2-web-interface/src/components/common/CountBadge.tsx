@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
-
-const Badge: StyledComponent<undefined, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => `
+const Badge = styled.span(({ theme }) => `
   background-color: ${theme.colors.variant.light.info};
 `);
 

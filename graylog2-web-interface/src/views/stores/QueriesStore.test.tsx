@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import moment from 'moment';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
@@ -92,7 +91,6 @@ describe('QueriesStore', () => {
     });
 
     it('throws error if no type is given', () => {
-      // $FlowFixMe: Passing no second argument on purpose
       return QueriesActions.rangeType('query1', undefined)
         .catch((error) => expect(error).toEqual(new Error('Invalid time range type: undefined')));
     });

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
@@ -44,7 +43,6 @@ export type MessagesWidgetConfigJSON = {
   decorators: Array<Decorator>,
   fields: Array<string>,
   sort: Array<SortConfigJson>,
-  // eslint-disable-next-line camelcase
   show_message_row: boolean,
 };
 
@@ -115,7 +113,6 @@ export default class MessagesWidgetConfig extends WidgetConfig {
   }
 
   static fromJSON(value: MessagesWidgetConfigJSON) {
-    // eslint-disable-next-line camelcase
     const { decorators, show_message_row, fields, sort } = value;
 
     return new MessagesWidgetConfig(fields, show_message_row, decorators, sort.map(SortConfig.fromJSON));

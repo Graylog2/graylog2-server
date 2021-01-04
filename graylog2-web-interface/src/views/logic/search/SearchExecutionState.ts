@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 
 import GlobalOverride from './GlobalOverride';
@@ -28,12 +27,10 @@ type InternalState = {
   globalOverride: GlobalOverride | undefined | null,
 };
 
-/* eslint-disable camelcase */
 type JsonRepresentation = {
   global_override: GlobalOverride | undefined | null,
   parameter_bindings: ParameterBindings,
 };
-/* eslint-enable camelcase */
 
 export default class SearchExecutionState {
   private _value: InternalState;
@@ -76,7 +73,6 @@ export default class SearchExecutionState {
   }
 
   static fromJSON(value: JsonRepresentation): SearchExecutionState {
-    // eslint-disable-next-line camelcase
     const { global_override, parameter_bindings } = value;
 
     return SearchExecutionState.create(parameter_bindings, global_override);

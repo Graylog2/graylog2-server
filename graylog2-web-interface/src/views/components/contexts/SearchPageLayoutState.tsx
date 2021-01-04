@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useContext, useState } from 'react';
 
@@ -53,7 +52,6 @@ const _getPinningPreferenceKey = (viewType: ViewType | undefined): PinningPrefer
 const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
   const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
 
-  // eslint-disable-next-line camelcase
   if (currentUser?.read_only) {
     return Store.get(sidebarPinningPrefKey);
   }
@@ -64,7 +62,6 @@ const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
 const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, newIsPinned) => {
   const sidebarPinningPrefKey: string = _getPinningPreferenceKey(viewType);
 
-  // eslint-disable-next-line camelcase
   if (currentUser?.read_only) {
     Store.set(sidebarPinningPrefKey, newIsPinned);
   } else {

@@ -63,10 +63,7 @@ class BackendStartupIT {
                         .extract().jsonPath()
                         .getList("plugins.name");
 
-        assertThat(pluginNames).containsExactlyInAnyOrder(
-                "Threat Intelligence Plugin",
-                "Collector",
-                "AWS plugins",
+        assertThat(pluginNames).containsAnyOf(
                 "Elasticsearch 6 Support",
                 "Elasticsearch 7 Support");
     }

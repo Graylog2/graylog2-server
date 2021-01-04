@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 
 import queryTitle from './QueryTitle';
@@ -58,17 +57,14 @@ describe('QueryTitle', () => {
   });
 
   it('returns `undefined` if query id is `undefined`', () => {
-    // $FlowFixMe: passing invalid values on purpose
     expect(queryTitle(view, undefined)).toEqual(undefined);
   });
 
   it('returns `undefined` if view is `undefined`', () => {
-    // $FlowFixMe: passing invalid values on purpose
     expect(queryTitle(undefined, undefined)).toEqual(undefined);
   });
 
   it('returns `undefined` if search is `undefined`', () => {
-    // $FlowFixMe: passing invalid values on purpose
     expect(queryTitle(View.create(), undefined)).toEqual(undefined);
   });
 
@@ -77,10 +73,8 @@ describe('QueryTitle', () => {
       .toBuilder()
       .search(Search.create()
         .toBuilder()
-        // $FlowFixMe: passing invalid values on purpose
         .queries(undefined)
         .build())
-      // $FlowFixMe: passing invalid values on purpose
       .build(), undefined)).toEqual(undefined);
   });
 });

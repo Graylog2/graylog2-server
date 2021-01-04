@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';

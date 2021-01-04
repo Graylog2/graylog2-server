@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { Col, Row, HelpBlock } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
@@ -32,7 +30,7 @@ const ValueCol = styled(Col)`
   padding-top: 7px;
 `;
 
-const LabelCol = styled(ValueCol)(({ theme }) => css`
+const LabelCol = styled(ValueCol)(({ theme }: { theme: DefaultTheme }) => css`
   font-weight: bold;
 
   @media (min-width: ${theme.breakpoints.min.md}) {
@@ -40,7 +38,7 @@ const LabelCol = styled(ValueCol)(({ theme }) => css`
   }
 `);
 
-const BooleanIcon: StyledComponent<{value?: boolean}, ThemeInterface, Icon> = styled(Icon)(({ theme, value }) => `
+const BooleanIcon = styled(Icon)(({ theme, value }: { theme: DefaultTheme, value: Props['value']}) => `
   color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
 `);
 

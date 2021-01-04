@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -37,6 +36,7 @@ import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvi
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import Search from './Search';
+import DashboardSearchBar from './DashboardSearchBar';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
@@ -109,7 +109,7 @@ jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
 jest.mock('routing/withLocation', () => (Component) => (props) => <Component location={{ query: {}, pathname: '', search: '' }} {...props} />);
 
-const mockPromise = <T,>(res: T): Promise<T> => {
+const mockPromise = <T, >(res: T): Promise<T> => {
   const promise = Promise.resolve(res);
 
   // @ts-ignore
@@ -124,8 +124,8 @@ describe('Search', () => {
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
     // @ts-ignore
     SearchActions.execute = jest.fn(() => mockPromise());
-    StreamsActions.refresh = jest.fn();
-    SearchConfigActions.refresh = jest.fn();
+    StreamsActions.refresh = mockAction(jest.fn());
+    SearchConfigActions.refresh = mockAction(jest.fn());
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
 
@@ -139,7 +139,6 @@ describe('Search', () => {
     FieldTypesActions.all = mockAction(jest.fn(async () => {}));
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
-    // $FlowFixMe: Somehow flow does not see the `listen` property.
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
     asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
@@ -166,23 +165,6 @@ describe('Search', () => {
     mount(<SimpleSearch />);
 
     expect(SearchConfigActions.refresh).toHaveBeenCalled();
-  });
-
-  it('does not register to WidgetStore upon mount', () => {
-    mount(<SimpleSearch />);
-
-    expect(WidgetStore.listen).not.toHaveBeenCalled();
-  });
-
-  it('does not unregister from Widget store upon unmount', () => {
-    const unsubscribe = jest.fn();
-
-    WidgetStore.listen = jest.fn(() => unsubscribe);
-    const wrapper = mount(<SimpleSearch />);
-
-    wrapper.unmount();
-
-    expect(unsubscribe).not.toHaveBeenCalled();
   });
 
   it('does not register to QueryFiltersStore upon mount', () => {
@@ -283,12 +265,12 @@ describe('Search', () => {
   it('refreshing after query change parses search metadata first', (done) => {
     const wrapper = mount(<SimpleSearch />);
 
-    const searchBar = wrapper.find('DashboardSearchBar');
-    const cb = searchBar.at(0).props().onExecute;
+    const searchBar = wrapper.find(DashboardSearchBar);
+    const cb = searchBar.at(0).props().onExecute as (view?: View) => Promise<void>;
 
     const view = { search: {} };
 
-    const promise = cb(view);
+    const promise = cb(view as View);
 
     promise.then(() => {
       expect(SearchMetadataActions.parseSearch).toHaveBeenCalled();

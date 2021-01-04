@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
-import type { ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
 import type { Pagination } from 'stores/PaginationTypes';
 
@@ -29,7 +27,7 @@ type Props = {
   onSearch: (query: $PropertyType<Pagination, 'query'>) => void,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Container = styled.div`
   margin-bottom: 10px;
 `;
 

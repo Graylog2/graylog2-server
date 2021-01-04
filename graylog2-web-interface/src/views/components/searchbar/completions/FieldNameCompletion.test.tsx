@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import * as Immutable from 'immutable';

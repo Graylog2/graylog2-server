@@ -72,7 +72,6 @@ const ConfigurationForm = createReactClass({
     };
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
   },

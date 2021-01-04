@@ -14,9 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-
-// $FlowFixMe: imports from core need to be fixed in flow
 import each from 'jest-each';
 
 import inferTypeForSeries from './InferTypeForSeries';
@@ -64,7 +61,6 @@ describe('InferTypeForSeries', () => {
   });
 
   it('returns unknown if field types are `undefined`', () => {
-    // $FlowFixMe: passing invalid types parameter on purpose.
     expect(inferTypeForSeries(Series.forFunction('avg(foo)'), undefined))
       .toEqual(FieldTypeMapping.create('avg(foo)', FieldType.Unknown));
   });

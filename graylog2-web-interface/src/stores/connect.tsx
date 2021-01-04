@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { isFunction } from 'lodash';
@@ -30,6 +29,8 @@ type StoreType<State> = {
 export type ExtractStoreState<Store> = Store extends StoreType<infer V> ? V : never;
 
 export type ResultType<Stores> = { [K in keyof Stores]: ExtractStoreState<Stores[K]> };
+
+type PropsWithDefaults<C extends React.ComponentType> = JSX.LibraryManagedAttributes<C, React.ComponentProps<C>>;
 
 type PropsMapper<V, R> = (props: V) => R;
 
@@ -80,30 +81,29 @@ export function useStore(store, propsMapper = id) {
  *
  */
 
-function connect<Props extends object, Stores extends object>(
-    Component: React.ComponentType<Props>,
-    stores: Stores
-    // @ts-ignore
-): React.ComponentType<Optional<Props, keyof Stores>>;
+function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object>(
+  Component: C,
+  stores: Stores
+): React.ComponentType<Optional<PropsWithDefaults<C>, keyof Stores>>;
 
-function connect<Stores extends object, Props extends MappedProps, MappedProps extends object>(
-    Component: React.ComponentType<Props>,
+function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object, MappedProps extends object>(
+    Component: C,
     stores: Stores,
     mapProps: PropsMapper<ResultType<Stores>, MappedProps>
-): React.ComponentType<Optional<Props, keyof MappedProps>>;
+): React.ComponentType<Optional<PropsWithDefaults<C>, keyof MappedProps>>;
 
 function connect<
+    C extends React.ComponentType<React.ComponentProps<C>>,
     Stores,
-    Props extends MappedProps,
     MappedProps extends object,
     >(
-  Component: React.ComponentType<Props>,
+  Component: C,
   stores: Stores,
   mapProps: PropsMapper<ResultType<Stores>, MappedProps> = (props: ResultType<Stores>) => props as MappedProps,
-): React.ComponentType<Optional<Props, keyof MappedProps>> {
+): React.ComponentType<Optional<PropsWithDefaults<C>, keyof MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
 
-  class ConnectStoresWrapper extends React.Component<Optional<Props, keyof MappedProps>> {
+  class ConnectStoresWrapper extends React.Component<Optional<PropsWithDefaults<C>, keyof MappedProps>> {
     // eslint-disable-next-line react/state-in-constructor
     state: ResultType<Stores>;
 
@@ -173,7 +173,7 @@ function connect<
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { ref, ...componentProps } = this.props;
 
-      return <Component {...nextProps as MappedProps} {...componentProps as Props} />;
+      return <Component {...nextProps as MappedProps} {...componentProps as PropsWithDefaults<C>} />;
     }
   }
 

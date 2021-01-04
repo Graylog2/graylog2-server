@@ -41,7 +41,6 @@ export default class ViewPropertiesModal extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { title } = this.props;
     const { view } = this.state;

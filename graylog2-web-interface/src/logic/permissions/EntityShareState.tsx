@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
@@ -81,7 +80,6 @@ type InternalState = {
   validationResults: ValidationResult,
 };
 
-/* eslint-disable camelcase */
 export type EntityShareStateJson = {
   entity: $PropertyType<InternalState, 'entity'>,
   available_grantees: Array<GranteeType>,
@@ -93,7 +91,6 @@ export type EntityShareStateJson = {
   missing_permissions_on_dependencies: {[key: string]: Array<SharedEntityType>},
   validation_result: ValidationResultJSON,
 };
-/* eslint-enable camelcase */
 
 export default class EntityShareState {
   _value: InternalState;
@@ -209,7 +206,6 @@ export default class EntityShareState {
   }
 
   static fromJSON(value: EntityShareStateJson): EntityShareState {
-    /* eslint-disable camelcase */
     const {
       entity,
       available_grantees,
@@ -227,7 +223,6 @@ export default class EntityShareState {
     const missingDependencies = _missingDependenciesFromJSON(missing_permissions_on_dependencies);
     const validationResults = ValidationResult.fromJSON(validation_result);
 
-    /* eslint-enable camelcase */
     return new EntityShareState(
       entity,
       availableGrantees,

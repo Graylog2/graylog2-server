@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
+import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
@@ -32,12 +32,22 @@ import TSearchResult from 'views/logic/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/graylog';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 type IndicatorProps = {
   searchLoadingState: {
     isLoading: boolean;
   };
 };
+
+const StyledRow = styled(Row)(({ overflow }) => css`
+  height: 100%;
+  ${overflow}
+`);
+
+const StyledCol = styled(Col)`
+  height: 100%;
+`;
 
 const SearchLoadingIndicator = connect(
   ({ searchLoadingState }: IndicatorProps) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
@@ -57,6 +67,7 @@ type Props = {
 
 const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
+  const { focusedWidget } = useContext(WidgetFocusContext);
 
   if (!fieldTypes) {
     return <Spinner />;
@@ -64,6 +75,8 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
 
   const results = searches && searches.result;
   const widgetMapping = searches && searches.widgetMapping;
+
+  const hasFocusedWidget = !!focusedWidget;
 
   const currentResults = results ? results.forId(queryId) : undefined;
   const allFields = fieldTypes.all;
@@ -79,12 +92,12 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   ) : <Spinner />;
 
   return (
-    <Row>
-      <Col>
+    <StyledRow overflow={hasFocusedWidget ? 'overflow: auto' : undefined}>
+      <StyledCol>
         {content}
         <SearchLoadingIndicator />
-      </Col>
-    </Row>
+      </StyledCol>
+    </StyledRow>
   );
 });
 

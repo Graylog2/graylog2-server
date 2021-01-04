@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { withTheme } from 'styled-components';
+import { DefaultTheme, withTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
-import type { ThemeInterface } from 'theme';
 import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
@@ -71,8 +69,9 @@ type Props = {
   layout: {},
   onZoom: (from: string, to: string) => boolean,
   setChartColor?: (data: ChartConfig, color: ColorMap) => ChartColor,
-  theme: ThemeInterface,
 };
+
+type GenericPlotProps = Props & { theme: DefaultTheme };
 
 type State = {
   legendConfig?: LegendConfig,
@@ -88,7 +87,7 @@ const nonInteractiveLayout = {
   hovermode: false,
 };
 
-class GenericPlot extends React.Component<Props, State> {
+class GenericPlot extends React.Component<GenericPlotProps, State> {
   static propTypes = {
     chartData: PropTypes.array.isRequired,
     layout: PropTypes.object,
@@ -104,7 +103,7 @@ class GenericPlot extends React.Component<Props, State> {
     setChartColor: undefined,
   };
 
-  constructor(props: Props) {
+  constructor(props: GenericPlotProps) {
     super(props);
     this.state = {};
   }
@@ -137,7 +136,6 @@ class GenericPlot extends React.Component<Props, State> {
     if (getChartColor) {
       const color = getChartColor(e.fullData, name);
 
-      /* $FlowFixMe color is already declared as optional */
       this.setState({ legendConfig: { name, target, color } });
     }
 
@@ -163,7 +161,7 @@ class GenericPlot extends React.Component<Props, State> {
         pad: 0,
       },
       legend: {
-        orientation: 'h',
+        orientation: 'h' as const,
         font: {
           color: theme.colors.variant.darkest.default,
         },
@@ -206,7 +204,7 @@ class GenericPlot extends React.Component<Props, State> {
 
     const style = { height: '100%', width: '100%' };
 
-    const config = { displayModeBar: false, doubleClick: false, responsive: true };
+    const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
     const { legendConfig } = this.state;
 

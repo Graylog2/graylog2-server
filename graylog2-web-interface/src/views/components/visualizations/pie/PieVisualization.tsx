@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
@@ -65,10 +64,8 @@ const getChartColor = (fullDataArray, name) => {
 
   if (fullData && fullData.labels && fullData.marker && fullData.marker.colors) {
     const indexOfName = fullData.labels.indexOf(name);
-    // $FlowFixMe the check above ensures the presents of marker
     const { marker: { colors } } = fullData;
 
-    // $FlowFixMe the check above ensures the presents of colors
     return colors[indexOfName];
   }
 

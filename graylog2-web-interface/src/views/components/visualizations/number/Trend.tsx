@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { StyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import numeral from 'numeral';
 
-import type { ThemeInterface } from 'theme';
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
@@ -33,7 +31,7 @@ type Props = {
   trendPreference: TrendPreference,
 };
 
-const Background: StyledComponent<{ trend: string | undefined | null }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
+const Background = styled.div<{ trend: string | undefined | null }>(({ theme, trend }) => {
   const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
@@ -70,7 +68,7 @@ const _trendIcon = (delta) => {
   return <Icon name={delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down'} />;
 };
 
-const Trend = React.forwardRef<Props, any>(({ current, previous, trendPreference }: Props, ref) => {
+const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference }: Props, ref) => {
   const difference = previous ? current - previous : NaN;
   const differencePercent = previous ? difference / previous : NaN;
 

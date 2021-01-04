@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import download from 'downloadjs';
 
 import { fetchFile } from 'logic/rest/FetchProvider';
@@ -24,7 +23,6 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { QueryString, TimeRange } from 'views/logic/queries/Query';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
-/* eslint-disable camelcase */
 export type ExportPayload = {
   timerange?: TimeRange | undefined | null,
   query_string?: QueryString,
@@ -33,7 +31,6 @@ export type ExportPayload = {
   execution_state?: SearchExecutionState,
   limit?: number,
 };
-/* eslint-enable camelcase */
 
 const downloadCSV = (fileContent: string, filename: string = 'search-result') => {
   download(fileContent, `${filename}.csv`, 'text/csv');

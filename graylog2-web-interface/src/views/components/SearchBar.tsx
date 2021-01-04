@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
@@ -132,9 +131,9 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                                     onChange={(newQuery) => {
                                       onChange({ target: { value: newQuery, name } });
 
-                                      return Promise.resolve();
+                                      return Promise.resolve(newQuery);
                                     }}
-                                    onExecute={handleSubmit} />
+                                    onExecute={handleSubmit as () => void} />
                       )}
                     </Field>
                   </Col>

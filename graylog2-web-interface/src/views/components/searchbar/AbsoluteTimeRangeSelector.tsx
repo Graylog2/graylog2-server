@@ -14,16 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
-import type { ThemeInterface } from 'theme';
 
 import TimerangeSelector from './TimerangeSelector';
 import DateInputWithPicker from './DateInputWithPicker';
@@ -32,15 +29,15 @@ type Props = {
   disabled: boolean,
 };
 
-const StyledTimerangeSelector: StyledComponent<{}, void, any> = styled(TimerangeSelector)`
+const StyledTimerangeSelector = styled(TimerangeSelector)`
   display: flex;
 `;
 
-const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const InputWrap = styled.div`
   width: 200px;
 `;
 
-const Separator: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
+const Separator = styled.p(({ theme }) => css`
   margin: 0;
   line-height: 34px;
   font-size: ${theme.fonts.size.large};

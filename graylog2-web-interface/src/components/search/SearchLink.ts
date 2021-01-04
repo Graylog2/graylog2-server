@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import URI from 'urijs';
 import { $PropertyType } from 'utility-types';
@@ -53,7 +52,6 @@ const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: str
 export default class SearchLink {
   _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(
     id: $PropertyType<InternalState, 'id'>,
     timerange: $PropertyType<InternalState, 'timerange'>,
@@ -135,7 +133,6 @@ class Builder {
     this.value = value;
   }
 
-  // eslint-disable-next-line no-undef
   id(value: $PropertyType<InternalState, 'id'>) {
     return new Builder(this.value.set('id', value));
   }

@@ -123,7 +123,7 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>2.31</jersey.version>
+        <jersey.version>2.32</jersey.version>
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.10.6</joda-time.version>
         <jool.version>0.9.14</jool.version>
@@ -137,6 +137,7 @@
         <netty.version>4.1.52.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.34.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
+        <okta-sdk.version>3.0.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.5</pkts.version>
@@ -389,6 +390,8 @@
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>
                         <jsx>SLASHSTAR_STYLE</jsx>
+                        <ts>SLASHSTAR_STYLE</ts>
+                        <tsx>SLASHSTAR_STYLE</tsx>
                     </mapping>
                     <licenseSets>
                         <licenseSet>
@@ -408,16 +411,26 @@
                                 <include>*.js</include>
                                 <include>src/web/**/*.js</include>
                                 <include>src/web/**/*.jsx</include>
+                                <include>src/web/**/*.ts</include>
+                                <include>src/web/**/*.tsx</include>
                                 <include>graylog2-web-interface/*.js</include>
+                                <include>graylog2-web-interface/*.ts</include>
                                 <include>graylog2-web-interface/config/**/*.js</include>
+                                <include>graylog2-web-interface/config/**/*.ts</include>
                                 <include>graylog2-web-interface/packages/**/*.js</include>
                                 <include>graylog2-web-interface/packages/**/*.jsx</include>
-                                <include>graylog2-web-interface/src/**/*.js</include>
+                                <include>graylog2-web-interface/packages/**/*.ts</include>
+                                <include>graylog2-web-interface/packages/**/*.tsx</include>
                                 <include>graylog2-web-interface/src/**/*.js</include>
                                 <include>graylog2-web-interface/src/**/*.jsx</include>
+                                <include>graylog2-web-interface/src/**/*.ts</include>
+                                <include>graylog2-web-interface/src/**/*.tsx</include>
                                 <include>graylog2-web-interface/test/**/*.js</include>
                                 <include>graylog2-web-interface/test/**/*.jsx</include>
+                                <include>graylog2-web-interface/test/**/*.ts</include>
+                                <include>graylog2-web-interface/test/**/*.tsx</include>
                                 <include>graylog2-web-interface/webpack/**/*.js</include>
+                                <include>graylog2-web-interface/webpack/**/*.ts</include>
                             </includes>
                             <excludes>
                                 <exclude>**/resources/swagger/**</exclude>

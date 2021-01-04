@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import fetch from 'logic/rest/FetchProvider';
 import Search from 'views/logic/search/Search';
 

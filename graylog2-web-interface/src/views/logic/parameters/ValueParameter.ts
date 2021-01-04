@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 
 import * as Immutable from 'immutable';
 
@@ -62,7 +61,6 @@ export default class ValueParameter extends Parameter {
   }
 
   static fromJSON(value: ParameterJson): ValueParameter {
-    // eslint-disable-next-line camelcase
     const { name, title, description, data_type, default_value, optional, binding } = value;
 
     return new ValueParameter(name, title, description, data_type, default_value, optional, ParameterBinding.fromJSON(binding));

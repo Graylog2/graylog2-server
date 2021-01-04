@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 
 import Widget from 'views/logic/widgets/Widget';
+import { SearchTypeList } from 'views/logic/queries/Query';
+import { SearchType } from 'views/logic/queries/SearchType';
 
 import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
@@ -28,14 +29,12 @@ import { WidgetId } from '../views/types';
 const filterForWidget = (widget) => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
 export type ResultType = {
-  searchTypes: Immutable.Set<Immutable.Map<string, any>>,
+  searchTypes: SearchTypeList,
   widgetMapping: WidgetMapping,
 };
 
-type SearchType = {
+type SearchTypeWithWidgetId = SearchType & {
   widgetId: string;
-  type: string;
-  id: string;
   config: any;
 };
 
@@ -54,7 +53,7 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
         widgetId: widget.id,
         ...filterForWidget(widget),
       })))
-    .reduce((acc, cur) => acc.merge(cur), Immutable.Set<SearchType>())
+    .reduce((acc, cur) => acc.merge(cur), Immutable.Set<SearchTypeWithWidgetId>())
     .map((searchType) => {
       widgetMapping = widgetMapping.update(searchType.widgetId, Immutable.Set(), (widgetSearchTypes) => widgetSearchTypes.add(searchType.id));
       const typeDefinition = searchTypeDefinition(searchType.type);
@@ -65,7 +64,12 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
       }
 
       const { defaults = {} } = typeDefinition || {};
-      const { config, widgetId, ...rest } = searchType;
+      const {
+        config,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        widgetId,
+        ...rest
+      } = searchType;
 
       return Immutable.Map<string, any>(defaults)
         .merge(rest)
@@ -75,9 +79,10 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
             id: searchType.id,
             type: searchType.type,
           },
-        );
+        )
+        .toJS() as SearchType;
     })
-    .toSet();
+    .toArray();
 
   return { widgetMapping, searchTypes };
 };

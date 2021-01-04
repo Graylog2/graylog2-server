@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState } from 'react';
 import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
 import SearchPageLayoutContext, { SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
@@ -49,7 +46,7 @@ const Container = styled.div`
   width: min-content;
 `;
 
-const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const ContentOverlay = styled.div(({ theme }) => css`
   position: fixed;
   top: 0;
   bottom: 0;

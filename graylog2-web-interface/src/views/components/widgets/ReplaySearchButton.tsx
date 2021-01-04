@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { IconButton } from 'components/common';
 import SearchLink from 'components/search/SearchLink';
@@ -26,7 +24,7 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import DrilldownContext from '../contexts/DrilldownContext';
 
-const NeutralLink: StyledComponent<{}, {}, HTMLAnchorElement> = styled.a`
+const NeutralLink = styled.a`
   color: inherit;
   text-decoration: none;
 

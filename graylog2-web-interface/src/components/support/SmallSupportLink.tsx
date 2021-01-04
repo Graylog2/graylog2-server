@@ -14,26 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { Icon } from 'components/common';
-import type { ThemeInterface } from 'theme';
 
 type Props = {
   children: React.ReactNode,
 };
 
-const Description: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const Description = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: center;
 `;
 
-const IconStack: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const IconStack = styled.div(({ theme }) => css`
   position: relative;
   min-width: 2.5em;
   
@@ -46,7 +43,7 @@ const IconStack: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
   }
 `);
 
-const Content: StyledComponent<{}, void, HTMLParagraphElement> = styled.p`
+const Content = styled.p`
   font-weight: bold;
   margin: 0;
 `;

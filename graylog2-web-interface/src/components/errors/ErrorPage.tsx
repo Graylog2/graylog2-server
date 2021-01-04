@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -26,7 +25,7 @@ import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
 const generateStyles = () => css`
   body {
-    background: url(${(props) => props.backgroundImage}) no-repeat center center fixed;
+    background: url(${({ backgroundImage }: { backgroundImage: string }) => backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;

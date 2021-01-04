@@ -15,23 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import UserOverview from 'logic/users/UserOverview';
 import { OverlayTrigger, Popover } from 'components/graylog';
-import type { ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 
 type Props = {
   accountStatus: $PropertyType<UserOverview, 'accountStatus'>,
 };
 
-const Wrapper: StyledComponent<{enabled?: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, enabled }) => `
+const Wrapper = styled.div<{ enabled: boolean }>(({ theme, enabled }) => `
   color: ${enabled ? theme.colors.variant.success : theme.colors.variant.default};
 `);
 
-const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
+const Td = styled.td`
   width: 35px;
   text-align: center;
 `;

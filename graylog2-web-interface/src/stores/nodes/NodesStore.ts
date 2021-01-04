@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
-
-import { Store } from '../StoreTypes';
 
 const { NodesActions } = CombinedProvider.get('Nodes');
 const { SessionStore } = CombinedProvider.get('Session');
@@ -48,7 +45,7 @@ export type NodesStoreState = {
   clusterId: string;
   nodeCount: number;
 };
-const NodesStore: Store<NodesStoreState> = Reflux.createStore({
+const NodesStore = Reflux.createStore<NodesStoreState>({
   listenables: [NodesActions],
   nodes: undefined,
   clusterId: undefined,

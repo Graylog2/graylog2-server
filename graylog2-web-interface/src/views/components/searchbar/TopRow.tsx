@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { Row } from 'components/graylog';
 
-const TopRow: StyledComponent<{}, void, Row> = styled(Row)`
+const TopRow = styled(Row)`
   margin-bottom: 10px;
 `;
 

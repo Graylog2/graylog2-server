@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-import { ThemeInterface } from 'theme';
 import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
@@ -36,7 +34,7 @@ const DEFAULT_PAGINATION = {
   query: '',
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const Container = styled.div`
   .data-table {
     overflow-x: visible;
   }

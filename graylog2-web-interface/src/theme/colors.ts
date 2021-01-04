@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 
 import teint from './variants/teint';
@@ -155,25 +154,15 @@ export const colorsPropTypes = PropTypes.shape({
     textDefault: PropTypes.string,
   }),
   gray: PropTypes.shape({
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     10: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     20: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     30: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     40: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     50: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     60: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     70: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     80: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     90: PropTypes.string,
-    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
     100: PropTypes.string,
   }),
   input: PropTypes.shape({

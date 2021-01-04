@@ -30,7 +30,6 @@ const { PreferencesStore } = CombinedProvider.get('Preferences');
 type CurrentUser = {
   currentUser?: {
     username: string;
-    // eslint-disable-next-line camelcase
     read_only: boolean;
   };
 };

@@ -14,16 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { $PropertyType } from 'utility-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Grantee from 'logic/permissions/Grantee';
-import { ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const Container = styled.div(({ theme }) => css`
   display: inline-flex;
   align-items: center;
   justify-content: center;

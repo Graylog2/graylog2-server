@@ -34,6 +34,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @Api(value = "Events", description = "Events overview and search")
 @Path("/events")
 @Produces(MediaType.APPLICATION_JSON)
@@ -52,6 +54,6 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Search events")
     @NoAuditEvent("Doesn't change any data, only searches for events")
     public EventsSearchResult search(@ApiParam(name = "JSON body") EventsSearchParameters request) {
-        return searchService.search(request, getSubject());
+        return searchService.search(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
     }
 }

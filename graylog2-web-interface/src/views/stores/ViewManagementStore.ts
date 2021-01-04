@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
 import type { RefluxActions } from 'stores/StoreTypes';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { Pagination } from 'stores/PaginationTypes';
 
 export type SortOrder = 'asc' | 'desc';
 
@@ -72,13 +72,18 @@ const ViewManagementActions: ViewManagementActionsType = singletonActions(
   }),
 );
 
-const viewsUrl = URLUtils.qualifyUrl('/views');
-const viewsIdUrl = (id) => URLUtils.qualifyUrl(`/views/${id}`);
-const forValueUrl = () => URLUtils.qualifyUrl('/views/forValue');
+const viewsUrl = qualifyUrl('/views');
+const viewsIdUrl = (id) => qualifyUrl(`/views/${id}`);
+const forValueUrl = () => qualifyUrl('/views/forValue');
+
+type ViewManagementStoreState = {
+  pagination: Pagination;
+  list: Array<ViewJson>;
+};
 
 const ViewManagementStore = singletonStore(
   'views.ViewManagement',
-  () => Reflux.createStore({
+  () => Reflux.createStore<ViewManagementStoreState>({
     listenables: [ViewManagementActions],
 
     views: undefined,

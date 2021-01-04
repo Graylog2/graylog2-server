@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
@@ -53,7 +52,7 @@ describe('XYPlot', () => {
   const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
   const timestampPivot = new Pivot('timestamp', 'time', {});
   const config = AggregationWidgetConfig.builder().rowPivots([timestampPivot]).build();
-  const getChartColor = () => {};
+  const getChartColor = () => undefined;
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42] }];
   type SimpleXYPlotProps = {

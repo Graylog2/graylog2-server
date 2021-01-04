@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Widget from 'views/logic/widgets/Widget';
@@ -30,7 +29,6 @@ describe('Views bindings enterprise widgets', () => {
   const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 
   describe('Aggregations', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const aggregationConfig: WidgetCondig = findWidgetConfig('AGGREGATION');
 
     it('is present', () => {

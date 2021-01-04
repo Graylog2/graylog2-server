@@ -103,7 +103,6 @@ const CollectorProcessControl = createReactClass({
 
     // Check if all selected collectors have assigned configurations
     const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => {
-      // eslint-disable-next-line camelcase
       return sidecar.assignments.some(({ collector_id }) => collector_id === collector.id);
     });
 

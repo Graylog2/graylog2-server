@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
@@ -137,22 +136,24 @@ describe('MessageList', () => {
 
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
-    const wrapper1 = mount(<MessageList editing
-                                        data={data}
-                                        config={config}
-                                        fields={Immutable.List(fields)}
-                                        setLoadingState={() => {}} />);
+    const wrapper1 = mount(
+      <MessageList data={data}
+                   config={config}
+                   fields={Immutable.List(fields)}
+                   setLoadingState={() => {}} />,
+    );
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
 
     const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
 
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
-    const wrapper2 = mount(<MessageList editing
-                                        data={data}
-                                        config={emptyConfig}
-                                        fields={Immutable.List(fields)}
-                                        setLoadingState={() => {}} />);
+    const wrapper2 = mount(
+      <MessageList data={data}
+                   config={emptyConfig}
+                   fields={Immutable.List(fields)}
+                   setLoadingState={() => {}} />,
+    );
 
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
@@ -160,11 +161,12 @@ describe('MessageList', () => {
   it('provides a message context for each individual entry', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
-    const wrapper = mount(<MessageList editing
-                                       data={data}
-                                       fields={Immutable.List(fields)}
-                                       config={config}
-                                       setLoadingState={() => {}} />);
+    const wrapper = mount(
+      <MessageList data={data}
+                   fields={Immutable.List(fields)}
+                   config={config}
+                   setLoadingState={() => {}} />,
+    );
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
 
@@ -175,8 +177,7 @@ describe('MessageList', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
 
-    mount(<MessageList editing
-                       data={data}
+    mount(<MessageList data={data}
                        fields={Immutable.List([])}
                        config={config}
                        setLoadingState={() => {}} />);
@@ -185,8 +186,7 @@ describe('MessageList', () => {
   it('refreshs Inputs list upon mount', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (
-      <MessageList editing
-                   data={data}
+      <MessageList data={data}
                    fields={Immutable.List([])}
                    config={config}
                    setLoadingState={() => {}} />
@@ -201,8 +201,7 @@ describe('MessageList', () => {
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList editing
-                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
@@ -215,8 +214,7 @@ describe('MessageList', () => {
   it('disables refresh actions, when using pagination', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList editing
-                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
@@ -233,8 +231,7 @@ describe('MessageList', () => {
 
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const wrapper = mount(<MessageList editing
-                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+    const wrapper = mount(<MessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
@@ -248,8 +245,7 @@ describe('MessageList', () => {
   it('calls render completion callback after first render', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const Component = () => (
-      <MessageList editing
-                   data={data}
+      <MessageList data={data}
                    fields={Immutable.List([])}
                    config={config}
                    setLoadingState={() => {}} />

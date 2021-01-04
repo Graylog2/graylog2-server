@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
@@ -25,7 +24,6 @@ type InternalState = {
 
 export type HTTPHeaderAuthConfigJSON = {
   enabled: boolean,
-  // eslint-disable-next-line camelcase
   username_header: string,
 };
 

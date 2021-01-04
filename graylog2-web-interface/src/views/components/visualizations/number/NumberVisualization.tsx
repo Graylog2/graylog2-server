@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -29,10 +27,7 @@ import DecoratedValue from 'views/components/messagelist/decoration/DecoratedVal
 import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import type {
-  VisualizationComponent,
-  VisualizationComponentProps,
-} from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import Trend from './Trend';
@@ -40,7 +35,7 @@ import AutoFontSizer from './AutoFontSizer';
 
 import type { CurrentViewType } from '../../CustomPropTypes';
 
-const GridContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const GridContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 4fr 1fr;

@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { last, sortBy } from 'lodash';
+import { withTheme, DefaultTheme } from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
@@ -40,6 +40,7 @@ type Props = {
   field: string,
   value?: any,
   highlightRanges: Ranges,
+  theme: DefaultTheme,
 };
 
 function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
@@ -55,8 +56,8 @@ function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
 
 const shouldBeFormatted = (field, value) => isFunction(field) && isNumeric(value);
 
-const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {} }: Props) => {
-  if (value === undefined || value == null) {
+const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {}, theme }: Props) => {
+  if (value === undefined || value === null) {
     return '';
   }
 
@@ -68,6 +69,8 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
 
   const style = {
     backgroundColor: color,
+    color: theme.utils.contrastingColor(color),
+    padding: '0 1px',
   };
 
   if (highlightCompleteValue(highlightRanges[field], value)) {
@@ -88,7 +91,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   const highlights = ranges
     .filter(({ start }) => (start >= 0))
     .filter(({ length }) => (length >= 0))
-    .reduce(([acc, i], cur, idx) => [
+    .reduce<[HighlightRange[], number]>(([acc, i], cur, idx) => [
       [...acc,
         subst(i, Math.max(0, cur.start - i)), // non-highlighted string before this range
         highlight(subst(Math.max(cur.start, i), Math.max(0, cur.length - Math.max(0, i - cur.start))), idx, style), // highlighted string in range
@@ -116,4 +119,4 @@ PossiblyHighlight.defaultProps = {
   value: undefined,
 };
 
-export default PossiblyHighlight;
+export default withTheme(PossiblyHighlight);

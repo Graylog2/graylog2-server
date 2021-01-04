@@ -16,11 +16,22 @@
  */
 import Reflux from 'reflux';
 
-const StreamsActions = Reflux.createActions({
-  list: { asyncResult: true },
-  create: { asyncResult: true },
+import { singletonActions } from 'views/logic/singleton';
+
+const StreamsActions = singletonActions('Streams', () => Reflux.createActions({
+  searchPaginated: { asyncResult: true },
+  listStreams: { asyncResult: true },
+  load: { asyncResult: true },
+  get: { asyncResult: true },
+  remove: { asyncResult: true },
+  pause: { asyncResult: true },
+  resume: { asyncResult: true },
+  cloneStream: { asyncResult: true },
   update: { asyncResult: true },
-  delete: { asyncResult: true },
-});
+  save: { asyncResult: true },
+  removeOutput: { asyncResult: true },
+  addOutput: { asyncResult: true },
+  testMatch: { asyncResult: true },
+}));
 
 export default StreamsActions;

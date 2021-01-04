@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { trim } from 'lodash';
 
 const isPhrase = (searchTerm: string | undefined | null) => {

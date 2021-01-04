@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import uuid from 'uuid/v4';
 
@@ -58,6 +57,7 @@ export type HandlerAction = {
   title: string,
   component?: ActionComponentType,
   handler?: ActionHandler,
+  resetFocus: boolean,
 };
 
 export type ActionDefinition = HandlerAction & ActionHandlerConditions;

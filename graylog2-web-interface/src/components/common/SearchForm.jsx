@@ -146,7 +146,6 @@ class SearchForm extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { query } = this.props;
 

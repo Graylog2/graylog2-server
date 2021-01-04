@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
+import type { HTMLAttributes } from 'enzyme';
 import { mount } from 'wrappedEnzyme';
 import mockAction from 'helpers/mocking/MockAction';
 
@@ -26,6 +26,10 @@ import HighlightingRule from './HighlightingRule';
 
 jest.mock('components/common/ColorPickerPopover', () => 'color-picker-popover');
 jest.mock('views/stores/HighlightingRulesStore', () => ({ HighlightingRulesActions: {} }));
+
+type ColorPickerProps = HTMLAttributes & {
+  onChange: (color: string, event: any, callback: () => void) => Promise<unknown>;
+};
 
 describe('HighlightingRule', () => {
   const rule = Rule.create('response_time', '250', undefined, '#f44242');
@@ -41,7 +45,7 @@ describe('HighlightingRule', () => {
     HighlightingRulesActions.update = mockAction(jest.fn((updatedRule) => Promise.resolve([updatedRule])));
     const wrapper = mount(<HighlightingRule rule={rule} />);
 
-    const { onChange } = wrapper.find('color-picker-popover').props();
+    const { onChange } = wrapper.find('color-picker-popover').props() as ColorPickerProps;
     const hidePopover = jest.fn();
 
     return onChange('#416af4', undefined, hidePopover).then(() => {
@@ -58,7 +62,7 @@ describe('HighlightingRule', () => {
     HighlightingRulesActions.update = mockAction(jest.fn((updatedRule) => Promise.resolve([updatedRule])));
     const wrapper = mount(<HighlightingRule rule={rule} />);
 
-    const { onChange } = wrapper.find('color-picker-popover').props();
+    const { onChange } = wrapper.find('color-picker-popover').props() as ColorPickerProps;
     const hidePopover = jest.fn();
 
     return onChange('#416af4', undefined, hidePopover)

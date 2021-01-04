@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-import styled, { StyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { ThemeInterface } from 'theme';
-
-const SectionGrid: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const SectionGrid = styled.div(({ theme }) => css`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-column-gap: 40px;

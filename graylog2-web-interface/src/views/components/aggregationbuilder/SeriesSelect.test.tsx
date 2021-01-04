@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesParameterOptions from 'views/components/aggregationbuilder/SeriesParameterOptions';
+import Select from 'views/components/Select';
 
 import SeriesSelect from './SeriesSelect';
 
@@ -108,9 +108,9 @@ describe('SeriesSelect', () => {
 
     input.simulate('focus');
 
-    const select = wrapper.find('Select').at(0);
+    const select = wrapper.find(Select).at(0);
 
-    select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true }]);
+    select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true }], 'set-value');
 
     expect(suggester.for).toHaveBeenCalledTimes(1);
     expect(suggester.for).toHaveBeenCalledWith('func1', undefined);
@@ -137,9 +137,9 @@ describe('SeriesSelect', () => {
 
     input.simulate('focus');
 
-    const select = wrapper.find('Select').at(0);
+    const select = wrapper.find(Select).at(0);
 
-    select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true, parameterNeeded: true }]);
+    select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true, parameterNeeded: true }], 'set-value');
 
     // eslint-disable-next-line import/no-named-as-default-member
     expect(SeriesParameterOptions.parameterOptionsForType).toHaveBeenCalledTimes(1);
@@ -155,9 +155,9 @@ describe('SeriesSelect', () => {
 
     expect(onChange).not.toHaveBeenCalled();
 
-    const select = wrapper.find('Select').at(0);
+    const select = wrapper.find(Select).at(0);
 
-    select.prop('onChange')([{ label: 'func1(foo)', value: 'func1(foo)' }]);
+    select.prop('onChange')([{ label: 'func1(foo)', value: 'func1(foo)' }], 'set-value');
 
     expect(onChange).toHaveBeenCalled();
     expect(onChange).toHaveBeenCalledWith(['func1(foo)']);

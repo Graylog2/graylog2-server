@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { difference, isEqual } from 'lodash';
 
 import CombinedProvider from 'injection/CombinedProvider';

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import isDeepEqual from 'stores/isDeepEqual';
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 import { QueriesActions } from 'views/stores/QueriesStore';

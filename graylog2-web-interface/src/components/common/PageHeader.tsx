@@ -14,18 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
 import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
 import ContentHeadRow from 'components/common/ContentHeadRow';
 import SupportLink from 'components/support/SupportLink';
 
-const LifecycleIndicator: StyledComponent<undefined, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const LifecycleIndicator = styled.span(({ theme }) => css`
   cursor: help;
   margin-left: 5px;
   font-size: ${theme.fonts.size.body};

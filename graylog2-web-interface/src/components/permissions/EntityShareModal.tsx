@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
+import { FormikProps } from 'formik';
 import PropTypes from 'prop-types';
 import { $PropertyType } from 'utility-types';
 
@@ -28,8 +28,8 @@ import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
-import Select from 'components/common/Select';
 
+import type { FormValues as GranteesSelectFormValues } from './GranteesSelector';
 import EntityShareSettings from './EntityShareSettings';
 
 type Props = {
@@ -45,7 +45,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const entityGRN = createGRN(entityType, entityId);
-  const granteesSelectRef = useRef<typeof Select>();
+  const granteesSelectFormRef = useRef<FormikProps<GranteesSelectFormValues>>();
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
@@ -53,22 +53,16 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
 
   const _handleSave = () => {
     setDisableSubmit(true);
-    const granteesSelect = granteesSelectRef?.current;
-    const granteesSelectValue = granteesSelect?.state?.value;
-    const granteesSelectOptions = granteesSelect?.props?.options;
+    const selectedGranteeId = granteesSelectFormRef.current?.values?.granteeId;
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: entityShareState.selectedGranteeCapabilities,
     };
 
-    if (granteesSelectValue) {
-      const selectedOption = granteesSelectOptions?.find((option) => option.value === granteesSelectValue);
-
-      if (!selectedOption) {
-        throw Error(`Can't find ${granteesSelectValue} in grantees select options on save`);
-      }
+    if (selectedGranteeId) {
+      const selectedGrantee = entityShareState?.availableGrantees.find((grantee) => grantee.id === selectedGranteeId);
 
       // eslint-disable-next-line no-alert
-      if (!window.confirm(`"${selectedOption.label}" got selected but was never added as a collaborator. Do you want to continue anyway?`)) {
+      if (!window.confirm(`${selectedGrantee.title ? `"${selectedGrantee.title}"` : 'An entity (name not found)'} got selected but was never added as a collaborator. Do you want to continue anyway?`)) {
         setDisableSubmit(false);
 
         return;
@@ -96,7 +90,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, enti
                                entityType={entityType}
                                entityTitle={entityTitle}
                                entityShareState={entityShareState}
-                               granteesSelectRef={granteesSelectRef}
+                               granteesSelectFormRef={granteesSelectFormRef}
                                setDisableSubmit={setDisableSubmit} />
         ) : (
           <Spinner />

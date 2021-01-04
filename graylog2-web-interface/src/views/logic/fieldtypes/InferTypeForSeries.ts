@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
@@ -37,9 +36,7 @@ const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Arra
 
   const { type, field } = definition;
 
-  // $FlowFixMe: this check should...
   if (constantTypeFunctions[type]) {
-    // $FlowFixMe: ... guard this access!
     return newMapping(constantTypeFunctions[type]());
   }
 

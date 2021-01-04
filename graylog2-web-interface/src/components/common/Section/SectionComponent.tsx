@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { StyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
-import { ThemeInterface } from 'theme';
 import { Row, Col } from 'components/graylog';
 
 type Props = {
@@ -39,7 +37,7 @@ const Header = styled.div`
   }
 `;
 
-export const Headline: StyledComponent<{}, ThemeInterface, HTMLHeadingElement> = styled.h2`
+export const Headline = styled.h2`
   margin-bottom: 15px;
   display: inline;
 `;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
@@ -41,7 +40,6 @@ type Arguments = {
 
 const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
   return valuePath.map((item) => Object.entries(item)
-    // $FlowFixMe: We know that values are strings
     .map(([key, value]: [string, string]) => (
       key === '_exists_' ? value : key)))
     .reduce((prev, cur) => [...prev, ...cur], [])

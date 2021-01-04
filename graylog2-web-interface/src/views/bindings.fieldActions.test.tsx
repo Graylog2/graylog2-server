@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
@@ -72,7 +71,7 @@ describe('Views bindings field actions', () => {
         .toEqual(false);
     });
 
-    it('should be disabled when field analisys is disabled', () => {
+    it('should be disabled when field analysis is disabled', () => {
       expect(isEnabled({
         ...defaultArguments,
         field: 'something',
@@ -84,7 +83,6 @@ describe('Views bindings field actions', () => {
   });
 
   describe('Statistics', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const action: FieldAction = findAction('statistics');
     const { isEnabled } = action;
 
@@ -127,7 +125,6 @@ describe('Views bindings field actions', () => {
   });
 
   describe('AddToAllTables', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const action: FieldAction = findAction('add-to-all-tables');
     const { isEnabled } = action;
 
@@ -179,7 +176,6 @@ describe('Views bindings field actions', () => {
   });
 
   describe('RemoveFromAllTables', () => {
-    // $FlowFixMe: We are assuming here it is generally present
     const action: FieldAction = findAction('remove-from-all-tables');
     const { isEnabled } = action;
 

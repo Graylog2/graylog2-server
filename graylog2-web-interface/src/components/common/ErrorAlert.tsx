@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import { Alert, Button, Col, Row } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
@@ -27,7 +25,7 @@ const StyledRow = styled(Row)`
   margin-bottom: 0 !important;
 `;
 
-const Container: StyledComponent<{margin: number}, ThemeInterface, HTMLElement> = styled.div(({ margin }) => `
+const Container = styled.div<{ margin: number }>(({ margin }) => `
   margin-top: ${margin}px;
   margin-bottom: ${margin}px;
 `);

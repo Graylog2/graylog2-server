@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { trim } from 'lodash';
@@ -86,7 +85,7 @@ class SeriesSelect extends React.Component<Props, State> {
     const { suggester } = props;
 
     this.state = {
-      options: suggester.defaults,
+      options: suggester.defaults || [],
     };
   }
 
@@ -169,10 +168,9 @@ class SeriesSelect extends React.Component<Props, State> {
               options={options}
               value={series.map(_wrapOption)}
               components={_components}
-              onClose={this._onClose}
               closeMenuOnSelect={false}
+              onMenuClose={this._onClose}
               menuShouldScrollIntoView
-              tabSelectsValue
               escapeClearsValue
               isMulti />
     );

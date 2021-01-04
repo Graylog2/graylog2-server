@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 
@@ -33,14 +32,14 @@ describe('StreamRuleForm', () => {
   });
 
   const streamRuleTypes = [
-    { id: 1, short_desc: 'match exactly', long_desc: 'match exactly' },
-    { id: 2, short_desc: 'match regular expression', long_desc: 'match regular expression' },
-    { id: 3, short_desc: 'greater than', long_desc: 'greater than' },
-    { id: 4, short_desc: 'smaller than', long_desc: 'smaller than' },
-    { id: 5, short_desc: 'field presence', long_desc: 'field presence' },
-    { id: 6, short_desc: 'contain', long_desc: 'contain' },
-    { id: 7, short_desc: 'always match', long_desc: 'always match' },
-    { id: 8, short_desc: 'match input', long_desc: 'match input' },
+    { id: 1, short_desc: 'match exactly', long_desc: 'match exactly', name: 'Stream rule match exactly' },
+    { id: 2, short_desc: 'match regular expression', long_desc: 'match regular expression', name: 'Stream rule match regular' },
+    { id: 3, short_desc: 'greater than', long_desc: 'greater than', name: 'Stream rule greater than' },
+    { id: 4, short_desc: 'smaller than', long_desc: 'smaller than', name: 'Stream rule smaller than' },
+    { id: 5, short_desc: 'field presence', long_desc: 'field presence', name: 'Stream rule field presence' },
+    { id: 6, short_desc: 'contain', long_desc: 'contain', name: 'Stream rule contain' },
+    { id: 7, short_desc: 'always match', long_desc: 'always match', name: 'Stream rule always match' },
+    { id: 8, short_desc: 'match input', long_desc: 'match input', name: 'Stream rule match input' },
   ];
 
   const getStreamRule = (type = 1) => {

@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { SizeMe } from 'react-sizeme';
 import { FixedSizeList } from 'react-window';
 import { List as ImmutableList } from 'immutable';
-import type { Styles } from 'styled-components';
 import styled from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -73,7 +71,7 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
     return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
   }
 
-  const Row = ({ index, style }: { index: number, style: Styles }) => (
+  const Row = ({ index, style }: { index: number, style: React.CSSProperties }) => (
     <ListItem fieldType={fieldList.get(index)}
               selectedQuery={activeQuery}
               activeQueryFields={activeQueryFields}

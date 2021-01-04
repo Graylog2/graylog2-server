@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
@@ -28,13 +27,6 @@ export type PaginatedResponseType = {
   query: string,
 };
 
-export type Pagination = {
-  page: number,
-  perPage: number,
-  query: string,
-  additionalQueries?: AdditionalQueries,
-};
-
 export type PaginatedListJSON = {
   page: $PropertyType<Pagination, 'page'>,
   per_page: $PropertyType<Pagination, 'perPage'>,
@@ -43,9 +35,22 @@ export type PaginatedListJSON = {
   count: number,
 };
 
+export type Pagination = {
+  page: number,
+  perPage: number,
+  query: string,
+  additionalQueries?: AdditionalQueries,
+};
+
 export type ListPagination = Pagination & {
   total: number,
   count: number,
+};
+
+export const DEFAULT_PAGINATION: Pagination = {
+  page: 1,
+  perPage: 10,
+  query: '',
 };
 
 export type PaginatedList<ItemType> = {

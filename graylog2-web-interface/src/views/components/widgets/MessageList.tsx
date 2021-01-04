@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { isEmpty, get } from 'lodash';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -34,7 +31,6 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { PaginatedList } from 'components/common';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -76,7 +72,6 @@ type Props = {
   config: MessagesWidgetConfig,
   currentView: ViewStoreState,
   data: { messages: Array<BackendMessage>, total: number, id: string },
-  editing: boolean,
   fields: FieldTypeMappingsList,
   onConfigChange?: (MessagesWidgetConfig) => Promise<void>,
   pageSize?: number,
@@ -92,10 +87,16 @@ class MessageList extends React.Component<Props, State> {
     selectedFields: Immutable.Set<string>(),
   };
 
-  state = {
-    errors: [],
-    currentPage: 1,
-  };
+  static contextType = RenderCompletionCallback;
+
+  constructor(props: Props, context?: any) {
+    super(props, context);
+
+    this.state = {
+      errors: [],
+      currentPage: 1,
+    };
+  }
 
   componentDidMount() {
     const onRenderComplete = this.context;
@@ -153,14 +154,11 @@ class MessageList extends React.Component<Props, State> {
     return onConfigChange(newConfig);
   }
 
-  static contextType = RenderCompletionCallback;
-
   render() {
     const {
       config,
       currentView: { activeQuery: activeQueryId },
       data: { messages, total: totalMessages },
-      editing,
       fields,
       pageSize,
       selectedFields,
@@ -180,7 +178,6 @@ class MessageList extends React.Component<Props, State> {
           {!hasError ? (
             <MessageTable activeQueryId={activeQueryId}
                           config={config}
-                          editing={editing}
                           fields={fields}
                           key={listKey}
                           onSortChange={this._onSortChange}
@@ -194,7 +191,6 @@ class MessageList extends React.Component<Props, State> {
   }
 }
 
-type MProps = React.ComponentProps<typeof MessageList>;
 const mapProps = (props: {
   selectedFields: SelectedFieldsStoreState,
   currentView: ViewStoreState,

@@ -14,13 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
-
-const SectionSubheadline: StyledComponent<{}, ThemeInterface, HTMLHeadingElement> = styled.h3`
+const SectionSubheadline = styled.h3`
   margin-bottom: 10px;
 `;
 

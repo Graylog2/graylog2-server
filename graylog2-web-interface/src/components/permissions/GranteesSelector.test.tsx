@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import mockEntityShareState, { availableGrantees, availableCapabilities } from 'fixtures/entityShareState';
@@ -26,8 +25,7 @@ describe('GranteesSelector', () => {
     const { getByText } = render(
       <GranteesSelector availableGrantees={availableGrantees}
                         availableCapabilities={availableCapabilities}
-                        onSubmit={() => Promise.resolve(mockEntityShareState)}
-                        granteesSelectRef={undefined} />,
+                        onSubmit={() => Promise.resolve(mockEntityShareState)} />,
     );
 
     const submitButton = getByText('Add Collaborator');

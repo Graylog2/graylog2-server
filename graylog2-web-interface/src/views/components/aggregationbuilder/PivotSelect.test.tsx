@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
@@ -39,7 +38,7 @@ describe('PivotSelect', () => {
   };
   const SimplePivotSelect = ({ fieldTypes }: SimplePivotProps) => (
     <FieldTypesContext.Provider value={fieldTypes}>
-      <PivotSelect onChange={() => {}} value={[]} />
+      <PivotSelect onChange={() => {}} value={[]} options={[]} />
     </FieldTypesContext.Provider>
   );
 
@@ -55,7 +54,7 @@ describe('PivotSelect', () => {
 
   it('renders properly with `undefined` fields', () => {
     suppressConsole(() => {
-      const wrapper = mount(<PivotSelect onChange={() => {}} value={[]} />);
+      const wrapper = mount(<PivotSelect onChange={() => {}} value={[]} options={[]} />);
 
       expect(wrapper).not.toBeEmptyRender();
     });
@@ -64,7 +63,7 @@ describe('PivotSelect', () => {
   describe('upon pivot list change, field types are passed for new pivot generation', () => {
     it('using Unknown if field is not found', () => {
       const wrapper = mount(<SimplePivotSelect fieldTypes={{ ...initialFieldTypes, all: Immutable.List() }} />);
-      const cb = wrapper.find('SortableSelect').at(0).props().onChange;
+      const cb = wrapper.find('SortableSelect').at(0).props().onChange as (value: any) => void;
 
       cb([{ value: 'foo' }]);
 
@@ -78,7 +77,7 @@ describe('PivotSelect', () => {
         fieldTypeMapping,
       ]);
       const wrapper = mount(<SimplePivotSelect fieldTypes={{ ...initialFieldTypes, all: fields }} />);
-      const cb = wrapper.find('SortableSelect').at(0).props().onChange;
+      const cb = wrapper.find('SortableSelect').at(0).props().onChange as (value: any) => void;
 
       cb([{ value: 'foo' }]);
 

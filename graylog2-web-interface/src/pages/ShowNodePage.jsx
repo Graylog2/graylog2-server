@@ -58,7 +58,6 @@ const ShowNodePage = createReactClass({
     };
   },
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     Promise.all([
       ClusterOverviewStore.jvm(this.props.params.nodeId)

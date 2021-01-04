@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 
@@ -26,7 +25,7 @@ export type QueryId = string;
 
 export type FilterType = Immutable.Map<string, any>;
 
-type SearchTypeList = Array<SearchType>;
+export type SearchTypeList = Array<SearchType>;
 type InternalBuilderState = Immutable.Map<string, any>;
 
 type InternalState = {
@@ -187,7 +186,6 @@ export default class Query {
   }
 
   static fromJSON(value: QueryJson): Query {
-    // eslint-disable-next-line camelcase
     const { id, query, timerange, filter, search_types } = value;
 
     return new Query(id, query, timerange, Immutable.fromJS(filter), search_types);

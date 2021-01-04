@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
+
+import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
 import Trend, { TREND_BAD, TREND_GOOD, TREND_NEUTRAL } from './Trend';
 
@@ -24,7 +25,11 @@ const renderTrend = ({
   current = 42,
   previous = 42,
   trendPreference = 'NEUTRAL',
-} = {}) => mount(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
+}: {
+  current?: number,
+  previous?: number,
+  trendPreference?: TrendPreference
+ } = {}) => mount(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
 
 describe('Trend', () => {
   it('shows absolute delta', () => {

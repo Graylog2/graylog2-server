@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { readFileSync } from 'fs';
 
 import { dirname } from 'path';
@@ -200,7 +199,6 @@ describe('Chart helper functions', () => {
         transformKeys(config.rowPivots, config.columnPivots),
         extractSeries(),
         formatSeries,
-        // $FlowFixMe: Returning different result type on purpose
         generateChart('scatter', generatorFunction),
       ]);
       const result = pipeline(input);

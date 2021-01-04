@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
@@ -34,18 +33,19 @@ import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import TopRow from 'views/components/searchbar/TopRow';
+import { SearchesConfig } from 'components/search/SearchConfig';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 
 type Props = {
-  config: any,
+  config: SearchesConfig,
   globalOverride: {
     timerange: TimeRange,
     query: QueryString,
   },
   disableSearch?: boolean,
-  onExecute: () => void,
+  onExecute: () => Promise<void>,
 };
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
@@ -92,9 +92,9 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                     onChange={(newQuery) => {
                                       onChange({ target: { value: newQuery, name } });
 
-                                      return Promise.resolve();
+                                      return Promise.resolve(newQuery);
                                     }}
-                                    onExecute={handleSubmit} />
+                                    onExecute={handleSubmit as () => void} />
                       )}
                     </Field>
                   </Col>
@@ -114,7 +114,6 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
 };
 
 DashboardSearchBar.propTypes = {
-  config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
   onExecute: PropTypes.func.isRequired,
 };

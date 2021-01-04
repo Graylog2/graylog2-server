@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { render, act, screen } from 'wrappedTestingLibrary';
 import { alertsManager as exampleRole } from 'fixtures/roles';

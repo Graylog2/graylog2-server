@@ -14,24 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 import { trim } from 'lodash';
 import { connect, Field, useFormikContext } from 'formik';
 
 import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
-import type { ThemeInterface } from 'theme';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const KeywordPreview: StyledComponent<{}, void, any> = styled(Alert)`
+const KeywordPreview = styled(Alert)`
   display: flex;
   align-items: center;
   min-height: 34px;
@@ -40,7 +37,7 @@ const KeywordPreview: StyledComponent<{}, void, any> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, any> = styled(FormControl)(({ theme }) => css`
+const KeywordInput = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);

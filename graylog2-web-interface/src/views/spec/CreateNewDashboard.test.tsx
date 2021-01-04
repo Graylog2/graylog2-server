@@ -17,7 +17,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
@@ -63,7 +62,6 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore(
 declare global {
   namespace NodeJS {
     interface Global {
-      // eslint-disable-next-line camelcase
       api_url: string
     }
   }

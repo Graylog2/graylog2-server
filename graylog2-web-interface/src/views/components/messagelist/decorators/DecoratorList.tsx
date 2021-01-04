@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { Alert } from 'components/graylog';
 import { Icon, SortableList } from 'components/common';
@@ -26,7 +24,7 @@ import { Icon, SortableList } from 'components/common';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
-const AlertContainer: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+const AlertContainer = styled.div`
   margin-bottom: 20px;
 `;
 

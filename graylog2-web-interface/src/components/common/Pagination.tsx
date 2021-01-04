@@ -14,17 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
-// $FlowFixMe Need typing for react-ultimate-pagination dependency
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
-import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
-
-import type { ThemeInterface } from 'theme';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import Icon from './Icon';
 
@@ -40,7 +35,7 @@ type Props = {
   onChange: (nextPage: number) => void,
 };
 
-const StyledBootstrapPagination: StyledComponent<undefined, ThemeInterface, unknown> = styled(BootstrapPagination)(({ theme }) => css`
+const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }: { theme: DefaultTheme }) => css`
   &.pagination {
     font-size: ${theme.fonts.size.small};
     margin-top: 10px;

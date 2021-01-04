@@ -14,10 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useEffect } from 'react';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'components/graylog/router';
 import { Col, Row, Button } from 'components/graylog';
 import connect from 'stores/connect';

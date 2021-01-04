@@ -118,7 +118,6 @@ const UserCreate = () => {
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Assign Roles">
-                  { /* $FlowFixMe: assignRole has DescriptiveItem */}
                   <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
                 </Input>
 

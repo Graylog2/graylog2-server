@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
@@ -97,11 +96,6 @@ jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/logic/views/Actions');
 
 describe('<Widget />', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.resetModules();
-  });
-
   const widget = WidgetModel.builder().newId()
     .type('dummy')
     .config({})
@@ -140,6 +134,15 @@ describe('<Widget />', () => {
       count: 2,
     },
   };
+
+  beforeEach(() => {
+    ViewStore.getInitialState = jest.fn(() => viewStoreState);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+  });
 
   const DummyWidget = (props) => (
     <WidgetContext.Provider value={widget}>
@@ -198,7 +201,11 @@ describe('<Widget />', () => {
   });
 
   it('renders placeholder if widget type is unknown', async () => {
-    const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
+    const unknownWidget = WidgetModel.builder()
+      .id('widgetId')
+      .type('i-dont-know-this-widget-type')
+      .config({})
+      .build();
     const UnknownWidget = (props) => (
       <Widget widget={unknownWidget}
               id="widgetId"
@@ -210,7 +217,9 @@ describe('<Widget />', () => {
               {...props} />
 
     );
-    const { findByText } = render(<UnknownWidget data={[]} />);
+    const { findByText } = render(
+      <UnknownWidget data={[]} />,
+    );
 
     await findByText('Unknown widget');
   });
@@ -234,7 +243,9 @@ describe('<Widget />', () => {
                 {...props} />
       </WidgetContext.Provider>
     );
-    const { findByText } = render(<UnknownWidget data={[]} />);
+    const { findByText } = render(
+      <UnknownWidget data={[]} />,
+    );
 
     await findByText('Unknown widget in edit mode');
   });
@@ -284,7 +295,11 @@ describe('<Widget />', () => {
   });
 
   it('restores original state of widget config when clicking cancel after changes were made', () => {
-    const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
+    const widgetWithConfig = WidgetModel.builder()
+      .id('widgetId')
+      .type('dummy')
+      .config({ foo: 42 })
+      .build();
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
     WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
@@ -299,11 +314,15 @@ describe('<Widget />', () => {
 
     fireEvent.click(cancelButton);
 
-    expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
+    expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
 
   it('does not restore original state of widget config when clicking "Finish Editing"', () => {
-    const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
+    const widgetWithConfig = WidgetModel.builder()
+      .id('widgetId')
+      .type('dummy')
+      .config({ foo: 42 })
+      .build();
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
     WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
@@ -322,7 +341,11 @@ describe('<Widget />', () => {
   });
 
   it('does not display export to CSV action if widget is not a message table', () => {
-    const dummyWidget = { config: {}, id: 'widgetId', type: 'dummy' };
+    const dummyWidget = WidgetModel.builder()
+      .id('widgetId')
+      .type('dummy')
+      .config({})
+      .build();
     const { getByTestId, queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
 
     const actionToggle = getByTestId('widgetActionDropDown');
@@ -333,8 +356,11 @@ describe('<Widget />', () => {
   });
 
   it('allows export to CSV for message tables', () => {
-    ViewStore.getInitialState = jest.fn(() => viewStoreState);
-    const messagesWidget = { config: {}, id: 'widgetId', type: MessagesWidget.type };
+    const messagesWidget = WidgetModel.builder()
+      .id('widgetId')
+      .type(MessagesWidget.type)
+      .config({})
+      .build();
     const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
     const actionToggle = getByTestId('widgetActionDropDown');
@@ -352,7 +378,6 @@ describe('<Widget />', () => {
     beforeEach(() => {
       // @ts-ignore
       DashboardsStore.getInitialState = jest.fn(() => dashboardState);
-      ViewStore.getInitialState = jest.fn(() => viewStoreState);
       ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
       SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));

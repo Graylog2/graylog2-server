@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
@@ -26,7 +25,6 @@ type InternalState = {
   chartColors: ChartColors,
 };
 
-/* eslint-disable camelcase */
 type ChartColorSettingJson = {
   field_name: string,
   chart_color: Color,
@@ -35,12 +33,10 @@ type ChartColorSettingJson = {
 export type WidgetFormattingSettingsJSON = {
   chart_colors: Array<ChartColorSettingJson>,
 };
-/* eslint-enable camelcase */
 
 export default class WidgetFormattingSettings {
   private readonly _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(chartColors: $PropertyType<InternalState, 'chartColors'>) {
     this._value = { chartColors };
   }
@@ -54,7 +50,6 @@ export default class WidgetFormattingSettings {
     return new Builder(Immutable.Map(this._value));
   }
 
-  // eslint-disable-next-line no-undef
   static create(chartColors: $PropertyType<InternalState, 'chartColors'>) {
     return new WidgetFormattingSettings(chartColors);
   }
@@ -71,7 +66,6 @@ export default class WidgetFormattingSettings {
 
   toJSON() {
     const { chartColors } = this._value;
-    // $FlowFixMe flow cannot handle Object.keys
     const chartColorJson = Object.keys(chartColors)
       .map((fieldName) => ({ field_name: fieldName, chart_color: chartColors[fieldName] }));
 

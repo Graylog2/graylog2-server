@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 import { MissingDependencies, GranteesList } from 'logic/permissions/EntityShareState';
 import { Alert } from 'components/graylog';
-import { ThemeInterface } from 'theme';
 
 type Props = {
   missingDependencies: MissingDependencies,
   availableGrantees: GranteesList,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
+const Container = styled(Alert)`
   margin-top: 20px;
   max-height: 240px;
   overflow: auto;

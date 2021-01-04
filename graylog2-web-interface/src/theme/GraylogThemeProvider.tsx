@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, DefaultTheme } from 'styled-components';
 
 import { breakpoints, colors, fonts, utils } from 'theme';
-import type { ThemeInterface } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 
@@ -31,7 +29,7 @@ const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
   const themeColors = colors[mode];
 
-  const theme = useCallback((): ThemeInterface => {
+  const theme = useCallback((): DefaultTheme => {
     const formattedUtils = {
       ...utils,
       colorLevel: utils.colorLevel(themeColors),

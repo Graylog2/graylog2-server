@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { configure, mount, shallow, ReactWrapper, ShallowWrapper } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';

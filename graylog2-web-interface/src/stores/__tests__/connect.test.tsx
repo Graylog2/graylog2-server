@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 /// <reference types="jest-enzyme" />
 import React from 'react';
 import { act } from 'react-dom/test-utils';
@@ -41,13 +40,7 @@ import connect, { useStore } from '../connect';
 
 const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
 
-type Actions = {
-  setValue: (number) => void,
-  reset: () => void,
-  noop: () => void,
-};
-
-const SimpleStore: Store<{ value: number }> & Actions = Reflux.createStore({
+const SimpleStore = Reflux.createStore<{ value: number }>({
   getInitialState() {
     return this.state;
   },
@@ -149,6 +142,35 @@ describe('connect()', () => {
     const Component = connect(() => <span>hello!</span>, { simpleStore: SimpleStore });
 
     expect(Component.displayName).toEqual('ConnectStoresWrapper[Unknown/Anonymous] stores=simpleStore');
+  });
+
+  it('types store props as optional', () => {
+    const Component = connect(() => <span>hello!</span>, { simpleStore: SimpleStore });
+    mount(<Component />);
+  });
+
+  it('types mapped props as optional', () => {
+    const Component = connect(
+      () => <span>hello!</span>,
+      { simpleStore: SimpleStore },
+      ({ simpleStore }) => (simpleStore && { storeValue: simpleStore.value }),
+    );
+    mount(<Component />);
+  });
+
+  it('types props which have a default value (defaultProps) as optional', () => {
+    const BaseComponent = ({ exampleProp }: { exampleProp: string }) => <span>{exampleProp}</span>;
+
+    BaseComponent.defaultProps = {
+      exampleProp: 'hello!',
+    };
+
+    BaseComponent.propTypes = {
+      exampleProp: PropTypes.string,
+    };
+
+    const Component = connect(BaseComponent, { simpleStore: SimpleStore });
+    mount(<Component />);
   });
 
   describe('generates `shouldComponentUpdate`', () => {

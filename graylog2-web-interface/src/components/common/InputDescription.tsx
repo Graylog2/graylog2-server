@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -25,7 +24,7 @@ const ErrorMessage = styled.span(({ theme }) => `
   color: ${theme.colors.variant.danger};
 `);
 
-const HelpMessage = styled.span(({ theme, hasError }) => `
+const HelpMessage = styled.span<{ hasError: boolean }>(({ theme, hasError }) => `
   color: ${hasError ? theme.colors.gray[50] : 'inherit'};
 `);
 

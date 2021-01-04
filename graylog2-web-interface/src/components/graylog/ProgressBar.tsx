@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
-// $FlowFixMe removing in future iteration
 import chroma from 'chroma-js';
-
-import type { ThemeInterface } from 'theme';
 
 type StyledBarProps = {
   animated: boolean,
@@ -62,7 +57,7 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = css(({ bsStyle, theme }) => {
+const progressBarVariants = css<StyledBarProps>(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;
   }
@@ -73,18 +68,18 @@ const progressBarVariants = css(({ bsStyle, theme }) => {
   `;
 });
 
-const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const ProgressWrap = styled.div(({ theme }) => css`
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
   background-color: ${theme.colors.gray[90]};
   border-radius: 4px;
-  ${boxShadow('inset 0 1px 2px')};
+  ${boxShadow('inset 0 1px 2px')}
   display: flex;
   align-items: center;
 `);
 
-const Bar: StyledComponent<StyledBarProps, ThemeInterface, HTMLDivElement> = styled.div(({ animated, striped, theme, value }) => {
+const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => {
   const defaultStripColor = chroma(theme.colors.global.contentBackground).alpha(0.25).css();
 
   return css`
@@ -92,7 +87,7 @@ const Bar: StyledComponent<StyledBarProps, ThemeInterface, HTMLDivElement> = sty
     font-size: ${theme.fonts.size.small};
     line-height: 20px;
     text-align: center;
-    ${boxShadow('inset 0 -1px 0')};
+    ${boxShadow('inset 0 -1px 0')}
     transition: width 500ms ease-in-out;
     width: ${value}%;
     max-width: 100%;
@@ -126,8 +121,8 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => {
         return (
           <Bar role="progressbar"
                aria-valuenow={value}
-               aria-valuemin="0"
-               aria-valuemax="100"
+               aria-valuemin={0}
+               aria-valuemax={100}
                aria-valuetext={label}
                key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
                animated={animated}

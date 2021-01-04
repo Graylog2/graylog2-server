@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
-import type { ThemeInterface } from 'theme';
-
-const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
+const Td = styled.td`
   max-width: 300px;
 `;
 

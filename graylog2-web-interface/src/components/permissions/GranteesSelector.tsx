@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, FormikProps, Form, Field } from 'formik';
 import { $PropertyType } from 'utility-types';
-import styled, { StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { ThemeInterface } from 'theme';
 import EntityShareState, { GranteesList, CapabilitiesList } from 'logic/permissions/EntityShareState';
 import Capability from 'logic/permissions/Capability';
 import Grantee from 'logic/permissions/Grantee';
@@ -36,11 +34,16 @@ export type SelectionRequest = {
   capabilityId: $PropertyType<Capability, 'id'>,
 };
 
+export type FormValues = {
+  granteeId: $PropertyType<Grantee, 'id'> | undefined,
+  capabilityId: $PropertyType<Capability, 'id'>,
+}
+
 type Props = {
   availableGrantees: GranteesList,
   availableCapabilities: CapabilitiesList,
   className?: string,
-  granteesSelectRef: typeof Select | null | undefined,
+  formRef?: React.Ref<FormikProps<FormValues>>,
   onSubmit: (req: SelectionRequest) => Promise<EntityShareState | null | undefined>,
 };
 
@@ -48,7 +51,7 @@ const FormElements = styled.div`
   display: flex;
 `;
 
-const Errors: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const Errors = styled.div(({ theme }) => css`
   width: 100%;
   margin-top: 3px;
   color: ${theme.colors.variant.danger};
@@ -108,7 +111,7 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, granteesSelectRef }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, formRef }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
@@ -119,6 +122,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
   return (
     <div className={className}>
       <Formik onSubmit={(data, { resetForm }) => _handelSubmit(data, resetForm)}
+              innerRef={formRef}
               initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
@@ -130,7 +134,6 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
                                     onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
                                     optionRenderer={_renderGranteesSelectOption}
                                     options={granteesOptions}
-                                    ref={granteesSelectRef}
                                     placeholder="Search for users and teams"
                                     value={value} />
                   )}
@@ -160,6 +163,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
 
 GranteesSelector.defaultProps = {
   className: undefined,
+  formRef: undefined,
 };
 
 export default GranteesSelector;

@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 
 import breakpoints, { breakpointPropTypes } from './breakpoints';
 import colors, { colorsPropTypes } from './colors';
 import fonts, { fontsPropTypes } from './fonts';
 import utils, { utilsPropTypes } from './utils';
-import type { ThemeInterface } from './types';
 
 const themePropTypes = PropTypes.shape({
   breakpoints: breakpointPropTypes,
@@ -37,5 +35,3 @@ export {
   utils,
   themePropTypes,
 };
-
-export type { ThemeInterface };

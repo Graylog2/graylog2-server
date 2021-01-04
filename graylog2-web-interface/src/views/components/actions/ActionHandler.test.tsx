@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
@@ -33,6 +32,7 @@ describe('ActionHandler', () => {
       type: 'dummy-action',
       title: 'Dummy Action',
       handler: () => Promise.resolve(42),
+      resetFocus: false,
     };
 
     const result = createHandlerFor(actionDefinition, jest.fn());
@@ -47,6 +47,7 @@ describe('ActionHandler', () => {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
+      resetFocus: false,
     };
     const handler: ActionHandler = createHandlerFor(actionDefinition, setActionComponents);
 
@@ -79,13 +80,13 @@ describe('ActionHandler', () => {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
+      resetFocus: false,
     };
     const handler: ActionHandler = createHandlerFor(actionDefinition, setActionComponents);
 
     return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} })
       .then(() => {
         const state: ActionComponents = setState.mock.calls[0][0];
-        // $FlowFixMe: Object.value's signature is in the way
         const component: { props: ActionComponentProps } = Object.values(state)[0];
         const { onClose } = component.props;
 

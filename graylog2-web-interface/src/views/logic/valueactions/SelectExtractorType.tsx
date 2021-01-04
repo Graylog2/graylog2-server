@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -44,7 +43,6 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
 
   componentDidMount() {
     const { message } = this.context;
-    // eslint-disable-next-line camelcase
     const { gl2_source_node, gl2_source_input } = message.fields;
     const { field } = this.props;
 

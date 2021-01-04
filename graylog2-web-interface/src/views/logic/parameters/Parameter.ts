@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 
 import * as Immutable from 'immutable';
 
@@ -35,7 +34,6 @@ type InternalState = {
   binding: ParameterBinding | undefined | null,
 };
 
-/* eslint-disable camelcase */
 export type ParameterJson = {
   type: string,
   name: string,
@@ -46,7 +44,6 @@ export type ParameterJson = {
   optional: boolean,
   binding: ParameterBindingJsonRepresentation | undefined | null,
 };
-/* eslint-enable camelcase */
 
 type ParameterSubClass = {
   fromJSON: (json: ParameterJson) => Parameter;

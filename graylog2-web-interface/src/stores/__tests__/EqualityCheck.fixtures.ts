@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { List, Map } from 'immutable';
 
 type MixedMapsAndObjects = { [key: string]: Map<string, { [key: string]: Map<string, number> }> };

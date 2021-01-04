@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import chroma from 'chroma-js';
 
 import type { Colors } from 'theme/colors';

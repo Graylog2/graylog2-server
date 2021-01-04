@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useRef, useMemo } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
 import { Overlay } from 'react-overlays';
-import { withTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 import { createFilter } from 'react-select/lib/filters';
 
-import { themePropTypes, ThemeInterface } from 'theme';
+export type Option = { [key: string]: any };
 
 const MultiValueRemove = (props) => {
   return (
@@ -131,11 +130,23 @@ const placeholder = ({ theme }) => (base) => ({
 
 type Props = {
   allowOptionCreation?: boolean,
+  closeMenuOnSelect?: boolean,
   components: { [key: string]: ComponentType<any> },
+  escapeClearsValue?: boolean,
   styles: { [key: string]: any },
+  inputId?: string,
   ignoreAccents: boolean,
   ignoreCase: boolean,
-  theme: ThemeInterface,
+  options: Array<Option>,
+  isDisabled?: boolean,
+  isClearable?: boolean,
+  isSearchable?: boolean,
+  isMulti?: boolean,
+  menuShouldScrollIntoView: boolean,
+  onChange: (value: any, actionType: string) => void,
+  onMenuClose: () => void,
+  placeholder: string,
+  value?: Object | Array<Object> | null | undefined,
 };
 
 const ValueWithTitle = (props: { data: { label: string } }) => {
@@ -170,9 +181,9 @@ const Select = ({
   ignoreCase = true,
   ignoreAccents = false,
   allowOptionCreation = false,
-  theme,
   ...rest
 }: Props) => {
+  const theme = useTheme();
   const selectRef = useRef(null);
   const Component = allowOptionCreation ? CreatableSelect : ReactSelect;
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
@@ -237,19 +248,48 @@ const Select = ({
 
 Select.propTypes = {
   allowOptionCreation: PropTypes.bool,
+  closeMenuOnSelect: PropTypes.bool,
   components: PropTypes.object,
+  escapeClearsValue: PropTypes.bool,
   styles: PropTypes.object,
+  inputId: PropTypes.string,
   ignoreAccents: PropTypes.bool,
   ignoreCase: PropTypes.bool,
-  theme: themePropTypes.isRequired,
+  isDisabled: PropTypes.bool,
+  isClearable: PropTypes.bool,
+  isSearchable: PropTypes.bool,
+  isMulti: PropTypes.bool,
+  menuShouldScrollIntoView: PropTypes.bool,
+  options: PropTypes.array.isRequired,
+  onChange: PropTypes.func,
+  onMenuClose: PropTypes.func,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+    PropTypes.arrayOf(PropTypes.object),
+  ]),
+  placeholder: PropTypes.string,
 };
 
 Select.defaultProps = {
   allowOptionCreation: false,
   components: {},
+  closeMenuOnSelect: true,
+  escapeClearsValue: false,
   styles: {},
+  inputId: undefined,
   ignoreAccents: false,
   ignoreCase: true,
+  isDisabled: false,
+  isClearable: true,
+  isSearchable: true,
+  isMulti: false,
+  // react-select uses !isMobileDevice() by default
+  menuShouldScrollIntoView: undefined,
+  placeholder: undefined,
+  onChange: undefined,
+  onMenuClose: undefined,
+  value: undefined,
 };
 
-export default withTheme(Select);
+export default Select;

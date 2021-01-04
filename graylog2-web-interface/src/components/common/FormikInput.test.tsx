@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import { Formik, Form } from 'formik';
 import * as React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';

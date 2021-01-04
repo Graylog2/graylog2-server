@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
 
@@ -31,14 +30,12 @@ export type RoleJSON = {
   name: string,
   description: string,
   permissions: Immutable.Set<string>,
-  // eslint-disable-next-line camelcase
   read_only: boolean,
 };
 
 export default class Role {
   _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(
     id: $PropertyType<InternalState, 'id'>,
     name: $PropertyType<InternalState, 'name'>,
@@ -94,7 +91,6 @@ export default class Role {
     }));
   }
 
-  // eslint-disable-next-line no-undef
   static create(
     id: $PropertyType<InternalState, 'id'>,
     name: $PropertyType<InternalState, 'name'>,

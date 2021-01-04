@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -148,7 +147,6 @@ class AddWidgetButton extends React.Component<Props, State> {
     const creators: Array<Creator> = PluginStore.exports('creators');
     const presets = this._createGroup(creators, 'preset');
     const generic = this._createGroup(creators, 'generic');
-    // $FlowFixMe: Object.value signature is in the way
     const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
     return (

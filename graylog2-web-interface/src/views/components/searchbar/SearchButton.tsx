@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
-import type { ThemeInterface } from 'theme';
 
-const StyledButton: StyledComponent<{}, void, Button> = styled(Button)`
+const StyledButton = styled(Button)`
   margin-right: 7px;
 `;
 
-const DirtyButton: StyledComponent<{}, ThemeInterface, Button> = styled(StyledButton)(({ theme }) => css`
+const DirtyButton = styled(StyledButton)(({ theme }) => css`
   position: relative;
 
   &::after {

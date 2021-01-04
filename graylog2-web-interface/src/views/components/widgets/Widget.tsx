@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
@@ -42,10 +41,11 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
+import { IconButton } from 'components/common';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -63,6 +63,7 @@ import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import ReplaySearchButton from './ReplaySearchButton';
 
+import CustomPropTypes from '../CustomPropTypes';
 import IfDashboard from '../dashboard/IfDashboard';
 import InteractiveContext from '../contexts/InteractiveContext';
 import IfInteractive from '../dashboard/IfInteractive';
@@ -130,14 +131,8 @@ const _editComponentForType = (type) => {
 class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
-    view: PropTypes.object.isRequired,
-    widget: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      computationTimeRange: PropTypes.object,
-      config: PropTypes.object.isRequired,
-      filter: PropTypes.string,
-    }).isRequired,
+    view: CustomPropTypes.CurrentView.isRequired,
+    widget: PropTypes.instanceOf(WidgetModel).isRequired,
     data: PropTypes.any,
     editing: PropTypes.bool,
     errors: WidgetErrorsList,
@@ -147,7 +142,7 @@ class Widget extends React.Component<Props, State> {
     onSizeChange: PropTypes.func.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    position: PropTypes.object.isRequired,
+    position: PropTypes.instanceOf(WidgetPosition).isRequired,
   };
 
   static defaultProps = {
@@ -184,11 +179,13 @@ class Widget extends React.Component<Props, State> {
     }
   };
 
-  _onDuplicate = (widgetId) => {
+  _onDuplicate = (widgetId, setFocusWidget) => {
     const { title } = this.props;
 
     WidgetActions.duplicate(widgetId).then((newWidget) => {
-      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`);
+      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
+        setFocusWidget(undefined);
+      });
     });
   };
 
@@ -339,6 +336,8 @@ class Widget extends React.Component<Props, State> {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
     const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config, type } = widget;
+    const { focusedWidget, setFocusedWidget } = this.context;
+    const isFocusedWidget = focusedWidget === id;
     const visualization = this.visualize();
 
     if (editing) {
@@ -376,7 +375,7 @@ class Widget extends React.Component<Props, State> {
           <InteractiveContext.Consumer>
             {(interactive) => (
               <WidgetHeader title={title}
-                            hideDragHandle={!interactive}
+                            hideDragHandle={!interactive || isFocusedWidget}
                             loading={loading}
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
@@ -385,13 +384,18 @@ class Widget extends React.Component<Props, State> {
                     <IfDashboard>
                       <ReplaySearchButton />
                     </IfDashboard>
+                    <IconButton name={isFocusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
+                                title={isFocusedWidget ? 'Un-focus widget' : 'Focus this widget'}
+                                onClick={() => setFocusedWidget(id)} />
+                    {!isFocusedWidget && (
                     <WidgetHorizontalStretch widgetId={widget.id}
                                              widgetType={widget.type}
                                              onStretch={onPositionsChange}
                                              position={position} />
+                    )}
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                      <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
                       {type === MessagesWidget.type && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
@@ -428,5 +432,7 @@ class Widget extends React.Component<Props, State> {
     );
   }
 }
+
+Widget.contextType = WidgetFocusContext;
 
 export default connect(Widget, { view: ViewStore });

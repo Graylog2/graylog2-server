@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import Reflux from 'reflux';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -38,7 +37,7 @@ const DashboardsActions: DashboardsActionsType = singletonActions(
   }),
 );
 
-const dashboardsUrl = URLUtils.qualifyUrl('/dashboards');
+const dashboardsUrl = qualifyUrl('/dashboards');
 
 export type Pagination = {
   total: number;
@@ -87,7 +86,10 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
             pagination: this.pagination,
           });
 
-          return response;
+          return {
+            list: this.dashboards,
+            pagination: this.pagination,
+          };
         })
         .catch((error) => {
           UserNotification.error(`Fetching dashboards failed with status: ${error}`,

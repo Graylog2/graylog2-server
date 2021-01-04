@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import type MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
@@ -39,15 +38,13 @@ type SearchTypeBase = {
   streams: Array<string>,
 };
 
-/* eslint-disable camelcase */
 export type AggregationSearchType = SearchTypeBase & {
   sort: Array<SortConfig>,
-  series: Array<{id: string, type: string, field: string}>,
+  series: Array<{ id: string, type: string, field: string }>,
   column_groups: Array<SearchTypePivot>,
   row_groups: Array<SearchTypePivot>,
   rollup: boolean,
 };
-/* eslint-enable camelcase */
 
 export type MessagesSearchType = SearchTypeBase & {
   sort: Array<MessageSortConfig>,

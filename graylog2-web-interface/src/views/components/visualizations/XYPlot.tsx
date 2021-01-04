@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 
 import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
@@ -44,7 +43,7 @@ export type Props = {
     from: string,
     to: string,
   },
-  getChartColor?: (data: Array<ChartConfig>, name: string) => (string | undefined | null | void),
+  getChartColor?: (data: Array<ChartConfig>, name: string) => (string | undefined | null),
   height?: number;
   setChartColor?: (config: ChartConfig, color: ColorMap) => ChartColor,
   plotLayout?: any,
@@ -123,6 +122,7 @@ XYPlot.propTypes = {
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   currentQuery: CustomPropTypes.instanceOf(Query).isRequired,
   effectiveTimerange: PropTypes.exact({
+    // eslint-disable-next-line react/no-unused-prop-types
     type: PropTypes.string.isRequired,
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,

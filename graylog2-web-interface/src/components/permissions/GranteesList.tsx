@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { $PropertyType } from 'utility-types';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
@@ -26,7 +25,6 @@ import { Alert } from 'components/graylog';
 import EntityShareState, { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
-import { ThemeInterface } from 'theme';
 
 import GranteesListItem from './GranteesListItem';
 
@@ -37,7 +35,7 @@ const Header = styled.div`
   margin-bottom: 10px;
 `;
 
-const List: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const List = styled.div(({ theme }) => `
   >:nth-child(even) {
     background: ${theme.colors.table.backgroundAlt};
   };
@@ -49,6 +47,7 @@ const List: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ 
 const PaginationWrapper = styled.ul`
   display: flex;
   justify-content: center;
+
   .pagination {
     margin: 10px 0 0 0;
   }

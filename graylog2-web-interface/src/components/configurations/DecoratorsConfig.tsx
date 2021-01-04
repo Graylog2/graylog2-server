@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { groupBy } from 'lodash';
 
@@ -22,9 +21,10 @@ import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import CombinedProvider from 'injection/CombinedProvider';
-import StreamsStore, { Stream } from 'stores/streams/StreamsStore';
+import { StreamsActions, Stream } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
+import { Decorator } from 'views/components/messagelist/decorators/Types';
 
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
@@ -38,11 +38,11 @@ const { DecoratorsActions } = CombinedProvider.get('Decorators');
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState<Array<Stream> | undefined>();
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
-  const [decorators, setDecorators] = useState();
+  const [decorators, setDecorators] = useState<Array<Decorator> | undefined>();
   const [types, setTypes] = useState();
   const configModal = useRef<BootstrapModalWrapper>();
 
-  useEffect(() => { StreamsStore.listStreams().then(setStreams); }, [setStreams]);
+  useEffect(() => { StreamsActions.listStreams().then(setStreams); }, [setStreams]);
   useEffect(() => { DecoratorsActions.available().then(setTypes); }, [setTypes]);
   useEffect(() => { DecoratorsActions.list().then(setDecorators); }, [setDecorators]);
 

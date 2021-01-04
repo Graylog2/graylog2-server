@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 import { $PropertyType } from 'utility-types';
 import { useState } from 'react';
-import styled, { StyledComponent } from 'styled-components';
+import styled, { DefaultTheme, css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { ThemeInterface } from 'theme';
 import EntityShareState, { CapabilitiesList } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import { Spinner, IconButton } from 'components/common';
@@ -31,7 +29,7 @@ import SelectedGrantee, { CurrentState as CurrentGranteeState } from 'logic/perm
 import GranteeIcon from './GranteeIcon';
 import CapabilitySelect from './CapabilitySelect';
 
-const currentStateColor = (theme: ThemeInterface, currentState: CurrentGranteeState) => {
+const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeState) => {
   switch (currentState) {
     case 'new':
       return theme.colors.variant.lighter.success;
@@ -42,7 +40,7 @@ const currentStateColor = (theme: ThemeInterface, currentState: CurrentGranteeSt
   }
 };
 
-const Container: StyledComponent<{ currentState: CurrentGranteeState }, ThemeInterface, HTMLLIElement> = styled.li(({ theme, currentState }) => `
+const Container = styled.li<{ currentState: CurrentGranteeState, theme: DefaultTheme }>(({ theme, currentState }) => css`
   display: flex;
   align-items: center;
   width: 100%;
