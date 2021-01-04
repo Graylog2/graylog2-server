@@ -33,10 +33,15 @@ public class AtomicCache<T> {
         final CompletableFuture<T> completableFuture = new CompletableFuture<>();
         final Future<T> previous = this.value.getAndAccumulate(completableFuture, (prev, cur) -> prev == null ? cur : prev);
         if (previous == null) {
-            final T newValue = valueSupplier.get();
-            completableFuture.complete(newValue);
+            try {
+                final T newValue = valueSupplier.get();
+                completableFuture.complete(newValue);
 
-            return newValue;
+                return newValue;
+            } catch (Exception e) {
+                completableFuture.completeExceptionally(e);
+                return null;
+            }
         } else {
             return previous.get();
         }

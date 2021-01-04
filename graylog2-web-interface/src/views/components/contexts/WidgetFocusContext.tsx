@@ -15,22 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  padding: 12px 6px;
-  
-  h5 {
-    font-weight: bold;
-    margin: 0 0 6px;
-  }
-`;
+import { singleton } from 'views/logic/singleton';
 
-const DisabledTimeRangeSelector = () => (
-  <Wrapper>
-    <h5>No Date/Time Override chosen.</h5>
-    <p>Use the tabs above to choose a Date & Time Range to Search.</p>
-  </Wrapper>
-);
+type WidgetFocusContextType = {
+  focusedWidget: string | undefined | null,
+  setFocusedWidget: (focusedWidget: string | undefined | null) => void,
+};
 
-export default DisabledTimeRangeSelector;
+const defaultContext = { focusedWidget: undefined, setFocusedWidget: () => {} };
+
+const WidgetFocus = React.createContext<WidgetFocusContextType>(defaultContext);
+
+export default singleton('contexts.WidgetFocus', () => WidgetFocus);

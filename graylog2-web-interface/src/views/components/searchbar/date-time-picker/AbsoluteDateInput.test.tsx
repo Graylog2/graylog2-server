@@ -15,35 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render } from 'wrappedTestingLibrary';
-import moment from 'moment-timezone';
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
 
-import DateInputWithPicker from './DateInputWithPicker';
+import AbsoluteDateInput from './AbsoluteDateInput';
 
 const dateTimeRange = '2020-04-08 13:22:46';
-const initialDateTimeObject = moment(dateTimeRange).toObject();
 
-const onChange = jest.fn();
 const defaultProps = {
+  name: 'test-absolute-date-input',
+  disabled: false,
+  onChange: jest.fn(),
   value: dateTimeRange,
-  initialDateTimeObject,
-  onChange,
-  name: 'date-picker',
+  hasError: false,
 };
 
-describe('DateInputWithPicker', () => {
+describe('AbsoluteDateInput', () => {
   beforeAll(() => { jest.clearAllMocks(); });
 
   it('renders with minimal props', () => {
-    const { container } = render(<DateInputWithPicker {...defaultProps} />);
+    render(<AbsoluteDateInput {...defaultProps} />);
 
-    expect(container).not.toBeNull();
+    expect(screen).not.toBeNull();
   });
 
   it('calls onChange upon changing the input', () => {
-    const { getByPlaceholderText } = render(<DateInputWithPicker {...defaultProps} />);
+    const { getByPlaceholderText } = render(<AbsoluteDateInput {...defaultProps} />);
 
     const input = getByPlaceholderText(DateTime.Formats.DATETIME);
 
@@ -55,7 +54,7 @@ describe('DateInputWithPicker', () => {
   it('pressing magic wand inserts current date', () => {
     const output = moment().format(DateTime.Formats.TIMESTAMP);
     defaultProps.onChange.mockReturnValueOnce(output);
-    const { getByTitle } = render(<DateInputWithPicker {...defaultProps} />);
+    const { getByTitle } = render(<AbsoluteDateInput {...defaultProps} />);
 
     const insertCurrentDate = getByTitle('Insert current date');
 

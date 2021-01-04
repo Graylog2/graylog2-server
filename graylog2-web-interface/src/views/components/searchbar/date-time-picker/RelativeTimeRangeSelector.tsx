@@ -159,22 +159,24 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
             return null;
           }).filter(Boolean).pop();
 
-          const _onChangeTime = (event) => {
-            const newTimeValue = moment.duration(event.target.value, fromValue.rangeType).asSeconds();
+          const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
 
-            onChange({ target: { name, value: newTimeValue } });
+          const _onChangeTime = (event) => {
+            const newTimeValue = moment.duration(event.target.value || 1, fromValue.rangeType).asSeconds();
+
+            _onChange(newTimeValue);
           };
 
           const _onChangeType = (type) => {
             const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
 
-            onChange({ target: { name, value: newTimeValue } });
+            _onChange(newTimeValue);
           };
 
           const _onCheckAllTime = (event) => {
             const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
 
-            onChange({ target: { name, value: event.target.checked ? 0 : notAllTime } });
+            _onChange(event.target.checked ? 0 : notAllTime);
           };
 
           return (
@@ -193,6 +195,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                        name="relative-timerange-from-value"
                        disabled={disabled || fromValue.rangeAllTime}
                        type="number"
+                       min="1"
                        value={fromValue.rangeValue}
                        title="Set the range value"
                        onChange={_onChangeTime}

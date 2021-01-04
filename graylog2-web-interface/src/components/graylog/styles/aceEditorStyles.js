@@ -64,12 +64,12 @@ const aceEditorStyles = ({ colors }) => {
         }
 
         .ace_active-line {
-          background: ${colors.gray[90]};
+          background: ${colors.variant.lighter.default};
         }
       }
 
       .ace_gutter-active-line {
-        background-color: ${colors.gray[80]};
+        background-color: ${colors.variant.lighter.default};
       }
 
       .ace_invisible {
@@ -81,7 +81,7 @@ const aceEditorStyles = ({ colors }) => {
       .ace_storage,
       .ace_storage.ace_type,
       .ace_support.ace_type {
-        color: ${colors.variant.primary};
+        color: ${colors.global.link};
       }
 
       .ace_keyword.ace_operator {

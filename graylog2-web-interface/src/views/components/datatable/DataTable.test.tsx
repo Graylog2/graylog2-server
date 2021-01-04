@@ -22,7 +22,7 @@ import 'helpers/mocking/react-dom_mock';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
-import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
 
@@ -219,7 +219,7 @@ describe('DataTable', () => {
                                                fields={fields}
                                                data={dataWithMoreSeries} />);
 
-    const expectFieldType = (elem, type) => expect(wrapper.find(elem).props().type).toEqual(type);
+    const expectFieldType = (elem, type) => expect((wrapper.find(elem).props() as { type: FieldType }).type).toEqual(type);
 
     expectFieldType('Value[field="count()"]', FieldTypes.LONG());
     expectFieldType('Field[name="count()"]', FieldTypes.LONG());

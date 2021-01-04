@@ -1746,7 +1746,7 @@ fieldset[disabled] .c9.form-control:not([type="range"]) {
                         aria-disabled="false"
                         aria-label="Mon Dec 14 2020"
                         aria-selected="false"
-                        class="DayPicker-Day"
+                        class="DayPicker-Day DayPicker-Day--today"
                         role="gridcell"
                         tabindex="-1"
                       >
