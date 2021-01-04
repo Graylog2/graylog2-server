@@ -149,6 +149,13 @@ public class ServerStatus {
         publishLifecycle(Lifecycle.OVERRIDE_LB_THROTTLED);
     }
 
+    /**
+     * Blocks until the server enters the RUNNING state and then executes the given Runnable.
+     * <p>
+     * <b>This method is not interruptible while waiting for the server to enter the RUNNING state.</b>
+     * @deprecated Preferably use {@link #awaitRunning()} instead, which is interruptible.
+     */
+    @Deprecated
     public void awaitRunning(final Runnable runnable) {
         LOG.debug("Waiting for server to enter RUNNING state");
         Uninterruptibles.awaitUninterruptibly(runningLatch);
@@ -160,6 +167,15 @@ public class ServerStatus {
         } catch (Exception e) {
             LOG.error("awaitRunning callback failed", e);
         }
+    }
+
+    /**
+     * Blocks until the server enters the RUNNING state.
+     * @throws InterruptedException if the thread is interrupted while waiting for the server to enter the RUNNING
+     * state.
+     */
+    public void awaitRunning() throws InterruptedException {
+        runningLatch.await();
     }
 
     public DateTime getStartedAt() {
