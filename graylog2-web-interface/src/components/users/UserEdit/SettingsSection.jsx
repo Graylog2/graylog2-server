@@ -24,6 +24,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
+import { IfPermitted } from '../../common';
 
 type Props = {
   user: User,
@@ -42,7 +43,9 @@ const SettingsSection = ({
             initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs }}>
       {({ isSubmitting, isValid }) => (
         <Form className="form form-horizontal">
-          <TimeoutFormGroup />
+          <IfPermitted permissions="*">
+            <TimeoutFormGroup />
+          </IfPermitted>
           <TimezoneFormGroup />
           <Row className="no-bm">
             <Col xs={12}>
