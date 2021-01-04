@@ -32,6 +32,7 @@ describe('ActionHandler', () => {
       type: 'dummy-action',
       title: 'Dummy Action',
       handler: () => Promise.resolve(42),
+      resetFocus: false,
     };
 
     const result = createHandlerFor(actionDefinition, jest.fn());
@@ -46,6 +47,7 @@ describe('ActionHandler', () => {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
+      resetFocus: false,
     };
     const handler: ActionHandler = createHandlerFor(actionDefinition, setActionComponents);
 
@@ -78,6 +80,7 @@ describe('ActionHandler', () => {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
+      resetFocus: false,
     };
     const handler: ActionHandler = createHandlerFor(actionDefinition, setActionComponents);
 

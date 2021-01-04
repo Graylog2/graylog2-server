@@ -108,17 +108,17 @@ const DEFAULT_RANGES = {
 };
 
 const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, currentTimeRange }) => availableTimeRangeTypes.map(({ type, name }) => {
-  const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
+  const TimeRangeComponent = timeRangeTypes[type];
 
   return (
     <Tab title={name}
          key={`time-range-type-selector-${type}`}
          eventKey={type}>
       {type === activeTab && (
-        <RangeComponent disabled={false}
-                        originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
-                        limitDuration={limitDuration}
-                        currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
+        <TimeRangeComponent disabled={false}
+                            originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
+                            limitDuration={limitDuration}
+                            currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
       )}
     </Tab>
   );
@@ -132,16 +132,6 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
   const currentTimeRange = values?.nextTimeRange;
 
   const [activeTab, setActiveTab] = useState(currentTimeRange?.type);
-
-  useEffect(() => {
-    if (currentTimeRange?.type) {
-      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, activeTab), false);
-    } else {
-      setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
-    }
-
-    validateForm();
-  }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
 
   const handleNoOverride = () => {
     setFieldValue('timerange', {});
@@ -162,14 +152,34 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
     toggleDropdownShow();
   }, [currentTimeRange, setFieldValue, toggleDropdownShow]);
 
+  const handleEnterKeyPress = useCallback(() => {
+    if (isValid) {
+      handleApply();
+    }
+  }, [isValid, handleApply]);
+
+  const handleEscKeyPress = useCallback(() => {
+    handleCancel();
+  }, [handleCancel]);
+
   useEffect(() => {
-    Mousetrap.bind('enter', isValid ? handleApply : () => {});
-    Mousetrap.bind('esc', handleCancel);
+    if (currentTimeRange?.type) {
+      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, activeTab), false);
+    } else {
+      setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
+    }
+
+    validateForm();
+  }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
+
+  useEffect(() => {
+    Mousetrap.bind('enter', handleEnterKeyPress);
+    Mousetrap.bind('esc', handleEscKeyPress);
 
     return () => {
       Mousetrap.reset();
     };
-  }, [isValid, handleApply, handleCancel]);
+  }, [handleEnterKeyPress, handleEscKeyPress]);
 
   const title = (
     <PopoverTitle>
@@ -195,7 +205,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeTab}
+                      activeKey={activeTab ?? -1}
                       onSelect={setActiveTab}
                       animation={false}>
             {timeRangeTypeTabs({
@@ -204,6 +214,9 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
               limitDuration,
               currentTimeRange,
             })}
+
+            {!activeTab && (<DisabledTimeRangeSelector />)}
+
           </StyledTabs>
         </Col>
       </Row>

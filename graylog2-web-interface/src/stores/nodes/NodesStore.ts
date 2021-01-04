@@ -24,7 +24,6 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { NodesActions } = CombinedProvider.get('Nodes');
 const { SessionStore } = CombinedProvider.get('Session');
 
-/* eslint-disable camelcase */
 type NodeInfo = {
   cluster_id: string,
   hostname: string,
@@ -35,7 +34,6 @@ type NodeInfo = {
   transport_address: string,
   type: 'server',
 };
-/* eslint-enable camelcase */
 
 type NodesListResponse = {
   nodes: Array<NodeInfo> | null | undefined,

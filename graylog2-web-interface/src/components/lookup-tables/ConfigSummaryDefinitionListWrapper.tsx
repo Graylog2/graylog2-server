@@ -14,23 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  padding: 12px 6px;
-  
-  h5 {
-    font-weight: bold;
-    margin: 0 0 6px;
+const ConfigSummaryDefinitionListWrapper = styled.div`
+  dl {
+    margin-top: 10px;
+
+    dt {
+      float: left;
+      clear: left;
+    }
+
+    dd {
+      margin-left: 185px;
+      word-wrap: break-word;
+
+      :not(:last-child) {
+        border-bottom: 1px solid #ececec;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+      }
+    }
   }
 `;
 
-const DisabledTimeRangeSelector = () => (
-  <Wrapper>
-    <h5>No Date/Time Override chosen.</h5>
-    <p>Use the tabs above to choose a Date & Time Range to Search.</p>
-  </Wrapper>
-);
-
-export default DisabledTimeRangeSelector;
+export default ConfigSummaryDefinitionListWrapper;

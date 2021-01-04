@@ -19,7 +19,7 @@ import { isEqual } from 'lodash';
 
 import { singletonStore } from 'views/logic/singleton';
 
-import { QueriesStore } from './QueriesStore';
+import { ViewStore } from './ViewStore';
 
 // eslint-disable-next-line import/prefer-default-export
 export const QueryIdsStore = singletonStore(
@@ -27,13 +27,13 @@ export const QueryIdsStore = singletonStore(
   () => Reflux.createStore({
     state: {},
     init() {
-      this.listenTo(QueriesStore, this.onQueriesStoreUpdate, this.onQueriesStoreUpdate);
+      this.listenTo(ViewStore, this.onViewsStoreUpdate, this.onViewsStoreUpdate);
     },
     getInitialState() {
       return this._state();
     },
-    onQueriesStoreUpdate(queries) {
-      const newState = queries.keySeq().toList();
+    onViewsStoreUpdate(view) {
+      const newState = view?.view?.state?.keySeq().toList();
 
       if (!isEqual(this.state, newState)) {
         this.state = newState;

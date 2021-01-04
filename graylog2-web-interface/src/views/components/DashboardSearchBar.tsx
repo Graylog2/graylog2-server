@@ -52,7 +52,7 @@ type Props = {
     query: QueryString,
   },
   disableSearch?: boolean,
-  onExecute: () => void,
+  onExecute: () => Promise<void>,
 };
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {

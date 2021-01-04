@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<Widget /> should render with empty props 1`] = `
+exports['<Widget /> should render with empty props 1'] = `
 .c2 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -163,6 +163,16 @@ exports[`<Widget /> should render with empty props 1`] = `
         <div
           class="c1"
         >
+          <button
+            class="c2"
+            tabindex="0"
+            title="Focus this widget"
+            type="button"
+          >
+            <svg
+              class="svg-inline--fa fa-expand-arrows-alt"
+            />
+          </button>
           <button
             class="c2"
             tabindex="0"

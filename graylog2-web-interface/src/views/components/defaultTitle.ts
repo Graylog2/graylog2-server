@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+import { capitalize } from 'lodash';
 
-const Wrapper = styled.div`
-  padding: 12px 6px;
-  
-  h5 {
-    font-weight: bold;
-    margin: 0 0 6px;
-  }
-`;
+import { widgetDefinition } from 'views/logic/Widgets';
 
-const DisabledTimeRangeSelector = () => (
-  <Wrapper>
-    <h5>No Date/Time Override chosen.</h5>
-    <p>Use the tabs above to choose a Date & Time Range to Search.</p>
-  </Wrapper>
-);
+const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
 
-export default DisabledTimeRangeSelector;
+const defaultTitle = (widget) => {
+  const widgetDef = widgetDefinition(widget.type);
+
+  return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);
+};
+
+export default defaultTitle;

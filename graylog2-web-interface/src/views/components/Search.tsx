@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useContext } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -59,13 +59,16 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import usePluginEntities from 'views/logic/usePluginEntities';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
     height: calc(100vh - 50px);
     display: flex;
     overflow: hidden;
-    
+
     > *:nth-child(2) {
       flex-grow: 1;
     }
@@ -75,7 +78,25 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
 const SearchArea = styled(AppContentGrid)`
   height: 100%;
   overflow-y: auto;
+
+  .container-fluid {
+    height: 100%;
+  }
 `;
+
+const SearchLayoutContainer = styled.div(({ isDashboard }: { isDashboard: boolean }) => {
+  const { focusedWidget } = useContext(WidgetFocusContext);
+
+  const grid = isDashboard
+    ? 'grid-template-rows: min-content min-content auto min-content;'
+    : 'grid-template-rows: min-content auto min-content;';
+
+  return css`
+    height: 100%;
+    display: ${focusedWidget ? 'grid' : 'initial'};
+    ${focusedWidget ? grid : ''}
+  `;
+});
 
 const ConnectedSidebar = connect(
   Sidebar,
@@ -160,53 +181,61 @@ const Search = ({ location }: Props) => {
   useSyncWithQueryParameters(query);
 
   return (
-    <CurrentViewTypeProvider>
-      <IfInteractive>
-        <IfDashboard>
-          <WindowLeaveMessage />
-        </IfDashboard>
-      </IfInteractive>
-      <InteractiveContext.Consumer>
-        {(interactive) => (
-          <SearchPageLayoutProvider>
-            <DefaultFieldTypesProvider>
-              <ViewAdditionalContextProvider>
-                <HighlightingRulesProvider>
-                  <GridContainer id="main-row" interactive={interactive}>
-                    <IfInteractive>
-                      <ConnectedSidebar>
-                        <FieldsOverview />
-                      </ConnectedSidebar>
-                    </IfInteractive>
-                    <SearchArea>
+    <WidgetFocusProvider>
+      <CurrentViewTypeProvider>
+        <IfInteractive>
+          <IfDashboard>
+            <WindowLeaveMessage />
+          </IfDashboard>
+        </IfInteractive>
+        <InteractiveContext.Consumer>
+          {(interactive) => (
+            <SearchPageLayoutProvider>
+              <DefaultFieldTypesProvider>
+                <ViewAdditionalContextProvider>
+                  <HighlightingRulesProvider>
+                    <GridContainer id="main-row" interactive={interactive}>
                       <IfInteractive>
-                        <HeaderElements />
-                        <IfDashboard>
-                          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                        </IfDashboard>
-                        <IfSearch>
-                          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                        </IfSearch>
-
-                        <QueryBarElements />
-
-                        <IfDashboard>
-                          <QueryBar />
-                        </IfDashboard>
+                        <ConnectedSidebar>
+                          <FieldsOverview />
+                        </ConnectedSidebar>
                       </IfInteractive>
-                      <HighlightMessageInQuery>
-                        <SearchResult />
-                      </HighlightMessageInQuery>
-                      <Footer />
-                    </SearchArea>
-                  </GridContainer>
-                </HighlightingRulesProvider>
-              </ViewAdditionalContextProvider>
-            </DefaultFieldTypesProvider>
-          </SearchPageLayoutProvider>
-        )}
-      </InteractiveContext.Consumer>
-    </CurrentViewTypeProvider>
+                      <SearchArea>
+                        <ViewTypeContext.Consumer>
+                          {(viewType) => (
+                            <SearchLayoutContainer isDashboard={viewType === 'DASHBOARD'}>
+                              <IfInteractive>
+                                <HeaderElements />
+                                <IfDashboard>
+                                  <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                                </IfDashboard>
+                                <IfSearch>
+                                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                                </IfSearch>
+
+                                <QueryBarElements />
+
+                                <IfDashboard>
+                                  <QueryBar />
+                                </IfDashboard>
+                              </IfInteractive>
+                              <HighlightMessageInQuery>
+                                <SearchResult />
+                              </HighlightMessageInQuery>
+                              <Footer />
+                            </SearchLayoutContainer>
+                          )}
+                        </ViewTypeContext.Consumer>
+                      </SearchArea>
+                    </GridContainer>
+                  </HighlightingRulesProvider>
+                </ViewAdditionalContextProvider>
+              </DefaultFieldTypesProvider>
+            </SearchPageLayoutProvider>
+          )}
+        </InteractiveContext.Consumer>
+      </CurrentViewTypeProvider>
+    </WidgetFocusProvider>
   );
 };
 
