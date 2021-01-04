@@ -55,6 +55,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.tiny};
   font-style: italic;
   padding: 3px 3px 9px;
+  height: 1.5em;
 `);
 
 const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }: Props) => {
@@ -94,7 +95,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
               </StyledAccordion>
             </StyledAccordionGroup>
 
-            {error && <ErrorMessage>{error}</ErrorMessage>}
+            <ErrorMessage>{error ?? ' '}</ErrorMessage>
           </>
         );
       }}
