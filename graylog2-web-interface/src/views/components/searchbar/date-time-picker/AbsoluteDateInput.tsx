@@ -17,33 +17,44 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import styled from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
 import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
+const Wrapper = styled.div`
+  margin: 9px 6px;
+  
+  .form-group {
+    margin: 0;
+  }
+`;
+
 const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
   const _onSetTimeToNow = () => onChange(moment().format(DateTime.Formats.TIMESTAMP));
   const _onChange = (event) => onChange(event.target.value);
 
   return (
-    <Input type="text"
-           id={`date-input-${name}`}
-           name={name}
-           autoComplete="off"
-           disabled={disabled}
-           onChange={_onChange}
-           placeholder={DateTime.Formats.DATETIME}
-           value={value}
-           buttonAfter={(
-             <Button disabled={disabled}
-                     onClick={_onSetTimeToNow}
-                     title="Insert current date">
-               <Icon name="magic" />
-             </Button>
+    <Wrapper>
+      <Input type="text"
+             id={`date-input-${name}`}
+             name={name}
+             autoComplete="off"
+             disabled={disabled}
+             onChange={_onChange}
+             placeholder={DateTime.Formats.DATETIME}
+             value={value}
+             buttonAfter={(
+               <Button disabled={disabled}
+                       onClick={_onSetTimeToNow}
+                       title="Insert current date">
+                 <Icon name="magic" />
+               </Button>
            )}
-           bsStyle={hasError ? 'error' : null} />
+             bsStyle={hasError ? 'error' : null} />
+    </Wrapper>
   );
 };
 

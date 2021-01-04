@@ -19,7 +19,7 @@ import React from 'react';
 
 import Panel from './Panel';
 
-const Accordion = ({ children, name }) => {
+const Accordion = ({ children, name, ...restProps }) => {
   if (!name) {
     return <></>;
   }
@@ -27,7 +27,7 @@ const Accordion = ({ children, name }) => {
   const id = name.replace(/[^0-9a-zA-Z]/g, '-').toLowerCase();
 
   return (
-    <Panel id={id} defaultExpanded eventKey={id}>
+    <Panel {...restProps} id={id} defaultExpanded eventKey={id}>
       <Panel.Heading>
         <Panel.Title toggle>
           {name}

@@ -22,7 +22,13 @@ import { Panel as BootstrapPanel } from 'react-bootstrap';
 
 import deprecationNotice from 'util/deprecationNotice';
 
-const PanelHeading = styled(BootstrapPanel.Heading)``;
+const PanelHeading = styled(BootstrapPanel.Heading)`
+  .panel-title {
+    > a {
+      display: block;
+    }
+  }
+`;
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
@@ -168,7 +174,7 @@ const Panel = ({
     setIsExpanded((defaultExpanded && expanded)
       || (!defaultExpanded && expanded)
       || (defaultExpanded && isExpanded === expanded));
-  }, [expanded]);
+  }, [defaultExpanded, expanded, isExpanded]);
 
   const handleToggle = (nextIsExpanded) => {
     setIsExpanded(nextIsExpanded);
@@ -179,9 +185,7 @@ const Panel = ({
 
   if (header || footer || title || collapsible || hasDeprecatedChildren) {
     /** NOTE: Deprecated & should be removed in 4.0 */
-    useEffect(() => {
-      deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
-    }, []);
+    deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */

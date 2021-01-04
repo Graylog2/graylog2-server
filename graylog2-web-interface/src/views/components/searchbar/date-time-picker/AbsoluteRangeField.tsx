@@ -40,6 +40,16 @@ const StyledAccordionGroup = styled(AccordionGroup)`
   width: 100%;
 `;
 
+const StyledAccordion = styled(Accordion)`
+  .panel-heading {
+    padding: 3px 6px;
+  }
+  
+  .panel-body {
+    padding: 0;
+  }
+`;
+
 const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
   font-size: ${theme.fonts.size.tiny};
@@ -64,14 +74,14 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
         return (
           <>
             <StyledAccordionGroup>
-              <Accordion name="Text Input">
+              <StyledAccordion name="Text Input">
                 <AbsoluteDateInput name={name}
                                    disabled={disabled}
                                    value={dateTime}
                                    onChange={_onChange} />
-              </Accordion>
+              </StyledAccordion>
 
-              <Accordion name="Calendar Input">
+              <StyledAccordion name="Calendar Input">
                 <AbsoluteDatePicker name={name}
                                     disabled={disabled}
                                     onChange={_onChange}
@@ -81,7 +91,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                 <AbsoluteTimeInput onChange={_onChange}
                                    range={range}
                                    dateTime={dateTime} />
-              </Accordion>
+              </StyledAccordion>
             </StyledAccordionGroup>
 
             {error && <ErrorMessage>{error}</ErrorMessage>}
