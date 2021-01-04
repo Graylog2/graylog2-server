@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import URI from 'urijs';
 
 import { useStore } from 'stores/connect';
+import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
@@ -35,11 +36,14 @@ const _syncWithQuery = (query: string, focusedWidget: string) => {
   return baseUri.toString();
 };
 
-const getFocusedWidgetFromSearch = (search: string) => {
-  const uri = new URI(search);
-  const { focused } = uri.search(true);
+const useFocusWidgetIdFromParam = (focusedWidget, setFocusedWidget) => {
+  const { focused: paramFocusedWidget } = useQuery();
 
-  return focused;
+  useEffect(() => {
+    if (focusedWidget !== paramFocusedWidget) {
+      setFocusedWidget(paramFocusedWidget);
+    }
+  }, [focusedWidget, paramFocusedWidget, setFocusedWidget]);
 };
 
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
@@ -49,13 +53,7 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   const [focusedWidget, setFocusedWidget] = useState<string | undefined>();
   const widgets = useStore(WidgetStore);
 
-  useEffect(() => {
-    const paramFocusedWidget = getFocusedWidgetFromSearch(search);
-
-    if (paramFocusedWidget && focusedWidget !== paramFocusedWidget) {
-      setFocusedWidget(paramFocusedWidget);
-    }
-  }, [focusedWidget, search]);
+  useFocusWidgetIdFromParam(focusedWidget, setFocusedWidget);
 
   useEffect(() => {
     if (focusedWidget && !widgets.has(focusedWidget)) {
@@ -68,9 +66,8 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
       ? undefined
       : widgetId;
     const newURI = _syncWithQuery(query, newFocus);
-    history.replace(newURI);
 
-    setFocusedWidget(newFocus);
+    history.replace(newURI);
   }, [focusedWidget, history, query]);
 
   return (
