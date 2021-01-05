@@ -19,6 +19,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
 import { Formik, Form } from 'formik';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
@@ -30,6 +31,7 @@ import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import history from 'util/History';
 import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -40,10 +42,17 @@ import UsernameFormGroup from './UsernameFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 
+const isCloud = AppConfig.isCloud();
+
 const _onSubmit = (formData, roles, setSubmitError) => {
   const data = { ...formData, roles: roles.toJS(), permissions: [] };
   delete data.password_repeat;
-  data.username = data.username.trim();
+
+  if (isCloud) {
+    data.email = data.username;
+  } else {
+    data.username = data.username.trim();
+  }
 
   setSubmitError(null);
 
@@ -54,8 +63,17 @@ const _onSubmit = (formData, roles, setSubmitError) => {
 
 const _validate = (values) => {
   let errors = {};
+
   const { password, password_repeat: passwordRepeat } = values;
-  errors = validatePasswords(errors, password, passwordRepeat);
+
+  if (isCloud) {
+    const cloudPlugin = PluginStore.exports('cloud');
+    const validateCloudPasswords = cloudPlugin?.[0]?.validateCloudPasswords;
+
+    errors = validateCloudPasswords(errors, password, passwordRepeat);
+  } else {
+    errors = validatePasswords(errors, password, passwordRepeat);
+  }
 
   return errors;
 };
@@ -88,6 +106,33 @@ const UserCreate = () => {
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
+  const getUserNameGroup = () => {
+    if (isCloud) {
+      const cloudPlugin = PluginStore.exports('cloud');
+      const OktaUserNameFormGroup = cloudPlugin?.[0]?.OktaUserNameFormGroup;
+
+      return <OktaUserNameFormGroup />;
+    }
+
+    return (
+      <>
+        <UsernameFormGroup users={users} />
+        <EmailFormGroup />
+      </>
+    );
+  };
+
+  const getPasswordGroup = () => {
+    if (isCloud) {
+      const cloudPlugin = PluginStore.exports('cloud');
+      const CloudPasswordFormGroup = cloudPlugin?.[0]?.CloudPasswordFormGroup;
+
+      return <CloudPasswordFormGroup />;
+    }
+
+    return <PasswordFormGroup />;
+  };
+
   if (!users) {
     return <Spinner />;
   }
@@ -102,9 +147,8 @@ const UserCreate = () => {
             <Form className="form form-horizontal">
               <div>
                 <Headline>Profile</Headline>
-                <UsernameFormGroup users={users} />
                 <FullNameFormGroup />
-                <EmailFormGroup />
+                {getUserNameGroup()}
               </div>
               <div>
                 <Headline>Settings</Headline>
@@ -137,7 +181,7 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Password</Headline>
-                <PasswordFormGroup />
+                {getPasswordGroup()}
               </div>
               {submitError && (
                 <Row>
