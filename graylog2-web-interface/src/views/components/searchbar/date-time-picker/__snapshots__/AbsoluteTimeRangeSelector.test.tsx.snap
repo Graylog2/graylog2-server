@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AbsoluteTimeRangeSelector renders 1`] = `
+exports[`TabAbsoluteTimeRange renders 1`] = `
 <DocumentFragment>
   .c3.btn-danger {
   background-color: #ad0707;

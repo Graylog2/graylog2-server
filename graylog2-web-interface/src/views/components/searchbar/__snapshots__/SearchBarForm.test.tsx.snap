@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
+exports[`SearchBarForm with TabAbsoluteTimeRange renders 1`] = `
 <DocumentFragment>
   .c0 {
   height: 100%;

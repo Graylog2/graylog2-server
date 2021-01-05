@@ -27,16 +27,16 @@ import { availableTimeRangeTypes, FormikValues } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 
-import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
-import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
-import RelativeTimeRangeSelector from './RelativeTimeRangeSelector';
-import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
+import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
+import TabKeywordTimeRange from './TabKeywordTimeRange';
+import TabRelativeTimeRange from './TabRelativeTimeRange';
+import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
 
 const timeRangeTypes = {
-  absolute: AbsoluteTimeRangeSelector,
-  relative: RelativeTimeRangeSelector,
-  keyword: KeywordTimeRangeSelector,
+  absolute: TabAbsoluteTimeRange,
+  relative: TabRelativeTimeRange,
+  keyword: TabKeywordTimeRange,
 };
 
 type Props = {
@@ -149,7 +149,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
     validateForm();
     setActiveTab(nextTab);
-  }
+  };
 
   const handleCancel = useCallback(() => {
     setFieldValue('nextTimeRange', initialTimeRange);
@@ -216,7 +216,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
               currentTimeRange,
             })}
 
-            {!activeTab && (<DisabledTimeRangeSelector />)}
+            {!activeTab && (<TabDisabledTimeRange />)}
 
           </StyledTabs>
         </Col>
