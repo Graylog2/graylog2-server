@@ -103,6 +103,7 @@ const HeatmapVisualizationConfiguration = ({ config = HeatmapVisualizationConfig
       <Select placeholder="Select Color Scheme"
               onChange={_onColorScaleChange}
               options={colorScalesOptions}
+              isClearable={false}
               value={_makeOption(config.colorScale)} />
       <Checkbox onChange={_onReverseScaleChange}
                 checked={config.reverseScale}>
