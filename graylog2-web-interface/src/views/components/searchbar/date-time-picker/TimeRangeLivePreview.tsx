@@ -19,10 +19,12 @@ import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import { useFormikContext } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
+import { FormikValues } from 'views/Constants';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -91,13 +93,18 @@ const dateOutput = (timerange: TimeRange) => {
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
+  const { isValid } = useFormikContext<FormikValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
   useEffect(() => {
-    const output = dateOutput(timerange);
+    let output = EMPTY_OUTPUT;
+
+    if (isValid) {
+      output = dateOutput(timerange);
+    }
 
     setTimeOutput(output);
-  }, [timerange]);
+  }, [isValid, timerange]);
 
   return (
     <PreviewWrapper>
