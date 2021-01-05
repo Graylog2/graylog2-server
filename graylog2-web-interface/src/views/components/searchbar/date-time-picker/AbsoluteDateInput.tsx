@@ -26,6 +26,7 @@ import { Input } from 'components/bootstrap';
 
 const Wrapper = styled.div`
   margin: 9px 6px;
+  width: 100%;
   
   .form-group {
     margin: 0;

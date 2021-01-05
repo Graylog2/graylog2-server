@@ -21,8 +21,7 @@ import { Field } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
-import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
-// import { ExpandableList, ExpandableListItem, Icon } from 'components/common';
+import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Accordion, AccordionGroup } from 'components/graylog';
 
 import AbsoluteDateInput from './AbsoluteDateInput';
@@ -33,7 +32,6 @@ type Props = {
   disabled: boolean,
   from: boolean,
   currentTimeRange?: AbsoluteTimeRange,
-  originalTimeRange: TimeRange,
   limitDuration?: number,
 };
 
@@ -114,10 +112,6 @@ AbsoluteRangeField.propTypes = {
     from: PropTypes.string,
     to: PropTypes.string,
   }),
-  originalTimeRange: PropTypes.shape({
-    from: PropTypes.string,
-    to: PropTypes.string,
-  }).isRequired,
   disabled: PropTypes.bool,
   limitDuration: PropTypes.number,
 };

@@ -15,13 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import { Field } from 'formik';
+import moment from 'moment';
 
 import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
+import { Accordion, AccordionGroup } from 'components/graylog';
 
-import AbsoluteRangeField from './AbsoluteRangeField';
+import AbsoluteDateInput from './AbsoluteDateInput';
+import AbsoluteDatePicker from './AbsoluteDatePicker';
+import AbsoluteTimeInput from './AbsoluteTimeInput';
 
 type Props = {
   disabled: boolean,
@@ -39,7 +45,6 @@ const AbsoluteWrapper = styled.div`
 const RangeWrapper = styled.div`
   flex: 4;
   align-items: center;
-  min-height: 290px;
   display: flex;
   flex-direction: column;
   
@@ -55,28 +60,132 @@ const IconWrap = styled.div`
   justify-content: center;
 `;
 
-const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, originalTimeRange, currentTimeRange }: Props) => {
+const StyledAccordionGroup = styled(AccordionGroup)`
+  width: 100%;
+  
+  .panel-body {
+    display: flex;
+  }
+`;
+
+const ErrorMessage = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.dark.danger};
+  font-size: ${theme.fonts.size.tiny};
+  font-style: italic;
+  padding: 3px 3px 9px;
+  height: 1.5em;
+`);
+
+const AbsoluteTimeRangeSelector = ({ disabled, limitDuration, currentTimeRange }: Props) => {
+  const [activeTab, setActiveTab] = useState();
+  const toStartDate = moment(currentTimeRange.from).toDate();
+  const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : toStartDate;
+
   return (
     <AbsoluteWrapper>
-      <RangeWrapper>
-        <AbsoluteRangeField from
-                            originalTimeRange={originalTimeRange}
-                            disabled={disabled}
-                            limitDuration={limitDuration}
-                            currentTimeRange={currentTimeRange} />
-      </RangeWrapper>
+      <StyledAccordionGroup defaultActiveKey="text"
+                            onSelect={(wat) => { setActiveTab(wat); }}
+                            id="absolute-time-ranges"
+                            activeKey={activeTab}>
+        <Accordion name="Text">
+          <RangeWrapper>
+            <Field name="nextTimeRange['from']">
+              {({ field: { value, onChange, name }, meta: { error } }) => {
+                const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+                const dateTime = error ? currentTimeRange.from : value || currentTimeRange.from;
 
-      <IconWrap>
-        <Icon name="arrow-right" />
-      </IconWrap>
+                return (
+                  <>
+                    <AbsoluteDateInput name={name}
+                                       disabled={disabled}
+                                       value={dateTime}
+                                       onChange={_onChange} />
 
-      <RangeWrapper>
-        <AbsoluteRangeField from={false}
-                            originalTimeRange={originalTimeRange}
-                            disabled={disabled}
-                            limitDuration={limitDuration}
-                            currentTimeRange={currentTimeRange} />
-      </RangeWrapper>
+                    <ErrorMessage>{error ?? ' '}</ErrorMessage>
+                  </>
+                );
+              }}
+            </Field>
+          </RangeWrapper>
+          <IconWrap>
+            <Icon name="arrow-right" />
+          </IconWrap>
+          <RangeWrapper>
+            <Field name="nextTimeRange['to']">
+              {({ field: { value, onChange, name }, meta: { error } }) => {
+                const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+                const dateTime = error ? currentTimeRange.to : value || currentTimeRange.to;
+
+                return (
+                  <>
+                    <AbsoluteDateInput name={name}
+                                       disabled={disabled}
+                                       value={dateTime}
+                                       onChange={_onChange} />
+
+                    <ErrorMessage>{error ?? ' '}</ErrorMessage>
+                  </>
+                );
+              }}
+            </Field>
+          </RangeWrapper>
+        </Accordion>
+
+        <Accordion name="Calendar">
+          <RangeWrapper>
+            <Field name="nextTimeRange['from']">
+              {({ field: { value, onChange, name }, meta: { error } }) => {
+                const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+                const dateTime = error ? currentTimeRange.from : value || currentTimeRange.from;
+
+                return (
+                  <>
+                    <AbsoluteDatePicker name={name}
+                                        disabled={disabled}
+                                        onChange={_onChange}
+                                        startDate={fromStartDate}
+                                        dateTime={dateTime} />
+
+                    <AbsoluteTimeInput onChange={_onChange}
+                                       range="from"
+                                       dateTime={dateTime} />
+
+                    <ErrorMessage>{error ?? ' '}</ErrorMessage>
+                  </>
+                );
+              }}
+            </Field>
+          </RangeWrapper>
+          <IconWrap>
+            <Icon name="arrow-right" />
+          </IconWrap>
+          <RangeWrapper>
+            <Field name="nextTimeRange['to']">
+              {({ field: { value, onChange, name }, meta: { error } }) => {
+                const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
+                const dateTime = error ? currentTimeRange.to : value || currentTimeRange.to;
+
+                return (
+                  <>
+                    <AbsoluteDatePicker name={name}
+                                        disabled={disabled}
+                                        onChange={_onChange}
+                                        startDate={toStartDate}
+                                        dateTime={dateTime} />
+
+                    <AbsoluteTimeInput onChange={_onChange}
+                                       range="to"
+                                       dateTime={dateTime} />
+
+                    <ErrorMessage>{error ?? ' '}</ErrorMessage>
+                  </>
+                );
+              }}
+            </Field>
+          </RangeWrapper>
+        </Accordion>
+      </StyledAccordionGroup>
+
     </AbsoluteWrapper>
   );
 };
