@@ -19,15 +19,21 @@ import React from 'react';
 
 import Panel from './Panel';
 
-const Accordion = ({ children, name, ...restProps }) => {
+type Props = {
+  children: React.ReactNode,
+  name: string,
+  id?: string,
+}
+
+const Accordion = ({ children, name, id, ...restProps }: Props) => {
   if (!name) {
     return <></>;
   }
 
-  const id = name.replace(/[^0-9a-zA-Z]/g, '-').toLowerCase();
+  const eventKey = id ?? name.replace(/[^0-9a-zA-Z]/g, '-').toLowerCase();
 
   return (
-    <Panel {...restProps} id={id} defaultExpanded eventKey={id}>
+    <Panel {...restProps} id={id} eventKey={eventKey} >
       <Panel.Heading>
         <Panel.Title toggle>
           {name}
@@ -44,7 +50,12 @@ const Accordion = ({ children, name, ...restProps }) => {
 
 Accordion.propTypes = {
   name: PropTypes.string.isRequired,
+  id: PropTypes.string,
   children: PropTypes.node.isRequired,
+};
+
+Accordion.defaultProps = {
+  id: undefined,
 };
 
 export default Accordion;

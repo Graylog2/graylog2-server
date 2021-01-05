@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import {useState} from 'react'
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -59,6 +60,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
 `);
 
 const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }: Props) => {
+  const [activeTab, setActiveTab] = useState();
   const range = from ? 'from' : 'to';
 
   return (
@@ -74,7 +76,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
 
         return (
           <>
-            <StyledAccordionGroup>
+            <StyledAccordionGroup  defaultActiveKey="text-input" onSelect={(wat)=>{setActiveTab(wat)}} id={"absolute-time-ranges"} activeKey={activeTab}>
               <StyledAccordion name="Text Input">
                 <AbsoluteDateInput name={name}
                                    disabled={disabled}

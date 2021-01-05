@@ -17,9 +17,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { PanelGroup } from 'components/graylog/bootstrap-import';
+import { PanelGroup } from './bootstrap-import';
 
-const AccordionGroup = ({ children, ...restProps }) => {
+type Props = {
+  children: React.ReactNode,
+}
+
+const AccordionGroup = ({ children, ...restProps }:Props) => {
   return (
     <PanelGroup {...restProps} accordion>
       {children}

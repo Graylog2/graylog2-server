@@ -168,7 +168,7 @@ const Panel = ({
   onToggle,
   ...props
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   useEffect(() => {
     setIsExpanded((defaultExpanded && expanded)
