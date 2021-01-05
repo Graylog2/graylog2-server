@@ -22,9 +22,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.Email;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.EmailConstants;
 import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 import org.graylog.events.notifications.EventBacklogService;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
@@ -123,7 +125,7 @@ public class EmailSender {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
-        final HtmlEmail email = new HtmlEmail();
+        final Email email = createEmailWithBody(config, model);
         email.setCharset(EmailConstants.UTF_8);
 
         if (isNullOrEmpty(emailConfig.getHostname())) {
@@ -153,11 +155,22 @@ public class EmailSender {
         email.setSSLOnConnect(emailConfig.isUseSsl());
         email.setStartTLSEnabled(emailConfig.isUseTls());
         email.setSubject(buildSubject(config, model));
-        email.setTextMsg(buildBody(config, model));
-        email.setHtmlMsg(buildHtmlBody(config, model));
         email.addTo(emailAddress);
 
         email.send();
+    }
+
+    Email createEmailWithBody(EmailEventNotificationConfig config, Map<String, Object> model) throws EmailException {
+        if (!isNullOrEmpty(config.htmlBodyTemplate())) {
+            HtmlEmail email = new HtmlEmail();
+            email.setTextMsg(buildBody(config, model));
+            email.setHtmlMsg(buildHtmlBody(config, model));
+            return email;
+        } else {
+            SimpleEmail email = new SimpleEmail();
+            email.setMsg(buildBody(config, model));
+            return email;
+        }
     }
 
     // TODO: move EmailRecipients class to events code
