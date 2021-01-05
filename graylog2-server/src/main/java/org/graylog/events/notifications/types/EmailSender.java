@@ -105,13 +105,7 @@ public class EmailSender {
 
     @VisibleForTesting
     private String buildHtmlBody(EmailEventNotificationConfig config, Map<String, Object> model) {
-        final String template;
-        if (isNullOrEmpty(config.htmlBodyTemplate())) {
-            template = formatHtmlBody(EmailEventNotificationConfig.DEFAULT_HTML_BODY_TEMPLATE);
-        } else {
-            template = formatHtmlBody(config.htmlBodyTemplate());
-        }
-        return this.templateEngine.transform(template, model);
+        return this.templateEngine.transform(config.htmlBodyTemplate(), model);
     }
 
     private String formatHtmlBody(String bodyContent) {

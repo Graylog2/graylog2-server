@@ -72,7 +72,8 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EmailEventNotificationConfigEntity.Builder()
-                    .type(TYPE_NAME);
+                    .type(TYPE_NAME)
+                    .htmlBodyTemplate(ValueReference.of(""));
         }
 
         @JsonProperty(FIELD_SENDER)
