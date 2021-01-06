@@ -22,13 +22,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
-import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
+import com.google.common.reflect.TypeToken;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -54,14 +57,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -158,6 +164,7 @@ public class Generator {
 
     public Map<String, Object> generateForRoute(String route, String basePath) {
         Map<String, Object> result = Maps.newHashMap();
+        Map<String, Object> models = Maps.newHashMap();
         Set<Class<?>> modelTypes = Sets.newHashSet();
         List<Map<String, Object>> apis = Lists.newArrayList();
 
@@ -229,9 +236,10 @@ public class Generator {
                         operation.put("produces", produces.value());
                     }
                     // skip Response.class because we can't reliably infer any schema information from its payload anyway.
-                    if (!method.getReturnType().isAssignableFrom(Response.class)) {
-                        operation.put("type", method.getReturnType().getSimpleName());
-                        modelTypes.add(method.getReturnType());
+                    final TypeSchema responseType = extractResponseType(method);
+                    if (responseType != null) {
+                        operation.putAll(responseType.type());
+                        models.putAll(responseType.models());
                     }
 
                     List<Parameter> parameters = determineParameters(method);
@@ -265,13 +273,13 @@ public class Generator {
                 .result());
 
         // generate the json schema for the auto-mapped return types
-        Map<String, Object> models = Maps.newHashMap();
         for (Class<?> type : modelTypes) {
 
             // skip non-jackson mapped classes (like Response)
             if (!type.isAnnotationPresent(JsonAutoDetect.class)) {
                 continue;
             }
+            /*
             try {
                 SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
                 mapper.acceptJsonFormatVisitor(mapper.constructType(type), visitor);
@@ -279,6 +287,27 @@ public class Generator {
                 models.put(type.getSimpleName(), schema);
             } catch (JsonMappingException e) {
                 LOG.error("Error generating model schema. Ignoring this model, this will likely break the API browser.", e);
+            }*/
+
+            /*final Map<String, Object> schema = ImmutableMap.of(
+                    "id", type.getSimpleName(),
+                    "properties", Collections.emptyMap()
+            );*/
+
+            try {
+                final JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(mapper);
+                final JsonSchema schema = schemaGen.generateSchema(type);
+
+                final Map<String, Object> schemaMap = mapper.readValue(mapper.writeValueAsBytes(schema), Map.class);
+                if (!schemaMap.containsKey("properties")) {
+                    schemaMap.put("properties", Collections.emptyMap());
+                }
+
+                models.put(type.getSimpleName(), schemaMap);
+            } catch (JsonMappingException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
         }
@@ -290,6 +319,115 @@ public class Generator {
         result.put("swaggerVersion", EMULATED_SWAGGER_VERSION);
 
         return result;
+    }
+
+    interface TypeSchema {
+        Map<String, Object> type();
+
+        Map<String, Object> models();
+    }
+
+    private TypeSchema createTypeSchema(Map<String, Object> type, Map<String, Object> models) {
+        return new TypeSchema() {
+            @Override
+            public Map<String, Object> type() {
+                return type;
+            }
+
+            @Override
+            public Map<String, Object> models() {
+                return models;
+            }
+        };
+    }
+
+    private TypeSchema createPrimitiveSchema(Map<String, Object> type) {
+        return createTypeSchema(type, Collections.emptyMap());
+    }
+
+    private TypeSchema extractResponseType(Method method) {
+        final Type genericReturnType = method.getGenericReturnType();
+        return typeSchema(genericReturnType);
+    }
+
+    private Class<?> classForType(Type type) {
+        return TypeToken.of(type).getRawType();
+    }
+
+    private TypeSchema typeSchema(Type genericType) {
+        final Class<?> returnType = classForType(genericType);
+        if (returnType.isAssignableFrom(Response.class)) {
+            return null;
+        }
+
+        if (isPrimitive(returnType)) {
+            return createPrimitiveSchema(schemaForType(genericType));
+        }
+
+        if (returnType.isAssignableFrom(Map.class)) {
+            final ParameterizedType parameterizedType = (ParameterizedType)genericType;
+            final Type valueType = parameterizedType.getActualTypeArguments()[1];
+            final String valueName = simpleName(valueType);
+            final String modelName = valueName + "Map";
+
+            final TypeSchema valueSchema = typeSchema(valueType);
+            if (valueSchema == null) {
+                return null;
+            }
+            final Map<String, Object> models = new HashMap<>();
+            models.put(valueName, valueSchema.type());
+            models.putAll(valueSchema.models());
+            models.put(modelName, ImmutableMap.of(
+                            "type", "object",
+                            "properties", Collections.emptyMap(),
+                            "additional_properties", Collections.singletonMap(
+                                    "type", modelName
+                            )));
+            return createTypeSchema(Collections.singletonMap("type", modelName), models);
+        }
+        if (returnType.isAssignableFrom(Optional.class)) {
+            final ParameterizedType parameterizedType = (ParameterizedType)genericType;
+            final Type valueType = parameterizedType.getActualTypeArguments()[0];
+            return typeSchema(valueType);
+        }
+        if (returnType.isAssignableFrom(List.class) || returnType.isAssignableFrom(Set.class)) {
+            final ParameterizedType parameterizedType = (ParameterizedType)genericType;
+            final Type valueType = parameterizedType.getActualTypeArguments()[0];
+            final String valueName = simpleName(valueType);
+            final String modelName = valueName + "Array";
+            final TypeSchema valueSchema = typeSchema(valueType);
+            if (valueSchema == null) {
+                return null;
+            }
+            final Map<String, Object> models = new HashMap<>();
+            models.put(valueName, valueSchema.type());
+            models.putAll(valueSchema.models());
+            models.put(modelName, ImmutableMap.of("type", "array", "items", valueName));
+            return createTypeSchema(Collections.singletonMap("type", modelName), models);
+        }
+
+        final String modelName = returnType.getSimpleName();
+        return createTypeSchema(ImmutableMap.of("type", modelName), ImmutableMap.of(modelName, schemaForType(genericType)));
+    }
+
+    private String simpleName(Type valueType) {
+        final Splitter splitter = Splitter.on('.');
+        final List<String> elements = splitter.splitToList(valueType.getTypeName());
+        return elements.get(elements.size() - 1);
+    }
+
+    private Map<String, Object> schemaForType(Type valueType) {
+        final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper);
+        try {
+            final JsonSchema schema = schemaGenerator.generateSchema(mapper.getTypeFactory().constructType(valueType));
+            final Map<String, Object> schemaMap = mapper.readValue(mapper.writeValueAsBytes(schema), Map.class);
+            if (schemaMap.containsKey("additional_properties") && !schemaMap.containsKey("properties")) {
+                schemaMap.put("properties", Collections.emptyMap());
+            }
+            return schemaMap;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Parameter> determineParameters(Method method) {
@@ -345,6 +483,39 @@ public class Generator {
         return params;
     }
 
+    class PrimitiveType implements Type {
+        private final String type;
+
+        PrimitiveType(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String getTypeName() {
+            return type;
+        }
+    }
+
+    private Type mapType(Type parameterType) {
+        if (parameterType == null) {
+            return null;
+        }
+        final String typeName = parameterType.getTypeName();
+        if (typeName.equals(String.class.getCanonicalName())) {
+            return new PrimitiveType("string");
+        }
+        if (typeName.equals(Boolean.class.getCanonicalName())) {
+            return new PrimitiveType("boolean");
+        }
+        if (typeName.equals(Integer.class.getCanonicalName()) || typeName.equals(Long.class.getCanonicalName())) {
+            return new PrimitiveType("integer");
+        }
+        if (typeName.equals(Float.class.getCanonicalName()) || typeName.equals(Double.class.getCanonicalName())) {
+            return new PrimitiveType("number");
+        }
+        return parameterType;
+    }
+
     private List<Map<String, Object>> determineResponses(Method method) {
         final List<Map<String, Object>> result = Lists.newArrayList();
 
@@ -373,6 +544,52 @@ public class Generator {
         }
 
         return route;
+    }
+
+    private final static Set<String> PRIMITIVES = ImmutableSet.of(
+            "int",
+            "Integer",
+            "Long",
+            "Number",
+            "Float",
+            "Double",
+            "String",
+            "Boolean",
+            "void",
+            "Void"
+    );
+
+    private static boolean isPrimitive(String simpleName) {
+        return PRIMITIVES.contains(simpleName);
+    }
+
+    private static boolean isPrimitive(Class<?> klass) {
+        return isPrimitive(klass.getSimpleName());
+    }
+
+    private static String mapPrimitives(String simpleName) {
+        if (Strings.isNullOrEmpty(simpleName)) {
+            return simpleName;
+        }
+
+        switch (simpleName) {
+            case "int":
+            case "Integer":
+            case "Long":
+                return "integer";
+            case "Number":
+            case "Float":
+            case "Double":
+                return "number";
+            case "String":
+                return "string";
+            case "Boolean":
+                return "boolean";
+            case "Void":
+            case "void":
+                return "void";
+        }
+        return simpleName;
     }
 
     @Nullable
@@ -467,7 +684,7 @@ public class Generator {
 
         @JsonProperty("type")
         public String getTypeName() {
-            return type.getSimpleName();
+            return mapPrimitives(type.getSimpleName());
         }
 
         public void setKind(Kind kind) {
