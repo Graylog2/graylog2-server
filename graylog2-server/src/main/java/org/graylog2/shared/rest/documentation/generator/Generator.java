@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
@@ -57,6 +56,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -375,27 +375,45 @@ public class Generator {
             return null;
         }
 
+        if (returnType.isAssignableFrom(StreamingOutput.class)) {
+            return createPrimitiveSchema("string", Collections.singletonMap("type", "string"));
+        }
+
         if (isPrimitive(returnType)) {
             return createPrimitiveSchema(returnType.getSimpleName(), schemaForType(genericType));
         }
 
         if (returnType.isAssignableFrom(Map.class)) {
             final Type valueType = typeParameters(genericType)[1];
-            final TypeSchema valueSchema = typeSchema(valueType);
-            if (valueSchema == null) {
-                return null;
-            }
-            final String valueName = valueSchema.name();
-            final String modelName = valueName + "Map";
-
             final Map<String, Object> models = new HashMap<>();
-            models.put(valueName, valueSchema.type());
-            models.putAll(valueSchema.models());
-            models.put(modelName, ImmutableMap.of(
-                            "type", "object",
-                            "properties", Collections.emptyMap(),
-                            "additional_properties", Collections.singletonMap("type", valueName)
-            ));
+
+            final String valueName;
+            final Map<String, Object> modelItemsDefinition;
+            if (valueType instanceof Class && isPrimitive((Class<?>)valueType)) {
+                valueName = mapPrimitives(((Class<?>) valueType).getSimpleName());
+                modelItemsDefinition = Collections.singletonMap("additional_properties", valueName);
+            } else {
+                final TypeSchema valueSchema = typeSchema(valueType);
+                if (valueSchema == null) {
+                    return null;
+                }
+                valueName = valueSchema.name();
+                models.put(valueName, valueSchema.type());
+                models.putAll(valueSchema.models());
+                final String valueModelId = (String)((Map<String, Object>)models.get(valueName)).get("id");
+                modelItemsDefinition = Collections.singletonMap("additional_properties", Collections.singletonMap("$ref", valueModelId));
+                models.put(valueName, valueSchema.type());
+                models.putAll(valueSchema.models());
+            }
+
+            final String modelName = valueName + "Map";
+            final Map<String, Object> model = ImmutableMap.<String, Object>builder()
+                    .put("type", "object")
+                    .put("id", modelName)
+                    .put("properties", Collections.emptyMap())
+                    .putAll(modelItemsDefinition)
+                    .build();
+            models.put(modelName, model);
             return createTypeSchema(modelName, Collections.singletonMap("type", modelName), models);
         }
         if (returnType.isAssignableFrom(Optional.class)) {
@@ -404,27 +422,36 @@ public class Generator {
         }
         if (returnType.isAssignableFrom(List.class) || returnType.isAssignableFrom(Set.class)) {
             final Type valueType = typeParameters(genericType)[0];
-            final TypeSchema valueSchema = typeSchema(valueType);
-            if (valueSchema == null) {
-                return null;
-            }
-            final String valueName = valueSchema.name();
-            final String modelName = valueName + "Array";
             final Map<String, Object> models = new HashMap<>();
-            models.put(valueName, valueSchema.type());
-            models.putAll(valueSchema.models());
-            models.put(modelName, ImmutableMap.of("type", "array", "items", valueName));
+            final String valueName;
+            final Map<String, Object> modelItemsDefinition;
+            if (valueType instanceof Class && isPrimitive((Class<?>)valueType)) {
+                valueName = mapPrimitives(((Class<?>) valueType).getSimpleName());
+                modelItemsDefinition = Collections.singletonMap("items", valueName);
+            } else {
+                final TypeSchema valueSchema = typeSchema(valueType);
+                if (valueSchema == null) {
+                    return null;
+                }
+                valueName = valueSchema.name();
+                models.put(valueName, valueSchema.type());
+                models.putAll(valueSchema.models());
+                final String valueModelId = (String)((Map<String, Object>)models.get(valueName)).get("id");
+                modelItemsDefinition = Collections.singletonMap("items", Collections.singletonMap("$ref", valueModelId));
+            }
+            final String modelName = valueName + "Array";
+            final Map<String, Object> model = ImmutableMap.<String, Object>builder()
+                    .put("type", "array")
+                    .put("id", modelName)
+                    .put("properties", Collections.emptyMap())
+                    .putAll(modelItemsDefinition)
+                    .build();
+            models.put(modelName, model);
             return createTypeSchema(modelName, Collections.singletonMap("type", modelName), models);
         }
 
         final String modelName = returnType.getSimpleName();
         return createTypeSchema(modelName, ImmutableMap.of("type", modelName), ImmutableMap.of(modelName, schemaForType(genericType)));
-    }
-
-    private String simpleName(Type valueType) {
-        final Splitter splitter = Splitter.on('.');
-        final List<String> elements = splitter.splitToList(valueType.getTypeName());
-        return elements.get(elements.size() - 1);
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
@@ -434,6 +461,12 @@ public class Generator {
             final Map<String, Object> schemaMap = mapper.readValue(mapper.writeValueAsBytes(schema), Map.class);
             if (schemaMap.containsKey("additional_properties") && !schemaMap.containsKey("properties")) {
                 schemaMap.put("properties", Collections.emptyMap());
+            }
+            if (schemaMap.equals(Collections.singletonMap("type", "any"))) {
+                return ImmutableMap.of(
+                        "type", "object",
+                        "properties", Collections.emptyMap()
+                );
             }
             return schemaMap;
         } catch (IOException e) {
