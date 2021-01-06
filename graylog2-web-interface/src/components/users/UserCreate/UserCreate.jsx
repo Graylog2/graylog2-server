@@ -109,9 +109,9 @@ const UserCreate = () => {
   const getUserNameGroup = () => {
     if (isCloud) {
       const cloudPlugin = PluginStore.exports('cloud');
-      const OktaUserNameFormGroup = cloudPlugin?.[0]?.OktaUserNameFormGroup;
+      const CloudUserNameFormGroup = cloudPlugin?.[0]?.CloudUserNameFormGroup;
 
-      return <OktaUserNameFormGroup />;
+      return <CloudUserNameFormGroup />;
     }
 
     return (
