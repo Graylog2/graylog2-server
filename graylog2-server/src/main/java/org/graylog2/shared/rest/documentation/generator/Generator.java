@@ -19,10 +19,15 @@ package org.graylog2.shared.rest.documentation.generator;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
+import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.types.AnySchema;
+import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
@@ -455,7 +460,16 @@ public class Generator {
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
-        final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper);
+        final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {
+            @Override
+            public JsonAnyFormatVisitor expectAnyFormat(JavaType convertedType) {
+                final ObjectSchema s = schemaProvider.objectSchema();
+                s.putProperty("anyType", schemaProvider.stringSchema());
+                this.schema = s;
+                return visitorFactory.anyFormatVisitor(new AnySchema());
+            }
+        };
+        final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper, schemaFactoryWrapper);
         try {
             final JsonSchema schema = schemaGenerator.generateSchema(mapper.getTypeFactory().constructType(valueType));
             final Map<String, Object> schemaMap = mapper.readValue(mapper.writeValueAsBytes(schema), Map.class);
