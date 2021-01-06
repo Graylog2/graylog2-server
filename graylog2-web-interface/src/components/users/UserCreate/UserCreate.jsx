@@ -137,6 +137,16 @@ const UserCreate = () => {
     return <Spinner />;
   }
 
+  const showSubmitError = (errors) => {
+    if (isCloud) {
+      const oktaError = JSON.parse(errors?.additional?.res?.text);
+
+      return oktaError && oktaError?.message;
+    }
+
+    return errors?.additional?.res?.text;
+  };
+
   return (
     <Row className="content">
       <Col lg={8}>
@@ -188,7 +198,7 @@ const UserCreate = () => {
                   <Col xs={9} xsOffset={3}>
                     <Alert bsStyle="danger">
                       <b>Failed to create user</b><br />
-                      {submitError?.additional?.res?.text}
+                      {showSubmitError(submitError)}
                     </Alert>
                   </Col>
                 </Row>
