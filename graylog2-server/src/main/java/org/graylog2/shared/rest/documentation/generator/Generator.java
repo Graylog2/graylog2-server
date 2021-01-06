@@ -87,7 +87,7 @@ public class Generator {
 
     public static final String EMULATED_SWAGGER_VERSION = "1.2";
 
-    private static Map<String, Object> overviewResult = Maps.newHashMap();
+    private static final Map<String, Object> overviewResult = Maps.newHashMap();
 
     private final Set<Class<?>> resourceClasses;
     private final Map<Class<?>, String> pluginMapping;
@@ -322,13 +322,20 @@ public class Generator {
     }
 
     interface TypeSchema {
+        String name();
+
         Map<String, Object> type();
 
         Map<String, Object> models();
     }
 
-    private TypeSchema createTypeSchema(Map<String, Object> type, Map<String, Object> models) {
+    private TypeSchema createTypeSchema(String name, Map<String, Object> type, Map<String, Object> models) {
         return new TypeSchema() {
+            @Override
+            public String name() {
+                return name;
+            }
+
             @Override
             public Map<String, Object> type() {
                 return type;
@@ -341,8 +348,8 @@ public class Generator {
         };
     }
 
-    private TypeSchema createPrimitiveSchema(Map<String, Object> type) {
-        return createTypeSchema(type, Collections.emptyMap());
+    private TypeSchema createPrimitiveSchema(String name, Map<String, Object> type) {
+        return createTypeSchema(name, type, Collections.emptyMap());
     }
 
     private TypeSchema extractResponseType(Method method) {
@@ -354,6 +361,14 @@ public class Generator {
         return TypeToken.of(type).getRawType();
     }
 
+    private Type[] typeParameters(Type type) {
+        if (type instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType)type;
+            return parameterizedType.getActualTypeArguments();
+        }
+        return new Type[0];
+    }
+
     private TypeSchema typeSchema(Type genericType) {
         final Class<?> returnType = classForType(genericType);
         if (returnType.isAssignableFrom(Response.class)) {
@@ -361,53 +376,49 @@ public class Generator {
         }
 
         if (isPrimitive(returnType)) {
-            return createPrimitiveSchema(schemaForType(genericType));
+            return createPrimitiveSchema(returnType.getSimpleName(), schemaForType(genericType));
         }
 
         if (returnType.isAssignableFrom(Map.class)) {
-            final ParameterizedType parameterizedType = (ParameterizedType)genericType;
-            final Type valueType = parameterizedType.getActualTypeArguments()[1];
-            final String valueName = simpleName(valueType);
-            final String modelName = valueName + "Map";
-
+            final Type valueType = typeParameters(genericType)[1];
             final TypeSchema valueSchema = typeSchema(valueType);
             if (valueSchema == null) {
                 return null;
             }
+            final String valueName = valueSchema.name();
+            final String modelName = valueName + "Map";
+
             final Map<String, Object> models = new HashMap<>();
             models.put(valueName, valueSchema.type());
             models.putAll(valueSchema.models());
             models.put(modelName, ImmutableMap.of(
                             "type", "object",
                             "properties", Collections.emptyMap(),
-                            "additional_properties", Collections.singletonMap(
-                                    "type", modelName
-                            )));
-            return createTypeSchema(Collections.singletonMap("type", modelName), models);
+                            "additional_properties", Collections.singletonMap("type", valueName)
+            ));
+            return createTypeSchema(modelName, Collections.singletonMap("type", modelName), models);
         }
         if (returnType.isAssignableFrom(Optional.class)) {
-            final ParameterizedType parameterizedType = (ParameterizedType)genericType;
-            final Type valueType = parameterizedType.getActualTypeArguments()[0];
+            final Type valueType = typeParameters(genericType)[0];
             return typeSchema(valueType);
         }
         if (returnType.isAssignableFrom(List.class) || returnType.isAssignableFrom(Set.class)) {
-            final ParameterizedType parameterizedType = (ParameterizedType)genericType;
-            final Type valueType = parameterizedType.getActualTypeArguments()[0];
-            final String valueName = simpleName(valueType);
-            final String modelName = valueName + "Array";
+            final Type valueType = typeParameters(genericType)[0];
             final TypeSchema valueSchema = typeSchema(valueType);
             if (valueSchema == null) {
                 return null;
             }
+            final String valueName = valueSchema.name();
+            final String modelName = valueName + "Array";
             final Map<String, Object> models = new HashMap<>();
             models.put(valueName, valueSchema.type());
             models.putAll(valueSchema.models());
             models.put(modelName, ImmutableMap.of("type", "array", "items", valueName));
-            return createTypeSchema(Collections.singletonMap("type", modelName), models);
+            return createTypeSchema(modelName, Collections.singletonMap("type", modelName), models);
         }
 
         final String modelName = returnType.getSimpleName();
-        return createTypeSchema(ImmutableMap.of("type", modelName), ImmutableMap.of(modelName, schemaForType(genericType)));
+        return createTypeSchema(modelName, ImmutableMap.of("type", modelName), ImmutableMap.of(modelName, schemaForType(genericType)));
     }
 
     private String simpleName(Type valueType) {
