@@ -17,20 +17,24 @@
 // @flow strict
 import * as React from 'react';
 import { Formik, Form } from 'formik';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/graylog';
 import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import AppConfig from 'util/AppConfig';
 
 import FullNameFormGroup from '../UserCreate/FullNameFormGroup';
 import EmailFormGroup from '../UserCreate/EmailFormGroup';
 
+const isCloud = AppConfig.isCloud();
 type Props = {
   user: User,
   onSubmit: ({
     full_name: $PropertyType<User, 'fullName'>,
     email: $PropertyType<User, 'email'>,
+    username: $PropertyType<User, 'username'>,
   }) => Promise<void>,
 };
 
@@ -44,15 +48,33 @@ const ProfileSection = ({
     email,
   } = user;
 
+  const _onSubmit = (formData) => {
+    const data = { ...formData };
+
+    onSubmit(data);
+  };
+
+  const _getUserNameGroup = () => {
+    if (isCloud) {
+      return <ReadOnlyFormGroup label="Username" value={username} />;
+    }
+
+    return (
+      <>
+        <ReadOnlyFormGroup label="Username" value={username} />
+        <EmailFormGroup />
+      </>
+    );
+  };
+
   return (
     <SectionComponent title="Profile">
-      <Formik onSubmit={onSubmit}
-              initialValues={{ email, full_name: fullName }}>
+      <Formik onSubmit={_onSubmit}
+              initialValues={{ email, full_name: fullName, username }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <ReadOnlyFormGroup label="Username" value={username} />
             <FullNameFormGroup />
-            <EmailFormGroup />
+            {_getUserNameGroup()}
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
