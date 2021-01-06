@@ -27,7 +27,7 @@ import AbsoluteTimeInput from './AbsoluteTimeInput';
 type Props = {
   disabled: boolean,
   startDate: Date,
-  range: string,
+  range: 'to' | 'from',
   currentTimeRange: AbsoluteTimeRange,
 };
 
@@ -58,7 +58,7 @@ const AbsoluteCalendar = ({ disabled, startDate, currentTimeRange, range }: Prop
                                range={range}
                                dateTime={dateTime} />
 
-            <ErrorMessage>{error ?? ' '}</ErrorMessage>
+            <ErrorMessage>{error}</ErrorMessage>
           </>
         );
       }}

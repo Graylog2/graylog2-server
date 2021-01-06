@@ -25,7 +25,7 @@ import AbsoluteDateInput from './AbsoluteDateInput';
 
 type Props = {
   disabled: boolean,
-  range: string,
+  range: 'to' | 'from',
   currentTimeRange: AbsoluteTimeRange,
 };
 
@@ -51,7 +51,7 @@ const AbsoluteText = ({ disabled, currentTimeRange, range }: Props) => {
                                value={dateTime}
                                onChange={_onChange} />
 
-            <ErrorMessage>{error ?? ' '}</ErrorMessage>
+            <ErrorMessage>{error}</ErrorMessage>
           </>
         );
       }}

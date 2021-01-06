@@ -75,7 +75,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
   return (
     <AbsoluteWrapper>
       <StyledAccordionGroup defaultActiveKey="text"
-                            onSelect={(wat) => { setActiveTab(wat); }}
+                            onSelect={setActiveTab}
                             id="absolute-time-ranges"
                             activeKey={activeTab}>
         <Accordion name="Text">
@@ -92,7 +92,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
           <RangeWrapper>
             <AbsoluteText disabled={disabled}
                           currentTimeRange={currentTimeRange}
-                          range="from" />
+                          range="to" />
           </RangeWrapper>
         </Accordion>
 
