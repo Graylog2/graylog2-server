@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { useLocation } from 'react-router-dom';
 
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -28,10 +29,10 @@ jest.mock('react-router-dom', () => ({
   useHistory: () => ({
     replace: mockHistoryReplace,
   }),
-  useLocation: () => ({
+  useLocation: jest.fn(() => ({
     pathname: '',
     search: '?focused=clack',
-  }),
+  })),
 }));
 
 jest.mock('stores/connect', () => ({
@@ -71,6 +72,11 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should set focused widget from url', () => {
+    useLocation.mockReturnValue({
+      pathname: '',
+      search: 'focused=clack',
+    });
+
     renderSUT();
     const div = screen.getByText('clack');
 
