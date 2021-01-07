@@ -66,7 +66,7 @@ describe('WidgetFocusProvider', () => {
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(mockHistoryReplace).toBeCalledWith('/?focused=click');
+      expect(mockHistoryReplace).toBeCalledWith('?focused=click');
     });
   });
 
