@@ -16,8 +16,7 @@
  */
 package org.graylog2.shared.rest.documentation.generator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
@@ -357,6 +356,10 @@ public class Generator {
             return createPrimitiveSchema("string");
         }
 
+        if (returnType.isEnum()) {
+            return createTypeSchema(null, schemaForType(genericType), Collections.emptyMap());
+        }
+
         if (returnType.isAssignableFrom(StreamingOutput.class)) {
             return createPrimitiveSchema("string");
         }
@@ -514,16 +517,16 @@ public class Generator {
                 : id;
     }
 
-    private Optional<String> typeOfSchema(@Nullable Map<String, Object> typeSchema) {
+    private static Optional<String> typeOfSchema(@Nullable Map<String, Object> typeSchema) {
         return Optional.ofNullable(typeSchema)
             .map(schema -> Strings.emptyToNull((String)schema.get("type")));
     }
 
-    private boolean isArraySchema(Map<String, Object> genericTypeSchema) {
+    private static boolean isArraySchema(Map<String, Object> genericTypeSchema) {
         return typeOfSchema(genericTypeSchema).map(type -> type.equals("array")).orElse(false);
     }
 
-    private boolean isObjectSchema(Map<String, Object> genericTypeSchema) {
+    private static boolean isObjectSchema(Map<String, Object> genericTypeSchema) {
         return typeOfSchema(genericTypeSchema).map(type -> type.equals("object")).orElse(false);
     }
 
@@ -667,6 +670,7 @@ public class Generator {
             "int",
             "Integer",
             "Long",
+            "long",
             "Number",
             "Object",
             "String",
@@ -755,24 +759,12 @@ public class Generator {
             this.name = name;
         }
 
-        public String getName() {
-            return name;
-        }
-
         public void setDescription(String description) {
             this.description = description;
         }
 
-        public String getDescription() {
-            return description;
-        }
-
         public void setIsRequired(boolean required) {
             isRequired = required;
-        }
-
-        public boolean isRequired() {
-            return isRequired;
         }
 
         public void setRequired(boolean required) {
@@ -783,13 +775,11 @@ public class Generator {
             this.typeSchema = typeSchema;
         }
 
-        @JsonIgnore
         public TypeSchema getTypeSchema() {
             return typeSchema;
         }
 
-        @JsonProperty("type")
-        public String getType() {
+        private String getType() {
             return mapPrimitives(typeSchema.name());
         }
 
@@ -797,18 +787,37 @@ public class Generator {
             this.kind = kind;
         }
 
-        @JsonProperty("paramType")
-        public String getKind() {
+        private String getKind() {
             return kind.toString().toLowerCase(Locale.ENGLISH);
+        }
+
+        public String getDefaultValue() {
+            return defaultValue;
         }
 
         public void setDefaultValue(String defaultValue) {
             this.defaultValue = defaultValue;
         }
 
-        @JsonProperty("defaultValue")
-        public String getDefaultValue() {
-            return this.defaultValue;
+        @JsonValue
+        public Map<String, Object> jsonValue() {
+            ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
+                    .put("name", name)
+                    .put("description", description)
+                    .put("required", isRequired)
+                    .put("paramType", getKind());
+
+            if (defaultValue != null) {
+                builder = builder.put("defaultValue", defaultValue);
+            }
+
+            if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {
+                builder = builder.put("type", typeSchema.name());
+            } else {
+                builder = builder.putAll(typeSchema.type());
+            }
+
+            return builder.build();
         }
 
         public enum Kind {
