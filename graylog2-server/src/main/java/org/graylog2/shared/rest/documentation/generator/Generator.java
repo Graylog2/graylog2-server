@@ -575,7 +575,12 @@ public class Generator {
             for (Annotation annotation : annotations) {
                 if (annotation instanceof ApiParam) {
                     final ApiParam apiParam = (ApiParam) annotation;
-                    param.setName(apiParam.name());
+                    final String name = Strings.isNullOrEmpty(apiParam.name())
+                            ? Strings.isNullOrEmpty(apiParam.value())
+                                ? "arg" + i
+                                : apiParam.value()
+                            : apiParam.name();
+                    param.setName(name);
                     param.setDescription(apiParam.value());
                     param.setIsRequired(apiParam.required());
 
