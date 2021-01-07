@@ -247,6 +247,8 @@ public class Generator {
                         } else {
                             if (responseType.type() != null) {
                                 operation.putAll(responseType.type());
+                            } else {
+                                operation.put("type", responseType.name());
                             }
                         }
                     }
