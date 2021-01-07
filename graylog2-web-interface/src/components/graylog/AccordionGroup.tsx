@@ -32,10 +32,7 @@ const AccordionGroup = ({ children, ...restProps }:Props) => {
 };
 
 AccordionGroup.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
+  children: PropTypes.element.isRequired,
 };
 
 export default AccordionGroup;

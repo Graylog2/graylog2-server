@@ -37,7 +37,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteText = ({ disabled, currentTimeRange, range }: Props) => {
+const AbsoluteTimestamp = ({ disabled, currentTimeRange, range }: Props) => {
   return (
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
@@ -59,14 +59,14 @@ const AbsoluteText = ({ disabled, currentTimeRange, range }: Props) => {
   );
 };
 
-AbsoluteText.propTypes = {
+AbsoluteTimestamp.propTypes = {
   disabled: PropTypes.bool,
   currentTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   range: PropTypes.oneOf(['to', 'from']).isRequired,
 };
 
-AbsoluteText.defaultProps = {
+AbsoluteTimestamp.defaultProps = {
   disabled: false,
 };
 
-export default AbsoluteText;
+export default AbsoluteTimestamp;

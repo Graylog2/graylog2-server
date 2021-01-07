@@ -19,12 +19,13 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
+import { faCalendarAlt, faClock } from '@fortawesome/free-regular-svg-icons';
 
 import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import { Accordion, AccordionGroup } from 'components/graylog';
 
-import AbsoluteText from './AbsoluteText';
+import AbsoluteTimestamp from './AbsoluteTimestamp';
 import AbsoluteCalendar from './AbsoluteCalendar';
 
 type Props = {
@@ -67,6 +68,14 @@ const StyledAccordionGroup = styled(AccordionGroup)`
   }
 `;
 
+const TimestampContent = styled.div`
+  flex: 1;
+`;
+
+const FlexWrap = styled.div`
+  display: flex;
+`;
+
 const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Props) => {
   const [activeTab, setActiveTab] = useState();
   const toStartDate = moment(currentTimeRange.from).toDate();
@@ -74,29 +83,12 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
 
   return (
     <AbsoluteWrapper>
-      <StyledAccordionGroup defaultActiveKey="text"
+      <StyledAccordionGroup defaultActiveKey="calendar"
                             onSelect={setActiveTab}
                             id="absolute-time-ranges"
                             activeKey={activeTab}>
-        <Accordion name="Text">
-          <RangeWrapper>
-            <AbsoluteText disabled={disabled}
-                          currentTimeRange={currentTimeRange}
-                          range="from" />
-          </RangeWrapper>
 
-          <IconWrap>
-            <Icon name="arrow-right" />
-          </IconWrap>
-
-          <RangeWrapper>
-            <AbsoluteText disabled={disabled}
-                          currentTimeRange={currentTimeRange}
-                          range="to" />
-          </RangeWrapper>
-        </Accordion>
-
-        <Accordion name="Calendar">
+        <Accordion name="Calendar" icon={faCalendarAlt}>
           <RangeWrapper>
             <AbsoluteCalendar disabled={disabled}
                               startDate={fromStartDate}
@@ -115,6 +107,29 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
                               currentTimeRange={currentTimeRange}
                               range="to" />
           </RangeWrapper>
+        </Accordion>
+
+        <Accordion name="Timestamp" icon={faClock}>
+          <TimestampContent>
+            <p>Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.</p>
+            <FlexWrap>
+              <RangeWrapper>
+                <AbsoluteTimestamp disabled={disabled}
+                                   currentTimeRange={currentTimeRange}
+                                   range="from" />
+              </RangeWrapper>
+
+              <IconWrap>
+                <Icon name="arrow-right" />
+              </IconWrap>
+
+              <RangeWrapper>
+                <AbsoluteTimestamp disabled={disabled}
+                                   currentTimeRange={currentTimeRange}
+                                   range="to" />
+              </RangeWrapper>
+            </FlexWrap>
+          </TimestampContent>
         </Accordion>
       </StyledAccordionGroup>
 
