@@ -19,7 +19,6 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
-import { faCalendarAlt, faClock } from '@fortawesome/free-regular-svg-icons';
 
 import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
@@ -88,7 +87,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
                             id="absolute-time-ranges"
                             activeKey={activeTab}>
 
-        <Accordion name="Calendar" icon={faCalendarAlt}>
+        <Accordion name="Calendar">
           <RangeWrapper>
             <AbsoluteCalendar disabled={disabled}
                               startDate={fromStartDate}
@@ -109,7 +108,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
           </RangeWrapper>
         </Accordion>
 
-        <Accordion name="Timestamp" icon={faClock}>
+        <Accordion name="Timestamp">
           <TimestampContent>
             <p>Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.</p>
             <FlexWrap>
