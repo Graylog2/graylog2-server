@@ -240,10 +240,15 @@ public class Generator {
                     // skip Response.class because we can't reliably infer any schema information from its payload anyway.
                     final TypeSchema responseType = extractResponseType(method);
                     if (responseType != null) {
-                        if (responseType.type() != null) {
-                            operation.putAll(responseType.type());
-                        }
                         models.putAll(responseType.models());
+                        if (responseType.name() != null && isObjectSchema(responseType.type())) {
+                            operation.put("type", responseType.name());
+                            models.put(responseType.name(), responseType.type());
+                        } else {
+                            if (responseType.type() != null) {
+                                operation.putAll(responseType.type());
+                            }
+                        }
                     }
 
                     List<Parameter> parameters = determineParameters(method);
@@ -347,7 +352,7 @@ public class Generator {
     private TypeSchema typeSchema(Type genericType) {
         final Class<?> returnType = classForType(genericType);
         if (returnType.isAssignableFrom(Response.class)) {
-            return null;
+            return createPrimitiveSchema("string");
         }
 
         if (returnType.isAssignableFrom(StreamingOutput.class)) {
@@ -413,8 +418,8 @@ public class Generator {
                     models.put(valueName, valueSchema.type());
                 }
                 models.putAll(valueSchema.models());
-                final String valueModelId = (String)((Map<String, Object>)models.get(valueName)).get("id");
-                modelItemsDefinition = Collections.singletonMap("items", Collections.singletonMap("$ref", valueModelId));
+                //final String valueModelId = (String)((Map<String, Object>)models.get(valueName)).get("id");
+                modelItemsDefinition = Collections.singletonMap("items", Collections.singletonMap("$ref", valueName));
             }
             final String modelName = valueName + "Array";
             final Map<String, Object> model = ImmutableMap.<String, Object>builder()
@@ -507,15 +512,17 @@ public class Generator {
                 : id;
     }
 
-    private boolean isArraySchema(Map<String, Object> genericTypeSchema) {
-        return typeOfSchema(genericTypeSchema).equals("array");
+    private Optional<String> typeOfSchema(@Nullable Map<String, Object> typeSchema) {
+        return Optional.ofNullable(typeSchema)
+            .map(schema -> Strings.emptyToNull((String)schema.get("type")));
     }
 
-    private String typeOfSchema(Map<String, Object> typeSchema) {
-        return Strings.nullToEmpty((String)typeSchema.get("type"));
+    private boolean isArraySchema(Map<String, Object> genericTypeSchema) {
+        return typeOfSchema(genericTypeSchema).map(type -> type.equals("array")).orElse(false);
     }
+
     private boolean isObjectSchema(Map<String, Object> genericTypeSchema) {
-        return typeOfSchema(genericTypeSchema).equals("object");
+        return typeOfSchema(genericTypeSchema).map(type -> type.equals("object")).orElse(false);
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
@@ -659,6 +666,7 @@ public class Generator {
             "Integer",
             "Long",
             "Number",
+            "Object",
             "String",
             "void",
             "Void"
@@ -694,6 +702,8 @@ public class Generator {
             case "Void":
             case "void":
                 return "void";
+            case "Object":
+                return "any";
         }
         return simpleName;
     }
