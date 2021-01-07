@@ -28,16 +28,27 @@ jest.mock('react-router-dom', () => ({
   useHistory: () => ({
     replace: mockHistoryReplace,
   }),
+  useLocation: () => ({
+    pathname: '',
+    search: '?focused=clack',
+  }),
+}));
+
+jest.mock('stores/connect', () => ({
+  useStore: jest.fn(() => ({
+    has: jest.fn(() => true),
+  })),
 }));
 
 describe('WidgetFocusProvider', () => {
   const renderSUT = () => {
     const Consumer = () => {
-      const { setFocusedWidget } = useContext(WidgetFocusContext);
+      const { setFocusedWidget, focusedWidget } = useContext(WidgetFocusContext);
 
       return (
         <>
           <button type="button" onClick={() => setFocusedWidget('click')}>Click</button>
+          <div>{focusedWidget}</div>
         </>
       );
     };
@@ -57,5 +68,12 @@ describe('WidgetFocusProvider', () => {
     await waitFor(() => {
       expect(mockHistoryReplace).toBeCalledWith('/?focused=click');
     });
+  });
+
+  it('should set focused widget from url', () => {
+    renderSUT();
+    const div = screen.getByText('clack');
+
+    expect(div).not.toBeEmptyDOMElement();
   });
 });
