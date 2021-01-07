@@ -71,15 +71,13 @@ describe('WidgetFocusProvider', () => {
     });
   });
 
-  it('should set focused widget from url', () => {
+  it('should set focused widget from url', async () => {
     useLocation.mockReturnValue({
       pathname: '',
       search: 'focused=clack',
     });
 
     renderSUT();
-    const div = screen.getByText('clack');
-
-    expect(div).not.toBeEmptyDOMElement();
+    await screen.findByText('clack');
   });
 });
