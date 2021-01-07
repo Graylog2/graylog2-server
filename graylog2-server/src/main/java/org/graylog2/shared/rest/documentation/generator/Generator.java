@@ -16,11 +16,9 @@
  */
 package org.graylog2.shared.rest.documentation.generator;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
@@ -33,7 +31,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Primitives;
 import com.google.common.reflect.TypeToken;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -170,7 +167,7 @@ public class Generator {
     public Map<String, Object> generateForRoute(String route, String basePath) {
         Map<String, Object> result = Maps.newHashMap();
         Map<String, Object> models = Maps.newHashMap();
-        Set<Class<?>> modelTypes = Sets.newHashSet();
+        Set<Type> modelTypes = Sets.newHashSet();
         List<Map<String, Object>> apis = Lists.newArrayList();
 
         for (Class<?> clazz : getAnnotatedClasses()) {
@@ -243,7 +240,9 @@ public class Generator {
                     // skip Response.class because we can't reliably infer any schema information from its payload anyway.
                     final TypeSchema responseType = extractResponseType(method);
                     if (responseType != null) {
-                        operation.putAll(responseType.type());
+                        if (responseType.type() != null) {
+                            operation.putAll(responseType.type());
+                        }
                         models.putAll(responseType.models());
                     }
 
@@ -251,12 +250,13 @@ public class Generator {
                     if (parameters != null && !parameters.isEmpty()) {
                         operation.put("parameters", parameters);
                     }
+
                     for (Parameter parameter : parameters) {
-                        final Class type = parameter.getType();
-                        if (Primitives.unwrap(type).isPrimitive() || type.equals(String.class)) {
-                            continue;
+                        final TypeSchema parameterTypeSchema = parameter.getTypeSchema();
+                        if (parameterTypeSchema.name() != null && parameterTypeSchema.type() != null) {
+                            models.put(parameterTypeSchema.name(), parameterTypeSchema.type());
                         }
-                        modelTypes.add(type);
+                        models.putAll(parameterTypeSchema.models());
                     }
 
                     operation.put("responseMessages", determineResponses(method));
@@ -278,29 +278,13 @@ public class Generator {
                 .result());
 
         // generate the json schema for the auto-mapped return types
-        for (Class<?> type : modelTypes) {
-
-            // skip non-jackson mapped classes (like Response)
-            if (!type.isAnnotationPresent(JsonAutoDetect.class)) {
-                continue;
+        for (Type type : modelTypes) {
+            final Class<?> typeClass = classForType(type);
+            final TypeSchema modelSchema = typeSchema(type);
+            if (modelSchema.type() != null) {
+                models.put(typeClass.getSimpleName(), modelSchema.type());
             }
-
-            try {
-                final JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(mapper);
-                final JsonSchema schema = schemaGen.generateSchema(type);
-
-                final Map<String, Object> schemaMap = mapper.readValue(mapper.writeValueAsBytes(schema), Map.class);
-                if (!schemaMap.containsKey("properties")) {
-                    schemaMap.put("properties", Collections.emptyMap());
-                }
-
-                models.put(type.getSimpleName(), schemaMap);
-            } catch (JsonMappingException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            models.putAll(modelSchema.models());
         }
         result.put("apis", apis);
         result.put("basePath", basePath);
@@ -339,8 +323,8 @@ public class Generator {
         };
     }
 
-    private TypeSchema createPrimitiveSchema(String name, Map<String, Object> type) {
-        return createTypeSchema(name, type, Collections.emptyMap());
+    private TypeSchema createPrimitiveSchema(String name) {
+        return createTypeSchema(name, null, Collections.emptyMap());
     }
 
     private TypeSchema extractResponseType(Method method) {
@@ -348,7 +332,7 @@ public class Generator {
         return typeSchema(genericReturnType);
     }
 
-    private Class<?> classForType(Type type) {
+    private static Class<?> classForType(Type type) {
         return TypeToken.of(type).getRawType();
     }
 
@@ -367,11 +351,11 @@ public class Generator {
         }
 
         if (returnType.isAssignableFrom(StreamingOutput.class)) {
-            return createPrimitiveSchema("string", Collections.singletonMap("type", "string"));
+            return createPrimitiveSchema("string");
         }
 
         if (isPrimitive(returnType)) {
-            return createPrimitiveSchema(returnType.getSimpleName(), schemaForType(genericType));
+            return createPrimitiveSchema(mapPrimitives(returnType.getSimpleName()));
         }
 
         if (returnType.isAssignableFrom(Map.class)) {
@@ -389,10 +373,11 @@ public class Generator {
                     return null;
                 }
                 valueName = valueSchema.name();
-                models.put(valueName, valueSchema.type());
                 models.putAll(valueSchema.models());
                 modelItemsDefinition = Collections.singletonMap("additional_properties", Collections.singletonMap("$ref", valueName));
-                models.put(valueName, valueSchema.type());
+                if (valueSchema.type() != null) {
+                    models.put(valueName, valueSchema.type());
+                }
                 models.putAll(valueSchema.models());
             }
 
@@ -424,7 +409,9 @@ public class Generator {
                     return null;
                 }
                 valueName = valueSchema.name();
-                models.put(valueName, valueSchema.type());
+                if (valueSchema.type() != null) {
+                    models.put(valueName, valueSchema.type());
+                }
                 models.putAll(valueSchema.models());
                 final String valueModelId = (String)((Map<String, Object>)models.get(valueName)).get("id");
                 modelItemsDefinition = Collections.singletonMap("items", Collections.singletonMap("$ref", valueModelId));
@@ -463,7 +450,9 @@ public class Generator {
                     if (propertySchema.name() == null) {
                         return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), propertySchema.type());
                     }
-                    models.put(propertySchema.name(), propertySchema.type());
+                    if (propertySchema.type() != null) {
+                        models.put(propertySchema.name(), propertySchema.type());
+                    }
                     return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap("$ref", propertySchema.name()));
                 })
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -474,7 +463,9 @@ public class Generator {
                 final TypeSchema itemsSchema = extractInlineModels(additionalProperties);
                 models.putAll(itemsSchema.models());
                 if (itemsSchema.name() != null) {
-                    models.put(itemsSchema.name(), itemsSchema.type());
+                    if (itemsSchema.type() != null) {
+                        models.put(itemsSchema.name(), itemsSchema.type());
+                    }
                     newGenericTypeSchema.put("additional_properties", Collections.singletonMap("$ref", itemsSchema.name()));
                 }
             }
@@ -494,7 +485,9 @@ public class Generator {
                 final TypeSchema itemsSchema = extractInlineModels(items);
                 models.putAll(itemsSchema.models());
                 if (itemsSchema.name() != null) {
-                    models.put(itemsSchema.name(), itemsSchema.type());
+                    if (itemsSchema.type() != null) {
+                        models.put(itemsSchema.name(), itemsSchema.type());
+                    }
                     newGenericTypeSchema.put("items", Collections.singletonMap("$ref", itemsSchema.name()));
                 }
             }
@@ -573,7 +566,9 @@ public class Generator {
                     param.setName(apiParam.name());
                     param.setDescription(apiParam.value());
                     param.setIsRequired(apiParam.required());
-                    param.setType(method.getGenericParameterTypes()[i]);
+
+                    final TypeSchema parameterSchema = typeSchema(method.getGenericParameterTypes()[i]);
+                    param.setTypeSchema(parameterSchema);
 
                     if (!isNullOrEmpty(apiParam.defaultValue())) {
                         param.setDefaultValue(apiParam.defaultValue());
@@ -602,7 +597,7 @@ public class Generator {
 
             param.setKind(paramKind);
 
-            if (param.getType() != null) {
+            if (param.getTypeSchema() != null) {
                 params.add(param);
             }
 
@@ -656,14 +651,15 @@ public class Generator {
     }
 
     private final static Set<String> PRIMITIVES = ImmutableSet.of(
+            "boolean",
+            "Boolean",
+            "Double",
+            "Float",
             "int",
             "Integer",
             "Long",
             "Number",
-            "Float",
-            "Double",
             "String",
-            "Boolean",
             "void",
             "Void"
     );
@@ -692,6 +688,7 @@ public class Generator {
                 return "number";
             case "String":
                 return "string";
+            case "boolean":
             case "Boolean":
                 return "boolean";
             case "Void":
@@ -738,7 +735,7 @@ public class Generator {
         private String name;
         private String description;
         private boolean isRequired;
-        private Class type;
+        private TypeSchema typeSchema;
         private Kind kind;
         private String defaultValue;
 
@@ -770,30 +767,18 @@ public class Generator {
             isRequired = required;
         }
 
-        public void setType(Type type) {
-            final Class<?> klass;
-
-            if (type instanceof ParameterizedType) {
-                klass = (Class<?>) ((ParameterizedType) type).getRawType();
-            } else {
-                klass = (Class<?>) type;
-            }
-
-            if (klass.isPrimitive()) {
-                this.type = Primitives.wrap(klass);
-            } else {
-                this.type = klass;
-            }
+        public void setTypeSchema(TypeSchema typeSchema) {
+            this.typeSchema = typeSchema;
         }
 
         @JsonIgnore
-        public Class getType() {
-            return type;
+        public TypeSchema getTypeSchema() {
+            return typeSchema;
         }
 
         @JsonProperty("type")
-        public String getTypeName() {
-            return mapPrimitives(type.getSimpleName());
+        public String getType() {
+            return mapPrimitives(typeSchema.name());
         }
 
         public void setKind(Kind kind) {
