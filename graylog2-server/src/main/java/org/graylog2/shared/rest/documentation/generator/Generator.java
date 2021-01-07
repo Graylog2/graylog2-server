@@ -440,7 +440,7 @@ public class Generator {
         final String modelName = returnType.getSimpleName();
         final Map<String, Object> genericTypeSchema = schemaForType(genericType);
         if (!isObjectOrArray(genericTypeSchema)) {
-            return createTypeSchema(modelName, ImmutableMap.of("type", modelName), ImmutableMap.of(modelName, schemaForType(genericType)));
+            return createTypeSchema(null, genericTypeSchema, Collections.emptyMap());
         }
 
         final TypeSchema inlineSchema = extractInlineModels(genericTypeSchema);
