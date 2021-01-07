@@ -17,7 +17,6 @@
 // @flow strict
 import * as React from 'react';
 import { Formik, Form } from 'formik';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/graylog';
 import { ReadOnlyFormGroup } from 'components/common';
@@ -48,15 +47,9 @@ const ProfileSection = ({
     email,
   } = user;
 
-  const _onSubmit = (formData) => {
-    const data = { ...formData };
-
-    onSubmit(data);
-  };
-
   const _getUserNameGroup = () => {
     if (isCloud) {
-      return <ReadOnlyFormGroup label="Username" value={username} />;
+      return <ReadOnlyFormGroup label="Username" value={email} />;
     }
 
     return (
@@ -69,8 +62,8 @@ const ProfileSection = ({
 
   return (
     <SectionComponent title="Profile">
-      <Formik onSubmit={_onSubmit}
-              initialValues={{ email, full_name: fullName, username }}>
+      <Formik onSubmit={onSubmit}
+              initialValues={{ email, full_name: fullName }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <FullNameFormGroup />
