@@ -232,7 +232,9 @@ public class Generator {
                     operation.put("method", determineHttpMethod(method));
                     operation.put("summary", apiOperation.value());
                     operation.put("notes", apiOperation.notes());
-                    operation.put("nickname", method.getName());
+                    operation.put("nickname", Strings.isNullOrEmpty(apiOperation.nickname())
+                            ? method.getName()
+                            : apiOperation.nickname());
                     if (produces != null) {
                         operation.put("produces", produces.value());
                     }
