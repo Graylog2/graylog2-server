@@ -26,8 +26,6 @@ import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-import com.fasterxml.jackson.module.jsonSchema.types.AnySchema;
-import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
@@ -67,6 +65,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -456,17 +455,85 @@ public class Generator {
         }
 
         final String modelName = returnType.getSimpleName();
-        return createTypeSchema(modelName, ImmutableMap.of("type", modelName), ImmutableMap.of(modelName, schemaForType(genericType)));
+        final Map<String, Object> genericTypeSchema = schemaForType(genericType);
+        if (!isObjectOrArray(genericTypeSchema)) {
+            return createTypeSchema(modelName, ImmutableMap.of("type", modelName), ImmutableMap.of(modelName, schemaForType(genericType)));
+        }
+
+        final TypeSchema inlineSchema = extractInlineModels(genericTypeSchema);
+        if (inlineSchema.name() == null) {
+            return createTypeSchema(modelName, inlineSchema.type(), inlineSchema.models());
+        }
+        return createTypeSchema(modelName, ImmutableMap.of("type", modelName), inlineSchema.models());
+    }
+
+    private TypeSchema extractInlineModels(Map<String, Object> genericTypeSchema) {
+        if (isObjectSchema(genericTypeSchema)) {
+            final Map<String, Object> models = new HashMap<>();
+            if (genericTypeSchema.get("properties") instanceof Map) {
+                final Map<String, Object> properties = (Map<String, Object>) genericTypeSchema.get("properties");
+                final Map<String, Object> newProperties = properties.entrySet().stream().map(entry -> {
+                    final Map<String, Object> property = (Map<String, Object>) entry.getValue();
+                    final TypeSchema propertySchema = extractInlineModels(property);
+                    models.putAll(propertySchema.models());
+                    if (propertySchema.name() == null) {
+                        return entry;
+                    }
+                    models.put(propertySchema.name(), propertySchema.type());
+                    return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap("$ref", propertySchema.name()));
+                })
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                genericTypeSchema.put("properties", newProperties);
+            }
+            if (genericTypeSchema.get("additional_properties") instanceof Map) {
+                final Map<String, Object> additionalProperties = (Map<String, Object>) genericTypeSchema.get("additional_properties");
+                final TypeSchema itemsSchema = extractInlineModels(additionalProperties);
+                models.putAll(itemsSchema.models());
+                if (itemsSchema.name() != null) {
+                    models.put(itemsSchema.name(), itemsSchema.type());
+                    genericTypeSchema.put("additional_properties", Collections.singletonMap("$ref", itemsSchema.name()));
+                }
+            }
+            final String id = (String)genericTypeSchema.get("id");
+            return createTypeSchema(id, genericTypeSchema, models);
+        }
+
+        if (isArraySchema(genericTypeSchema)) {
+            final Map<String, Object> models = new HashMap<>();
+            if (genericTypeSchema.get("items") instanceof Map) {
+                final Map<String, Object> items = (Map<String, Object>) genericTypeSchema.get("items");
+                final TypeSchema itemsSchema = extractInlineModels(items);
+                models.putAll(itemsSchema.models());
+                if (itemsSchema.name() != null) {
+                    models.put(itemsSchema.name(), itemsSchema.type());
+                    genericTypeSchema.put("items", Collections.singletonMap("$ref", itemsSchema.name()));
+                }
+            }
+            return createTypeSchema(null, genericTypeSchema, models);
+        }
+        return createTypeSchema(null, genericTypeSchema, Collections.emptyMap());
+    }
+
+    private boolean isArraySchema(Map<String, Object> genericTypeSchema) {
+        return typeOfSchema(genericTypeSchema).equals("array");
+    }
+
+    private String typeOfSchema(Map<String, Object> typeSchema) {
+        return Strings.nullToEmpty((String)typeSchema.get("type"));
+    }
+    private boolean isObjectSchema(Map<String, Object> genericTypeSchema) {
+        return typeOfSchema(genericTypeSchema).equals("object");
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
         final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {
             @Override
             public JsonAnyFormatVisitor expectAnyFormat(JavaType convertedType) {
-                final ObjectSchema s = schemaProvider.objectSchema();
+                /*final ObjectSchema s = schemaProvider.objectSchema();
                 s.putProperty("anyType", schemaProvider.stringSchema());
                 this.schema = s;
-                return visitorFactory.anyFormatVisitor(new AnySchema());
+                return visitorFactory.anyFormatVisitor(new AnySchema());*/
+                return super.expectAnyFormat(convertedType);
             }
         };
         final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper, schemaFactoryWrapper);
@@ -486,6 +553,10 @@ public class Generator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isObjectOrArray(Map<String, Object> schemaMap) {
+        return isObjectSchema(schemaMap) || isArraySchema(schemaMap);
     }
 
     private List<Parameter> determineParameters(Method method) {
