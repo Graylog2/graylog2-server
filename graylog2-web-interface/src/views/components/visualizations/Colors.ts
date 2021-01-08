@@ -56,4 +56,11 @@ export const defaultChartColors = [
   pinks[1],
   lightorange[3],
   cyans[3],
+  darkblues[0],
+  darkorange[0],
+  darkgreens[0],
+  darkpurples[0],
+  gray[2],
+  purples[4],
+  darkred[0],
 ];
