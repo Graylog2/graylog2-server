@@ -39,14 +39,14 @@ const ColorHint = styled.div(({ color }) => `
 const Container = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto min-content;
+  grid-template-rows: 4fr auto;
   grid-template-areas: "." ".";
   height: 100%;
 `;
 
 const LegendContainer = styled.div`
   padding: 5px;
-  max-height: 80px;
+  max-height: 100px;
   overflow: auto;
 `;
 
