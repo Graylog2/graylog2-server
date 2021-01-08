@@ -15,17 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useContext, useState, useCallback } from 'react';
 import styled from 'styled-components';
+import { Overlay, RootCloseWrapper } from 'react-overlays';
 
+import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
 import { useStore } from 'stores/connect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ChartColorContext from 'views/components/visualizations/ChartColorContext';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import { Popover } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { colors as defaultColors } from 'views/components/visualizations/Colors';
 
 const ColorHint = styled.div(({ color }) => `
+  cursor: pointer;
   background: ${color};
   width: 12px;
   height: 12px;
@@ -74,12 +79,18 @@ type Props = {
   chartData: any,
 };
 
+type ColorPickerConfig = {
+  name: string,
+  target: EventTarget,
+};
+
 const PlotLegend = ({ children, config, chartData }: Props) => {
+  const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { columnPivots } = config;
   const fields = columnPivots.map(({ field }) => field);
   const values: Array<string> = chartData.map(({ name }) => name);
   const { activeQuery } = useStore(CurrentViewStateStore);
-  const { colors } = useContext(ChartColorContext);
+  const { colors, setColor } = useContext(ChartColorContext);
 
   const chunkCells = (cells, columnCount) => {
     const { length } = cells;
@@ -111,6 +122,17 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
     return 1;
   };
 
+  const _onCloseColorPicker = useCallback(() => setColorPickerConfig(undefined), [setColorPickerConfig]);
+
+  const _onOpenColorPicker = useCallback((field) => (event) => {
+    setColorPickerConfig({ name: field, target: event.currentTarget });
+  }, [setColorPickerConfig]);
+
+  const _onColorSelect = useCallback((field: string, color: string) => {
+    setColor(field, color);
+    setColorPickerConfig(undefined);
+  }, [setColor]);
+
   const tableCells = values.sort(stringLenSort).map((value) => {
     let val: React.ReactNode = value;
 
@@ -121,7 +143,7 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
     return (
       <LegendCell key={value}>
         <LegendEntry>
-          <ColorHint color={colors.get(value)} />
+          <ColorHint onClick={_onOpenColorPicker(value)} color={colors.get(value)} />
           <ValueContainer>
             {val}
           </ValueContainer>
@@ -142,6 +164,21 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
       <LegendContainer>
         <Legend>{result}</Legend>
       </LegendContainer>
+      {colorPickerConfig && (
+        <RootCloseWrapper event="mousedown"
+                          onRootClose={_onCloseColorPicker}>
+          <Overlay show
+                   placement="top"
+                   target={colorPickerConfig.target}>
+            <Popover id="legend-config"
+                     title={`Configuration for ${colorPickerConfig.name}`}>
+              <ColorPicker color={colors.get(colorPickerConfig.name)}
+                           colors={defaultColors}
+                           onChange={(newColor) => _onColorSelect(colorPickerConfig.name, newColor)} />
+            </Popover>
+          </Overlay>
+        </RootCloseWrapper>
+      )}
     </Container>
   );
 };
