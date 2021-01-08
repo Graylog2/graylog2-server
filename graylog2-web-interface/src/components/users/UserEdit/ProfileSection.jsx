@@ -49,7 +49,7 @@ const ProfileSection = ({
 
   const _getUserNameGroup = () => {
     if (isCloud) {
-      return <ReadOnlyFormGroup label="Username" value={email} />;
+      return <ReadOnlyFormGroup label="Email" value={email} />;
     }
 
     return (
