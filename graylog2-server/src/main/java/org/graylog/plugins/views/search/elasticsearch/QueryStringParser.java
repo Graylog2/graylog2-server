@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QueryStringParser {
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$(.+?)\\$");
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$([a-zA-Z_]\\w*)\\$");
 
     public QueryMetadata parse(String queryString) {
         if (Strings.isNullOrEmpty(queryString)) {
