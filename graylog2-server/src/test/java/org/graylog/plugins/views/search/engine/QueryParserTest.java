@@ -31,9 +31,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-class QueryParserTest {
+public class QueryParserTest {
     private static QueryParser queryParser = new QueryParser(new QueryStringParser());
 
     @Test
@@ -45,7 +44,7 @@ class QueryParserTest {
                 .build());
 
         assertThat(queryMetadata.usedParameterNames())
-                .containsOnly("username", "foo");
+                .containsExactlyInAnyOrder("username", "foo");
     }
 
     @Test
@@ -73,6 +72,6 @@ class QueryParserTest {
                 .build());
 
         assertThat(queryMetadata.usedParameterNames())
-                .containsOnly("username", "foo", "bar", "baz");
+                .containsExactlyInAnyOrder("username", "foo", "bar", "baz");
     }
 }
