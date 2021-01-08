@@ -95,7 +95,14 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
 
   const chunkCells = (cells, columnCount) => {
     const { length } = cells;
-    const rowCount = Math.round(length / columnCount) + 1;
+    let rowCount;
+
+    if (length <= columnCount) {
+      rowCount = 1;
+    } else {
+      rowCount = Math.round(length / columnCount) + 1;
+    }
+
     const result = new Array(rowCount);
 
     for (let row = 0; row < rowCount; row += 1) {
