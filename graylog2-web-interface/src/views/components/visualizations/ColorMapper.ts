@@ -28,8 +28,12 @@ class ColorMapper {
     this._currentDefaultColor = colorIndex;
   }
 
-  private _nextFreeColor() {
+  private _incrementColor() {
     this._currentDefaultColor = (this._currentDefaultColor + 1) % defaultChartColors.length;
+  }
+
+  private _nextFreeColor() {
+    this._incrementColor();
 
     return defaultChartColors[this._currentDefaultColor];
   }
@@ -38,6 +42,8 @@ class ColorMapper {
     const color = this._value.get(name);
 
     if (color) {
+      this._incrementColor();
+
       return color;
     }
 
