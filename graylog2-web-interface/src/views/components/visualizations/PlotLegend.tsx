@@ -88,7 +88,6 @@ type ColorPickerConfig = {
 const PlotLegend = ({ children, config, chartData }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { columnPivots } = config;
-  const fields = columnPivots.map(({ field }) => field);
   const values: Array<string> = chartData.map(({ name }) => name);
   const { activeQuery } = useStore(CurrentViewStateStore);
   const { colors, setColor } = useContext(ChartColorContext);
@@ -144,14 +143,14 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
   const tableCells = values.sort(stringLenSort).map((value) => {
     let val: React.ReactNode = value;
 
-    if (fields.length === 1) {
-      val = (<Value type={FieldType.Unknown} value={value} field={fields[0]} queryId={activeQuery}>{value}</Value>);
+    if (columnPivots.length === 1) {
+      val = (<Value type={FieldType.Unknown} value={value} field={columnPivots[0].field} queryId={activeQuery}>{value}</Value>);
     }
 
     return (
       <LegendCell key={value}>
         <LegendEntry>
-          <ColorHint onClick={_onOpenColorPicker(value)} color={colors.get(value)} />
+          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value)} color={colors.get(value)} />
           <ValueContainer>
             {val}
           </ValueContainer>
@@ -160,8 +159,9 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
     );
   });
 
-  const result = chunkCells(tableCells, 5).map((cells) => (
-    <LegendRow>
+  const result = chunkCells(tableCells, 5).map((cells, index) => (
+    // eslint-disable-next-line react/no-array-index-key
+    <LegendRow key={index}>
       {cells}
     </LegendRow>
   ));
