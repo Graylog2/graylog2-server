@@ -48,6 +48,7 @@ public class QueryEngine {
     private static final Logger LOG = LoggerFactory.getLogger(QueryEngine.class);
 
     private final Set<QueryMetadataDecorator> queryMetadataDecorators;
+    private final QueryParser queryParser;
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
@@ -55,16 +56,19 @@ public class QueryEngine {
 
     @Inject
     public QueryEngine(QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend,
-                       Set<QueryMetadataDecorator> queryMetadataDecorators) {
+                       Set<QueryMetadataDecorator> queryMetadataDecorators,
+                       QueryParser queryParser) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.queryMetadataDecorators = queryMetadataDecorators;
+        this.queryParser = queryParser;
     }
 
     // TODO: Backwards-compatible constructor to avoid breakage. Remove at some point.
     @Deprecated
     public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
-                       Set<QueryMetadataDecorator> queryMetadataDecorators) {
-        this(backends.get("elasticsearch"), queryMetadataDecorators);
+                       Set<QueryMetadataDecorator> queryMetadataDecorators,
+                       QueryParser queryParser) {
+        this(backends.get("elasticsearch"), queryMetadataDecorators, queryParser);
     }
 
     private static Set<QueryResult> allOfResults(Set<CompletableFuture<QueryResult>> futures) {
@@ -83,7 +87,7 @@ public class QueryEngine {
     }
 
     public QueryMetadata parse(Search search, Query query) {
-        final QueryMetadata parsedMetadata = elasticsearchBackend.parse(search.parameters(), query);
+        final QueryMetadata parsedMetadata = queryParser.parse(search.parameters(), query);
 
         return this.queryMetadataDecorators.stream()
                 .reduce((decorator1, decorator2) -> (s, q, metadata) -> decorator1.decorate(s, q, decorator2.decorate(s, q, metadata)))
