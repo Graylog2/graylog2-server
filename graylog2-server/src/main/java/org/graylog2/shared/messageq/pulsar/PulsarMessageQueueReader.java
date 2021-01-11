@@ -161,6 +161,8 @@ public class PulsarMessageQueueReader extends AbstractMessageQueueReader {
                 builder.add(PulsarMessageQueueEntry.fromMessage(message));
             });
         } catch (PulsarClientException e) {
+            // TODO: probably not good to throw an exception here, as it's currently not caught and will cause #run
+            //  method to return. This will terminate the service
             throw new MessageQueueException("Error consuming messages", e);
         }
 

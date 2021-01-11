@@ -21,6 +21,7 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.shared.messageq.kafka.KafkaMessageQueueModule;
 import org.graylog2.shared.messageq.noop.NoopMessagequeueModule;
 import org.graylog2.shared.messageq.pulsar.PulsarMessageQueueModule;
+import org.graylog2.shared.messageq.sqs.SqsMessageQueueModule;
 
 public class MessageQueueModule extends PluginModule {
     private final Configuration configuration;
@@ -38,6 +39,9 @@ public class MessageQueueModule extends PluginModule {
                     break;
                 case PULSAR:
                     install(new PulsarMessageQueueModule());
+                    break;
+                case SQS:
+                    install(new SqsMessageQueueModule());
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported journal <" + configuration.getMessageJournalMode() + ">");

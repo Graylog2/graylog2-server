@@ -74,6 +74,10 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter(value = "pulsar_service_url", validators = PulsarServiceUrlValidator.class)
     private String pulsarServiceUrl = "pulsar://localhost:6650";
 
+    // TODO: don't use a fixed queue URL
+    @Parameter(value = "sqs_queue_url")
+    private URI sqsQueueUrl;
+
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
 
