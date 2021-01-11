@@ -2,7 +2,9 @@
 import AccordionItem from './AccordionItem';
 
 const AccordionExample = () => (
-  <Accordion>
+  <Accordion onSelect={() => {}}
+             id="accordion-test"
+             activeKey="example-a">
     <AccordionItem name={"Example A"}>
       <h4>A as in Apple</h4>
 
