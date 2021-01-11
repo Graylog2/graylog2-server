@@ -1,5 +1,7 @@
 ```js
-<AccordionGroup>
+import AccordionGroup from './AccordionGroup';
+
+const AccordionExample = () => (<AccordionGroup>
   <Accordion name={"Example A"}>
     <i className="fa fa-exclamation-triangle fa-fw fa-lg" />{' '}
     <strong>Default</strong> Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -9,5 +11,7 @@
     <i className="fa fa-exclamation-triangle fa-fw fa-lg" />{' '}
     <strong>Default</strong> Lorem ipsum dolor sit amet consectetur adipisicing elit.
   </Accordion>
-</AccordionGroup>
+</AccordionGroup>);
+
+<AccordionExample />
 ```

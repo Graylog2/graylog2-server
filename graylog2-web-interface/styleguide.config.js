@@ -52,19 +52,19 @@ module.exports = {
       sections: [
         {
           name: 'Bootstrap',
-          components: 'src/components/bootstrap/[A-Z]*.jsx',
+          components: 'src/components/bootstrap/[A-Z]*.{jsx,tsx}',
         },
         {
           name: 'Common',
-          components: 'src/components/common/[A-Z]*.jsx',
+          components: 'src/components/common/[A-Z]*.{jsx,tsx}',
         },
         {
           name: 'Themeable',
-          components: 'src/components/graylog/[A-Z]*.jsx',
+          components: 'src/components/graylog/[A-Z]*.{jsx,tsx}',
         },
         {
           name: 'Configuration Forms',
-          components: 'src/components/configurationforms/[A-Z]*.jsx',
+          components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
         },
       ],
     },
