@@ -25,7 +25,7 @@ type Props = {
 }
 
 const Accordion = ({ activeKey, children, ...restProps }:Props) => {
-  const cleanActiveKey = activeKey.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
+  const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
 
   return (
     <PanelGroup {...restProps} activeKey={cleanActiveKey} accordion>
