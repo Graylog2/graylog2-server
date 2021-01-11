@@ -26,7 +26,7 @@ import GetPositionForNewWidget from 'views/logic/views/GetPositionForNewWidget';
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
-import AddNewWidgetsToPositions from './AddNewWidgetsToPositions';
+import GenerateNextPosition from './GenerateNextPosition';
 
 import Widget from '../widgets/Widget';
 
@@ -80,7 +80,7 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
   const newWidgets = viewState.widgets.push(newWidget);
   const overridePositions = Immutable.Map({ [newWidget.id]: newWidgetPosition });
   const { widgetPositions } = viewState;
-  const newWidgetPositions = AddNewWidgetsToPositions(Immutable.Map(widgetPositions), newWidgets.toArray(), overridePositions);
+  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositions), newWidgets.toArray(), overridePositions);
   const newTitleMap = _setWidgetTitle(viewState.titles, newWidget.id, widgetTitle);
   const newViewState = viewState.toBuilder()
     .widgets(newWidgets)

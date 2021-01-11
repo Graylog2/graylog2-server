@@ -26,17 +26,21 @@ export default (
   widgets: Array<Widget>,
   overrideWidgetPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map(),
 ): Immutable.Map<string, WidgetPosition> => {
+  const clearedPositionsMap = positionsMap.filter(
+    (_, widgetId) => widgets.findIndex((widget) => widgetId === widget.id) >= 0,
+  ).toMap();
   const newWidgets = widgets.filter((widget) => !positionsMap.get(widget.id));
 
   return newWidgets.reduce((nextPositionsMap, widget) => {
     const widgetDef = widgetDefinition(widget.type);
     const result = nextPositionsMap.reduce((newPosMap, position, id) => {
-      const pos = position.toBuilder().row(position.row + widgetDef.defaultHeight).build();
+      const defaultHeight = widgetDef.defaultHeight || 0;
+      const pos = position.toBuilder().row(position.row + defaultHeight).build();
 
       return newPosMap.set(id, pos);
     }, Immutable.Map<string, WidgetPosition>());
     const position = overrideWidgetPositions.get(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
 
     return result.set(widget.id, position.toBuilder().row(1).col(1).build());
-  }, positionsMap);
+  }, clearedPositionsMap);
 };

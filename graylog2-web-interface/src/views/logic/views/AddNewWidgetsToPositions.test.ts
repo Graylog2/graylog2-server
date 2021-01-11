@@ -20,7 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
-import AddNewWidgetsToPositions from './AddNewWidgetsToPositions';
+import AddNewWidgetsToPositions from './GenerateNextPosition';
 
 describe('AddNewWidgetsToPositions', () => {
   PluginStore.exports = () => {

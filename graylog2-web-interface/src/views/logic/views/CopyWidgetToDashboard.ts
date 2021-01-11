@@ -20,7 +20,7 @@ import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import GetPositionForNewWidget from 'views/logic/views/GetPositionForNewWidget';
-import AddNewWidgetsToPositions from 'views/logic/views/AddNewWidgetsToPositions';
+import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
@@ -34,7 +34,7 @@ const _addWidgetToDashboard = (widget: Widget, dashboard: View, widgetPosition: 
   const widgets = viewState.widgets.push(widget);
   const { widgetPositions } = viewState;
   const overrideWidget = Map({ [widget.id]: widgetPosition });
-  const newWidgetPositions = AddNewWidgetsToPositions(Map(widgetPositions), widgets.toArray(), overrideWidget);
+  const newWidgetPositions = GenerateNextPosition(Map(widgetPositions), widgets.toArray(), overrideWidget);
   const newViewState = viewState.toBuilder()
     .widgets(widgets)
     .widgetPositions(newWidgetPositions)
