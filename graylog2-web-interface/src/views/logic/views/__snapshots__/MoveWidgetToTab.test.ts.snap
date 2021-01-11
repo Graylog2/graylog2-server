@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports['MoveWidgetToTab should copy a Widget to a dashboard 1'] = `
+exports[`MoveWidgetToTab should copy a Widget to a dashboard 1`] = `
 Object {
   "created_at": "2020-05-27T12:32:49.786Z",
   "description": "move widget to tab",
@@ -116,7 +116,7 @@ Object {
 }
 `;
 
-exports['MoveWidgetToTab should move a Widget to a dashboard 1'] = `
+exports[`MoveWidgetToTab should move a Widget to a dashboard 1`] = `
 Object {
   "created_at": "2020-05-27T12:32:49.786Z",
   "description": "move widget to tab",
@@ -194,7 +194,7 @@ Object {
 }
 `;
 
-exports['MoveWidgetToTab should provide a default position in case the widgets position cannot be found 1'] = `
+exports[`MoveWidgetToTab should provide a default position in case the widgets position cannot be found 1`] = `
 Object {
   "created_at": "2020-05-27T12:32:49.786Z",
   "description": "move widget to tab",
@@ -222,9 +222,9 @@ Object {
       "positions": Immutable.Map {
         "dead-beef": Object {
           "col": 1,
-          "height": undefined,
+          "height": 4,
           "row": 1,
-          "width": undefined,
+          "width": 4,
         },
       },
       "selected_fields": undefined,
@@ -272,7 +272,7 @@ Object {
 }
 `;
 
-exports['MoveWidgetToTab should work when titles are empty 1'] = `
+exports[`MoveWidgetToTab should work when titles are empty 1`] = `
 Object {
   "created_at": "2020-05-27T12:32:49.786Z",
   "description": "move widget to tab",
