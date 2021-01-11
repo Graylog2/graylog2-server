@@ -44,7 +44,7 @@ const getValues = (data = {}, callback = () => {}) => {
 
 const SectionWrap = (mode, section) => {
   return (
-    <>
+    <React.Fragment key={`wrap-theme.colors.${section}`}>
       <Swatches>
         {getValues(mode, (name) => {
           if (typeof mode[name] === 'string' && chroma.valid(mode[name])) {
@@ -54,7 +54,8 @@ const SectionWrap = (mode, section) => {
               <StyledColorSwatch name={name}
                                  section={section}
                                  color={mode[name]}
-                                 copyText={`theme.colors.${copyTextName}`} />
+                                 key={`theme.colors.${copyTextName}`}
+                                 copyText={`theme.colors.${copyTextName}`}/>
             )
           }
         })}
@@ -63,7 +64,7 @@ const SectionWrap = (mode, section) => {
       <div>
         {getValues(mode, (name) =>
           typeof mode[name] === 'object' && (
-            <>
+            <React.Fragment key={`wrap-theme.colors.${section}.${name}`}>
               <Section>{section} &mdash; {name}</Section>
 
               <Swatches>
@@ -71,14 +72,15 @@ const SectionWrap = (mode, section) => {
                   <StyledColorSwatch name={subname}
                                      section={section}
                                      color={mode[name][subname]}
-                                     copyText={`theme.colors.${section}.${name}.${subname}`} />
+                                     key={`theme.colors.${section}.${name}.${subname}`}
+                                     copyText={`theme.colors.${section}.${name}.${subname}`}/>
                 ))}
               </Swatches>
-            </>
+            </React.Fragment>
           )
         )}
       </div>
-    </>
+    </React.Fragment>
   );
 };
 
@@ -86,15 +88,15 @@ const Colors = () => {
   return (
     <>
       {getValues(colors, (themeMode) => (
-<>
-        <ModeTitle key={`title-${themeMode}`}>{themeMode}</ModeTitle>
-        {getValues(colors[themeMode], (section) => (
-          <>
-            <Section key={`section-${section}`}>{section}</Section>
-            {SectionWrap(colors[themeMode][section], section)}
-          </>
-        ))}
-</>
+        <React.Fragment key={`wrap-title-${themeMode}`}>
+          <ModeTitle>{themeMode}</ModeTitle>
+          {getValues(colors[themeMode], (section) => (
+            <>
+              <Section key={`section-${section}`}>{section}</Section>
+              {SectionWrap(colors[themeMode][section], section)}
+            </>
+          ))}
+        </React.Fragment>
       ))}
     </>
   );

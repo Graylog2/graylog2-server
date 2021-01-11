@@ -16,6 +16,7 @@
  */
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
 const path = require('path');
+
 const webpackConfig = require('./webpack.config.js');
 
 module.exports = {
@@ -31,7 +32,7 @@ module.exports = {
       content: 'docs/introduction.md',
     },
     {
-      name: 'Style guide',
+      name: 'Style Guide',
       content: 'docs/styleguide.md',
     },
     {
@@ -39,30 +40,12 @@ module.exports = {
       content: 'docs/documentation.md',
     },
     {
-      name: 'Theming Details',
-      content: 'src/theme/docs/Details.md',
-      sections: [
-        {
-          name: 'ThemeProvider & Usage',
-          content: 'src/theme/docs/ThemeProvider.md',
-        },
-        {
-          name: 'Fonts',
-          content: 'src/theme/docs/Fonts.md',
-        },
-        {
-          name: 'Colors',
-          content: 'src/theme/docs/Colors.md',
-        },
-        {
-          name: 'Color Utilities',
-          content: 'src/theme/docs/Utilities.md',
-        },
-      ],
-    },
-    {
       name: 'Tests',
       content: 'docs/tests.md',
+    },
+    {
+      name: 'Util Objects',
+      content: 'docs/util-objects.md',
     },
     {
       name: 'Shared Components',
@@ -86,8 +69,26 @@ module.exports = {
       ],
     },
     {
-      name: 'Util objects',
-      content: 'docs/util-objects.md',
+      name: 'Theming Details',
+      content: 'src/theme/docs/Details.md',
+      sections: [
+        {
+          name: 'ThemeProvider & Usage',
+          content: 'src/theme/docs/ThemeProvider.md',
+        },
+        {
+          name: 'Fonts',
+          content: 'src/theme/docs/Fonts.md',
+        },
+        // {
+        //   name: 'Colors',
+        //   content: 'src/theme/docs/Colors.md',
+        // },
+        {
+          name: 'Color Utilities',
+          content: 'src/theme/docs/Utilities.md',
+        },
+      ],
     },
   ],
   usageMode: 'collapse',
