@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
-import { useStore } from 'stores/connect';
+import { asMock } from 'helpers/mocking';
 
+import { useStore } from 'stores/connect';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
@@ -83,8 +84,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should not set focused widget from url if the widget does not exist', async () => {
-    // @ts-ignore this is already mocked above.
-    useStore.mockReturnValue({
+    asMock(useStore).mockReturnValue({
       has: jest.fn(() => false),
     });
 
