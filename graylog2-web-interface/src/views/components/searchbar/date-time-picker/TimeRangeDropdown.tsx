@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import moment from 'moment';
+import Mousetrap from 'mousetrap';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -107,17 +108,17 @@ const DEFAULT_RANGES = {
 };
 
 const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, currentTimeRange }) => availableTimeRangeTypes.map(({ type, name }) => {
-  const RangeComponent = timeRangeTypes?.[type] || DisabledTimeRangeSelector;
+  const TimeRangeComponent = timeRangeTypes[type];
 
   return (
     <Tab title={name}
          key={`time-range-type-selector-${type}`}
          eventKey={type}>
       {type === activeTab && (
-        <RangeComponent disabled={false}
-                        originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
-                        limitDuration={limitDuration}
-                        currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
+        <TimeRangeComponent disabled={false}
+                            originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
+                            limitDuration={limitDuration}
+                            currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
       )}
     </Tab>
   );
@@ -132,6 +133,35 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
   const [activeTab, setActiveTab] = useState(currentTimeRange?.type);
 
+  const handleNoOverride = () => {
+    setFieldValue('timerange', {});
+    setFieldValue('nextTimeRange', {});
+
+    toggleDropdownShow();
+  };
+
+  const handleCancel = useCallback(() => {
+    setFieldValue('nextTimeRange', initialTimeRange);
+
+    toggleDropdownShow();
+  }, [initialTimeRange, setFieldValue, toggleDropdownShow]);
+
+  const handleApply = useCallback(() => {
+    setFieldValue('timerange', currentTimeRange);
+
+    toggleDropdownShow();
+  }, [currentTimeRange, setFieldValue, toggleDropdownShow]);
+
+  const handleEnterKeyPress = useCallback(() => {
+    if (isValid) {
+      handleApply();
+    }
+  }, [isValid, handleApply]);
+
+  const handleEscKeyPress = useCallback(() => {
+    handleCancel();
+  }, [handleCancel]);
+
   useEffect(() => {
     if (currentTimeRange?.type) {
       setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, activeTab), false);
@@ -142,24 +172,14 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
     validateForm();
   }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
 
-  const handleNoOverride = () => {
-    setFieldValue('timerange', {});
-    setFieldValue('nextTimeRange', {});
+  useEffect(() => {
+    Mousetrap.bind('enter', handleEnterKeyPress);
+    Mousetrap.bind('esc', handleEscKeyPress);
 
-    toggleDropdownShow();
-  };
-
-  const handleCancel = () => {
-    setFieldValue('nextTimeRange', initialTimeRange);
-
-    toggleDropdownShow();
-  };
-
-  const handleApply = () => {
-    setFieldValue('timerange', currentTimeRange);
-
-    toggleDropdownShow();
-  };
+    return () => {
+      Mousetrap.reset();
+    };
+  }, [handleEnterKeyPress, handleEscKeyPress]);
 
   const title = (
     <PopoverTitle>
@@ -185,7 +205,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
 
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeTab}
+                      activeKey={activeTab ?? -1}
                       onSelect={setActiveTab}
                       animation={false}>
             {timeRangeTypeTabs({
@@ -194,6 +214,9 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
               limitDuration,
               currentTimeRange,
             })}
+
+            {!activeTab && (<DisabledTimeRangeSelector />)}
+
           </StyledTabs>
         </Col>
       </Row>

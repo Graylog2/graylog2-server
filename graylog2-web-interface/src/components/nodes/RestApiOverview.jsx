@@ -16,24 +16,38 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
 
-class RestApiOverview extends React.Component {
-  static propTypes = {
-    node: PropTypes.object.isRequired,
-  };
+const StyledDl = styled.dl`
+  margin-top: 5px;
+  margin-bottom: 0;
 
-  render() {
-    return (
-      <dl className="system-rest">
-        <dt>Transport address:</dt>
-        <dd>{this.props.node.transport_address}</dd>
-        <dt>Last seen:</dt>
-        <dd><Timestamp dateTime={this.props.node.last_seen} relative /></dd>
-      </dl>
-    );
+  dt {
+    float: left;
   }
-}
+
+  dd {
+    margin-left: 150px;
+  }
+`;
+
+const RestApiOverview = ({ node }) => {
+  const { transport_address, last_seen } = node;
+
+  return (
+    <StyledDl>
+      <dt>Transport address:</dt>
+      <dd>{transport_address}</dd>
+      <dt>Last seen:</dt>
+      <dd><Timestamp dateTime={last_seen} relative /></dd>
+    </StyledDl>
+  );
+};
+
+RestApiOverview.propTypes = {
+  node: PropTypes.object.isRequired,
+};
 
 export default RestApiOverview;

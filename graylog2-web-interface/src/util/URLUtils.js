@@ -75,7 +75,7 @@ const URLUtils = {
     return joinedPath.replace(/[/]+/g, '/');
   },
   areCredentialsInURLSupported() {
-    const browser = this.parser.getBrowser();
+    const browser = URLUtils.parser.getBrowser();
 
     return browser.name !== 'IE' && browser.name !== 'Edge';
   },

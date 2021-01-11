@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -126,7 +126,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
                                          Map<String, ValueReference> parameters,
                                          Map<EntityDescriptor, Object> nativeEntities, User user) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
-        final Map<String, ViewStateDTO> viewStateMap = new HashMap<>(viewEntity.state().size());
+        final Map<String, ViewStateDTO> viewStateMap = new LinkedHashMap<>(viewEntity.state().size());
         for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {
             final ViewStateEntity entity = entry.getValue();
             viewStateMap.put(entry.getKey(), entity.toNativeEntity(parameters, nativeEntities));

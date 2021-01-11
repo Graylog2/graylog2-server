@@ -32,7 +32,7 @@ import java.time.Duration;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
 import static org.graylog.testing.graylognode.NodeContainerConfig.DEBUG_PORT;
-import static org.graylog.testing.graylognode.ResourceUtil.resourceToTmpFile;
+import static org.graylog.testing.ResourceUtil.resourceToTmpFile;
 
 public class NodeContainerFactory {
     private static final Logger LOG = LoggerFactory.getLogger(NodeContainerFactory.class);

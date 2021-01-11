@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -22,9 +23,10 @@ import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import { createHandlerFor } from './ActionHandler';
-import type { ActionComponents, ActionDefinition } from './ActionHandler';
+import type { ActionDefinition } from './ActionHandler';
 
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Value.css';
@@ -40,93 +42,86 @@ type Props = {
   value: React.ReactNode,
 };
 
-type State = {
-  open: boolean,
-  overflowingComponents: ActionComponents,
+const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
+  const actionContext = useContext(ActionContext);
+  const { setFocusedWidget } = useContext(WidgetFocusContext);
+  const [open, setOpen] = useState(false);
+  const [overflowingComponents, setOverflowingComponents] = useState({});
+
+  const _onMenuToggle = () => setOpen(!open);
+  const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
+  const handlerArgs = { queryId, field, type, value, contexts: actionContext };
+  const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
+    .filter((action: ActionDefinition) => {
+      const { isHidden = () => false } = action;
+
+      return !isHidden(handlerArgs);
+    })
+    .map((action: ActionDefinition) => {
+      const setActionComponents = (fn) => {
+        setOverflowingComponents(fn(overflowingComponents));
+      };
+
+      const handler = createHandlerFor(action, setActionComponents);
+
+      const onSelect = () => {
+        const { resetFocus } = action;
+
+        if (resetFocus) {
+          setFocusedWidget(undefined);
+        }
+
+        _onMenuToggle();
+        handler(handlerArgs);
+      };
+
+      const { isEnabled = () => true } = action;
+      const actionDisabled = !isEnabled(handlerArgs);
+
+      return (
+        <MenuItem key={`value-action-${field}-${action.type}`}
+                  disabled={actionDisabled}
+                  eventKey={{ field, value }}
+                  onSelect={onSelect}>{action.title}
+        </MenuItem>
+      );
+    });
+
+  return (
+    <>
+      <OverlayDropdown show={open}
+                       toggle={element}
+                       placement="right"
+                       onToggle={_onMenuToggle}
+                       menuContainer={menuContainer}>
+        <li className={style.bottomSpacer}>
+          <span className={style.dropdownheader}>
+            {children}
+          </span>
+        </li>
+
+        <MenuItem divider />
+        <MenuItem header>Actions</MenuItem>
+        {valueActions}
+      </OverlayDropdown>
+      {overflowingComponentsValues}
+    </>
+  );
 };
 
-class ValueActions extends React.Component<Props, State> {
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    element: PropTypes.node.isRequired,
-    field: PropTypes.string.isRequired,
-    menuContainer: PropTypes.object,
-    queryId: PropTypes.string.isRequired,
-    type: CustomPropTypes.FieldType,
-    value: PropTypes.node.isRequired,
-  };
+ValueActions.propTypes = {
+  children: PropTypes.node.isRequired,
+  element: PropTypes.node.isRequired,
+  field: PropTypes.string.isRequired,
+  menuContainer: PropTypes.object,
+  queryId: PropTypes.string.isRequired,
+  type: CustomPropTypes.FieldType,
+  value: PropTypes.node.isRequired,
+};
 
-  static defaultProps = {
-    menuContainer: document.body,
-    type: FieldType.Unknown,
-  };
-
-  static contextType = ActionContext;
-
-  constructor(props: Props, context: typeof ActionContext) {
-    super(props, context);
-
-    this.state = {
-      open: false,
-      overflowingComponents: {},
-    };
-  }
-
-  _onMenuToggle = () => this.setState((state) => ({ open: !state.open }));
-
-  render() {
-    const { children, element, field, menuContainer, queryId, type, value } = this.props;
-    const { open, overflowingComponents: components } = this.state;
-    const overflowingComponents: Array<React.ReactNode> = Object.values(components);
-    const handlerArgs = { queryId, field, type, value, contexts: this.context };
-    const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
-      .filter((action: ActionDefinition) => {
-        const { isHidden = () => false } = action;
-
-        return !isHidden(handlerArgs);
-      })
-      .map((action: ActionDefinition) => {
-        const setActionComponents = (fn) => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
-        const handler = createHandlerFor(action, setActionComponents);
-
-        const onSelect = () => {
-          this._onMenuToggle();
-          handler(handlerArgs);
-        };
-
-        const { isEnabled = () => true } = action;
-        const actionDisabled = !isEnabled(handlerArgs);
-
-        return (
-          <MenuItem key={`value-action-${field}-${action.type}`}
-                    disabled={actionDisabled}
-                    eventKey={{ field, value }}
-                    onSelect={onSelect}>{action.title}
-          </MenuItem>
-        );
-      });
-
-    return (
-      <>
-        <OverlayDropdown show={open}
-                         toggle={element}
-                         placement="right"
-                         onToggle={this._onMenuToggle}
-                         menuContainer={menuContainer}>
-          <li className={style.bottomSpacer}>
-            <span className={style.dropdownheader}>
-              {children}
-            </span>
-          </li>
-
-          <MenuItem divider />
-          <MenuItem header>Actions</MenuItem>
-          {valueActions}
-        </OverlayDropdown>
-        {overflowingComponents}
-      </>
-    );
-  }
-}
+ValueActions.defaultProps = {
+  menuContainer: document.body,
+  type: FieldType.Unknown,
+};
 
 export default ValueActions;
