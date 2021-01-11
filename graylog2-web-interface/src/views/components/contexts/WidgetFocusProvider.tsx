@@ -36,14 +36,18 @@ const _syncWithQuery = (query: string, focusedWidget: string) => {
   return baseUri.toString();
 };
 
-const useFocusWidgetIdFromParam = (focusedWidget, setFocusedWidget) => {
+const useFocusWidgetIdFromParam = (focusedWidget, setFocusedWidget, widgets) => {
   const { focused: paramFocusedWidget } = useQuery();
 
   useEffect(() => {
     if (focusedWidget !== paramFocusedWidget) {
+      if (paramFocusedWidget && !widgets.has(paramFocusedWidget)) {
+        return;
+      }
+
       setFocusedWidget(paramFocusedWidget);
     }
-  }, [focusedWidget, paramFocusedWidget, setFocusedWidget]);
+  }, [focusedWidget, paramFocusedWidget, setFocusedWidget, widgets]);
 };
 
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
@@ -53,7 +57,7 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   const [focusedWidget, setFocusedWidget] = useState<string | undefined>();
   const widgets = useStore(WidgetStore);
 
-  useFocusWidgetIdFromParam(focusedWidget, setFocusedWidget);
+  useFocusWidgetIdFromParam(focusedWidget, setFocusedWidget, widgets);
 
   useEffect(() => {
     if (focusedWidget && !widgets.has(focusedWidget)) {

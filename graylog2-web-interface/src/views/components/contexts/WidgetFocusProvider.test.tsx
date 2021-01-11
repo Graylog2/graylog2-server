@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
+import { useStore } from 'stores/connect';
 
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -79,5 +80,24 @@ describe('WidgetFocusProvider', () => {
 
     renderSUT();
     await screen.findByText('clack');
+  });
+
+  it('should not set focused widget from url if the widget does not exist', async () => {
+    // @ts-ignore this is already mocked above.
+    useStore.mockReturnValue({
+      has: jest.fn(() => false),
+    });
+
+    useLocation.mockReturnValue({
+      pathname: '',
+      search: 'focused=clack',
+    });
+
+    renderSUT();
+    const clack = screen.findByText('clack');
+
+    waitFor(() => {
+      expect(clack).toBeEmptyDOMElement();
+    });
   });
 });
