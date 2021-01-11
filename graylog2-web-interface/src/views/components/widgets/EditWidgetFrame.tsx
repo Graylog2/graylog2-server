@@ -29,7 +29,6 @@ import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -75,7 +74,7 @@ const onSubmit = (values, widget: Widget) => {
 };
 
 const EditWidgetFrame = ({ children }: Props) => {
-  const config: SearchesConfig = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
+  const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
 
   useEffect(() => {
     globalStyles.use();
