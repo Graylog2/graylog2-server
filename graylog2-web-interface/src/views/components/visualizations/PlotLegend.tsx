@@ -70,7 +70,7 @@ const LegendEntry = styled.div`
 `;
 
 const ValueContainer = styled.div`
-  margin-left: 8px; 
+  margin-left: 8px;
   line-height: 12px;
 `;
 
