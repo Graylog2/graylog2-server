@@ -37,7 +37,7 @@ public class QueryParserTest {
 
     @Test
     public void parse() throws Exception {
-        final QueryMetadata queryMetadata = queryParser.parse(ImmutableSet.of(), Query.builder()
+        final QueryMetadata queryMetadata = queryParser.parse(Query.builder()
                 .id("abc123")
                 .query(ElasticsearchQueryString.builder().queryString("user_name:$username$ http_method:$foo$").build())
                 .timerange(RelativeRange.create(600))
@@ -64,7 +64,7 @@ public class QueryParserTest {
                 .series(new ArrayList<>())
                 .rollup(false)
                 .build();
-        final QueryMetadata queryMetadata = queryParser.parse(ImmutableSet.of(), Query.builder()
+        final QueryMetadata queryMetadata = queryParser.parse(Query.builder()
                 .id("abc123")
                 .query(ElasticsearchQueryString.builder().queryString("user_name:$username$ http_method:$foo$").build())
                 .timerange(RelativeRange.create(600))

@@ -16,11 +16,9 @@
  */
 package org.graylog.plugins.views.search.engine;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.Filter;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.SearchType;
@@ -28,6 +26,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -40,11 +39,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class QueryParser {
     private final QueryStringParser queryStringParser;
 
+    @Inject
     public QueryParser(QueryStringParser queryStringParser) {
         this.queryStringParser = queryStringParser;
     }
 
-    public QueryMetadata parse(ImmutableSet<Parameter> declaredParameters, Query query) {
+    public QueryMetadata parse(Query query) {
         checkArgument(query.query() instanceof ElasticsearchQueryString);
         final String mainQueryString = ((ElasticsearchQueryString) query.query()).queryString();
         final java.util.stream.Stream<String> queryStringStreams = java.util.stream.Stream.concat(

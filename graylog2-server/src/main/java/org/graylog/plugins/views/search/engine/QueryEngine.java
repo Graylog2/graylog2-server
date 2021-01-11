@@ -87,7 +87,7 @@ public class QueryEngine {
     }
 
     public QueryMetadata parse(Search search, Query query) {
-        final QueryMetadata parsedMetadata = queryParser.parse(search.parameters(), query);
+        final QueryMetadata parsedMetadata = queryParser.parse(query);
 
         return this.queryMetadataDecorators.stream()
                 .reduce((decorator1, decorator2) -> (s, q, metadata) -> decorator1.decorate(s, q, decorator2.decorate(s, q, metadata)))
