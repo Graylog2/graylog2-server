@@ -16,16 +16,36 @@
  */
 package org.graylog.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GenerateApiDefinition {
-    public static void main(String[] args) {
-        System.out.println("Generating Swagger definition for API ...");
-        final Generator generator = new Generator(ImmutableSet.of("org.graylog", "org.graylog2"), Collections.emptyMap(), "", new ObjectMapper());
-        System.out.println(generator.generateOverview());
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static void log(String s) {
+        System.out.println(s);
+    }
+
+    private static void bail(String s) {
+        log(s);
+        System.exit(-1);
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        if (args.length < 2) {
+           bail("Syntax: " + GenerateApiDefinition.class.getSimpleName() + " <outfile> <package1> ... <packageN>");
+        }
+        log("Generating Swagger definition for API ...");
+        final String targetName = args[0];
+        final Set<String> packageNames = Arrays.stream(args).skip(1).collect(Collectors.toSet());
+        final Generator generator = new Generator(packageNames, Collections.emptyMap(), "", new ObjectMapper());
+
+        log(objectMapper.writeValueAsString(generator.generateOverview()));
     }
 }
