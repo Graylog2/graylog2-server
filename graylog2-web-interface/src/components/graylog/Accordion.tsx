@@ -72,7 +72,7 @@ const Accordion = ({ children, name, id, ...restProps }: Props) => {
 Accordion.propTypes = {
   name: PropTypes.node.isRequired,
   id: PropTypes.string,
-  children: PropTypes.element.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 Accordion.defaultProps = {
