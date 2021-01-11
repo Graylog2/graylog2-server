@@ -42,6 +42,15 @@ jest.mock('../SearchType', () => jest.fn(() => ({
   defaults: {},
 })));
 
+jest.mock('views/logic/Widgets', () => ({
+  widgetDefinition: jest.fn(() => ({
+    defaultHeight: 4,
+    defaultWidth: 4,
+    type: 'aggregation',
+    searchTypes: jest.fn(() => ([{}])),
+  })),
+}));
+
 const cwd = dirname(__filename);
 const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
