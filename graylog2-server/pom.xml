@@ -946,6 +946,11 @@
                         </executions>
                         <configuration>
                             <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
+                            <arguments>
+                                <argument>target/swagger.json</argument>
+                                <argument>org.graylog</argument>
+                                <argument>org.graylog2</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                     <plugin>
