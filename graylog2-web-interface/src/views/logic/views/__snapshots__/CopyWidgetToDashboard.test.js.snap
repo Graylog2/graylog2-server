@@ -17,14 +17,14 @@ Object {
         "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": Object {
           "col": 1,
           "height": 4,
-          "row": 1,
+          "row": 2,
           "width": "Infinity",
         },
         "4d73ccaa-aabf-451a-b36e-309f55798e04": Object {
           "col": 1,
-          "height": 4,
+          "height": undefined,
           "row": 1,
-          "width": 4,
+          "width": undefined,
         },
       },
       "selected_fields": Array [

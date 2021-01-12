@@ -13,17 +13,17 @@ Immutable.Map {
 
 exports[`AddNewWidgetsToPositions should add a new widget to the first row and column to other widgets 1`] = `
 Immutable.Map {
-  "foo": Object {
-    "col": 1,
-    "height": 8,
-    "row": 6,
-    "width": 3,
-  },
   "foo-1": Object {
     "col": 1,
     "height": 5,
     "row": 1,
     "width": 6,
+  },
+  "foo": Object {
+    "col": 1,
+    "height": 8,
+    "row": 2,
+    "width": 3,
   },
 }
 `;

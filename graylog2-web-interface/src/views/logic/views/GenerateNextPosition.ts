@@ -16,31 +16,20 @@
  */
 import * as Immutable from 'immutable';
 
-import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import GetPositionForNewWidget from 'views/logic/views/GetPositionForNewWidget';
 
 import Widget from '../widgets/Widget';
 
+const incrementRow = (position: WidgetPosition) => position.row + 1;
+
 export default (
-  positionsMap: Immutable.Map<string, WidgetPosition>,
+  widgetPositions: Immutable.Map<string, WidgetPosition>,
   widgets: Array<Widget>,
-  overrideWidgetPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map(),
-): Immutable.Map<string, WidgetPosition> => {
-  const clearedPositionsMap = positionsMap.filter(
-    (_, widgetId) => widgets.findIndex((widget) => widgetId === widget.id) >= 0,
-  ).toMap();
-  const newWidgets = widgets.filter((widget) => !positionsMap.get(widget.id));
+): Immutable.Map<string, WidgetPosition> => Immutable.Map(
+  widgets
+    .map((widget) => [widget.id, widgetPositions.has(widget.id)
+      ? widgetPositions.get(widget.id).toBuilder().row(incrementRow(widgetPositions.get(widget.id))).build()
+      : GetPositionForNewWidget(widget)]),
+);
 
-  return newWidgets.reduce((nextPositionsMap, widget) => {
-    const widgetDef = widgetDefinition(widget.type);
-    const result = nextPositionsMap.reduce((newPosMap, position, id) => {
-      const defaultHeight = widgetDef.defaultHeight || 0;
-      const pos = position.toBuilder().row(position.row + defaultHeight).build();
-
-      return newPosMap.set(id, pos);
-    }, Immutable.Map<string, WidgetPosition>());
-    const position = overrideWidgetPositions.get(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
-
-    return result.set(widget.id, position.toBuilder().row(1).col(1).build());
-  }, clearedPositionsMap);
-};

@@ -74,13 +74,12 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: str
   return titlesMap.set('widget', newWidgetTitleMap);
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, newWidgetPosition: WidgetPosition, widgetTitle: string | undefined | null): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetTitle: string | undefined | null): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newWidget = widget.toBuilder().id(uuid()).build();
   const newWidgets = viewState.widgets.push(newWidget);
-  const overridePositions = Immutable.Map({ [newWidget.id]: newWidgetPosition });
   const { widgetPositions } = viewState;
-  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositions), newWidgets.toArray(), overridePositions);
+  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositions), newWidgets.toArray());
   const newTitleMap = _setWidgetTitle(viewState.titles, newWidget.id, widgetTitle);
   const newViewState = viewState.toBuilder()
     .widgets(newWidgets)
@@ -91,12 +90,6 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
   return dashboard.toBuilder()
     .state(dashboard.state.set(targetQueryId, newViewState))
     .build();
-};
-
-const _getWidgetPosition = (widgetId: WidgetId, queryId: QueryId, view: View): WidgetPosition => {
-  const widget = view.state.get(queryId).widgets.find((w) => w.id === widgetId);
-
-  return GetPositionForNewWidget(widget, queryId, view);
 };
 
 const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => {
@@ -113,10 +106,9 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
   if (match) {
     const [widget, queryId] = match;
     const widgetTitle = _getWidgetTitle(widgetId, queryId, dashboard);
-    const newWidgetPosition = _getWidgetPosition(widgetId, queryId, dashboard);
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
 
-    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, newWidgetPosition, widgetTitle));
+    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, widgetTitle));
   }
 
   return undefined;
