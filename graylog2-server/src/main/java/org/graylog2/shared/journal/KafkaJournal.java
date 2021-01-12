@@ -577,6 +577,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
      * @return A list of entries
      */
     public List<JournalReadEntry> readNext(long startOffset, long requestedMaximumCount) {
+        final long logEndOffset = getLogEndOffset();
+
         List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
 
         if (messages.isEmpty()) {
@@ -587,7 +589,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             long failedReadOffset = startOffset;
             long retryReadOffset = failedReadOffset + 1;
 
-            while (messages.isEmpty() && failedReadOffset < (getLogEndOffset() - 1)) {
+            while (messages.isEmpty() && failedReadOffset < (logEndOffset - 1)) {
                 LOG.warn(
                         "Couldn't read any messages from offset <{}> but journal has more messages. Skipping and " +
                                 "trying to read from offset <{}>",
