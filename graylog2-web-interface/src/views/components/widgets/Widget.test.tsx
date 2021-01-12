@@ -95,6 +95,16 @@ jest.mock('views/stores/TitlesStore');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/logic/views/Actions');
 
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: {
+    listen: () => jest.fn(),
+    getInitialState: () => ({
+      searchesClusterConfig: {},
+    }),
+  },
+  SearchConfigActions: {},
+}));
+
 describe('<Widget />', () => {
   const widget = WidgetModel.builder().newId()
     .type('dummy')
