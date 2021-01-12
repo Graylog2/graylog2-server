@@ -78,7 +78,7 @@ const FlexWrap = styled.div`
 const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Props) => {
   const [activeTab, setActiveTab] = useState();
   const toStartDate = moment(currentTimeRange.from).toDate();
-  const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : toStartDate;
+  const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : null;
 
   return (
     <AbsoluteWrapper>
