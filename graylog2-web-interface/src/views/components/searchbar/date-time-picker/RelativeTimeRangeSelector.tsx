@@ -195,7 +195,6 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
             };
 
             return (
-
               <>
                 <RangeWrapper>
                   <RangeTitle>From:</RangeTitle>
@@ -203,6 +202,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                     <input type="checkbox"
                            id="relative-all-time"
                            value="0"
+                           className="mousetrap"
                            checked={fromValue.rangeAllTime}
                            onChange={_onCheckAllTime}
                            disabled={limitDuration !== 0} />All Time
@@ -214,6 +214,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                            type="number"
                            min="1"
                            value={fromValue.rangeValue}
+                           className="mousetrap"
                            title="Set the range value"
                            onChange={_onChangeTime}
                            bsStyle={error ? 'error' : null} />
@@ -223,6 +224,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                                 disabled={disabled || fromValue.rangeAllTime}
                                 value={fromValue.rangeType}
                                 options={availableRangeTypes}
+                                inputProps={{ className: 'mousetrap' }}
                                 placeholder="Select a range length"
                                 onChange={_onChangeType}
                                 clearable={false} />

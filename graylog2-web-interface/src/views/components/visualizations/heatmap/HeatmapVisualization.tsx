@@ -20,35 +20,11 @@ import { values, merge, fill, find, isEmpty, get } from 'lodash';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 import { chartData, ValuesBySeries } from '../ChartData';
-
-const BG_COLOR = '#440154';
-
-const COLORSCALE: [number, string][] = [
-  [0.00, BG_COLOR],
-  [0.05, '#481567'],
-  [0.10, '#483677'],
-  [0.15, '#453781'],
-  [0.20, '#404788'],
-  [0.30, '#39568c'],
-  [0.35, '#33638d'],
-  [0.40, '#2d708e'],
-  [0.45, '#287d8e'],
-  [0.50, '#238a8d'],
-  [0.55, '#1f968b'],
-  [0.60, '#20a387'],
-  [0.65, '#29af7f'],
-  [0.70, '#3cbb75'],
-  [0.75, '#55c667'],
-  [0.80, '#73d055'],
-  [0.85, '#95d840'],
-  [0.90, '#b8de29'],
-  [0.95, '#dce319'],
-  [1.00, '#fde725'],
-];
 
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map((s) => s.function);
@@ -63,11 +39,12 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefinition => {
+const _heatmapGenerateSeries = (type, name, x, y, z, idx, total, config, visualizationConfig): ChartDefinition => {
   const xAxisTitle = get(config, ['rowPivots', idx, 'field']);
   const yAxisTitle = get(config, ['columnPivots', idx, 'field']);
   const zSeriesTitles = _generateSeriesTitles(config, y, x);
   const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
+  const { colorScale, reverseScale, zMin, zMax } = visualizationConfig;
 
   return {
     type,
@@ -78,13 +55,16 @@ const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefiniti
     text: zSeriesTitles,
     customdata: z,
     hovertemplate,
-    colorscale: COLORSCALE,
+    colorscale: colorScale,
+    reversescale: reverseScale,
+    zmin: zMin,
+    zmax: zMax,
   };
 };
 
-const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>) => {
-  const defaultValue = 'None';
+const _generateSeries = (visualizationConfig) => (type, name, x, y, z, idx, total, config) => _heatmapGenerateSeries(type, name, x, y, z, idx, total, config, visualizationConfig);
 
+const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue = 'None') => {
   return z.map((series) => {
     const newSeries = fill(Array(xLabels.length), defaultValue);
 
@@ -98,11 +78,17 @@ const _transposeMatrix = (z: Array<Array<any>> = []) => {
   return z[0].map((_, c) => { return z.map((r) => { return r[c]; }); });
 };
 
-const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: ValuesBySeries, xLabels: Array<any>}): ExtractedSeries => {
+const _findSmallestValue = (valuesFound: Array<Array<number>>) => valuesFound.reduce((result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result), valuesFound[0][0]);
+
+const _formatSeries = (visualizationConfig) => ({ valuesBySeries, xLabels }: {valuesBySeries: ValuesBySeries, xLabels: Array<any>}): ExtractedSeries => {
+  const valuesFoundBySeries = values(valuesBySeries);
   // When using the hovertemplate, we need to provie a value for empty z values.
   // Otherwise plotly would throw errors when hovering over a field.
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
-  const z = _transposeMatrix(_fillUpMatrix(values(valuesBySeries), xLabels));
+  const defaultValue = visualizationConfig.useSmallestAsDefault
+    ? _findSmallestValue(valuesFoundBySeries)
+    : (visualizationConfig.defaultValue ?? 'None');
+  const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
   const yLabels = Object.keys(valuesBySeries);
 
   return [[
@@ -134,7 +120,6 @@ const _chartLayout = (heatmapData) => {
   return {
     yaxis: axisConfig,
     xaxis: axisConfig,
-    plot_bgcolor: hasContent ? BG_COLOR : 'transparent',
     margin: {
       b: 40,
     },
@@ -144,8 +129,9 @@ const _chartLayout = (heatmapData) => {
 const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
 
 const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+  const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = data.chart || Object.values(data)[0];
-  const heatmapData = chartData(config, rows, 'heatmap', _generateSeries, _formatSeries, _leafSourceMatcher);
+  const heatmapData = chartData(config, rows, 'heatmap', _generateSeries(visualizationConfig), _formatSeries(visualizationConfig), _leafSourceMatcher);
   const layout = _chartLayout(heatmapData);
 
   return (
