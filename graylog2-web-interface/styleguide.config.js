@@ -80,10 +80,7 @@ module.exports = {
           name: 'Fonts',
           content: 'src/theme/docs/Fonts.md',
         },
-        // {
-        //   name: 'Colors',
-        //   content: 'src/theme/docs/Colors.md',
-        // },
+        // TODO: add src/theme/docs/Colors.md color swatches
         {
           name: 'Color Utilities',
           content: 'src/theme/docs/Utilities.md',
