@@ -22,10 +22,14 @@ import AbsoluteTimeInput from './AbsoluteTimeInput';
 const defaultProps = {
   dateTime: '1955-05-11 06:15:00.000',
   range: 'from',
-  onChange: undefined,
+  onChange: jest.fn(),
 } as const;
 
 describe('AbsoluteTimeInput', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('renders', () => {
     render(<AbsoluteTimeInput {...defaultProps} />);
 
@@ -33,18 +37,17 @@ describe('AbsoluteTimeInput', () => {
   });
 
   it('toggles bod & eod', () => {
-    const onChange = jest.fn();
-    render(<AbsoluteTimeInput {...defaultProps} onChange={onChange} />);
+    render(<AbsoluteTimeInput {...defaultProps} />);
 
     const toggleBtn = screen.getByRole('button', { name: /toggle between beginning and end of day/i });
 
     fireEvent.click(toggleBtn);
 
-    expect(onChange).toHaveReturnedWith('1955-05-11 00:00:00.000');
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:00:00.000');
 
-    // fireEvent.click(toggleBtn);
-    //
-    // expect(defaultProps.onChange).toHaveReturnedWith('1955-05-11 23:59:59.999');
+    fireEvent.click(toggleBtn);
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:59:59.999');
   });
 
   it('does not allow non-numeric characters', () => {
@@ -54,7 +57,7 @@ describe('AbsoluteTimeInput', () => {
 
     fireEvent.change(inputHour, { target: { value: '/w!' } });
 
-    expect(inputHour).toHaveValue(0);
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00.000');
   });
 
   it('does allow proper value', () => {
@@ -64,7 +67,7 @@ describe('AbsoluteTimeInput', () => {
 
     fireEvent.change(inputHour, { target: { value: '10' } });
 
-    expect(inputHour).toHaveValue(10);
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 10:15:00.000');
   });
 
   it('does not allow numbers over their maximum', () => {
@@ -74,7 +77,7 @@ describe('AbsoluteTimeInput', () => {
 
     fireEvent.change(inputHour, { target: { value: '50' } });
 
-    expect(inputHour).toHaveValue(23);
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:15:00.000');
   });
 
   it('does not try to parse an empty date', () => {
@@ -84,6 +87,6 @@ describe('AbsoluteTimeInput', () => {
 
     fireEvent.change(inputHour, { target: { value: '' } });
 
-    expect(inputHour).toHaveValue(0);
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00.000');
   });
 });

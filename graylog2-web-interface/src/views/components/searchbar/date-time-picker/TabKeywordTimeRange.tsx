@@ -72,7 +72,7 @@ const _validateKeyword = (
       .then(_setSuccessfullPreview, _setFailedPreview);
 };
 
-const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
+const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const keywordRef = useRef();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
@@ -164,14 +164,14 @@ const KeywordTimeRangeSelector = ({ defaultValue, disabled }: Props) => {
   );
 };
 
-KeywordTimeRangeSelector.propTypes = {
+TabKeywordTimeRange.propTypes = {
   defaultValue: PropTypes.string,
   disabled: PropTypes.bool,
 };
 
-KeywordTimeRangeSelector.defaultProps = {
+TabKeywordTimeRange.defaultProps = {
   defaultValue: '',
   disabled: false,
 };
 
-export default KeywordTimeRangeSelector;
+export default TabKeywordTimeRange;

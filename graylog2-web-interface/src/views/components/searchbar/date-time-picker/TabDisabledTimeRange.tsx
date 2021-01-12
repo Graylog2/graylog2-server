@@ -14,24 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import styled from 'styled-components';
 
-class BootstrapAccordion extends React.Component {
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-  };
-
-  render() {
-    return (
-      <div id="bundles" className="panel-group">
-        {this.props.children}
-      </div>
-    );
+const Wrapper = styled.div`
+  padding: 12px 6px;
+  
+  h5 {
+    font-weight: bold;
+    margin: 0 0 6px;
   }
-}
+`;
 
-export default BootstrapAccordion;
+const TabDisabledTimeRange = () => (
+  <Wrapper>
+    <h5>No Date/Time Override chosen.</h5>
+    <p>Use the tabs above to choose a Date & Time Range to Search.</p>
+  </Wrapper>
+);
+
+export default TabDisabledTimeRange;

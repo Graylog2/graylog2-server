@@ -14,23 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const Wrapper = styled.div`
-  padding: 12px 6px;
-  
-  h5 {
-    font-weight: bold;
-    margin: 0 0 6px;
-  }
-`;
+import { PanelGroup } from './bootstrap-import';
 
-const DisabledTimeRangeSelector = () => (
-  <Wrapper>
-    <h5>No Date/Time Override chosen.</h5>
-    <p>Use the tabs above to choose a Date & Time Range to Search.</p>
-  </Wrapper>
-);
+type Props = {
+  activeKey?: string,
+  children: React.ReactNode,
+}
 
-export default DisabledTimeRangeSelector;
+const Accordion = ({ activeKey, children, ...restProps }:Props) => {
+  const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
+
+  return (
+    <PanelGroup {...restProps} activeKey={cleanActiveKey} accordion>
+      {children}
+    </PanelGroup>
+  );
+};
+
+Accordion.propTypes = {
+  activeKey: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
+Accordion.defaultProps = {
+  activeKey: undefined,
+};
+
+export default Accordion;
