@@ -82,7 +82,9 @@ describe('SearchResult', () => {
   };
 
   it('should show spinner with undefined fields', () => {
-    const { getByText } = render(<SearchResult />);
+    const { getByText } = render(
+      <SearchResult />,
+    );
 
     act(() => jest.advanceTimersByTime(200));
 

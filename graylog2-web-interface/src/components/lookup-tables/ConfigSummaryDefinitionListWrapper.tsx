@@ -14,40 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
 import styled from 'styled-components';
 
-import { Timestamp } from 'components/common';
+const ConfigSummaryDefinitionListWrapper = styled.div`
+  dl {
+    margin-top: 10px;
 
-const StyledDl = styled.dl`
-  margin-top: 5px;
-  margin-bottom: 0;
+    dt {
+      float: left;
+      clear: left;
+    }
 
-  dt {
-    float: left;
-  }
+    dd {
+      margin-left: 185px;
+      word-wrap: break-word;
 
-  dd {
-    margin-left: 150px;
+      :not(:last-child) {
+        border-bottom: 1px solid #ececec;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+      }
+    }
   }
 `;
 
-const RestApiOverview = ({ node }) => {
-  const { transport_address, last_seen } = node;
-
-  return (
-    <StyledDl>
-      <dt>Transport address:</dt>
-      <dd>{transport_address}</dd>
-      <dt>Last seen:</dt>
-      <dd><Timestamp dateTime={last_seen} relative /></dd>
-    </StyledDl>
-  );
-};
-
-RestApiOverview.propTypes = {
-  node: PropTypes.object.isRequired,
-};
-
-export default RestApiOverview;
+export default ConfigSummaryDefinitionListWrapper;

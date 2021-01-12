@@ -57,6 +57,7 @@ export type HandlerAction = {
   title: string,
   component?: ActionComponentType,
   handler?: ActionHandler,
+  resetFocus: boolean,
 };
 
 export type ActionDefinition = HandlerAction & ActionHandlerConditions;

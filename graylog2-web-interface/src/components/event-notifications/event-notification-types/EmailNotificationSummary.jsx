@@ -65,6 +65,14 @@ class EmailNotificationSummary extends React.Component {
               </Well>
             </td>
           </tr>
+          <tr>
+            <td>Email HTML Body</td>
+            <td>
+              <Well bsSize="small" className={styles.bodyPreview}>
+                {notification.config.html_body_template || <em>Empty HTML body</em>}
+              </Well>
+            </td>
+          </tr>
         </>
       </CommonNotificationSummary>
     );

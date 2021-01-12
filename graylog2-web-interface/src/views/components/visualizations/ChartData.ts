@@ -39,6 +39,9 @@ export type ChartDefinition = {
   },
   customdata?: any,
   colorscale?: [number, string][],
+  reversescale?: boolean,
+  zmin?: boolean,
+  zmax?: boolean,
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];

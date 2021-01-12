@@ -28,7 +28,6 @@ import { singletonStore } from 'views/logic/singleton';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-/* eslint-disable camelcase */
 export type Stream = {
   id: string,
   title: string,
@@ -88,7 +87,6 @@ export type StreamResponse = {
   remove_matches_from_default_stream: boolean,
   index_set_id: string,
 }
-/* eslint-enable camelcase */
 
 type TestMatchResponse = {
   matches: boolean,
@@ -104,7 +102,6 @@ type StreamSummaryResponse = {
   streams: Array<Stream>,
 };
 
-/* eslint-disable camelcase */
 type PaginatedResponse = {
   pagination: {
     count: number,
@@ -115,7 +112,6 @@ type PaginatedResponse = {
   },
   streams: Array<Stream>,
 };
-/* eslint-enable camelcase */
 
 const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
   listenables: [StreamsActions],
