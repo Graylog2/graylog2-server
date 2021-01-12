@@ -142,6 +142,7 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
 
   return null;
 }).filter(Boolean);
+
 const getFromValue = (value: number, originalTimeRange) => RANGE_TYPES.map(({ type }) => {
   const isAllTime = value === 0;
   const diff = moment.duration(value, 'seconds').as(type);
