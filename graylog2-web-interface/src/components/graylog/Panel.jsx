@@ -253,7 +253,7 @@ Panel.propTypes = {
 Panel.defaultProps = {
   collapsible: false,
   defaultExpanded: null,
-  expanded: false,
+  expanded: null,
   footer: undefined,
   header: undefined,
   onToggle: () => {},
