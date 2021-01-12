@@ -88,7 +88,7 @@ const EditWidgetFrame = ({ children }: Props) => {
     return <Spinner text="Loading widget ..." />;
   }
 
-  const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds();
+  const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
@@ -99,7 +99,8 @@ const EditWidgetFrame = ({ children }: Props) => {
            animation={false}
            dialogComponentClass={EditWidgetDialog}
            enforceFocus={false}>
-      <SearchBarForm initialValues={{ limitDuration, timerange, streams, queryString }}
+      <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                     limitDuration={limitDuration}
                      onSubmit={_onSubmit}>
         <div className={styles.gridContainer}>
           <IfDashboard>
