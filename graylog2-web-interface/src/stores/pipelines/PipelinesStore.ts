@@ -24,6 +24,23 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { PipelinesActions } = CombinedProvider.get('Pipelines');
 
+export type PipelineType = {
+  id: string,
+  title: string,
+  description: string,
+  source: string,
+  created_at: string,
+  modified_at: string,
+  stages: StageType[],
+  errors?: [],
+};
+
+export type StageType = {
+  stage: number,
+  match_all: boolean,
+  rules: [string],
+};
+
 const PipelinesStore = Reflux.createStore({
   listenables: [PipelinesActions],
   pipelines: undefined,
@@ -32,7 +49,7 @@ const PipelinesStore = Reflux.createStore({
     return { pipelines: this.pipelines };
   },
 
-  _updatePipelinesState(pipeline) {
+  _updatePipelinesState(pipeline: PipelineType) {
     if (!this.pipelines) {
       this.pipelines = [pipeline];
     } else {

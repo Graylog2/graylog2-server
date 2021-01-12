@@ -24,6 +24,17 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
+export type PipelineConnectionsType = {
+  id?: string,
+  stream_id: string,
+  pipeline_ids: string[],
+};
+
+type PipelineReverseConnectionsType = {
+  pipeline_id: string,
+  stream_ids: string[],
+};
+
 const PipelineConnectionsStore = Reflux.createStore({
   listenables: [PipelineConnectionsActions],
   connections: undefined,
@@ -49,7 +60,7 @@ const PipelineConnectionsStore = Reflux.createStore({
 
   connectToStream(connection) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.to_stream().url);
-    const updatedConnection = {
+    const updatedConnection: PipelineConnectionsType = {
       stream_id: connection.stream,
       pipeline_ids: connection.pipelines,
     };
@@ -72,7 +83,7 @@ const PipelineConnectionsStore = Reflux.createStore({
 
   connectToPipeline(reverseConnection) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.to_pipeline().url);
-    const updatedConnection = {
+    const updatedConnection: PipelineReverseConnectionsType = {
       pipeline_id: reverseConnection.pipeline,
       stream_ids: reverseConnection.streams,
     };
