@@ -25,7 +25,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -63,8 +62,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class ElasticsearchBackendGeneratedRequestTestBase {
-    protected static final QueryStringParser queryStringParser = new QueryStringParser();
-
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -94,7 +91,6 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
         elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(bucketHandlers, seriesHandlers));
 
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
-                queryStringParser,
                 client,
                 indexLookup,
                 new QueryStringDecorators.Fake(),
