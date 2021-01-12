@@ -76,16 +76,20 @@ const FlexWrap = styled.div`
 `;
 
 const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Props) => {
-  const [activeTab, setActiveTab] = useState();
+  const [activeAccordion, setActiveAccordion] = useState();
   const toStartDate = moment(currentTimeRange.from).toDate();
   const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : null;
+
+  const handleSelect = (nextKey) => {
+    setActiveAccordion(nextKey ?? activeAccordion);
+  };
 
   return (
     <AbsoluteWrapper>
       <StyledAccordion defaultActiveKey="calendar"
-                       onSelect={setActiveTab}
+                       onSelect={handleSelect}
                        id="absolute-time-ranges"
-                       activeKey={activeTab}>
+                       activeKey={activeAccordion}>
 
         <AccordionItem name="Calendar">
           <RangeWrapper>
