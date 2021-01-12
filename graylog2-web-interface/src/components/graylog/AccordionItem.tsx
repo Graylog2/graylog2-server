@@ -47,7 +47,7 @@ const PanelTitle = styled(Panel.Title)(({ theme }) => css`
 `);
 
 const PanelBody = styled(Panel.Body)(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
+  background-color: ${theme.colors.global.contentBackground};
   border-top-color: ${theme.colors.variant.light.default} !important;
   color: ${theme.colors.variant.darkest.default};
 `);
