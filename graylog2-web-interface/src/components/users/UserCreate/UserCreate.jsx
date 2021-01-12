@@ -19,6 +19,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
 import { Formik, Form } from 'formik';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
@@ -30,6 +31,7 @@ import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import history from 'util/History';
 import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -40,10 +42,20 @@ import UsernameFormGroup from './UsernameFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 
+const isCloud = AppConfig.isCloud();
+
+const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
+
 const _onSubmit = (formData, roles, setSubmitError) => {
-  const data = { ...formData, roles: roles.toJS(), permissions: [] };
+  let data = { ...formData, roles: roles.toJS(), permissions: [] };
   delete data.password_repeat;
-  data.username = data.username.trim();
+
+  if (isCloud && oktaUserForm) {
+    const { onCreate } = oktaUserForm;
+    data = onCreate(data);
+  } else {
+    data.username = data.username.trim();
+  }
 
   setSubmitError(null);
 
@@ -54,8 +66,16 @@ const _onSubmit = (formData, roles, setSubmitError) => {
 
 const _validate = (values) => {
   let errors = {};
+
   const { password, password_repeat: passwordRepeat } = values;
-  errors = validatePasswords(errors, password, passwordRepeat);
+
+  if (isCloud && oktaUserForm) {
+    const { validations: { password: validateCloudPasswords } } = oktaUserForm;
+
+    errors = validateCloudPasswords(errors, password, passwordRepeat);
+  } else {
+    errors = validatePasswords(errors, password, passwordRepeat);
+  }
 
   return errors;
 };
@@ -88,9 +108,65 @@ const UserCreate = () => {
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
+  const getUserNameGroup = () => {
+    if (isCloud && oktaUserForm) {
+      const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
+
+      return (
+        <>
+          {CloudUserNameFormGroup && <CloudUserNameFormGroup />}
+        </>
+      );
+    }
+
+    return (
+      <>
+        <UsernameFormGroup users={users} />
+      </>
+    );
+  };
+
+  const getEmailGroup = () => {
+    if (isCloud && oktaUserForm) {
+      const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
+
+      return (
+        <>
+          {CloudEmailFormGroup && <CloudEmailFormGroup /> }
+        </>
+      );
+    }
+
+    return (
+      <>
+        <EmailFormGroup />
+      </>
+    );
+  };
+
+  const getPasswordGroup = () => {
+    if (isCloud && oktaUserForm) {
+      const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+
+      return <CloudPasswordFormGroup />;
+    }
+
+    return <PasswordFormGroup />;
+  };
+
   if (!users) {
     return <Spinner />;
   }
+
+  const showSubmitError = (errors) => {
+    if (isCloud && oktaUserForm) {
+      const { extractSubmitError } = oktaUserForm;
+
+      return extractSubmitError(errors);
+    }
+
+    return errors?.additional?.res?.text;
+  };
 
   return (
     <Row className="content">
@@ -102,9 +178,9 @@ const UserCreate = () => {
             <Form className="form form-horizontal">
               <div>
                 <Headline>Profile</Headline>
-                <UsernameFormGroup users={users} />
                 <FullNameFormGroup />
-                <EmailFormGroup />
+                {getUserNameGroup()}
+                {getEmailGroup()}
               </div>
               <div>
                 <Headline>Settings</Headline>
@@ -137,14 +213,14 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Password</Headline>
-                <PasswordFormGroup />
+                {getPasswordGroup()}
               </div>
               {submitError && (
                 <Row>
                   <Col xs={9} xsOffset={3}>
                     <Alert bsStyle="danger">
                       <b>Failed to create user</b><br />
-                      {submitError?.additional?.res?.text}
+                      {showSubmitError(submitError)}
                     </Alert>
                   </Col>
                 </Row>
