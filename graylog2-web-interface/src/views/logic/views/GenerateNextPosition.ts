@@ -32,4 +32,3 @@ export default (
       ? widgetPositions.get(widget.id).toBuilder().row(incrementRow(widgetPositions.get(widget.id))).build()
       : GetPositionForNewWidget(widget)]),
 );
-

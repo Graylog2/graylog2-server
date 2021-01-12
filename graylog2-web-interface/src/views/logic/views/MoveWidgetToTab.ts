@@ -19,9 +19,7 @@ import uuid from 'uuid/v4';
 
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { TitlesMap } from 'views/stores/TitleTypes';
-import GetPositionForNewWidget from 'views/logic/views/GetPositionForNewWidget';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
