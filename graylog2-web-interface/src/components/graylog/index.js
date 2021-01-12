@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Accordion from './Accordion';
-import AccordionGroup from './AccordionGroup';
+import AccordionItem from './AccordionItem';
 import Alert from './Alert';
 import Badge from './Badge';
 import Button from './Button';
@@ -49,7 +49,7 @@ import Well from './Well';
 
 export {
   Accordion,
-  AccordionGroup,
+  AccordionItem,
   Alert,
   Badge,
   Button,

@@ -22,7 +22,7 @@ import moment from 'moment';
 
 import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
-import { Accordion, AccordionGroup } from 'components/graylog';
+import { Accordion, AccordionItem } from 'components/graylog';
 
 import AbsoluteTimestamp from './AbsoluteTimestamp';
 import AbsoluteCalendar from './AbsoluteCalendar';
@@ -59,7 +59,7 @@ const IconWrap = styled.div`
   transform: translateY(-0.65em);
 `;
 
-const StyledAccordionGroup = styled(AccordionGroup)`
+const StyledAccordion = styled(Accordion)`
   width: 100%;
   
   .panel-body {
@@ -82,12 +82,12 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
 
   return (
     <AbsoluteWrapper>
-      <StyledAccordionGroup defaultActiveKey="calendar"
-                            onSelect={setActiveTab}
-                            id="absolute-time-ranges"
-                            activeKey={activeTab}>
+      <StyledAccordion defaultActiveKey="calendar"
+                       onSelect={setActiveTab}
+                       id="absolute-time-ranges"
+                       activeKey={activeTab}>
 
-        <Accordion name="Calendar">
+        <AccordionItem name="Calendar">
           <RangeWrapper>
             <AbsoluteCalendar disabled={disabled}
                               startDate={fromStartDate}
@@ -106,9 +106,9 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
                               currentTimeRange={currentTimeRange}
                               range="to" />
           </RangeWrapper>
-        </Accordion>
+        </AccordionItem>
 
-        <Accordion name="Timestamp">
+        <AccordionItem name="Timestamp">
           <TimestampContent>
             <p>Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.</p>
             <FlexWrap>
@@ -129,8 +129,8 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
               </RangeWrapper>
             </FlexWrap>
           </TimestampContent>
-        </Accordion>
-      </StyledAccordionGroup>
+        </AccordionItem>
+      </StyledAccordion>
 
     </AbsoluteWrapper>
   );
