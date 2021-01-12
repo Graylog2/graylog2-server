@@ -43,14 +43,15 @@ import UsernameFormGroup from './UsernameFormGroup';
 import { Headline } from '../../common/Section/SectionComponent';
 
 const isCloud = AppConfig.isCloud();
-const cloudPlugin = isCloud ? PluginStore.exports('cloud') : null;
+
+const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
 
 const _onSubmit = (formData, roles, setSubmitError) => {
   let data = { ...formData, roles: roles.toJS(), permissions: [] };
   delete data.password_repeat;
 
-  if (isCloud && cloudPlugin) {
-    const onCreate = cloudPlugin?.[0]?.oktaUserForm.onCreate;
+  if (isCloud && oktaUserForm) {
+    const { onCreate } = oktaUserForm;
     data = onCreate(data);
   } else {
     data.username = data.username.trim();
@@ -68,8 +69,8 @@ const _validate = (values) => {
 
   const { password, password_repeat: passwordRepeat } = values;
 
-  if (isCloud && cloudPlugin) {
-    const validateCloudPasswords = cloudPlugin?.[0]?.oktaUserForm.validations.password;
+  if (isCloud && oktaUserForm) {
+    const { validations: { password: validateCloudPasswords } } = oktaUserForm;
 
     errors = validateCloudPasswords(errors, password, passwordRepeat);
   } else {
@@ -107,15 +108,13 @@ const UserCreate = () => {
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
-  const getUserNameEmailGroup = () => {
-    if (isCloud && cloudPlugin) {
-      const CloudUserNameFormGroup = cloudPlugin?.[0]?.oktaUserForm.fields.username;
-      const CloudEmailFormGroup = cloudPlugin?.[0]?.oktaUserForm.fields.email;
+  const getUserNameGroup = () => {
+    if (isCloud && oktaUserForm) {
+      const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
 
       return (
         <>
           {CloudUserNameFormGroup && <CloudUserNameFormGroup />}
-          {CloudEmailFormGroup && <CloudEmailFormGroup /> }
         </>
       );
     }
@@ -123,14 +122,31 @@ const UserCreate = () => {
     return (
       <>
         <UsernameFormGroup users={users} />
+      </>
+    );
+  };
+
+  const getEmailGroup = () => {
+    if (isCloud && oktaUserForm) {
+      const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
+
+      return (
+        <>
+          {CloudEmailFormGroup && <CloudEmailFormGroup /> }
+        </>
+      );
+    }
+
+    return (
+      <>
         <EmailFormGroup />
       </>
     );
   };
 
   const getPasswordGroup = () => {
-    if (isCloud && cloudPlugin) {
-      const CloudPasswordFormGroup = cloudPlugin?.[0]?.oktaUserForm.fields.password;
+    if (isCloud && oktaUserForm) {
+      const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
 
       return <CloudPasswordFormGroup />;
     }
@@ -143,8 +159,8 @@ const UserCreate = () => {
   }
 
   const showSubmitError = (errors) => {
-    if (isCloud && cloudPlugin) {
-      const extractSubmitError = cloudPlugin?.[0]?.oktaUserForm.extractSubmitError;
+    if (isCloud && oktaUserForm) {
+      const { extractSubmitError } = oktaUserForm;
 
       return extractSubmitError(errors);
     }
@@ -163,7 +179,8 @@ const UserCreate = () => {
               <div>
                 <Headline>Profile</Headline>
                 <FullNameFormGroup />
-                {getUserNameEmailGroup()}
+                {getUserNameGroup()}
+                {getEmailGroup()}
               </div>
               <div>
                 <Headline>Settings</Headline>
