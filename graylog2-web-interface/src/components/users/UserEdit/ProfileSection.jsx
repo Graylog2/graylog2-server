@@ -55,6 +55,17 @@ const ProfileSection = ({
     return (
       <>
         <ReadOnlyFormGroup label="Username" value={username} />
+      </>
+    );
+  };
+
+  const _getEmailGroup = () => {
+    if (isCloud) {
+      return null;
+    }
+
+    return (
+      <>
         <EmailFormGroup />
       </>
     );
@@ -68,6 +79,7 @@ const ProfileSection = ({
           <Form className="form form-horizontal">
             <FullNameFormGroup />
             {_getUserNameGroup()}
+            {_getEmailGroup()}
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
