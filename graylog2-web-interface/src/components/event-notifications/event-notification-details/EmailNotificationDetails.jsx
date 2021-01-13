@@ -34,6 +34,12 @@ const EmailNotificationDetails = ({ notification }) => (
                            {notification.config.body_template || <em>Empty body</em>}
                          </Well>
                        )} />
+    <ReadOnlyFormGroup label="Email HTML Body"
+                       value={(
+                         <Well bsSize="small" className={styles.bodyPreview}>
+                           {notification.config.html_body_template || <em>Empty body</em>}
+                         </Well>
+                       )} />
   </>
 );
 
