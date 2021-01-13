@@ -79,9 +79,10 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                               availableRangeTypes={availableRangeTypes}
                               disabled={disabled}
                               disableUnsetRange={limitDuration !== 0}
-                              unsetRangeLabel="All Time"
                               defaultRange={defaultRange}
-                              title="From:" />
+                              unsetRangeLabel="All Time"
+                              title="From:"
+                              valueInputTitle="Set the range start value" />
 
       <StyledIcon name="arrow-right" />
 
@@ -91,7 +92,8 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                               defaultRange={defaultOffset}
                               disabled={disabled}
                               unsetRangeLabel="Now"
-                              title="Until:" />
+                              title="Until:"
+                              valueInputTitle="Set the range end value" />
     </RelativeWrapper>
   );
 };

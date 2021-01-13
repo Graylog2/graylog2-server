@@ -55,7 +55,7 @@ describe('RelativeTimeRangeSelector', () => {
   it('renders originalTimeRange value', () => {
     render(<RelativeTimeRangeSelector {...defaultProps} />);
 
-    const spinbutton = screen.getByRole('spinbutton', { name: /set the range value/i });
+    const spinbutton = screen.getByRole('spinbutton', { name: /set the range start value/i });
 
     expect(spinbutton).toBeInTheDocument();
     expect(spinbutton).toHaveValue(1);
@@ -71,7 +71,7 @@ describe('RelativeTimeRangeSelector', () => {
     render(<RelativeTimeRangeSelector {...defaultProps} />);
 
     const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
-    const rangeValue = screen.getByRole('spinbutton', { name: /set the range value/i });
+    const rangeValue = screen.getByRole('spinbutton', { name: /set the range start value/i });
 
     expect(rangeValue).not.toBeDisabled();
 

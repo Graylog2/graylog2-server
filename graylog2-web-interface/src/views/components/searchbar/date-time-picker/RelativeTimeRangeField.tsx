@@ -82,7 +82,8 @@ type Props = {
   disabled: boolean,
   name: string,
   originalTimeRange: TimeRange,
-  title: string
+  title: string,
+  valueInputTitle: string,
 }
 
 const RelativeTimeRangeField = ({
@@ -94,6 +95,7 @@ const RelativeTimeRangeField = ({
   name,
   originalTimeRange,
   title,
+  valueInputTitle,
 }: Props) => {
   return (
     <Field name={name}>
@@ -147,13 +149,13 @@ const RelativeTimeRangeField = ({
             </RangeCheck>
             <InputWrap>
               <Input id={`${name}-value`}
-                     name={`${name}-from-value`}
+                     name={`${name}-value`}
                      disabled={disabled || fromValue.rangeAllTime}
                      type="number"
                      min="1"
                      value={fromValue.rangeValue}
                      className="mousetrap"
-                     title="Set the range value"
+                     title={valueInputTitle}
                      onChange={_onChangeTime}
                      bsStyle={error ? 'error' : null} />
             </InputWrap>
