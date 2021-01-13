@@ -58,7 +58,7 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
-const DatePicker = ({ date, fromDate, onChange }) => {
+const DatePicker = ({ date, fromDate, onChange, showOutsideDays }) => {
   let selectedDate;
 
   if (date) {
@@ -88,7 +88,7 @@ const DatePicker = ({ date, fromDate, onChange }) => {
     <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
                      onDayClick={onChange}
                      modifiers={modifiers}
-                     showOutsideDays />
+                     showOutsideDays={showOutsideDays} />
   );
 };
 
@@ -102,11 +102,14 @@ DatePicker.propTypes = {
   onChange: PropTypes.func.isRequired,
   /** Earliest date possible to select in the date picker. */
   fromDate: PropTypes.instanceOf(Date),
+  /** Earliest date possible to select in the date picker. */
+  showOutsideDays: PropTypes.bool,
 };
 
 DatePicker.defaultProps = {
   date: undefined,
   fromDate: undefined,
+  showOutsideDays: false,
 };
 
 export default DatePicker;
