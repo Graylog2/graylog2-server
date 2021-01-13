@@ -22,19 +22,13 @@ import { PanelGroup } from './bootstrap-import';
 type Props = {
   activeKey?: string,
   children: React.ReactNode,
-  id: string,
-  onSelect?: () => string,
 }
 
-const Accordion = ({ activeKey, children, id, onSelect, ...restProps }:Props) => {
+const Accordion = ({ activeKey, children, ...restProps }:Props) => {
   const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
 
   return (
-    <PanelGroup {...restProps}
-                activeKey={cleanActiveKey}
-                id={id}
-                onSelect={onSelect}
-                accordion>
+    <PanelGroup {...restProps} activeKey={cleanActiveKey} accordion>
       {children}
     </PanelGroup>
   );
@@ -43,13 +37,10 @@ const Accordion = ({ activeKey, children, id, onSelect, ...restProps }:Props) =>
 Accordion.propTypes = {
   activeKey: PropTypes.string,
   children: PropTypes.node.isRequired,
-  id: PropTypes.string.isRequired,
-  onSelect: PropTypes.func,
 };
 
 Accordion.defaultProps = {
   activeKey: undefined,
-  onSelect: () => {},
 };
 
 export default Accordion;

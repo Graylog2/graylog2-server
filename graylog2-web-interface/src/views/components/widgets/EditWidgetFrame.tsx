@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
+import { useStore } from 'stores/connect';
 import { Modal } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import WidgetContext from 'views/components/contexts/WidgetContext';
@@ -26,6 +28,8 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -71,6 +75,8 @@ const onSubmit = (values, widget: Widget) => {
 };
 
 const EditWidgetFrame = ({ children }: Props) => {
+  const config: SearchesConfig = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
+
   useEffect(() => {
     globalStyles.use();
 
@@ -83,6 +89,7 @@ const EditWidgetFrame = ({ children }: Props) => {
     return <Spinner text="Loading widget ..." />;
   }
 
+  const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds();
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
@@ -93,7 +100,7 @@ const EditWidgetFrame = ({ children }: Props) => {
            animation={false}
            dialogComponentClass={EditWidgetDialog}
            enforceFocus={false}>
-      <SearchBarForm initialValues={{ limitDuration: 0, timerange, streams, queryString }}
+      <SearchBarForm initialValues={{ limitDuration, timerange, streams, queryString }}
                      onSubmit={_onSubmit}>
         <div className={styles.gridContainer}>
           <IfDashboard>
