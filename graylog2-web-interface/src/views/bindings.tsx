@@ -18,6 +18,7 @@ import React from 'react';
 import { get } from 'lodash';
 
 import Routes from 'routing/Routes';
+import App from 'routing/App';
 import * as Permissions from 'views/Permissions';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
@@ -115,19 +116,19 @@ export default {
     search: { component: NewSearchPage },
   },
   routes: [
-    { path: newDashboardsPath, component: NewDashboardPage },
+    { path: newDashboardsPath, component: NewDashboardPage, parentComponent: App },
     { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: dashboardsPath, component: DashboardsPage },
-    { path: showDashboardsPath, component: ShowViewPage },
+    { path: showDashboardsPath, component: ShowViewPage, parentComponent: App },
 
     { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
-    { path: showSearchPath, component: ShowViewPage },
+    { path: showSearchPath, component: ShowViewPage, parentComponent: App },
     { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
-    { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage },
+    { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
 
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
-    { path: showViewsPath, component: ShowViewPage },
+    { path: showViewsPath, component: ShowViewPage, parentComponent: App },
   ],
   enterpriseWidgets: [
     {

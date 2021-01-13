@@ -136,7 +136,8 @@ const WrappedNotFoundPage = () => (
 const AppRouter = () => {
   const pluginRoutes = usePluginEntities('routes');
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map(renderPluginRoute);
-  const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map(renderPluginRoute);
+  const pluginRoutesWithAppParent = pluginRoutes.filter((route) => (route.parentComponent === App)).map(renderPluginRoute);
+  const pluginRoutesWithParent = pluginRoutes.filter((route) => (route.parentComponent && route.parentComponent !== App)).map(renderPluginRoute);
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
 
   return (
@@ -151,6 +152,7 @@ const AppRouter = () => {
                 <Switch>
                   <Route exact path={Routes.STARTPAGE} component={StartPage} />
                   {pluginRoutesWithParent}
+                  {pluginRoutesWithAppParent}
                   <Route exact path={Routes.SEARCH} component={DelegatedSearchPage} />
                   <Route path="/">
                     <AppWithoutSearchBar>
