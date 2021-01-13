@@ -61,6 +61,14 @@ const FlexCol = styled(Col)`
   justify-content: space-between;
 `;
 
+const StreamWrap = styled.div`
+  flex: 1;
+  
+  > div {
+    margin-right: 24px;
+  }
+`;
+
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   const newQuery = currentQuery.toBuilder()
     .timerange(timerange)
@@ -105,25 +113,28 @@ const SearchBar = ({
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
               <>
                 <TopRow>
-                  <FlexCol md={6}>
+                  <FlexCol md={5}>
                     <TimeRangeTypeSelector disabled={disableSearch} />
                     <TimeRangeDisplay timerange={values?.timerange} />
-                    <RefreshControls />
                   </FlexCol>
 
                   <Col mdHidden lgHidden>
                     <HorizontalSpacer />
                   </Col>
 
-                  <Col md={6}>
-                    <Field name="streams">
-                      {({ field: { name, value, onChange } }) => (
-                        <StreamsFilter value={value}
-                                       streams={availableStreams}
-                                       onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
-                      )}
-                    </Field>
-                  </Col>
+                  <FlexCol md={7}>
+                    <StreamWrap>
+                      <Field name="streams">
+                        {({ field: { name, value, onChange } }) => (
+                          <StreamsFilter value={value}
+                                         streams={availableStreams}
+                                         onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                        )}
+                      </Field>
+                    </StreamWrap>
+
+                    <RefreshControls />
+                  </FlexCol>
                 </TopRow>
 
                 <Row className="no-bm">
