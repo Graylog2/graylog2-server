@@ -68,27 +68,33 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 15px;
 `);
 
+const readableTimeRange = (range: number, placeholder: string) => {
+  return !range ? placeholder : moment()
+    .subtract(range * 1000)
+    .fromNow();
+};
+
 const dateOutput = (timerange: TimeRange) => {
-  let range = EMPTY_RANGE;
+  let from = EMPTY_RANGE;
+  let until = EMPTY_RANGE;
 
   if (!timerange) {
     return EMPTY_OUTPUT;
   }
 
   if ('range' in timerange) {
-    range = !timerange.range ? 'All Time' : moment()
-      .subtract(timerange.range * 1000)
-      .fromNow();
+    from = readableTimeRange(timerange.range, 'All Time');
+    until = readableTimeRange(timerange.offset, 'Now');
 
     return {
-      from: range,
-      until: 'Now',
+      from,
+      until,
     };
   }
 
   return {
-    from: timerange.from || range,
-    until: timerange.to || range,
+    from: timerange.from || from,
+    until: timerange.to || until,
   };
 };
 
