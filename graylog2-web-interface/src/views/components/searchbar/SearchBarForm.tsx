@@ -37,6 +37,7 @@ export const dateTimeValidate = (values) => {
     from?: string,
     to?: string,
     range?: string,
+    offset?: string
   } } = {};
 
   const { limitDuration, nextTimeRange } = values;

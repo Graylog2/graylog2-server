@@ -18,6 +18,8 @@ import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 
+import type { TimeRange } from 'views/logic/queries/Query';
+
 import OriginalRelativeTimeRangeSelector from './RelativeTimeRangeSelector';
 
 const defaultProps = {
@@ -27,7 +29,7 @@ const defaultProps = {
     type: 'relative',
     range: 3600,
   },
-};
+} as const;
 
 const initialValues = {
   nextTimeRange: defaultProps.originalTimeRange,
@@ -36,9 +38,7 @@ const initialValues = {
 type Props = {
   disabled: boolean,
   limitDuration: number,
-  originalTimeRange: {
-    range: string | number,
-  },
+  originalTimeRange: TimeRange,
 };
 
 const RelativeTimeRangeSelector = (allProps: Props) => (
