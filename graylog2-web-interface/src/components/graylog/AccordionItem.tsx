@@ -29,12 +29,16 @@ type Props = {
 const StyledPanel = styled(Panel)`
   border: 0;
   border-radius: 0;
+  box-shadow: none;
 `;
 
-const PanelHeading = styled(Panel.Heading)`
-  padding: 0;
-  border-radius: 0;
-`;
+const PanelHeading = styled(Panel.Heading)(({ theme }) => css`
+  && {
+    padding: 0;
+    border-radius: 0;
+    background-color: ${theme.colors.variant.lightest.default};
+  }
+`);
 
 const PanelTitle = styled(Panel.Title)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
@@ -47,9 +51,12 @@ const PanelTitle = styled(Panel.Title)(({ theme }) => css`
 `);
 
 const PanelBody = styled(Panel.Body)(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  border-top-color: ${theme.colors.variant.light.default} !important;
-  color: ${theme.colors.variant.darkest.default};
+  ${StyledPanel} > ${PanelHeading} + .panel-collapse > & {
+    background-color: ${theme.colors.global.contentBackground};
+    border-top-color: ${theme.colors.variant.lighter.default};
+    border-bottom-width: 0;
+    color: ${theme.colors.variant.darkest.default};
+  }
 `);
 
 const AccordionItem = ({ children, name, id, ...restProps }: Props) => {
