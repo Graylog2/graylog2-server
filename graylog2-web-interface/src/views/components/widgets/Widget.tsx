@@ -41,10 +41,11 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
+import { IconButton } from 'components/common';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -178,11 +179,13 @@ class Widget extends React.Component<Props, State> {
     }
   };
 
-  _onDuplicate = (widgetId) => {
+  _onDuplicate = (widgetId, setFocusWidget) => {
     const { title } = this.props;
 
     WidgetActions.duplicate(widgetId).then((newWidget) => {
-      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`);
+      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
+        setFocusWidget(undefined);
+      });
     });
   };
 
@@ -333,6 +336,8 @@ class Widget extends React.Component<Props, State> {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
     const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config, type } = widget;
+    const { focusedWidget, setFocusedWidget } = this.context;
+    const isFocusedWidget = focusedWidget === id;
     const visualization = this.visualize();
 
     if (editing) {
@@ -370,7 +375,7 @@ class Widget extends React.Component<Props, State> {
           <InteractiveContext.Consumer>
             {(interactive) => (
               <WidgetHeader title={title}
-                            hideDragHandle={!interactive}
+                            hideDragHandle={!interactive || isFocusedWidget}
                             loading={loading}
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
@@ -379,13 +384,18 @@ class Widget extends React.Component<Props, State> {
                     <IfDashboard>
                       <ReplaySearchButton />
                     </IfDashboard>
+                    <IconButton name={isFocusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
+                                title={isFocusedWidget ? 'Un-focus widget' : 'Focus this widget'}
+                                onClick={() => setFocusedWidget(id)} />
+                    {!isFocusedWidget && (
                     <WidgetHorizontalStretch widgetId={widget.id}
                                              widgetType={widget.type}
                                              onStretch={onPositionsChange}
                                              position={position} />
+                    )}
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                      <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
                       {type === MessagesWidget.type && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
@@ -422,5 +432,7 @@ class Widget extends React.Component<Props, State> {
     );
   }
 }
+
+Widget.contextType = WidgetFocusContext;
 
 export default connect(Widget, { view: ViewStore });

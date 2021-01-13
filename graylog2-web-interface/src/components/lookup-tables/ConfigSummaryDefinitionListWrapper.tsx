@@ -14,24 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import styled from 'styled-components';
 
-class BootstrapAccordion extends React.Component {
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-  };
+const ConfigSummaryDefinitionListWrapper = styled.div`
+  dl {
+    margin-top: 10px;
 
-  render() {
-    return (
-      <div id="bundles" className="panel-group">
-        {this.props.children}
-      </div>
-    );
+    dt {
+      float: left;
+      clear: left;
+    }
+
+    dd {
+      margin-left: 185px;
+      word-wrap: break-word;
+
+      :not(:last-child) {
+        border-bottom: 1px solid #ececec;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+      }
+    }
   }
-}
+`;
 
-export default BootstrapAccordion;
+export default ConfigSummaryDefinitionListWrapper;

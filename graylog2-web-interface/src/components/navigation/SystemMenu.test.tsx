@@ -86,7 +86,8 @@ describe('SystemMenu', () => {
     ${['users:list']}              | ${3}  | ${['Users and Teams']}
     ${['roles:read']}              | ${3}  | ${['Roles']}
     ${['dashboards:create', 'inputs:create', 'streams:create']} | ${4}  | ${['Content Packs']}
-    ${['inputs:edit']}             | ${4}  | ${['Lookup Tables', 'Sidecars']}
+    ${['inputs:edit']}             | ${3}  | ${['Lookup Tables']}
+    ${['sidecars:read']}           | ${3}  | ${['Sidecars']}
     ${['inputs:create']}           | ${3}  | ${['Pipelines']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });

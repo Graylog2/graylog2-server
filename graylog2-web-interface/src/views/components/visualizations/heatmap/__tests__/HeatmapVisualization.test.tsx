@@ -41,7 +41,7 @@ describe('HeatmapVisualization', () => {
       .visualization('heatmap')
       .build();
     const effectiveTimerange: AbsoluteTimeRange = { type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' };
-    const plotLayout = { yaxis: { type: 'category', fixedrange: true }, xaxis: { type: 'category', fixedrange: true }, plot_bgcolor: '#440154', margin: { b: 40 } };
+    const plotLayout = { yaxis: { type: 'category', fixedrange: true }, xaxis: { type: 'category', fixedrange: true }, margin: { b: 40 } };
     const plotChartData = [
       {
         type: 'heatmap',
@@ -52,7 +52,8 @@ describe('HeatmapVisualization', () => {
         text: [['count()', 'count()', 'count()', 'count()'], ['count()', 'count()', 'count()', 'count()']],
         customdata: [[217, 'None', 213, 'None'], ['None', 217, 'None', 230]],
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
-        colorscale: [[0, '#440154'], [0.05, '#481567'], [0.1, '#483677'], [0.15, '#453781'], [0.2, '#404788'], [0.3, '#39568c'], [0.35, '#33638d'], [0.4, '#2d708e'], [0.45, '#287d8e'], [0.5, '#238a8d'], [0.55, '#1f968b'], [0.6, '#20a387'], [0.65, '#29af7f'], [0.7, '#3cbb75'], [0.75, '#55c667'], [0.8, '#73d055'], [0.85, '#95d840'], [0.9, '#b8de29'], [0.95, '#dce319'], [1, '#fde725']],
+        colorscale: 'Viridis',
+        reversescale: false,
       },
     ];
 

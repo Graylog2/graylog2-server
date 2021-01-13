@@ -79,6 +79,8 @@ import {
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
+import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -102,6 +104,7 @@ VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfi
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
+VisualizationConfig.registerSubtype(HeatmapVisualization.type, HeatmapVisualizationConfig);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
@@ -203,18 +206,21 @@ export default {
       title: 'Chart',
       handler: ChartActionHandler,
       isEnabled: ({ type }) => type.isNumeric(),
+      resetFocus: true,
     },
     {
       type: 'aggregate',
       title: 'Show top values',
       handler: AggregateActionHandler,
       isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      resetFocus: true,
     },
     {
       type: 'statistics',
       title: 'Statistics',
       isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
       handler: FieldStatisticsHandler,
+      resetFocus: false,
     },
     {
       type: 'add-to-table',
@@ -222,6 +228,7 @@ export default {
       handler: AddToTableActionHandler,
       isEnabled: AddToTableActionHandler.isEnabled,
       isHidden: AddToTableActionHandler.isHidden,
+      resetFocus: false,
     },
     {
       type: 'remove-from-table',
@@ -229,18 +236,21 @@ export default {
       handler: RemoveFromTableActionHandler,
       isEnabled: RemoveFromTableActionHandler.isEnabled,
       isHidden: RemoveFromTableActionHandler.isHidden,
+      resetFocus: false,
     },
     {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       handler: AddToAllTablesActionHandler,
       isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      resetFocus: false,
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       handler: RemoveFromAllTablesActionHandler,
       isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      resetFocus: false,
     },
   ],
   valueActions: [
@@ -249,30 +259,35 @@ export default {
       title: 'Exclude from results',
       handler: new ExcludeFromQueryHandler().handle,
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
+      resetFocus: false,
     },
     {
       type: 'add-to-query',
       title: 'Add to query',
       handler: new AddToQueryHandler().handle,
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
+      resetFocus: false,
     },
     {
       type: 'show-bucket',
       title: 'Show documents for value',
       handler: ShowDocumentsHandler,
       isEnabled: ShowDocumentsHandler.isEnabled,
+      resetFocus: true,
     },
     {
       type: 'create-extractor',
       title: 'Create extractor',
       isEnabled: ({ type, contexts }) => (!!contexts.message && !type.isDecorated()),
       component: SelectExtractorType,
+      resetFocus: false,
     },
     {
       type: 'highlight-value',
       title: 'Highlight this value',
       handler: HighlightValueHandler,
       isEnabled: HighlightValueHandler.isEnabled,
+      resetFocus: false,
     },
   ],
   visualizationTypes: [
@@ -338,6 +353,10 @@ export default {
     {
       type: NumberVisualization.type,
       component: NumberVisualizationConfiguration,
+    },
+    {
+      type: HeatmapVisualization.type,
+      component: HeatmapVisualizationConfiguration,
     },
   ],
   creators: [
