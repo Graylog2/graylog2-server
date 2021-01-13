@@ -26,3 +26,4 @@ If you do not need the theme colors in your component
 const StyledElement = styled.div`
   opacity: 0.5;
 `;
+```
