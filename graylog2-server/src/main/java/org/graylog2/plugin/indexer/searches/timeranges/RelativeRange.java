@@ -18,19 +18,20 @@ package org.graylog2.plugin.indexer.searches.timeranges;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Seconds;
 
-import java.util.Map;
+import java.util.OptionalInt;
 
 @AutoValue
 @JsonTypeName(RelativeRange.RELATIVE)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
+@JsonDeserialize(builder = RelativeRange.Builder.class)
 public abstract class RelativeRange extends TimeRange {
 
     public static final String RELATIVE = "relative";
@@ -40,56 +41,86 @@ public abstract class RelativeRange extends TimeRange {
     public abstract String type();
 
     @JsonProperty
-    public abstract int range();
+    public abstract OptionalInt range();
+
+    @JsonProperty
+    public abstract OptionalInt from();
+
+    @JsonProperty
+    public abstract OptionalInt to();
 
     public int getRange() {
-        return range();
+        return range().orElse(0);
     }
 
     @Override
     @JsonIgnore
     public DateTime getFrom() {
         // TODO this should be computed once
-        if (range() > 0) {
-            return Tools.nowUTC().minus(Seconds.seconds(range()));
+        if (range().isPresent()) {
+            return Tools.nowUTC().minusSeconds(range().getAsInt());
         }
-        return new DateTime(0, DateTimeZone.UTC);
+
+        return Tools.nowUTC().minusSeconds(from().orElseThrow(() -> new IllegalStateException("Neither `range` nor `from` specified!")));
     }
 
     @Override
     @JsonIgnore
     public DateTime getTo() {
         // TODO this should be fixed
-        return Tools.nowUTC();
+        if (range().isPresent()) {
+            return Tools.nowUTC();
+        }
+
+        return Tools.nowUTC().minusSeconds(to().orElseThrow(() -> new IllegalStateException("Neither `range` nor `to` specified!")));
     }
 
-    @JsonCreator
-    public static RelativeRange create(@JsonProperty("type") String type, @JsonProperty("range") int range) throws InvalidRangeParametersException {
-        return builder().type(type).checkRange(range).build();
+    @JsonIgnore
+    public boolean isAllMessages() {
+        return range().orElse(-1) == 0;
     }
 
     public static RelativeRange create(int range) throws InvalidRangeParametersException {
-        return create(RELATIVE, range);
-    }
-
-    public static Builder builder() {
-        return new AutoValue_RelativeRange.Builder();
+        return Builder.builder()
+                .range(range)
+                .build();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract RelativeRange build();
+        abstract RelativeRange autoBuild();
 
+        @JsonProperty("type")
         public abstract Builder type(String type);
 
+        @JsonProperty("range")
         public abstract Builder range(int range);
+        abstract OptionalInt range();
 
-        // TODO replace with custom build()
-        public Builder checkRange(int range) throws InvalidRangeParametersException {
-            if (range < 0) {
-                throw new InvalidRangeParametersException("Range must not be negative");
+        @JsonProperty("from")
+        public abstract Builder from(int from);
+        abstract OptionalInt from();
+
+        @JsonProperty("to")
+        public abstract Builder to(int to);
+        abstract OptionalInt to();
+
+        public RelativeRange build() throws InvalidRangeParametersException {
+            if (range().isPresent() && (from().isPresent() || to().isPresent())) {
+                throw new InvalidRangeParametersException("Either `range` OR `from`/`to` must be specifed, not both!");
             }
-            return range(range);
+
+            if (range().isPresent()) {
+                if (range().getAsInt() < 0) {
+                    throw new InvalidRangeParametersException("Range must not be negative");
+                }
+            }
+            return autoBuild();
+        }
+
+        @JsonCreator
+        public static Builder builder() {
+            return new AutoValue_RelativeRange.Builder().type(RELATIVE);
         }
     }
 
