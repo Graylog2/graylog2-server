@@ -116,14 +116,13 @@ public abstract class RelativeRange extends TimeRange {
                 }
             }
 
-            if ((from().isPresent() && !to().isPresent()) || (to().isPresent() && !from().isPresent()) {
+            if ((from().isPresent() && !to().isPresent()) || (to().isPresent() && !from().isPresent())) {
                 throw new InvalidRangeParametersException("Both `from` and `to` must be specified!");
             }
 
             if ((from().isPresent() && to().isPresent()) && (to().getAsInt() > from().getAsInt())) {
                 throw new InvalidRangeParametersException("`from` must be greater than `to`!");
             }
-            
             return autoBuild();
         }
 
