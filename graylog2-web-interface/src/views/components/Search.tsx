@@ -19,11 +19,10 @@ import { useCallback, useEffect, useContext } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
+import PageContentLayout from 'components/layout/PageContentLayout';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 import connect from 'stores/connect';
-import Footer from 'components/layout/Footer';
-import AppContentGrid from 'components/layout/AppContentGrid';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
@@ -75,7 +74,7 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
   ` : '';
 });
 
-const SearchArea = styled(AppContentGrid)`
+const SearchArea = styled(PageContentLayout)`
   height: 100%;
   overflow-y: auto;
 
@@ -222,7 +221,6 @@ const Search = ({ location }: Props) => {
                               <HighlightMessageInQuery>
                                 <SearchResult />
                               </HighlightMessageInQuery>
-                              <Footer />
                             </SearchLayoutContainer>
                           )}
                         </ViewTypeContext.Consumer>

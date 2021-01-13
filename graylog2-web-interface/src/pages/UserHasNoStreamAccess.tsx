@@ -19,11 +19,10 @@ import * as React from 'react';
 import { DocumentTitle, Icon } from 'components/common';
 import { Alert, Row, Col } from 'components/graylog';
 import PageHeader from 'components/common/PageHeader';
-
-import AppWithoutSearchBar from '../routing/AppWithoutSearchBar';
+import PageContentLayout from 'components/layout/PageContentLayout';
 
 const UserHasNoStreamAccess = () => (
-  <AppWithoutSearchBar>
+  <PageContentLayout>
     <DocumentTitle title="No stream permissions.">
       <div>
         <PageHeader title="No stream permissions." />
@@ -37,7 +36,7 @@ const UserHasNoStreamAccess = () => (
         </Row>
       </div>
     </DocumentTitle>
-  </AppWithoutSearchBar>
+  </PageContentLayout>
 );
 
 export default UserHasNoStreamAccess;

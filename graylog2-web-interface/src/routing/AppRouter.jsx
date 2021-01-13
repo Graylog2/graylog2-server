@@ -18,8 +18,8 @@ import React from 'react';
 import { Redirect, Router, Route, Switch } from 'react-router-dom';
 
 import App from 'routing/App';
-import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
+import PageContentLayout from 'components/layout/PageContentLayout';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
@@ -127,12 +127,6 @@ const renderPluginRoute = ({ path, component: Component, parentComponent }) => {
   );
 };
 
-const WrappedNotFoundPage = () => (
-  <AppWithoutSearchBar>
-    <NotFoundPage />
-  </AppWithoutSearchBar>
-);
-
 const AppRouter = () => {
   const pluginRoutes = usePluginEntities('routes');
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map(renderPluginRoute);
@@ -151,11 +145,11 @@ const AppRouter = () => {
               <AppWithGlobalNotifications>
                 <Switch>
                   <Route exact path={Routes.STARTPAGE} component={StartPage} />
+                  <Route exact path={Routes.SEARCH} component={DelegatedSearchPage} />
                   {pluginRoutesWithParent}
                   {pluginRoutesWithAppParent}
-                  <Route exact path={Routes.SEARCH} component={DelegatedSearchPage} />
                   <Route path="/">
-                    <AppWithoutSearchBar>
+                    <PageContentLayout>
                       <Switch>
                         <Route exact path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
                         <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
@@ -306,14 +300,14 @@ const AppRouter = () => {
                                path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
                                component={SidecarEditCollectorPage} />
                         {standardPluginRoutes}
-                        <Route path="*" component={WrappedNotFoundPage} />
+                        <Route path="*" component={NotFoundPage} />
                       </Switch>
-                    </AppWithoutSearchBar>
+                    </PageContentLayout>
                   </Route>
-                  <Route exact path={Routes.NOTFOUND} component={WrappedNotFoundPage} />
+                  <Route exact path={Routes.NOTFOUND} component={NotFoundPage} />
                 </Switch>
               </AppWithGlobalNotifications>
-              <Route exact path={Routes.NOTFOUND} component={WrappedNotFoundPage} />
+              <Route exact path={Routes.NOTFOUND} component={NotFoundPage} />
             </App>
           </Route>
         </Switch>

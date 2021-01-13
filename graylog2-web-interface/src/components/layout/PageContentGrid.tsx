@@ -18,31 +18,26 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Col, Row } from 'components/graylog';
-import Footer from 'components/layout/Footer';
-import AppContentGrid from 'components/layout/AppContentGrid';
+import { Grid } from 'components/graylog';
 
 type Props = {
   children: React.ReactNode,
 };
 
-const StyledRow = styled(Row)`
-  margin-bottom: 0;
+const Container = styled.div`
+  padding: 15px 12px;
 `;
 
-const AppWithoutSearchBar = ({ children }: Props) => (
-  <AppContentGrid>
-    <StyledRow>
-      <Col md={12}>
-        {children}
-      </Col>
-    </StyledRow>
-    <Footer />
-  </AppContentGrid>
+const PageContentGrid = ({ children, ...rest }: Props) => (
+  <Container {...rest}>
+    <Grid fluid>
+      {children}
+    </Grid>
+  </Container>
 );
 
-AppWithoutSearchBar.propTypes = {
+PageContentGrid.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default AppWithoutSearchBar;
+export default PageContentGrid;
