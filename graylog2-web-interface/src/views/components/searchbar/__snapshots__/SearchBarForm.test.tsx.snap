@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SearchBarForm with TabAbsoluteTimeRange renders 1`] = `
+exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
 <DocumentFragment>
   .c0 {
   height: 100%;
@@ -729,6 +729,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   color: rgb(88,73,5);
 }
 
+.c11 {
+  color: #990606;
+  font-size: 0.79rem;
+  font-style: italic;
+  padding: 3px 3px 9px;
+  height: 1.5em;
+}
+
 .c1 {
   display: -webkit-box;
   display: -webkit-flex;
@@ -766,7 +774,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   padding-bottom: 0;
 }
 
-.c11 {
+.c12 {
   -webkit-flex: 0.75;
   -ms-flex: 0.75;
   flex: 0.75;
@@ -803,7 +811,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
             >
               <input
                 autocomplete="off"
-                class="c3 form-control"
+                class="c3 mousetrap form-control"
                 id="date-input-nextTimeRange[from]"
                 label=""
                 name="nextTimeRange[from]"
@@ -1411,9 +1419,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
             </span>
           </div>
         </div>
+        <span
+          class="c11"
+        >
+           
+        </span>
       </div>
       <div
-        class="c11"
+        class="c12"
       >
         <svg
           class="svg-inline--fa fa-arrow-right"
@@ -1431,7 +1444,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
             >
               <input
                 autocomplete="off"
-                class="c3 form-control"
+                class="c3 mousetrap form-control"
                 id="date-input-nextTimeRange[to]"
                 label=""
                 name="nextTimeRange[to]"
@@ -2039,6 +2052,11 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
             </span>
           </div>
         </div>
+        <span
+          class="c11"
+        >
+           
+        </span>
       </div>
     </div>
   </form>

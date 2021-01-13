@@ -20,7 +20,7 @@ import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import AbsoluteTimeInput from './AbsoluteTimeInput';
 
 const defaultProps = {
-  dateTime: '1955-05-11 06:15:00.000',
+  dateTime: '1955-05-11 06:15:00',
   range: 'from',
   onChange: jest.fn(),
 } as const;
@@ -43,41 +43,54 @@ describe('AbsoluteTimeInput', () => {
 
     fireEvent.click(toggleBtn);
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:00:00.000');
+    expect(defaultProps.onChange).toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:00:00');
 
     fireEvent.click(toggleBtn);
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:59:59.999');
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:59:59');
   });
 
-  it('does not allow non-numeric characters', () => {
+  it('reset non-numeric inputs to 0', () => {
     render(<AbsoluteTimeInput {...defaultProps} />);
 
     const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
 
-    fireEvent.change(inputHour, { target: { value: '/w!' } });
+    fireEvent.change(inputHour, { target: { value: '!' } });
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00.000');
+    expect(defaultProps.onChange).toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00');
   });
 
-  it('does allow proper value', () => {
+  it('allows numeric input', () => {
     render(<AbsoluteTimeInput {...defaultProps} />);
 
     const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
 
     fireEvent.change(inputHour, { target: { value: '10' } });
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 10:15:00.000');
+    expect(defaultProps.onChange).toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 10:15:00');
   });
 
   it('does not allow numbers over their maximum', () => {
     render(<AbsoluteTimeInput {...defaultProps} />);
 
     const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
+    const inputMinute = screen.getByRole('spinbutton', { name: /from minutes/i });
+    const inputSeconds = screen.getByRole('spinbutton', { name: /from seconds/i });
 
-    fireEvent.change(inputHour, { target: { value: '50' } });
+    fireEvent.change(inputHour, { target: { value: '99' } });
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:15:00.000');
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:15:00');
+
+    fireEvent.change(inputMinute, { target: { value: '999' } });
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 06:59:00');
+
+    fireEvent.change(inputSeconds, { target: { value: '999' } });
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 06:15:59');
   });
 
   it('does not try to parse an empty date', () => {
@@ -87,6 +100,7 @@ describe('AbsoluteTimeInput', () => {
 
     fireEvent.change(inputHour, { target: { value: '' } });
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00.000');
+    expect(defaultProps.onChange).toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00');
   });
 });
