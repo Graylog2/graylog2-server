@@ -78,8 +78,8 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                               name="nextTimeRange.range"
                               availableRangeTypes={availableRangeTypes}
                               disabled={disabled}
+                              disableUnsetRange={limitDuration !== 0}
                               unsetRangeLabel="All Time"
-                              limitDuration={limitDuration}
                               defaultRange={defaultRange}
                               title="From:" />
 
@@ -91,7 +91,6 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                               defaultRange={defaultOffset}
                               disabled={disabled}
                               unsetRangeLabel="Now"
-                              limitDuration={limitDuration}
                               title="Until:" />
     </RelativeWrapper>
   );

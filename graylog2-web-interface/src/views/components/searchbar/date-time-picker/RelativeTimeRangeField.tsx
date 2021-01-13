@@ -76,10 +76,10 @@ type Props = {
     label: 'Seconds' | 'Minutes' | 'Hours' | 'Days' | 'Weeks';
     value: 'seconds' | 'minutes' | 'hours' | 'days' | 'weeks';
   }>,
+  disableUnsetRange?: boolean,
   unsetRangeLabel: string,
   defaultRange: RelativeTimeRange['range'],
   disabled: boolean,
-  limitDuration: number,
   name: string,
   originalTimeRange: TimeRange,
   title: string
@@ -87,10 +87,10 @@ type Props = {
 
 const RelativeTimeRangeField = ({
   availableRangeTypes,
+  disableUnsetRange,
   unsetRangeLabel,
   defaultRange,
   disabled,
-  limitDuration,
   name,
   originalTimeRange,
   title,
@@ -136,14 +136,14 @@ const RelativeTimeRangeField = ({
         return (
           <RangeWrapper>
             <RangeTitle>{title}</RangeTitle>
-            <RangeCheck htmlFor={`${name}-not-a-range`} className={limitDuration !== 0 && 'shortened'}>
+            <RangeCheck htmlFor={`${name}-not-a-range`} className={disableUnsetRange && 'shortened'}>
               <input type="checkbox"
                      id={`${name}-not-a-range`}
                      value="0"
                      className="mousetrap"
                      checked={fromValue.rangeAllTime}
                      onChange={_onCheckAllTime}
-                     disabled={limitDuration !== 0} />{unsetRangeLabel}
+                     disabled={disableUnsetRange} />{unsetRangeLabel}
             </RangeCheck>
             <InputWrap>
               <Input id={`${name}-value`}
@@ -170,7 +170,7 @@ const RelativeTimeRangeField = ({
             <Ago />
             {error && (
               <ErrorMessage>
-                Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
+                {error}
               </ErrorMessage>
             )}
           </RangeWrapper>
@@ -178,6 +178,10 @@ const RelativeTimeRangeField = ({
       }}
     </Field>
   );
+};
+
+RelativeTimeRangeField.defaultProps = {
+  disableUnsetRange: false,
 };
 
 export default RelativeTimeRangeField;

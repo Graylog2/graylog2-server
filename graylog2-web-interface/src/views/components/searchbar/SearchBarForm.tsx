@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
@@ -58,7 +59,11 @@ export const dateTimeValidate = (values) => {
 
   if (nextTimeRange?.type === 'relative') {
     if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
-      errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+      errors.nextTimeRange = { range: `Admin has limited searching to ${moment.duration(-limitDuration, 'seconds').humanize(true)}` };
+    }
+
+    if (nextTimeRange.offset >= nextTimeRange.range) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, offset: 'Range end must be after range start' };
     }
   }
 
