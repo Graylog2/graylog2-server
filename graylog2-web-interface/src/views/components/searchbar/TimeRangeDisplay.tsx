@@ -52,8 +52,15 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 `);
 
+const readableTimeRange = (range: number, placeholder: string) => {
+  return !range ? placeholder : moment()
+    .subtract(range * 1000)
+    .fromNow();
+};
+
 const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
+  let until = EMPTY_RANGE;
 
   if (!timerange) {
     return EMPTY_OUTPUT;
@@ -61,13 +68,12 @@ const dateOutput = (timerange: TimeRange) => {
 
   switch (timerange.type) {
     case 'relative':
-      from = !timerange.range ? 'All Time' : moment()
-        .subtract(timerange.range * 1000)
-        .fromNow();
+      from = readableTimeRange(timerange.range, 'All Time');
+      until = readableTimeRange(timerange.offset, 'Now');
 
       return {
         from,
-        until: 'Now',
+        until,
       };
 
     case 'absolute':

@@ -35,6 +35,7 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
       return {
         type: timerange.type,
         range: timerange.range,
+        offset: timerange.offset,
       };
     case 'keyword':
       return timerange;

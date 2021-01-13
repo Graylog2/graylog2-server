@@ -33,7 +33,8 @@ export const Messages = {
 };
 
 export const DEFAULT_RANGE_TYPE = 'relative';
-export const DEFAULT_TIMERANGE: RelativeTimeRange = { type: DEFAULT_RANGE_TYPE, range: 300 };
+export const DEFAULT_TIMERANGE: RelativeTimeRange = { type: DEFAULT_RANGE_TYPE, range: 300, offset: undefined };
+export const DEFAULT_OFFSET_RANGE: RelativeTimeRange['offset'] = DEFAULT_TIMERANGE.range - 60;
 
 export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
@@ -50,6 +51,25 @@ export const TimeUnits = {
 };
 
 export type TimeUnit = keyof typeof TimeUnits;
+
+export const RELATIVE_RANGE_TYPES = [
+  {
+    type: 'seconds',
+    label: 'Seconds',
+  }, {
+    type: 'minutes',
+    label: 'Minutes',
+  }, {
+    type: 'hours',
+    label: 'Hours',
+  }, {
+    type: 'days',
+    label: 'Days',
+  }, {
+    type: 'weeks',
+    label: 'Weeks',
+  },
+] as const;
 
 export const viewsPath = '/views';
 export const showViewsPath = `${viewsPath}/:viewId`;

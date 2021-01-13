@@ -91,6 +91,7 @@ export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 export type RelativeTimeRange = {
   type: 'relative',
   range: number,
+  offset: number | undefined
 };
 
 export type AbsoluteTimeRange = {
