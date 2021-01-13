@@ -25,21 +25,20 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESAverageHandler;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESMaxHandler;
-import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -63,7 +62,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchBackendTestBase {
-    protected static final QueryStringParser queryStringParser = new QueryStringParser();
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -93,7 +91,6 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(bucketHandlers, seriesHandlers));
 
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
-                queryStringParser,
                 jestClient,
                 indexLookup,
                 new QueryStringDecorators.Fake(),
