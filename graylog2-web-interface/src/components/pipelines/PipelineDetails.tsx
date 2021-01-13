@@ -48,7 +48,7 @@ type Props = {
   pipeline?: PipelineType,
   create?: boolean,
   onChange: (event) => void,
-  onCancel?: (event) => void,
+  onCancel?: () => void,
 };
 
 const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
