@@ -85,10 +85,6 @@ const parseTimeValue = (value, type) => {
     if (timeValue > 23) {
       return 23;
     }
-  } else if (type === 'milliseconds') {
-    if (timeValue > 999) {
-      return 999;
-    }
   } else if (timeValue > 59) {
     return 59;
   }
@@ -100,7 +96,7 @@ const fieldUpdate = (value) => {
   const initialDateTime = moment(value).toObject();
 
   TIME_TYPES.forEach((type) => {
-    initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
+    initialDateTime[type] = zeroPad(initialDateTime[type]);
   });
 
   const handleChangeSetTime = (event) => {
@@ -112,7 +108,7 @@ const fieldUpdate = (value) => {
       [timeType]: timeValue,
     });
 
-    return newTime.format(DateTime.Formats.TIMESTAMP);
+    return newTime.format(DateTime.Formats.DATETIME);
   };
 
   const handleClickTimeNow = () => {
@@ -123,8 +119,7 @@ const fieldUpdate = (value) => {
       hours: newTime.hours,
       minutes: newTime.minutes,
       seconds: newTime.seconds,
-      milliseconds: newTime.milliseconds,
-    }).format(DateTime.Formats.TIMESTAMP);
+    }).format(DateTime.Formats.DATETIME);
   };
 
   const handleTimeToggle = (eod = false) => {
@@ -133,8 +128,7 @@ const fieldUpdate = (value) => {
       hours: eod ? 23 : 0,
       minutes: eod ? 59 : 0,
       seconds: eod ? 59 : 0,
-      milliseconds: eod ? 999 : 0,
-    }).format(DateTime.Formats.TIMESTAMP);
+    }).format(DateTime.Formats.DATETIME);
   };
 
   return {
@@ -211,14 +205,6 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
                              id={`${range}-time-seconds`}
                              title={`${range} seconds`}
                              value={initialDateTime.seconds ?? ''}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSelect}
-                             bsSize="sm" />
-          <StyledInputAddon>.</StyledInputAddon>
-          <StyledFormControl type="number"
-                             id={`${range}-time-milliseconds`}
-                             title={`${range} milliseconds`}
-                             value={initialDateTime.milliseconds ?? ''}
                              onChange={_onChangeSetTime}
                              onFocus={_onFocusSelect}
                              bsSize="sm" />
