@@ -51,7 +51,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
 
   const actions = [
     <Button key={`delete-stage-${stage}`} bsStyle="primary" onClick={onDelete}>Delete</Button>,
-    <StageForm key={`edit-stage-${stage}`} stage={stage} save={onUpdate} />,
+    <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,
   ];
 
   let description;

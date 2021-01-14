@@ -126,6 +126,10 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
       .map((stage) => _formatStage(stage, maxStage));
   }, [pipeline.stages]);
 
+  const stageKey = useMemo(() => {
+    return pipeline.stages.map(s => s.stage).join('-');
+  }, [pipeline.stages]);
+
   return (
     <div>
       {_connectionsWarning()}
@@ -152,7 +156,7 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
       <StyledRow className="row-sm">
         <Col md={12}>
           <div className="pull-right">
-            <StageForm create save={_saveStage} />
+            <StageForm key={stageKey} pipeline={pipeline} create save={_saveStage} />
           </div>
           <h2>Pipeline Stages</h2>
           <StyledP>

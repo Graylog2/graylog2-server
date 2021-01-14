@@ -15,30 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useCallback, useRef, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useStore } from 'stores/connect';
 import { Link } from 'components/graylog/router';
-import { Button, FormGroup, ControlLabel } from 'components/graylog';
+import { Button, ControlLabel, FormGroup } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-import { StageType } from 'stores/pipelines/PipelinesStore';
+import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 
 const { RulesStore } = CombinedProvider.get('Rules');
 
 type Props = {
+  pipeline: PipelineType,
   stage?: StageType,
   create: boolean,
   save: (nextStage: StageType, callback: () => void) => void,
 };
 
-const StageForm = ({ stage, create, save }: Props) => {
+const StageForm = ({ pipeline, stage, create, save }: Props) => {
   const modalRef = useRef<BootstrapModalForm>();
-  const [nextStage, setNextStage] = useState<StageType>(cloneDeep(stage));
+
+  const _initialStageNumber = useMemo(() => (
+    create ? Math.max(...pipeline.stages.map((s) => s.stage)) + 1 : stage.stage
+  ), [create, pipeline.stages, stage.stage]);
+
+  const [nextStage, setNextStage] = useState<StageType>({ ...stage, stage: _initialStageNumber });
   const { rules } = useStore(RulesStore);
 
   const openModal = () => {
@@ -63,15 +68,16 @@ const StageForm = ({ stage, create, save }: Props) => {
 
   const _onSaved = () => {
     _closeModal();
-
-    if (create) {
-      // Reset form after creation
-      setNextStage(cloneDeep(stage));
-    }
   };
 
+  const isOverridingStage = useMemo(() => (
+    nextStage.stage !== _initialStageNumber && pipeline.stages.some(({ stage: s }) => s === nextStage.stage)
+  ), [nextStage.stage, _initialStageNumber, pipeline.stages]);
+
   const _handleSave = () => {
-    save(nextStage, _onSaved);
+    if (!isOverridingStage) {
+      save(nextStage, _onSaved);
+    }
   };
 
   const _formatRuleOption = ({ title }) => {
@@ -112,7 +118,10 @@ const StageForm = ({ stage, create, save }: Props) => {
                  label="Stage"
                  autoFocus
                  onChange={_onChange}
-                 help="Stage priority. The lower the number, the earlier it will execute."
+                 bsStyle={isOverridingStage ? 'error' : null}
+                 help={isOverridingStage
+                   ? 'Stage is already in use, please use another number or edit the existing stage.'
+                   : 'Stage priority. The lower the number, the earlier it will execute.'}
                  value={nextStage.stage} />
 
           <FormGroup>
@@ -150,6 +159,7 @@ const StageForm = ({ stage, create, save }: Props) => {
 };
 
 StageForm.propTypes = {
+  pipeline: PropTypes.object.isRequired,
   stage: PropTypes.object,
   create: PropTypes.bool,
   save: PropTypes.func.isRequired,
