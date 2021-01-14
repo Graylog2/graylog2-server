@@ -17,6 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
 
 import { Grid } from 'components/graylog';
 import Footer from 'components/layout/Footer';
@@ -38,10 +39,12 @@ const Container = styled.div`
  */
 const PageContentLayout = ({ children, className }: Props) => (
   <Container className={className}>
-    <Grid fluid>
-      {children}
-    </Grid>
-    <Footer />
+    <WithGlobalAppNotifications>
+      <Grid fluid className="page-content-grid">
+        {children}
+      </Grid>
+      <Footer />
+    </WithGlobalAppNotifications>
   </Container>
 );
 

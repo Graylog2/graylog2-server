@@ -181,11 +181,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 10px;
   }
 
-  .alert {
-    margin-bottom: 0;
-    margin-top: 5px;
-  }
-
   .modal form {
     margin-bottom: 0;
   }

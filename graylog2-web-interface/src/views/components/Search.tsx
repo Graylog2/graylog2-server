@@ -81,7 +81,7 @@ const SearchArea = styled(PageContentLayout)(() => {
     height: 100%;
 
     ${focusedWidget && css`
-      > div {
+      .page-content-grid {
         height: ${focusedWidget ? 'calc(100% - 40px)' : 'auto'};
         margin-bottom: 15px;
       }
