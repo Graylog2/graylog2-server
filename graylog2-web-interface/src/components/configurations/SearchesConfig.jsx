@@ -32,6 +32,10 @@ function _queryTimeRangeLimitValidator(milliseconds) {
   return milliseconds >= 1;
 }
 
+function _relativeTimeRangeValidator(milliseconds, duration) {
+  return milliseconds >= 1 || duration === 'PT0S';
+}
+
 function _surroundingTimeRangeValidator(milliseconds) {
   return milliseconds >= 1;
 }
@@ -189,6 +193,7 @@ class SearchesConfig extends React.Component {
       limitEnabled,
       surroundingTimeRangeOptionsUpdate,
       surroundingFilterFields,
+      relativeTimeRangeOptionsUpdate,
       analysisDisabledFields,
     } = this.state;
     const duration = moment.duration(config.query_time_range_limit);
@@ -223,25 +228,26 @@ class SearchesConfig extends React.Component {
         </dl>
 
         <Row>
-          <Col md={5}>
+          <Col md={6}>
+            <strong>Relative time range options</strong>
+            <TimeRangeOptionsSummary options={config.relative_timerange_options} />
+          </Col>
+          <Col md={6}>
             <strong>Surrounding time range options</strong>
             <TimeRangeOptionsSummary options={config.surrounding_timerange_options} />
           </Col>
-          <Col md={7}>
-            <Row>
-              <Col lg={6} md={12}>
-                <strong>Surrounding search filter fields</strong>
-                <ul>
-                  {filterFields}
-                </ul>
-              </Col>
-              <Col lg={6} md={12}>
-                <strong>UI analysis disabled for fields</strong>
-                <ul>
-                  {analysisDisabledFieldsListItems}
-                </ul>
-              </Col>
-            </Row>
+          <Col md={6}>
+
+            <strong>Surrounding search filter fields</strong>
+            <ul>
+              {filterFields}
+            </ul>
+
+            <strong>UI analysis disabled for fields</strong>
+            <ul>
+              {analysisDisabledFieldsListItems}
+            </ul>
+
           </Col>
 
         </Row>
@@ -271,7 +277,11 @@ class SearchesConfig extends React.Component {
                                 validator={_queryTimeRangeLimitValidator}
                                 required />
             )}
-
+            <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || _buildTimeRangeOptions(config.relative_timerange_options)}
+                                  update={this._onRelativeTimeRangeOptionsUpdate}
+                                  validator={_relativeTimeRangeValidator}
+                                  title="Relative Timerange Options"
+                                  help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
             <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || _buildTimeRangeOptions(config.surrounding_timerange_options)}
                                   update={this._onSurroundingTimeRangeOptionsUpdate}
                                   validator={_surroundingTimeRangeValidator}
