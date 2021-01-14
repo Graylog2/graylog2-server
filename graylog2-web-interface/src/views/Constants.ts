@@ -19,7 +19,6 @@ import chroma from 'chroma-js';
 import { RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 
 export type FormikValues = {
-  limitDuration: number,
   nextTimeRange?: TimeRange,
   timerange: TimeRange,
   streams: Array<string>,
