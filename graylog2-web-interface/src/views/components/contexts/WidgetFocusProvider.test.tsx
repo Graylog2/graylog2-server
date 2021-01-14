@@ -51,7 +51,7 @@ describe('WidgetFocusProvider', () => {
       return (
         <>
           <button type="button" onClick={() => setFocusedWidget('click')}>Click</button>
-          <div>{focusedWidget}</div>
+          <div>{focusedWidget || 'No focus widget set'}</div>
         </>
       );
     };
@@ -94,10 +94,6 @@ describe('WidgetFocusProvider', () => {
     });
 
     renderSUT();
-    const clack = screen.findByText('clack');
-
-    waitFor(() => {
-      expect(clack).toBeEmptyDOMElement();
-    });
+    await screen.findByText('No focus widget set');
   });
 });
