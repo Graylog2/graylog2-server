@@ -35,17 +35,17 @@ import org.slf4j.LoggerFactory;
 
 public class SystemStatsModule extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(SystemStatsModule.class);
-    private final boolean disableOshi;
+    private final boolean disableNativeSystemStats;
 
-    public SystemStatsModule(boolean disableOshi) {
-        this.disableOshi = disableOshi;
+    public SystemStatsModule(boolean disableNativeSystemStats) {
+        this.disableNativeSystemStats = disableNativeSystemStats;
     }
 
     @Override
     protected void configure() {
         boolean oshiLoaded = false;
 
-        if(disableOshi) {
+        if(disableNativeSystemStats) {
             LOG.debug("OSHI disabled. Using JMX implementations.");
         } else {
             try {
