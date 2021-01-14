@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Row, Col, Alert } from 'components/graylog';
@@ -117,10 +117,14 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     );
   };
 
-  const maxStage = pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
-  const formattedStages = pipeline.stages
-    .sort((s1, s2) => s1.stage - s2.stage)
-    .map((stage) => _formatStage(stage, maxStage));
+  const maxStage = useMemo(() => {
+    return pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
+  }, [pipeline.stages]);
+  const formattedStages = useMemo(() => {
+    return pipeline.stages
+      .sort((s1, s2) => s1.stage - s2.stage)
+      .map((stage) => _formatStage(stage, maxStage));
+  }, [pipeline.stages]);
 
   return (
     <div>
