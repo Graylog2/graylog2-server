@@ -78,7 +78,7 @@ const FlexWrap = styled.div`
 const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Props) => {
   const [activeAccordion, setActiveAccordion] = useState();
   const toStartDate = moment(currentTimeRange.from).toDate();
-  const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : null;
+  const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
 
   const handleSelect = (nextKey) => {
     setActiveAccordion(nextKey ?? activeAccordion);

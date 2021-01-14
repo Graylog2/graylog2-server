@@ -26,7 +26,7 @@ import AbsoluteTimeInput from './AbsoluteTimeInput';
 
 type Props = {
   disabled: boolean,
-  startDate: Date,
+  startDate?: Date,
   range: 'to' | 'from',
   currentTimeRange: AbsoluteTimeRange,
 };
@@ -69,12 +69,13 @@ const AbsoluteCalendar = ({ disabled, startDate, currentTimeRange, range }: Prop
 AbsoluteCalendar.propTypes = {
   disabled: PropTypes.bool,
   currentTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
-  startDate: PropTypes.instanceOf(Date).isRequired,
+  startDate: PropTypes.instanceOf(Date),
   range: PropTypes.oneOf(['to', 'from']).isRequired,
 };
 
 AbsoluteCalendar.defaultProps = {
   disabled: false,
+  startDate: undefined,
 };
 
 export default AbsoluteCalendar;
