@@ -26,11 +26,11 @@ const Wrapper = styled.div`
   }
 `;
 
-const DisabledTimeRangeSelector = () => (
+const TabDisabledTimeRange = () => (
   <Wrapper>
     <h5>No Date/Time Override chosen.</h5>
     <p>Use the tabs above to choose a Date & Time Range to Search.</p>
   </Wrapper>
 );
 
-export default DisabledTimeRangeSelector;
+export default TabDisabledTimeRange;

@@ -21,12 +21,13 @@ import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { FormikValues } from 'views/Constants';
 
 import SearchBarForm from './SearchBarForm';
-import AbsoluteTimeRangeSelector from './date-time-picker/AbsoluteTimeRangeSelector';
+import TabAbsoluteTimeRange from './date-time-picker/TabAbsoluteTimeRange';
 
 describe('SearchBarForm', () => {
-  describe('with AbsoluteTimeRangeSelector', () => {
+  describe('with TabAbsoluteTimeRange', () => {
     it('renders', () => {
       const initialValues: FormikValues & { timerange: AbsoluteTimeRange } = {
+        limitDuration: 0,
         timerange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-17 10:04:30.329' },
         queryString: '*',
         streams: [],
@@ -35,9 +36,8 @@ describe('SearchBarForm', () => {
 
       const { asFragment } = render(
         <SearchBarForm onSubmit={() => {}}
-                       initialValues={initialValues}
-                       limitDuration={0}>
-          <AbsoluteTimeRangeSelector originalTimeRange={originalTimeRange} currentTimeRange={initialValues.timerange} />
+                       initialValues={initialValues}>
+          <TabAbsoluteTimeRange originalTimeRange={originalTimeRange} currentTimeRange={initialValues.timerange} />
         </SearchBarForm>,
       );
 
