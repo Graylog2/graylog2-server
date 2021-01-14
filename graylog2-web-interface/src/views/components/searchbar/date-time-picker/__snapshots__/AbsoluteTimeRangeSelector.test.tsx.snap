@@ -1,12 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
+exports[`AbsoluteTimeRangeSelector renders 1`] = `
 <DocumentFragment>
-  .c0 {
-  height: 100%;
-}
-
-.c4.btn-danger {
+  .c3.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -14,39 +10,39 @@ exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c4.btn-danger:hover {
+.c3.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c4.btn-danger.active {
+.c3.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c4.btn-danger.active:hover {
+.c3.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c4.btn-danger[disabled],
-.c4.btn-danger.disabled {
+.c3.btn-danger[disabled],
+.c3.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c4.btn-danger[disabled]:hover,
-.c4.btn-danger.disabled:hover {
+.c3.btn-danger[disabled]:hover,
+.c3.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c4.btn-default {
+.c3.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -54,39 +50,39 @@ exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c4.btn-default:hover {
+.c3.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c4.btn-default.active {
+.c3.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c4.btn-default.active:hover {
+.c3.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c4.btn-default[disabled],
-.c4.btn-default.disabled {
+.c3.btn-default[disabled],
+.c3.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c4.btn-default[disabled]:hover,
-.c4.btn-default.disabled:hover {
+.c3.btn-default[disabled]:hover,
+.c3.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c4.btn-info {
+.c3.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -94,39 +90,39 @@ exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c4.btn-info:hover {
+.c3.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c4.btn-info.active {
+.c3.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c4.btn-info.active:hover {
+.c3.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c4.btn-info[disabled],
-.c4.btn-info.disabled {
+.c3.btn-info[disabled],
+.c3.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c4.btn-info[disabled]:hover,
-.c4.btn-info.disabled:hover {
+.c3.btn-info[disabled]:hover,
+.c3.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c4.btn-link {
+.c3.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -134,39 +130,39 @@ exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c4.btn-link:hover {
+.c3.btn-link:hover {
   background-color: transparent;
   border-color: transparent;
   color: #410057;
 }
 
-.c4.btn-link.active {
+.c3.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c4.btn-link.active:hover {
+.c3.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: transparent;
   color: #410057;
 }
 
-.c4.btn-link[disabled],
-.c4.btn-link.disabled {
+.c3.btn-link[disabled],
+.c3.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c4.btn-link[disabled]:hover,
-.c4.btn-link.disabled:hover {
+.c3.btn-link[disabled]:hover,
+.c3.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c4.btn-primary {
+.c3.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -174,39 +170,39 @@ exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c4.btn-primary:hover {
+.c3.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c4.btn-primary.active {
+.c3.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c4.btn-primary.active:hover {
+.c3.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c4.btn-primary[disabled],
-.c4.btn-primary.disabled {
+.c3.btn-primary[disabled],
+.c3.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c4.btn-primary[disabled]:hover,
-.c4.btn-primary.disabled:hover {
+.c3.btn-primary[disabled]:hover,
+.c3.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c4.btn-success {
+.c3.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -214,39 +210,39 @@ exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c4.btn-success:hover {
+.c3.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c4.btn-success.active {
+.c3.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c4.btn-success.active:hover {
+.c3.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c4.btn-success[disabled],
-.c4.btn-success.disabled {
+.c3.btn-success[disabled],
+.c3.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c4.btn-success[disabled]:hover,
-.c4.btn-success.disabled:hover {
+.c3.btn-success[disabled]:hover,
+.c3.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c4.btn-warning {
+.c3.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -254,116 +250,116 @@ exports[`SearchBarForm with AbsoluteTimeRangeSelector renders 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c4.btn-warning:hover {
+.c3.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c4.btn-warning.active {
+.c3.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c4.btn-warning.active:hover {
+.c3.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c4.btn-warning[disabled],
-.c4.btn-warning.disabled {
+.c3.btn-warning[disabled],
+.c3.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c4.btn-warning[disabled]:hover,
-.c4.btn-warning.disabled:hover {
+.c3.btn-warning[disabled]:hover,
+.c3.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c3.form-control:not([type="range"]) {
+.c2.form-control:not([type="range"]) {
   color: #1f1f1f;
   background-color: #fff;
   border-color: #a6a6a6;
 }
 
-.c3.form-control:not([type="range"])::-webkit-input-placeholder {
+.c2.form-control:not([type="range"])::-webkit-input-placeholder {
   color: #9b9b9b;
 }
 
-.c3.form-control:not([type="range"])::-moz-placeholder {
+.c2.form-control:not([type="range"])::-moz-placeholder {
   color: #9b9b9b;
 }
 
-.c3.form-control:not([type="range"]):-ms-input-placeholder {
+.c2.form-control:not([type="range"]):-ms-input-placeholder {
   color: #9b9b9b;
 }
 
-.c3.form-control:not([type="range"])::placeholder {
+.c2.form-control:not([type="range"])::placeholder {
   color: #9b9b9b;
 }
 
-.c3.form-control:not([type="range"]):focus {
+.c2.form-control:not([type="range"]):focus {
   border-color: #7894ce;
   box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
 }
 
-.c3.form-control:not([type="range"])[disabled],
-.c3.form-control:not([type="range"])[readonly],
-fieldset[disabled] .c3.form-control:not([type="range"]) {
+.c2.form-control:not([type="range"])[disabled],
+.c2.form-control:not([type="range"])[readonly],
+fieldset[disabled] .c2.form-control:not([type="range"]) {
   background-color: #dddddd;
   color: #9b9b9b;
 }
 
-.c3.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
+.c2.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
   display: none;
 }
 
-.c7 {
+.c6 {
   color: #1f1f1f;
   background-color: #fff;
   border-color: #a6a6a6;
 }
 
-.c5 {
+.c4 {
   width: 100%;
 }
 
-.c5 .DayPicker-Day {
+.c4 .DayPicker-Day {
   min-width: 34px;
   max-width: 34px;
   min-height: 34px;
   max-height: 34px;
 }
 
-.c5 .DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside) {
+.c4 .DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside) {
   background-color: #cbbfd1;
   color: #270e2e;
 }
 
-.c5 .DayPicker-Day--today {
+.c4 .DayPicker-Day--today {
   color: #0063be;
 }
 
-.c5 .DayPicker-Day:focus {
+.c4 .DayPicker-Day:focus {
   outline-color: #702785;
 }
 
-.c5:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):focus {
+.c4:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):focus {
   outline-color: #702785;
 }
 
-.c5:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):hover {
+.c4:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):hover {
   background-color: #f2f0f4;
   color: #4b1a59;
 }
 
-.c6 {
+.c5 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -381,75 +377,75 @@ fieldset[disabled] .c3.form-control:not([type="range"]) {
   flex: 1;
 }
 
-.c6 b {
+.c5 b {
   padding: 0 3px;
 }
 
-.c10 {
+.c9 {
   padding: 0 6px 0 9px;
   width: 50px !important;
 }
 
-.c10.form-control:not([type="range"]) {
+.c9.form-control:not([type="range"]) {
   color: #1f1f1f;
   background-color: #fff;
   border-color: #a6a6a6;
 }
 
-.c10.form-control:not([type="range"])::-webkit-input-placeholder {
+.c9.form-control:not([type="range"])::-webkit-input-placeholder {
   color: #9b9b9b;
 }
 
-.c10.form-control:not([type="range"])::-moz-placeholder {
+.c9.form-control:not([type="range"])::-moz-placeholder {
   color: #9b9b9b;
 }
 
-.c10.form-control:not([type="range"]):-ms-input-placeholder {
+.c9.form-control:not([type="range"]):-ms-input-placeholder {
   color: #9b9b9b;
 }
 
-.c10.form-control:not([type="range"])::placeholder {
+.c9.form-control:not([type="range"])::placeholder {
   color: #9b9b9b;
 }
 
-.c10.form-control:not([type="range"]):focus {
+.c9.form-control:not([type="range"]):focus {
   border-color: #7894ce;
   box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
 }
 
-.c10.form-control:not([type="range"])[disabled],
-.c10.form-control:not([type="range"])[readonly],
-fieldset[disabled] .c10.form-control:not([type="range"]) {
+.c9.form-control:not([type="range"])[disabled],
+.c9.form-control:not([type="range"])[readonly],
+fieldset[disabled] .c9.form-control:not([type="range"]) {
   background-color: #dddddd;
   color: #9b9b9b;
 }
 
-.c10.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
+.c9.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
   display: none;
 }
 
-.c10:last-of-type {
+.c9:last-of-type {
   width: 60px !important;
 }
 
-.c8 {
+.c7 {
   padding: 0;
   background: #f3f3f3;
   font-weight: bold;
 }
 
-.c8:not(:first-child):not(:last-child) {
+.c7:not(:first-child):not(:last-child) {
   border-right: 0;
   border-left: 0;
   padding: 0 3px;
 }
 
-.c9 {
+.c8 {
   padding: 6px 9px;
   line-height: 1.1;
 }
 
-.c9.btn-danger {
+.c8.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -457,39 +453,39 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c9.btn-danger:hover {
+.c8.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c9.btn-danger.active {
+.c8.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c9.btn-danger.active:hover {
+.c8.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c9.btn-danger[disabled],
-.c9.btn-danger.disabled {
+.c8.btn-danger[disabled],
+.c8.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c9.btn-danger[disabled]:hover,
-.c9.btn-danger.disabled:hover {
+.c8.btn-danger[disabled]:hover,
+.c8.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c9.btn-default {
+.c8.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -497,39 +493,39 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c9.btn-default:hover {
+.c8.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c9.btn-default.active {
+.c8.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c9.btn-default.active:hover {
+.c8.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c9.btn-default[disabled],
-.c9.btn-default.disabled {
+.c8.btn-default[disabled],
+.c8.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c9.btn-default[disabled]:hover,
-.c9.btn-default.disabled:hover {
+.c8.btn-default[disabled]:hover,
+.c8.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c9.btn-info {
+.c8.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -537,39 +533,39 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c9.btn-info:hover {
+.c8.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c9.btn-info.active {
+.c8.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c9.btn-info.active:hover {
+.c8.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c9.btn-info[disabled],
-.c9.btn-info.disabled {
+.c8.btn-info[disabled],
+.c8.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c9.btn-info[disabled]:hover,
-.c9.btn-info.disabled:hover {
+.c8.btn-info[disabled]:hover,
+.c8.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c9.btn-link {
+.c8.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -577,39 +573,39 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c9.btn-link:hover {
+.c8.btn-link:hover {
   background-color: transparent;
   border-color: transparent;
   color: #410057;
 }
 
-.c9.btn-link.active {
+.c8.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c9.btn-link.active:hover {
+.c8.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: transparent;
   color: #410057;
 }
 
-.c9.btn-link[disabled],
-.c9.btn-link.disabled {
+.c8.btn-link[disabled],
+.c8.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c9.btn-link[disabled]:hover,
-.c9.btn-link.disabled:hover {
+.c8.btn-link[disabled]:hover,
+.c8.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c9.btn-primary {
+.c8.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -617,39 +613,39 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c9.btn-primary:hover {
+.c8.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c9.btn-primary.active {
+.c8.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c9.btn-primary.active:hover {
+.c8.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c9.btn-primary[disabled],
-.c9.btn-primary.disabled {
+.c8.btn-primary[disabled],
+.c8.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c9.btn-primary[disabled]:hover,
-.c9.btn-primary.disabled:hover {
+.c8.btn-primary[disabled]:hover,
+.c8.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c9.btn-success {
+.c8.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -657,39 +653,39 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c9.btn-success:hover {
+.c8.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c9.btn-success.active {
+.c8.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c9.btn-success.active:hover {
+.c8.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c9.btn-success[disabled],
-.c9.btn-success.disabled {
+.c8.btn-success[disabled],
+.c8.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c9.btn-success[disabled]:hover,
-.c9.btn-success.disabled:hover {
+.c8.btn-success[disabled]:hover,
+.c8.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c9.btn-warning {
+.c8.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -697,39 +693,39 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c9.btn-warning:hover {
+.c8.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c9.btn-warning.active {
+.c8.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c9.btn-warning.active:hover {
+.c8.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c9.btn-warning[disabled],
-.c9.btn-warning.disabled {
+.c8.btn-warning[disabled],
+.c8.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c9.btn-warning[disabled]:hover,
-.c9.btn-warning.disabled:hover {
+.c8.btn-warning[disabled]:hover,
+.c8.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c11 {
+.c10 {
   color: #990606;
   font-size: 0.79rem;
   font-style: italic;
@@ -737,7 +733,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   height: 1.5em;
 }
 
-.c1 {
+.c0 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -752,7 +748,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   justify-content: space-around;
 }
 
-.c2 {
+.c1 {
   -webkit-flex: 4;
   -ms-flex: 4;
   flex: 4;
@@ -770,11 +766,11 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
   flex-direction: column;
 }
 
-.c2 .DayPicker-wrapper {
+.c1 .DayPicker-wrapper {
   padding-bottom: 0;
 }
 
-.c12 {
+.c11 {
   -webkit-flex: 0.75;
   -ms-flex: 0.75;
   flex: 0.75;
@@ -794,13 +790,12 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
 
 <form
     action="#"
-    class="c0"
   >
     <div
-      class="c1"
+      class="c0"
     >
       <div
-        class="c2"
+        class="c1"
       >
         <div
           class="form-group"
@@ -811,19 +806,19 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
             >
               <input
                 autocomplete="off"
-                class="c3 mousetrap form-control"
+                class="c2 mousetrap form-control"
                 id="date-input-nextTimeRange[from]"
                 label=""
                 name="nextTimeRange[from]"
                 placeholder="YYYY-MM-DD HH:mm:ss"
                 type="text"
-                value="2020-01-16 10:04:30.329"
+                value="1955-05-11 06:15:00.000"
               />
               <span
                 class="input-group-btn"
               >
                 <button
-                  class="c4 btn btn-default"
+                  class="c3 btn btn-default"
                   title="Insert current date"
                   type="button"
                 >
@@ -836,7 +831,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
           </span>
         </div>
         <div
-          class="DayPicker c5"
+          class="DayPicker c4"
           lang="en"
         >
           <div
@@ -871,7 +866,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   role="heading"
                 >
                   <div>
-                    January 2020
+                    May 1955
                   </div>
                 </div>
                 <div
@@ -964,37 +959,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   >
                     <div
                       aria-disabled="true"
-                      aria-label="Sun Dec 29 2019"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      29
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Mon Dec 30 2019"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      30
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Tue Dec 31 2019"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      31
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Wed Jan 01 2020"
+                      aria-label="Sun May 01 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1004,7 +969,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Thu Jan 02 2020"
+                      aria-label="Mon May 02 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1014,7 +979,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Fri Jan 03 2020"
+                      aria-label="Tue May 03 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1024,7 +989,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Sat Jan 04 2020"
+                      aria-label="Wed May 04 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1032,14 +997,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       4
                     </div>
-                  </div>
-                  <div
-                    class="DayPicker-Week"
-                    role="row"
-                  >
                     <div
                       aria-disabled="true"
-                      aria-label="Sun Jan 05 2020"
+                      aria-label="Thu May 05 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1049,7 +1009,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Mon Jan 06 2020"
+                      aria-label="Fri May 06 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1059,7 +1019,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Tue Jan 07 2020"
+                      aria-label="Sat May 07 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1067,9 +1027,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       7
                     </div>
+                  </div>
+                  <div
+                    class="DayPicker-Week"
+                    role="row"
+                  >
                     <div
                       aria-disabled="true"
-                      aria-label="Wed Jan 08 2020"
+                      aria-label="Sun May 08 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1079,7 +1044,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Thu Jan 09 2020"
+                      aria-label="Mon May 09 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1089,7 +1054,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Fri Jan 10 2020"
+                      aria-label="Tue May 10 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--disabled"
                       role="gridcell"
@@ -1098,14 +1063,44 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                       10
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Sat Jan 11 2020"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      aria-disabled="false"
+                      aria-label="Wed May 11 1955"
+                      aria-selected="true"
+                      class="DayPicker-Day DayPicker-Day--selected"
                       role="gridcell"
                       tabindex="-1"
                     >
                       11
+                    </div>
+                    <div
+                      aria-disabled="false"
+                      aria-label="Thu May 12 1955"
+                      aria-selected="false"
+                      class="DayPicker-Day"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      12
+                    </div>
+                    <div
+                      aria-disabled="false"
+                      aria-label="Fri May 13 1955"
+                      aria-selected="false"
+                      class="DayPicker-Day"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      13
+                    </div>
+                    <div
+                      aria-disabled="false"
+                      aria-label="Sat May 14 1955"
+                      aria-selected="false"
+                      class="DayPicker-Day"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      14
                     </div>
                   </div>
                   <div
@@ -1113,40 +1108,10 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     role="row"
                   >
                     <div
-                      aria-disabled="true"
-                      aria-label="Sun Jan 12 2020"
+                      aria-disabled="false"
+                      aria-label="Sun May 15 1955"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      12
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Mon Jan 13 2020"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      13
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Tue Jan 14 2020"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      14
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Wed Jan 15 2020"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
@@ -1154,9 +1119,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Thu Jan 16 2020"
-                      aria-selected="true"
-                      class="DayPicker-Day DayPicker-Day--selected"
+                      aria-label="Mon May 16 1955"
+                      aria-selected="false"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
@@ -1164,7 +1129,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Fri Jan 17 2020"
+                      aria-label="Tue May 17 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1174,7 +1139,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Sat Jan 18 2020"
+                      aria-label="Wed May 18 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1182,14 +1147,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       18
                     </div>
-                  </div>
-                  <div
-                    class="DayPicker-Week"
-                    role="row"
-                  >
                     <div
                       aria-disabled="false"
-                      aria-label="Sun Jan 19 2020"
+                      aria-label="Thu May 19 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1199,7 +1159,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Mon Jan 20 2020"
+                      aria-label="Fri May 20 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1209,7 +1169,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Tue Jan 21 2020"
+                      aria-label="Sat May 21 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1217,9 +1177,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       21
                     </div>
+                  </div>
+                  <div
+                    class="DayPicker-Week"
+                    role="row"
+                  >
                     <div
                       aria-disabled="false"
-                      aria-label="Wed Jan 22 2020"
+                      aria-label="Sun May 22 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1229,7 +1194,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Thu Jan 23 2020"
+                      aria-label="Mon May 23 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1239,7 +1204,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Fri Jan 24 2020"
+                      aria-label="Tue May 24 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1249,7 +1214,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Sat Jan 25 2020"
+                      aria-label="Wed May 25 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1257,14 +1222,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       25
                     </div>
-                  </div>
-                  <div
-                    class="DayPicker-Week"
-                    role="row"
-                  >
                     <div
                       aria-disabled="false"
-                      aria-label="Sun Jan 26 2020"
+                      aria-label="Thu May 26 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1274,7 +1234,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Mon Jan 27 2020"
+                      aria-label="Fri May 27 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1284,7 +1244,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Tue Jan 28 2020"
+                      aria-label="Sat May 28 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1292,9 +1252,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       28
                     </div>
+                  </div>
+                  <div
+                    class="DayPicker-Week"
+                    role="row"
+                  >
                     <div
                       aria-disabled="false"
-                      aria-label="Wed Jan 29 2020"
+                      aria-label="Sun May 29 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1304,7 +1269,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Thu Jan 30 2020"
+                      aria-label="Mon May 30 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1314,7 +1279,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Fri Jan 31 2020"
+                      aria-label="Tue May 31 1955"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1324,13 +1289,43 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Sat Feb 01 2020"
+                      aria-label="Wed Jun 01 1955"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--outside"
                       role="gridcell"
                       tabindex="-1"
                     >
                       1
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Thu Jun 02 1955"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      2
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Fri Jun 03 1955"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      3
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Sat Jun 04 1955"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      4
                     </div>
                   </div>
                 </div>
@@ -1339,7 +1334,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
           </div>
         </div>
         <div
-          class="c6"
+          class="c5"
         >
           <div
             class="form-group"
@@ -1348,10 +1343,10 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
               class="input-group"
             >
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 <button
-                  class="c9 btn btn-sm btn-link"
+                  class="c8 btn btn-sm btn-link"
                   title="Toggle between beginning and end of day"
                   type="button"
                 >
@@ -1361,53 +1356,53 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 </button>
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="from-time-hours"
                 title="from hour"
                 type="number"
-                value="10"
+                value="06"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 :
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="from-time-minutes"
                 title="from minutes"
                 type="number"
-                value="04"
+                value="15"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 :
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="from-time-seconds"
                 title="from seconds"
                 type="number"
-                value="30"
+                value="00"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 .
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="from-time-milliseconds"
                 title="from milliseconds"
                 type="number"
-                value="329"
+                value="000"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 <button
-                  class="c9 btn btn-sm btn-link"
+                  class="c8 btn btn-sm btn-link"
                   title="Set to current local time"
                   type="button"
                 >
@@ -1420,20 +1415,20 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
           </div>
         </div>
         <span
-          class="c11"
+          class="c10"
         >
            
         </span>
       </div>
       <div
-        class="c12"
+        class="c11"
       >
         <svg
           class="svg-inline--fa fa-arrow-right"
         />
       </div>
       <div
-        class="c2"
+        class="c1"
       >
         <div
           class="form-group"
@@ -1444,19 +1439,19 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
             >
               <input
                 autocomplete="off"
-                class="c3 mousetrap form-control"
+                class="c2 mousetrap form-control"
                 id="date-input-nextTimeRange[to]"
                 label=""
                 name="nextTimeRange[to]"
                 placeholder="YYYY-MM-DD HH:mm:ss"
                 type="text"
-                value="2020-01-17 10:04:30.329"
+                value="1985-25-10 08:18:00.000"
               />
               <span
                 class="input-group-btn"
               >
                 <button
-                  class="c4 btn btn-default"
+                  class="c3 btn btn-default"
                   title="Insert current date"
                   type="button"
                 >
@@ -1469,7 +1464,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
           </span>
         </div>
         <div
-          class="DayPicker c5"
+          class="DayPicker c4"
           lang="en"
         >
           <div
@@ -1504,7 +1499,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   role="heading"
                 >
                   <div>
-                    January 2020
+                    January 2021
                   </div>
                 </div>
                 <div
@@ -1597,9 +1592,29 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   >
                     <div
                       aria-disabled="true"
-                      aria-label="Sun Dec 29 2019"
+                      aria-label="Sun Dec 27 2020"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      27
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Mon Dec 28 2020"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      28
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Tue Dec 29 2020"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
                       role="gridcell"
                       tabindex="-1"
                     >
@@ -1607,9 +1622,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Mon Dec 30 2019"
+                      aria-label="Wed Dec 30 2020"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
+                      class="DayPicker-Day DayPicker-Day--outside"
                       role="gridcell"
                       tabindex="-1"
                     >
@@ -1617,128 +1632,108 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Tue Dec 31 2019"
+                      aria-label="Thu Dec 31 2020"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled DayPicker-Day--outside"
+                      class="DayPicker-Day DayPicker-Day--outside"
                       role="gridcell"
                       tabindex="-1"
                     >
                       31
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Wed Jan 01 2020"
+                      aria-disabled="false"
+                      aria-label="Fri Jan 01 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="0"
                     >
                       1
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Thu Jan 02 2020"
+                      aria-disabled="false"
+                      aria-label="Sat Jan 02 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       2
                     </div>
+                  </div>
+                  <div
+                    class="DayPicker-Week"
+                    role="row"
+                  >
                     <div
-                      aria-disabled="true"
-                      aria-label="Fri Jan 03 2020"
+                      aria-disabled="false"
+                      aria-label="Sun Jan 03 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       3
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Sat Jan 04 2020"
+                      aria-disabled="false"
+                      aria-label="Mon Jan 04 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       4
                     </div>
-                  </div>
-                  <div
-                    class="DayPicker-Week"
-                    role="row"
-                  >
                     <div
-                      aria-disabled="true"
-                      aria-label="Sun Jan 05 2020"
+                      aria-disabled="false"
+                      aria-label="Tue Jan 05 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       5
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Mon Jan 06 2020"
+                      aria-disabled="false"
+                      aria-label="Wed Jan 06 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       6
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Tue Jan 07 2020"
+                      aria-disabled="false"
+                      aria-label="Thu Jan 07 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       7
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Wed Jan 08 2020"
+                      aria-disabled="false"
+                      aria-label="Fri Jan 08 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       8
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Thu Jan 09 2020"
+                      aria-disabled="false"
+                      aria-label="Sat Jan 09 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       9
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Fri Jan 10 2020"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      10
-                    </div>
-                    <div
-                      aria-disabled="true"
-                      aria-label="Sat Jan 11 2020"
-                      aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      11
                     </div>
                   </div>
                   <div
@@ -1746,40 +1741,60 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     role="row"
                   >
                     <div
-                      aria-disabled="true"
-                      aria-label="Sun Jan 12 2020"
+                      aria-disabled="false"
+                      aria-label="Sun Jan 10 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      10
+                    </div>
+                    <div
+                      aria-disabled="false"
+                      aria-label="Mon Jan 11 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      11
+                    </div>
+                    <div
+                      aria-disabled="false"
+                      aria-label="Tue Jan 12 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       12
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Mon Jan 13 2020"
+                      aria-disabled="false"
+                      aria-label="Wed Jan 13 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day DayPicker-Day--today"
                       role="gridcell"
                       tabindex="-1"
                     >
                       13
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Tue Jan 14 2020"
+                      aria-disabled="false"
+                      aria-label="Thu Jan 14 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       14
                     </div>
                     <div
-                      aria-disabled="true"
-                      aria-label="Wed Jan 15 2020"
+                      aria-disabled="false"
+                      aria-label="Fri Jan 15 2021"
                       aria-selected="false"
-                      class="DayPicker-Day DayPicker-Day--disabled"
+                      class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
@@ -1787,33 +1802,13 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Thu Jan 16 2020"
+                      aria-label="Sat Jan 16 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
                       tabindex="-1"
                     >
                       16
-                    </div>
-                    <div
-                      aria-disabled="false"
-                      aria-label="Fri Jan 17 2020"
-                      aria-selected="true"
-                      class="DayPicker-Day DayPicker-Day--selected"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      17
-                    </div>
-                    <div
-                      aria-disabled="false"
-                      aria-label="Sat Jan 18 2020"
-                      aria-selected="false"
-                      class="DayPicker-Day"
-                      role="gridcell"
-                      tabindex="-1"
-                    >
-                      18
                     </div>
                   </div>
                   <div
@@ -1822,7 +1817,27 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                   >
                     <div
                       aria-disabled="false"
-                      aria-label="Sun Jan 19 2020"
+                      aria-label="Sun Jan 17 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      17
+                    </div>
+                    <div
+                      aria-disabled="false"
+                      aria-label="Mon Jan 18 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      18
+                    </div>
+                    <div
+                      aria-disabled="false"
+                      aria-label="Tue Jan 19 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1832,7 +1847,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Mon Jan 20 2020"
+                      aria-label="Wed Jan 20 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1842,7 +1857,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Tue Jan 21 2020"
+                      aria-label="Thu Jan 21 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1852,7 +1867,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Wed Jan 22 2020"
+                      aria-label="Fri Jan 22 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1862,7 +1877,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Thu Jan 23 2020"
+                      aria-label="Sat Jan 23 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1870,9 +1885,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       23
                     </div>
+                  </div>
+                  <div
+                    class="DayPicker-Week"
+                    role="row"
+                  >
                     <div
                       aria-disabled="false"
-                      aria-label="Fri Jan 24 2020"
+                      aria-label="Sun Jan 24 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1882,7 +1902,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Sat Jan 25 2020"
+                      aria-label="Mon Jan 25 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1890,14 +1910,9 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       25
                     </div>
-                  </div>
-                  <div
-                    class="DayPicker-Week"
-                    role="row"
-                  >
                     <div
                       aria-disabled="false"
-                      aria-label="Sun Jan 26 2020"
+                      aria-label="Tue Jan 26 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1907,7 +1922,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Mon Jan 27 2020"
+                      aria-label="Wed Jan 27 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1917,7 +1932,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Tue Jan 28 2020"
+                      aria-label="Thu Jan 28 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1927,7 +1942,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Wed Jan 29 2020"
+                      aria-label="Fri Jan 29 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1937,7 +1952,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="false"
-                      aria-label="Thu Jan 30 2020"
+                      aria-label="Sat Jan 30 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1945,9 +1960,14 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     >
                       30
                     </div>
+                  </div>
+                  <div
+                    class="DayPicker-Week"
+                    role="row"
+                  >
                     <div
                       aria-disabled="false"
-                      aria-label="Fri Jan 31 2020"
+                      aria-label="Sun Jan 31 2021"
                       aria-selected="false"
                       class="DayPicker-Day"
                       role="gridcell"
@@ -1957,13 +1977,63 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                     </div>
                     <div
                       aria-disabled="true"
-                      aria-label="Sat Feb 01 2020"
+                      aria-label="Mon Feb 01 2021"
                       aria-selected="false"
                       class="DayPicker-Day DayPicker-Day--outside"
                       role="gridcell"
                       tabindex="-1"
                     >
                       1
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Tue Feb 02 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      2
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Wed Feb 03 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      3
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Thu Feb 04 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      4
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Fri Feb 05 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      5
+                    </div>
+                    <div
+                      aria-disabled="true"
+                      aria-label="Sat Feb 06 2021"
+                      aria-selected="false"
+                      class="DayPicker-Day DayPicker-Day--outside"
+                      role="gridcell"
+                      tabindex="-1"
+                    >
+                      6
                     </div>
                   </div>
                 </div>
@@ -1972,7 +2042,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
           </div>
         </div>
         <div
-          class="c6"
+          class="c5"
         >
           <div
             class="form-group"
@@ -1981,10 +2051,10 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
               class="input-group"
             >
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 <button
-                  class="c9 btn btn-sm btn-link"
+                  class="c8 btn btn-sm btn-link"
                   title="Toggle between beginning and end of day"
                   type="button"
                 >
@@ -1994,53 +2064,53 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
                 </button>
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="to-time-hours"
                 title="to hour"
                 type="number"
-                value="10"
+                value="NaN"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 :
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="to-time-minutes"
                 title="to minutes"
                 type="number"
-                value="04"
+                value="NaN"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 :
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="to-time-seconds"
                 title="to seconds"
                 type="number"
-                value="30"
+                value="NaN"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 .
               </span>
               <input
-                class="c10 form-control input-sm"
+                class="c9 form-control input-sm"
                 id="to-time-milliseconds"
                 title="to milliseconds"
                 type="number"
-                value="329"
+                value="NaN"
               />
               <span
-                class="c7 input-group-addon c8"
+                class="c6 input-group-addon c7"
               >
                 <button
-                  class="c9 btn btn-sm btn-link"
+                  class="c8 btn btn-sm btn-link"
                   title="Set to current local time"
                   type="button"
                 >
@@ -2053,7 +2123,7 @@ fieldset[disabled] .c10.form-control:not([type="range"]) {
           </div>
         </div>
         <span
-          class="c11"
+          class="c10"
         >
            
         </span>
