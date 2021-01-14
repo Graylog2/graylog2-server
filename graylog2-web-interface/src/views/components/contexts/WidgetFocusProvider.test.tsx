@@ -15,14 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Map } from 'immutable';
 import { useContext } from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 import { asMock } from 'helpers/mocking';
 
-import { useStore } from 'stores/connect';
+import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import Widget from 'views/logic/widgets/Widget';
 
 const mockHistoryReplace = jest.fn();
 
@@ -37,10 +39,11 @@ jest.mock('react-router-dom', () => ({
   })),
 }));
 
-jest.mock('stores/connect', () => ({
-  useStore: jest.fn(() => ({
-    has: jest.fn(() => true),
-  })),
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetStore: {
+    getInitialState: jest.fn(() => ({ has: jest.fn(() => true) })),
+    listen: jest.fn(),
+  },
 }));
 
 describe('WidgetFocusProvider', () => {
@@ -74,6 +77,8 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should set focused widget from url', async () => {
+    asMock(WidgetStore.getInitialState).mockReturnValue(Map({ clack: Widget.builder().build() }));
+
     useLocation.mockReturnValue({
       pathname: '',
       search: 'focused=clack',
@@ -84,9 +89,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should not set focused widget from url if the widget does not exist', async () => {
-    asMock(useStore).mockReturnValue({
-      has: jest.fn(() => false),
-    });
+    asMock(WidgetStore.getInitialState).mockReturnValue(Map());
 
     useLocation.mockReturnValue({
       pathname: '',
