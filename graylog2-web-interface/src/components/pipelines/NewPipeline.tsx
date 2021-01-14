@@ -20,38 +20,41 @@ import React from 'react';
 import { Row, Col } from 'components/graylog';
 import history from 'util/History';
 import Routes from 'routing/Routes';
+import { PipelineType } from 'stores/pipelines/PipelinesStore';
 
 import PipelineDetails from './PipelineDetails';
 
-class NewPipeline extends React.Component {
-  static propTypes = {
-    onChange: PropTypes.func.isRequired,
-  };
+type Props = {
+  onChange: (pipeline: PipelineType, callback?: (pipeline: PipelineType) => void) => void;
+};
 
-  _onChange = (newPipeline) => {
-    this.props.onChange(newPipeline, this._goToPipeline);
-  };
-
-  _goToPipeline = (pipeline) => {
+const NewPipeline = ({ onChange }: Props) => {
+  const _goToPipeline = (pipeline) => {
     history.push(Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id));
   };
 
-  _goBack = () => {
+  const _goBack = () => {
     history.goBack();
   };
 
-  render() {
-    return (
-      <Row>
-        <Col md={6}>
-          <p>
-            Give a name and description to the new pipeline. You can add stages to it when you save the changes.
-          </p>
-          <PipelineDetails create onChange={this._onChange} onCancel={this._goBack} />
-        </Col>
-      </Row>
-    );
-  }
-}
+  const _onChange = (newPipeline) => {
+    onChange(newPipeline, _goToPipeline);
+  };
+
+  return (
+    <Row>
+      <Col md={6}>
+        <p>
+          Give a name and description to the new pipeline. You can add stages to it when you save the changes.
+        </p>
+        <PipelineDetails create onChange={_onChange} onCancel={_goBack} />
+      </Col>
+    </Row>
+  );
+};
+
+NewPipeline.propTypes = {
+  onChange: PropTypes.func.isRequired,
+};
 
 export default NewPipeline;
