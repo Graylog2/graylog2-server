@@ -125,7 +125,7 @@ export default {
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
     { path: `${Routes.unqualified.stream_search(':streamId')}/new`, component: NewSearchRedirectPage, parentComponent: null },
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
-    { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
+    { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use, parentComponent: App },
 
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
