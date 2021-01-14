@@ -77,14 +77,6 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
     }
   };
 
-  const _resetForm = () => {
-    setConnectedStreams(formatStreams(initialStreamConnections));
-  };
-
-  const _saved = () => {
-    _closeModal();
-  };
-
   const _save = () => {
     const streamIds = connectedStreams.map((cs) => cs.value);
     const newConnection = {
@@ -92,7 +84,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
       streams: streamIds,
     };
 
-    save(newConnection, _saved);
+    save(newConnection, _closeModal);
   };
 
   const streamsHelp = (
@@ -110,7 +102,6 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
       <BootstrapModalForm ref={modalRef}
                           title={<span>Edit connections for <em>{pipeline.title}</em></span>}
                           onSubmitForm={_save}
-                          onCancel={_resetForm}
                           submitButtonText="Save">
         <fieldset>
           <FormGroup id="streamsConnections">
