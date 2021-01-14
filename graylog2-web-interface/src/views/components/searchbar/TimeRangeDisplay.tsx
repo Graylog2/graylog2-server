@@ -34,7 +34,7 @@ const ToolsStore = StoreProvider.getStore('Tools');
 const TimeRangeWrapper = styled.p(({ theme }) => css`
   width: 100%;
   padding: 3px 9px;
-  margin: 0 12px;
+  margin: 0 0 0 12px;
   display: flex;
   justify-content: space-around;
   background-color: ${theme.colors.variant.lightest.primary};
