@@ -18,35 +18,40 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Col, Row } from 'components/graylog';
+import { Grid } from 'components/graylog';
 import Footer from 'components/layout/Footer';
-import PageContentGrid from 'components/layout/PageContentGrid';
 
 type Props = {
   children: React.ReactNode,
+  className?: string
 };
 
-const StyledRow = styled(Row)`
-  margin-bottom: 0;
+const Container = styled.div`
+  height: 100%;
+  overflow: auto;
+  padding: 15px;
 `;
 
 /*
  * Provides the basic layout for the page content section.
  * The section includes all page specific components, but not elements like the navigation or sidebar.
  */
-const PageContentLayout = ({ children }: Props) => (
-  <PageContentGrid>
-    <StyledRow>
-      <Col md={12}>
-        {children}
-      </Col>
-    </StyledRow>
+const PageContentLayout = ({ children, className }: Props) => (
+  <Container className={className}>
+    <Grid fluid>
+      {children}
+    </Grid>
     <Footer />
-  </PageContentGrid>
+  </Container>
 );
 
 PageContentLayout.propTypes = {
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+PageContentLayout.defaultProps = {
+  className: undefined,
 };
 
 export default PageContentLayout;

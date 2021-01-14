@@ -47,7 +47,6 @@ const StyledFooter = styled.footer(({ theme }) => css`
   text-align: center;
   font-size: ${theme.fonts.size.small};
   color: ${theme.colors.gray[70]};
-  margin-bottom: 15px;
   height: 20px;
 
   @media print {

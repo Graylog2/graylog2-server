@@ -74,21 +74,27 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
   ` : '';
 });
 
-const SearchArea = styled(PageContentLayout)`
-  height: 100%;
-  overflow-y: auto;
+const SearchArea = styled(PageContentLayout)(() => {
+  const { focusedWidget } = useContext(WidgetFocusContext);
 
-  .container-fluid {
+  return css`
     height: 100%;
-  }
-`;
 
-const SearchLayoutContainer = styled.div(({ isDashboard }: { isDashboard: boolean }) => {
+    ${focusedWidget && css`
+      > div {
+        height: ${focusedWidget ? 'calc(100% - 40px)' : 'auto'};
+        margin-bottom: 15px;
+      }
+    `}
+  `;
+});
+
+const SearchAreaGrid = styled.div(({ isDashboard }: { isDashboard: boolean }) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   const grid = isDashboard
-    ? 'grid-template-rows: min-content min-content auto min-content;'
-    : 'grid-template-rows: min-content auto min-content;';
+    ? 'grid-template-rows: min-content min-content auto;'
+    : 'grid-template-rows: min-content auto;';
 
   return css`
     height: 100%;
@@ -202,7 +208,7 @@ const Search = ({ location }: Props) => {
                       <SearchArea>
                         <ViewTypeContext.Consumer>
                           {(viewType) => (
-                            <SearchLayoutContainer isDashboard={viewType === 'DASHBOARD'}>
+                            <SearchAreaGrid isDashboard={viewType === 'DASHBOARD'}>
                               <IfInteractive>
                                 <HeaderElements />
                                 <IfDashboard>
@@ -221,7 +227,7 @@ const Search = ({ location }: Props) => {
                               <HighlightMessageInQuery>
                                 <SearchResult />
                               </HighlightMessageInQuery>
-                            </SearchLayoutContainer>
+                            </SearchAreaGrid>
                           )}
                         </ViewTypeContext.Consumer>
                       </SearchArea>
