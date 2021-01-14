@@ -174,11 +174,11 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.15.0</testcontainers.version>
+        <testcontainers.version>1.15.1</testcontainers.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v12.13.1</nodejs.version>
-        <yarn.version>v1.19.2</yarn.version>
+        <nodejs.version>v14.15.4</nodejs.version>
+        <yarn.version>v1.22.5</yarn.version>
 
         <!-- Plugin versions -->
         <license-maven.version>4.0.rc2</license-maven.version>

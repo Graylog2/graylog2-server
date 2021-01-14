@@ -22,7 +22,7 @@ import AccordionItem from './AccordionItem';
 
 describe('Accordion', () => {
   it('should render with all Items closed', () => {
-    render(
+    const { container } = render(
       <Accordion id="accordion-test">
         <AccordionItem name="Example A">
           <h4>A as in Apple</h4>
@@ -38,17 +38,19 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    // @ts-ignore
     const expandedButtons = screen.queryAllByRole('button', { expanded: false });
-    // @ts-ignore
-    const expandedTabs = screen.queryAllByRole('tabpanel', { expanded: true });
+    const tab1 = container.querySelector('#accordion-test-body-example-a');
+    const tab2 = container.querySelector('#accordion-test-body-example-2');
+    const tab3 = container.querySelector('#accordion-test-body-example-iii');
 
     expect(expandedButtons.length).toBe(3);
-    expect(expandedTabs.length).toBe(0);
+    expect(tab1).not.toHaveClass('in');
+    expect(tab2).not.toHaveClass('in');
+    expect(tab3).not.toHaveClass('in');
   });
 
   it('should render with one item opened', () => {
-    render(
+    const { container } = render(
       <Accordion onSelect={jest.fn()}
                  id="accordion-test"
                  activeKey="example-a">
@@ -66,17 +68,19 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    // @ts-ignore
     const expandedButtons = screen.queryAllByRole('button', { expanded: false });
-    // @ts-ignore
-    const expandedTabs = screen.queryAllByRole('tabpanel', { expanded: true });
+    const tab1 = container.querySelector('#accordion-test-body-example-a');
+    const tab2 = container.querySelector('#accordion-test-body-example-2');
+    const tab3 = container.querySelector('#accordion-test-body-example-iii');
 
     expect(expandedButtons.length).toBe(2);
-    expect(expandedTabs.length).toBe(1);
+    expect(tab1).toHaveClass('in');
+    expect(tab2).not.toHaveClass('in');
+    expect(tab3).not.toHaveClass('in');
   });
 
   it('should render with activeKey as regular string', () => {
-    render(
+    const { container } = render(
       <Accordion onSelect={jest.fn()}
                  id="accordion-test"
                  activeKey="Example 2">
@@ -94,12 +98,14 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    // @ts-ignore
     const expandedButtons = screen.queryAllByRole('button', { expanded: false });
-    // @ts-ignore
-    const expandedTabs = screen.queryAllByRole('tabpanel', { expanded: true });
+    const tab1 = container.querySelector('#accordion-test-body-example-a');
+    const tab2 = container.querySelector('#accordion-test-body-example-2');
+    const tab3 = container.querySelector('#accordion-test-body-example-iii');
 
     expect(expandedButtons.length).toBe(2);
-    expect(expandedTabs.length).toBe(1);
+    expect(tab1).not.toHaveClass('in');
+    expect(tab2).toHaveClass('in');
+    expect(tab3).not.toHaveClass('in');
   });
 });
