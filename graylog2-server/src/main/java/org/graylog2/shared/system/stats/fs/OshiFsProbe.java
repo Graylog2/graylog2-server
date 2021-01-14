@@ -203,7 +203,7 @@ public class OshiFsProbe implements FsProbe {
 
             @Override
             public long getTotalSpace() {
-                return 0;
+                return 1;
             }
 
             @Override
@@ -213,7 +213,7 @@ public class OshiFsProbe implements FsProbe {
 
             @Override
             public long getTotalInodes() {
-                return 0;
+                return 1;
             }
 
             @Override
