@@ -77,7 +77,7 @@ public class OshiFsProbe implements FsProbe {
                                 // First try search for the diskstore with the logical volume or volume name
                                 Optional<HWDiskStore> diskStore = hardware.getDiskStores().stream()
                                         .filter(ds -> ds.getName().equals(StringUtils.defaultIfEmpty(fs.getLogicalVolume(), fs.getVolume())))
-                                        .findFirst(); //.orElse(generateDummyDiskStore());
+                                        .findFirst();
                                 if (diskStore.isPresent()) {
                                     return new Pair<>(fs, diskStore.get());
                                 }
