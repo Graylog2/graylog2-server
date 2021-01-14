@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.OptionalInt;
 
@@ -58,7 +59,10 @@ public abstract class RelativeRange extends TimeRange {
     public DateTime getFrom() {
         // TODO this should be computed once
         if (range().isPresent()) {
-            return Tools.nowUTC().minusSeconds(range().getAsInt());
+            final int range = range().getAsInt();
+            return range > 0
+                ? Tools.nowUTC().minusSeconds(range().getAsInt())
+                : new DateTime(0, DateTimeZone.UTC);
         }
 
         return Tools.nowUTC().minusSeconds(from().orElseThrow(() -> new IllegalStateException("Neither `range` nor `from` specified!")));
