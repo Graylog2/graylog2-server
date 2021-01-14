@@ -725,6 +725,14 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
   color: rgb(88,73,5);
 }
 
+.c8 {
+  color: #990606;
+  font-size: 0.79rem;
+  font-style: italic;
+  padding: 3px 3px 9px;
+  height: 1.5em;
+}
+
 <form
     action="#"
   >
@@ -737,7 +745,7 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
         >
           <input
             autocomplete="off"
-            class="c0 form-control"
+            class="c0 mousetrap form-control"
             id="date-input-nextTimeRange[from]"
             label=""
             name="nextTimeRange[from]"
@@ -1345,6 +1353,11 @@ fieldset[disabled] .c7.form-control:not([type="range"]) {
         </span>
       </div>
     </div>
+    <span
+      class="c8"
+    >
+       
+    </span>
   </form>
 </DocumentFragment>
 `;
