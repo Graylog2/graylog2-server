@@ -22,21 +22,19 @@ import PageHeader from 'components/common/PageHeader';
 import PageContentLayout from 'components/layout/PageContentLayout';
 
 const UserHasNoStreamAccess = () => (
-  <PageContentLayout>
-    <DocumentTitle title="No stream permissions.">
-      <div>
-        <PageHeader title="No stream permissions." />
-        <Row className="content">
-          <Col md={12}>
-            <Alert bsStyle="warning">
-              <Icon name="info-circle" />&nbsp;We cannot start a search right now, because you are not allowed to access any stream.
-              If you feel this is an error, please contact your administrator.
-            </Alert>
-          </Col>
-        </Row>
-      </div>
-    </DocumentTitle>
-  </PageContentLayout>
+  <DocumentTitle title="No stream permissions.">
+    <PageContentLayout>
+      <PageHeader title="No stream permissions." />
+      <Row className="content">
+        <Col md={12}>
+          <Alert bsStyle="warning">
+            <Icon name="info-circle" />&nbsp;We cannot start a search right now, because you are not allowed to access any stream.
+            If you feel this is an error, please contact your administrator.
+          </Alert>
+        </Col>
+      </Row>
+    </PageContentLayout>
+  </DocumentTitle>
 );
 
 export default UserHasNoStreamAccess;
