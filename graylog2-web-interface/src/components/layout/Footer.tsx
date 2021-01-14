@@ -47,7 +47,6 @@ const StyledFooter = styled.footer(({ theme }) => css`
   text-align: center;
   font-size: ${theme.fonts.size.small};
   color: ${theme.colors.gray[70]};
-  margin-bottom: 15px;
   height: 20px;
 
   @media print {
@@ -82,7 +81,6 @@ const Footer = ({ system }: Props) => {
 
   return (
     <StyledFooter>
-      {/* @ts-ignore jvm s checked in line 65 */}
       Graylog {system.version} on {system.hostname} ({jvm.info})
     </StyledFooter>
   );
