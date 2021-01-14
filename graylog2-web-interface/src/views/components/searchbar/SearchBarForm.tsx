@@ -35,14 +35,14 @@ type Props = {
   children: ((props: FormikProps<FormikValues>) => React.ReactNode) | React.ReactNode,
 };
 
-export const dateTimeValidate = (values) => {
+export const dateTimeValidate = (limitDuration) => (values) => {
   const errors: { nextTimeRange?: {
     from?: string,
     to?: string,
     range?: string,
   } } = {};
 
-  const { limitDuration, nextTimeRange } = values;
+  const { nextTimeRange } = values;
 
   if (nextTimeRange?.type === 'absolute') {
     if (!DateTime.isValidDateString(nextTimeRange.from)) {
@@ -96,7 +96,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children }: Pro
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
-            validate={dateTimeValidate}>
+            validate={dateTimeValidate(limitDuration)}>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
           <StyledForm>
