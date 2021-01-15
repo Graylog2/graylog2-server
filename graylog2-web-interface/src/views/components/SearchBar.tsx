@@ -61,6 +61,14 @@ const FlexCol = styled(Col)`
   justify-content: space-between;
 `;
 
+const StreamWrap = styled.div`
+  flex: 1;
+  
+  > div {
+    margin-right: 24px;
+  }
+`;
+
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   const newQuery = currentQuery.toBuilder()
     .timerange(timerange)
@@ -92,7 +100,7 @@ const SearchBar = ({
   const { query_string: queryString } = query;
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
-  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   const _onSubmit = (values) => onSubmit(values, currentQuery);
 
@@ -100,30 +108,34 @@ const SearchBar = ({
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
-          <SearchBarForm initialValues={{ limitDuration, timerange, streams, queryString }}
+          <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                         limitDuration={limitDuration}
                          onSubmit={_onSubmit}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
               <>
                 <TopRow>
-                  <FlexCol md={6}>
+                  <FlexCol md={5}>
                     <TimeRangeTypeSelector disabled={disableSearch} />
                     <TimeRangeDisplay timerange={values?.timerange} />
-                    <RefreshControls />
                   </FlexCol>
 
                   <Col mdHidden lgHidden>
                     <HorizontalSpacer />
                   </Col>
 
-                  <Col md={6}>
-                    <Field name="streams">
-                      {({ field: { name, value, onChange } }) => (
-                        <StreamsFilter value={value}
-                                       streams={availableStreams}
-                                       onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
-                      )}
-                    </Field>
-                  </Col>
+                  <FlexCol md={7}>
+                    <StreamWrap>
+                      <Field name="streams">
+                        {({ field: { name, value, onChange } }) => (
+                          <StreamsFilter value={value}
+                                         streams={availableStreams}
+                                         onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                        )}
+                      </Field>
+                    </StreamWrap>
+
+                    <RefreshControls />
+                  </FlexCol>
                 </TopRow>
 
                 <Row className="no-bm">

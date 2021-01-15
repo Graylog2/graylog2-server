@@ -160,7 +160,7 @@ const getFromValue = (value: number, originalTimeRange) => RANGE_TYPES.map(({ ty
   return null;
 }).filter(Boolean).pop();
 
-const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
+const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
   return (
@@ -180,6 +180,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
 
             const _onChangeType = (type) => {
               const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
+
               _onChange(newTimeValue);
             };
 
@@ -233,9 +234,9 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                   <Ago />
 
                   {error && (
-                  <ErrorMessage>
-                    Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
-                  </ErrorMessage>
+                    <ErrorMessage>
+                      Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
+                    </ErrorMessage>
                   )}
 
                   <ConfiguredWrapper>
@@ -244,7 +245,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                 </RangeWrapper>
               </>
             );
-          } }
+          }}
         </Field>
 
         <StyledIcon name="arrow-right" />
@@ -263,7 +264,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                    min="1"
                    title="Set the offset value"
                    name="relative-timerange-until-value"
-                   onChange={() => { }} />
+                   onChange={() => {}} />
           </InputWrap>
 
           <StyledSelect id="relative-timerange-until-length"
@@ -272,7 +273,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
                         options={availableRangeTypes}
                         placeholder="Select an offset"
                         name="relative-timerange-until-length"
-                        onChange={() => { }} />
+                        onChange={() => {}} />
           <Ago />
         </RangeWrapper>
       </RelativeWrapper>
@@ -280,7 +281,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
   );
 };
 
-RelativeTimeRangeSelector.propTypes = {
+TabRelativeTimeRange.propTypes = {
   limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({
@@ -288,9 +289,9 @@ RelativeTimeRangeSelector.propTypes = {
   }).isRequired,
 };
 
-RelativeTimeRangeSelector.defaultProps = {
+TabRelativeTimeRange.defaultProps = {
   disabled: false,
   limitDuration: 0,
 };
 
-export default RelativeTimeRangeSelector;
+export default TabRelativeTimeRange;

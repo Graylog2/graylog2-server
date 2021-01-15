@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useCallback, useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import moment from 'moment';
 import Mousetrap from 'mousetrap';
@@ -27,16 +27,17 @@ import { availableTimeRangeTypes, FormikValues } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 
-import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
-import KeywordTimeRangeSelector from './KeywordTimeRangeSelector';
-import RelativeTimeRangeSelector from './RelativeTimeRangeSelector';
-import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
+import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
+import TabKeywordTimeRange from './TabKeywordTimeRange';
+import TabRelativeTimeRange from './TabRelativeTimeRange';
+import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
+import { DateTimeContext } from './DateTimeProvider';
 
 const timeRangeTypes = {
-  absolute: AbsoluteTimeRangeSelector,
-  relative: RelativeTimeRangeSelector,
-  keyword: KeywordTimeRangeSelector,
+  absolute: TabAbsoluteTimeRange,
+  relative: TabRelativeTimeRange,
+  keyword: TabKeywordTimeRange,
 };
 
 type Props = {
@@ -125,8 +126,8 @@ const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, curren
 });
 
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
+  const { limitDuration } = useContext(DateTimeContext);
   const { initialValues, isValid, setFieldValue, validateForm, values } = useFormikContext<FormikValues>();
-  const limitDuration = initialValues?.limitDuration;
   const originalTimeRange = initialValues?.timerange;
   const initialTimeRange = values?.timerange;
   const currentTimeRange = values?.nextTimeRange;
@@ -138,6 +139,17 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
     setFieldValue('nextTimeRange', {});
 
     toggleDropdownShow();
+  };
+
+  const handleActiveTab = (nextTab) => {
+    if (currentTimeRange?.type) {
+      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, nextTab), false);
+    } else {
+      setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab], false);
+    }
+
+    validateForm();
+    setActiveTab(nextTab);
   };
 
   const handleCancel = useCallback(() => {
@@ -161,16 +173,6 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
   const handleEscKeyPress = useCallback(() => {
     handleCancel();
   }, [handleCancel]);
-
-  useEffect(() => {
-    if (currentTimeRange?.type) {
-      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, activeTab), false);
-    } else {
-      setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
-    }
-
-    validateForm();
-  }, [activeTab, setFieldValue, currentTimeRange, validateForm]);
 
   useEffect(() => {
     Mousetrap.bind('enter', handleEnterKeyPress);
@@ -206,7 +208,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
           <StyledTabs id="dateTimeTypes"
                       defaultActiveKey={availableTimeRangeTypes[0].type}
                       activeKey={activeTab ?? -1}
-                      onSelect={setActiveTab}
+                      onSelect={handleActiveTab}
                       animation={false}>
             {timeRangeTypeTabs({
               activeTab,
@@ -215,7 +217,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
               currentTimeRange,
             })}
 
-            {!activeTab && (<DisabledTimeRangeSelector />)}
+            {!activeTab && (<TabDisabledTimeRange />)}
 
           </StyledTabs>
         </Col>
