@@ -25,6 +25,16 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { RulesActions } = CombinedProvider.get('Rules');
 
+export type RuleType = {
+  id?: string,
+  source: string,
+  title: string,
+  description: string,
+  created_at: string,
+  modified_at: string,
+  errors?: [],
+};
+
 const RulesStore = Reflux.createStore({
   listenables: [RulesActions],
   rules: undefined,
@@ -87,7 +97,7 @@ const RulesStore = Reflux.createStore({
     return promise;
   },
 
-  save(ruleSource) {
+  save(ruleSource: RuleType) {
     const failCallback = (error) => {
       UserNotification.error(`Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
         `Could not save processing rule "${ruleSource.title}"`);
@@ -113,7 +123,7 @@ const RulesStore = Reflux.createStore({
     return promise;
   },
 
-  update(ruleSource) {
+  update(ruleSource: RuleType) {
     const failCallback = (error) => {
       UserNotification.error(`Updating rule "${ruleSource.title}" failed with status: ${error.message}`,
         `Could not update processing rule "${ruleSource.title}"`);
