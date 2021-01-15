@@ -20,6 +20,8 @@ import suppressConsole from 'helpers/suppressConsole';
 
 import RouterErrorBoundary from './RouterErrorBoundary';
 
+jest.mock('components/layout/Footer');
+
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal
   throw {
