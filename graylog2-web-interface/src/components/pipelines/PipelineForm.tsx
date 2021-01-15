@@ -17,11 +17,16 @@
 import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
 import { cloneDeep } from 'lodash';
+import styled from 'styled-components';
 
 import { Row, Col, Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { PipelineType } from 'stores/pipelines/PipelinesStore';
+
+const SaveButton = styled(Button)`
+  margin-right: 10px;
+`;
 
 type Props = {
   pipeline: PipelineType,
@@ -111,7 +116,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
       {content}
       <Row>
         <Col md={12}>
-          <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+          <SaveButton type="submit" bsStyle="primary">Save</SaveButton>
           <Button type="button" onClick={onCancel}>Cancel</Button>
         </Col>
       </Row>

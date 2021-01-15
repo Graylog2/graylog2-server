@@ -28,6 +28,7 @@ import PipelineForm from './PipelineForm';
 const PipelineDl = styled.dl`
   & {
     margin-bottom: 0;
+    margin-top: 10px;
   }
 
   & > dt {
@@ -64,7 +65,7 @@ const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
             <PipelineForm pipeline={pipeline} save={onChange} />
           </div>
           <h2>Details</h2>
-          <PipelineDl className="dl-horizontal" style={{ marginTop: 10 }}>
+          <PipelineDl className="dl-horizontal">
             <dt>Title</dt>
             <dd>{pipeline.title}</dd>
             <dt>Description</dt>

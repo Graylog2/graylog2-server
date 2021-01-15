@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
 import { Link } from 'components/graylog/router';
@@ -23,6 +24,10 @@ import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import { RuleType } from 'stores/rules/RulesStore';
+
+const TitleTd = styled.td`
+  width: 400px;
+`;
 
 type Props = {
   pipeline: PipelineType,
@@ -56,9 +61,9 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
 
     return (
       <tr key={rule.id}>
-        <td style={{ width: 400 }}>
+        <TitleTd>
           {ruleTitle}
-        </td>
+        </TitleTd>
         <td>{rule.description}</td>
         <td>
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}>
