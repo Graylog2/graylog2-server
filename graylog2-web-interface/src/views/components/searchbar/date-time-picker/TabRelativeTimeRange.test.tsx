@@ -18,7 +18,7 @@ import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 
-import OriginalRelativeTimeRangeSelector from './RelativeTimeRangeSelector';
+import OriginalTabRelativeTimeRange from './TabRelativeTimeRange';
 
 const defaultProps = {
   limitDuration: 0,
@@ -41,19 +41,19 @@ type Props = {
   },
 };
 
-const RelativeTimeRangeSelector = (allProps: Props) => (
+const TabRelativeTimeRange = (allProps: Props) => (
   <Formik initialValues={initialValues}
           onSubmit={() => {}}
           validateOnMount>
     <Form>
-      <OriginalRelativeTimeRangeSelector {...allProps} />
+      <OriginalTabRelativeTimeRange {...allProps} />
     </Form>
   </Formik>
 );
 
-describe('RelativeTimeRangeSelector', () => {
+describe('TabRelativeTimeRange', () => {
   it('renders originalTimeRange value', () => {
-    render(<RelativeTimeRangeSelector {...defaultProps} />);
+    render(<TabRelativeTimeRange {...defaultProps} />);
 
     const spinbutton = screen.getByRole('spinbutton', { name: /set the range value/i });
 
@@ -62,13 +62,13 @@ describe('RelativeTimeRangeSelector', () => {
   });
 
   it('renders originalTimeRange type', () => {
-    render(<RelativeTimeRangeSelector {...defaultProps} />);
+    render(<TabRelativeTimeRange {...defaultProps} />);
 
     expect(screen.getByText(/Hours/i)).toBeInTheDocument();
   });
 
   it('Clicking All Time disables input', () => {
-    render(<RelativeTimeRangeSelector {...defaultProps} />);
+    render(<TabRelativeTimeRange {...defaultProps} />);
 
     const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
     const rangeValue = screen.getByRole('spinbutton', { name: /set the range value/i });
@@ -81,7 +81,7 @@ describe('RelativeTimeRangeSelector', () => {
   });
 
   it('All Time checkbox is disabled', () => {
-    render(<RelativeTimeRangeSelector {...defaultProps} limitDuration={10} />);
+    render(<TabRelativeTimeRange {...defaultProps} limitDuration={10} />);
 
     const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
 

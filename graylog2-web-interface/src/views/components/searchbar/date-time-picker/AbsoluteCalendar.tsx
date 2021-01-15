@@ -16,22 +16,19 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Field } from 'formik';
 import styled, { css } from 'styled-components';
-import moment from 'moment';
+import { Field } from 'formik';
 
-import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
+import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
-import AbsoluteDateInput from './AbsoluteDateInput';
 import AbsoluteDatePicker from './AbsoluteDatePicker';
 import AbsoluteTimeInput from './AbsoluteTimeInput';
 
 type Props = {
   disabled: boolean,
-  from: boolean,
-  currentTimeRange?: AbsoluteTimeRange,
-  originalTimeRange: TimeRange,
-  limitDuration?: number,
+  startDate?: Date,
+  range: 'to' | 'from',
+  currentTimeRange: AbsoluteTimeRange,
 };
 
 const ErrorMessage = styled.span(({ theme }) => css`
@@ -42,30 +39,17 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }: Props) => {
-  const range = from ? 'from' : 'to';
-
+const AbsoluteCalendar = ({ disabled, startDate, currentTimeRange, range }: Props) => {
   return (
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? currentTimeRange[range] : value || currentTimeRange[range];
-        let startDate = moment(currentTimeRange.from).toDate();
-
-        if (from) {
-          startDate = limitDuration ? moment().seconds(-limitDuration).toDate() : startDate;
-        }
+        const dateTime = error ? currentTimeRange.to : value || currentTimeRange.to;
 
         return (
           <>
-            <AbsoluteDateInput name={name}
-                               disabled={disabled}
-                               value={value}
-                               onChange={_onChange} />
-
             <AbsoluteDatePicker name={name}
                                 disabled={disabled}
-                                value={value}
                                 onChange={_onChange}
                                 startDate={startDate}
                                 dateTime={dateTime} />
@@ -74,7 +58,7 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
                                range={range}
                                dateTime={dateTime} />
 
-            <ErrorMessage>{error ?? ' '}</ErrorMessage>
+            <ErrorMessage>{error}</ErrorMessage>
           </>
         );
       }}
@@ -82,24 +66,16 @@ const AbsoluteRangeField = ({ disabled, limitDuration, from, currentTimeRange }:
   );
 };
 
-AbsoluteRangeField.propTypes = {
-  from: PropTypes.bool.isRequired,
-  currentTimeRange: PropTypes.shape({
-    from: PropTypes.string,
-    to: PropTypes.string,
-  }),
-  originalTimeRange: PropTypes.shape({
-    from: PropTypes.string,
-    to: PropTypes.string,
-  }).isRequired,
+AbsoluteCalendar.propTypes = {
   disabled: PropTypes.bool,
-  limitDuration: PropTypes.number,
+  currentTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  startDate: PropTypes.instanceOf(Date),
+  range: PropTypes.oneOf(['to', 'from']).isRequired,
 };
 
-AbsoluteRangeField.defaultProps = {
+AbsoluteCalendar.defaultProps = {
   disabled: false,
-  limitDuration: 0,
-  currentTimeRange: undefined,
+  startDate: undefined,
 };
 
-export default AbsoluteRangeField;
+export default AbsoluteCalendar;

@@ -134,7 +134,7 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
   return null;
 }).filter(Boolean);
 
-const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration }: Props) => {
+const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
   return (
@@ -255,7 +255,7 @@ const RelativeTimeRangeSelector = ({ disabled, originalTimeRange, limitDuration 
   );
 };
 
-RelativeTimeRangeSelector.propTypes = {
+TabRelativeTimeRange.propTypes = {
   limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
   originalTimeRange: PropTypes.shape({
@@ -263,9 +263,9 @@ RelativeTimeRangeSelector.propTypes = {
   }).isRequired,
 };
 
-RelativeTimeRangeSelector.defaultProps = {
+TabRelativeTimeRange.defaultProps = {
   disabled: false,
   limitDuration: 0,
 };
 
-export default RelativeTimeRangeSelector;
+export default TabRelativeTimeRange;

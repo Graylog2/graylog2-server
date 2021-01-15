@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 
-import AbsoluteRangeField from './AbsoluteRangeField';
+import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 
 const defaultProps = {
   disabled: false,
@@ -34,12 +34,8 @@ const defaultProps = {
   },
 } as const;
 
-const initialValues = {
-  nextTimeRange: defaultProps.originalTimeRange,
-};
-
 const renderWithForm = (element) => render((
-  <Formik initialValues={initialValues}
+  <Formik initialValues={{ nextTimeRange: defaultProps.originalTimeRange }}
           onSubmit={() => {}}>
     <Form>
       {element}
@@ -47,10 +43,10 @@ const renderWithForm = (element) => render((
   </Formik>
 ));
 
-describe('AbsoluteRangeField', () => {
+describe('TabAbsoluteTimeRange', () => {
   it('renders', () => {
     const { asFragment } = renderWithForm((
-      <AbsoluteRangeField {...defaultProps} from />
+      <TabAbsoluteTimeRange {...defaultProps} />
     ));
 
     expect(asFragment()).toMatchSnapshot();
