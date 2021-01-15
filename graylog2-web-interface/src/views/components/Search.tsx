@@ -89,6 +89,7 @@ const SearchArea = styled(PageContentLayout)(() => {
         flex-direction: column;
         height: 100%;
         width: 100%;
+
         /* overflow auto is required to display the message table widget height correctly */
         overflow: ${focusedWidget ? 'auto' : 'visible'};
       }
