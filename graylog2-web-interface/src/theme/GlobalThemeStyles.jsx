@@ -169,10 +169,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 10px;
   }
 
-  .row {
-    margin-bottom: 15px;
-  }
-
   .no-bm {
     margin-bottom: 0;
   }

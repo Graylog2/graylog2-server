@@ -42,6 +42,7 @@ type IndicatorProps = {
 
 const StyledRow = styled(Row)(({ overflow }) => css`
   height: 100%;
+  margin-bottom: 10px;
   ${overflow}
 `);
 
