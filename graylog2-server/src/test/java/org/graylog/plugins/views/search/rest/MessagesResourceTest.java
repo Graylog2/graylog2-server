@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.export.CommandFactory;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,6 +53,7 @@ public class MessagesResourceTest {
     private MessagesResource sut;
     private User currentUser;
     private MessagesExporter exporter;
+    private ViewPermissionChecks viewPermissionChecks;
     private PermittedStreams permittedStreams;
     private SearchExecutionGuard executionGuard;
     private CommandFactory commandFactory;
@@ -64,6 +67,7 @@ public class MessagesResourceTest {
         currentUser = mock(User.class);
         when(currentUser.getName()).thenReturn("peterchen");
         exporter = mock(MessagesExporter.class);
+        viewPermissionChecks = mock(ViewPermissionChecks.class);
         commandFactory = mock(CommandFactory.class);
         when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
         when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
@@ -72,7 +76,7 @@ public class MessagesResourceTest {
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
         searchDomain = mock(SearchDomain.class);
-        sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus);
+        sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), viewPermissionChecks, eventBus);
 
         sut.asyncRunner = c -> {
             c.accept(x -> {
@@ -82,8 +86,8 @@ public class MessagesResourceTest {
     }
 
     class MessagesTestResource extends MessagesResource {
-        public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, EventBus eventBus) {
-            super(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, objectMapper, eventBus);
+        public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, ViewPermissionChecks viewPermissionChecks, EventBus eventBus) {
+            super(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, objectMapper, viewPermissionChecks, eventBus);
         }
 
         @Nullable

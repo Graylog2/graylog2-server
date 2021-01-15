@@ -65,6 +65,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final SearchExecutionGuard executionGuard;
     private final PermittedStreams permittedStreams;
     private final ObjectMapper objectMapper;
+    private final ViewPermissionChecks viewPermissionChecks;
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
@@ -78,12 +79,13 @@ public class MessagesResource extends RestResource implements PluginRestResource
             SearchExecutionGuard executionGuard,
             PermittedStreams permittedStreams,
             ObjectMapper objectMapper,
-            @SuppressWarnings("UnstableApiUsage") EventBus eventBus) {
+            ViewPermissionChecks viewPermissionChecks, @SuppressWarnings("UnstableApiUsage") EventBus eventBus) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
         this.permittedStreams = permittedStreams;
         this.objectMapper = objectMapper;
+        this.viewPermissionChecks = viewPermissionChecks;
         this.messagesExporterFactory = context -> new AuditingMessagesExporter(context, eventBus, exporter);
     }
 
@@ -182,7 +184,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     private boolean hasViewReadPermission(ViewDTO view) {
-        return isPermitted(ViewsRestPermissions.VIEW_READ, view.id());
+        return viewPermissionChecks.allowedToSeeView(getCurrentUser(), view, this::isPermitted);
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser() {
