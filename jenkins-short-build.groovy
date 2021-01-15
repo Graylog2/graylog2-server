@@ -50,7 +50,7 @@ always-auth=true'''
 
            writeFile file: '.yarnrc', text: 'registry "http://nexus-internal.ci.torch.sh/repository/graylog-yarn/"'
 
-           sh 'mvn --settings ~/.m2/settings-short-build.xml --show-version --batch-mode -Dstyle.color=always --fail-fast -Dspotbugs.skip -Dit.es clean deploy'
+           sh 'mvn --settings ~/.m2/settings-nexus-internal.xml --show-version --batch-mode -Dstyle.color=always --fail-fast -Dspotbugs.skip -Dit.es clean deploy'
          }
      }
    }
