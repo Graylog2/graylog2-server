@@ -300,7 +300,7 @@ const AppRouter = () => {
                              path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
                              component={SidecarEditCollectorPage} />
                       {standardPluginRoutes}
-                      <Route path="*" component={NotFoundPage} />
+                      <Route path="*" render={() => <NotFoundPage displayPageLayout={false} />} />
                     </Switch>
                   </PageContentLayout>
                 </Route>
