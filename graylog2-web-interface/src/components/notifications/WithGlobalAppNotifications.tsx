@@ -19,20 +19,22 @@ import PropTypes from 'prop-types';
 
 import GlobalAppNotifications from './GlobalAppNotifications';
 
-const AppWithGlobalNotifications = ({ children }) => {
-  return (
-    <div>
-      <GlobalAppNotifications />
-      {children}
-    </div>
-  );
-};
+type Props = {
+  children: React.ReactNode
+}
 
-AppWithGlobalNotifications.propTypes = {
+const WithGlobalNotifications = ({ children }: Props) => (
+  <>
+    <GlobalAppNotifications />
+    {children}
+  </>
+);
+
+WithGlobalNotifications.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.element),
     PropTypes.element,
   ]).isRequired,
 };
 
-export default AppWithGlobalNotifications;
+export default WithGlobalNotifications;
