@@ -17,11 +17,11 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
-import AppContentGrid from './AppContentGrid';
+import PageContentLayout from './PageContentLayout';
 
-describe('AppContentGrid', () => {
+describe('PageContentLayout', () => {
   it('renders its children', async () => {
-    const { getByText } = render(<AppContentGrid><div>The content</div></AppContentGrid>);
+    const { getByText } = render(<PageContentLayout><div>The content</div></PageContentLayout>);
 
     expect(getByText('The content')).not.toBeNull();
   });

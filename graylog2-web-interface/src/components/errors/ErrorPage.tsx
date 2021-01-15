@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
-import AppContentGrid from 'components/layout/AppContentGrid';
+import PageContentLayout from 'components/layout/PageContentLayout';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
@@ -58,21 +58,19 @@ const ErrorPageStyles = createGlobalStyle`
   `;
 
 const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
-  <AppContentGrid>
-    <ErrorPageStyles backgroundImage={backgroundImage} />
-    <div className="container-fluid">
-      <DocumentTitle title={title}>
-        <ErrorJumbotron title={title}>
-          {description}
-          {children && (
+  <DocumentTitle title={title}>
+    <PageContentLayout>
+      <ErrorPageStyles backgroundImage={backgroundImage} />
+      <ErrorJumbotron title={title}>
+        {description}
+        {children && (
           <ErrorMessage>
             {children}
           </ErrorMessage>
-          )}
-        </ErrorJumbotron>
-      </DocumentTitle>
-    </div>
-  </AppContentGrid>
+        )}
+      </ErrorJumbotron>
+    </PageContentLayout>
+  </DocumentTitle>
 );
 
 ErrorPage.propTypes = {
