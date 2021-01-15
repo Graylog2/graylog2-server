@@ -44,7 +44,7 @@ const AbsoluteCalendar = ({ disabled, startDate, currentTimeRange, range }: Prop
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? currentTimeRange.to : value || currentTimeRange.to;
+        const dateTime = error ? currentTimeRange[range] : value || currentTimeRange[range];
 
         return (
           <>
