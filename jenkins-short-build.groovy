@@ -31,7 +31,7 @@ pipeline
      {
        agent
        {
-         label 'nexus'
+         label 'linux'
        }
        when
        {
