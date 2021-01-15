@@ -21,6 +21,7 @@ import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
+import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
@@ -55,6 +56,15 @@ export const dateTimeValidate = (limitDuration) => (values) => {
 
     if (nextTimeRange.from > nextTimeRange.to) {
       errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Start date must be before end date' };
+    }
+
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
+      }
     }
   }
 
