@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.storage.elasticsearch7;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,6 +22,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
@@ -120,7 +137,9 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     @Override
     public Optional<String> nodeIdToHostName(String nodeId) {
         return nodeById(nodeId)
-                .map(jsonNode -> jsonNode.get("host").asText());
+                .map(jsonNode -> jsonNode.path("host"))
+                .filter(host -> !host.isMissingNode())
+                .map(JsonNode::asText);
     }
 
     private Optional<JsonNode> nodeById(String nodeId) {
@@ -191,10 +210,10 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     @Override
     public ClusterStats clusterStats() {
-        final Request request = new Request("GET", "/_cluster/stats/nodes");
+        final Request request = new Request("GET", "/_cluster/stats/nodes/*");
 
         final JsonNode clusterStatsResponseJson = jsonApi.perform(request,
-            "Couldn't read Elasticsearch cluster stats");
+                "Couldn't read Elasticsearch cluster stats");
         final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
 
         String clusterVersion = null;
@@ -246,12 +265,12 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     private Optional<ClusterHealthResponse> clusterHealth(Collection<String> indices) {
         final String[] indicesAry = indices.toArray(new String[0]);
-        if (!indicesExist(indicesAry)) {
+        if (!indices.isEmpty() && !indicesExist(indicesAry)) {
             return Optional.empty();
         }
-
         final ClusterHealthRequest request = new ClusterHealthRequest(indicesAry)
-                .indicesOptions(IndicesOptions.fromOptions(false, false, true, true));
+                .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())))
+                .indicesOptions(IndicesOptions.lenientExpand());
 
         try {
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));

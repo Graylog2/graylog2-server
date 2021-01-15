@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
@@ -6,7 +22,13 @@ import { Panel as BootstrapPanel } from 'react-bootstrap';
 
 import deprecationNotice from 'util/deprecationNotice';
 
-const PanelHeading = styled(BootstrapPanel.Heading)``;
+const PanelHeading = styled(BootstrapPanel.Heading)`
+  .panel-title {
+    > a {
+      display: block;
+    }
+  }
+`;
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
@@ -146,13 +168,13 @@ const Panel = ({
   onToggle,
   ...props
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   useEffect(() => {
     setIsExpanded((defaultExpanded && expanded)
       || (!defaultExpanded && expanded)
       || (defaultExpanded && isExpanded === expanded));
-  }, [expanded]);
+  }, [defaultExpanded, expanded, isExpanded]);
 
   const handleToggle = (nextIsExpanded) => {
     setIsExpanded(nextIsExpanded);
@@ -163,9 +185,7 @@ const Panel = ({
 
   if (header || footer || title || collapsible || hasDeprecatedChildren) {
     /** NOTE: Deprecated & should be removed in 4.0 */
-    useEffect(() => {
-      deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
-    }, []);
+    deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */
@@ -233,7 +253,7 @@ Panel.propTypes = {
 Panel.defaultProps = {
   collapsible: false,
   defaultExpanded: null,
-  expanded: false,
+  expanded: null,
   footer: undefined,
   header: undefined,
   onToggle: () => {},

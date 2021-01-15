@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import Qs from 'qs';
 
 const ApiRoutes = {
@@ -23,6 +39,29 @@ const ApiRoutes = {
   AlertConditionsApiController: {
     available: () => { return { url: '/alerts/conditions/types' }; },
     list: () => { return { url: '/alerts/conditions' }; },
+  },
+  AuthenticationController: {
+    create: () => ({ url: '/system/authentication/services/backends' }),
+    delete: (backendId) => ({ url: `/system/authentication/services/backends/${backendId}` }),
+    disableUser: (userId) => ({ url: `/system/authentication/users/${userId}/disable` }),
+    enableUser: (userId) => ({ url: `/system/authentication/users/${userId}/enable` }),
+    load: (serviceId) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
+    loadActive: () => ({ url: '/system/authentication/services/active-backend' }),
+    loadUsersPaginated: (authBackendId) => ({ url: `/system/authentication/services/backends/${authBackendId}/users` }),
+    servicesPaginated: () => ({ url: '/system/authentication/services/backends' }),
+    testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
+    testLogin: () => ({ url: '/system/authentication/services/test/backend/login' }),
+    update: (serviceId) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
+    updateConfiguration: () => ({ url: '/system/authentication/services/configuration' }),
+  },
+  AuthzRolesController: {
+    load: (roleId) => { return { url: `/authz/roles/${roleId}` }; },
+    delete: (roleId) => { return { url: `/authz/roles/${roleId}` }; },
+    list: () => { return { url: '/authz/roles' }; },
+    removeMember: (roleId, username) => { return { url: `/authz/roles/${roleId}/assignee/${username}` }; },
+    addMembers: (roleId) => { return { url: `/authz/roles/${roleId}/assignees` }; },
+    loadRolesForUser: (username) => { return { url: `/authz/roles/user/${username}` }; },
+    loadUsersForRole: (roleId) => { return { url: `/authz/roles/${roleId}/assignees` }; },
   },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },
@@ -58,6 +97,7 @@ const ApiRoutes = {
   },
   GrokPatternsController: {
     test: () => { return { url: '/system/grok/test' }; },
+    paginated: () => { return { url: '/system/grok/paginated' }; },
   },
   DashboardsApiController: {
     create: () => { return { url: '/dashboards' }; },
@@ -82,6 +122,15 @@ const ApiRoutes = {
   DeflectorApiController: {
     cycle: (indexSetId) => { return { url: `/cluster/deflector/${indexSetId}/cycle` }; },
     list: (indexSetId) => { return { url: `/system/deflector/${indexSetId}` }; },
+  },
+  EntityShareController: {
+    prepare: (entityGRN) => { return { url: `/authz/shares/entities/${entityGRN}/prepare` }; },
+    update: (entityGRN) => { return { url: `/authz/shares/entities/${entityGRN}` }; },
+    userSharesPaginated: (username) => { return { url: `/authz/shares/user/${username}` }; },
+  },
+  HTTPHeaderAuthConfigController: {
+    load: () => ({ url: '/system/authentication/http-header-auth-config' }),
+    update: () => ({ url: '/system/authentication/http-header-auth-config' }),
   },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },
@@ -244,7 +293,9 @@ const ApiRoutes = {
       const streamFilter = this._streamFilter(streamId);
 
       queryString.query = query;
+
       Object.keys(timerange).forEach((key) => { queryString[key] = timerange[key]; });
+
       Object.keys(streamFilter).forEach((key) => { queryString[key] = streamFilter[key]; });
 
       return queryString;
@@ -294,15 +345,18 @@ const ApiRoutes = {
     },
   },
   UsersApiController: {
-    changePassword: (username) => { return { url: `/users/${username}/password` }; },
+    changePassword: (userId) => { return { url: `/users/${userId}/password` }; },
     create: () => { return { url: '/users' }; },
     list: () => { return { url: '/users' }; },
-    load: (username) => { return { url: `/users/${username}` }; },
-    delete: (username) => { return { url: `/users/${username}` }; },
-    update: (username) => { return { url: `/users/${username}` }; },
-    create_token: (username, tokenName) => { return { url: `/users/${username}/tokens/${tokenName}` }; },
-    delete_token: (username, tokenName) => { return { url: `/users/${username}/tokens/${tokenName}` }; },
-    list_tokens: (username) => { return { url: `/users/${username}/tokens` }; },
+    paginated: () => { return { url: '/users/paginated' }; },
+    load: (userId) => { return { url: `/users/id/${userId}` }; },
+    loadByUsername: (username) => { return { url: `/users/${username}` }; },
+    delete: (id) => { return { url: `/users/id/${id}` }; },
+    update: (userId) => { return { url: `/users/${userId}` }; },
+    create_token: (userId, tokenName) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
+    delete_token: (userId, tokenName) => { return { url: `/users/${userId}/tokens/${tokenName}` }; },
+    list_tokens: (userId) => { return { url: `/users/${userId}/tokens` }; },
+    setStatus: (userId, accountStatus) => { return { url: `/users/${userId}/status/${accountStatus}` }; },
   },
   DashboardsController: {
     show: (id) => { return { url: `/dashboards/${id}` }; },

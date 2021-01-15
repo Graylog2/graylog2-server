@@ -1,13 +1,35 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import lodash from 'lodash';
+import escape from 'lodash/escape';
 import $ from 'jquery';
 import 'typeahead.js';
+import styled from 'styled-components';
 
 import UniversalSearch from 'logic/search/UniversalSearch';
-// eslint-disable-next-line no-unused-vars
 import { Input } from 'components/bootstrap';
+
+const StyledInput = styled(Input)`
+  input&.tt-hint {
+    background-color: transparent !important;
+  }
+`;
 
 /**
  * Component that renders a field input with auto-completion capabilities.
@@ -29,6 +51,8 @@ class TypeAheadInput extends React.Component {
     onKeyPress: PropTypes.func,
     /** Object key where to store auto-completion result. */
     displayKey: PropTypes.string,
+    /** String that allows overriding the input form group */
+    formGroupClassName: PropTypes.string,
     /**
      * Array of strings providing auto-completion.
      * E.g. `[ "some string", "otherstring" ]`
@@ -57,6 +81,7 @@ class TypeAheadInput extends React.Component {
 
   static defaultProps = {
     displayKey: 'suggestion',
+    formGroupClassName: undefined,
     onKeyPress: () => {},
     onTypeaheadLoaded: () => {},
     onSuggestionSelected: () => {},
@@ -70,7 +95,6 @@ class TypeAheadInput extends React.Component {
     this._updateTypeahead({ suggestions, displayKey, suggestionText, onTypeaheadLoaded, onSuggestionSelected });
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(newProps) {
     this._destroyTypeahead();
     this._updateTypeahead(newProps);
@@ -113,10 +137,10 @@ class TypeAheadInput extends React.Component {
         suggestion: (value) => {
           // Escape all text here that may be user-generated, since this is not automatically escaped by React.
           if (suggestionText) {
-            return `<div><strong>${lodash.escape(suggestionText)}</strong> ${lodash.escape(value[displayKey])}</div>`;
+            return `<div><strong>${escape(suggestionText)}</strong> ${escape(value[displayKey])}</div>`;
           }
 
-          return `<div>${lodash.escape(value[displayKey])}</div>`;
+          return `<div>${escape(value[displayKey])}</div>`;
         },
       },
     });
@@ -134,15 +158,16 @@ class TypeAheadInput extends React.Component {
   };
 
   render() {
-    const { id, label, onKeyPress } = this.props;
+    const { id, label, onKeyPress, formGroupClassName } = this.props;
 
     return (
-      <Input id={id}
-             type="text"
-             ref={(fieldInput) => { this.fieldInputElem = fieldInput; }}
-             wrapperClassName="typeahead-wrapper"
-             label={label}
-             onKeyPress={onKeyPress} />
+      <StyledInput id={id}
+                   type="text"
+                   ref={(fieldInput) => { this.fieldInputElem = fieldInput; }}
+                   wrapperClassName="typeahead-wrapper"
+                   formGroupClassName={formGroupClassName}
+                   label={label}
+                   onKeyPress={onKeyPress} />
     );
   }
 }

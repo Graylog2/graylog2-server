@@ -1,17 +1,36 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { LinkContainer, Link } from 'components/graylog/router';
+import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Col, DropdownButton, MenuItem, Row, Button } from 'components/graylog';
 import {
   EmptyEntity,
   EntityList,
   EntityListItem,
+  ShareButton,
   IfPermitted,
   PaginatedList,
   SearchForm,
   Spinner,
+  Icon,
 } from 'components/common';
 import Routes from 'routing/Routes';
 
@@ -33,6 +52,14 @@ class EventNotifications extends React.Component {
     onDelete: PropTypes.func.isRequired,
     onTest: PropTypes.func.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      notificationToShare: undefined,
+    };
+  }
 
   renderEmptyContent = () => {
     return (
@@ -62,12 +89,12 @@ class EventNotifications extends React.Component {
     return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
-  formatNotification = (notifications) => {
+  formatNotification = (notifications, setNotificationToShare) => {
     const { testResult } = this.props;
 
     return notifications.map((notification) => {
       const isTestLoading = testResult.id === notification.id && testResult.isLoading;
-      const actions = this.formatActions(notification, isTestLoading);
+      const actions = this.formatActions(notification, isTestLoading, setNotificationToShare);
 
       const plugin = this.getNotificationPlugin(notification.config.type);
       const content = testResult.id === notification.id ? (
@@ -82,9 +109,11 @@ class EventNotifications extends React.Component {
         </Col>
       ) : null;
 
+      const title = <Link to={Routes.ALERTS.NOTIFICATIONS.show(notification.id)}>{notification.title}</Link>;
+
       return (
         <EntityListItem key={`event-definition-${notification.id}`}
-                        title={notification.title}
+                        title={title}
                         titleSuffix={plugin.displayName || notification.config.type}
                         description={notification.description || <em>No description given</em>}
                         actions={actions}
@@ -93,17 +122,20 @@ class EventNotifications extends React.Component {
     });
   };
 
-  formatActions(notification, isTestLoading) {
+  formatActions(notification, isTestLoading, setNotificationToShare) {
     const { onDelete, onTest } = this.props;
 
     return (
       <>
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
-            <Button bsStyle="info">Edit</Button>
+            <Button bsStyle="info">
+              <Icon name="edit" /> Edit
+            </Button>
           </IfPermitted>
         </LinkContainer>
-        <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}>
+        <ShareButton entityType="notification" entityId={notification.id} onClick={() => setNotificationToShare(notification)} />
+        <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]} anyPermissions>
           <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
               <MenuItem disabled={isTestLoading} onClick={onTest(notification)}>
@@ -122,41 +154,53 @@ class EventNotifications extends React.Component {
 
   render() {
     const { notifications, pagination, query, onPageChange, onQueryChange } = this.props;
+    const { notificationToShare } = this.state;
+
+    const setNotificationToShare = (notification) => this.setState({ notificationToShare: notification });
 
     if (pagination.grandTotal === 0) {
       return this.renderEmptyContent();
     }
 
     return (
-      <Row>
-        <Col md={12}>
-          <SearchForm query={query}
-                      onSearch={onQueryChange}
-                      onReset={onQueryChange}
-                      searchButtonLabel="Find"
-                      placeholder="Find Notifications"
-                      wrapperClass={styles.inline}
-                      queryWidth={200}
-                      topMargin={0}
-                      useLoadingState>
-            <IfPermitted permissions="eventnotifications:create">
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                <Button bsStyle="success" className={styles.createButton}>Create Notification</Button>
-              </LinkContainer>
-            </IfPermitted>
-          </SearchForm>
+      <>
+        <Row>
+          <Col md={12}>
+            <SearchForm query={query}
+                        onSearch={onQueryChange}
+                        onReset={onQueryChange}
+                        searchButtonLabel="Find"
+                        placeholder="Find Notifications"
+                        wrapperClass={styles.inline}
+                        queryWidth={200}
+                        topMargin={0}
+                        useLoadingState>
+              <IfPermitted permissions="eventnotifications:create">
+                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                  <Button bsStyle="success" className={styles.createButton}>Create Notification</Button>
+                </LinkContainer>
+              </IfPermitted>
+            </SearchForm>
 
-          <PaginatedList activePage={pagination.page}
-                         pageSize={pagination.pageSize}
-                         pageSizes={[10, 25, 50]}
-                         totalItems={pagination.total}
-                         onChange={onPageChange}>
-            <div className={styles.notificationList}>
-              <EntityList items={this.formatNotification(notifications)} />
-            </div>
-          </PaginatedList>
-        </Col>
-      </Row>
+            <PaginatedList activePage={pagination.page}
+                           pageSize={pagination.pageSize}
+                           pageSizes={[10, 25, 50]}
+                           totalItems={pagination.total}
+                           onChange={onPageChange}>
+              <div className={styles.notificationList}>
+                <EntityList items={this.formatNotification(notifications, setNotificationToShare)} />
+              </div>
+            </PaginatedList>
+          </Col>
+        </Row>
+        {notificationToShare && (
+          <EntityShareModal entityId={notificationToShare.id}
+                            entityType="notification"
+                            description="Search for a User or Team to add as collaborator on this notification."
+                            entityTitle={notificationToShare.title}
+                            onClose={() => setNotificationToShare(undefined)} />
+        )}
+      </>
     );
   }
 }

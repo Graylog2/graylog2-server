@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer.cluster;
 
@@ -104,6 +104,13 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void health_returns_green_with_no_indices() {
+        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{});
+        final Optional<HealthStatus> health = cluster.health();
+        assertThat(health).contains(HealthStatus.Green);
+    }
+
+    @Test
     public void deflectorHealth() {
         when(indexSetRegistry.getWriteIndexAliases()).thenReturn(new String[]{ALIAS_NAME});
         final Optional<HealthStatus> deflectorHealth = cluster.deflectorHealth();
@@ -117,6 +124,13 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         when(indexSetRegistry.getWriteIndexAliases()).thenReturn(new String[]{"does_not_exist"});
         final Optional<HealthStatus> deflectorHealth = cluster.deflectorHealth();
         assertThat(deflectorHealth).isEmpty();
+    }
+
+    @Test
+    public void deflectorHealth_returns_green_with_empty_index() {
+        when(indexSetRegistry.getWriteIndexAliases()).thenReturn(new String[]{});
+        final Optional<HealthStatus> deflectorHealth = cluster.deflectorHealth();
+        assertThat(deflectorHealth).contains(HealthStatus.Green);
     }
 
     @Test
@@ -166,6 +180,13 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{"does-not-exist"});
         when(indexSetRegistry.isUp()).thenReturn(true);
         assertThat(cluster.isHealthy()).isFalse();
+    }
+
+    @Test
+    public void isHealthy_returns_true_with_no_indices() {
+        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{});
+        when(indexSetRegistry.isUp()).thenReturn(true);
+        assertThat(cluster.isHealthy()).isTrue();
     }
 
     @Test

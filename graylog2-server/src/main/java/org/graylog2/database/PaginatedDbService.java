@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.database;
 
@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * This class is a helper to implement a basic Mongojack-based database service that allows CRUD operations on a
  * single DTO type and offers paginated access.
  * <p>
- *     It makes only a few assumptions, which are common to many Graylog entities:
+ * It makes only a few assumptions, which are common to many Graylog entities:
  *     <ul>
  *         <li>The DTO class has a name which is unique</li>
  *     </ul>
@@ -47,6 +47,7 @@ import java.util.stream.Stream;
  *     Subclasses can add more sophisticated query methods by access the protected "db" property.<br/>
  *     Indices can be added in the constructor.
  * </p>
+ *
  * @param <DTO>
  */
 public abstract class PaginatedDbService<DTO> {
@@ -108,9 +109,9 @@ public abstract class PaginatedDbService<DTO> {
      * This method is only accessible by subclasses to avoid exposure of the {@link DBQuery} and {@link DBSort}
      * interfaces to consumers.
      *
-     * @param query the query to execute
-     * @param sort the sort builder for the query
-     * @param page the page number that should be returned
+     * @param query   the query to execute
+     * @param sort    the sort builder for the query
+     * @param page    the page number that should be returned
      * @param perPage the number of entries per page, 0 is unlimited
      * @return the paginated list
      */
@@ -124,7 +125,7 @@ public abstract class PaginatedDbService<DTO> {
         }
     }
 
-    private ImmutableList<DTO> asImmutableList(Iterator<? extends DTO> cursor) {
+    protected ImmutableList<DTO> asImmutableList(Iterator<? extends DTO> cursor) {
         return ImmutableList.copyOf(cursor);
     }
 
@@ -140,10 +141,10 @@ public abstract class PaginatedDbService<DTO> {
      * This method is only accessible by subclasses to avoid exposure of the {@link DBQuery} and {@link DBSort}
      * interfaces to consumers.
      *
-     * @param query the query to execute
-     * @param filter the filter to apply to each database entry
-     * @param sort the sort builder for the query
-     * @param page the page number that should be returned
+     * @param query   the query to execute
+     * @param filter  the filter to apply to each database entry
+     * @param sort    the sort builder for the query
+     * @param page    the page number that should be returned
      * @param perPage the number of entries per page, 0 is unlimited
      * @return the paginated list
      */
@@ -169,7 +170,7 @@ public abstract class PaginatedDbService<DTO> {
 
             return new PaginatedList<>(filteredResultStream.collect(Collectors.toList()), Math.toIntExact(total), page, perPage, grandTotal);
         }
-}
+    }
 
     /**
      * Returns an unordered stream of all entries in the database.
@@ -217,7 +218,7 @@ public abstract class PaginatedDbService<DTO> {
      * The returned stream needs to be closed to free the underlying database resources.
      *
      * @param query the query to execute
-     * @param sort the sort order for the query
+     * @param sort  the sort order for the query
      * @return stream of database entries that match the query
      */
     protected Stream<DTO> streamQueryWithSort(DBQuery.Query query, DBSort.SortBuilder sort) {

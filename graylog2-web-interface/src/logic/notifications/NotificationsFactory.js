@@ -1,6 +1,22 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
-import { Link } from 'react-router';
 
+import { Link } from 'components/graylog/router';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -128,6 +144,18 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'input_failure_shutdown':
+        return {
+          title: 'An input has shut down due to failures',
+          description: (
+            <span>
+              Input {notification.details.input_title} has shut down on node {notification.node_id} for this reason:
+              »{notification.details.reason}«. This means that you are unable to receive any messages from this input.
+              This is often an indication of persistent network failures.
+              You can click {' '} <Link to={Routes.SYSTEM.INPUTS}>here</Link> to see the input.
+            </span>
+          ),
+        };
       case 'journal_uncommitted_messages_deleted':
         return {
           title: 'Uncommited messages deleted from journal',
@@ -208,6 +236,19 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'output_failing':
+        return {
+          title: 'Output failing',
+          description: (
+            <span>
+              The output "{notification.details.outputTitle}" (id: {notification.details.outputId})
+              in stream "{notification.details.streamTitle}" (id: {notification.details.streamId})
+              is unable to send messages to the configured destination.
+              <br />
+              The error message from the output is: <em>{notification.details.errorMessage}</em>
+            </span>
+          ),
+        };
       case 'stream_processing_disabled':
         return {
           title: 'Processing of a stream has been disabled due to excessive processing time.',
@@ -256,6 +297,48 @@ class NotificationsFactory {
               For this reason Elasticsearch enforces a read-only index block on all indexes having any of their shards in any of the{' '}
               affected nodes. The affected nodes are: [{notification.details.nodes}]{' '}
               Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              for more details.
+            </span>
+          ),
+        };
+      case 'es_version_mismatch':
+        const { initial_version: initialVersion, current_version: currentVersion } = notification.details;
+
+        return {
+          title: 'Elasticsearch version is incompatible',
+          description: (
+            <span>
+              The Elasticsearch version which is currently running ({currentVersion}) has a different major version than
+              the one the Graylog master node was started with ({initialVersion}).{' '}
+              This will most probably result in errors during indexing or searching. Graylog requires a full restart after an
+              Elasticsearch upgrade from one major version to another.
+              <br />
+              For details, please see our notes about{' '}
+              <DocumentationLink page={DocsHelper.PAGES.ROLLING_ES_UPGRADE}
+                                 text="rolling Elasticsearch upgrades." />
+
+            </span>
+          ),
+        };
+      case 'legacy_ldap_config_migration':
+        const { auth_service_id: authServiceId } = notification.details;
+        const authServiceLink = <Link to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId)}>Authentication Service</Link>;
+
+        return {
+          title: 'Legacy LDAP/Active Directory configuration has been migrated to an Authentication Service',
+          description: (
+            <span>
+              The legacy LDAP/Active Directory configuration of this system has been upgraded to a new {authServiceLink}.
+              Since the new {authServiceLink} requires some information that is not present in the legacy
+              configuration, the {authServiceLink} <strong>requires a manual review</strong>!
+              <br />
+              <br />
+              <strong>After reviewing the {authServiceLink} it must be enabled to allow LDAP or Active Directory users
+                to log in again!
+              </strong>
+              <br />
+              <br />
+              Please check the <DocumentationLink page={DocsHelper.PAGES.UPGRADE_GUIDE} text="upgrade guide" />
               for more details.
             </span>
           ),

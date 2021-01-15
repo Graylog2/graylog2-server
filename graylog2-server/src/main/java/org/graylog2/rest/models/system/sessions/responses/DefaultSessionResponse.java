@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.rest.models.system.sessions.responses;
 
@@ -37,10 +37,14 @@ public abstract class DefaultSessionResponse {
     @JsonProperty("username")
     public abstract String username();
 
+    @JsonProperty("user_id")
+    public abstract String userId();
+
     @JsonCreator
     public static DefaultSessionResponse create(@JsonProperty("valid_until") Date validUntil,
-                                         @JsonProperty("session_id") String sessionId,
-                                         @JsonProperty("username") String username) {
-        return new AutoValue_DefaultSessionResponse(validUntil, sessionId, username);
+                                                @JsonProperty("session_id") String sessionId,
+                                                @JsonProperty("username") String username,
+                                                @JsonProperty("user_id") String userId) {
+        return new AutoValue_DefaultSessionResponse(validUntil, sessionId, username, userId);
     }
 }

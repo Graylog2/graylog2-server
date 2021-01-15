@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 const fs = require('fs');
 
 const webpack = require('webpack');
@@ -14,7 +30,7 @@ const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
-const TARGET = process.env.npm_lifecycle_event;
+const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
 const BABELRC = path.resolve(ROOT_PATH, 'babel.config.js');
@@ -82,7 +98,7 @@ const webpackConfig = {
   },
   module: {
     rules: [
-      { test: /\.js(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
+      { test: /\.[jt]s(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
       { test: /\.(svg)(\?.+)?$/, loader: 'file-loader' },
       {
         test: /\.(woff(2)?|ttf)(\?.+)?$/,
@@ -124,7 +140,7 @@ const webpackConfig = {
   },
   resolve: {
     // you can now require('file') instead of require('file.coffee')
-    extensions: ['.js', '.json', '.jsx'],
+    extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
     alias: {
       theme: path.resolve(APP_PATH, 'theme'),
@@ -178,13 +194,13 @@ if (TARGET === 'start') {
         DEVELOPMENT: true,
         GRAYLOG_HTTP_PUBLISH_URI: JSON.stringify(process.env.GRAYLOG_HTTP_PUBLISH_URI),
       }),
-      new CopyWebpackPlugin([{ from: 'config.js' }]),
+      new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
       new webpack.HotModuleReplacementPlugin(),
     ],
   });
 }
 
-if (TARGET === 'build') {
+if (TARGET.startsWith('build')) {
   // eslint-disable-next-line no-console
   console.error('Running in production mode');
   process.env.NODE_ENV = 'production';

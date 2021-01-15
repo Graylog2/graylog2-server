@@ -1,0 +1,103 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Highlight does not highlight string if length is negative 1`] = `
+<div>
+  foobar
+</div>
+`;
+
+exports[`Highlight does not highlight string if range for field is absent 1`] = `
+<div>
+  foobar
+</div>
+`;
+
+exports[`Highlight does not highlight string if start is negative 1`] = `
+<div>
+  foobar
+</div>
+`;
+
+exports[`Highlight highlights remainder of string if length of range exceeds length of string 1`] = `
+<div>
+  foo
+  <span
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+  >
+    bar
+  </span>
+  
+</div>
+`;
+
+exports[`Highlight highlights string for multiple highlight ranges 1`] = `
+<div>
+  the 
+  <span
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+  >
+    brown
+  </span>
+   fox 
+  <span
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+  >
+    jumps over
+  </span>
+   the lazy dog
+</div>
+`;
+
+exports[`Highlight highlights string for multiple highlight ranges where one is a complete subset of the other 1`] = `
+<div>
+  the 
+  <span
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+  >
+    brown
+  </span>
+  
+  <span
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+  />
+   fox jumps over the lazy dog
+</div>
+`;
+
+exports[`Highlight highlights string for multiple, overlapping highlight ranges 1`] = `
+<div>
+  the 
+  <span
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+  >
+    brown
+  </span>
+  
+  <span
+    style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+  >
+     fox jum
+  </span>
+  ps over the lazy dog
+</div>
+`;
+
+exports[`Highlight highlights string for single highlight range 1`] = `
+<span
+  style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
+>
+  foobar
+</span>
+`;
+
+exports[`Highlight returns unmodified string without ranges 1`] = `
+<div>
+  bar
+</div>
+`;
+
+exports[`Highlight works for empty field & value 1`] = `
+<div>
+  
+</div>
+`;

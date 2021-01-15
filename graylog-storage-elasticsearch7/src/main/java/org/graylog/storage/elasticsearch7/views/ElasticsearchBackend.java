@@ -1,38 +1,32 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.storage.elasticsearch7.views;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.graph.Traverser;
 import com.google.inject.name.Named;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -71,16 +65,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Preconditions.checkArgument;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
 
     private final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers;
-    private final QueryStringParser queryStringParser;
     private final ElasticsearchClient client;
     private final IndexLookup indexLookup;
     private final QueryStringDecorators queryStringDecorators;
@@ -89,14 +78,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
-                                QueryStringParser queryStringParser,
                                 ElasticsearchClient client,
                                 IndexLookup indexLookup,
                                 QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
-        this.queryStringParser = queryStringParser;
         this.client = client;
         this.indexLookup = indexLookup;
 
@@ -315,44 +302,5 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         }
 
         return Optional.empty();
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    private Set<String> queryStringsFromFilter(Filter entry) {
-        if (entry != null) {
-            final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
-            return StreamSupport.stream(filterTraverser.breadthFirst(entry).spliterator(), false)
-                    .filter(filter -> filter instanceof QueryStringFilter)
-                    .map(queryStringFilter -> ((QueryStringFilter) queryStringFilter).query())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-        }
-        return Collections.emptySet();
-    }
-
-    @Override
-    public QueryMetadata parse(ImmutableSet<Parameter> declaredParameters, Query query) {
-        checkArgument(query.query() instanceof ElasticsearchQueryString);
-        final String mainQueryString = ((ElasticsearchQueryString) query.query()).queryString();
-        final java.util.stream.Stream<String> queryStringStreams = java.util.stream.Stream.concat(
-                java.util.stream.Stream.of(mainQueryString),
-                query.searchTypes().stream().flatMap(this::queryStringsFromSearchType)
-        );
-
-        return queryStringStreams
-                .map(queryStringParser::parse)
-                .reduce(QueryMetadata.builder().build(), (meta1, meta2) -> QueryMetadata.builder().usedParameterNames(
-                        Sets.union(meta1.usedParameterNames(), meta2.usedParameterNames())
-                ).build());
-    }
-
-    private java.util.stream.Stream<String> queryStringsFromSearchType(SearchType searchType) {
-        return java.util.stream.Stream.concat(
-                searchType.query().filter(query -> query instanceof ElasticsearchQueryString)
-                        .map(query -> ((ElasticsearchQueryString) query).queryString())
-                        .map(java.util.stream.Stream::of)
-                        .orElse(java.util.stream.Stream.empty()),
-                queryStringsFromFilter(searchType.filter()).stream()
-        );
     }
 }

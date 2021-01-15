@@ -1,0 +1,82 @@
+# Bind DN:  cn=admin,dc=example,dc=com
+# Password is: admin
+
+#### Organizational Units ############################################
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+#### Groups ##########################################################
+dn: cn=IT,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: IT
+member: cn=Developers,ou=Groups,dc=example,dc=com
+member: cn=Operations,ou=Groups,dc=example,dc=com
+
+dn: cn=Developers,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Developers
+description: All developers
+member: cn=Senior Developers,ou=Groups,dc=example,dc=com
+member: cn=Bob Barker,ou=People,dc=example,dc=com
+
+dn: cn=Senior Developers,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+description: All senior developers
+cn: Senior Developers
+member: cn=Alice Allison,ou=People,dc=example,dc=com
+
+dn: cn=Operations,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Operations
+description: All of operations
+member: cn=Senior Operations,ou=Groups,dc=example,dc=com
+member: cn=John Doe,ou=People,dc=example,dc=com
+
+dn: cn=Senior Operations,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Senior Operations
+description: All of senior operations
+member: cn=Jane Doe,ou=People,dc=example,dc=com
+
+#### People ##########################################################
+# The password for all accounts is: pass
+dn: cn=Jane Doe,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Jane Doe
+gn: Jane
+sn: Doe
+mail: jane@example.com
+uid: jane
+userPassword:: e1NTSEF9VUFZMldUVEk3S1BHbjJ6UFRvaFdRMVNZTUswNWVrMHU=
+
+dn: cn=John Doe,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: John Doe
+gn: John
+sn: Doe
+mail: john@example.com
+uid: john
+userPassword:: e1NTSEF9VUFZMldUVEk3S1BHbjJ6UFRvaFdRMVNZTUswNWVrMHU=
+
+dn: cn=Alice Allison,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Alice Allison
+gn: Alice
+sn: Allison
+mail: alice@example.com
+uid: alice
+userPassword:: e1NTSEF9VUFZMldUVEk3S1BHbjJ6UFRvaFdRMVNZTUswNWVrMHU=
+
+dn: cn=Bob Barker,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Bob Barker
+gn: Bob
+sn: Barker
+mail: bob@example.com
+uid: bob
+userPassword:: e1NTSEF9VUFZMldUVEk3S1BHbjJ6UFRvaFdRMVNZTUswNWVrMHU=

@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer.fieldtypes;
 
@@ -102,12 +102,6 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
      */
     @Override
     public void doRun() {
-        final Lifecycle currentLifecycle = serverStatus.getLifecycle();
-        if (skippedLifecycles.contains(currentLifecycle)) {
-            LOG.debug("Server is not running, skipping run.");
-            return;
-        }
-
         if (!cluster.isConnected()) {
             LOG.info("Cluster not connected yet, delaying index field type initialization until it is reachable.");
             while (true) {
@@ -142,6 +136,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                     .filter(types -> !indices.exists(types.indexName()))
                     .forEach(types -> dbService.delete(types.id()));
         });
+    }
+
+    private boolean serverIsNotRunning() {
+        final Lifecycle currentLifecycle = serverStatus.getLifecycle();
+        return skippedLifecycles.contains(currentLifecycle);
     }
 
     /**
@@ -209,6 +208,9 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         LOG.debug("Schedule index field type updating for index set <{}/{}> every {} ms", indexSetId, indexSetTitle,
                 refreshInterval.getMillis());
         final ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
+            if (serverIsNotRunning()) {
+                return;
+            }
             try {
                 // Only check the active write index on a regular basis, the others don't change anymore
                 final String activeWriteIndex = indexSet.getActiveWriteIndex();

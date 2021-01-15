@@ -1,9 +1,22 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import styled from 'styled-components';
-import { enzymeFind } from 'styled-components/test-utils';
 
-import { Nav } from 'components/graylog';
 import Wizard from 'components/common/Wizard';
 
 import 'helpers/mocking/react-dom_mock';
@@ -215,16 +228,5 @@ describe('<Wizard />', () => {
 
     expect(wrapperH.find('button > svg.fa-caret-left').exists()).toBe(false);
     expect(wrapperH.find('button > svg.fa-caret-right').exists()).toBe(false);
-  });
-
-  it('should render a new component if NavigationComponent is passed', () => {
-    const TestNavComponentFaux = styled(Nav)``;
-    const TestNavComponent = styled(Nav)`
-      background: #000;
-    `;
-    const wrapper = mount(<Wizard steps={steps} NavigationComponent={TestNavComponent} />);
-
-    expect(enzymeFind(wrapper, TestNavComponent).exists()).toBe(true);
-    expect(enzymeFind(wrapper, TestNavComponentFaux).exists()).toBe(false);
   });
 });

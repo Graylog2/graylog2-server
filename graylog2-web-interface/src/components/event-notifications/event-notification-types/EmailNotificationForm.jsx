@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
@@ -34,6 +50,36 @@ Last messages accounting for this alert:
 \${end}
 `;
 
+const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
+<tr style="line-height:1.5"><th colspan="2" style="background-color:#e6e6e6">Event Definition</th></tr>
+<tr><td width="200px">Title</td><td>\${event_definition_title}</td></tr>
+<tr><td>Description</td><td>\${event_definition_description}</td></tr>
+<tr><td>Type</td><td>\${event_definition_type}</td></tr>
+</tbody></table>
+<br /><table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
+<tr><th colspan="2" style="background-color:#e6e6e6;line-height:1.5">Event</th></tr>
+<tr><td width="200px">Timestamp</td><td>\${event.timestamp}</td></tr>
+<tr><td>Message</td><td>\${event.message}</td></tr>
+<tr><td>Source</td><td>\${event.source}</td></tr>
+<tr><td>Key</td><td>\${event.key}</td></tr>
+<tr><td>Priority</td><td>\${event.priority}</td></tr>
+<tr><td>Alert</td><td>\${event.alert}</td></tr>
+<tr><td>Timestamp Processing</td><td>\${event.timestamp}</td></tr>
+<tr><td>Timerange Start</td><td>\${event.timerange_start}</td></tr>
+<tr><td>Timerange End</td><td>\${event.timerange_end}</td></tr>
+<tr><td>Source Streams</td><td>\${event.source_streams}</td></tr>
+<tr><td>Fields</td><td><ul style="list-style-type:square;">\${foreach event.fields field}<li>\${field.key}:\${field.value}</li>\${end}<ul></td></tr>
+</tbody></table>
+\${if backlog}
+<br /><table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
+<tr><th style="background-color:#e6e6e6;line-height:1.5">Backlog (Last messages accounting for this alert)</th></tr>
+\${foreach backlog message}
+<tr><td>\${message}</td></tr>
+\${end}
+</tbody></table>
+\${end}
+`;
+
 class EmailNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -47,6 +93,7 @@ class EmailNotificationForm extends React.Component {
     // eslint-disable-next-line no-template-curly-in-string
     subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
     body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
+    html_body_template: DEFAULT_HTML_BODY_TEMPLATE,
     user_recipients: [],
     email_recipients: [],
   };
@@ -67,6 +114,10 @@ class EmailNotificationForm extends React.Component {
 
   handleBodyTemplateChange = (nextValue) => {
     this.propagateChange('body_template', nextValue);
+  };
+
+  handleHtmlBodyTemplateChange = (nextValue) => {
+    this.propagateChange('html_body_template', nextValue);
   };
 
   handleRecipientsChange = (key) => {
@@ -128,7 +179,7 @@ class EmailNotificationForm extends React.Component {
           </HelpBlock>
         </FormGroup>
         <FormGroup controlId="notification-body-template"
-                   validationState={validation.errors.body_template ? 'error' : null}>
+                   validationState={validation.errors.body ? 'error' : null}>
           <ControlLabel>Body Template</ControlLabel>
           <SourceCodeEditor id="notification-body-template"
                             mode="text"
@@ -136,7 +187,19 @@ class EmailNotificationForm extends React.Component {
                             value={config.body_template || ''}
                             onChange={this.handleBodyTemplateChange} />
           <HelpBlock>
-            {lodash.get(validation, 'errors.body_template[0]', 'The template that will be used to generate the email body.')}
+            {lodash.get(validation, 'errors.body[0]', 'The template that will be used to generate the email body.')}
+          </HelpBlock>
+        </FormGroup>
+        <FormGroup controlId="notification-body-template"
+                   validationState={validation.errors.body ? 'error' : null}>
+          <ControlLabel>HTML Body Template</ControlLabel>
+          <SourceCodeEditor id="notification-html-body-template"
+                            mode="text"
+                            theme="light"
+                            value={config.html_body_template || ''}
+                            onChange={this.handleHtmlBodyTemplateChange} />
+          <HelpBlock>
+            {lodash.get(validation, 'errors.body[0]', 'The template that will be used to generate the email HTML body.')}
           </HelpBlock>
         </FormGroup>
       </>

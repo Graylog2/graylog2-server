@@ -1,0 +1,77 @@
+{
+  "entity": "grn::::dashboard:57bc9188e62a2373778d9e06",
+  "sharing_user": "grn::::user:john",
+  "available_grantees": [
+    {
+      "id": "grn::::builtin-team:everyone",
+      "type": "global",
+      "title": "Everyone"
+    },
+    {
+      "id": "grn::::user:jane",
+      "type": "user",
+      "title": "Jane Doe"
+    },
+    {
+      "id": "grn::::user:john",
+      "type": "user",
+      "title": "John Doe"
+    },
+    {
+      "id": "grn::::team:security",
+      "type": "team",
+      "title": "Security Folks"
+    }
+  ],
+  "available_capabilities": [
+    {
+      "id": "grn::::capability:54e3deadbeefdeadbeef0000",
+      "title": "Viewer"
+    },
+    {
+      "id": "grn::::capability:54e3deadbeefdeadbeef0001",
+      "title": "Manager"
+    },
+    {
+      "id": "grn::::capability:54e3deadbeefdeadbeef0002",
+      "title": "Owner"
+    }
+  ],
+  "active_shares": [
+    {
+      "grant": "grn::::grant:5ee2393bb3ceb9225f056efe",
+      "grantee": "grn::::user:john",
+      "capability": "grn::::capability:54e3deadbeefdeadbeef0002"
+    },
+    {
+      "grant": "grn::::grant:5ee2393bb3ceb9225f056fef",
+      "grantee": "grn::::user:jane",
+      "capability": "grn::::capability:54e3deadbeefdeadbeef0002"
+    }
+  ],
+  "selected_grantee_capabilities": {
+    "grn::::user:jane": "grn::::capability:54e3deadbeefdeadbeef0001",
+    "grn::::team:security": "grn::::capability:54e3deadbeefdeadbeef0000"
+  },
+  "missing_permissions_on_dependencies": {
+    "grn::::user:jane": [
+      {
+        "id": "grn::::stream:57bc9188e62a2373778d9e03",
+        "type": "stream",
+        "title": "Security Data",
+        "owners": [
+          {
+            "id": "grn::::user:john",
+            "type": "user",
+            "title": "Jane Doe"
+          },
+          {
+            "id": "grn::::team:security",
+            "type": "team",
+            "title": "Security Folks"
+          }
+        ]
+      }
+    ]
+  }
+}

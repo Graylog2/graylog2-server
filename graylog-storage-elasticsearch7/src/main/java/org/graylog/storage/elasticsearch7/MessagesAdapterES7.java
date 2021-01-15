@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.Meter;
@@ -44,6 +60,8 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String MAPPER_PARSING_EXCEPTION = "mapper_parsing_exception";
     static final String INDEX_BLOCK_REASON = "blocked by: [TOO_MANY_REQUESTS/12/index read-only / allow delete (api)";
+    static final String UNAVAILABLE_SHARDS_EXCEPTION = "unavailable_shards_exception";
+    static final String PRIMARY_SHARD_NOT_ACTIVE_REASON = "primary shard is not active";
 
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
@@ -207,6 +225,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         switch (exception.type()) {
             case MAPPER_PARSING_EXCEPTION: return Messages.IndexingError.ErrorType.MappingError;
             case INDEX_BLOCK_ERROR: if (exception.reason().contains(INDEX_BLOCK_REASON)) return Messages.IndexingError.ErrorType.IndexBlocked;
+            case UNAVAILABLE_SHARDS_EXCEPTION: if (exception.reason().contains(PRIMARY_SHARD_NOT_ACTIVE_REASON)) return Messages.IndexingError.ErrorType.IndexBlocked;
             default: return Messages.IndexingError.ErrorType.Unknown;
         }
     }

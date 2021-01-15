@@ -1,9 +1,25 @@
-import React, { useContext } from 'react';
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BootstrapPopover } from 'react-bootstrap';
-import styled, { css, ThemeContext } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 
 const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
@@ -24,7 +40,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.top {
       > .arrow {
         border-top-color: ${borderColor};
-  
+
         &::after {
           border-top-color: ${backgroundColor};
         }
@@ -34,7 +50,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.right {
       > .arrow {
         border-right-color: ${borderColor};
-  
+
         &::after {
           border-right-color: ${backgroundColor};
           z-index: 1;
@@ -45,7 +61,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.bottom {
       > .arrow {
         border-bottom-color: ${borderColor};
-  
+
         &::after {
           border-bottom-color: ${arrowColor};
         }
@@ -55,7 +71,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     &.left {
       > .arrow {
         border-left-color: ${borderColor};
-  
+
         &::after {
           border-left-color: ${backgroundColor};
         }
@@ -65,12 +81,10 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
 });
 
 const Popover = (props) => {
-  const theme = useContext(ThemeContext);
-
   return (
-    <GraylogThemeProvider overrideMode={theme?.mode}>
+    <ThemeAndUserProvider>
       <StyledPopover {...props} />
-    </GraylogThemeProvider>
+    </ThemeAndUserProvider>
   );
 };
 

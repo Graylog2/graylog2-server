@@ -1,18 +1,34 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import naturalSort from 'javascript-natural-sort';
 
+import withLocation from 'routing/withLocation';
 import { NavDropdown } from 'components/graylog';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
-import URLUtils from 'util/URLUtils';
+import { appPrefixed } from 'util/URLUtils';
 
 import NavigationLink from './NavigationLink';
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
 
 const _systemTitle = (pathname) => {
@@ -83,7 +99,7 @@ const SystemMenu = ({ location }) => {
   const pluginSystemNavigations = PluginStore.exports('systemnavigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
-      const prefixedPath = URLUtils.appPrefixed(path);
+      const prefixedPath = appPrefixed(path);
       const link = <NavigationLink description={description} path={prefixedPath} />;
 
       if (permissions) {
@@ -112,13 +128,19 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['loggers:read']}>
         <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
       </IfPermitted>
-      <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
-        <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} description="Authentication" />
+      <IfPermitted permissions={['users:list']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.USERS.OVERVIEW} description="Users and Teams" />
+      </IfPermitted>
+      <IfPermitted permissions={['roles:read']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} description="Roles" />
+      </IfPermitted>
+      <IfPermitted permissions={['authentication:edit']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE} description="Authentication" />
       </IfPermitted>
       <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['inputs:read']}>
         <NavigationLink path={Routes.SYSTEM.GROKPATTERNS} description="Grok Patterns" />
       </IfPermitted>
       <IfPermitted permissions={['inputs:edit']}>
@@ -127,7 +149,7 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['inputs:create']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['sidecars:read']}>
         <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
       </IfPermitted>
       {pluginSystemNavigations}
@@ -141,4 +163,4 @@ SystemMenu.propTypes = {
   }).isRequired,
 };
 
-export default withRouter(SystemMenu);
+export default withLocation(SystemMenu);

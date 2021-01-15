@@ -1,27 +1,24 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.GlobalOverride;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.errors.QueryError;
@@ -53,7 +50,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     T generate(SearchJob job, Query query, Set<QueryResult> predecessorResults);
 
     default boolean isAllMessages(TimeRange timeRange) {
-        return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).range() == 0;
+        return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();
     }
 
     default AbsoluteRange effectiveTimeRangeForResult(Query query, QueryResult queryResult) {
@@ -113,12 +110,4 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * @throws RuntimeException if the query could not be executed for some reason
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext, Set<QueryResult> predecessorResults);
-
-    /**
-     * Parse the query and return structural information about it.
-     * <p>
-     * This method decomposes the backend-specific query and returns information about used parameters, optionally the
-     * AST for syntax highlight and other information the UI can use to offer help.
-     */
-    QueryMetadata parse(ImmutableSet<Parameter> parameters, Query query);
 }

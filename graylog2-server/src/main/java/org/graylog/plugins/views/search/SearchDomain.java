@@ -1,27 +1,29 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.plugins.views.search;
 
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -29,12 +31,12 @@ import java.util.stream.Collectors;
 
 public class SearchDomain {
     private final SearchDbService dbService;
-    private final ViewPermissions viewPermissions;
+    private final ViewService viewService;
 
     @Inject
-    public SearchDomain(SearchDbService dbService, ViewPermissions viewPermissions) {
+    public SearchDomain(SearchDbService dbService, ViewService viewService) {
         this.dbService = dbService;
-        this.viewPermissions = viewPermissions;
+        this.viewService = viewService;
     }
 
     public Optional<Search> getForUser(String id, User user, Predicate<ViewDTO> viewReadPermission) {
@@ -57,11 +59,15 @@ public class SearchDomain {
     }
 
     private boolean hasReadPermissionFor(User user, Predicate<ViewDTO> viewReadPermission, Search search) {
-        return isOwned(search, user) || hasPermissionFromViews(search, user, viewReadPermission);
-    }
+        if (isOwned(search, user)) {
+            return true;
+        }
+        // Allowed if permissions exist for a referencing view
+        final Collection<ViewDTO> views = viewService.forSearch(search.id());
+        if (views.isEmpty())
+            return false;
 
-    private boolean hasPermissionFromViews(Search search, User user, Predicate<ViewDTO> hasViewReadPermission) {
-        return viewPermissions.isSearchPermitted(search.id(), user, hasViewReadPermission);
+        return views.stream().anyMatch(viewReadPermission);
     }
 
     private boolean isOwned(Search search, User user) {

@@ -11,6 +11,7 @@
         "sender" : "konrad.merz@example.org",
         "subject" : "Graylog event notification: ${event_definition_title}",
         "body_template" : "--- [Event Definition] ---------------------------\nTitle:       ${event_definition_title}\nDescription: ${event_definition_description}\nType:        ${event_definition_type}\n--- [Event] --------------------------------------\nTimestamp:            ${event.timestamp}\nMessage:              ${event.message}\nSource:               ${event.source}\nKey:                  ${event.key}\nPriority:             ${event.priority}\nAlert:                ${event.alert}\nTimestamp Processing: ${event.timestamp}\nTimerange Start:      ${event.timerange_start}\nTimerange End:        ${event.timerange_end}\nFields:\n${foreach event.fields field}  ${field.key}: ${field.value}\n${end}\n${if backlog}\n--- [Backlog] ------------------------------------\nLast messages accounting for this alert:\n${foreach backlog message}\n${message}\n${end}\n${end}\n",
+        "html_body_template": "<table><tbody><tr><td>Title</td><td>${event_definition_title}</td></tr></tbody></table>",
         "email_recipients" : [
           "example@example.org"
         ],

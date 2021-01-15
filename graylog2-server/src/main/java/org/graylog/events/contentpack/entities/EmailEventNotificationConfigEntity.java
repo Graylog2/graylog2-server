@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.contentpack.entities;
 
@@ -38,6 +38,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_SENDER = "sender";
     private static final String FIELD_SUBJECT = "subject";
     private static final String FIELD_BODY_TEMPLATE = "body_template";
+    private static final String FIELD_HTML_BODY_TEMPLATE = "html_body_template";
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
 
@@ -49,6 +50,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
 
     @JsonProperty(FIELD_BODY_TEMPLATE)
     public abstract ValueReference bodyTemplate();
+
+    @JsonProperty(FIELD_HTML_BODY_TEMPLATE)
+    public abstract ValueReference htmlBodyTemplate();
 
     @JsonProperty(FIELD_EMAIL_RECIPIENTS)
     public abstract Set<String> emailRecipients();
@@ -68,7 +72,8 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EmailEventNotificationConfigEntity.Builder()
-                    .type(TYPE_NAME);
+                    .type(TYPE_NAME)
+                    .htmlBodyTemplate(ValueReference.of(""));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -79,6 +84,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
 
         @JsonProperty(FIELD_BODY_TEMPLATE)
         public abstract Builder bodyTemplate(ValueReference bodyTemplate);
+
+        @JsonProperty(FIELD_HTML_BODY_TEMPLATE)
+        public abstract Builder htmlBodyTemplate(ValueReference htmlBodyTemplate);
 
         @JsonProperty(FIELD_EMAIL_RECIPIENTS)
         public abstract Builder emailRecipients(Set<String> emailRecipients);
@@ -95,6 +103,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .sender(sender().asString(parameters))
                 .subject(subject().asString(parameters))
                 .bodyTemplate(bodyTemplate().asString())
+                .htmlBodyTemplate(htmlBodyTemplate().asString())
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
                 .build();

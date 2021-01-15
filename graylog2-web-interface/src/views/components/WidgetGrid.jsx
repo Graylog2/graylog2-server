@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
@@ -7,18 +23,16 @@ import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import connect from 'stores/connect';
-import { AdditionalContext } from 'views/logic/ActionContext';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import WidgetContext from 'views/components/contexts/WidgetContext';
 import { RowContentStyles } from 'components/graylog/Row';
 
-import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
-import DrilldownContextProvider from './contexts/DrilldownContextProvider';
+import WidgetComponent from './WidgetComponent';
+import defaultTitle from './defaultTitle';
 
 const DashboardWrap = styled.div(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
@@ -26,24 +40,18 @@ const DashboardWrap = styled.div(({ theme }) => css`
   width: 100%;
 `);
 
-const WidgetContainer = styled.div`
+export const WidgetContainer = styled.div`
   z-index: auto;
   ${RowContentStyles}
+  height: 100%;
+  margin-bottom: 0;
 `;
-
-const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
 class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
     const widgetDef = widgetDefinition(type);
 
     return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
-  }
-
-  static _defaultTitle(widget) {
-    const widgetDef = widgetDefinition(widget.type);
-
-    return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);
   }
 
   static propTypes = {
@@ -98,40 +106,25 @@ class WidgetGrid extends React.Component {
 
     Object.keys(widgets).forEach((widgetId) => {
       const widget = widgets[widgetId];
-      const dataKey = widget.data || widgetId;
-      const widgetData = data[dataKey];
-      const widgetErrors = errors[widgetId] || [];
-
       returnedWidgets.positions[widgetId] = positions[widgetId] || WidgetGrid._defaultDimensions(widget.type);
 
       const { widgetDimensions = {} } = this.state;
-      const { height, width } = widgetDimensions[widgetId] || {};
-
       const { fields, allFields, titles = Immutable.Map() } = this.props;
-
-      const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], WidgetGrid._defaultTitle(widget));
+      const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
 
       returnedWidgets.widgets.push(
-        <WidgetContainer key={widget.id}>
-          <DrilldownContextProvider widget={widget}>
-            <WidgetContext.Provider value={widget}>
-              <AdditionalContext.Provider value={{ widget }}>
-                <Widget key={widgetId}
-                        id={widgetId}
-                        widget={widget}
-                        data={widgetData}
-                        errors={widgetErrors}
-                        height={height}
-                        position={returnedWidgets.positions[widgetId]}
-                        width={width}
-                        allFields={allFields}
-                        fields={fields}
-                        onPositionsChange={onPositionsChange}
-                        onSizeChange={this._onWidgetSizeChange}
-                        title={widgetTitle} />
-              </AdditionalContext.Provider>
-            </WidgetContext.Provider>
-          </DrilldownContextProvider>
+        <WidgetContainer key={widgetId}>
+          <WidgetComponent widget={widget}
+                           widgetId={widgetId}
+                           data={data}
+                           errors={errors}
+                           widgetDimension={widgetDimensions[widgetId] || {}}
+                           title={widgetTitle}
+                           position={returnedWidgets.positions[widgetId]}
+                           onPositionsChange={onPositionsChange}
+                           fields={fields}
+                           allFields={allFields}
+                           onWidgetSizeChange={this._onWidgetSizeChange} />
         </WidgetContainer>,
       );
     });

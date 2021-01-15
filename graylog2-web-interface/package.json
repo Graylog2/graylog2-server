@@ -1,9 +1,9 @@
 {
   "name": "graylog-web-interface",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.1.0-SNAPSHOT",
   "description": "Graylog Web Interface",
   "author": "torch",
-  "license": "GPL-3.0",
+  "license": "SSPL-1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/graylog2/graylog2-web-interface.git"
@@ -12,55 +12,26 @@
   "scripts": {
     "docs:build": "styleguidist build",
     "docs:server": "styleguidist server",
-    "flow-check": "flow check",
     "start": "node devServer.js",
     "build": "cross-env disable_plugins=true webpack --config webpack.bundled.js",
     "build:stats": "cross-env disable_plugins=true webpack --profile --json > ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json",
     "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
-    "lint": "eslint --ext js,jsx src",
-    "lint:path": "eslint --ext js,jsx",
+    "lint": "eslint src",
+    "lint:path": "eslint",
     "lint:styles": "stylelint './src/**/*.{js,jsx}' --syntax css-in-js",
     "lint:styles:path": "stylelint --syntax css-in-js --",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"
   },
+  "eslintConfig": {
+    "extends": "graylog"
+  },
   "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}"
-    ],
+    "preset": "jest-preset-graylog",
     "setupFiles": [
-      "jest-localstorage-mock",
-      "<rootDir>/test/setup-jest.js",
-      "<rootDir>/test/mock-FetchProvider.js",
-      "<rootDir>/test/mock-Version.js",
-      "<rootDir>/test/console-warnings-fail-tests.js"
-    ],
-    "setupFilesAfterEnv": [
-      "jest-enzyme"
-    ],
-    "moduleDirectories": [
-      "src",
-      "test",
-      "node_modules"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ],
-    "moduleNameMapper": {
-      "^file-loader(\\?esModule=false)?!(.+)$": "$2",
-      "^!style/useable!.*\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
-      "\\.(css|less)$": "identity-obj-proxy",
-      "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/fileMock.js"
-    },
-    "testPathIgnorePatterns": [
-      ".fixtures.js$"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest"
-    }
+      "<rootDir>/test/setup-jest.js"
+    ]
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
@@ -78,10 +49,8 @@
     "classnames": "^2.2.0",
     "clipboard": "^2.0.0",
     "crossfilter": "1.3.x",
-    "deep-equal": "^1.0.1",
     "dompurify": "^2.0.11",
     "downloadjs": "^1.4.7",
-    "formik": "^2.1.4",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",
@@ -98,11 +67,11 @@
     "opensans-npm-webfont": "1.0.0",
     "plotly.js": "^1.52.2",
     "qs": "^6.3.0",
-    "react-ace": "9.1.1",
+    "react-ace": "9.2.1",
     "react-color": "^2.14.0",
     "react-day-picker": "^7.4.8",
-    "react-dnd": "^7.0.2",
-    "react-dnd-html5-backend": "^2.0.0",
+    "react-dnd": "^11.1.3",
+    "react-dnd-html5-backend": "^11.1.3",
     "react-grid-layout": "^0.18.3",
     "react-immutable-proptypes": "^2.1.0",
     "react-isolated-scroll": "^0.1.1",
@@ -119,7 +88,7 @@
     "react-ultimate-pagination": "^1.2.0",
     "react-window": "^1.8.2",
     "sockjs-client": "^1.4.0",
-    "superagent": "^5.2.2",
+    "superagent": "^6.1.0",
     "superagent-bluebird-promise": "^4.1.0",
     "terser-webpack-plugin": "^4.0.0",
     "toastr": "^2.1.2",
@@ -127,6 +96,7 @@
     "typeahead.js": "^0.11.1",
     "ua-parser-js": "^0.7.12",
     "urijs": "^1.19.1",
+    "utility-types": "^3.10.0",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
@@ -136,14 +106,11 @@
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/polyfill": "^7.8.3",
     "@babel/preset-env": "^7.8.4",
-    "@babel/preset-flow": "^7.8.3",
     "@babel/preset-react": "^7.8.3",
-    "@testing-library/dom": "7.20.2",
-    "@testing-library/jest-dom": "5.11.0",
-    "@testing-library/react": "10.4.6",
-    "assets-webpack-plugin": "^3.5.1",
+    "@types/lodash": "^4.14.165",
+    "@types/react-plotly.js": "^2.2.4",
+    "assets-webpack-plugin": "^5.1.2",
     "babel-core": "^7.0.0-0",
-    "babel-jest": "^25.1.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-dynamic-import-node": "^2.3.0",
@@ -151,33 +118,25 @@
     "clean-webpack-plugin": "^3.0.0",
     "compression": "^1.7.2",
     "connect-history-api-fallback": "^1.4.0",
-    "copy-webpack-plugin": "^5.1.1",
+    "copy-webpack-plugin": "^6.1.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.2",
     "css-loader": "^0.28.10",
-    "enzyme": "3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
     "eslint-config-graylog": "file:packages/eslint-config-graylog",
     "eslint-loader": "^4.0.2",
     "estraverse-fb": "^1.3.1",
     "express": "^4.16.4",
+    "express-http-proxy": "^1.6.2",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^6.0.0",
-    "flow-bin": "0.128.0",
+    "fork-ts-checker-webpack-plugin": "^6.0.0",
     "glob": "^7.0.0",
     "html-webpack-plugin": "^4.2.0",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^25.1.0",
-    "jest-environment-enzyme": "^7.1.2",
-    "jest-enzyme": "^7.1.2",
-    "jest-localstorage-mock": "^2.4.0",
-    "jest-styled-components": "7.0.2",
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^2.1.1",
-    "react-select-event": "^4.1.4",
     "react-styleguidist": "^11.0.8",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
@@ -186,7 +145,7 @@
     "url-loader": "^4.0.0",
     "webpack": "^4.39.3",
     "webpack-bundle-analyzer": "^3.5.2",
-    "webpack-cli": "^3.3.9",
+    "webpack-cli": "3.3.12",
     "webpack-dev-middleware": "^3.7.1",
     "webpack-dev-server": "^3.8.0",
     "webpack-hot-middleware": "^2.25.0",
@@ -194,9 +153,9 @@
     "yargs": "^15.3.1"
   },
   "resolutions": {
-    "jquery": "3.4.1",
+    "jquery": "3.5.1",
     "jsdom": "15.2.1",
     "upath": "1.0.5",
-    "ace-builds": "1.4.11"
+    "ace-builds": "1.4.12"
   }
 }

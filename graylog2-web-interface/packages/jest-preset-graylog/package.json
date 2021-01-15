@@ -1,0 +1,43 @@
+{
+  "name": "jest-preset-graylog",
+  "version": "1.0.0",
+  "description": "Graylog jest preset, contains the jest configuration and dependencies to setup the test environment for the web interface",
+  "main": "jest-preset.js",
+  "scripts": {
+    "build": "babel -d lib/ src/ --copy-files",
+    "preparebuild": "yarn install --ignore-scripts --production=false",
+    "compile": "yarn run preparebuild && yarn run build",
+    "prepublish": "yarn run compile",
+    "preinstall": "yarn run compile || echo \"src\" folder missing, skipping preinstall"
+  },
+  "keywords": [
+    "graylog",
+    "jest"
+  ],
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "SSPL-1.0",
+  "dependencies": {
+    "@testing-library/dom": "7.20.2",
+    "@testing-library/jest-dom": "5.11.0",
+    "@testing-library/react": "11.2.3",
+    "@types/enzyme": "3.10.8",
+    "@types/jest": "25.2.3",
+    "babel-jest": "^25.1.0",
+    "enzyme": "3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "identity-obj-proxy": "^3.0.0",
+    "jest-environment-enzyme": "^7.1.2",
+    "jest-enzyme": "^7.1.2",
+    "jest-localstorage-mock": "^2.4.0",
+    "jest-styled-components": "7.0.2",
+    "jest": "^25.1.0",
+    "react-select-event": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.0",
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "7.12.1",
+    "babel-plugin-add-module-exports": "^1.0.2"
+  }
+}

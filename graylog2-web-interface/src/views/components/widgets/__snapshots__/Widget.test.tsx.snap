@@ -1,0 +1,220 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports['<Widget /> should render with empty props 1'] = `
+.c2 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 25px;
+  width: 25px;
+  border: 0;
+  background-color: transparent;
+  cursor: pointer;
+  color: #b4b4b4;
+  font-size: 1.125rem;
+}
+
+.c2:hover {
+  background-color: #e6e6e6;
+}
+
+.c2:active {
+  background-color: #cdcdcd;
+}
+
+.c0 {
+  height: inherit;
+  margin: 0;
+  padding: 20px;
+  display: grid;
+  display: -ms-grid;
+  grid-template-rows: auto minmax(10px,1fr);
+  -ms-grid-rows: auto minmax(10px,1fr);
+  -ms-grid-columns: 1fr;
+}
+
+.c0 .widget-top {
+  position: relative;
+  margin-bottom: -15px;
+  top: -5px;
+  font-size: 0.889rem;
+  line-height: 11px;
+}
+
+.c0 .dc-chart {
+  float: none;
+}
+
+.c0 .controls {
+  display: none;
+  position: relative;
+  left: -3px;
+}
+
+.c0 .reloading {
+  margin-right: 2px;
+  font-weight: bold;
+  color: #0057a8;
+  display: none;
+}
+
+.c0 .loading-failed {
+  color: #ad0707 !important;
+}
+
+.c0 .widget-title {
+  font-size: 1.125rem;
+  height: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c0 .load-error {
+  color: #ad0707;
+  margin-right: 5px;
+}
+
+.c0 .widget-update-info {
+  text-align: left;
+  float: left;
+  font-size: 0.889rem;
+  position: absolute;
+  bottom: 10px;
+  width: 130px;
+}
+
+.c0 .configuration dt {
+  text-transform: capitalize;
+}
+
+.c0 svg {
+  overflow: hidden;
+}
+
+.c0 .quickvalues-graph {
+  text-align: center;
+}
+
+.c0 .graph.scatterplot path.line {
+  display: none;
+}
+
+.c0 .actions {
+  position: absolute;
+  right: 15px;
+  bottom: 10px;
+}
+
+.c0 .actions div {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.c0 .actions button {
+  padding: 0 5px 0 5px;
+}
+
+.c0 .not-available {
+  font-size: 2.027rem;
+}
+
+.c0 .loading,
+.c0 .not-available {
+  line-height: 100px;
+  text-align: center;
+}
+
+.c0 .loading .spinner,
+.c0 .not-available .spinner {
+  vertical-align: middle;
+}
+
+.c1 > * {
+  margin-right: 5px;
+}
+
+.c1 > *:last-child {
+  margin-right: 0;
+}
+
+<body>
+  <div>
+    <div
+      class="c0"
+      data-widget-id="widgetId"
+      style="overflow: hidden;"
+    >
+      <widget-header
+        editing="false"
+        hidedraghandle="false"
+        loading="false"
+        title="Widget Title"
+      >
+        <div
+          class="c1"
+        >
+          <button
+            class="c2"
+            tabindex="0"
+            title="Focus this widget"
+            type="button"
+          >
+            <svg
+              class="svg-inline--fa fa-expand-arrows-alt"
+            />
+          </button>
+          <button
+            class="c2"
+            tabindex="0"
+            title="Stretch width"
+            type="button"
+          >
+            <svg
+              class="svg-inline--fa fa-arrows-alt-h"
+            />
+          </button>
+          <span
+            role="presentation"
+          >
+            <span
+              role="presentation"
+            >
+              <span>
+                <button
+                  class="c2"
+                  tabindex="0"
+                  title="Open actions dropdown"
+                  type="button"
+                >
+                  <svg
+                    class="svg-inline--fa fa-chevron-down"
+                    data-testid="widgetActionDropDown"
+                  />
+                </button>
+              </span>
+            </span>
+          </span>
+        </div>
+      </widget-header>
+      <div
+        class="spinnerContainer"
+      >
+        <svg
+          class="svg-inline--fa fa-sync"
+          data-testid="loading-widget"
+        />
+      </div>
+    </div>
+  </div>
+</body>
+`;

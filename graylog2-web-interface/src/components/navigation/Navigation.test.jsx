@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -12,7 +28,6 @@ jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
-jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 
@@ -22,6 +37,8 @@ jest.mock('util/AppConfig', () => ({
   gl2DevMode: jest.fn(() => false),
   isFeatureEnabled: jest.fn(() => false),
 }));
+
+jest.mock('routing/withLocation', () => (x) => x);
 
 const currentUser = viewsManager;
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
@@ -46,7 +63,7 @@ describe('Navigation', () => {
 
   beforeEach(() => {
     // eslint-disable-next-line global-require
-    Navigation = require('./Navigation');
+    Navigation = require('./Navigation').default;
   });
 
   describe('has common elements', () => {
@@ -64,10 +81,10 @@ describe('Navigation', () => {
       expect(brand.find('NavigationBrand')).toExist();
     });
 
-    it('contains user menu including correct username', () => {
+    it('contains user menu including correct user details', () => {
       const usermenu = wrapper.find('UserMenu');
 
-      expect(usermenu).toHaveProp('loginName', currentUser.username);
+      expect(usermenu).toHaveProp('userId', currentUser.id);
       expect(usermenu).toHaveProp('fullName', currentUser.full_name);
     });
 
@@ -172,8 +189,21 @@ describe('Navigation', () => {
 
     it.each`
     permissions                    | count | links
-    ${[]}                          | ${4}  | ${['Streams', 'Alerts', 'Dashboards']}
-    ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${5}  | ${['Search']}
+    ${[]}                          | ${5}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
+
+    it('should not show `Enterprise` item if user is lacking permissions', () => {
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              permissions={[]} />);
+
+      expect(wrapper.find('NavigationLink[description="Enterprise"]')).not.toExist();
+    });
+
+    it('should show `Enterprise` item if user has permission to read license', () => {
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              permissions={['licenseinfos:read']} />);
+
+      expect(wrapper.find('NavigationLink[description="Enterprise"]')).toExist();
+    });
   });
 });

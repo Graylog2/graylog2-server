@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.storage.elasticsearch7.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -68,11 +84,12 @@ public class ClientES7 implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        for (String index : indices)
+        for (String index : indices) {
             if (indicesExists(index)) {
                 final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
                 client.execute((c, requestOptions) -> c.indices().delete(deleteIndexRequest, requestOptions));
             }
+        }
     }
 
     @Override
@@ -192,7 +209,7 @@ public class ClientES7 implements Client {
     }
 
     private String[] existingTemplates() {
-        final GetIndexTemplatesRequest getIndexTemplatesRequest = new GetIndexTemplatesRequest("*");
+        final GetIndexTemplatesRequest getIndexTemplatesRequest = new GetIndexTemplatesRequest();
         final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
         return result.getIndexTemplates().stream()
                 .map(IndexTemplateMetadata::name)
@@ -206,7 +223,7 @@ public class ClientES7 implements Client {
 
         final JsonNode jsonResponse = client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
-             final Response response = c.getLowLevelClient().performRequest(request);
+            final Response response = c.getLowLevelClient().performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         });
 

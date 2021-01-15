@@ -1,29 +1,39 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
-import React, { useState, useContext, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import authStyles from 'theme/styles/authStyles';
 import { qualifyUrl } from 'util/URLUtils';
-import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
+const ServerUnavailableStyles = createGlobalStyle`
+  ${authStyles}
+`;
+
 const ServerUnavailablePage = ({ server }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const { addGlobalStyles } = useContext(GlobalStylesContext);
-
-  useEffect(() => {
-    addGlobalStyles(authStyles);
-
-    return () => {
-      addGlobalStyles(null);
-    };
-  }, []);
 
   const _toggleDetails = () => setShowDetails(!showDetails);
 
@@ -91,6 +101,7 @@ const ServerUnavailablePage = ({ server }) => {
 
   return (
     <DocumentTitle title="Server unavailable">
+      <ServerUnavailableStyles />
       <Modal show>
         <Modal.Header>
           <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>

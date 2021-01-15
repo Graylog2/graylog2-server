@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import Immutable from 'immutable';
@@ -8,6 +24,7 @@ import View from 'views/logic/views/View';
 
 import Query from './Query';
 import WidgetGrid from './WidgetGrid';
+import WidgetFocusContext from './contexts/WidgetFocusContext';
 
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
@@ -32,6 +49,20 @@ const widget2 = AggregationWidget.builder()
 const widgets = Immutable.Map({ widget1, widget2 });
 
 describe('Query', () => {
+  const SUT = (props) => (
+    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
+      <Query results={{ errors: [], searchTypes: {} }}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()}
+             {...props} />
+    </WidgetFocusContext.Provider>
+  );
+
   it('renders extracted results and provided widgets', () => {
     const results = {
       errors: [],
@@ -41,14 +72,7 @@ describe('Query', () => {
       },
     };
     const wrapper = mount((
-      <Query results={results}
-             widgetMapping={widgetMapping}
-             widgets={widgets}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -67,14 +91,7 @@ describe('Query', () => {
       },
     };
     const wrapper = mount((
-      <Query results={results}
-             widgetMapping={widgetMapping}
-             widgets={widgets}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -94,14 +111,7 @@ describe('Query', () => {
       },
     };
     const wrapper = mount((
-      <Query results={results}
-             widgetMapping={widgetMapping}
-             widgets={widgets}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -119,14 +129,7 @@ describe('Query', () => {
       searchTypes: {},
     };
     const wrapper = mount((
-      <Query results={results}
-             widgetMapping={widgetMapping}
-             widgets={widgets}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+      <SUT results={results} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
 
@@ -143,14 +146,8 @@ describe('Query', () => {
     };
     const wrapper = mount((
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <Query results={results}
-               widgetMapping={widgetMapping}
-               widgets={Immutable.Map()}
-               onToggleMessages={() => {}}
-               queryId="someQueryId"
-               showMessages
-               allFields={Immutable.List()}
-               fields={Immutable.List()} />
+        <SUT results={results}
+             widgets={Immutable.Map()} />
       </ViewTypeContext.Provider>
     ));
 
@@ -165,14 +162,8 @@ describe('Query', () => {
     };
     const wrapper = mount((
       <ViewTypeContext.Provider value={View.Type.Search}>
-        <Query results={results}
-               widgetMapping={widgetMapping}
-               widgets={Immutable.Map()}
-               onToggleMessages={() => {}}
-               queryId="someQueryId"
-               showMessages
-               allFields={Immutable.List()}
-               fields={Immutable.List()} />
+        <SUT results={results}
+             widgets={Immutable.Map()} />
       </ViewTypeContext.Provider>
     ));
 
@@ -186,14 +177,7 @@ describe('Query', () => {
       searchTypes: {},
     };
     const wrapper = mount((
-      <Query results={results}
-             widgetMapping={widgetMapping}
-             widgets={widgets}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+      <SUT results={results} />
     ));
 
     expect(wrapper.contains('You can create a new widget by selecting a widget type')).toEqual(false);

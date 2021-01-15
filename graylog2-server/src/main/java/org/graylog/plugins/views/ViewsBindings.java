@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.plugins.views;
 
@@ -72,16 +72,11 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
-import org.graylog.plugins.views.search.views.sharing.AllUsersOfInstance;
-import org.graylog.plugins.views.search.views.sharing.AllUsersOfInstanceStrategy;
-import org.graylog.plugins.views.search.views.sharing.SpecificRoles;
-import org.graylog.plugins.views.search.views.sharing.SpecificRolesStrategy;
-import org.graylog.plugins.views.search.views.sharing.SpecificUsers;
-import org.graylog.plugins.views.search.views.sharing.SpecificUsersStrategy;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.HeatmapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
@@ -168,8 +163,6 @@ public class ViewsBindings extends ViewsModule {
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 
-        registerViewSharingSubtypes();
-        registerSharingStrategies();
         registerSortConfigSubclasses();
         registerParameterSubtypes();
 
@@ -213,22 +206,11 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(NumberVisualizationConfigDTO.class);
         registerJacksonSubtype(LineVisualizationConfigDTO.class);
         registerJacksonSubtype(AreaVisualizationConfigDTO.class);
-    }
-
-    private void registerViewSharingSubtypes() {
-        registerJacksonSubtype(AllUsersOfInstance.class);
-        registerJacksonSubtype(SpecificRoles.class);
-        registerJacksonSubtype(SpecificUsers.class);
+        registerJacksonSubtype(HeatmapVisualizationConfigDTO.class);
     }
 
     private void registerParameterSubtypes() {
         registerJacksonSubtype(ValueParameter.class);
-    }
-
-    private void registerSharingStrategies() {
-        registerSharingStrategy(AllUsersOfInstance.TYPE, AllUsersOfInstanceStrategy.class);
-        registerSharingStrategy(SpecificRoles.TYPE, SpecificRolesStrategy.class);
-        registerSharingStrategy(SpecificUsers.TYPE, SpecificUsersStrategy.class);
     }
 
     private void registerExceptionMappers() {
