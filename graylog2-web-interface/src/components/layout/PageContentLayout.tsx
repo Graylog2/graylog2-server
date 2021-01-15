@@ -17,8 +17,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
 
+import { WithGlobalAppNotifications } from 'components/notifications';
 import { Grid } from 'components/graylog';
 import Footer from 'components/layout/Footer';
 
