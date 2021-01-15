@@ -22,6 +22,8 @@ import FetchError from 'logic/errors/FetchError';
 
 import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 
+jest.mock('components/layout/Footer');
+
 describe('UnauthorizedErrorPage', () => {
   it('displays fetch error', () => {
     suppressConsole(async () => {

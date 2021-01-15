@@ -19,6 +19,8 @@ import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import RuntimeErrorPage from './RuntimeErrorPage';
 
+jest.mock('components/layout/Footer');
+
 describe('RuntimeErrorPage', () => {
   const SimpleRuntimeErrorPage = () => <RuntimeErrorPage error={new Error('The error message')} componentStack="The component stack" />;
 

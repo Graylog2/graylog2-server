@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import mockComponent from 'helpers/mocking/MockComponent';
 
 import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
 
-jest.mock('components/layout/Footer', () => mockComponent('Footer'));
+jest.mock('components/layout/Footer');
 
 describe('UserHasNoStreamAccess', () => {
   it('should render error message', () => {
