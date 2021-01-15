@@ -17,12 +17,29 @@
 import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { PipelinesActions } = CombinedProvider.get('Pipelines');
+
+export type PipelineType = {
+  id: string,
+  title: string,
+  description: string,
+  source: string,
+  created_at: string,
+  modified_at: string,
+  stages: StageType[],
+  errors?: [],
+};
+
+export type StageType = {
+  stage: number,
+  match_all: boolean,
+  rules: [string],
+};
 
 const PipelinesStore = Reflux.createStore({
   listenables: [PipelinesActions],
@@ -32,7 +49,7 @@ const PipelinesStore = Reflux.createStore({
     return { pipelines: this.pipelines };
   },
 
-  _updatePipelinesState(pipeline) {
+  _updatePipelinesState(pipeline: PipelineType) {
     if (!this.pipelines) {
       this.pipelines = [pipeline];
     } else {
@@ -54,7 +71,7 @@ const PipelinesStore = Reflux.createStore({
         'Could not retrieve processing pipelines');
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.list().url);
+    const url = qualifyUrl(ApiRoutes.PipelinesController.list().url);
 
     return fetch('GET', url).then((response) => {
       this.pipelines = response;
@@ -68,7 +85,7 @@ const PipelinesStore = Reflux.createStore({
         `Could not retrieve processing pipeline "${pipelineId}"`);
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.get(pipelineId).url);
+    const url = qualifyUrl(ApiRoutes.PipelinesController.get(pipelineId).url);
     const promise = fetch('GET', url);
 
     promise.then(this._updatePipelinesState, failCallback);
@@ -80,7 +97,7 @@ const PipelinesStore = Reflux.createStore({
         'Could not save processing pipeline');
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.create().url);
+    const url = qualifyUrl(ApiRoutes.PipelinesController.create().url);
     const pipeline = {
       title: pipelineSource.title,
       description: pipelineSource.description,
@@ -105,7 +122,7 @@ const PipelinesStore = Reflux.createStore({
         'Could not update processing pipeline');
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.update(pipelineSource.id).url);
+    const url = qualifyUrl(ApiRoutes.PipelinesController.update(pipelineSource.id).url);
     const pipeline = {
       id: pipelineSource.id,
       title: pipelineSource.title,
@@ -130,7 +147,7 @@ const PipelinesStore = Reflux.createStore({
         `Could not delete processing pipeline "${pipelineId}"`);
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
+    const url = qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
 
     return fetch('DELETE', url).then(() => {
       const updatedPipelines = this.pipelines || [];
@@ -141,7 +158,7 @@ const PipelinesStore = Reflux.createStore({
     }, failCallback);
   },
   parse(pipelineSource, callback) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.parse().url);
+    const url = qualifyUrl(ApiRoutes.PipelinesController.parse().url);
     const pipeline = {
       title: pipelineSource.title,
       description: pipelineSource.description,

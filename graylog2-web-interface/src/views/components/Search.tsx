@@ -19,11 +19,10 @@ import { useCallback, useEffect, useContext } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
+import PageContentLayout from 'components/layout/PageContentLayout';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 import connect from 'stores/connect';
-import Footer from 'components/layout/Footer';
-import AppContentGrid from 'components/layout/AppContentGrid';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
@@ -75,21 +74,27 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
   ` : '';
 });
 
-const SearchArea = styled(AppContentGrid)`
-  height: 100%;
-  overflow-y: auto;
+const SearchArea = styled(PageContentLayout)(() => {
+  const { focusedWidget } = useContext(WidgetFocusContext);
 
-  .container-fluid {
+  return css`
     height: 100%;
-  }
-`;
 
-const SearchLayoutContainer = styled.div(({ isDashboard }: { isDashboard: boolean }) => {
+    ${focusedWidget && css`
+      > div {
+        height: ${focusedWidget ? 'calc(100% - 40px)' : 'auto'};
+        margin-bottom: 15px;
+      }
+    `}
+  `;
+});
+
+const SearchAreaGrid = styled.div(({ isDashboard }: { isDashboard: boolean }) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   const grid = isDashboard
-    ? 'grid-template-rows: min-content min-content auto min-content;'
-    : 'grid-template-rows: min-content auto min-content;';
+    ? 'grid-template-rows: min-content min-content auto;'
+    : 'grid-template-rows: min-content auto;';
 
   return css`
     height: 100%;
@@ -203,7 +208,7 @@ const Search = ({ location }: Props) => {
                       <SearchArea>
                         <ViewTypeContext.Consumer>
                           {(viewType) => (
-                            <SearchLayoutContainer isDashboard={viewType === 'DASHBOARD'}>
+                            <SearchAreaGrid isDashboard={viewType === 'DASHBOARD'}>
                               <IfInteractive>
                                 <HeaderElements />
                                 <IfDashboard>
@@ -222,8 +227,7 @@ const Search = ({ location }: Props) => {
                               <HighlightMessageInQuery>
                                 <SearchResult />
                               </HighlightMessageInQuery>
-                              <Footer />
-                            </SearchLayoutContainer>
+                            </SearchAreaGrid>
                           )}
                         </ViewTypeContext.Consumer>
                       </SearchArea>

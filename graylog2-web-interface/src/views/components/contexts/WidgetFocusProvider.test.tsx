@@ -15,12 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Map } from 'immutable';
 import { useContext } from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
+import { asMock } from 'helpers/mocking';
 
+import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import Widget from 'views/logic/widgets/Widget';
 
 const mockHistoryReplace = jest.fn();
 
@@ -35,10 +39,11 @@ jest.mock('react-router-dom', () => ({
   })),
 }));
 
-jest.mock('stores/connect', () => ({
-  useStore: jest.fn(() => ({
-    has: jest.fn(() => true),
-  })),
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetStore: {
+    getInitialState: jest.fn(() => ({ has: jest.fn(() => true) })),
+    listen: jest.fn(),
+  },
 }));
 
 describe('WidgetFocusProvider', () => {
@@ -49,7 +54,7 @@ describe('WidgetFocusProvider', () => {
       return (
         <>
           <button type="button" onClick={() => setFocusedWidget('click')}>Click</button>
-          <div>{focusedWidget}</div>
+          <div>{focusedWidget || 'No focus widget set'}</div>
         </>
       );
     };
@@ -72,6 +77,8 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should set focused widget from url', async () => {
+    asMock(WidgetStore.getInitialState).mockReturnValue(Map({ clack: Widget.builder().build() }));
+
     useLocation.mockReturnValue({
       pathname: '',
       search: 'focused=clack',
@@ -79,5 +86,17 @@ describe('WidgetFocusProvider', () => {
 
     renderSUT();
     await screen.findByText('clack');
+  });
+
+  it('should not set focused widget from url if the widget does not exist', async () => {
+    asMock(WidgetStore.getInitialState).mockReturnValue(Map());
+
+    useLocation.mockReturnValue({
+      pathname: '',
+      search: 'focused=clack',
+    });
+
+    renderSUT();
+    await screen.findByText('No focus widget set');
   });
 });
