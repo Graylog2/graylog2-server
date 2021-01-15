@@ -100,7 +100,7 @@ const SearchBar = ({
   const { query_string: queryString } = query;
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
-  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   const _onSubmit = (values) => onSubmit(values, currentQuery);
 
@@ -108,7 +108,8 @@ const SearchBar = ({
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
-          <SearchBarForm initialValues={{ limitDuration, timerange, streams, queryString }}
+          <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                         limitDuration={limitDuration}
                          onSubmit={_onSubmit}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
               <>

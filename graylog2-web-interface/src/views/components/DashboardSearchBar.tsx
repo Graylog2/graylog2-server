@@ -64,13 +64,15 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
     .then(() => performSearch());
 
   const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
-  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds();
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   return (
     <ScrollToHint value={queryString}>
       <Row className="content">
         <Col md={12}>
-          <DashboardSearchForm initialValues={{ limitDuration, timerange, queryString }} onSubmit={submitForm}>
+          <DashboardSearchForm initialValues={{ timerange, queryString }}
+                               limitDuration={limitDuration}
+                               onSubmit={submitForm}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values }) => {
               return (
                 <>
