@@ -28,9 +28,15 @@ type Props = {
 };
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
   height: 100%;
   overflow: auto;
   padding: 15px;
+`;
+
+const StyledGrid = styled(Grid)`
+  width: 100%;
 `;
 
 /*
@@ -40,9 +46,9 @@ const Container = styled.div`
 const PageContentLayout = ({ children, className }: Props) => (
   <Container className={className}>
     <WithGlobalAppNotifications>
-      <Grid fluid className="page-content-grid">
+      <StyledGrid fluid className="page-content-grid">
         {children}
-      </Grid>
+      </StyledGrid>
       <Footer />
     </WithGlobalAppNotifications>
   </Container>

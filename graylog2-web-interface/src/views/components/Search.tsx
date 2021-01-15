@@ -58,7 +58,6 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
@@ -80,26 +79,13 @@ const SearchArea = styled(PageContentLayout)(() => {
   return css`
     height: 100%;
 
-    ${focusedWidget && css`
-      .page-content-grid {
-        height: ${focusedWidget ? 'calc(100% - 40px)' : 'auto'};
-        margin-bottom: 15px;
-      }
-    `}
-  `;
-});
-
-const SearchAreaGrid = styled.div(({ isDashboard }: { isDashboard: boolean }) => {
-  const { focusedWidget } = useContext(WidgetFocusContext);
-
-  const grid = isDashboard
-    ? 'grid-template-rows: min-content min-content auto;'
-    : 'grid-template-rows: min-content auto;';
-
-  return css`
-    height: 100%;
-    display: ${focusedWidget ? 'grid' : 'initial'};
-    ${focusedWidget ? grid : ''}
+    .page-content-grid {
+      display: flex;
+      flex-direction: column;
+      height: ${focusedWidget ? '100%' : 'auto'};
+      /* overflow auto is required to display the message table widget height correctly */
+      overflow: ${focusedWidget ? 'auto' : 'visible'};
+    }
   `;
 });
 
@@ -206,30 +192,24 @@ const Search = ({ location }: Props) => {
                         </ConnectedSidebar>
                       </IfInteractive>
                       <SearchArea>
-                        <ViewTypeContext.Consumer>
-                          {(viewType) => (
-                            <SearchAreaGrid isDashboard={viewType === 'DASHBOARD'}>
-                              <IfInteractive>
-                                <HeaderElements />
-                                <IfDashboard>
-                                  <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                                </IfDashboard>
-                                <IfSearch>
-                                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                                </IfSearch>
+                        <IfInteractive>
+                          <HeaderElements />
+                          <IfDashboard>
+                            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                          </IfDashboard>
+                          <IfSearch>
+                            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                          </IfSearch>
 
-                                <QueryBarElements />
+                          <QueryBarElements />
 
-                                <IfDashboard>
-                                  <QueryBar />
-                                </IfDashboard>
-                              </IfInteractive>
-                              <HighlightMessageInQuery>
-                                <SearchResult />
-                              </HighlightMessageInQuery>
-                            </SearchAreaGrid>
-                          )}
-                        </ViewTypeContext.Consumer>
+                          <IfDashboard>
+                            <QueryBar />
+                          </IfDashboard>
+                        </IfInteractive>
+                        <HighlightMessageInQuery>
+                          <SearchResult />
+                        </HighlightMessageInQuery>
                       </SearchArea>
                     </GridContainer>
                   </HighlightingRulesProvider>
