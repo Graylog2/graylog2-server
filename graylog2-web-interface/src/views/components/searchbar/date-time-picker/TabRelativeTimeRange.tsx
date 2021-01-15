@@ -24,6 +24,8 @@ import Input from 'components/bootstrap/Input';
 import { Icon, Select } from 'components/common';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
+import ConfiguredRelativeTimeRangeSelector from './ConfiguredRelativeTimeRangeSelector';
+
 type Props = {
   disabled: boolean,
   originalTimeRange: {
@@ -54,6 +56,7 @@ const RANGE_TYPES = [
 const RelativeWrapper = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: space-around;
 `;
 
@@ -118,11 +121,17 @@ const RangeCheck = styled.label(({ theme }) => css`
 
 const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
-  grid-area: 3 / 1 / 3 / 8;
+  grid-area: 3 / 1 / 3 / 5;
   font-size: ${theme.fonts.size.tiny};
   font-style: italic;
   padding: 3px;
 `);
+
+const ConfiguredWrapper = styled.div`
+  grid-area: 3 / 5 / 3 / 7;
+  margin: 3px 12px 3px 0;
+  text-align: right;
+`;
 
 const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => {
   const typeDuration = moment.duration(1, type).asSeconds();
@@ -134,29 +143,32 @@ const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => 
   return null;
 }).filter(Boolean);
 
+const getFromValue = (value: number, originalTimeRange) => RANGE_TYPES.map(({ type }) => {
+  const isAllTime = value === 0;
+  const diff = moment.duration(value, 'seconds').as(type);
+
+  if (diff - Math.floor(diff) === 0) {
+    return {
+      ...originalTimeRange,
+      rangeValue: diff || 0,
+      rangeType: isAllTime ? 'seconds' : type,
+      rangeAllTime: isAllTime,
+      range: value,
+    };
+  }
+
+  return null;
+}).filter(Boolean).pop();
+
 const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
   return (
+    <>
     <RelativeWrapper>
       <Field name="nextTimeRange.range">
         {({ field: { value, onChange, name }, meta: { error } }) => {
-          const fromValue = RANGE_TYPES.map(({ type }) => {
-            const isAllTime = value === 0;
-            const diff = moment.duration(value, 'seconds').as(type);
-
-            if (diff - Math.floor(diff) === 0) {
-              return {
-                ...originalTimeRange,
-                rangeValue: diff || 0,
-                rangeType: isAllTime ? 'seconds' : type,
-                rangeAllTime: isAllTime,
-                range: value,
-              };
-            }
-
-            return null;
-          }).filter(Boolean).pop();
+          const fromValue = getFromValue(value, originalTimeRange);
 
           const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
 
@@ -178,7 +190,14 @@ const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Pr
             _onChange(event.target.checked ? 0 : notAllTime);
           };
 
+          const _onChangeExisting = (range) => {
+            const newFromValue = getFromValue(range, originalTimeRange);
+
+            _onChange(newFromValue.range);
+          };
+
           return (
+            <>
             <RangeWrapper>
               <RangeTitle>From:</RangeTitle>
               <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
@@ -213,12 +232,18 @@ const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Pr
                             clearable={false} />
 
               <Ago />
+
               {error && (
                 <ErrorMessage>
                   Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
                 </ErrorMessage>
               )}
+
+              <ConfiguredWrapper>
+                <ConfiguredRelativeTimeRangeSelector onChange={_onChangeExisting} />
+              </ConfiguredWrapper>
             </RangeWrapper>
+            </>
           );
         }}
       </Field>
@@ -252,6 +277,7 @@ const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Pr
         <Ago />
       </RangeWrapper>
     </RelativeWrapper>
+    </>
   );
 };
 
