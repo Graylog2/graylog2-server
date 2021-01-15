@@ -41,6 +41,7 @@ export const dateTimeValidate = (limitDuration) => (values) => {
     from?: string,
     to?: string,
     range?: string,
+    keyword?: string,
   } } = {};
 
   const { nextTimeRange } = values;
@@ -71,6 +72,17 @@ export const dateTimeValidate = (limitDuration) => (values) => {
   if (nextTimeRange?.type === 'relative') {
     if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
       errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+    }
+  }
+
+  if (nextTimeRange?.type === 'keyword') {
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
+      }
     }
   }
 
