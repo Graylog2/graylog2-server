@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -49,7 +49,7 @@ const PipelineConnectionsStore = Reflux.createStore({
         'Could not retrieve pipeline connections');
     };
 
-    const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.list().url);
+    const url = qualifyUrl(ApiRoutes.ConnectionsController.list().url);
     const promise = fetch('GET', url);
 
     promise.then((response) => {
@@ -59,7 +59,7 @@ const PipelineConnectionsStore = Reflux.createStore({
   },
 
   connectToStream(connection) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.to_stream().url);
+    const url = qualifyUrl(ApiRoutes.ConnectionsController.to_stream().url);
     const updatedConnection: PipelineConnectionsType = {
       stream_id: connection.stream,
       pipeline_ids: connection.pipelines,
@@ -82,7 +82,7 @@ const PipelineConnectionsStore = Reflux.createStore({
   },
 
   connectToPipeline(reverseConnection) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.to_pipeline().url);
+    const url = qualifyUrl(ApiRoutes.ConnectionsController.to_pipeline().url);
     const updatedConnection: PipelineReverseConnectionsType = {
       pipeline_id: reverseConnection.pipeline,
       stream_ids: reverseConnection.streams,

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Row, Col, Alert } from 'components/graylog';
@@ -73,16 +73,16 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     onStagesChange(newStages, callback);
   };
 
-  const _updateStage = (prevStage) => {
+  const _updateStage = useCallback((prevStage) => {
     return (stage, callback) => {
       const newStages = pipeline.stages.filter((s) => s.stage !== prevStage.stage);
 
       newStages.push(stage);
       onStagesChange(newStages, callback);
     };
-  };
+  }, [pipeline, onStagesChange]);
 
-  const _deleteStage = (stage) => {
+  const _deleteStage = useCallback((stage) => {
     return () => {
       // eslint-disable-next-line no-alert
       if (window.confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
@@ -91,7 +91,7 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
         onStagesChange(newStages);
       }
     };
-  };
+  }, [pipeline, onStagesChange]);
 
   const _formatConnectedStreams = (connectedStreams) => {
     const formattedStreams = connectedStreams.map((s) => `"${s.title}"`);
@@ -106,28 +106,23 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     );
   };
 
-  const _formatStage = (stage, maxStage) => {
-    return (
-      <Stage key={`stage-${stage.stage}`}
-             pipeline={pipeline}
-             stage={stage}
-             isLastStage={stage.stage === maxStage}
-             onUpdate={_updateStage(stage)}
-             onDelete={_deleteStage(stage)} />
-    );
-  };
-
-  const maxStage = useMemo(() => {
-    return pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
-  }, [pipeline.stages]);
   const formattedStages = useMemo(() => {
+    const maxStage = pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
+
     return pipeline.stages
       .sort((s1, s2) => s1.stage - s2.stage)
-      .map((stage) => _formatStage(stage, maxStage));
-  }, [pipeline.stages]);
+      .map((stage) => (
+        <Stage key={`stage-${stage.stage}`}
+               pipeline={pipeline}
+               stage={stage}
+               isLastStage={stage.stage === maxStage}
+               onUpdate={_updateStage(stage)}
+               onDelete={_deleteStage(stage)} />
+      ));
+  }, [pipeline, _updateStage, _deleteStage]);
 
   const stageKey = useMemo(() => {
-    return pipeline.stages.map(s => s.stage).join('-');
+    return pipeline.stages.map((s) => s.stage).join('-');
   }, [pipeline.stages]);
 
   return (

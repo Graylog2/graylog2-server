@@ -35,7 +35,7 @@ const PipelineDl = styled.dl`
     width: 160px;
   }
 
-  & > dt:after {
+  & > dt::after {
     content: ':';
   }
 

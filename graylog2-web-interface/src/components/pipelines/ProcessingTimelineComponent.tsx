@@ -117,6 +117,7 @@ const ProcessingTimelineComponent = () => {
   const _deletePipeline = (pipeline) => {
     return () => {
       // TODO: Replace with ConfirmDialog components
+      // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
         PipelinesActions.delete(pipeline.id);
       }
