@@ -79,13 +79,20 @@ const SearchArea = styled(PageContentLayout)(() => {
   return css`
     height: 100%;
 
-    .page-content-grid {
+    ${focusedWidget && css`
       display: flex;
       flex-direction: column;
-      height: ${focusedWidget ? '100%' : 'auto'};
-      /* overflow auto is required to display the message table widget height correctly */
-      overflow: ${focusedWidget ? 'auto' : 'visible'};
-    }
+      height: 100%;
+
+      .page-content-grid {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        /* overflow auto is required to display the message table widget height correctly */
+        overflow: ${focusedWidget ? 'auto' : 'visible'};
+      }
+    `}
   `;
 });
 

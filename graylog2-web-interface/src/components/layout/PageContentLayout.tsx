@@ -28,8 +28,6 @@ type Props = {
 };
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
   height: 100%;
   overflow: auto;
   padding: 15px;
@@ -37,6 +35,7 @@ const Container = styled.div`
 
 const StyledGrid = styled(Grid)`
   width: 100%;
+  margin-bottom: 10px;
 `;
 
 /*
