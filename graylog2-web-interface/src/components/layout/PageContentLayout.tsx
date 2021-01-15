@@ -30,7 +30,7 @@ type Props = {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 50px);
+  height: 100%;
   overflow: auto;
   padding: 15px;
 `;
