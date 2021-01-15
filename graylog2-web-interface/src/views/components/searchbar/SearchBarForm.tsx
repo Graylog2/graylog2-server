@@ -26,20 +26,23 @@ import DateTime from 'logic/datetimes/DateTime';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { FormikValues } from 'views/Constants';
 
+import DateTimeProvider from './date-time-picker/DateTimeProvider';
+
 type Props = {
+  limitDuration: number,
   initialValues: FormikValues,
   onSubmit: (Values) => void | Promise<any>,
   children: ((props: FormikProps<FormikValues>) => React.ReactNode) | React.ReactNode,
 };
 
-export const dateTimeValidate = (values) => {
+export const dateTimeValidate = (limitDuration) => (values) => {
   const errors: { nextTimeRange?: {
     from?: string,
     to?: string,
     range?: string,
   } } = {};
 
-  const { limitDuration, nextTimeRange } = values;
+  const { nextTimeRange } = values;
 
   if (nextTimeRange?.type === 'absolute') {
     if (!DateTime.isValidDateString(nextTimeRange.from)) {
@@ -70,7 +73,7 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<FormikValues>) => React.ReactElement => isFunction(children);
 
-const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
+const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     const newTimeRange = onSubmittingTimerange(timerange);
 
@@ -80,10 +83,9 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
       queryString,
     });
   }, [onSubmit]);
-  const { limitDuration, timerange, streams, queryString } = initialValues;
+  const { timerange, streams, queryString } = initialValues;
   const initialTimeRange = onInitializingTimerange(timerange);
   const _initialValues = {
-    limitDuration,
     queryString,
     streams,
     timerange: initialTimeRange,
@@ -94,11 +96,13 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
-            validate={dateTimeValidate}>
+            validate={dateTimeValidate(limitDuration)}>
       {(...args) => (
-        <StyledForm>
-          {_isFunction(children) ? children(...args) : children}
-        </StyledForm>
+        <DateTimeProvider limitDuration={limitDuration}>
+          <StyledForm>
+            {_isFunction(children) ? children(...args) : children}
+          </StyledForm>
+        </DateTimeProvider>
       )}
     </Formik>
   );
@@ -106,12 +110,12 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
 
 SearchBarForm.propTypes = {
   initialValues: PropTypes.shape({
-    limitDuration: PropTypes.number.isRequired,
     timerange: PropTypes.object.isRequired,
     queryString: PropTypes.string.isRequired,
     streams: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   onSubmit: PropTypes.func.isRequired,
+  limitDuration: PropTypes.number.isRequired,
 };
 
 export default SearchBarForm;

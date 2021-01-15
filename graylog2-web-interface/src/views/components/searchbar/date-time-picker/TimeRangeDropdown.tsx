@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useCallback, useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
 import moment from 'moment';
 import Mousetrap from 'mousetrap';
@@ -32,6 +32,7 @@ import TabKeywordTimeRange from './TabKeywordTimeRange';
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
+import { DateTimeContext } from './DateTimeProvider';
 
 const timeRangeTypes = {
   absolute: TabAbsoluteTimeRange,
@@ -125,8 +126,8 @@ const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, curren
 });
 
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
+  const { limitDuration } = useContext(DateTimeContext);
   const { initialValues, isValid, setFieldValue, validateForm, values } = useFormikContext<FormikValues>();
-  const limitDuration = initialValues?.limitDuration;
   const originalTimeRange = initialValues?.timerange;
   const initialTimeRange = values?.timerange;
   const currentTimeRange = values?.nextTimeRange;
