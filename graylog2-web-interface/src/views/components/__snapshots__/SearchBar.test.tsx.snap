@@ -282,7 +282,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
   color: rgb(88,73,5);
 }
 
-.c8.btn-danger {
+.c10.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -290,39 +290,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c8.btn-danger:hover {
+.c10.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c8.btn-danger.active {
+.c10.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c8.btn-danger.active:hover {
+.c10.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c8.btn-danger[disabled],
-.c8.btn-danger.disabled {
+.c10.btn-danger[disabled],
+.c10.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c8.btn-danger[disabled]:hover,
-.c8.btn-danger.disabled:hover {
+.c10.btn-danger[disabled]:hover,
+.c10.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c8.btn-default {
+.c10.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -330,39 +330,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c8.btn-default:hover {
+.c10.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c8.btn-default.active {
+.c10.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c8.btn-default.active:hover {
+.c10.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c8.btn-default[disabled],
-.c8.btn-default.disabled {
+.c10.btn-default[disabled],
+.c10.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c8.btn-default[disabled]:hover,
-.c8.btn-default.disabled:hover {
+.c10.btn-default[disabled]:hover,
+.c10.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c8.btn-info {
+.c10.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -370,39 +370,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c8.btn-info:hover {
+.c10.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c8.btn-info.active {
+.c10.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c8.btn-info.active:hover {
+.c10.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c8.btn-info[disabled],
-.c8.btn-info.disabled {
+.c10.btn-info[disabled],
+.c10.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c8.btn-info[disabled]:hover,
-.c8.btn-info.disabled:hover {
+.c10.btn-info[disabled]:hover,
+.c10.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c8.btn-link {
+.c10.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -410,39 +410,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c8.btn-link:hover {
+.c10.btn-link:hover {
   background-color: transparent;
   border-color: transparent;
   color: #410057;
 }
 
-.c8.btn-link.active {
+.c10.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c8.btn-link.active:hover {
+.c10.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: transparent;
   color: #410057;
 }
 
-.c8.btn-link[disabled],
-.c8.btn-link.disabled {
+.c10.btn-link[disabled],
+.c10.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c8.btn-link[disabled]:hover,
-.c8.btn-link.disabled:hover {
+.c10.btn-link[disabled]:hover,
+.c10.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c8.btn-primary {
+.c10.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -450,39 +450,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c8.btn-primary:hover {
+.c10.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c8.btn-primary.active {
+.c10.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c8.btn-primary.active:hover {
+.c10.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c8.btn-primary[disabled],
-.c8.btn-primary.disabled {
+.c10.btn-primary[disabled],
+.c10.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c8.btn-primary[disabled]:hover,
-.c8.btn-primary.disabled:hover {
+.c10.btn-primary[disabled]:hover,
+.c10.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c8.btn-success {
+.c10.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -490,39 +490,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c8.btn-success:hover {
+.c10.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c8.btn-success.active {
+.c10.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c8.btn-success.active:hover {
+.c10.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c8.btn-success[disabled],
-.c8.btn-success.disabled {
+.c10.btn-success[disabled],
+.c10.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c8.btn-success[disabled]:hover,
-.c8.btn-success.disabled:hover {
+.c10.btn-success[disabled]:hover,
+.c10.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c8.btn-warning {
+.c10.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -530,71 +530,71 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c8.btn-warning:hover {
+.c10.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c8.btn-warning.active {
+.c10.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c8.btn-warning.active:hover {
+.c10.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c8.btn-warning[disabled],
-.c8.btn-warning.disabled {
+.c10.btn-warning[disabled],
+.c10.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c8.btn-warning[disabled]:hover,
-.c8.btn-warning.disabled:hover {
+.c10.btn-warning[disabled]:hover,
+.c10.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c8 ~ .dropdown-menu {
+.c10 ~ .dropdown-menu {
   background-color: #fff;
   box-shadow: 0 3px 3px rgba(115,115,115,0.25);
 }
 
-.c8 ~ .dropdown-menu > li > a {
+.c10 ~ .dropdown-menu > li > a {
   color: #1f1f1f;
 }
 
-.c8 ~ .dropdown-menu > li > a:hover,
-.c8 ~ .dropdown-menu > li > a:focus {
+.c10 ~ .dropdown-menu > li > a:hover,
+.c10 ~ .dropdown-menu > li > a:focus {
   color: #575757;
   background-color: #f3f3f3;
 }
 
-.c8 ~ .dropdown-menu > .active > a {
+.c10 ~ .dropdown-menu > .active > a {
   color: #575757;
   background-color: #f3f3f3;
 }
 
-.c8 ~ .dropdown-menu > .active > a:hover,
-.c8 ~ .dropdown-menu > .active > a:focus {
+.c10 ~ .dropdown-menu > .active > a:hover,
+.c10 ~ .dropdown-menu > .active > a:focus {
   color: #2d2d2d;
   background-color: #d0d0d0;
 }
 
-.c8 ~ .dropdown-menu > .disabled > a {
+.c10 ~ .dropdown-menu > .disabled > a {
   color: #737373;
   background-color: #f3f3f3;
 }
 
-.c8 ~ .dropdown-menu > .disabled > a:hover,
-.c8 ~ .dropdown-menu > .disabled > a:focus {
+.c10 ~ .dropdown-menu > .disabled > a:hover,
+.c10 ~ .dropdown-menu > .disabled > a:focus {
   color: #737373;
   background-color: #f3f3f3;
 }
@@ -617,11 +617,11 @@ exports[`SearchBar should render the SearchBar 1`] = `
   border-radius: 4px;
 }
 
-.c11 {
+.c12 {
   margin-right: 7px;
 }
 
-.c11.btn-danger {
+.c12.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -629,39 +629,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c11.btn-danger:hover {
+.c12.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c11.btn-danger.active {
+.c12.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c11.btn-danger.active:hover {
+.c12.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c11.btn-danger[disabled],
-.c11.btn-danger.disabled {
+.c12.btn-danger[disabled],
+.c12.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c11.btn-danger[disabled]:hover,
-.c11.btn-danger.disabled:hover {
+.c12.btn-danger[disabled]:hover,
+.c12.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c11.btn-default {
+.c12.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -669,39 +669,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c11.btn-default:hover {
+.c12.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c11.btn-default.active {
+.c12.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c11.btn-default.active:hover {
+.c12.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c11.btn-default[disabled],
-.c11.btn-default.disabled {
+.c12.btn-default[disabled],
+.c12.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c11.btn-default[disabled]:hover,
-.c11.btn-default.disabled:hover {
+.c12.btn-default[disabled]:hover,
+.c12.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c11.btn-info {
+.c12.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -709,39 +709,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c11.btn-info:hover {
+.c12.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c11.btn-info.active {
+.c12.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c11.btn-info.active:hover {
+.c12.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c11.btn-info[disabled],
-.c11.btn-info.disabled {
+.c12.btn-info[disabled],
+.c12.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c11.btn-info[disabled]:hover,
-.c11.btn-info.disabled:hover {
+.c12.btn-info[disabled]:hover,
+.c12.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c11.btn-link {
+.c12.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -749,39 +749,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c11.btn-link:hover {
+.c12.btn-link:hover {
   background-color: transparent;
   border-color: transparent;
   color: #410057;
 }
 
-.c11.btn-link.active {
+.c12.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c11.btn-link.active:hover {
+.c12.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: transparent;
   color: #410057;
 }
 
-.c11.btn-link[disabled],
-.c11.btn-link.disabled {
+.c12.btn-link[disabled],
+.c12.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c11.btn-link[disabled]:hover,
-.c11.btn-link.disabled:hover {
+.c12.btn-link[disabled]:hover,
+.c12.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c11.btn-primary {
+.c12.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -789,39 +789,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c11.btn-primary:hover {
+.c12.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c11.btn-primary.active {
+.c12.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c11.btn-primary.active:hover {
+.c12.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c11.btn-primary[disabled],
-.c11.btn-primary.disabled {
+.c12.btn-primary[disabled],
+.c12.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c11.btn-primary[disabled]:hover,
-.c11.btn-primary.disabled:hover {
+.c12.btn-primary[disabled]:hover,
+.c12.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c11.btn-success {
+.c12.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -829,39 +829,39 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c11.btn-success:hover {
+.c12.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c11.btn-success.active {
+.c12.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c11.btn-success.active:hover {
+.c12.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c11.btn-success[disabled],
-.c11.btn-success.disabled {
+.c12.btn-success[disabled],
+.c12.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c11.btn-success[disabled]:hover,
-.c11.btn-success.disabled:hover {
+.c12.btn-success[disabled]:hover,
+.c12.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c11.btn-warning {
+.c12.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -869,33 +869,33 @@ exports[`SearchBar should render the SearchBar 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c11.btn-warning:hover {
+.c12.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c11.btn-warning.active {
+.c12.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c11.btn-warning.active:hover {
+.c12.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c11.btn-warning[disabled],
-.c11.btn-warning.disabled {
+.c12.btn-warning[disabled],
+.c12.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c11.btn-warning[disabled]:hover,
-.c11.btn-warning.disabled:hover {
+.c12.btn-warning[disabled]:hover,
+.c12.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
@@ -904,7 +904,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
 .c5 {
   width: 100%;
   padding: 3px 9px;
-  margin: 0 12px;
+  margin: 0 0 0 12px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -933,22 +933,22 @@ exports[`SearchBar should render the SearchBar 1`] = `
   font-size: 1rem;
 }
 
-.c6 {
+.c8 {
   max-width: 100%;
 }
 
-.c7 {
+.c9 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.c7 > .btn-group .btn:first-child {
+.c9 > .btn-group .btn:first-child {
   max-width: 100%;
 }
 
-.c9 {
+.c11 {
   display: inline-block;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -956,7 +956,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
   vertical-align: inherit;
 }
 
-.c10 {
+.c6 {
   width: 100%;
   height: 10px;
 }
@@ -980,6 +980,16 @@ exports[`SearchBar should render the SearchBar 1`] = `
   justify-content: space-between;
 }
 
+.c7 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.c7 > div {
+  margin-right: 24px;
+}
+
 <span>
     <div
       class="c0 content row"
@@ -995,7 +1005,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
             class="c2 row"
           >
             <div
-              class="c3 col-md-6"
+              class="c3 col-md-5"
             >
               <div>
                 <button
@@ -1029,11 +1039,86 @@ exports[`SearchBar should render the SearchBar 1`] = `
                   </code>
                 </span>
               </p>
+            </div>
+            <div
+              class="hidden-lg hidden-md"
+            >
               <div
-                class="c6 pull-right"
+                class="c6"
+                height="10"
+              />
+            </div>
+            <div
+              class="c3 col-md-7"
+            >
+              <div
+                class="c7"
               >
                 <div
-                  class="c7 btn-group"
+                  data-testid="streams-filter"
+                  style="position: relative;"
+                  title="Select streams the search should include. Searches in all streams if empty."
+                >
+                  <div
+                    class="css-1pcexqc-container"
+                  >
+                    <div
+                      class="css-ghr2vn-control"
+                    >
+                      <div
+                        class="css-1hio1c"
+                      >
+                        <div
+                          class="css-1nlt8zk-placeholder"
+                        >
+                          Select streams the search should include. Searches in all streams if empty.
+                        </div>
+                        <div
+                          class="css-dg7tyz"
+                        >
+                          <div
+                            class=""
+                            style="display: inline-block;"
+                          >
+                            <input
+                              aria-autocomplete="list"
+                              autocapitalize="none"
+                              autocomplete="off"
+                              autocorrect="off"
+                              id="streams-filter"
+                              spellcheck="false"
+                              style="box-sizing: content-box; width: 2px; border: 0px; opacity: 1; outline: 0; padding: 0px;"
+                              tabindex="0"
+                              type="text"
+                              value=""
+                            />
+                            <div
+                              style="position: absolute; top: 0px; left: 0px; visibility: hidden; height: 0px; overflow: scroll; white-space: pre; font-family: -webkit-small-control; letter-spacing: normal; text-transform: none;"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="css-1wy0on6"
+                      >
+                        <div
+                          aria-hidden="true"
+                          style="color: rgb(166, 166, 166); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
+                        >
+                          <svg
+                            class="svg-inline--fa fa-caret-down"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="c8 pull-right"
+              >
+                <div
+                  class="c9 btn-group"
                 >
                   <button
                     class="c4 btn btn-default"
@@ -1049,13 +1134,13 @@ exports[`SearchBar should render the SearchBar 1`] = `
                     <button
                       aria-expanded="false"
                       aria-haspopup="true"
-                      class="c8 dropdown-toggle btn btn-default"
+                      class="c10 dropdown-toggle btn btn-default"
                       id="refresh-options-dropdown"
                       role="button"
                       type="button"
                     >
                       <div
-                        class="c9"
+                        class="c11"
                       >
                         Not updating
                       </div>
@@ -1158,77 +1243,6 @@ exports[`SearchBar should render the SearchBar 1`] = `
                 </div>
               </div>
             </div>
-            <div
-              class="hidden-lg hidden-md"
-            >
-              <div
-                class="c10"
-                height="10"
-              />
-            </div>
-            <div
-              class="col-md-6"
-            >
-              <div
-                data-testid="streams-filter"
-                style="position: relative;"
-                title="Select streams the search should include. Searches in all streams if empty."
-              >
-                <div
-                  class="css-1pcexqc-container"
-                >
-                  <div
-                    class="css-ghr2vn-control"
-                  >
-                    <div
-                      class="css-1hio1c"
-                    >
-                      <div
-                        class="css-1nlt8zk-placeholder"
-                      >
-                        Select streams the search should include. Searches in all streams if empty.
-                      </div>
-                      <div
-                        class="css-dg7tyz"
-                      >
-                        <div
-                          class=""
-                          style="display: inline-block;"
-                        >
-                          <input
-                            aria-autocomplete="list"
-                            autocapitalize="none"
-                            autocomplete="off"
-                            autocorrect="off"
-                            id="streams-filter"
-                            spellcheck="false"
-                            style="box-sizing: content-box; width: 2px; border: 0px; opacity: 1; outline: 0; padding: 0px;"
-                            tabindex="0"
-                            type="text"
-                            value=""
-                          />
-                          <div
-                            style="position: absolute; top: 0px; left: 0px; visibility: hidden; height: 0px; overflow: scroll; white-space: pre; font-family: -webkit-small-control; letter-spacing: normal; text-transform: none;"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      class="css-1wy0on6"
-                    >
-                      <div
-                        aria-hidden="true"
-                        style="color: rgb(166, 166, 166); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
-                      >
-                        <svg
-                          class="svg-inline--fa fa-caret-down"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
           <div
             class="c0 no-bm row"
@@ -1250,7 +1264,7 @@ exports[`SearchBar should render the SearchBar 1`] = `
                 </a>
               </div>
               <button
-                class="c11 pull-left btn btn-success"
+                class="c12 pull-left btn btn-success"
                 title="Perform search"
                 type="submit"
               >
