@@ -15,14 +15,44 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import PageContentLayout from './PageContentLayout';
 
+jest.mock('injection/StoreProvider', () => ({
+  getStore: () => ({
+    getInitialState: () => ({
+      system: { version: '23.42.0-SNAPSHOT+SPECIALFEATURE', hostname: 'hopper.local' },
+    }),
+    jvm: jest.fn(() => Promise.resolve({ info: 'SomeJDK v12.0.0' })),
+    listen: jest.fn(() => () => {}),
+  }),
+}));
+
 describe('PageContentLayout', () => {
   it('renders its children', async () => {
-    const { getByText } = render(<PageContentLayout><div>The content</div></PageContentLayout>);
+    render(<PageContentLayout><div>The content</div></PageContentLayout>);
 
-    expect(getByText('The content')).not.toBeNull();
+    await screen.findByText('Graylog 23.42.0-SNAPSHOT+SPECIALFEATURE', { exact: false });
+
+    expect(screen.getByText('The content')).not.toBeNull();
+  });
+
+  it('displays global notifications', async () => {
+    PluginStore.register(new PluginManifest({}, {
+      globalNotifications: [
+        {
+          key: 'org.graylog.plugins.globalNotification.licenseWarning',
+          component: () => 'Your license is expiring.',
+        },
+      ],
+    }));
+
+    render(<PageContentLayout><div>The content</div></PageContentLayout>);
+
+    await screen.findByText('Graylog 23.42.0-SNAPSHOT+SPECIALFEATURE', { exact: false });
+
+    expect(screen.getByText('Your license is expiring.')).not.toBeNull();
   });
 });
