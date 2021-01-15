@@ -17,7 +17,7 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-class AppGlobalNotifications extends React.Component {
+class GlobalAppNotifications extends React.Component {
   render() {
     const globalNotifications = PluginStore.exports('globalNotifications')
       .map((notification) => {
@@ -47,4 +47,4 @@ class AppGlobalNotifications extends React.Component {
   }
 }
 
-export default AppGlobalNotifications;
+export default GlobalAppNotifications;

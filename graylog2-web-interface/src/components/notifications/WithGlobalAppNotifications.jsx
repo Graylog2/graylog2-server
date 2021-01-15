@@ -17,12 +17,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import AppGlobalNotifications from './AppGlobalNotifications';
+import GlobalAppNotifications from './GlobalAppNotifications';
 
 const AppWithGlobalNotifications = ({ children }) => {
   return (
     <div>
-      <AppGlobalNotifications />
+      <GlobalAppNotifications />
       {children}
     </div>
   );
