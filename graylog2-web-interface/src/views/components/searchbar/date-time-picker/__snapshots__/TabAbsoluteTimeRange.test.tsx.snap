@@ -1579,7 +1579,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                           role="heading"
                         >
                           <div>
-                            January 2021
+                            October 1985
                           </div>
                         </div>
                         <div
@@ -1672,27 +1672,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                           >
                             <div
                               aria-disabled="true"
-                              aria-label="Sun Dec 27 2020"
-                              aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--outside"
-                              role="gridcell"
-                              tabindex="-1"
-                            >
-                              27
-                            </div>
-                            <div
-                              aria-disabled="true"
-                              aria-label="Mon Dec 28 2020"
-                              aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--outside"
-                              role="gridcell"
-                              tabindex="-1"
-                            >
-                              28
-                            </div>
-                            <div
-                              aria-disabled="true"
-                              aria-label="Tue Dec 29 2020"
+                              aria-label="Sun Sep 29 1985"
                               aria-selected="false"
                               class="DayPicker-Day DayPicker-Day--outside"
                               role="gridcell"
@@ -1702,7 +1682,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="true"
-                              aria-label="Wed Dec 30 2020"
+                              aria-label="Mon Sep 30 1985"
                               aria-selected="false"
                               class="DayPicker-Day DayPicker-Day--outside"
                               role="gridcell"
@@ -1711,18 +1691,8 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                               30
                             </div>
                             <div
-                              aria-disabled="true"
-                              aria-label="Thu Dec 31 2020"
-                              aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--outside"
-                              role="gridcell"
-                              tabindex="-1"
-                            >
-                              31
-                            </div>
-                            <div
                               aria-disabled="false"
-                              aria-label="Fri Jan 01 2021"
+                              aria-label="Tue Oct 01 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1732,7 +1702,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Sat Jan 02 2021"
+                              aria-label="Wed Oct 02 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1740,14 +1710,9 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               2
                             </div>
-                          </div>
-                          <div
-                            class="DayPicker-Week"
-                            role="row"
-                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Sun Jan 03 2021"
+                              aria-label="Thu Oct 03 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1757,7 +1722,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Mon Jan 04 2021"
+                              aria-label="Fri Oct 04 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1767,7 +1732,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Tue Jan 05 2021"
+                              aria-label="Sat Oct 05 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1775,9 +1740,14 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               5
                             </div>
+                          </div>
+                          <div
+                            class="DayPicker-Week"
+                            role="row"
+                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Wed Jan 06 2021"
+                              aria-label="Sun Oct 06 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1787,7 +1757,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Thu Jan 07 2021"
+                              aria-label="Mon Oct 07 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1797,7 +1767,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Fri Jan 08 2021"
+                              aria-label="Tue Oct 08 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1807,7 +1777,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Sat Jan 09 2021"
+                              aria-label="Wed Oct 09 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1815,14 +1785,9 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               9
                             </div>
-                          </div>
-                          <div
-                            class="DayPicker-Week"
-                            role="row"
-                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Sun Jan 10 2021"
+                              aria-label="Thu Oct 10 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1832,7 +1797,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Mon Jan 11 2021"
+                              aria-label="Fri Oct 11 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1842,7 +1807,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Tue Jan 12 2021"
+                              aria-label="Sat Oct 12 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1850,9 +1815,14 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               12
                             </div>
+                          </div>
+                          <div
+                            class="DayPicker-Week"
+                            role="row"
+                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Wed Jan 13 2021"
+                              aria-label="Sun Oct 13 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1862,7 +1832,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Thu Jan 14 2021"
+                              aria-label="Mon Oct 14 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1872,9 +1842,9 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Fri Jan 15 2021"
+                              aria-label="Tue Oct 15 1985"
                               aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--today"
+                              class="DayPicker-Day"
                               role="gridcell"
                               tabindex="-1"
                             >
@@ -1882,7 +1852,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Sat Jan 16 2021"
+                              aria-label="Wed Oct 16 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1890,14 +1860,9 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               16
                             </div>
-                          </div>
-                          <div
-                            class="DayPicker-Week"
-                            role="row"
-                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Sun Jan 17 2021"
+                              aria-label="Thu Oct 17 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1907,7 +1872,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Mon Jan 18 2021"
+                              aria-label="Fri Oct 18 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1917,7 +1882,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Tue Jan 19 2021"
+                              aria-label="Sat Oct 19 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1925,9 +1890,14 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               19
                             </div>
+                          </div>
+                          <div
+                            class="DayPicker-Week"
+                            role="row"
+                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Wed Jan 20 2021"
+                              aria-label="Sun Oct 20 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1937,7 +1907,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Thu Jan 21 2021"
+                              aria-label="Mon Oct 21 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1947,7 +1917,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Fri Jan 22 2021"
+                              aria-label="Tue Oct 22 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1957,7 +1927,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Sat Jan 23 2021"
+                              aria-label="Wed Oct 23 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1965,14 +1935,9 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               23
                             </div>
-                          </div>
-                          <div
-                            class="DayPicker-Week"
-                            role="row"
-                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Sun Jan 24 2021"
+                              aria-label="Thu Oct 24 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -1982,9 +1947,9 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Mon Jan 25 2021"
-                              aria-selected="false"
-                              class="DayPicker-Day"
+                              aria-label="Fri Oct 25 1985"
+                              aria-selected="true"
+                              class="DayPicker-Day DayPicker-Day--selected"
                               role="gridcell"
                               tabindex="-1"
                             >
@@ -1992,7 +1957,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Tue Jan 26 2021"
+                              aria-label="Sat Oct 26 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -2000,9 +1965,14 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               26
                             </div>
+                          </div>
+                          <div
+                            class="DayPicker-Week"
+                            role="row"
+                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Wed Jan 27 2021"
+                              aria-label="Sun Oct 27 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -2012,7 +1982,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Thu Jan 28 2021"
+                              aria-label="Mon Oct 28 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -2022,7 +1992,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Fri Jan 29 2021"
+                              aria-label="Tue Oct 29 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -2032,7 +2002,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="false"
-                              aria-label="Sat Jan 30 2021"
+                              aria-label="Wed Oct 30 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -2040,14 +2010,9 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             >
                               30
                             </div>
-                          </div>
-                          <div
-                            class="DayPicker-Week"
-                            role="row"
-                          >
                             <div
                               aria-disabled="false"
-                              aria-label="Sun Jan 31 2021"
+                              aria-label="Thu Oct 31 1985"
                               aria-selected="false"
                               class="DayPicker-Day"
                               role="gridcell"
@@ -2057,7 +2022,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="true"
-                              aria-label="Mon Feb 01 2021"
+                              aria-label="Fri Nov 01 1985"
                               aria-selected="false"
                               class="DayPicker-Day DayPicker-Day--outside"
                               role="gridcell"
@@ -2067,53 +2032,13 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                             </div>
                             <div
                               aria-disabled="true"
-                              aria-label="Tue Feb 02 2021"
+                              aria-label="Sat Nov 02 1985"
                               aria-selected="false"
                               class="DayPicker-Day DayPicker-Day--outside"
                               role="gridcell"
                               tabindex="-1"
                             >
                               2
-                            </div>
-                            <div
-                              aria-disabled="true"
-                              aria-label="Wed Feb 03 2021"
-                              aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--outside"
-                              role="gridcell"
-                              tabindex="-1"
-                            >
-                              3
-                            </div>
-                            <div
-                              aria-disabled="true"
-                              aria-label="Thu Feb 04 2021"
-                              aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--outside"
-                              role="gridcell"
-                              tabindex="-1"
-                            >
-                              4
-                            </div>
-                            <div
-                              aria-disabled="true"
-                              aria-label="Fri Feb 05 2021"
-                              aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--outside"
-                              role="gridcell"
-                              tabindex="-1"
-                            >
-                              5
-                            </div>
-                            <div
-                              aria-disabled="true"
-                              aria-label="Sat Feb 06 2021"
-                              aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--outside"
-                              role="gridcell"
-                              tabindex="-1"
-                            >
-                              6
                             </div>
                           </div>
                         </div>
@@ -2148,7 +2073,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                         id="to-time-hours"
                         title="to hour"
                         type="number"
-                        value="NaN"
+                        value="08"
                       />
                       <span
                         class="c10 input-group-addon c11"
@@ -2160,7 +2085,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                         id="to-time-minutes"
                         title="to minutes"
                         type="number"
-                        value="NaN"
+                        value="18"
                       />
                       <span
                         class="c10 input-group-addon c11"
@@ -2172,7 +2097,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                         id="to-time-seconds"
                         title="to seconds"
                         type="number"
-                        value="NaN"
+                        value="00"
                       />
                       <span
                         class="c10 input-group-addon c11"
@@ -2184,7 +2109,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                         id="to-time-milliseconds"
                         title="to milliseconds"
                         type="number"
-                        value="NaN"
+                        value="000"
                       />
                       <span
                         class="c10 input-group-addon c11"
@@ -2326,7 +2251,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                               name="nextTimeRange[to]"
                               placeholder="YYYY-MM-DD HH:mm:ss"
                               type="text"
-                              value="1985-25-10 08:18:00.000"
+                              value="1985-10-25 08:18:00.000"
                             />
                             <span
                               class="input-group-btn"
