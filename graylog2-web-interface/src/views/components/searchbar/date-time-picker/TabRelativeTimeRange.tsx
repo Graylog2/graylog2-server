@@ -165,118 +165,118 @@ const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Pr
 
   return (
     <>
-    <RelativeWrapper>
-      <Field name="nextTimeRange.range">
-        {({ field: { value, onChange, name }, meta: { error } }) => {
-          const fromValue = getFromValue(value, originalTimeRange);
+      <RelativeWrapper>
+        <Field name="nextTimeRange.range">
+          {({ field: { value, onChange, name }, meta: { error } }) => {
+            const fromValue = getFromValue(value, originalTimeRange);
 
-          const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
+            const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
 
-          const _onChangeTime = (event) => {
-            const newTimeValue = moment.duration(event.target.value || 1, fromValue.rangeType).asSeconds();
+            const _onChangeTime = (event) => {
+              const newTimeValue = moment.duration(event.target.value || 1, fromValue.rangeType).asSeconds();
 
-            _onChange(newTimeValue);
-          };
+              _onChange(newTimeValue);
+            };
 
-          const _onChangeType = (type) => {
-            const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
+            const _onChangeType = (type) => {
+              const newTimeValue = moment.duration(fromValue.rangeValue, type).asSeconds();
 
-            _onChange(newTimeValue);
-          };
+              _onChange(newTimeValue);
+            };
 
-          const _onCheckAllTime = (event) => {
-            const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
+            const _onCheckAllTime = (event) => {
+              const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
 
-            _onChange(event.target.checked ? 0 : notAllTime);
-          };
+              _onChange(event.target.checked ? 0 : notAllTime);
+            };
 
-          const _onChangeExisting = (range) => {
-            const newFromValue = getFromValue(range, originalTimeRange);
+            const _onChangeExisting = (range) => {
+              const newFromValue = getFromValue(range, originalTimeRange);
 
-            _onChange(newFromValue.range);
-          };
+              _onChange(newFromValue.range);
+            };
 
-          return (
-            <>
-            <RangeWrapper>
-              <RangeTitle>From:</RangeTitle>
-              <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
-                <input type="checkbox"
-                       id="relative-all-time"
-                       value="0"
-                       className="mousetrap"
-                       checked={fromValue.rangeAllTime}
-                       onChange={_onCheckAllTime}
-                       disabled={limitDuration !== 0} />All Time
-              </RangeCheck>
-              <InputWrap>
-                <Input id="relative-timerange-from-value"
-                       name="relative-timerange-from-value"
-                       disabled={disabled || fromValue.rangeAllTime}
-                       type="number"
-                       min="1"
-                       value={fromValue.rangeValue}
-                       className="mousetrap"
-                       title="Set the range value"
-                       onChange={_onChangeTime}
-                       bsStyle={error ? 'error' : null} />
-              </InputWrap>
-              <StyledSelect id="relative-timerange-from-length"
-                            name="relative-timerange-from-length"
-                            disabled={disabled || fromValue.rangeAllTime}
-                            value={fromValue.rangeType}
-                            options={availableRangeTypes}
-                            inputProps={{ className: 'mousetrap' }}
-                            placeholder="Select a range length"
-                            onChange={_onChangeType}
-                            clearable={false} />
+            return (
+              <>
+                <RangeWrapper>
+                  <RangeTitle>From:</RangeTitle>
+                  <RangeCheck htmlFor="relative-all-time" className={limitDuration !== 0 && 'shortened'}>
+                    <input type="checkbox"
+                           id="relative-all-time"
+                           value="0"
+                           className="mousetrap"
+                           checked={fromValue.rangeAllTime}
+                           onChange={_onCheckAllTime}
+                           disabled={limitDuration !== 0} />All Time
+                  </RangeCheck>
+                  <InputWrap>
+                    <Input id="relative-timerange-from-value"
+                           name="relative-timerange-from-value"
+                           disabled={disabled || fromValue.rangeAllTime}
+                           type="number"
+                           min="1"
+                           value={fromValue.rangeValue}
+                           className="mousetrap"
+                           title="Set the range value"
+                           onChange={_onChangeTime}
+                           bsStyle={error ? 'error' : null} />
+                  </InputWrap>
+                  <StyledSelect id="relative-timerange-from-length"
+                                name="relative-timerange-from-length"
+                                disabled={disabled || fromValue.rangeAllTime}
+                                value={fromValue.rangeType}
+                                options={availableRangeTypes}
+                                inputProps={{ className: 'mousetrap' }}
+                                placeholder="Select a range length"
+                                onChange={_onChangeType}
+                                clearable={false} />
 
-              <Ago />
+                  <Ago />
 
-              {error && (
-                <ErrorMessage>
-                  Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
-                </ErrorMessage>
-              )}
+                  {error && (
+                  <ErrorMessage>
+                    Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}
+                  </ErrorMessage>
+                  )}
 
-              <ConfiguredWrapper>
-                <ConfiguredRelativeTimeRangeSelector onChange={_onChangeExisting} />
-              </ConfiguredWrapper>
-            </RangeWrapper>
-            </>
-          );
-        }}
-      </Field>
+                  <ConfiguredWrapper>
+                    <ConfiguredRelativeTimeRangeSelector onChange={_onChangeExisting} />
+                  </ConfiguredWrapper>
+                </RangeWrapper>
+              </>
+            );
+          }}
+        </Field>
 
-      <StyledIcon name="arrow-right" />
+        <StyledIcon name="arrow-right" />
 
-      <RangeWrapper>
-        <RangeTitle>Until:</RangeTitle>
-        <RangeCheck htmlFor="relative-offset">
-          <input type="checkbox" id="relative-offset" checked disabled />Now
-        </RangeCheck>
+        <RangeWrapper>
+          <RangeTitle>Until:</RangeTitle>
+          <RangeCheck htmlFor="relative-offset">
+            <input type="checkbox" id="relative-offset" checked disabled />Now
+          </RangeCheck>
 
-        <InputWrap>
-          <Input id="relative-timerange-until-value"
-                 disabled
-                 type="number"
-                 value="0"
-                 min="1"
-                 title="Set the offset value"
-                 name="relative-timerange-until-value"
-                 onChange={() => {}} />
-        </InputWrap>
+          <InputWrap>
+            <Input id="relative-timerange-until-value"
+                   disabled
+                   type="number"
+                   value="0"
+                   min="1"
+                   title="Set the offset value"
+                   name="relative-timerange-until-value"
+                   onChange={() => {}} />
+          </InputWrap>
 
-        <StyledSelect id="relative-timerange-until-length"
-                      disabled
-                      value={RANGE_TYPES[0].type}
-                      options={availableRangeTypes}
-                      placeholder="Select an offset"
-                      name="relative-timerange-until-length"
-                      onChange={() => {}} />
-        <Ago />
-      </RangeWrapper>
-    </RelativeWrapper>
+          <StyledSelect id="relative-timerange-until-length"
+                        disabled
+                        value={RANGE_TYPES[0].type}
+                        options={availableRangeTypes}
+                        placeholder="Select an offset"
+                        name="relative-timerange-until-length"
+                        onChange={() => {}} />
+          <Ago />
+        </RangeWrapper>
+      </RelativeWrapper>
     </>
   );
 };
