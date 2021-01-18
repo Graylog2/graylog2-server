@@ -40,17 +40,10 @@ type IndicatorProps = {
   };
 };
 
-<<<<<<< HEAD
-const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
-  height: ${$hasFocusedWidget ? '100%' : 'auto'};
-  overflow: ${$hasFocusedWidget ? 'auto' : 'visible'};
+const StyledRow = styled(Row)(({ hasFocusedWidget }: { hasFocusedWidget: boolean }) => css`
+  height: ${hasFocusedWidget ? '100%' : 'auto'};
+  overflow: ${hasFocusedWidget ? 'auto' : 'visible'};
   margin-bottom: 10px;
-=======
-const StyledRow = styled(Row)(({ overflow }) => css`
-  height: 100%;
-  margin-bottom: 10px;
-  ${overflow}
->>>>>>> Unifying footer margin.
 `);
 
 const StyledCol = styled(Col)`
