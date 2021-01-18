@@ -42,6 +42,14 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     color: ${theme.colors.global.textDefault};
   }
 
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    && .navbar-collapse {
+      position: absolute;
+      background-color: ${theme.colors.global.navigationBackground};
+      width: 100%;
+    }
+  }
+
   .navbar-nav {
     > li > a,
     > li > .btn-link {
