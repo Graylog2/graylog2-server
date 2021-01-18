@@ -61,6 +61,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .toArray();
 
     const dashboardWidget = widget.toBuilder()
+      .newId()
       .timerange(timerange)
       .query(query)
       .streams(streams)

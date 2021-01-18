@@ -105,8 +105,9 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
     const [widget, queryId] = match;
     const widgetTitle = _getWidgetTitle(widgetId, queryId, dashboard);
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
+    const newWidget = copy ? widget.toBuilder().newId().build() : widget;
 
-    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, widgetTitle));
+    return UpdateSearchForWidgets(_addWidgetToTab(newWidget, targetQueryId, tempDashboard, widgetTitle));
   }
 
   return undefined;
