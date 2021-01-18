@@ -40,10 +40,10 @@ type IndicatorProps = {
   };
 };
 
-const StyledRow = styled(Row)(({ overflow }) => css`
-  height: 100%;
+const StyledRow = styled(Row)(({ hasFocusedWidget }: { hasFocusedWidget: boolean }) => css`
+  height: ${hasFocusedWidget ? '100%' : 'auto'};
+  overflow: ${hasFocusedWidget ? 'auto' : 'visible'};
   margin-bottom: 10px;
-  ${overflow}
 `);
 
 const StyledCol = styled(Col)`
@@ -93,7 +93,7 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   ) : <Spinner />;
 
   return (
-    <StyledRow overflow={hasFocusedWidget ? 'overflow: auto' : undefined}>
+    <StyledRow hasFocusedWidget={hasFocusedWidget}>
       <StyledCol>
         {content}
         <SearchLoadingIndicator />

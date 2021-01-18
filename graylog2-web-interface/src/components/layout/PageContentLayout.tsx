@@ -28,13 +28,16 @@ type Props = {
 };
 
 const Container = styled.div`
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 50px);
   overflow: auto;
   padding: 15px;
 `;
 
 const StyledGrid = styled(Grid)`
   width: 100%;
+  flex: 1;
   margin-bottom: 10px;
 `;
 

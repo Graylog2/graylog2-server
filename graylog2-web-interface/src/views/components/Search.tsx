@@ -63,9 +63,9 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
-    height: calc(100vh - 50px);
     display: flex;
-    overflow: hidden;
+    height: calc(100vh - 50px);
+    overflow: auto;
 
     > *:nth-child(2) {
       flex-grow: 1;
@@ -77,13 +77,7 @@ const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return css`
-    height: 100%;
-
     ${focusedWidget && css`
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-
       .page-content-grid {
         display: flex;
         flex-direction: column;
