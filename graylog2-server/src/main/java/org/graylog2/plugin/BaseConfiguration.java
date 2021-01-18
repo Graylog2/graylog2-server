@@ -71,8 +71,8 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter("message_recordings_enable")
     private boolean messageRecordingsEnable = false;
 
-    @Parameter("disable_sigar")
-    private boolean disableSigar = false;
+    @Parameter("disable_native_system_stats_collector")
+    private boolean disableNativeSystemStatsCollector = false;
 
     @Parameter(value = "http_proxy_uri")
     private URI httpProxyUri;
@@ -162,8 +162,8 @@ public abstract class BaseConfiguration extends PathConfiguration {
         return messageRecordingsEnable;
     }
 
-    public boolean isDisableSigar() {
-        return disableSigar;
+    public boolean isDisableNativeSystemStatsCollector() {
+        return disableNativeSystemStatsCollector;
     }
 
     public URI getHttpProxyUri() {
