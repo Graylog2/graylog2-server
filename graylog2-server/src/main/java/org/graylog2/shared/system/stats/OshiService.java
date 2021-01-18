@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats;
 
 
+import org.graylog2.shared.utilities.DockerRuntimeDetection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
@@ -27,8 +28,8 @@ import oshi.util.GlobalConfig;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Singleton
 public class OshiService {
@@ -39,11 +40,17 @@ public class OshiService {
 
     @Inject
     public OshiService() {
-        // Don't let OSHI filter out "overlay" filesystems.
-        // Otherwise we cannot get proper disk statistics from within Docker.
-        final String fsTypes = GlobalConfig.get(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES, "");
-        GlobalConfig.set(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES,
-                Arrays.stream(fsTypes.split(",")).filter(fs -> !fs.equals("overlay")).collect(Collectors.joining(",")));
+        // Ignore "none" filesystems, which can lead to unwanted errors.
+        final ArrayList<String> fsTypes = new ArrayList<>(Arrays.asList(GlobalConfig.get(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES, "").split(",")));
+        fsTypes.add("none");
+
+        if (DockerRuntimeDetection.isRunningInsideDocker()) {
+            // Don't let OSHI filter out "overlay" filesystems when running within Docker.
+            // Otherwise we cannot get proper disk statistics
+            fsTypes.remove("overlay");
+        }
+        GlobalConfig.set(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES, String.join(",", fsTypes));
+
         SystemInfo systemInfo = new SystemInfo();
         hal = systemInfo.getHardware();
         os = systemInfo.getOperatingSystem();
