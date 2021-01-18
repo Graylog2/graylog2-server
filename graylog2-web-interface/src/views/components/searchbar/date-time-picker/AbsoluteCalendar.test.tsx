@@ -24,8 +24,8 @@ const defaultProps = {
   disabled: false,
   currentTimeRange: {
     type: 'absolute',
-    from: '1955-05-11 06:15:00.000',
-    to: '1985-10-25 08:18:00.000',
+    from: '1955-05-11 06:15:00',
+    to: '1985-10-25 08:18:00',
   },
 } as const;
 
@@ -46,7 +46,6 @@ describe('AbsoluteCalendar', () => {
     const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
     const inputMinute = screen.getByRole('spinbutton', { name: /from minutes/i });
     const inputSeconds = screen.getByRole('spinbutton', { name: /from seconds/i });
-    const inputMS = screen.getByRole('spinbutton', { name: /from milliseconds/i });
 
     expect(monthYear).not.toBeNull();
     // @ts-ignore
@@ -55,8 +54,6 @@ describe('AbsoluteCalendar', () => {
     expect(inputMinute.value).toBe('15');
     // @ts-ignore
     expect(inputSeconds.value).toBe('00');
-    // @ts-ignore
-    expect(inputMS.value).toBe('000');
   });
 
   it('renders `to` date', () => {
@@ -66,7 +63,6 @@ describe('AbsoluteCalendar', () => {
     const inputHour = screen.getByRole('spinbutton', { name: /to hour/i });
     const inputMinute = screen.getByRole('spinbutton', { name: /to minutes/i });
     const inputSeconds = screen.getByRole('spinbutton', { name: /to seconds/i });
-    const inputMS = screen.getByRole('spinbutton', { name: /to milliseconds/i });
 
     expect(monthYear).not.toBeNull();
     // @ts-ignore
@@ -75,7 +71,5 @@ describe('AbsoluteCalendar', () => {
     expect(inputMinute.value).toBe('18');
     // @ts-ignore
     expect(inputSeconds.value).toBe('00');
-    // @ts-ignore
-    expect(inputMS.value).toBe('000');
   });
 });

@@ -46,6 +46,6 @@ describe('AbsoluteDatePicker', () => {
 
     fireEvent.click(input);
 
-    expect(defaultProps.onChange).toHaveBeenCalledWith('2020-04-20 13:22:46.000');
+    expect(defaultProps.onChange).toHaveBeenCalledWith('2020-04-20 13:22:46');
   });
 });
