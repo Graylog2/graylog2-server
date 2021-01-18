@@ -62,8 +62,7 @@ public class NodeContainerFactory {
                 // set mode here explicitly, because file system permissions can get lost when executing from maven
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
-                .withFileFromClasspath("log4j2.xml", "log4j2.xml")
-                .withFileFromPath("sigar", pathTo("sigar_dir"));
+                .withFileFromClasspath("log4j2.xml", "log4j2.xml");
         if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
         }
