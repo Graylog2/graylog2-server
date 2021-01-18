@@ -121,7 +121,7 @@ const FormGroupGrid = styled(FormGroup)`
 `;
 
 const GridInputGroup = styled(InputGroup)`
-  display: contents; /* hack to allow subgrid functionality : https://drafts.csswg.org/css-display/#valdef-display-contents*/
+  display: contents;
 `;
 
 const _onFocusSelect = (event) => {
