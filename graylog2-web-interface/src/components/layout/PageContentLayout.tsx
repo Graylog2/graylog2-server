@@ -33,7 +33,8 @@ const Container = styled.div`
   overflow: auto;
   height: 100%;
   width: 100%;
-  // Bottom gap is defined by footer bottom margin
+
+  /* Bottom gap is defined by footer bottom margin */
   padding: 15px 15px 0 15px;
 `;
 
