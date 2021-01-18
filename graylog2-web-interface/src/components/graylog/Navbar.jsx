@@ -20,9 +20,12 @@ import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
 const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
+  position: relative;
+  min-height: auto;
   background-color: ${theme.colors.global.navigationBackground};
   border: 0;
   box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
+  margin-bottom: 0;
 
   .navbar-brand {
     color: ${theme.colors.variant.default};
