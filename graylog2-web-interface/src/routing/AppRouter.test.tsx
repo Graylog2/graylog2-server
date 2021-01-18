@@ -28,7 +28,7 @@ import history from 'util/History';
 import AppRouter from './AppRouter';
 
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
-jest.mock('components/layout/Footer');
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 jest.mock('injection/CombinedProvider', () => {
   return new MockCombinedProvider({

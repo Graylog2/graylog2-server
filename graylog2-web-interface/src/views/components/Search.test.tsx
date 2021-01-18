@@ -41,7 +41,7 @@ import DashboardSearchBar from './DashboardSearchBar';
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
 jest.mock('util/History');
-jest.mock('components/layout/Footer');
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
