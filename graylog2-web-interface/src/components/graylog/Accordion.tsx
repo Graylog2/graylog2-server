@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { PanelGroup } from './bootstrap-import';
 
@@ -26,17 +27,21 @@ type Props = {
   onSelect?: () => string,
 }
 
+const StyledPanelGroup = styled(PanelGroup)`
+  margin-bottom: 0;
+`;
+
 const Accordion = ({ activeKey, children, id, onSelect, ...restProps }:Props) => {
   const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
 
   return (
-    <PanelGroup {...restProps}
-                activeKey={cleanActiveKey}
-                id={id}
-                onSelect={onSelect}
-                accordion>
+    <StyledPanelGroup {...restProps}
+                      activeKey={cleanActiveKey}
+                      id={id}
+                      onSelect={onSelect}
+                      accordion>
       {children}
-    </PanelGroup>
+    </StyledPanelGroup>
   );
 };
 

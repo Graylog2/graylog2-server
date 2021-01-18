@@ -40,16 +40,24 @@ const SetTimeOption = styled.div`
   align-items: center;
   justify-content: center;
   flex: 1;
+  padding-top: 12px;
 
   b { padding: 0 3px; }
 `;
 
 const StyledFormControl = styled(FormControl)`
   padding: 0 6px 0 9px;
-  width: 50px !important;
+
+  :nth-of-type(1) {
+    grid-area: 2 / 2 / 2 / 2;
+  }
   
-  &:last-of-type {
-    width: 60px !important;
+  :nth-of-type(2) {
+    grid-area: 2 / 4 / 2 / 4;
+  }
+  
+  :nth-of-type(3) {
+    grid-area: 2 / 6 / 2 / 6;
   }
 `;
 
@@ -57,17 +65,63 @@ const StyledInputAddon = styled(InputGroup.Addon)(({ theme }) => css`
   padding: 0;
   background: ${theme.colors.variant.lightest.default};
   font-weight: bold;
+  width: auto;
+  display: flex;
+  align-items: center;
 
   &:not(:first-child):not(:last-child) {
     border-right: 0;
     border-left: 0;
     padding: 0 3px;
   }
+
+  :nth-of-type(1) {
+    grid-area: 2 / 1 / 2 / 1;
+  }
+  
+  :nth-of-type(2) {
+    grid-area: 2 / 3 / 2 / 3;
+  }
+  
+  :nth-of-type(3) {
+    grid-area: 2 / 5 / 2 / 5;
+  }
+  
+  :nth-of-type(4) {
+    grid-area: 2 / 7 / 2 / 7;
+  }
 `);
 
 const StyledButton = styled(Button)`
   padding: 6px 9px;
   line-height: 1.1;
+`;
+
+const FormGroupGrid = styled(FormGroup)`
+  display: grid;
+  grid-template-columns: max-content repeat(3, 1fr max-content);
+  grid-template-rows: auto 1fr;
+
+  label {
+    padding-left: 6px;
+    margin: 0;
+    
+    :nth-child(1) {
+      grid-area: 1 / 2 / 1 / 2;
+    }
+
+    :nth-child(2) {
+      grid-area: 1 / 4 / 1 / 4;
+    }
+
+    :nth-child(3) {
+      grid-area: 1 / 6 / 1 / 6;
+    }
+  }
+`;
+
+const GridInputGroup = styled(InputGroup)`
+  display: contents; /* hack to allow subgrid functionality : https://drafts.csswg.org/css-display/#valdef-display-contents*/
 `;
 
 const _onFocusSelect = (event) => {
@@ -85,10 +139,6 @@ const parseTimeValue = (value, type) => {
     if (timeValue > 23) {
       return 23;
     }
-  } else if (type === 'milliseconds') {
-    if (timeValue > 999) {
-      return 999;
-    }
   } else if (timeValue > 59) {
     return 59;
   }
@@ -100,7 +150,7 @@ const fieldUpdate = (value) => {
   const initialDateTime = moment(value).toObject();
 
   TIME_TYPES.forEach((type) => {
-    initialDateTime[type] = zeroPad(initialDateTime[type], type === 'milliseconds' ? 3 : 2);
+    initialDateTime[type] = zeroPad(initialDateTime[type]);
   });
 
   const handleChangeSetTime = (event) => {
@@ -112,7 +162,7 @@ const fieldUpdate = (value) => {
       [timeType]: timeValue,
     });
 
-    return newTime.format(DateTime.Formats.TIMESTAMP);
+    return newTime.format(DateTime.Formats.DATETIME);
   };
 
   const handleClickTimeNow = () => {
@@ -123,8 +173,7 @@ const fieldUpdate = (value) => {
       hours: newTime.hours,
       minutes: newTime.minutes,
       seconds: newTime.seconds,
-      milliseconds: newTime.milliseconds,
-    }).format(DateTime.Formats.TIMESTAMP);
+    }).format(DateTime.Formats.DATETIME);
   };
 
   const handleTimeToggle = (eod = false) => {
@@ -133,8 +182,7 @@ const fieldUpdate = (value) => {
       hours: eod ? 23 : 0,
       minutes: eod ? 59 : 0,
       seconds: eod ? 59 : 0,
-      milliseconds: eod ? 999 : 0,
-    }).format(DateTime.Formats.TIMESTAMP);
+    }).format(DateTime.Formats.DATETIME);
   };
 
   return {
@@ -181,8 +229,11 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
 
   return (
     <SetTimeOption>
-      <FormGroup>
-        <InputGroup>
+      <FormGroupGrid>
+        <label htmlFor={`${range}-time-hours`} title={`${range} hours label`}>HH</label>
+        <label htmlFor={`${range}-time-minutes`} title={`${range} minutes label`}>mm</label>
+        <label htmlFor={`${range}-time-seconds`} title={`${range} seconds label`}>ss</label>
+        <GridInputGroup>
           <StyledInputAddon>
             <StyledButton bsStyle="link"
                           bsSize="small"
@@ -214,14 +265,6 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
                              onChange={_onChangeSetTime}
                              onFocus={_onFocusSelect}
                              bsSize="sm" />
-          <StyledInputAddon>.</StyledInputAddon>
-          <StyledFormControl type="number"
-                             id={`${range}-time-milliseconds`}
-                             title={`${range} milliseconds`}
-                             value={initialDateTime.milliseconds ?? ''}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSelect}
-                             bsSize="sm" />
           <StyledInputAddon>
             <StyledButton bsStyle="link"
                           bsSize="small"
@@ -230,8 +273,8 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
               <Icon name="magic" />
             </StyledButton>
           </StyledInputAddon>
-        </InputGroup>
-      </FormGroup>
+        </GridInputGroup>
+      </FormGroupGrid>
     </SetTimeOption>
   );
 };
