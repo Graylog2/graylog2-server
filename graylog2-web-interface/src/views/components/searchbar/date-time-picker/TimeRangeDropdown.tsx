@@ -23,7 +23,7 @@ import Mousetrap from 'mousetrap';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
-import { availableTimeRangeTypes, DEFAULT_RANGE_TYPE } from 'views/Constants';
+import { availableTimeRangeTypes } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
