@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AddNewWidgetsToPositions should add a new widget to the first row and column 1`] = `
+exports[`GenerateNextPosition should add a new widget to the first row and column 1`] = `
 Immutable.Map {
   "foo-1": Object {
     "col": 1,
@@ -11,7 +11,7 @@ Immutable.Map {
 }
 `;
 
-exports[`AddNewWidgetsToPositions should add a new widget to the first row and column to other widgets 1`] = `
+exports[`GenerateNextPosition should add a new widget to the first row and column to other widgets 1`] = `
 Immutable.Map {
   "foo-1": Object {
     "col": 1,

@@ -20,11 +20,11 @@ Object {
           "row": 2,
           "width": "Infinity",
         },
-        "4d73ccaa-aabf-451a-b36e-309f55798e04": Object {
+        "dead-beef": Object {
           "col": 1,
-          "height": undefined,
+          "height": 4,
           "row": 1,
-          "width": undefined,
+          "width": 4,
         },
       },
       "selected_fields": Array [
@@ -42,7 +42,7 @@ Object {
         "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": Immutable.Set [
           "dead-beef",
         ],
-        "4d73ccaa-aabf-451a-b36e-309f55798e04": Immutable.Set [
+        "dead-beef": Immutable.Set [
           "dead-beef",
         ],
       },
@@ -104,7 +104,7 @@ Object {
             "visualization": "numeric",
           },
           "filter": undefined,
-          "id": "4d73ccaa-aabf-451a-b36e-309f55798e04",
+          "id": "dead-beef",
           "query": Object {
             "query_string": "",
             "type": "elasticsearch",

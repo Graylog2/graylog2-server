@@ -27,6 +27,7 @@ import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import GenerateNextPosition from './GenerateNextPosition';
 
 import Widget from '../widgets/Widget';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 const _removeWidgetTitle = (titlesMap: TitlesMap, widgetId: WidgetId): TitlesMap => {
   const widgetTitles = titlesMap.get('widget');
@@ -72,12 +73,13 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: str
   return titlesMap.set('widget', newWidgetTitleMap);
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetTitle: string | undefined | null): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetTitle: string | undefined | null, oldPosition: WidgetPosition): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newWidget = widget.toBuilder().id(uuid()).build();
   const newWidgets = viewState.widgets.push(newWidget);
   const { widgetPositions } = viewState;
-  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositions), newWidgets.toArray());
+  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositions),
+    newWidgets.toArray(), Immutable.Map({ [newWidget.id]: oldPosition }));
   const newTitleMap = _setWidgetTitle(viewState.titles, newWidget.id, widgetTitle);
   const newViewState = viewState.toBuilder()
     .widgets(newWidgets)
@@ -104,10 +106,13 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
   if (match) {
     const [widget, queryId] = match;
     const widgetTitle = _getWidgetTitle(widgetId, queryId, dashboard);
+    const { widgetPositions } = dashboard.state.get(queryId);
+    const oldPosition = widgetPositions[widgetId];
+
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
     const newWidget = copy ? widget.toBuilder().newId().build() : widget;
 
-    return UpdateSearchForWidgets(_addWidgetToTab(newWidget, targetQueryId, tempDashboard, widgetTitle));
+    return UpdateSearchForWidgets(_addWidgetToTab(newWidget, targetQueryId, tempDashboard, widgetTitle, oldPosition));
   }
 
   return undefined;

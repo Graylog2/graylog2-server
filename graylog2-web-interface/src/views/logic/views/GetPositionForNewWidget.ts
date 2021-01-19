@@ -18,12 +18,12 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/logic/widgets/Widget';
 
-const GetPositionForNewWidget = (widget: Widget) => {
+const GetPositionForNewWidget = (widget: Widget, oldWidgetPosition: WidgetPosition) => {
   const { defaultHeight, defaultWidth } = widgetDefinition(widget.type);
 
   return WidgetPosition.builder()
-    .height(defaultHeight)
-    .width(defaultWidth)
+    .height(oldWidgetPosition?.height ?? defaultHeight)
+    .width(oldWidgetPosition?.width ?? defaultWidth)
     .col(1)
     .row(1)
     .build();

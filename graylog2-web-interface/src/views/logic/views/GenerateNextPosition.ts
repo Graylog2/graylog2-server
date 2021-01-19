@@ -26,9 +26,10 @@ const incrementRow = (position: WidgetPosition) => position.row + 1;
 export default (
   widgetPositions: Immutable.Map<string, WidgetPosition>,
   widgets: Array<Widget>,
+  oldPositionsMap: Immutable.Map<string, WidgetPosition> = Immutable.Map(),
 ): Immutable.Map<string, WidgetPosition> => Immutable.Map(
   widgets
     .map((widget) => [widget.id, widgetPositions.has(widget.id)
       ? widgetPositions.get(widget.id).toBuilder().row(incrementRow(widgetPositions.get(widget.id))).build()
-      : GetPositionForNewWidget(widget)]),
+      : GetPositionForNewWidget(widget, oldPositionsMap.get(widget.id))]),
 );

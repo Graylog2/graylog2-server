@@ -23,15 +23,16 @@ import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 type QueryId = string;
 
-const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
+const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPositions: WidgetPosition): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
   const viewState = dashboard.state.get(dashboardQueryId);
   const widgets = viewState.widgets.push(widget);
   const { widgetPositions } = viewState;
-  const newWidgetPositions = GenerateNextPosition(Map(widgetPositions), widgets.toArray());
+  const newWidgetPositions = GenerateNextPosition(Map(widgetPositions), widgets.toArray(), Map({ [widget.id]: oldPositions }));
   const newViewState = viewState.toBuilder()
     .widgets(widgets)
     .widgetPositions(newWidgetPositions)
@@ -53,6 +54,8 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
   if (match) {
     const [widget, queryId] = match;
     const { timerange, query, filter = Map() } = queryMap.get(queryId);
+    const { widgetPositions } = search.state.get(queryId);
+    const oldPositions = widgetPositions[widgetId];
 
     const streams = (filter ? filter.get('filters', List.of()) : List.of())
       .filter((value) => Map.isMap(value) && value.get('type') === 'stream')
@@ -67,7 +70,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .streams(streams)
       .build();
 
-    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard));
+    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions));
   }
 
   return undefined;
