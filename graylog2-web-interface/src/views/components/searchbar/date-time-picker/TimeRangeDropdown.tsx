@@ -165,7 +165,7 @@ export const dateTimeValidate = (values, limitDuration) => {
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange }: Props) => {
   const { limitDuration } = useContext(DateTimeContext);
 
-  const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : DEFAULT_RANGE_TYPE);
+  const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
   const handleNoOverride = () => {
     setCurrentTimeRange({});
