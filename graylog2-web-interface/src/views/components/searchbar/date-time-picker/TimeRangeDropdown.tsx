@@ -176,6 +176,11 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
     toggleDropdownShow();
   }, [toggleDropdownShow]);
 
+  const handleSubmit = ({ nextTimeRange }) => {
+    setCurrentTimeRange(nextTimeRange);
+    toggleDropdownShow();
+  };
+
   const handleEscKeyPress = useCallback(() => {
     handleCancel();
   }, [handleCancel]);
@@ -208,10 +213,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    arrowOffsetLeft={34}>
       <Formik initialValues={{ nextTimeRange: currentTimeRange }}
               validate={(values) => dateTimeValidate(values, limitDuration)}
-              onSubmit={({ nextTimeRange }) => {
-                setCurrentTimeRange(nextTimeRange);
-                toggleDropdownShow();
-              }}>
+              onSubmit={handleSubmit}>
         {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
@@ -252,7 +254,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                 <Col md={6}>
                   <div className="pull-right">
                     {noOverride && (
-                    <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
+                      <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
                     )}
                     <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
                     <Button bsStyle="success" disabled={!isValid} type="submit">Apply</Button>

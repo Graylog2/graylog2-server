@@ -83,7 +83,7 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   const dateTested = useRef(false);
 
   useEffect(() => {
-    if ('type' in timerange && timerange.type === 'keyword' && !timerange.from) {
+    if (timerange && 'type' in timerange && timerange.type === 'keyword' && !timerange.from) {
       if (!dateTested.current) {
         ToolsStore.testNaturalDate(timerange.keyword)
           .then((response) => {
@@ -97,14 +97,14 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
             setTimeOutput(EMPTY_OUTPUT);
           });
       }
-    } else if ('type' in timerange) {
+    } else if (timerange && 'type' in timerange) {
       setTimeOutput(dateOutput(timerange));
     }
   }, [dateTested, timerange]);
 
   return (
     <TimeRangeWrapper>
-      {!('type' in timerange)
+      {!(timerange && 'type' in timerange)
         ? <span><code>No Override</code></span>
         : (
           <>
