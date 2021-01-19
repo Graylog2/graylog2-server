@@ -75,7 +75,7 @@ const migrationStrategies = {
 };
 
 export const migrateTimeRangeToNewType = (oldTimerange: TimeRange | undefined | null, type: string): TimeRange | undefined | null => {
-  const oldType = oldTimerange ? oldTimerange.type : 'disabled';
+  const oldType = oldTimerange && 'type' in oldTimerange ? oldTimerange.type : 'disabled';
 
   if (type === oldType) {
     return oldTimerange;

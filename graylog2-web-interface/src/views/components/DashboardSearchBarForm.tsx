@@ -22,7 +22,6 @@ import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
-import { dateTimeValidate } from 'views/components/searchbar/SearchBarForm';
 
 import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
@@ -59,8 +58,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children 
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}
-            validate={dateTimeValidate(limitDuration)}>
+            onSubmit={_onSubmit}>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
           <Form>

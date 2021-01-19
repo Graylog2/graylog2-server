@@ -108,6 +108,8 @@ export type KeywordTimeRange = {
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
+export type NoTimeRangeOverride = {};
+
 export default class Query {
   private _value: InternalState;
 
