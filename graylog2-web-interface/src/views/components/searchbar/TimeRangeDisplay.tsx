@@ -19,11 +19,11 @@ import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 
 type Props = {
-  timerange: TimeRange | null | undefined,
+  timerange: TimeRange | NoTimeRangeOverride | null | undefined,
 };
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
@@ -83,7 +83,7 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   const dateTested = useRef(false);
 
   useEffect(() => {
-    if (timerange?.type === 'keyword' && !timerange.from) {
+    if ('type' in timerange && timerange.type === 'keyword' && !timerange.from) {
       if (!dateTested.current) {
         ToolsStore.testNaturalDate(timerange.keyword)
           .then((response) => {
@@ -97,14 +97,14 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
             setTimeOutput(EMPTY_OUTPUT);
           });
       }
-    } else if (timerange?.type) {
+    } else if ('type' in timerange) {
       setTimeOutput(dateOutput(timerange));
     }
   }, [dateTested, timerange]);
 
   return (
     <TimeRangeWrapper>
-      {!timerange?.type
+      {!('type' in timerange)
         ? <span><code>No Override</code></span>
         : (
           <>

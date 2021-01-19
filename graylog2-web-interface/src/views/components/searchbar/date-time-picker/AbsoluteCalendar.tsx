@@ -28,7 +28,7 @@ type Props = {
   disabled: boolean,
   startDate?: Date,
   range: 'to' | 'from',
-  currentTimeRange: AbsoluteTimeRange,
+  nextTimeRange: AbsoluteTimeRange,
 };
 
 const ErrorMessage = styled.span(({ theme }) => css`
@@ -39,12 +39,12 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteCalendar = ({ disabled, startDate, currentTimeRange, range }: Props) => {
+const AbsoluteCalendar = ({ disabled, startDate, nextTimeRange, range }: Props) => {
   return (
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? currentTimeRange.to : value || currentTimeRange.to;
+        const dateTime = error ? nextTimeRange.to : value || nextTimeRange.to;
 
         return (
           <>
@@ -68,7 +68,7 @@ const AbsoluteCalendar = ({ disabled, startDate, currentTimeRange, range }: Prop
 
 AbsoluteCalendar.propTypes = {
   disabled: PropTypes.bool,
-  currentTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  nextTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   startDate: PropTypes.instanceOf(Date),
   range: PropTypes.oneOf(['to', 'from']).isRequired,
 };

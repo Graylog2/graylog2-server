@@ -17,20 +17,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
 import Input from 'components/bootstrap/Input';
 import { Icon, Select } from 'components/common';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
+import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import ConfiguredRelativeTimeRangeSelector from './ConfiguredRelativeTimeRangeSelector';
 
 type Props = {
   disabled: boolean,
-  originalTimeRange: {
-    range: string | number,
-  },
   limitDuration: number,
 };
 
@@ -160,15 +158,17 @@ const getFromValue = (value: number, originalTimeRange) => RANGE_TYPES.map(({ ty
   return null;
 }).filter(Boolean).pop();
 
-const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Props) => {
+const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const availableRangeTypes = buildRangeTypes(limitDuration);
+
+  const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
 
   return (
     <>
       <RelativeWrapper>
         <Field name="nextTimeRange.range">
           {({ field: { value, onChange, name }, meta: { error } }) => {
-            const fromValue = getFromValue(value, originalTimeRange);
+            const fromValue = getFromValue(value, initialValues);
 
             const _onChange = (nextValue) => onChange({ target: { name, value: nextValue } });
 
@@ -185,13 +185,13 @@ const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Pr
             };
 
             const _onCheckAllTime = (event) => {
-              const notAllTime = originalTimeRange.range ?? DEFAULT_TIMERANGE.range;
+              const notAllTime = 'range' in initialValues.nextTimeRange && initialValues.nextTimeRange.range ? initialValues.nextTimeRange.range : DEFAULT_TIMERANGE.range;
 
               _onChange(event.target.checked ? 0 : notAllTime);
             };
 
             const _onChangeExisting = (range) => {
-              const newFromValue = getFromValue(range, originalTimeRange);
+              const newFromValue = getFromValue(range, initialValues);
 
               _onChange(newFromValue.range);
             };
@@ -284,9 +284,6 @@ const TabRelativeTimeRange = ({ disabled, originalTimeRange, limitDuration }: Pr
 TabRelativeTimeRange.propTypes = {
   limitDuration: PropTypes.number,
   disabled: PropTypes.bool,
-  originalTimeRange: PropTypes.shape({
-    range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }).isRequired,
 };
 
 TabRelativeTimeRange.defaultProps = {

@@ -1874,7 +1874,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                               aria-disabled="false"
                               aria-label="Fri Jan 15 2021"
                               aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--today"
+                              class="DayPicker-Day"
                               role="gridcell"
                               tabindex="-1"
                             >
@@ -1919,7 +1919,7 @@ fieldset[disabled] .c13.form-control:not([type="range"]) {
                               aria-disabled="false"
                               aria-label="Tue Jan 19 2021"
                               aria-selected="false"
-                              class="DayPicker-Day"
+                              class="DayPicker-Day DayPicker-Day--today"
                               role="gridcell"
                               tabindex="-1"
                             >
