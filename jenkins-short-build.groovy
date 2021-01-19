@@ -45,10 +45,10 @@ pipeline
            echo "Checking out graylog2-server..."
            checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/build-refactoring']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'WipeWorkspace']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-access-token2', url: 'https://github.com/Graylog2/graylog2-server.git']]]
 
-           writeFile file: '.npmrc', text: '''registry=http://nexus-internal.ci.torch.sh/repository/graylog-yarn/
+           writeFile file: '.npmrc', text: '''registry=https://nexus.ci.torch.sh/repository/graylog-yarn/
 always-auth=true'''
 
-           writeFile file: '.yarnrc', text: 'registry "http://nexus-internal.ci.torch.sh/repository/graylog-yarn/"'
+           writeFile file: '.yarnrc', text: 'registry "https://nexus.ci.torch.sh/repository/graylog-yarn/"'
 
            sh 'mvn --settings ~/.m2/settings-nexus-internal.xml --show-version --batch-mode -Dstyle.color=always --fail-fast -Dspotbugs.skip -Dit.es clean deploy'
          }
