@@ -130,7 +130,7 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTy
   );
 });
 
-export const dateTimeValidate = (values, limitDuration) => {
+const dateTimeValidate = (values, limitDuration) => {
   const errors: { nextTimeRange?: {
     from?: string,
     to?: string,
