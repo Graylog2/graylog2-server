@@ -88,6 +88,13 @@ const StageForm = createReactClass({
     this.modal.close();
   },
 
+  _isOverridingStage() {
+    const { pipeline } = this.props;
+    const { initialStageNumber, stage } = this.state;
+
+    return (stage.stage !== initialStageNumber && pipeline.stages.some(({ stage: s }) => s === stage.stage));
+  },
+
   _saved() {
     this._closeModal();
   },
@@ -96,7 +103,9 @@ const StageForm = createReactClass({
     const { stage } = this.state;
     const { save } = this.props;
 
-    save(stage, this._saved);
+    if (!this._isOverridingStage()) {
+      save(stage, this._saved);
+    }
   },
 
   _getFormattedOptions(rules) {
@@ -116,8 +125,8 @@ const StageForm = createReactClass({
 
   render() {
     let triggerButtonContent;
-    const { create, pipeline } = this.props;
-    const { initialStageNumber, stage, rules } = this.state;
+    const { create } = this.props;
+    const { stage, rules } = this.state;
 
     if (create) {
       triggerButtonContent = 'Add new stage';
@@ -132,7 +141,7 @@ const StageForm = createReactClass({
       </span>
     );
 
-    const isOverridingStage = (stage.stage !== initialStageNumber && pipeline.stages.some(({ stage: s }) => s === stage.stage));
+    const isOverridingStage = this._isOverridingStage();
 
     return (
       <span>
