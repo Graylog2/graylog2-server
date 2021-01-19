@@ -90,10 +90,9 @@
         <amqp-client.version>5.8.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
-        <apache-httpclient.version>4.5.13</apache-httpclient.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-sdk.version>2.15.60</aws-sdk.version>
+        <aws-java-sdk.version>1.11.939</aws-java-sdk.version>
         <bouncycastle.version>1.64</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>

@@ -16,6 +16,15 @@
  */
 package org.graylog2.shared.messageq.sqs;
 
+import com.amazonaws.handlers.AsyncHandler;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import com.amazonaws.services.sqs.buffered.AmazonSQSBufferedAsyncClient;
+import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.DeleteMessageResult;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.QueueAttributeName;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -30,13 +39,6 @@ import org.graylog2.shared.messageq.MessageQueue;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
-import software.amazon.awssdk.services.sqs.model.Message;
-import software.amazon.awssdk.services.sqs.model.QueueAttributeName;
-import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
-import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -63,7 +65,7 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
 
     private final Provider<ProcessBuffer> processBufferProvider;
     private ProcessBuffer processBuffer;
-    private SqsClient sqsClient;
+    private AmazonSQSBufferedAsyncClient sqsClient;
 
     @Inject
     public SqsMessageQueueReader(MetricRegistry metricRegistry, Provider<ProcessBuffer> processBufferProvider,
@@ -87,9 +89,7 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
 
         LOG.info("Starting pulsar message queue reader service");
 
-        this.sqsClient = SqsClient.builder()
-                .region(Region.EU_WEST_1) // TODO: don't hardcode a region
-                .build();
+        this.sqsClient = new AmazonSQSBufferedAsyncClient(AmazonSQSAsyncClientBuilder.defaultClient());
 
         processBuffer = processBufferProvider.get();
 
@@ -100,7 +100,7 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
     @Override
     protected void shutDown() throws Exception {
         if (sqsClient != null) {
-            sqsClient.close();
+            sqsClient.shutdown();
         }
 
         super.shutDown();
@@ -123,58 +123,68 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
     }
 
     private List<MessageQueue.Entry> read() throws MessageQueueException {
-        final ImmutableList.Builder<MessageQueue.Entry> builder = ImmutableList.builder();
-
         if (!isRunning()) {
             throw new MessageQueueException("Message queue service is not running");
         }
 
-        List<Message> messages = Collections.emptyList();
-        try {
-            // doing this in a single thread offers poor performance. according to the documentation we would only
-            // get about 50 requests per second this way: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-throughput-horizontal-scaling-and-batching.html
-            final ReceiveMessageResponse response = sqsClient.receiveMessage(
-                    ReceiveMessageRequest.builder()
-                            .queueUrl(queueUrl)
-                            .attributeNames(QueueAttributeName.ALL)
-                            .waitTimeSeconds(20)
-                            .maxNumberOfMessages(10)
-                            .build());
-            messages = response.messages();
-        } catch (Exception e) {
-            LOG.error("Error consuming messages.", e);
-        }
+        final List<Message> messages = receiveEncodedMessages();
+        return decodeMessages(messages);
+    }
+
+    private ImmutableList<MessageQueue.Entry> decodeMessages(List<Message> messages) {
+        final ImmutableList.Builder<MessageQueue.Entry> builder = ImmutableList.builder();
 
         messages.forEach(message -> {
             try {
                 final MessageQueue.Entry entry = SqsMessageQueueEntry.fromMessage(message);
                 builder.add(entry);
                 messageMeter.mark();
-                byteCounter.inc(message.body().length());
-                byteMeter.mark(message.body().length());
+                byteCounter.inc(message.getBody().length());
+                byteMeter.mark(message.getBody().length());
             } catch (Exception e) {
-                LOG.error("Unable to convert message <" + message.messageId() + ">. Message will be deleted from " +
+                LOG.error("Unable to convert message <" + message.getMessageId() + ">. Message will be deleted from " +
                         "message bus.", e);
-                commit(message.receiptHandle());
+                commit(message.getReceiptHandle());
             }
         });
 
         return builder.build();
     }
 
-    // TODO: support batch commits
+    private List<Message> receiveEncodedMessages() {
+        try {
+            final ReceiveMessageResult result = sqsClient.receiveMessage(
+                    new ReceiveMessageRequest(queueUrl).withAttributeNames(QueueAttributeName.All)
+                            .withMaxNumberOfMessages(10)
+                            .withWaitTimeSeconds(20));
+            return result.getMessages();
+        } catch (Exception e) {
+            LOG.error("Error consuming messages.", e);
+        }
+        return Collections.emptyList();
+    }
+
     public void commit(Object receiptHandle) {
-        if (receiptHandle instanceof String) {
-            try {
-                sqsClient.deleteMessage(DeleteMessageRequest.builder()
-                        .queueUrl(queueUrl)
-                        .receiptHandle((String) receiptHandle)
-                        .build());
-            } catch (Exception e) {
-                LOG.error("Couldn't delete message", e);
-            }
-        } else {
+        if (!(receiptHandle instanceof String)) {
             LOG.error("Couldn't delete message. Expected <" + receiptHandle + "> to be a String receipt handle");
+            return;
+        }
+
+        try {
+            sqsClient.deleteMessageAsync(new DeleteMessageRequest(queueUrl, (String) receiptHandle),
+                    new AsyncHandler<DeleteMessageRequest, DeleteMessageResult>() {
+                @Override
+                public void onError(Exception exception) {
+                    LOG.error("Couldn't delete message", exception);
+                }
+
+                @Override
+                public void onSuccess(DeleteMessageRequest request, DeleteMessageResult deleteMessageResult) {
+                    // OK
+                }
+            });
+        } catch (Exception e) {
+            LOG.error("Couldn't send delete request to SQS.", e);
         }
     }
 }

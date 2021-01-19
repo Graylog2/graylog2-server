@@ -16,10 +16,10 @@
  */
 package org.graylog2.shared.messageq.sqs;
 
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.MessageSystemAttributeName;
 import com.google.common.io.BaseEncoding;
 import org.graylog2.shared.messageq.MessageQueue;
-import software.amazon.awssdk.services.sqs.model.Message;
-import software.amazon.awssdk.services.sqs.model.MessageSystemAttributeName;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
@@ -36,10 +36,11 @@ public class SqsMessageQueueEntry implements MessageQueue.Entry {
     }
 
     private SqsMessageQueueEntry(Message message) {
-        this.encodedRawMessage = BaseEncoding.base64().omitPadding().decode(message.body());
-        this.messageId = message.messageId().getBytes(StandardCharsets.UTF_8);
-        this.receiptHandle = message.receiptHandle();
-        this.timestamp = Long.parseLong(message.attributes().get(MessageSystemAttributeName.SENT_TIMESTAMP));
+        this.encodedRawMessage = BaseEncoding.base64().omitPadding().decode(message.getBody());
+        this.messageId = message.getMessageId().getBytes(StandardCharsets.UTF_8);
+        this.receiptHandle = message.getReceiptHandle();
+        this.timestamp = Long.parseLong(message.getAttributes()
+                .get(MessageSystemAttributeName.SentTimestamp.toString()));
     }
 
     @Override
