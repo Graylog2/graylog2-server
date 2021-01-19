@@ -56,7 +56,7 @@ export const dateTimeValidate = (limitDuration) => (values) => {
     }
 
     if (nextTimeRange.from > nextTimeRange.to) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Start date must be before end date' };
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
     }
 
     if (limitDuration !== 0) {

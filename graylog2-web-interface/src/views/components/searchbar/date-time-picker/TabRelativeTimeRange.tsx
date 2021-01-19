@@ -121,8 +121,8 @@ const RangeCheck = styled.label(({ theme }) => css`
 
 const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
-  grid-area: 3 / 1 / 3 / 5;
-  font-size: ${theme.fonts.size.tiny};
+  grid-area: 3 / 1 / 3 / 4;
+  font-size: ${theme.fonts.size.small};
   font-style: italic;
   padding: 3px;
 `);
@@ -130,7 +130,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
 const ConfiguredWrapper = styled.div`
   grid-area: 3 / 5 / 3 / 7;
   margin: 3px 12px 3px 0;
-  text-align: right;
+  justify-self: end;
 `;
 
 const buildRangeTypes = (limitDuration) => RANGE_TYPES.map(({ label, type }) => {
