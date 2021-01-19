@@ -116,15 +116,15 @@ const DEFAULT_RANGES = {
 };
 
 const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTypes.map(({ type, name }) => {
-  const TimeRangeComponent = timeRangeTypes[type];
+  const TimeRangeTypeTabs = timeRangeTypes[type];
 
   return (
     <Tab title={name}
          key={`time-range-type-selector-${type}`}
          eventKey={type}>
       {type === activeTab && (
-        <TimeRangeComponent disabled={false}
-                            limitDuration={limitDuration} />
+        <TimeRangeTypeTabs disabled={false}
+                           limitDuration={limitDuration} />
       )}
     </Tab>
   );
