@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
+import IconMarker from 'components/common/IconMarker';
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
@@ -27,33 +28,38 @@ type Props = {
   currentTimeRange: TimeRange | NoTimeRangeOverride,
   disabled?: boolean,
   noOverride?: boolean,
+  exceedsDuration?: boolean,
   setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
 };
 
-const TimeRangeTypeSelector = ({ disabled, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
+const TimeRangeTypeSelector = ({ disabled, exceedsDuration, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
 
   return (
-    <TimeRangeDropdownButton disabled={disabled}
-                             show={show}
-                             toggleShow={toggleShow}>
-      <TimeRangeDropdown currentTimeRange={currentTimeRange}
-                         noOverride={noOverride}
-                         setCurrentTimeRange={setCurrentTimeRange}
-                         toggleDropdownShow={toggleShow} />
-    </TimeRangeDropdownButton>
+    <IconMarker icon={exceedsDuration ? 'exclamation-triangle' : undefined} bsStyle="danger">
+      <TimeRangeDropdownButton disabled={disabled}
+                               show={show}
+                               toggleShow={toggleShow}>
+        <TimeRangeDropdown currentTimeRange={currentTimeRange}
+                           noOverride={noOverride}
+                           setCurrentTimeRange={setCurrentTimeRange}
+                           toggleDropdownShow={toggleShow} />
+      </TimeRangeDropdownButton>
+    </IconMarker>
   );
 };
 
 TimeRangeTypeSelector.propTypes = {
   disabled: PropTypes.bool,
+  exceedsDuration: PropTypes.bool,
   noOverride: PropTypes.bool,
 };
 
 TimeRangeTypeSelector.defaultProps = {
   disabled: false,
+  exceedsDuration: false,
   noOverride: false,
 };
 
