@@ -21,7 +21,6 @@ import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
-import moment from 'moment';
 
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
