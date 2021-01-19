@@ -449,7 +449,7 @@ fieldset[disabled] .c25.form-control:not([type="range"]) {
 
 .c27 {
   color: #990606;
-  font-size: 0.79rem;
+  font-size: 0.889rem;
   font-style: italic;
   padding: 3px 3px 9px;
   height: 1.5em;
@@ -883,7 +883,7 @@ fieldset[disabled] .c19.form-control:not([type="range"]) {
 
 .c20 {
   color: #990606;
-  font-size: 0.79rem;
+  font-size: 0.889rem;
   font-style: italic;
   padding: 3px 3px 9px;
   height: 1.5em;

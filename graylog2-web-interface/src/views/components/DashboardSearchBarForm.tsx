@@ -60,7 +60,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children 
     <Formik initialValues={_initialValues}
             enableReinitialize
             onSubmit={_onSubmit}
-            validate={dateTimeValidate}>
+            validate={dateTimeValidate(limitDuration)}>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
           <Form>
