@@ -28,7 +28,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.io.BaseEncoding;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.common.util.concurrent.SimpleTimeLimiter;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
@@ -41,10 +40,6 @@ import javax.inject.Singleton;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Singleton
 public class SqsMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
@@ -90,19 +85,7 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
     @Override
     protected void shutDown() throws Exception {
         if (sqsClient != null) {
-            // Wait for the SQS send client to flush its buffer during shutdown but abort if that takes to long
-            // TODO: test if this is really working
-            // TODO: we should do this after the input buffer was drained. Check if this happens during the shutdown
-            //  sequence.
-            final ExecutorService executorService = Executors.newSingleThreadExecutor();
-            try {
-                SimpleTimeLimiter.create(executorService)
-                        .runWithTimeout(sqsClient::shutdown, shutdownTimeoutMs, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } catch  (TimeoutException e) {
-                LOG.warn("Timeout waiting for SQS client to shut down. Proceeding with service shutdown.");
-            }
+            sqsClient.shutdown();
         }
     }
 
