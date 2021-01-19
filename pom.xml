@@ -69,12 +69,12 @@
         <snapshotRepository>
             <id>graylog-nexus</id>
             <name>Graylog Nexus Snapshots</name>
-            <url>http://nexus.ci.torch.sh/repository/graylog-snapshots/</url>
+            <url>https://nexus.ci.torch.sh/repository/graylog-snapshots/</url>
         </snapshotRepository>
         <repository>
             <id>graylog-nexus</id>
             <name>Graylog Nexus Releases</name>
-            <url>http://nexus.ci.torch.sh/repository/graylog-releases/</url>
+            <url>https://nexus.ci.torch.sh/repository/graylog-releases/</url>
         </repository>
     </distributionManagement>
 
