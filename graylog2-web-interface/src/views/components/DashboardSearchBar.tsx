@@ -66,8 +66,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
 
   const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
-
-  exceedsDuration(limitDuration, timerange);
+  const isOverLimit = exceedsDuration(limitDuration, timerange);
 
   return (
     <ScrollToHint value={queryString}>
@@ -83,6 +82,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                            currentTimeRange={values?.timerange}
+                                           exceedsDuration={isOverLimit}
                                            noOverride />
                     <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
