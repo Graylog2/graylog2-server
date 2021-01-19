@@ -19,51 +19,50 @@ package org.graylog2.shared.system.stats;
 import com.google.inject.AbstractModule;
 import org.graylog2.shared.system.stats.fs.FsProbe;
 import org.graylog2.shared.system.stats.fs.JmxFsProbe;
-import org.graylog2.shared.system.stats.fs.SigarFsProbe;
+import org.graylog2.shared.system.stats.fs.OshiFsProbe;
 import org.graylog2.shared.system.stats.jvm.JvmProbe;
 import org.graylog2.shared.system.stats.network.JmxNetworkProbe;
 import org.graylog2.shared.system.stats.network.NetworkProbe;
-import org.graylog2.shared.system.stats.network.SigarNetworkProbe;
+import org.graylog2.shared.system.stats.network.OshiNetworkProbe;
 import org.graylog2.shared.system.stats.os.JmxOsProbe;
 import org.graylog2.shared.system.stats.os.OsProbe;
-import org.graylog2.shared.system.stats.os.SigarOsProbe;
+import org.graylog2.shared.system.stats.os.OshiOsProbe;
 import org.graylog2.shared.system.stats.process.JmxProcessProbe;
+import org.graylog2.shared.system.stats.process.OshiProcessProbe;
 import org.graylog2.shared.system.stats.process.ProcessProbe;
-import org.graylog2.shared.system.stats.process.SigarProcessProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SystemStatsModule extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(SystemStatsModule.class);
-    private final boolean disableSigar;
+    private final boolean disableNativeSystemStats;
 
-    public SystemStatsModule(boolean disableSigar) {
-        this.disableSigar = disableSigar;
+    public SystemStatsModule(boolean disableNativeSystemStats) {
+        this.disableNativeSystemStats = disableNativeSystemStats;
     }
 
     @Override
     protected void configure() {
-        boolean sigarLoaded = false;
+        boolean oshiLoaded = false;
 
-        if(disableSigar) {
-            LOG.debug("SIGAR disabled. Using JMX implementations.");
+        if(disableNativeSystemStats) {
+            LOG.debug("OSHI disabled. Using JMX implementations.");
         } else {
             try {
-                SigarService sigarService = new SigarService();
-                if (sigarService.isReady()) {
-                    bind(SigarService.class).toInstance(sigarService);
-                    bind(FsProbe.class).to(SigarFsProbe.class).asEagerSingleton();
-                    bind(NetworkProbe.class).to(SigarNetworkProbe.class).asEagerSingleton();
-                    bind(OsProbe.class).to(SigarOsProbe.class).asEagerSingleton();
-                    bind(ProcessProbe.class).to(SigarProcessProbe.class).asEagerSingleton();
-                    sigarLoaded = true;
-                }
+                OshiService oshiService = new OshiService();
+
+                    bind(OshiService.class).toInstance(oshiService);
+                    bind(FsProbe.class).to(OshiFsProbe.class).asEagerSingleton();
+                    bind(NetworkProbe.class).to(OshiNetworkProbe.class).asEagerSingleton();
+                    bind(OsProbe.class).to(OshiOsProbe.class).asEagerSingleton();
+                    bind(ProcessProbe.class).to(OshiProcessProbe.class).asEagerSingleton();
+                    oshiLoaded = true;
             } catch (Throwable e) {
-                LOG.debug("Failed to load SIGAR. Falling back to JMX implementations.", e);
+                LOG.debug("Failed to load OSHI. Falling back to JMX implementations.", e);
             }
         }
 
-        if (!sigarLoaded) {
+        if (!oshiLoaded) {
             bind(FsProbe.class).to(JmxFsProbe.class).asEagerSingleton();
             bind(NetworkProbe.class).to(JmxNetworkProbe.class).asEagerSingleton();
             bind(OsProbe.class).to(JmxOsProbe.class).asEagerSingleton();

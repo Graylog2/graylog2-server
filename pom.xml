@@ -147,7 +147,7 @@
         <scala.version>2.11.8</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.2</shiro.version>
-        <sigar.version>1.6.4</sigar.version>
+        <oshi.version>5.3.7</oshi.version>
         <siv-mode.version>1.3.2</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
         <streamex.version>0.7.2</streamex.version>
@@ -174,11 +174,11 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.15.0</testcontainers.version>
+        <testcontainers.version>1.15.1</testcontainers.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v12.13.1</nodejs.version>
-        <yarn.version>v1.19.2</yarn.version>
+        <nodejs.version>v14.15.4</nodejs.version>
+        <yarn.version>v1.22.5</yarn.version>
 
         <!-- Plugin versions -->
         <license-maven.version>4.0.rc2</license-maven.version>

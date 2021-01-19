@@ -496,8 +496,8 @@
             <artifactId>HdrHistogram</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.fusesource</groupId>
-            <artifactId>sigar</artifactId>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>

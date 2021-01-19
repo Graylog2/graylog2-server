@@ -17,10 +17,13 @@
 import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import FetchError from 'logic/errors/FetchError';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
+
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('StreamPermissionErrorPage', () => {
   it('displays fetch error', () => {
