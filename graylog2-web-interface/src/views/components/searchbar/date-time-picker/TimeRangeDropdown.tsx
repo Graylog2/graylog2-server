@@ -27,6 +27,7 @@ import { availableTimeRangeTypes } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
+import { exceedsDuration } from 'views/components/SearchBar';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -149,30 +150,20 @@ export const dateTimeValidate = (values, limitDuration) => {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
     }
 
-    if (limitDuration !== 0) {
-      const durationFrom = nextTimeRange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-
-      if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
-      }
+    if (exceedsDuration(limitDuration, nextTimeRange)) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
     }
   }
 
   if (nextTimeRange?.type === 'relative') {
-    if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
+    if (exceedsDuration(limitDuration, nextTimeRange)) {
       errors.nextTimeRange = { range: 'Range is outside limit duration.' };
     }
   }
 
   if (nextTimeRange?.type === 'keyword') {
-    if (limitDuration !== 0) {
-      const durationFrom = nextTimeRange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-
-      if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
-      }
+    if (exceedsDuration(limitDuration, nextTimeRange)) {
+      errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
     }
   }
 
@@ -230,7 +221,8 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    arrowOffsetLeft={34}>
       <Formik initialValues={{ nextTimeRange: currentTimeRange }}
               validate={(values) => dateTimeValidate(values, limitDuration)}
-              onSubmit={handleSubmit}>
+              onSubmit={handleSubmit}
+              validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {

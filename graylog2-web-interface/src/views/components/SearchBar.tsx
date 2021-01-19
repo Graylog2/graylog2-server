@@ -86,45 +86,24 @@ const defaultProps = {
 };
 
 export const exceedsDuration = (limitDuration, timerange) => {
-  console.log('exceedsDuration', limitDuration, timerange);
+  if (limitDuration === 0) {
+    return false;
+  }
 
-  if (limitDuration !== 0) {
-    switch (timerange?.type) {
-      case 'absolute': {
-        const durationFrom = timerange.from;
-        const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+  switch (timerange?.type) {
+    case 'absolute':
+    case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
+      const durationFrom = timerange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
-        if (moment(durationFrom).isBefore(durationLimit)) {
-          console.log('Over Absolute');
-          // errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
-        }
-
-        break;
-      }
-
-      case 'relative': {
-        if (!(timerange.range <= limitDuration && limitDuration !== 0)) {
-          console.log('Over Relative');
-          // errors.nextTimeRange = { range: 'Range is outside limit duration.' };
-        }
-
-        break;
-      }
-
-      case 'keyword': {
-        const durationFrom = timerange.from;
-        const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-
-        if (moment(durationFrom).isBefore(durationLimit)) {
-          console.log('Over Keyword');
-          // errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
-        }
-
-        break;
-      }
-
-      default: break;
+      return moment(durationFrom).isBefore(durationLimit);
     }
+
+    case 'relative':
+      return timerange.range > limitDuration;
+
+    default:
+      return false;
   }
 };
 
@@ -145,11 +124,7 @@ const SearchBar = ({
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
-
-  exceedsDuration(limitDuration, timerange);
-
-  // const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-  // console.log(moment(timerange).isBefore(durationLimit))
+  const isOverLimit = exceedsDuration(limitDuration, timerange);
 
   const _onSubmit = (values) => onSubmit(values, currentQuery);
 
@@ -166,7 +141,8 @@ const SearchBar = ({
                   <FlexCol md={5}>
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange} />
+                                           currentTimeRange={values?.timerange}
+                                           exceedsDuration={isOverLimit} />
                     <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
 
@@ -196,7 +172,7 @@ const SearchBar = ({
                                          title="Search query syntax documentation"
                                          text={<Icon name="lightbulb" />} />
                     </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                    <SearchButton disabled={disableSearch || isSubmitting || !isValid || exceedsDuration(limitDuration, timerange)}
                                   dirty={dirty} />
 
                     <Field name="queryString">
