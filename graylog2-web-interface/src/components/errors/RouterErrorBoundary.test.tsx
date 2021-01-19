@@ -17,8 +17,11 @@
 import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import RouterErrorBoundary from './RouterErrorBoundary';
+
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal
