@@ -36,7 +36,7 @@ import TimeRangeLivePreview from './TimeRangeLivePreview';
 import { DateTimeContext } from './DateTimeProvider';
 
 export type TimeRangeDropDownFormValues = {
-  nextTimeRange: TimeRange,
+  nextTimeRange: TimeRange | NoTimeRangeOverride,
 };
 
 const timeRangeTypes = {
@@ -206,24 +206,21 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    positionTop={36}
                    title={title}
                    arrowOffsetLeft={34}>
-      <Formik initialValues={{ nextTimeRange: 'type' in currentTimeRange ? currentTimeRange : DEFAULT_RANGES[activeTab] }}
+      <Formik initialValues={{ nextTimeRange: currentTimeRange }}
               validate={(values) => dateTimeValidate(values, limitDuration)}
               onSubmit={({ nextTimeRange }) => {
                 setCurrentTimeRange(nextTimeRange);
                 toggleDropdownShow();
               }}>
-        {(({ values: { nextTimeRange }, isValid, setFieldValue, validateForm }) => {
-          const changeTab = (nextTimeRangeType) => {
-            if (nextTimeRangeType !== nextTimeRange?.type) {
-              if ('type' in nextTimeRange) {
-                setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTimeRangeType), false);
-              } else {
-                setFieldValue('nextTimeRange', DEFAULT_RANGES[activeTab], false);
-              }
+        {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
+          const handleActiveTab = (nextTab) => {
+            if ('type' in nextTimeRange) {
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab), false);
+            } else {
+              setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab], false);
             }
 
-            setActiveTab(nextTimeRangeType);
-            validateForm();
+            setActiveTab(nextTab);
           };
 
           return (
@@ -235,7 +232,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                   <StyledTabs id="dateTimeTypes"
                               defaultActiveKey={availableTimeRangeTypes[0].type}
                               activeKey={activeTab ?? -1}
-                              onSelect={changeTab}
+                              onSelect={handleActiveTab}
                               animation={false}>
                     {timeRangeTypeTabs({
                       activeTab,
