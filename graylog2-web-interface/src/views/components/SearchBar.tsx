@@ -160,11 +160,13 @@ const SearchBar = ({
           <SearchBarForm initialValues={{ timerange, streams, queryString }}
                          limitDuration={limitDuration}
                          onSubmit={_onSubmit}>
-            {({ dirty, isSubmitting, isValid, handleSubmit, values }) => (
+            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
               <>
                 <TopRow>
                   <FlexCol md={5}>
-                    <TimeRangeTypeSelector disabled={disableSearch} />
+                    <TimeRangeTypeSelector disabled={disableSearch}
+                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                           currentTimeRange={values?.timerange} />
                     <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
 

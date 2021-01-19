@@ -26,7 +26,7 @@ import AbsoluteDateInput from './AbsoluteDateInput';
 type Props = {
   disabled: boolean,
   range: 'to' | 'from',
-  currentTimeRange: AbsoluteTimeRange,
+  nextTimeRange: AbsoluteTimeRange,
 };
 
 const ErrorMessage = styled.span(({ theme }) => css`
@@ -37,12 +37,12 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteTimestamp = ({ disabled, currentTimeRange, range }: Props) => {
+const AbsoluteTimestamp = ({ disabled, nextTimeRange, range }: Props) => {
   return (
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? currentTimeRange[range] : value || currentTimeRange[range];
+        const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
 
         return (
           <>
@@ -61,7 +61,7 @@ const AbsoluteTimestamp = ({ disabled, currentTimeRange, range }: Props) => {
 
 AbsoluteTimestamp.propTypes = {
   disabled: PropTypes.bool,
-  currentTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  nextTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   range: PropTypes.oneOf(['to', 'from']).isRequired,
 };
 

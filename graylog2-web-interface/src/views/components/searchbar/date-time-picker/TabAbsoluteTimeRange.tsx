@@ -19,19 +19,19 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
+import { useFormikContext } from 'formik';
 
-import { TimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import { Accordion, AccordionItem } from 'components/graylog';
+import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
+import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
 import AbsoluteCalendar from './AbsoluteCalendar';
 
 type Props = {
   disabled: boolean,
-  originalTimeRange: TimeRange,
   limitDuration: number,
-  currentTimeRange: AbsoluteTimeRange,
 };
 
 const AbsoluteWrapper = styled.div`
@@ -75,9 +75,10 @@ const FlexWrap = styled.div`
   display: flex;
 `;
 
-const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Props) => {
+const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
+  const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const [activeAccordion, setActiveAccordion] = useState();
-  const toStartDate = moment(currentTimeRange.from).toDate();
+  const toStartDate = moment(nextTimeRange.from).toDate();
   const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
 
   const handleSelect = (nextKey) => {
@@ -95,7 +96,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
           <RangeWrapper>
             <AbsoluteCalendar disabled={disabled}
                               startDate={fromStartDate}
-                              currentTimeRange={currentTimeRange}
+                              nextTimeRange={nextTimeRange}
                               range="from" />
 
           </RangeWrapper>
@@ -107,7 +108,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
           <RangeWrapper>
             <AbsoluteCalendar disabled={disabled}
                               startDate={toStartDate}
-                              currentTimeRange={currentTimeRange}
+                              nextTimeRange={nextTimeRange}
                               range="to" />
           </RangeWrapper>
         </AccordionItem>
@@ -118,7 +119,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
             <FlexWrap>
               <RangeWrapper>
                 <AbsoluteTimestamp disabled={disabled}
-                                   currentTimeRange={currentTimeRange}
+                                   nextTimeRange={nextTimeRange}
                                    range="from" />
               </RangeWrapper>
 
@@ -128,7 +129,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
 
               <RangeWrapper>
                 <AbsoluteTimestamp disabled={disabled}
-                                   currentTimeRange={currentTimeRange}
+                                   nextTimeRange={nextTimeRange}
                                    range="to" />
               </RangeWrapper>
             </FlexWrap>
@@ -142,9 +143,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration, currentTimeRange }: Pro
 
 TabAbsoluteTimeRange.propTypes = {
   disabled: PropTypes.bool,
-  originalTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   limitDuration: PropTypes.number,
-  currentTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
 };
 
 TabAbsoluteTimeRange.defaultProps = {

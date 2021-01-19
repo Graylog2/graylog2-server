@@ -16,16 +16,17 @@
  */
 import * as React from 'react';
 import { useContext, useCallback, useEffect, useState } from 'react';
+import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
-import { useFormikContext } from 'formik';
 import moment from 'moment';
 import Mousetrap from 'mousetrap';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
-import { availableTimeRangeTypes, FormikValues } from 'views/Constants';
+import { availableTimeRangeTypes } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
+import type { NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -33,6 +34,10 @@ import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
 import TimeRangeLivePreview from './TimeRangeLivePreview';
 import { DateTimeContext } from './DateTimeProvider';
+
+export type TimeRangeDropDownFormValues = {
+  nextTimeRange: TimeRange | NoTimeRangeOverride,
+};
 
 const timeRangeTypes = {
   absolute: TabAbsoluteTimeRange,
@@ -42,6 +47,8 @@ const timeRangeTypes = {
 
 type Props = {
   noOverride?: boolean,
+  currentTimeRange: TimeRange | NoTimeRangeOverride,
+  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
 };
 
@@ -104,80 +111,104 @@ const DEFAULT_RANGES = {
   disabled: undefined,
 };
 
-const timeRangeTypeTabs = ({ activeTab, originalTimeRange, limitDuration, currentTimeRange }) => availableTimeRangeTypes.map(({ type, name }) => {
-  const TimeRangeComponent = timeRangeTypes[type];
+const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTypes.map(({ type, name }) => {
+  const TimeRangeTypeTabs = timeRangeTypes[type];
 
   return (
     <Tab title={name}
          key={`time-range-type-selector-${type}`}
          eventKey={type}>
       {type === activeTab && (
-        <TimeRangeComponent disabled={false}
-                            originalTimeRange={originalTimeRange || DEFAULT_RANGES[type]}
-                            limitDuration={limitDuration}
-                            currentTimeRange={currentTimeRange || DEFAULT_RANGES[type]} />
+        <TimeRangeTypeTabs disabled={false}
+                           limitDuration={limitDuration} />
       )}
     </Tab>
   );
 });
 
-const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
-  const { limitDuration } = useContext(DateTimeContext);
-  const { initialValues, isValid, setFieldValue, validateForm, values } = useFormikContext<FormikValues>();
-  const originalTimeRange = initialValues?.timerange;
-  const initialTimeRange = values?.timerange;
-  const currentTimeRange = values?.nextTimeRange;
+export const dateTimeValidate = (values, limitDuration) => {
+  const errors: { nextTimeRange?: {
+    from?: string,
+    to?: string,
+    range?: string,
+    keyword?: string,
+  } } = {};
 
-  const [activeTab, setActiveTab] = useState(currentTimeRange?.type);
+  const { nextTimeRange } = values;
 
-  const handleNoOverride = () => {
-    setFieldValue('timerange', {});
-    setFieldValue('nextTimeRange', {});
-
-    toggleDropdownShow();
-  };
-
-  const handleActiveTab = (nextTab) => {
-    if (currentTimeRange?.type) {
-      setFieldValue('nextTimeRange', migrateTimeRangeToNewType(currentTimeRange, nextTab), false);
-    } else {
-      setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab], false);
+  if (nextTimeRange?.type === 'absolute') {
+    if (!DateTime.isValidDateString(nextTimeRange.from)) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].' };
     }
 
-    validateForm();
-    setActiveTab(nextTab);
+    if (!DateTime.isValidDateString(nextTimeRange.to)) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].' };
+    }
+
+    if (nextTimeRange.from > nextTimeRange.to) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
+    }
+
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
+      }
+    }
+  }
+
+  if (nextTimeRange?.type === 'relative') {
+    if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
+      errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+    }
+  }
+
+  if (nextTimeRange?.type === 'keyword') {
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
+      }
+    }
+  }
+
+  return errors;
+};
+
+const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange }: Props) => {
+  const { limitDuration } = useContext(DateTimeContext);
+
+  const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
+
+  const handleNoOverride = () => {
+    setCurrentTimeRange({});
+    toggleDropdownShow();
   };
 
   const handleCancel = useCallback(() => {
-    setFieldValue('nextTimeRange', initialTimeRange);
-
     toggleDropdownShow();
-  }, [initialTimeRange, setFieldValue, toggleDropdownShow]);
+  }, [toggleDropdownShow]);
 
-  const handleApply = useCallback(() => {
-    setFieldValue('timerange', currentTimeRange);
-
+  const handleSubmit = ({ nextTimeRange }) => {
+    setCurrentTimeRange(nextTimeRange);
     toggleDropdownShow();
-  }, [currentTimeRange, setFieldValue, toggleDropdownShow]);
-
-  const handleEnterKeyPress = useCallback(() => {
-    if (isValid) {
-      handleApply();
-    }
-  }, [isValid, handleApply]);
+  };
 
   const handleEscKeyPress = useCallback(() => {
     handleCancel();
   }, [handleCancel]);
 
   useEffect(() => {
-    Mousetrap.bind('enter', handleEnterKeyPress);
     Mousetrap.bind('esc', handleEscKeyPress);
 
     return () => {
       Mousetrap.reset();
     };
-  }, [handleEnterKeyPress, handleEscKeyPress]);
+  }, [handleEscKeyPress]);
 
   const title = (
     <PopoverTitle>
@@ -197,42 +228,60 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow }: Props) => {
                    positionTop={36}
                    title={title}
                    arrowOffsetLeft={34}>
-      <Row>
-        <Col md={12}>
-          <TimeRangeLivePreview timerange={currentTimeRange} />
+      <Formik initialValues={{ nextTimeRange: currentTimeRange }}
+              validate={(values) => dateTimeValidate(values, limitDuration)}
+              onSubmit={handleSubmit}>
+        {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
+          const handleActiveTab = (nextTab) => {
+            if ('type' in nextTimeRange) {
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab), false);
+            } else {
+              setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab], false);
+            }
 
-          <StyledTabs id="dateTimeTypes"
-                      defaultActiveKey={availableTimeRangeTypes[0].type}
-                      activeKey={activeTab ?? -1}
-                      onSelect={handleActiveTab}
-                      animation={false}>
-            {timeRangeTypeTabs({
-              activeTab,
-              originalTimeRange,
-              limitDuration,
-              currentTimeRange,
-            })}
+            setActiveTab(nextTab);
+          };
 
-            {!activeTab && (<TabDisabledTimeRange />)}
+          return (
+            <Form>
+              <Row>
+                <Col md={12}>
+                  <TimeRangeLivePreview timerange={nextTimeRange} />
 
-          </StyledTabs>
-        </Col>
-      </Row>
+                  <StyledTabs id="dateTimeTypes"
+                              defaultActiveKey={availableTimeRangeTypes[0].type}
+                              activeKey={activeTab ?? -1}
+                              onSelect={handleActiveTab}
+                              animation={false}>
+                    {timeRangeTypeTabs({
+                      activeTab,
+                      limitDuration,
+                    })}
 
-      <Row className="row-sm">
-        <Col md={6}>
-          <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
-        </Col>
-        <Col md={6}>
-          <div className="pull-right">
-            {noOverride && (
-              <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
-            )}
-            <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
-            <Button bsStyle="success" onClick={handleApply} disabled={!isValid}>Apply</Button>
-          </div>
-        </Col>
-      </Row>
+                    {!activeTab && (<TabDisabledTimeRange />)}
+
+                  </StyledTabs>
+                </Col>
+              </Row>
+
+              <Row className="row-sm">
+                <Col md={6}>
+                  <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
+                </Col>
+                <Col md={6}>
+                  <div className="pull-right">
+                    {noOverride && (
+                      <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
+                    )}
+                    <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
+                    <Button bsStyle="success" disabled={!isValid} type="submit">Apply</Button>
+                  </div>
+                </Col>
+              </Row>
+            </Form>
+          );
+        })}
+      </Formik>
     </StyledPopover>
   );
 };

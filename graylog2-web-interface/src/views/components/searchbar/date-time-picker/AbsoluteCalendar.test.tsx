@@ -22,7 +22,7 @@ import AbsoluteCalendar from './AbsoluteCalendar';
 
 const defaultProps = {
   disabled: false,
-  currentTimeRange: {
+  nextTimeRange: {
     type: 'absolute',
     from: '1955-05-11 06:15:00',
     to: '1985-10-25 08:18:00',
@@ -30,7 +30,7 @@ const defaultProps = {
 } as const;
 
 const renderWithForm = (element) => render((
-  <Formik initialValues={{ nextTimeRange: defaultProps.currentTimeRange, timerange: defaultProps.currentTimeRange }}
+  <Formik initialValues={{ nextTimeRange: defaultProps.nextTimeRange }}
           onSubmit={() => {}}>
     <Form>
       {element}
@@ -57,7 +57,7 @@ describe('AbsoluteCalendar', () => {
   });
 
   it('renders `to` date', () => {
-    renderWithForm(<AbsoluteCalendar {...defaultProps} range="to" startDate={new Date(defaultProps.currentTimeRange.from)} />);
+    renderWithForm(<AbsoluteCalendar {...defaultProps} range="to" startDate={new Date(defaultProps.nextTimeRange.from)} />);
 
     const monthYear = screen.getByText('October 1985');
     const inputHour = screen.getByRole('spinbutton', { name: /to hour/i });

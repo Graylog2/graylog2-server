@@ -21,15 +21,15 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
 
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
-import { FormikValues } from 'views/Constants';
+import { SearchBarFormValues } from 'views/Constants';
 
 import { EMPTY_OUTPUT, EMPTY_RANGE } from '../TimeRangeDisplay';
 
 type Props = {
-  timerange?: TimeRange,
+  timerange?: TimeRange | NoTimeRangeOverride,
 };
 
 const PreviewWrapper = styled.div`
@@ -68,7 +68,7 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 15px;
 `);
 
-const dateOutput = (timerange: TimeRange) => {
+const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
   let range = EMPTY_RANGE;
 
   if (!timerange) {
@@ -87,13 +87,13 @@ const dateOutput = (timerange: TimeRange) => {
   }
 
   return {
-    from: timerange.from || range,
-    until: timerange.to || range,
+    from: 'from' in timerange ? timerange.from : range,
+    until: 'to' in timerange ? timerange.to : range,
   };
 };
 
 const TimeRangeLivePreview = ({ timerange }: Props) => {
-  const { isValid } = useFormikContext<FormikValues>();
+  const { isValid } = useFormikContext<SearchBarFormValues>();
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
 
   useEffect(() => {
