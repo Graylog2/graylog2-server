@@ -1921,7 +1921,7 @@ fieldset[disabled] .c18.form-control:not([type="range"]) {
                               aria-disabled="false"
                               aria-label="Sat Oct 19 1985"
                               aria-selected="false"
-                              class="DayPicker-Day DayPicker-Day--today"
+                              class="DayPicker-Day"
                               role="gridcell"
                               tabindex="-1"
                             >
