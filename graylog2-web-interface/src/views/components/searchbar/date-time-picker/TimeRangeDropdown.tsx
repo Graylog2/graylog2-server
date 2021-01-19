@@ -53,20 +53,16 @@ type Props = {
 };
 
 const StyledPopover = styled(Popover)(({ theme }) => css`
-  max-width: 100%;
-  min-width: 745px;
+  min-width: 100%;
   
   @media (min-width: ${theme.breakpoints.min.md}) {
-    max-width: 70vw;
-  }
-  
-  @media (min-width: ${theme.breakpoints.min.lg}) {
-    max-width: 45vw;
+    min-width: 750px;
   }
 `);
 
 const StyledTabs = styled(Tabs)`
   margin-top: 1px;
+  margin-bottom: 9px;
 `;
 
 const Timezone = styled.p(({ theme }) => css`
@@ -130,11 +126,12 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTy
   );
 });
 
-const dateTimeValidate = (values, limitDuration) => {
+export const dateTimeValidate = (values, limitDuration) => {
   const errors: { nextTimeRange?: {
     from?: string,
     to?: string,
     range?: string,
+    keyword?: string,
   } } = {};
 
   const { nextTimeRange } = values;
@@ -149,13 +146,33 @@ const dateTimeValidate = (values, limitDuration) => {
     }
 
     if (nextTimeRange.from > nextTimeRange.to) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Start date must be before end date' };
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
+    }
+
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
+      }
     }
   }
 
   if (nextTimeRange?.type === 'relative') {
     if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
       errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+    }
+  }
+
+  if (nextTimeRange?.type === 'keyword') {
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
+      }
     }
   }
 

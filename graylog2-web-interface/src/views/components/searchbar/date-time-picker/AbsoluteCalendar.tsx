@@ -33,7 +33,7 @@ type Props = {
 
 const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.tiny};
+  font-size: ${theme.fonts.size.small};
   font-style: italic;
   padding: 3px 3px 9px;
   height: 1.5em;
@@ -44,7 +44,7 @@ const AbsoluteCalendar = ({ disabled, startDate, nextTimeRange, range }: Props) 
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? nextTimeRange.to : value || nextTimeRange.to;
+        const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
 
         return (
           <>

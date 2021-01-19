@@ -45,7 +45,7 @@ const AbsoluteDatePicker = ({ name, disabled, dateTime, onChange, startDate }: P
       years: newDate.years,
       months: newDate.months,
       date: newDate.date,
-    }).format(DateTime.Formats.TIMESTAMP));
+    }).format(DateTime.Formats.DATETIME));
   };
 
   return (

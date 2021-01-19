@@ -50,14 +50,14 @@ const UntilWrapper = styled.span`
 
 const Title = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
-  color: ${theme.colors.variant.dark.info};
+  color: ${theme.colors.variant.darker.info};
   display: block;
   font-style: italic;
 `);
 
 const Date = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
-  color: ${theme.colors.variant.primary};
+  color: ${theme.colors.variant.dark.primary};
   display: block;
   font-weight: bold;
 `);

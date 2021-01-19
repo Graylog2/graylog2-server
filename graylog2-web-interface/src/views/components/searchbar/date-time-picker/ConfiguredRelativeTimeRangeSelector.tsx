@@ -94,7 +94,7 @@ export default function ConfiguredRelativeTimeRangeSelector({ disabled, onChange
                             bsSize="small"
                             onSelect={_onChange}>
               {options}
-              <IfPermitted permissions="*">
+              <IfPermitted permissions="clusterconfigentry:edit">
                 <MenuItem divider />
                 <AdminMenuItem href="/system/configurations" target="_blank">Configure Ranges <ExternalIcon name="external-link-alt" /></AdminMenuItem>
               </IfPermitted>
