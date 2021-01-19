@@ -4,7 +4,7 @@ exports[`ShowMessagePage renders for generic event 1`] = `
 .c0.content {
   background-color: #fff;
   border: 1px solid #d0d0d0;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
   border-radius: 4px;
 }
 
@@ -93,7 +93,7 @@ exports[`ShowMessagePage renders for generic message 1`] = `
 .c0.content {
   background-color: #fff;
   border: 1px solid #d0d0d0;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
   border-radius: 4px;
 }
 
