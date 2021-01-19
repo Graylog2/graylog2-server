@@ -42,6 +42,7 @@ import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
 import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import DateTime from 'logic/datetimes/DateTime';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
@@ -84,6 +85,49 @@ const defaultProps = {
   onSubmit: defaultOnSubmit,
 };
 
+export const exceedsDuration = (limitDuration, timerange) => {
+  console.log('exceedsDuration', limitDuration, timerange);
+
+  if (limitDuration !== 0) {
+    switch (timerange?.type) {
+      case 'absolute': {
+        const durationFrom = timerange.from;
+        const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+        if (moment(durationFrom).isBefore(durationLimit)) {
+          console.log('Over Absolute');
+          // errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
+        }
+
+        break;
+      }
+
+      case 'relative': {
+        if (!(timerange.range <= limitDuration && limitDuration !== 0)) {
+          console.log('Over Relative');
+          // errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+        }
+
+        break;
+      }
+
+      case 'keyword': {
+        const durationFrom = timerange.from;
+        const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+        if (moment(durationFrom).isBefore(durationLimit)) {
+          console.log('Over Keyword');
+          // errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
+        }
+
+        break;
+      }
+
+      default: break;
+    }
+  }
+};
+
 const SearchBar = ({
   availableStreams,
   config,
@@ -101,6 +145,11 @@ const SearchBar = ({
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
+
+  exceedsDuration(limitDuration, timerange);
+
+  // const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+  // console.log(moment(timerange).isBefore(durationLimit))
 
   const _onSubmit = (values) => onSubmit(values, currentQuery);
 

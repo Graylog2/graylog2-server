@@ -35,6 +35,7 @@ import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import TopRow from 'views/components/searchbar/TopRow';
 import { SearchesConfig } from 'components/search/SearchConfig';
 
+import { exceedsDuration } from './SearchBar';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
@@ -65,6 +66,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
 
   const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
+
+  exceedsDuration(limitDuration, timerange);
 
   return (
     <ScrollToHint value={queryString}>
