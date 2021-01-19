@@ -55,6 +55,7 @@ const StyledPopover = styled(Popover)(({ theme }) => css`
 
 const StyledTabs = styled(Tabs)`
   margin-top: 1px;
+  margin-bottom: 9px;
 `;
 
 const Timezone = styled.p(({ theme }) => css`
