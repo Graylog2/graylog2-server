@@ -18,27 +18,9 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import PageContentLayout from './PageContentLayout';
+import GlobalAppNotifications from './GlobalAppNotifications';
 
-jest.mock('injection/StoreProvider', () => ({
-  getStore: () => ({
-    getInitialState: () => ({
-      system: { version: '23.42.0-SNAPSHOT+SPECIALFEATURE', hostname: 'hopper.local' },
-    }),
-    jvm: jest.fn(() => Promise.resolve({ info: 'SomeJDK v12.0.0' })),
-    listen: jest.fn(() => () => {}),
-  }),
-}));
-
-describe('PageContentLayout', () => {
-  it('renders its children', async () => {
-    render(<PageContentLayout><div>The content</div></PageContentLayout>);
-
-    await screen.findByText('Graylog 23.42.0-SNAPSHOT+SPECIALFEATURE', { exact: false });
-
-    expect(screen.getByText('The content')).not.toBeNull();
-  });
-
+describe('GlobalAppNotifications', () => {
   it('displays global notifications', async () => {
     PluginStore.register(new PluginManifest({}, {
       globalNotifications: [
@@ -49,9 +31,7 @@ describe('PageContentLayout', () => {
       ],
     }));
 
-    render(<PageContentLayout><div>The content</div></PageContentLayout>);
-
-    await screen.findByText('Graylog 23.42.0-SNAPSHOT+SPECIALFEATURE', { exact: false });
+    render(<GlobalAppNotifications />);
 
     expect(screen.getByText('Your license is expiring.')).not.toBeNull();
   });

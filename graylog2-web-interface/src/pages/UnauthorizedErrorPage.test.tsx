@@ -17,10 +17,13 @@
 import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import FetchError from 'logic/errors/FetchError';
 
 import UnauthorizedErrorPage from './UnauthorizedErrorPage';
+
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 describe('UnauthorizedErrorPage', () => {
   it('displays fetch error', () => {
