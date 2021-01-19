@@ -20,10 +20,10 @@ import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 type QueryId = string;
 

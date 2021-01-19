@@ -20,6 +20,7 @@ import uuid from 'uuid/v4';
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 import type { TitlesMap } from 'views/stores/TitleTypes';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
@@ -27,7 +28,6 @@ import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import GenerateNextPosition from './GenerateNextPosition';
 
 import Widget from '../widgets/Widget';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 const _removeWidgetTitle = (titlesMap: TitlesMap, widgetId: WidgetId): TitlesMap => {
   const widgetTitles = titlesMap.get('widget');
