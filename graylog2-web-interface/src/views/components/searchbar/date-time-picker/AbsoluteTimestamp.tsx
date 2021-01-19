@@ -42,7 +42,7 @@ const AbsoluteTimestamp = ({ disabled, nextTimeRange, range }: Props) => {
     <Field name={`nextTimeRange[${range}]`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
         const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const dateTime = error ? nextTimeRange.from : value || nextTimeRange.from;
+        const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
 
         return (
           <>
