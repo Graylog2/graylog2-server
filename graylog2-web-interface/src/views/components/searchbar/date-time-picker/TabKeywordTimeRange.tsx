@@ -39,7 +39,7 @@ const KeywordInput = styled(FormControl)(({ theme }) => css`
 
 const ErrorMessage = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.tiny};
+  font-size: ${theme.fonts.size.small};
   font-style: italic;
   padding: 3px 3px 9px;
   display: block;

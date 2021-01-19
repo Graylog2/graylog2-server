@@ -21,6 +21,7 @@ import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik';
+import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
@@ -40,6 +41,7 @@ export const dateTimeValidate = (limitDuration) => (values) => {
     from?: string,
     to?: string,
     range?: string,
+    keyword?: string,
   } } = {};
 
   const { nextTimeRange } = values;
@@ -54,13 +56,33 @@ export const dateTimeValidate = (limitDuration) => (values) => {
     }
 
     if (nextTimeRange.from > nextTimeRange.to) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Start date must be before end date' };
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
+    }
+
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
+      }
     }
   }
 
   if (nextTimeRange?.type === 'relative') {
     if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
       errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+    }
+  }
+
+  if (nextTimeRange?.type === 'keyword') {
+    if (limitDuration !== 0) {
+      const durationFrom = nextTimeRange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      if (moment(durationFrom).isBefore(durationLimit)) {
+        errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
+      }
     }
   }
 

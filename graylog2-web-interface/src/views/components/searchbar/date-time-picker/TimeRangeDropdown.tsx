@@ -46,20 +46,16 @@ type Props = {
 };
 
 const StyledPopover = styled(Popover)(({ theme }) => css`
-  max-width: 100%;
-  min-width: 745px;
+  min-width: 100%;
   
   @media (min-width: ${theme.breakpoints.min.md}) {
-    max-width: 70vw;
-  }
-  
-  @media (min-width: ${theme.breakpoints.min.lg}) {
-    max-width: 45vw;
+    min-width: 750px;
   }
 `);
 
 const StyledTabs = styled(Tabs)`
   margin-top: 1px;
+  margin-bottom: 9px;
 `;
 
 const Timezone = styled.p(({ theme }) => css`
