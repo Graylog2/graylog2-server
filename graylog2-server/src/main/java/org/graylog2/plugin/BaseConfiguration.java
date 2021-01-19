@@ -17,10 +17,13 @@
 package org.graylog2.plugin;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -40,6 +43,8 @@ import java.net.URI;
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration extends PathConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
+
+    private static final String SETTING_SQS_QUEUE_URL = "sqs_queue_url";
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
@@ -74,8 +79,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter(value = "pulsar_service_url", validators = PulsarServiceUrlValidator.class)
     private String pulsarServiceUrl = "pulsar://localhost:6650";
 
-    // TODO: don't use a fixed queue URL
-    @Parameter(value = "sqs_queue_url")
+    @Parameter(value = SETTING_SQS_QUEUE_URL, validators = URIAbsoluteValidator.class)
     private URI sqsQueueUrl;
 
     @Parameter("inputbuffer_processors")
@@ -163,6 +167,10 @@ public abstract class BaseConfiguration extends PathConfiguration {
         return pulsarServiceUrl;
     }
 
+    public URI getSqsQueueUrl() {
+        return sqsQueueUrl;
+    }
+
     public void setMessageJournalEnabled(boolean messageJournalEnabled) {
         this.messageJournalEnabled = messageJournalEnabled;
     }
@@ -209,5 +217,17 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public String getInstallationSource() {
         return installationSource;
+    }
+
+    @ValidatorMethod
+    public void validateSqsConfiguration() throws ValidationException {
+        if (!isMessageJournalEnabled()) {
+            return;
+        }
+        if (getMessageJournalMode() == MessageJournalMode.SQS && getSqsQueueUrl() == null) {
+            throw new ValidationException(
+                    "Running with journal mode \"" + MessageJournalMode.SQS + "\" but configuration parameter \"" +
+                            SETTING_SQS_QUEUE_URL + "\" is missing. Please fix your configuration.");
+        }
     }
 }
