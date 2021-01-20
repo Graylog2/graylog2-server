@@ -57,21 +57,6 @@ type Props = {
   disabled: boolean,
 };
 
-const _validateKeyword = (
-  keyword: string,
-  _setSuccessfullPreview: (preview: { from: string, to: string }) => void,
-  _setFailedPreview: () => string,
-): Promise<string> | undefined | null => {
-  if (keyword === undefined) {
-    return undefined;
-  }
-
-  return trim(keyword) === ''
-    ? Promise.resolve('Keyword must not be empty!')
-    : ToolsStore.testNaturalDate(keyword)
-      .then(_setSuccessfullPreview, _setFailedPreview);
-};
-
 const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const keywordRef = useRef();
@@ -88,8 +73,21 @@ const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
+  const _validateKeyword = (keyword: string): Promise<string> | undefined | null => {
+    if (keyword === undefined) {
+      return undefined;
+    }
+
+    return trim(keyword) === ''
+      ? Promise.resolve('Keyword must not be empty!')
+      : ToolsStore.testNaturalDate(keyword)
+        .then(_setSuccessfullPreview, _setFailedPreview);
+  };
+
   const _validate = useCallback(
-    (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
+    (newKeyword) => {
+      return _validateKeyword(newKeyword);
+    },
     [_setSuccessfullPreview, _setFailedPreview],
   );
 
@@ -97,8 +95,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
     if (keywordRef.current !== nextRangeProps?.value?.keyword) {
       keywordRef.current = nextRangeProps.value.keyword;
 
-      ToolsStore.testNaturalDate(keywordRef.current)
-        .then(_setSuccessfullPreview, _setFailedPreview);
+      _validateKeyword(keywordRef.current);
     }
   });
 
