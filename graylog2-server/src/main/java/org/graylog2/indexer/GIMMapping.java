@@ -352,9 +352,7 @@ public abstract class GIMMapping extends IndexMapping {
         ));
     }
 
-    protected String dateFormats() {
-        return "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
-    }
+    protected abstract String dateFormats();
 
     private Map<String, Object> textField() {
         return typeField("text");
