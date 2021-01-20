@@ -55,17 +55,20 @@ const _parseKeywordPreview = (data) => {
 type Props = {
   defaultValue: string,
   disabled: boolean,
+  setValidatingKeyword: (boolean) => void
 };
 
-const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
+const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
   const keywordRef = useRef();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
 
-  const _setSuccessfullPreview = useCallback(
-    (response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)),
-    [],
-  );
+  const _setSuccessfullPreview = useCallback((response: { from: string, to: string }) => {
+    setValidatingKeyword(false);
+
+    return setKeywordPreview(_parseKeywordPreview(response));
+  },
+  [setValidatingKeyword]);
 
   const _setFailedPreview = useCallback(() => {
     setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE });
@@ -78,18 +81,13 @@ const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
       return undefined;
     }
 
+    setValidatingKeyword(true);
+
     return trim(keyword) === ''
       ? Promise.resolve('Keyword must not be empty!')
       : ToolsStore.testNaturalDate(keyword)
         .then(_setSuccessfullPreview, _setFailedPreview);
   };
-
-  const _validate = useCallback(
-    (newKeyword) => {
-      return _validateKeyword(newKeyword);
-    },
-    [_setSuccessfullPreview, _setFailedPreview],
-  );
 
   useEffect(() => {
     if (keywordRef.current !== nextRangeProps?.value?.keyword) {
@@ -117,7 +115,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
   return (
     <Row className="no-bm">
       <Col sm={5}>
-        <Field name="nextTimeRange.keyword" validate={_validate}>
+        <Field name="nextTimeRange.keyword" validate={_validateKeyword}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
@@ -164,11 +162,13 @@ const TabKeywordTimeRange = ({ defaultValue, disabled }: Props) => {
 TabKeywordTimeRange.propTypes = {
   defaultValue: PropTypes.string,
   disabled: PropTypes.bool,
+  setValidatingKeyword: PropTypes.func,
 };
 
 TabKeywordTimeRange.defaultProps = {
   defaultValue: '',
   disabled: false,
+  setValidatingKeyword: () => {},
 };
 
 export default TabKeywordTimeRange;
