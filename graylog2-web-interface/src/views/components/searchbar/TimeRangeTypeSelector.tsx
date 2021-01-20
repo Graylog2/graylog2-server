@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import IconMarker from 'components/common/IconMarker';
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
@@ -38,16 +37,15 @@ const TimeRangeTypeSelector = ({ disabled, exceedsDuration, noOverride, currentT
   const toggleShow = () => setShow(!show);
 
   return (
-    <IconMarker icon={exceedsDuration ? 'exclamation-triangle' : undefined} bsStyle="danger">
-      <TimeRangeDropdownButton disabled={disabled}
-                               show={show}
-                               toggleShow={toggleShow}>
-        <TimeRangeDropdown currentTimeRange={currentTimeRange}
-                           noOverride={noOverride}
-                           setCurrentTimeRange={setCurrentTimeRange}
-                           toggleDropdownShow={toggleShow} />
-      </TimeRangeDropdownButton>
-    </IconMarker>
+    <TimeRangeDropdownButton disabled={disabled}
+                             show={show}
+                             toggleShow={toggleShow}
+                             exceedsDuration={exceedsDuration}>
+      <TimeRangeDropdown currentTimeRange={currentTimeRange}
+                         noOverride={noOverride}
+                         setCurrentTimeRange={setCurrentTimeRange}
+                         toggleDropdownShow={toggleShow} />
+    </TimeRangeDropdownButton>
   );
 };
 
