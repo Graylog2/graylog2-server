@@ -18,6 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
 import { Grid } from 'components/graylog';
 import Footer from 'components/layout/Footer';
 
@@ -27,9 +28,17 @@ type Props = {
 };
 
 const Container = styled.div`
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 50px);
   overflow: auto;
   padding: 15px;
+`;
+
+const StyledGrid = styled(Grid)`
+  width: 100%;
+  flex: 1;
+  margin-bottom: 10px;
 `;
 
 /*
@@ -38,10 +47,12 @@ const Container = styled.div`
  */
 const PageContentLayout = ({ children, className }: Props) => (
   <Container className={className}>
-    <Grid fluid>
-      {children}
-    </Grid>
-    <Footer />
+    <WithGlobalAppNotifications>
+      <StyledGrid fluid className="page-content-grid">
+        {children}
+      </StyledGrid>
+      <Footer />
+    </WithGlobalAppNotifications>
   </Container>
 );
 

@@ -169,21 +169,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 10px;
   }
 
-  .row {
-    margin-bottom: 15px;
-  }
-
   .no-bm {
     margin-bottom: 0;
   }
 
   .has-bm {
     margin-bottom: 10px;
-  }
-
-  .alert {
-    margin-bottom: 0;
-    margin-top: 5px;
   }
 
   .modal form {
