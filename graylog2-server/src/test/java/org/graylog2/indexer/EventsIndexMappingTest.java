@@ -107,7 +107,7 @@ public class EventsIndexMappingTest {
             return "uuuu-MM-dd HH:mm:ss.SSS";
         }
 
-        return "yyyy-MM-dd HH:mm:ss.SSS";
+        return "8yyyy-MM-dd HH:mm:ss.SSS";
     }
 
     private String keyFor(String keySuffix, Version version) {
