@@ -168,8 +168,8 @@ export const dateTimeValidate = (values, limitDuration) => {
 
   if (nextTimeRange?.type === 'keyword') {
     if (limitDuration !== 0) {
-      const durationFrom = nextTimeRange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+      const durationFrom = moment(nextTimeRange.from).utc();
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').utc().format(DateTime.Formats.TIMESTAMP);
 
       if (moment(durationFrom).isBefore(durationLimit)) {
         errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
