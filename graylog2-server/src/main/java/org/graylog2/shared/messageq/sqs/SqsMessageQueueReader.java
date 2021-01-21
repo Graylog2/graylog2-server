@@ -19,6 +19,7 @@ package org.graylog2.shared.messageq.sqs;
 import com.amazonaws.handlers.AsyncHandler;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.amazonaws.services.sqs.buffered.AmazonSQSBufferedAsyncClient;
+import com.amazonaws.services.sqs.buffered.QueueBufferConfig;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageResult;
 import com.amazonaws.services.sqs.model.Message;
@@ -32,6 +33,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.messageq.AbstractMessageQueueReader;
@@ -41,10 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -55,6 +55,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class SqsMessageQueueReader extends AbstractMessageQueueReader {
     private static final Logger LOG = LoggerFactory.getLogger(SqsMessageQueueReader.class);
 
+    private final BaseConfiguration config;
     private final String queueUrl;
 
     private final CountDownLatch latch = new CountDownLatch(1);
@@ -69,13 +70,14 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
 
     @Inject
     public SqsMessageQueueReader(MetricRegistry metricRegistry, Provider<ProcessBuffer> processBufferProvider,
-            EventBus eventBus, @Named("sqs_queue_url") URI queueUrl) {
+            EventBus eventBus, BaseConfiguration config) {
         super(eventBus);
 
         // Using a ProcessBuffer directly will lead to guice error:
         // "Please wait until after injection has completed to use this object."
         this.processBufferProvider = processBufferProvider;
-        this.queueUrl = queueUrl.toString();
+        this.config = config;
+        this.queueUrl = config.getSqsQueueUrl().toString();
 
         this.messageMeter = metricRegistry.meter("system.message-queue.sqs.reader.messages");
         this.byteCounter = metricRegistry.counter("system.message-queue.sqs.reader.byte-count");
@@ -89,7 +91,12 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
 
         LOG.info("Starting pulsar message queue reader service");
 
-        this.sqsClient = new AmazonSQSBufferedAsyncClient(AmazonSQSAsyncClientBuilder.defaultClient());
+        final QueueBufferConfig bufferConfig = new QueueBufferConfig()
+                .withMaxInflightReceiveBatches(config.getSqsMaxInflightReceiveBatches())
+                .withMaxInflightOutboundBatches(config.getSqsMaxInflightOutboundBatches())
+                .withMaxDoneReceiveBatches(config.getSqsMaxDoneReceiveBatches());
+
+        this.sqsClient = new AmazonSQSBufferedAsyncClient(AmazonSQSAsyncClientBuilder.defaultClient(), bufferConfig);
 
         processBuffer = processBufferProvider.get();
 

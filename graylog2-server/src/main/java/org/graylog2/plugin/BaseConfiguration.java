@@ -79,8 +79,18 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter(value = "pulsar_service_url", validators = PulsarServiceUrlValidator.class)
     private String pulsarServiceUrl = "pulsar://localhost:6650";
 
+    // TODO: move sqs settings into separate config class
     @Parameter(value = SETTING_SQS_QUEUE_URL, validators = URIAbsoluteValidator.class)
     private URI sqsQueueUrl;
+
+    @Parameter(value = "sqs_max_inflight_outbound_batches", validators = PositiveIntegerValidator.class)
+    private int sqsMaxInflightOutboundBatches = 5;
+
+    @Parameter(value = "sqs_max_inflight_receive_batches", validators = PositiveIntegerValidator.class)
+    private int sqsMaxInflightReceiveBatches = 10;
+
+    @Parameter(value = "sqs_max_done_receive_batches", validators = PositiveIntegerValidator.class)
+    private int sqsMaxDoneReceiveBatches = 10;
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
@@ -169,6 +179,18 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public URI getSqsQueueUrl() {
         return sqsQueueUrl;
+    }
+
+    public int getSqsMaxInflightOutboundBatches() {
+        return sqsMaxInflightOutboundBatches;
+    }
+
+    public int getSqsMaxInflightReceiveBatches() {
+        return sqsMaxInflightReceiveBatches;
+    }
+
+    public int getSqsMaxDoneReceiveBatches() {
+        return sqsMaxDoneReceiveBatches;
     }
 
     public void setMessageJournalEnabled(boolean messageJournalEnabled) {

@@ -28,6 +28,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.io.BaseEncoding;
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
@@ -35,9 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -54,20 +53,18 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
     private final Counter byteCounter;
     private final Meter byteMeter;
     private final Timer writeTimer;
-    private final int shutdownTimeoutMs;
+    private final BaseConfiguration config;
 
     private AmazonSQSBufferedAsyncClient sqsClient;
 
     @Inject
-    public SqsMessageQueueWriter(MetricRegistry metricRegistry, @Named("sqs_queue_url") URI queueUrl,
-            @Named("shutdown_timeout") int shutdownTimeoutMs) {
-        this.queueUrl = queueUrl.toString();
-
+    public SqsMessageQueueWriter(MetricRegistry metricRegistry, BaseConfiguration config) {
         this.messageMeter = metricRegistry.meter("system.message-queue.sqs.writer.messages");
         this.byteCounter = metricRegistry.counter("system.message-queue.sqs.writer.byte-count");
         this.byteMeter = metricRegistry.meter("system.message-queue.sqs.writer.bytes");
         this.writeTimer = metricRegistry.timer("system.message-queue.sqs.writer.writes");
-        this.shutdownTimeoutMs = shutdownTimeoutMs;
+        this.config = config;
+        this.queueUrl = config.getSqsQueueUrl().toString();
     }
 
     @Override
@@ -75,7 +72,9 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
         LOG.info("Starting sqs message queue writer service");
 
         final QueueBufferConfig bufferConfig = new QueueBufferConfig()
-                .withFlushOnShutdown(true);
+                .withFlushOnShutdown(true)
+                .withMaxInflightOutboundBatches(config.getSqsMaxInflightOutboundBatches());
+
         sqsClient = new AmazonSQSBufferedAsyncClient(AmazonSQSAsyncClientBuilder.defaultClient(), bufferConfig);
 
         // Service is ready for writing
