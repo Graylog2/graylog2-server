@@ -154,6 +154,11 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>assembly.xml</descriptors>
+                    <archive>
+                        <manifestEntries>
+                            <Graylog-Plugin-Properties-Path>${project.groupId}.${project.artifactId}</Graylog-Plugin-Properties-Path>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
                 <executions>
                     <execution>
