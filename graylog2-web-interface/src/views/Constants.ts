@@ -31,7 +31,9 @@ export const Messages = {
 };
 
 export const DEFAULT_RANGE_TYPE = 'relative';
-export const DEFAULT_TIMERANGE: RelativeTimeRange = { type: DEFAULT_RANGE_TYPE, range: 300 };
+export const DEFAULT_RELATIVE_FROM = 300;
+export const DEFAULT_RELATIVE_TO = DEFAULT_RELATIVE_FROM - 60;
+export const DEFAULT_TIMERANGE: RelativeTimeRange = { type: DEFAULT_RANGE_TYPE, range: DEFAULT_RELATIVE_FROM };
 
 export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
@@ -46,6 +48,25 @@ export const TimeUnits = {
   weeks: 'Weeks',
   months: 'Months',
 };
+
+export const RELATIVE_RANGE_TYPES = [
+  {
+    type: 'seconds',
+    label: 'Seconds',
+  }, {
+    type: 'minutes',
+    label: 'Minutes',
+  }, {
+    type: 'hours',
+    label: 'Hours',
+  }, {
+    type: 'days',
+    label: 'Days',
+  }, {
+    type: 'weeks',
+    label: 'Weeks',
+  },
+] as const;
 
 export type TimeUnit = keyof typeof TimeUnits;
 

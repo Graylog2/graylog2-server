@@ -136,17 +136,22 @@ export const dateTimeValidate = (values, limitDuration) => {
 
   const { nextTimeRange } = values;
 
+  const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
+  const rangeLimitError = 'Range is outside limit duration.';
+  const dateLimitError = 'Date is outside limit duration.';
+  const timeRangeError = 'The "Until" date must come after the "From" date.';
+
   if (nextTimeRange?.type === 'absolute') {
     if (!DateTime.isValidDateString(nextTimeRange.from)) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].' };
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: invalidDateFormatError };
     }
 
     if (!DateTime.isValidDateString(nextTimeRange.to)) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].' };
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: invalidDateFormatError };
     }
 
-    if (nextTimeRange.from > nextTimeRange.to) {
-      errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
+    if (nextTimeRange.from >= nextTimeRange.to) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
     }
 
     if (limitDuration !== 0) {
@@ -154,14 +159,24 @@ export const dateTimeValidate = (values, limitDuration) => {
       const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
+        errors.nextTimeRange = { ...errors.nextTimeRange, from: dateLimitError };
       }
     }
   }
 
   if (nextTimeRange?.type === 'relative') {
-    if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
-      errors.nextTimeRange = { range: 'Range is outside limit duration.' };
+    if (limitDuration > 0) {
+      if (nextTimeRange.range >= limitDuration) {
+        errors.nextTimeRange = { ...errors.nextTimeRange, range: rangeLimitError };
+      }
+
+      if (nextTimeRange.from >= limitDuration) {
+        errors.nextTimeRange = { ...errors.nextTimeRange, from: rangeLimitError };
+      }
+    }
+
+    if (nextTimeRange.from <= nextTimeRange.to) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
     }
   }
 
@@ -171,7 +186,7 @@ export const dateTimeValidate = (values, limitDuration) => {
       const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
+        errors.nextTimeRange = { keyword: dateLimitError };
       }
     }
   }

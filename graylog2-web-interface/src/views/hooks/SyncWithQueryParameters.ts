@@ -37,10 +37,21 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
   const { type } = timerange;
   const result = { rangetype: type };
 
+  const formatResult = (paramsObject): [string, string | number][] => Object.entries(paramsObject);
+
   switch (timerange.type) {
-    case 'relative': return Object.entries({ ...result, relative: timerange.range });
-    case 'keyword': return Object.entries({ ...result, keyword: timerange.keyword });
-    case 'absolute': return Object.entries({ ...result, from: timerange.from, to: timerange.to });
+    case 'relative':
+      if ('range' in timerange) {
+        return formatResult({ ...result, relative: timerange.range });
+      }
+
+      if ('from' in timerange && 'to' in timerange) {
+        return formatResult({ ...result, from: timerange.from, to: timerange.to });
+      }
+
+      return formatResult(result);
+    case 'keyword': return formatResult({ ...result, keyword: timerange.keyword });
+    case 'absolute': return formatResult({ ...result, from: timerange.from, to: timerange.to });
     default: return Object.entries(result);
   }
 };

@@ -88,10 +88,18 @@ export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
-export type RelativeTimeRange = {
+export type RelativeTimeRangeStartOnly = {
   type: 'relative',
   range: number,
-};
+}
+
+export type RelativeTimeRangeWithEnd = {
+  type: 'relative',
+  from: number,
+  to: number
+}
+
+export type RelativeTimeRange = RelativeTimeRangeStartOnly | RelativeTimeRangeWithEnd
 
 export type AbsoluteTimeRange = {
   type: 'absolute',

@@ -37,7 +37,16 @@ const _searchTimerange = (timerange: TimeRange) => {
   const result = { rangetype: type };
 
   switch (timerange.type) {
-    case 'relative': return { ...result, relative: timerange.range };
+    case 'relative':
+      if ('range' in timerange) {
+        return { ...result, relative: timerange.range };
+      }
+
+      if ('from' in timerange && 'to' in timerange) {
+        return { ...result, from: timerange.from, to: timerange.to };
+      }
+
+      return result;
     case 'keyword': return { ...result, keyword: timerange.keyword };
     case 'absolute': return { ...result, from: timerange.from, to: timerange.to };
     default: return result;

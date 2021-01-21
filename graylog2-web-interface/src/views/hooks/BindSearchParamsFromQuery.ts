@@ -23,7 +23,6 @@ import {
   AbsoluteTimeRange,
   createElasticsearchQueryString,
   filtersForQuery, KeywordTimeRange,
-  RelativeTimeRange,
 } from 'views/logic/queries/Query';
 
 type RawRelativeRange = {
@@ -48,12 +47,28 @@ const _getRange = (query): RawAbsoluteRange | RawRelativeRange | RawKeywordRange
   return { ...query, rangetype };
 };
 
+const _getRelativeTimeRange = (range) => {
+  const parseRangeValue = (rangeValue: string) => parseInt(rangeValue, 10);
+
+  if (range.rangetype) {
+    if ('relative' in range) {
+      return { type: range.rangetype, range: parseRangeValue(range.relative) };
+    }
+
+    if ('from' in range && 'to' in range) {
+      return { type: range.rangetype, from: parseRangeValue(range.from), to: parseRangeValue(range.to) };
+    }
+  }
+
+  return undefined;
+};
+
 const _getTimerange = (query = {}) => {
   const range = _getRange(query);
 
   switch (range.rangetype) {
     case 'relative':
-      return range.relative ? { type: range.rangetype, range: parseInt(range.relative, 10) } as RelativeTimeRange : undefined;
+      return _getRelativeTimeRange(range);
     case 'absolute':
       return (range.from || range.to)
         ? {
