@@ -40,8 +40,8 @@ import DashboardSearchBar from './DashboardSearchBar';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
-jest.mock('components/layout/Footer', () => <div />);
 jest.mock('util/History');
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
@@ -96,7 +96,6 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {},
 }));
 
-jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
 jest.mock('views/stores/StreamsStore');
