@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import moment from 'moment';
 
+import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -61,7 +61,7 @@ const dateOutput = (timerange: TimeRange) => {
 
   switch (timerange.type) {
     case 'relative':
-      from = !timerange.range ? 'All Time' : moment()
+      from = !timerange.range ? 'All Time' : DateTime.now()
         .subtract(timerange.range * 1000)
         .fromNow();
 

@@ -97,8 +97,8 @@ const CancelButton = styled(Button)`
 const DEFAULT_RANGES = {
   absolute: {
     type: 'absolute',
-    from: moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: moment().format(DateTime.Formats.TIMESTAMP),
+    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
+    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
   },
   relative: {
     type: 'relative',
@@ -152,7 +152,7 @@ export const dateTimeValidate = (values, limitDuration) => {
 
     if (limitDuration !== 0) {
       const durationFrom = nextTimeRange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       if (moment(durationFrom).isBefore(durationLimit)) {
         errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
@@ -168,8 +168,8 @@ export const dateTimeValidate = (values, limitDuration) => {
 
   if (nextTimeRange?.type === 'keyword') {
     if (limitDuration !== 0) {
-      const durationFrom = moment(nextTimeRange.from).utc();
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').utc().format(DateTime.Formats.TIMESTAMP);
+      const durationFrom = moment(nextTimeRange.from);
+      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       if (moment(durationFrom).isBefore(durationLimit)) {
         errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };

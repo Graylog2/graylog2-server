@@ -24,6 +24,7 @@ import { useFormikContext } from 'formik';
 import { Icon } from 'components/common';
 import { Accordion, AccordionItem } from 'components/graylog';
 import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import DateTime from 'logic/datetimes/DateTime';
 
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
@@ -79,7 +80,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const [activeAccordion, setActiveAccordion] = useState();
   const toStartDate = moment(nextTimeRange.from).toDate();
-  const fromStartDate = limitDuration ? moment().seconds(-limitDuration).toDate() : undefined;
+  const fromStartDate = limitDuration ? DateTime.now().seconds(-limitDuration).toDate() : undefined;
 
   const handleSelect = (nextKey) => {
     setActiveAccordion(nextKey ?? activeAccordion);
