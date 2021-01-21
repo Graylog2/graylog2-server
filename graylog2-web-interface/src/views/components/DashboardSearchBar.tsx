@@ -38,6 +38,7 @@ import { SearchesConfig } from 'components/search/SearchConfig';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
+import { dateTimeValidate } from './searchbar/date-time-picker/TimeRangeDropdown';
 
 const FlexCol = styled(Col)`
   display: flex;
@@ -73,53 +74,58 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
           <DashboardSearchForm initialValues={{ timerange, queryString }}
                                limitDuration={limitDuration}
                                onSubmit={submitForm}>
-            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-              <>
-                <TopRow>
-                  <FlexCol lg={8} md={9} xs={10}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange}
-                                           noOverride />
-                    <TimeRangeDisplay timerange={values?.timerange} />
-                  </FlexCol>
-                  <Col lg={4} md={3} xs={2}>
-                    <RefreshControls />
-                  </Col>
-                </TopRow>
+            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => {
+              const isOverLimit = Object.keys(dateTimeValidate(timerange, limitDuration)).length > 0;
 
-                <Row className="no-bm">
-                  <Col md={8} lg={9}>
-                    <div className="pull-right search-help">
-                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                         title="Search query syntax documentation"
-                                         text={<Icon name="lightbulb" />} />
-                    </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                  glyph="filter"
-                                  dirty={dirty} />
+              return (
+                <>
+                  <TopRow>
+                    <FlexCol lg={8} md={9} xs={10}>
+                      <TimeRangeTypeSelector disabled={disableSearch}
+                                             setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                             currentTimeRange={values?.timerange}
+                                             exceedsDuration={isOverLimit}
+                                             noOverride />
+                      <TimeRangeDisplay timerange={values?.timerange} />
+                    </FlexCol>
+                    <Col lg={4} md={3} xs={2}>
+                      <RefreshControls />
+                    </Col>
+                  </TopRow>
 
-                    <Field name="queryString">
-                      {({ field: { name, value, onChange } }) => (
-                        <QueryInput value={value}
-                                    placeholder="Apply filter to all widgets"
-                                    onChange={(newQuery) => {
-                                      onChange({ target: { value: newQuery, name } });
+                  <Row className="no-bm">
+                    <Col md={8} lg={9}>
+                      <div className="pull-right search-help">
+                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                           title="Search query syntax documentation"
+                                           text={<Icon name="lightbulb" />} />
+                      </div>
+                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                                    glyph="filter"
+                                    dirty={dirty} />
 
-                                      return Promise.resolve(newQuery);
-                                    }}
-                                    onExecute={handleSubmit as () => void} />
-                      )}
-                    </Field>
-                  </Col>
-                  <Col md={4} lg={3}>
-                    <div className="pull-right">
-                      <ViewActionsMenu />
-                    </div>
-                  </Col>
-                </Row>
-              </>
-            )}
+                      <Field name="queryString">
+                        {({ field: { name, value, onChange } }) => (
+                          <QueryInput value={value}
+                                      placeholder="Apply filter to all widgets"
+                                      onChange={(newQuery) => {
+                                        onChange({ target: { value: newQuery, name } });
+
+                                        return Promise.resolve(newQuery);
+                                      }}
+                                      onExecute={handleSubmit as () => void} />
+                        )}
+                      </Field>
+                    </Col>
+                    <Col md={4} lg={3}>
+                      <div className="pull-right">
+                        <ViewActionsMenu />
+                      </div>
+                    </Col>
+                  </Row>
+                </>
+              );
+            }}
           </DashboardSearchForm>
         </Col>
       </Row>
