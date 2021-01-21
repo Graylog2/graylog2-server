@@ -28,4 +28,9 @@ public class GIMMapping6 extends GIMMapping {
                 "mapping", notAnalyzedString()
         );
     }
+
+    @Override
+    protected String dateFormats() {
+        return "8yyyy-MM-dd HH:mm:ss||8yyyy-MM-dd";
+    }
 }
