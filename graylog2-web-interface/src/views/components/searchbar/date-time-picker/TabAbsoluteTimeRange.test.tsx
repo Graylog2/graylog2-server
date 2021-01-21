@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
@@ -39,11 +39,22 @@ const renderWithForm = (element) => render((
 ));
 
 describe('TabAbsoluteTimeRange', () => {
-  it('renders', () => {
-    const { asFragment } = renderWithForm((
+  it('renders Accordions that work', () => {
+    renderWithForm((
       <TabAbsoluteTimeRange {...defaultProps} />
     ));
 
-    expect(asFragment()).toMatchSnapshot();
+    const accordion = screen.getByTestId('absolute-time-ranges');
+    const accordionItemCal = screen.getByRole('button', { name: 'Calendar' });
+    const accordionItemTime = screen.getByRole('button', { name: 'Timestamp' });
+
+    expect(accordion).not.toBeNull();
+    expect(accordionItemCal.getAttribute('aria-expanded')).toEqual('true');
+    expect(accordionItemTime.getAttribute('aria-expanded')).toEqual('false');
+
+    fireEvent.click(accordionItemTime);
+
+    expect(accordionItemCal.getAttribute('aria-expanded')).toEqual('false');
+    expect(accordionItemTime.getAttribute('aria-expanded')).toEqual('true');
   });
 });
