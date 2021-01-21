@@ -27,7 +27,6 @@ import { availableTimeRangeTypes } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
-import { exceedsDuration } from 'views/components/SearchBar';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -127,15 +126,35 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTy
   );
 });
 
-export const dateTimeValidate = (values, limitDuration) => {
+const exceedsDuration = (timerange, limitDuration) => {
+  if (limitDuration === 0) {
+    return false;
+  }
+
+  switch (timerange?.type) {
+    case 'absolute':
+    case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
+      const durationFrom = timerange.from;
+      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      return moment(durationFrom).isBefore(durationLimit);
+    }
+
+    case 'relative':
+      return timerange.range > limitDuration;
+
+    default:
+      return false;
+  }
+};
+
+export const dateTimeValidate = (nextTimeRange, limitDuration) => {
   const errors: { nextTimeRange?: {
     from?: string,
     to?: string,
     range?: string,
     keyword?: string,
   } } = {};
-
-  const { nextTimeRange } = values;
 
   if (nextTimeRange?.type === 'absolute') {
     if (!DateTime.isValidDateString(nextTimeRange.from)) {
@@ -150,19 +169,19 @@ export const dateTimeValidate = (values, limitDuration) => {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
     }
 
-    if (exceedsDuration(limitDuration, nextTimeRange)) {
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
       errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
     }
   }
 
   if (nextTimeRange?.type === 'relative') {
-    if (exceedsDuration(limitDuration, nextTimeRange)) {
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
       errors.nextTimeRange = { range: 'Range is outside limit duration.' };
     }
   }
 
   if (nextTimeRange?.type === 'keyword') {
-    if (exceedsDuration(limitDuration, nextTimeRange)) {
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
       errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
     }
   }
@@ -220,13 +239,13 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    title={title}
                    arrowOffsetLeft={34}>
       <Formik initialValues={{ nextTimeRange: currentTimeRange }}
-              validate={(values) => dateTimeValidate(values, limitDuration)}
+              validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
               onSubmit={handleSubmit}
               validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab), false);
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab), true);
             } else {
               setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab], false);
             }

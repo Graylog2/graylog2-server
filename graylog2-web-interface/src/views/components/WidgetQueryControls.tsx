@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Field, useFormikContext } from 'formik';
-import { useContext } from 'react';
 
 import connect from 'stores/connect';
 import { Col, Row } from 'components/graylog';
@@ -31,8 +30,6 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
 import type { SearchBarFormValues } from 'views/Constants';
-import { exceedsDuration } from 'views/components/SearchBar';
-import { DateTimeContext } from 'views/components/searchbar/date-time-picker/DateTimeProvider';
 
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import StreamsFilter from './searchbar/StreamsFilter';
@@ -86,13 +83,11 @@ const ResetOverrideHint = () => (
 );
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
-  const { limitDuration } = useContext(DateTimeContext);
   const isGloballyOverridden: boolean = globalOverride !== undefined
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
   const { dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue } = useFormikContext<SearchBarFormValues>();
-  const isOverLimit = exceedsDuration(limitDuration, values?.timerange);
 
   return (
     <>
@@ -103,8 +98,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
             <FlexCol md={4}>
               <TimeRangeTypeSelector disabled={isGloballyOverridden}
                                      setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                     currentTimeRange={values?.timerange}
-                                     exceedsDuration={isOverLimit} />
+                                     currentTimeRange={values?.timerange} />
               <TimeRangeDisplay timerange={values?.timerange} />
             </FlexCol>
 
