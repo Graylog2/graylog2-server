@@ -17,21 +17,19 @@
 package org.graylog2.shared.messageq.sqs;
 
 import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.MessageSystemAttributeName;
 import com.google.common.io.BaseEncoding;
 import org.graylog2.shared.messageq.MessageQueue;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class SqsMessageQueueEntry implements MessageQueue.Entry {
     private final byte[] encodedRawMessage;
     private final byte[] messageId;
     private final String receiptHandle;
-    private final long timestamp;
 
     public static MessageQueue.Entry fromMessage(Message message) {
-
         return new SqsMessageQueueEntry(message);
     }
 
@@ -39,8 +37,6 @@ public class SqsMessageQueueEntry implements MessageQueue.Entry {
         this.encodedRawMessage = BaseEncoding.base64().omitPadding().decode(message.getBody());
         this.messageId = message.getMessageId().getBytes(StandardCharsets.UTF_8);
         this.receiptHandle = message.getReceiptHandle();
-        this.timestamp = Long.parseLong(message.getAttributes()
-                .get(MessageSystemAttributeName.SentTimestamp.toString()));
     }
 
     @Override
@@ -65,7 +61,7 @@ public class SqsMessageQueueEntry implements MessageQueue.Entry {
     }
 
     @Override
-    public long timestamp() {
-        return this.timestamp;
+    public Optional<Long> timestamp() {
+        return Optional.empty();
     }
 }

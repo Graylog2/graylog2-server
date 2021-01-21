@@ -19,6 +19,7 @@ package org.graylog2.shared.messageq;
 import com.google.common.util.concurrent.Service;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public interface MessageQueue extends Service {
 
@@ -48,6 +49,6 @@ public interface MessageQueue extends Service {
          * This is the event time in milliseconds of the entry.
          * @return the event time in milliseconds
          */
-        long timestamp();
+        Optional<Long> timestamp();
     }
 }

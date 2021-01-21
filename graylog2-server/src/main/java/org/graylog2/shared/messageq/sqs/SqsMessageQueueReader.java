@@ -23,7 +23,6 @@ import com.amazonaws.services.sqs.buffered.QueueBufferConfig;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageResult;
 import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.QueueAttributeName;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import com.codahale.metrics.Counter;
@@ -159,9 +158,9 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
     }
 
     private List<Message> receiveEncodedMessages() {
-        try {
+        try(final Timer.Context ignored = readTimer.time()) {
             final ReceiveMessageResult result = sqsClient.receiveMessage(
-                    new ReceiveMessageRequest(queueUrl).withAttributeNames(QueueAttributeName.All)
+                    new ReceiveMessageRequest(queueUrl)
                             .withMaxNumberOfMessages(10)
                             .withWaitTimeSeconds(20));
             return result.getMessages();

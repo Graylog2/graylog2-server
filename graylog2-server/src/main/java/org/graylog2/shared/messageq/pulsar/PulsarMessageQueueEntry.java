@@ -24,6 +24,7 @@ import org.graylog2.shared.messageq.MessageQueue;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
@@ -69,8 +70,8 @@ public class PulsarMessageQueueEntry implements MessageQueue.Entry {
     }
 
     @Override
-    public long timestamp() {
-        return timestamp;
+    public Optional<Long> timestamp() {
+        return Optional.of(timestamp);
     }
 
     @Override
