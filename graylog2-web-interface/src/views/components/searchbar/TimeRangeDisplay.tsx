@@ -103,7 +103,7 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   }, [dateTested, timerange]);
 
   return (
-    <TimeRangeWrapper>
+    <TimeRangeWrapper aria-label="Search Time Range">
       {!(timerange && 'type' in timerange)
         ? <span><code>No Override</code></span>
         : (
