@@ -27,10 +27,11 @@ type Props = {
   currentTimeRange: TimeRange | NoTimeRangeOverride,
   disabled?: boolean,
   noOverride?: boolean,
+  exceedsDuration?: boolean,
   setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
 };
 
-const TimeRangeTypeSelector = ({ disabled, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
+const TimeRangeTypeSelector = ({ disabled, exceedsDuration, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
@@ -38,7 +39,8 @@ const TimeRangeTypeSelector = ({ disabled, noOverride, currentTimeRange, setCurr
   return (
     <TimeRangeDropdownButton disabled={disabled}
                              show={show}
-                             toggleShow={toggleShow}>
+                             toggleShow={toggleShow}
+                             exceedsDuration={exceedsDuration}>
       <TimeRangeDropdown currentTimeRange={currentTimeRange}
                          noOverride={noOverride}
                          setCurrentTimeRange={setCurrentTimeRange}
@@ -49,11 +51,13 @@ const TimeRangeTypeSelector = ({ disabled, noOverride, currentTimeRange, setCurr
 
 TimeRangeTypeSelector.propTypes = {
   disabled: PropTypes.bool,
+  exceedsDuration: PropTypes.bool,
   noOverride: PropTypes.bool,
 };
 
 TimeRangeTypeSelector.defaultProps = {
   disabled: false,
+  exceedsDuration: false,
   noOverride: false,
 };
 

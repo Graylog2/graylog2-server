@@ -45,6 +45,7 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
+import { dateTimeValidate } from './searchbar/date-time-picker/TimeRangeDropdown';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
@@ -111,64 +112,69 @@ const SearchBar = ({
           <SearchBarForm initialValues={{ timerange, streams, queryString }}
                          limitDuration={limitDuration}
                          onSubmit={_onSubmit}>
-            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-              <>
-                <TopRow>
-                  <FlexCol md={5}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange} />
-                    <TimeRangeDisplay timerange={values?.timerange} />
-                  </FlexCol>
+            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => {
+              const isOverLimit = Object.keys(dateTimeValidate(values?.timerange, limitDuration)).length > 0;
 
-                  <Col mdHidden lgHidden>
-                    <HorizontalSpacer />
-                  </Col>
+              return (
+                <>
+                  <TopRow>
+                    <FlexCol md={5}>
+                      <TimeRangeTypeSelector disabled={disableSearch}
+                                             setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                             currentTimeRange={values?.timerange}
+                                             exceedsDuration={isOverLimit} />
+                      <TimeRangeDisplay timerange={values?.timerange} />
+                    </FlexCol>
 
-                  <FlexCol md={7}>
-                    <StreamWrap>
-                      <Field name="streams">
+                    <Col mdHidden lgHidden>
+                      <HorizontalSpacer />
+                    </Col>
+
+                    <FlexCol md={7}>
+                      <StreamWrap>
+                        <Field name="streams">
+                          {({ field: { name, value, onChange } }) => (
+                            <StreamsFilter value={value}
+                                           streams={availableStreams}
+                                           onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                          )}
+                        </Field>
+                      </StreamWrap>
+
+                      <RefreshControls />
+                    </FlexCol>
+                  </TopRow>
+
+                  <Row className="no-bm">
+                    <Col md={9} xs={8}>
+                      <div className="pull-right search-help">
+                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                           title="Search query syntax documentation"
+                                           text={<Icon name="lightbulb" />} />
+                      </div>
+                      <SearchButton disabled={disableSearch || isSubmitting || !isValid || isOverLimit}
+                                    dirty={dirty} />
+
+                      <Field name="queryString">
                         {({ field: { name, value, onChange } }) => (
-                          <StreamsFilter value={value}
-                                         streams={availableStreams}
-                                         onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                          <QueryInput value={value}
+                                      placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                      onChange={(newQuery) => {
+                                        onChange({ target: { value: newQuery, name } });
+
+                                        return Promise.resolve(newQuery);
+                                      }}
+                                      onExecute={handleSubmit as () => void} />
                         )}
                       </Field>
-                    </StreamWrap>
-
-                    <RefreshControls />
-                  </FlexCol>
-                </TopRow>
-
-                <Row className="no-bm">
-                  <Col md={9} xs={8}>
-                    <div className="pull-right search-help">
-                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                         title="Search query syntax documentation"
-                                         text={<Icon name="lightbulb" />} />
-                    </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                  dirty={dirty} />
-
-                    <Field name="queryString">
-                      {({ field: { name, value, onChange } }) => (
-                        <QueryInput value={value}
-                                    placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                    onChange={(newQuery) => {
-                                      onChange({ target: { value: newQuery, name } });
-
-                                      return Promise.resolve(newQuery);
-                                    }}
-                                    onExecute={handleSubmit as () => void} />
-                      )}
-                    </Field>
-                  </Col>
-                  <Col md={3} xs={4} className="pull-right">
-                    <SavedSearchControls />
-                  </Col>
-                </Row>
-              </>
-            )}
+                    </Col>
+                    <Col md={3} xs={4} className="pull-right">
+                      <SavedSearchControls />
+                    </Col>
+                  </Row>
+                </>
+              );
+            }}
           </SearchBarForm>
         </Col>
       </Row>
