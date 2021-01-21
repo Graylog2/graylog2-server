@@ -91,6 +91,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
       <StyledAccordion defaultActiveKey="calendar"
                        onSelect={handleSelect}
                        id="absolute-time-ranges"
+                       data-testid="absolute-time-ranges"
                        activeKey={activeAccordion}>
 
         <AccordionItem name="Calendar">

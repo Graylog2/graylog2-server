@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 
@@ -63,20 +63,42 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', () => {
-    const { asFragment } = render(<SearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
-    expect(asFragment()).toMatchSnapshot();
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangeDisplay = screen.getByLabelText('Search Time Range');
+    const streamsFilter = screen.getByTestId('streams-filter');
+    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
+    const searchButton = screen.getByTitle('Perform search');
+    const metaButtons = screen.getByLabelText('Search Meta Buttons');
+
+    expect(timeRangeButton).not.toBeNull();
+    expect(timeRangeDisplay).not.toBeNull();
+    expect(streamsFilter).not.toBeNull();
+    expect(liveUpdate).not.toBeNull();
+    expect(searchButton).not.toBeNull();
+    expect(metaButtons).not.toBeNull();
   });
 
   it('should update query when search is performed', async () => {
-    const { getByTitle } = render(<SearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
-    const searchButton = getByTitle('Perform search');
+    const searchButton = screen.getByTitle('Perform search');
 
     fireEvent.click(searchButton);
 
     const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
 
     await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
+  });
+
+  it('date exceeding limitDuration should render with error Icon & search button disabled', () => {
+    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
+
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const searchButton = screen.getByTitle('Perform search');
+
+    expect(searchButton).toHaveAttribute('disabled');
+    expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
   });
 });
