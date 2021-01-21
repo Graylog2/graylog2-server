@@ -34,7 +34,7 @@ const Container = styled.div`
   height: 100%;
   width: 100%;
 
-  /* Bottom gap is defined by footer bottom margin */
+  /* Bottom gap is defined by the footer */
   padding: 15px 15px 0 15px;
 `;
 
