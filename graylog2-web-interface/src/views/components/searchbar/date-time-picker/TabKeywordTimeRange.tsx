@@ -60,6 +60,7 @@ type Props = {
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
   const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
+  const mounted = useRef(true);
   const keywordRef = useRef();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '' });
 
@@ -86,8 +87,17 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     return trim(keyword) === ''
       ? Promise.resolve('Keyword must not be empty!')
       : ToolsStore.testNaturalDate(keyword)
-        .then(_setSuccessfullPreview, _setFailedPreview);
+        .then((response) => {
+          if (mounted.current) _setSuccessfullPreview(response);
+        })
+        .catch(_setFailedPreview);
   };
+
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (keywordRef.current !== nextRangeProps?.value?.keyword) {
