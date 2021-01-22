@@ -66,14 +66,14 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>graylog-nexus</id>
-            <name>Graylog Nexus Snapshots</name>
-            <url>https://nexus.ci.torch.sh/repository/graylog-snapshots/</url>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>graylog-nexus</id>
-            <name>Graylog Nexus Releases</name>
-            <url>https://nexus.ci.torch.sh/repository/graylog-releases/</url>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
