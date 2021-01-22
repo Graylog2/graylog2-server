@@ -165,8 +165,6 @@ export const dateTimeValidate = (values, limitDuration) => {
   }
 
   if (nextTimeRange?.type === 'relative') {
-    console.log({ nextTimeRange });
-
     if (limitDuration > 0) {
       if (nextTimeRange.from >= limitDuration) {
         errors.nextTimeRange = { ...errors.nextTimeRange, from: rangeLimitError };
