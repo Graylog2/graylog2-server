@@ -154,25 +154,41 @@ describe('TimeRangeDropdown', () => {
     expect(limitDuration).toBeInTheDocument();
   });
 
-  it('Render Tab and tabs have content', async () => {
+  it('Render Tabs', async () => {
     await asyncRender(<TimeRangeDropdown {...defaultProps} />);
 
+    const relativeTabButton = screen.getByRole('tab', { name: /relative/i });
     const absoluteTabButton = screen.getByRole('tab', { name: /absolute/i });
     const keywordTabButton = screen.getByRole('tab', { name: /keyword/i });
 
+    expect(relativeTabButton).toBeInTheDocument();
     expect(absoluteTabButton).toBeInTheDocument();
+    expect(keywordTabButton).toBeInTheDocument();
+  });
 
-    fireEvent.click(absoluteTabButton);
+  it('Absolute tab has Accordion', async () => {
+    await asyncRender(<TimeRangeDropdown {...defaultProps} currentTimeRange={{ type: 'absolute', from: '1955-05-11 06:15:00', to: '1985-10-25 08:18:00' }} />);
 
-    const calendarButton = screen.getByRole('button', {
-      name: /calendar/i,
-    });
+    const calendarButton = screen.getByRole('button', { name: /calendar/i });
+    const timestampButton = screen.getByRole('button', { name: /timestamp/i });
 
     expect(calendarButton).toBeInTheDocument();
+    expect(timestampButton).toBeInTheDocument();
 
-    fireEvent.click(keywordTabButton);
-    const keywordInputLabel = screen.getByText(/specify the time frame for the search in natural language\./i);
+    fireEvent.click(timestampButton);
 
-    await waitFor(() => expect(keywordInputLabel).toBeInTheDocument());
+    const timestampContent = screen.getByText(/Date should be formatted as/i);
+
+    expect(timestampContent).toBeInTheDocument();
+  });
+
+  it('Renders No Override Tab for Dashboard', async () => {
+    await asyncRender(<TimeRangeDropdown {...defaultProps} currentTimeRange={{}} noOverride />);
+
+    const noOverrideContent = screen.getByText(/No Date\/Time Override chosen./i);
+    const noOverrideButton = screen.getByRole('button', { name: /no override/i });
+
+    expect(noOverrideButton).toBeInTheDocument();
+    expect(noOverrideContent).toBeInTheDocument();
   });
 });
