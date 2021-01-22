@@ -61,7 +61,6 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children 
             enableReinitialize
             onSubmit={_onSubmit}
             validate={({ timerange: nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
-            validateOnChange={false}
             validateOnMount>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
