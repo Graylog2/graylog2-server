@@ -18,7 +18,7 @@ import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 
-import OriginalTabRelativeTimeRange from './TabRelativeTimeRange';
+import TabRelativeTimeRange from './TabRelativeTimeRange';
 
 const defaultProps = {
   limitDuration: 0,
@@ -32,24 +32,19 @@ const initialValues = {
   },
 };
 
-type Props = {
-  disabled: boolean,
-  limitDuration: number,
-};
-
-const TabRelativeTimeRange = (allProps: Props) => (
-  <Formik initialValues={initialValues}
+const renderSUT = (allProps = defaultProps, initialFormValues = initialValues) => render(
+  <Formik initialValues={initialFormValues}
           onSubmit={() => {}}
           validateOnMount>
     <Form>
-      <OriginalTabRelativeTimeRange {...allProps} />
+      <TabRelativeTimeRange {...allProps} />
     </Form>
-  </Formik>
+  </Formik>,
 );
 
 describe('TabRelativeTimeRange', () => {
-  it('renders initial time range value', () => {
-    render(<TabRelativeTimeRange {...defaultProps} />);
+  it('renders initial from value', () => {
+    renderSUT();
 
     const spinbutton = screen.getByRole('spinbutton', { name: /set the from value/i });
 
@@ -57,27 +52,66 @@ describe('TabRelativeTimeRange', () => {
     expect(spinbutton).toHaveValue(1);
   });
 
+  it('sets "now" as default for to value', () => {
+    renderSUT();
+
+    const allTimeCheckbox = screen.getByRole('checkbox', { name: /Now/i });
+    const toRangeValue = screen.getByRole('spinbutton', { name: /set the to value/i });
+
+    expect(allTimeCheckbox).toBeEnabled();
+    expect(toRangeValue).toBeDisabled();
+  });
+
   it('renders initial time range type', () => {
-    render(<TabRelativeTimeRange {...defaultProps} />);
+    renderSUT();
 
     expect(screen.getByText(/Hours/i)).toBeInTheDocument();
+    expect((screen.getByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('1');
+  });
+
+  it('renders initial time range with from and to value', () => {
+    const initialFormValues = {
+      ...initialValues,
+      nextTimeRange: {
+        ...initialValues.nextTimeRange,
+        from: 300,
+        to: 240,
+      },
+    };
+    renderSUT(undefined, initialFormValues);
+
+    expect((screen.getByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('5');
+    expect((screen.getByRole('spinbutton', { name: /Set the to value/i }) as HTMLInputElement).value).toBe('4');
   });
 
   it('Clicking All Time disables input', () => {
-    render(<TabRelativeTimeRange {...defaultProps} />);
+    renderSUT();
 
     const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
-    const rangeValue = screen.getByRole('spinbutton', { name: /set the from value/i });
+    const fromRangeValue = screen.getByRole('spinbutton', { name: /set the from value/i });
 
-    expect(rangeValue).not.toBeDisabled();
+    expect(fromRangeValue).not.toBeDisabled();
 
     fireEvent.click(allTimeCheckbox);
 
-    expect(rangeValue).toBeDisabled();
+    expect(fromRangeValue).toBeDisabled();
+  });
+
+  it('Clicking Now enables to input', () => {
+    renderSUT();
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: /Now/i });
+    const toRangeValue = screen.getByRole('spinbutton', { name: /set the to value/i });
+
+    expect(toRangeValue).toBeDisabled();
+
+    fireEvent.click(nowCheckbox);
+
+    expect(toRangeValue).not.toBeDisabled();
   });
 
   it('All Time checkbox is disabled', () => {
-    render(<TabRelativeTimeRange {...defaultProps} limitDuration={10} />);
+    renderSUT({ ...defaultProps, limitDuration: 10 });
 
     const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
 
