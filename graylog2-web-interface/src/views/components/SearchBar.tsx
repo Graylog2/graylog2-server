@@ -45,7 +45,6 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
-import { dateTimeValidate } from './searchbar/date-time-picker/TimeRangeDropdown';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
@@ -113,8 +112,6 @@ const SearchBar = ({
                          limitDuration={limitDuration}
                          onSubmit={_onSubmit}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => {
-              const isOverLimit = Object.keys(dateTimeValidate(values?.timerange, limitDuration)).length > 0;
-
               return (
                 <>
                   <TopRow>
@@ -122,7 +119,7 @@ const SearchBar = ({
                       <TimeRangeTypeSelector disabled={disableSearch}
                                              setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                              currentTimeRange={values?.timerange}
-                                             exceedsDuration={isOverLimit} />
+                                             hasErrorOnMount={!isValid} />
                       <TimeRangeDisplay timerange={values?.timerange} />
                     </FlexCol>
 
@@ -152,7 +149,7 @@ const SearchBar = ({
                                            title="Search query syntax documentation"
                                            text={<Icon name="lightbulb" />} />
                       </div>
-                      <SearchButton disabled={disableSearch || isSubmitting || !isValid || isOverLimit}
+                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
                                     dirty={dirty} />
 
                       <Field name="queryString">

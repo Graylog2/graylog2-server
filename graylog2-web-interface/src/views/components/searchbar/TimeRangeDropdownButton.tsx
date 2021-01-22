@@ -24,20 +24,20 @@ import { Icon } from 'components/common';
 type Props = {
   children: React.ReactNode,
   disabled?: boolean,
-  exceedsDuration?: boolean,
+  hasErrorOnMount?: boolean,
   show?: boolean,
   toggleShow: () => void,
 };
 
-const TimeRangeDropdownButton = ({ children, disabled, exceedsDuration, show, toggleShow }: Props) => {
+const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, toggleShow }: Props) => {
   const containerRef = useRef();
 
   return (
     <div ref={containerRef}>
-      <Button bsStyle={exceedsDuration ? 'danger' : 'info'}
+      <Button bsStyle={hasErrorOnMount ? 'danger' : 'info'}
               disabled={disabled}
               onClick={toggleShow}>
-        <Icon name={exceedsDuration ? 'exclamation-triangle' : 'clock'} />
+        <Icon name={hasErrorOnMount ? 'exclamation-triangle' : 'clock'} />
       </Button>
 
       <Overlay show={show}
@@ -52,7 +52,7 @@ const TimeRangeDropdownButton = ({ children, disabled, exceedsDuration, show, to
 };
 
 TimeRangeDropdownButton.defaultProps = {
-  exceedsDuration: false,
+  hasErrorOnMount: false,
   disabled: false,
   show: false,
 };

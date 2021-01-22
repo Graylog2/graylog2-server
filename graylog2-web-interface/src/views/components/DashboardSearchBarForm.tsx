@@ -25,6 +25,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 
 import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
+import { dateTimeValidate } from './searchbar/date-time-picker/TimeRangeDropdown';
 
 type Values = {
   timerange: TimeRange | undefined | null,
@@ -58,7 +59,10 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children 
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}>
+            onSubmit={_onSubmit}
+            validate={({ timerange: nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+            validateOnChange={false}
+            validateOnMount>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
           <Form>

@@ -38,7 +38,6 @@ import { SearchesConfig } from 'components/search/SearchConfig';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
-import { dateTimeValidate } from './searchbar/date-time-picker/TimeRangeDropdown';
 
 const FlexCol = styled(Col)`
   display: flex;
@@ -75,8 +74,6 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                limitDuration={limitDuration}
                                onSubmit={submitForm}>
             {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => {
-              const isOverLimit = Object.keys(dateTimeValidate(timerange, limitDuration)).length > 0;
-
               return (
                 <>
                   <TopRow>
@@ -84,7 +81,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                       <TimeRangeTypeSelector disabled={disableSearch}
                                              setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                              currentTimeRange={values?.timerange}
-                                             exceedsDuration={isOverLimit}
+                                             hasErrorOnMount={!isValid}
                                              noOverride />
                       <TimeRangeDisplay timerange={values?.timerange} />
                     </FlexCol>
