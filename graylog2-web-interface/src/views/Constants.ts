@@ -33,7 +33,7 @@ export const Messages = {
 export const DEFAULT_RANGE_TYPE = 'relative';
 export const DEFAULT_RELATIVE_FROM = 300;
 export const DEFAULT_RELATIVE_TO = DEFAULT_RELATIVE_FROM - 60;
-export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE_TYPE, from: DEFAULT_RELATIVE_FROM };
+export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE_TYPE, from: DEFAULT_RELATIVE_FROM, to: 0 };
 
 export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
