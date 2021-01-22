@@ -165,17 +165,15 @@ export const dateTimeValidate = (values, limitDuration) => {
   }
 
   if (nextTimeRange?.type === 'relative') {
-    if (limitDuration > 0) {
-      if (nextTimeRange.range >= limitDuration) {
-        errors.nextTimeRange = { ...errors.nextTimeRange, range: rangeLimitError };
-      }
+    console.log({ nextTimeRange });
 
+    if (limitDuration > 0) {
       if (nextTimeRange.from >= limitDuration) {
         errors.nextTimeRange = { ...errors.nextTimeRange, from: rangeLimitError };
       }
     }
 
-    if (nextTimeRange.from <= nextTimeRange.to) {
+    if (nextTimeRange.from && nextTimeRange.from <= nextTimeRange.to) {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
     }
   }
