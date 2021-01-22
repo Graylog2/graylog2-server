@@ -17,13 +17,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useFormikContext } from 'formik';
 
 import { DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
 
 import RelativeRangeSelect from './RelativeRangeSelect';
-import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 
 type Props = {
   disabled: boolean,
@@ -41,45 +39,7 @@ const StyledIcon = styled(Icon)`
   flex: 0.75;
 `;
 
-const _handleToChange = (
-  formValues: TimeRangeDropDownFormValues,
-  setFormValues: (TimeRangeDropDownFormValues) => void,
-  toRange: number,
-  updateField: () => void,
-) => {
-  const { nextTimeRange, ...otherFormValues } = formValues;
-
-  const setNextTimeRange = (newTimeRange) => setFormValues({
-    ...otherFormValues,
-    nextTimeRange: newTimeRange,
-  });
-
-  if (!toRange && 'from' in nextTimeRange) {
-    setNextTimeRange({
-      type: nextTimeRange.type,
-      range: nextTimeRange.from,
-    });
-
-    return;
-  }
-
-  if (toRange && 'range' in nextTimeRange) {
-    setNextTimeRange({
-      type: nextTimeRange.type,
-      from: nextTimeRange.range,
-      to: toRange,
-    });
-
-    return;
-  }
-
-  updateField();
-};
-
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { setValues, values: formValues } = useFormikContext<TimeRangeDropDownFormValues>();
-  const fromFieldName = 'from' in formValues.nextTimeRange ? 'from' : 'range';
-
   return (
     <RelativeWrapper>
       <RelativeRangeSelect disabled={disabled}
@@ -88,13 +48,12 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
                            unsetRangeLabel="All Time"
                            disableUnsetRange={limitDuration !== 0}
                            defaultRange={DEFAULT_RELATIVE_FROM}
-                           fieldName={fromFieldName} />
+                           fieldName="from" />
       <StyledIcon name="arrow-right" />
 
       <RelativeRangeSelect disabled={disabled}
                            limitDuration={limitDuration}
                            defaultRange={DEFAULT_RELATIVE_TO}
-                           handleOnChange={(toRange, updateField) => _handleToChange(formValues, setValues, toRange, updateField)}
                            title="Until:"
                            unsetRangeLabel="Now"
                            fieldName="to" />

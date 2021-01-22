@@ -110,13 +110,12 @@ type Props = {
   fieldName: 'range' | 'from' | 'to',
   limitDuration: number,
   unsetRangeLabel: string,
-  handleOnChange?: (range: number, updateField: () => void) => void,
   title: string,
   defaultRange: number
   disableUnsetRange?: boolean
 }
 
-const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLabel, handleOnChange, defaultRange, title, disableUnsetRange }: Props) => {
+const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLabel, defaultRange, title, disableUnsetRange }: Props) => {
   const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
@@ -126,15 +125,7 @@ const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLab
         const inputValue = getValue(fieldName, value);
 
         const _onChange = (nextValue) => {
-          const updateField = () => onChange({ target: { name, value: nextValue } });
-
-          if (typeof handleOnChange === 'function') {
-            handleOnChange(nextValue, updateField);
-
-            return;
-          }
-
-          updateField();
+          onChange({ target: { name, value: nextValue } });
         };
 
         const _onChangeTime = (event) => {
@@ -186,7 +177,7 @@ const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLab
                      min="1"
                      value={inputValue.rangeValue}
                      className="mousetrap"
-                     title="Set the range value"
+                     title={`Set the ${fieldName} value`}
                      onChange={_onChangeTime}
                      bsStyle={error ? 'error' : null} />
             </InputWrap>
@@ -222,7 +213,6 @@ const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLab
 RelativeRangeSelect.defaultProps = {
   disabled: false,
   disableUnsetRange: false,
-  handleOnChange: undefined,
 };
 
 export default RelativeRangeSelect;

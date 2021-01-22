@@ -80,7 +80,7 @@ describe('QueriesStore', () => {
   describe('rangeType', () => {
     const query1 = Query.builder()
       .id('query1')
-      .timerange({ type: 'relative', range: 300 })
+      .timerange({ type: 'relative', from: 300 })
       .build();
     const queries = [query1];
 

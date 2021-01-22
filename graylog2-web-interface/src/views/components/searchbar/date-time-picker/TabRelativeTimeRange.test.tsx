@@ -28,7 +28,7 @@ const defaultProps = {
 const initialValues = {
   nextTimeRange: {
     type: 'relative',
-    range: 3600,
+    from: 3600,
   },
 };
 
@@ -51,7 +51,7 @@ describe('TabRelativeTimeRange', () => {
   it('renders initial time range value', () => {
     render(<TabRelativeTimeRange {...defaultProps} />);
 
-    const spinbutton = screen.getByRole('spinbutton', { name: /set the range value/i });
+    const spinbutton = screen.getByRole('spinbutton', { name: /set the from value/i });
 
     expect(spinbutton).toBeInTheDocument();
     expect(spinbutton).toHaveValue(1);
@@ -67,7 +67,7 @@ describe('TabRelativeTimeRange', () => {
     render(<TabRelativeTimeRange {...defaultProps} />);
 
     const allTimeCheckbox = screen.getByRole('checkbox', { name: /All Time/i });
-    const rangeValue = screen.getByRole('spinbutton', { name: /set the range value/i });
+    const rangeValue = screen.getByRole('spinbutton', { name: /set the from value/i });
 
     expect(rangeValue).not.toBeDisabled();
 

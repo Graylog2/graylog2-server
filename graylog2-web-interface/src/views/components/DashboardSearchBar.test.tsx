@@ -69,7 +69,7 @@ describe('DashboardSearchBar', () => {
   //
   //   expect(getByText('Search in last five minutes')).toBeVisible();
   //
-  //   await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', range: 300 }, ''));
+  //   await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
   //
   //   expect(onExecute).toHaveBeenCalled();
   // });

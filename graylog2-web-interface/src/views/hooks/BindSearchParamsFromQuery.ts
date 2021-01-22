@@ -55,8 +55,14 @@ const _getRelativeTimeRange = (range) => {
       return { type: range.rangetype, range: parseRangeValue(range.relative) };
     }
 
-    if ('from' in range && 'to' in range) {
-      return { type: range.rangetype, from: parseRangeValue(range.from), to: parseRangeValue(range.to) };
+    if ('from' in range) {
+      const result = { type: range.rangetype, from: parseRangeValue(range.from) };
+
+      if ('to' in range) {
+        return { ...result, to: parseRangeValue(range.to) };
+      }
+
+      return result;
     }
   }
 

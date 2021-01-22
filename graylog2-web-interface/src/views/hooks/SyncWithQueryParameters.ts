@@ -45,8 +45,12 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
         return formatResult({ ...result, relative: timerange.range });
       }
 
-      if ('from' in timerange && 'to' in timerange) {
-        return formatResult({ ...result, from: timerange.from, to: timerange.to });
+      if ('from' in timerange) {
+        if ('to' in timerange) {
+          return formatResult({ ...result, from: timerange.from, to: timerange.to });
+        }
+
+        return formatResult({ ...result, from: timerange.from });
       }
 
       return formatResult(result);

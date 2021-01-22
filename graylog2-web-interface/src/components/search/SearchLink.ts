@@ -42,8 +42,12 @@ const _searchTimerange = (timerange: TimeRange) => {
         return { ...result, relative: timerange.range };
       }
 
-      if ('from' in timerange && 'to' in timerange) {
-        return { ...result, from: timerange.from, to: timerange.to };
+      if ('from' in timerange) {
+        if ('to' in timerange) {
+          return { ...result, from: timerange.from, to: timerange.to };
+        }
+
+        return { ...result, from: timerange.from };
       }
 
       return result;

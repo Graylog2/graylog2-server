@@ -40,11 +40,18 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
         };
       }
 
-      if ('from' in timerange && 'to' in timerange) {
+      if ('from' in timerange) {
+        if ('to' in timerange) {
+          return {
+            type: timerange.type,
+            from: timerange.from,
+            to: timerange.to,
+          };
+        }
+
         return {
           type: timerange.type,
           from: timerange.from,
-          to: timerange.to,
         };
       }
 
@@ -69,11 +76,12 @@ export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
       if ('range' in timerange) {
         return {
           type: timerange.type,
-          range: timerange.range,
+          from: timerange.range,
+          to: 0,
         };
       }
 
-      if ('from' in timerange && 'to' in timerange) {
+      if ('from' in timerange) {
         return {
           type: timerange.type,
           from: timerange.from,
@@ -118,7 +126,7 @@ const migrationStrategies = {
     from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
     to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
   }),
-  relative: () => ({ type: 'relative', range: 300 }),
+  relative: () => ({ type: 'relative', from: 300 }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
   disabled: () => undefined,
 };

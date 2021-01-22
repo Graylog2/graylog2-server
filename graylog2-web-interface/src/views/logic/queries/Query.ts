@@ -96,7 +96,7 @@ export type RelativeTimeRangeStartOnly = {
 export type RelativeTimeRangeWithEnd = {
   type: 'relative',
   from: number,
-  to: number
+  to?: number
 }
 
 export type RelativeTimeRange = RelativeTimeRangeStartOnly | RelativeTimeRangeWithEnd
