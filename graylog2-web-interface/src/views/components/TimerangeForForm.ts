@@ -19,6 +19,7 @@ import moment from 'moment';
 import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
 import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
+import type { SearchBarFormValues } from 'views/Constants';
 
 const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
 
@@ -62,7 +63,7 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
   }
 };
 
-export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
+export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 
   switch (timerange.type) {

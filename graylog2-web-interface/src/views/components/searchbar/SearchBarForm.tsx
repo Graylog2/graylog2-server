@@ -24,12 +24,13 @@ import type { FormikProps } from 'formik';
 
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import DateTimeProvider from './date-time-picker/DateTimeProvider';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
-  initialValues: SearchBarFormValues,
+  initialValues: { timerange: TimeRange, streams: SearchBarFormValues['streams'], queryString: SearchBarFormValues['queryString'] },
   limitDuration: number,
   onSubmit: (Values) => void | Promise<any>,
 }

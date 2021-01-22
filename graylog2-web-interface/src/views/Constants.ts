@@ -16,10 +16,10 @@
  */
 import chroma from 'chroma-js';
 
-import { RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
+import { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 
 export type SearchBarFormValues = {
-  timerange: TimeRange,
+  timerange: RelativeTimeRangeWithEnd | AbsoluteTimeRange | KeywordTimeRange,
   streams: Array<string>,
   queryString: string,
 };
@@ -33,7 +33,7 @@ export const Messages = {
 export const DEFAULT_RANGE_TYPE = 'relative';
 export const DEFAULT_RELATIVE_FROM = 300;
 export const DEFAULT_RELATIVE_TO = DEFAULT_RELATIVE_FROM - 60;
-export const DEFAULT_TIMERANGE: RelativeTimeRange = { type: DEFAULT_RANGE_TYPE, range: DEFAULT_RELATIVE_FROM };
+export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE_TYPE, from: DEFAULT_RELATIVE_FROM };
 
 export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
