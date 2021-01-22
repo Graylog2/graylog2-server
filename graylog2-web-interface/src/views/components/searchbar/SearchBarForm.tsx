@@ -26,6 +26,7 @@ import { onInitializingTimerange, onSubmittingTimerange } from 'views/components
 import type { SearchBarFormValues } from 'views/Constants';
 
 import DateTimeProvider from './date-time-picker/DateTimeProvider';
+import { dateTimeValidate } from './date-time-picker/TimeRangeDropdown';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
@@ -61,7 +62,9 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children }: Pro
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}>
+            onSubmit={_onSubmit}
+            validate={({ timerange: nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+            validateOnMount>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
           <StyledForm>
