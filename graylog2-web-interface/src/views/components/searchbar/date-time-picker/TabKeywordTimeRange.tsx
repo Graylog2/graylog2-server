@@ -89,9 +89,8 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
       : ToolsStore.testNaturalDate(keyword)
         .then((response) => {
           if (mounted.current) _setSuccessfullPreview(response);
-        }, () => {
-          if (mounted.current) _setFailedPreview();
-        });
+        })
+        .catch(_setFailedPreview);
   };
 
   useEffect(() => {
