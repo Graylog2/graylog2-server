@@ -111,7 +111,7 @@ const DEFAULT_RANGES = {
   disabled: undefined,
 };
 
-const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTypes.map(({ type, name }) => {
+const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword }) => availableTimeRangeTypes.map(({ type, name }) => {
   const TimeRangeTypeTabs = timeRangeTypes[type];
 
   return (
@@ -120,7 +120,8 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTy
          eventKey={type}>
       {type === activeTab && (
         <TimeRangeTypeTabs disabled={false}
-                           limitDuration={limitDuration} />
+                           limitDuration={limitDuration}
+                           setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
       )}
     </Tab>
   );
@@ -135,7 +136,7 @@ const exceedsDuration = (timerange, limitDuration) => {
     case 'absolute':
     case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
       const durationFrom = timerange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       return moment(durationFrom).isBefore(durationLimit);
     }
@@ -191,7 +192,7 @@ export const dateTimeValidate = (nextTimeRange, limitDuration) => {
 
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange }: Props) => {
   const { limitDuration } = useContext(DateTimeContext);
-
+  const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
   const handleNoOverride = () => {
@@ -267,6 +268,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                     {timeRangeTypeTabs({
                       activeTab,
                       limitDuration,
+                      setValidatingKeyword,
                     })}
 
                     {!activeTab && (<TabDisabledTimeRange />)}
@@ -285,7 +287,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                       <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
                     )}
                     <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
-                    <Button bsStyle="success" disabled={!isValid} type="submit">Apply</Button>
+                    <Button bsStyle="success" disabled={!isValid || validatingKeyword} type="submit">Apply</Button>
                   </div>
                 </Col>
               </Row>

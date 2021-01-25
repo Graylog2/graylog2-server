@@ -14,26 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog2.shared.utilities;
 
-import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
 
-import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
+public class DockerRuntimeDetection {
 
-public class EventsIndexMapping7 extends EventsIndexMapping {
-    @Override
-    protected ImmutableMap<String, Object> fieldProperties() {
-        return map()
-                .putAll(super.fieldProperties())
-                .put(FIELD_GL2_MESSAGE_ID, map()
-                        .put("type", "alias")
-                        .put("path", "id")
-                        .build())
-                .build();
-    }
-
-    @Override
-    protected String dateFormat() {
-        return ConstantsES7.ES_DATE_FORMAT;
+    public static Boolean isRunningInsideDocker() {
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
+            return stream.anyMatch(line -> line.contains("/docker"));
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

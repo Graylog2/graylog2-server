@@ -79,13 +79,13 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString(keyFor("properties.event_definition_id.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.origin_context.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.timestamp.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timestamp.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timestamp.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.timestamp_processing.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timestamp_processing.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timestamp_processing.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.timerange_start.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timerange_start.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timerange_start.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.timerange_end.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timerange_end.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timerange_end.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.streams.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.source_streams.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.message.type", version)).isEqualTo("text");
@@ -100,6 +100,14 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString(keyFor("properties.fields.type", version)).isEqualTo("object");
         at.jsonPathAsBoolean(keyFor("properties.fields.dynamic", version)).isTrue();
         at.jsonPathAsString(keyFor("properties.triggered_jobs.type", version)).isEqualTo("keyword");
+    }
+
+    private String dateFormat(Version version) {
+        if (version.greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
+            return "uuuu-MM-dd HH:mm:ss.SSS";
+        }
+
+        return "8yyyy-MM-dd HH:mm:ss.SSS";
     }
 
     private String keyFor(String keySuffix, Version version) {

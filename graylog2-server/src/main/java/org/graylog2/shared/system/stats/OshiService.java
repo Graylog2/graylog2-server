@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats;
 
 
+import org.graylog2.shared.utilities.DockerRuntimeDetection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
@@ -27,8 +28,8 @@ import oshi.util.GlobalConfig;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Singleton
 public class OshiService {
@@ -39,11 +40,23 @@ public class OshiService {
 
     @Inject
     public OshiService() {
-        // Don't let OSHI filter out "overlay" filesystems.
-        // Otherwise we cannot get proper disk statistics from within Docker.
-        final String fsTypes = GlobalConfig.get(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES, "");
-        GlobalConfig.set(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES,
-                Arrays.stream(fsTypes.split(",")).filter(fs -> !fs.equals("overlay")).collect(Collectors.joining(",")));
+        final ArrayList<String> fsTypes = new ArrayList<>(Arrays.asList(GlobalConfig.get(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES, "").split(",")));
+        // Add non-default pseudo filesystem type (Docker related)
+        // Avoids warnings like: "WARN : oshi.software.os.linux.LinuxFileSystem - Failed to get information to use statvfs. path: /var/lib/docker/aufs/mnt/422edee4370d8e2553292b2a52b2716967fdf8d344b040c3b821615d5d584961, Error code: 13"
+        fsTypes.add("aufs");
+
+        if (DockerRuntimeDetection.isRunningInsideDocker()) {
+            // Don't let OSHI filter out "overlay" filesystems when running within Docker.
+            // Otherwise we cannot get proper disk statistics
+            fsTypes.remove("overlay");
+        }
+        // Updating the pseudo filesystem types only here only works because the static
+        // oshi.software.common.AbstractFileSystem.PSEUDO_FS_TYPES only gets initialized after we update the
+        // settings. (because the class hasn't been loaded yet) Should the AbstractFileSystem class at
+        // some point get loaded earlier, this setting will have no effect. A solution for this would be to
+        // create an upstream PR to make OSHI config usage more dynamic.
+        GlobalConfig.set(AbstractFileSystem.OSHI_PSEUDO_FILESYSTEM_TYPES, String.join(",", fsTypes));
+
         SystemInfo systemInfo = new SystemInfo();
         hal = systemInfo.getHardware();
         os = systemInfo.getOperatingSystem();
