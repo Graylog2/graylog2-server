@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 
 import java.util.Collections;
 import java.util.List;
@@ -121,7 +120,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     protected Map<String, Object> typeTimeWithMillis() {
         return ImmutableMap.of(
                 "type", "date",
-                "format", Tools.ES_DATE_FORMAT);
+                "format", dateFormat());
     }
 
     protected Map<String, Object> typeLong() {
@@ -130,5 +129,9 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     private Map<String, Boolean> enabled() {
         return ImmutableMap.of("enabled", true);
+    }
+
+    protected String dateFormat() {
+        return Constants.ES_DATE_FORMAT;
     }
 }
