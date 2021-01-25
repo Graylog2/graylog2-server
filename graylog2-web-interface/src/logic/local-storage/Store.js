@@ -39,15 +39,15 @@ const Store = {
   },
 
   sessionSet(key, value) {
-    Store.set(key, value, window.sessionStorage);
+    return Store.set(key, value, window.sessionStorage);
   },
 
   sessionGet(key) {
-    Store.get(key, window.sessionStorage);
+    return Store.get(key, window.sessionStorage);
   },
 
   sessionDelete(key) {
-    Store.delete(key, window.sessionStorage);
+    return Store.delete(key, window.sessionStorage);
   },
 };
 
