@@ -136,7 +136,7 @@ const exceedsDuration = (timerange, limitDuration) => {
     case 'absolute':
     case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
       const durationFrom = timerange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
 
       return moment(durationFrom).isBefore(durationLimit);
     }
