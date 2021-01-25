@@ -475,6 +475,8 @@
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
                             <goals>deploy</goals>
+                        <configuration>
+                          <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
                         </configuration>
                     </plugin>
                 </plugins>
