@@ -31,11 +31,16 @@ type Props = {
 const TimeRangeDropdownButton = ({ children, disabled, show, toggleShow }: Props) => {
   const containerRef = useRef();
 
+  const onClick = (e) => {
+    e.currentTarget.blur();
+    toggleShow();
+  };
+
   return (
     <div ref={containerRef}>
       <Button bsStyle="info"
               disabled={disabled}
-              onClick={toggleShow}>
+              onClick={onClick}>
         <Icon name="clock" />
       </Button>
 
