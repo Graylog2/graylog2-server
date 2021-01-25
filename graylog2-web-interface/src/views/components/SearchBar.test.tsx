@@ -92,13 +92,15 @@ describe('SearchBar', () => {
     await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
   });
 
-  it('date exceeding limitDuration should render with error Icon & search button disabled', () => {
+  it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
     render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
     const searchButton = screen.getByTitle('Perform search');
 
-    expect(searchButton).toHaveAttribute('disabled');
-    expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
+    await waitFor(() => {
+      expect(searchButton).toHaveAttribute('disabled');
+      expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
+    });
   });
 });
