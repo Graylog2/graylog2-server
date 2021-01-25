@@ -95,7 +95,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @After
     public void tearDown() {
-        client().deleteIndices(INDEX_NAME);
+        client().cleanUp();
     }
 
     protected abstract boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id);
@@ -188,10 +188,36 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void retryIndexingMessagesDuringFloodStage() throws Exception {
         triggerFloodStage(INDEX_NAME);
 
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024 * 1024, 50);
+        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
         final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch));
 
+        Thread.sleep(1000);
+
         resetFloodStage(INDEX_NAME);
+
+        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
+        assertThat(failedItems).isEmpty();
+
+        client().refreshNode();
+
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+    }
+
+    @Test
+    public void retryIndexingMessagesIfTargetAliasIsInvalid() throws Exception {
+        final String prefix = "multiple_targets";
+        final String index1 = client().createRandomIndex(prefix);
+        final String index2 = client().createRandomIndex(prefix);
+        client().deleteIndices(INDEX_NAME);
+        client().addAliasMapping(index1, INDEX_NAME);
+        client().addAliasMapping(index2, INDEX_NAME);
+
+        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
+        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch));
+
+        Thread.sleep(10000);
+
+        client().removeAliasMapping(index2, INDEX_NAME);
 
         final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
