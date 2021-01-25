@@ -38,7 +38,7 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = styled.div`
+const ButtonLabel = styled.span`
   display: inline-block;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -119,7 +119,7 @@ class RefreshControls extends React.Component<Props> {
             {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
           </Button>
 
-          <DropdownButton title={buttonLabel} id="refresh-options-dropdown" aria-labelledby={buttonLabel}>
+          <DropdownButton title={buttonLabel} id="refresh-options-dropdown">
             {intervalOptions}
           </DropdownButton>
         </FlexibleButtonGroup>
