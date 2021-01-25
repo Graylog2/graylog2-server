@@ -1,7 +1,23 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer
@@ -11,24 +27,28 @@ import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import history from 'util/History';
+import withParams from 'routing/withParams';
+
+import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-const { isPermitted } = PermissionsMixin;
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
   };
 
-  state = {
-    eventDefinition: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      eventDefinition: undefined,
+    };
+  }
 
   componentDidMount() {
     const { params, currentUser } = this.props;
@@ -54,12 +74,24 @@ class EditEventDefinitionPage extends React.Component {
     }
   }
 
+  _streamsWithMissingPermissions(eventDefinition, currentUser) {
+    const streams = eventDefinition?.config?.streams || [];
+
+    return streams.filter((streamId) => !isPermitted(currentUser.permissions, `streams:read:${streamId}`));
+  }
+
   render() {
-    const { params, currentUser, route } = this.props;
+    const { params, currentUser } = this.props;
     const { eventDefinition } = this.state;
 
     if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       history.push(Routes.NOTFOUND);
+    }
+
+    const missingStreams = this._streamsWithMissingPermissions(eventDefinition, currentUser);
+
+    if (missingStreams.length > 0) {
+      return <StreamPermissionErrorPage error={{}} missingStreamIds={missingStreams} />;
     }
 
     if (!eventDefinition) {
@@ -107,7 +139,7 @@ class EditEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} route={route} />
+              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
             </Col>
           </Row>
         </span>
@@ -116,7 +148,7 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default connect(EditEventDefinitionPage, {
+export default connect(withParams(EditEventDefinitionPage), {
   currentUser: CurrentUserStore,
 },
 ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

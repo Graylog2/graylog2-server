@@ -1,10 +1,26 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
 
 const arrowSize = 10;
 const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
@@ -14,8 +30,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 
   &.top {
-    transform: translate(-50%, -100%);
-  
     .tooltip-arrow {
       border-top-color: ${theme.colors.global.contentBackground};
       border-width: ${arrowSize}px ${arrowSize}px 0;
@@ -25,8 +39,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
   
   &.right {
-    transform: translateY(-50%);
-    
     .tooltip-arrow {
       border-right-color: ${theme.colors.global.contentBackground};
       border-width: ${arrowSize}px ${arrowSize}px ${arrowSize}px 0;
@@ -36,8 +48,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 
   &.bottom {
-    transform: translateX(-50%);
-  
     .tooltip-arrow {
       border-bottom-color: ${theme.colors.global.contentBackground};
       border-width: 0 ${arrowSize}px ${arrowSize}px;
@@ -47,8 +57,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
   
   &.left {
-    transform: translate(-100%, -50%);
-    
     .tooltip-arrow {
       border-left-color: ${theme.colors.global.contentBackground};
       border-width: ${arrowSize}px 0 ${arrowSize}px ${arrowSize}px;
@@ -75,7 +83,7 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
 
 const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft }) => {
   return (
-    <GraylogThemeProvider>
+    <ThemeAndUserProvider>
       <StyledTooltip className={className}
                      id={id}
                      placement={placement}
@@ -85,7 +93,7 @@ const Tooltip = ({ children, className, id, placement, positionTop, positionLeft
                      arrowOffsetLeft={arrowOffsetLeft}>
         {children}
       </StyledTooltip>
-    </GraylogThemeProvider>
+    </ThemeAndUserProvider>
   );
 };
 

@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer.fieldtypes;
 
@@ -30,6 +30,8 @@ import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.periodical.Periodical;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -59,6 +61,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private final Indices indices;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Cluster cluster;
+    private final ServerStatus serverStatus;
     private final com.github.joschi.jadconfig.util.Duration periodicalInterval;
     private final ScheduledExecutorService scheduler;
     private final ConcurrentMap<String, ScheduledFuture<?>> futures = new ConcurrentHashMap<>();
@@ -72,6 +75,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                                           final MongoIndexSet.Factory mongoIndexSetFactory,
                                           final Cluster cluster,
                                           final EventBus eventBus,
+                                          final ServerStatus serverStatus,
                                           @Named("index_field_type_periodical_interval") final com.github.joschi.jadconfig.util.Duration periodicalInterval,
                                           @Named("daemonScheduler") final ScheduledExecutorService scheduler) {
         this.poller = poller;
@@ -80,11 +84,14 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         this.indices = indices;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.cluster = cluster;
+        this.serverStatus = serverStatus;
         this.periodicalInterval = periodicalInterval;
         this.scheduler = scheduler;
 
         eventBus.register(this);
     }
+
+    private static final Set<Lifecycle> skippedLifecycles = ImmutableSet.of(Lifecycle.STARTING, Lifecycle.HALTING, Lifecycle.PAUSED, Lifecycle.FAILED, Lifecycle.UNINITIALIZED);
 
     /**
      * This creates index field type information for each index in each index set and schedules polling jobs to
@@ -129,6 +136,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                     .filter(types -> !indices.exists(types.indexName()))
                     .forEach(types -> dbService.delete(types.id()));
         });
+    }
+
+    private boolean serverIsNotRunning() {
+        final Lifecycle currentLifecycle = serverStatus.getLifecycle();
+        return skippedLifecycles.contains(currentLifecycle);
     }
 
     /**
@@ -196,6 +208,9 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         LOG.debug("Schedule index field type updating for index set <{}/{}> every {} ms", indexSetId, indexSetTitle,
                 refreshInterval.getMillis());
         final ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
+            if (serverIsNotRunning()) {
+                return;
+            }
             try {
                 // Only check the active write index on a regular basis, the others don't change anymore
                 final String activeWriteIndex = indexSet.getActiveWriteIndex();

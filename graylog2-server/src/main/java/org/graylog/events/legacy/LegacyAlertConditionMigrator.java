@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.legacy;
 
@@ -40,6 +40,7 @@ import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationFunction;
 import org.graylog.events.processor.aggregation.AggregationSeries;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,7 @@ public class LegacyAlertConditionMigrator {
     private final EventDefinitionHandler eventDefinitionHandler;
     private final NotificationResourceHandler notificationResourceHandler;
     private final DBNotificationService dbNotificationService;
+    private final UserService userService;
     private final long executeEveryMs;
 
     @Inject
@@ -78,12 +80,14 @@ public class LegacyAlertConditionMigrator {
                                         EventDefinitionHandler eventDefinitionHandler,
                                         NotificationResourceHandler notificationResourceHandler,
                                         DBNotificationService dbNotificationService,
+                                        UserService userService,
                                         @Named("alert_check_interval") int alertCheckInterval) {
         this.streamsCollection = mongoConnection.getMongoDatabase().getCollection("streams");
         this.alarmCallbacksCollection = mongoConnection.getMongoDatabase().getCollection("alarmcallbackconfigurations");
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.notificationResourceHandler = notificationResourceHandler;
         this.dbNotificationService = dbNotificationService;
+        this.userService = userService;
 
         // The old alert conditions have been executed every "alert_check_interval" in seconds
         this.executeEveryMs = alertCheckInterval * 1000L;
@@ -194,7 +198,7 @@ public class LegacyAlertConditionMigrator {
                 .build();
 
         LOG.info("Migrate legacy alarm callback <{}>", dto.title());
-        return notificationResourceHandler.create(dto);
+        return notificationResourceHandler.create(dto, userService.getRootUser());
     }
 
     /**
@@ -232,7 +236,7 @@ public class LegacyAlertConditionMigrator {
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
         LOG.info("Migrate legacy message count alert condition <{}>", definitionDto.title());
-        eventDefinitionHandler.create(definitionDto);
+        eventDefinitionHandler.create(definitionDto, userService.getRootUser());
     }
 
     /**
@@ -295,7 +299,7 @@ public class LegacyAlertConditionMigrator {
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
         LOG.info("Migrate legacy field value alert condition <{}>", definitionDto.title());
-        eventDefinitionHandler.create(definitionDto);
+        eventDefinitionHandler.create(definitionDto, userService.getRootUser());
     }
 
     /**
@@ -355,7 +359,7 @@ public class LegacyAlertConditionMigrator {
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
         LOG.info("Migrate legacy field content value alert condition <{}>", definitionDto.title());
-        eventDefinitionHandler.create(definitionDto);
+        eventDefinitionHandler.create(definitionDto, userService.getRootUser());
     }
 
     private static class Helper {

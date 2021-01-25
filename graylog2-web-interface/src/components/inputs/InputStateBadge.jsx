@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
@@ -39,6 +55,7 @@ const InputStateBadge = createReactClass({
       case 'RUNNING':
         return 'success';
       case 'FAILED':
+      case 'STOPPED':
         return 'danger';
       case 'STARTING':
         return 'info';
@@ -115,7 +132,7 @@ const InputStateBadge = createReactClass({
     const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
     return (
-      <Label bsStyle="danger" bsSize="xsmall">{text}</Label>
+      <Label bsStyle="warning" bsSize="xsmall">{text}</Label>
     );
   },
 });

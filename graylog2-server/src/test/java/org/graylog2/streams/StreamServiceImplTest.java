@@ -1,23 +1,24 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -63,13 +64,15 @@ public class StreamServiceImplTest {
     private NotificationService notificationService;
     @Mock
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    @Mock
+    private EntityOwnershipService entityOwnershipService;
 
     private StreamService streamService;
 
     @Before
     public void setUp() throws Exception {
         this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService, alertService,
-            outputService, indexSetService, factory, notificationService, new ClusterEventBus(), alarmCallbackConfigurationService);
+                outputService, indexSetService, factory, notificationService, entityOwnershipService, new ClusterEventBus(), alarmCallbackConfigurationService);
     }
 
     @Test
@@ -77,8 +80,8 @@ public class StreamServiceImplTest {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
         assertThat(alertableStreams)
-            .isNotNull()
-            .isEmpty();
+                .isNotNull()
+                .isEmpty();
     }
 
     @Test
@@ -87,7 +90,7 @@ public class StreamServiceImplTest {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
         assertThat(alertableStreams)
-            .isEmpty();
+                .isEmpty();
     }
 
     @Test
@@ -96,8 +99,8 @@ public class StreamServiceImplTest {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
         assertThat(alertableStreams)
-            .isNotEmpty()
-            .hasSize(2);
+                .isNotEmpty()
+                .hasSize(2);
     }
 
     @Test

@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer;
 
@@ -35,11 +35,22 @@ public class IndexMappingFactory {
     public IndexMappingTemplate createIndexMapping(IndexSetConfig.TemplateType templateType) {
         final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 
-        if (IndexSetConfig.TemplateType.EVENTS.equals(templateType)) {
-            return eventsIndexMappingFor(elasticsearchVersion);
+        switch (templateType) {
+            case MESSAGES: return indexMappingFor(elasticsearchVersion);
+            case EVENTS: return eventsIndexMappingFor(elasticsearchVersion);
+            case GIM_V1: return gimMappingFor(elasticsearchVersion);
+            default: throw new IllegalStateException("Invalid index template type: " + templateType);
         }
+    }
 
-        return indexMappingFor(elasticsearchVersion);
+    private IndexMapping gimMappingFor(Version elasticsearchVersion) {
+        if (elasticsearchVersion.satisfies("^6.0.0")) {
+            return new GIMMapping6();
+        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
+            return new GIMMapping7();
+        } else {
+            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+        }
     }
 
     public static IndexMapping indexMappingFor(Version elasticsearchVersion) {

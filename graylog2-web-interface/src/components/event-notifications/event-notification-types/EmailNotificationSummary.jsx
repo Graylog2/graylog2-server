@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -46,6 +62,14 @@ class EmailNotificationSummary extends React.Component {
             <td>
               <Well bsSize="small" className={styles.bodyPreview}>
                 {notification.config.body_template || <em>Empty body</em>}
+              </Well>
+            </td>
+          </tr>
+          <tr>
+            <td>Email HTML Body</td>
+            <td>
+              <Well bsSize="small" className={styles.bodyPreview}>
+                {notification.config.html_body_template || <em>Empty HTML body</em>}
               </Well>
             </td>
           </tr>

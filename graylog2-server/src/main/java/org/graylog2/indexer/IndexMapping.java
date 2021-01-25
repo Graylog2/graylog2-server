@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer;
 
@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +37,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
     }
 
-    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
-        final Map<String, Object> analyzerKeyword = ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
+    protected Map<String, Object> analyzerKeyword() {
+        return ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
                 "tokenizer", "keyword",
                 "filter", "lowercase"));
-        final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
-        final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
+    }
+
+    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
+        final Map<String, Object> settings = Collections.singletonMap(
+                "analysis", Collections.singletonMap("analyzer", analyzerKeyword())
+                );
         final Map<String, Object> mappings = mapping(analyzer);
 
         return createTemplate(template, order, settings, mappings);
@@ -77,7 +81,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         );
     }
 
-    private List<Map<String, Map<String, Object>>> dynamicTemplate() {
+    protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
         final Map<String, Map<String, Object>> templateInternal = internalFieldsMapping();
 
         final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", dynamicStrings());
@@ -87,7 +91,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     abstract Map<String, Object> dynamicStrings();
 
-    private Map<String, Map<String, Object>> fieldProperties(String analyzer) {
+    protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
                 .put("message", analyzedString(analyzer, false))
                 .put("full_message", analyzedString(analyzer, false))
@@ -116,7 +120,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     protected Map<String, Object> typeTimeWithMillis() {
         return ImmutableMap.of(
                 "type", "date",
-                "format", Tools.ES_DATE_FORMAT);
+                "format", dateFormat());
     }
 
     protected Map<String, Object> typeLong() {
@@ -125,5 +129,9 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     private Map<String, Boolean> enabled() {
         return ImmutableMap.of("enabled", true);
+    }
+
+    protected String dateFormat() {
+        return Constants.ES_DATE_FORMAT;
     }
 }

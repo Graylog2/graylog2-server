@@ -1,57 +1,94 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
 import moment from 'moment';
+import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
-const SystemInformation = createReactClass({
-  displayName: 'SystemInformation',
+const _getInitialState = () => {
+  return { time: moment() };
+};
 
-  propTypes: {
+const StyledDl = styled.dl`
+  margin-top: 5px;
+  margin-bottom: 0;
+
+  dt {
+    float: left;
+  }
+
+  dd {
+    margin-left: 95px;
+  }
+`;
+
+class SystemInformation extends React.Component {
+  static propTypes = {
     node: PropTypes.object.isRequired,
     systemInformation: PropTypes.object.isRequired,
     jvmInformation: PropTypes.object,
-  },
+  };
 
-  getInitialState() {
-    return { time: moment() };
-  },
+  static defaultProps = {
+    jvmInformation: undefined,
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = _getInitialState();
+  }
 
   componentDidMount() {
-    this.interval = setInterval(() => this.setState(this.getInitialState()), 1000);
-  },
+    this.interval = setInterval(() => this.setState(_getInitialState()), 1000);
+  }
 
   componentWillUnmount() {
     clearTimeout(this.interval);
-  },
+  }
 
   render() {
-    const { systemInformation } = this.props;
-    let jvmInformation;
+    const { systemInformation: { hostname, version, codename, timezone }, jvmInformation, node } = this.props;
+    const { time } = this.state;
+    let jvmInformationText;
 
-    if (this.props.jvmInformation) {
-      jvmInformation = <span>PID {this.props.jvmInformation.pid}, {this.props.jvmInformation.info}</span>;
+    if (jvmInformation) {
+      jvmInformationText = <span>PID {jvmInformation.pid}, {jvmInformation.info}</span>;
     } else {
-      jvmInformation = <span>JMV information for this node is unavailable.</span>;
+      jvmInformationText = <span>JMV information for this node is unavailable.</span>;
     }
 
     return (
-      <dl className="system-system">
+      <StyledDl>
         <dt>Hostname:</dt>
-        <dd>{systemInformation.hostname}</dd>
+        <dd>{hostname}</dd>
         <dt>Node ID:</dt>
-        <dd>{this.props.node.node_id}</dd>
+        <dd>{node.node_id}</dd>
         <dt>Version:</dt>
-        <dd>{systemInformation.version}, codename <em>{systemInformation.codename}</em></dd>
+        <dd>{version}, codename <em>{codename}</em></dd>
         <dt>JVM:</dt>
-        <dd>{jvmInformation}</dd>
+        <dd>{jvmInformationText}</dd>
         <dt>Time:</dt>
-        <dd><Timestamp dateTime={this.state.time} format={DateTime.Formats.DATETIME_TZ} tz={systemInformation.timezone} /></dd>
-      </dl>
+        <dd><Timestamp dateTime={time} format={DateTime.Formats.DATETIME_TZ} tz={timezone} /></dd>
+      </StyledDl>
     );
-  },
-});
+  }
+}
 
 export default SystemInformation;

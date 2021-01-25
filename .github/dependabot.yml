@@ -1,0 +1,44 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  labels:
+  - ready-for-review
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface/packages/graylog-web-plugin"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  labels:
+  - ready-for-review
+  ignore:
+  - dependency-name: react-bootstrap
+    versions:
+    - ">= 1.a"
+    - "< 2"
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  labels:
+  - ready-for-review
+  ignore:
+  - dependency-name: bootstrap
+    versions:
+    - ">= 4.a"
+    - "< 5"
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface/packages/eslint-config-graylog"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  labels:
+  - ready-for-review

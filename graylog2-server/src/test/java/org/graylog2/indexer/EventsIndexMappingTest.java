@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer;
 
@@ -79,13 +79,13 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString(keyFor("properties.event_definition_id.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.origin_context.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.timestamp.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timestamp.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timestamp.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.timestamp_processing.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timestamp_processing.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timestamp_processing.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.timerange_start.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timerange_start.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timerange_start.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.timerange_end.type", version)).isEqualTo("date");
-        at.jsonPathAsString(keyFor("properties.timerange_end.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timerange_end.format", version)).isEqualTo(dateFormat(version));
         at.jsonPathAsString(keyFor("properties.streams.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.source_streams.type", version)).isEqualTo("keyword");
         at.jsonPathAsString(keyFor("properties.message.type", version)).isEqualTo("text");
@@ -100,6 +100,14 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString(keyFor("properties.fields.type", version)).isEqualTo("object");
         at.jsonPathAsBoolean(keyFor("properties.fields.dynamic", version)).isTrue();
         at.jsonPathAsString(keyFor("properties.triggered_jobs.type", version)).isEqualTo("keyword");
+    }
+
+    private String dateFormat(Version version) {
+        if (version.greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
+            return "uuuu-MM-dd HH:mm:ss.SSS";
+        }
+
+        return "8yyyy-MM-dd HH:mm:ss.SSS";
     }
 
     private String keyFor(String keySuffix, Version version) {

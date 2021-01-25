@@ -1,38 +1,23 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
- */
-/**
- * This file is part of Graylog.
- * <p>
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * Graylog is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -148,7 +133,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void testIfTooLargeBatchesGetSplitUp() throws Exception {
         // This test assumes that ES is configured with bulk_max_body_size to 100MB
         // Check if we can index about 300MB of messages (once the large batch gets split up)
-        final int MESSAGECOUNT = 303;
+        final int MESSAGECOUNT = 101;
         // Each Message is about 1 MB
         final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
         final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
@@ -214,6 +199,25 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().refreshNode();
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+    }
+
+    @Test
+    public void properlySerializesCustomObjectsInMessageField() throws IOException {
+        final Message message = new Message("Some message", "somesource", now());
+        message.addField("custom_object", new TextNode("foo"));
+        final List<Map.Entry<IndexSet, Message>> messageBatch = ImmutableList.of(
+                Maps.immutableEntry(indexSet, message)
+        );
+
+        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+
+        assertThat(failedItems).isEmpty();
+
+        client().refreshNode();
+
+        final ResultMessage resultMessage = this.messages.get(message.getId(), INDEX_NAME);
+
+        assertThat(resultMessage.getMessage().getField("custom_object")).isEqualTo("foo");
     }
 
     private Future<List<String>> background(Callable<List<String>> task) {

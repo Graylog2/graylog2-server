@@ -1,11 +1,48 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import Promise from 'bluebird';
+import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 
-import style from './SearchForm.css';
+const FormContent = styled.div(({ buttonLeftMargin }) => `
+  > :not(:last-child) {
+    margin-right: ${buttonLeftMargin}px;
+  }
+
+  > * {
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 5px;
+  }
+`);
+
+const HelpFeedback = styled.span`
+  &.form-control-feedback {
+    pointer-events: auto;
+  }
+
+  .btn {
+    max-width: 34px;
+  }
+`;
 
 /**
  * Component that renders a customizable search form. The component
@@ -30,6 +67,8 @@ class SearchForm extends React.Component {
     onReset: PropTypes.func,
     /** Search field label. */
     label: PropTypes.string,
+    /** The className is needed to override the component style with styled-components  */
+    className: PropTypes.string,
     /** Search field placeholder. */
     placeholder: PropTypes.string,
     /** Class name for the search form container. */
@@ -79,6 +118,7 @@ class SearchForm extends React.Component {
 
   static defaultProps = {
     query: '',
+    className: '',
     onQueryChange: () => {},
     onReset: null,
     label: null,
@@ -106,7 +146,6 @@ class SearchForm extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { query } = this.props;
 
@@ -182,6 +221,7 @@ class SearchForm extends React.Component {
       queryWidth,
       focusAfterMount,
       children,
+      className,
       placeholder,
       resetButtonLabel,
       buttonLeftMargin,
@@ -196,42 +236,45 @@ class SearchForm extends React.Component {
     const { query, isLoading } = this.state;
 
     return (
-      <div className={wrapperClass} style={{ marginTop: topMargin }}>
+      <div className={`${wrapperClass} ${className}`} style={{ marginTop: topMargin }}>
         <form className="form-inline" onSubmit={this._onSearch}>
-          <div className="form-group has-feedback">
-            {label && <label htmlFor="common-search-form-query-input" className="control-label">{label}</label>}
-            <input id="common-search-form-query-input"
+          <FormContent buttonLeftMargin={buttonLeftMargin}>
+            <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
+              {label && (
+                <label htmlFor="common-search-form-query-input" className="control-label">
+                  {label}
+                </label>
+              )}
+              <input id="common-search-form-query-input"
                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                   autoFocus={focusAfterMount}
-                   onChange={this.handleQueryChange}
-                   value={query}
-                   placeholder={placeholder}
-                   type="text"
-                   style={{ width: queryWidth }}
-                   className="query form-control"
-                   autoComplete="off"
-                   spellCheck="false" />
-            {queryHelpComponent
-              && <span className={`form-control-feedback ${style.helpFeedback}`}>{queryHelpComponent}</span>}
-          </div>
+                     autoFocus={focusAfterMount}
+                     onChange={this.handleQueryChange}
+                     value={query}
+                     placeholder={placeholder}
+                     type="text"
+                     style={{ width: queryWidth }}
+                     className="query form-control"
+                     autoComplete="off"
+                     spellCheck="false" />
+              {queryHelpComponent && (
+                <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
+              )}
+            </div>
 
-          <div className="form-group" style={{ marginLeft: buttonLeftMargin }}>
             <Button bsStyle={searchBsStyle}
                     type="submit"
                     disabled={isLoading}
                     className="submit-button">
-              {isLoading ? <Spinner text={loadingLabel} /> : searchButtonLabel}
+              {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
             </Button>
-          </div>
-          {onReset
-            && (
-            <div className="form-group" style={{ marginLeft: buttonLeftMargin }}>
+
+            {onReset && (
               <Button type="reset" className="reset-button" onClick={this._onReset}>
                 {resetButtonLabel}
               </Button>
-            </div>
             )}
-          {children}
+            {children}
+          </FormContent>
         </form>
       </div>
     );

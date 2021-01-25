@@ -1,7 +1,6 @@
 # Graylog
 
-[![Build Status](https://travis-ci.org/Graylog2/graylog2-server.svg?branch=master)](https://travis-ci.org/Graylog2/graylog2-server)
-[![License](https://img.shields.io/github/license/Graylog2/graylog2-server.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
+[![License](https://img.shields.io/badge/license-SSPL-green)](https://www.mongodb.com/licensing/server-side-public-license)
 [![Maven Central](https://img.shields.io/maven-central/v/org.graylog2/graylog2-server.svg)](http://mvnrepository.com/artifact/org.graylog2/graylog2-server)
 
 Welcome! _Graylog_ is an open source log management platform.
@@ -28,4 +27,4 @@ Come chat with us in the [`#graylog` channel on freenode IRC](https://webchat.fr
 
 ## License
 
-_Graylog_ is released under version 3.0 of the [GNU General Public License](COPYING).
+_Graylog_ is released under version 1 of the [Server Side Public License (SSPL)](LICENSE).

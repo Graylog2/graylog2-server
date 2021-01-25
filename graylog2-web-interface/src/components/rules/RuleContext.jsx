@@ -1,4 +1,20 @@
-import React, { createContext, useEffect, useRef } from 'react';
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React, { createContext, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -20,7 +36,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
   };
 
-  const validateNewRule = (callback) => {
+  const validateNewRule = useCallback((callback) => {
     const nextRule = {
       ...rule,
       source: ruleSourceRef.current.editor.getSession().getValue(),
@@ -28,7 +44,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     };
 
     RulesActions.parse(nextRule, callback);
-  };
+  }, [rule]);
 
   const validateBeforeSave = (callback = () => {}) => {
     const savedRule = {
@@ -53,7 +69,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
       promise = RulesActions.save.triggerPromise(nextRule);
     }
 
-    promise.then(() => callback());
+    promise.then((response) => callback(response));
   };
 
   const handleSavePipelineRule = (callback = () => {}) => {
@@ -69,7 +85,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     if (descriptionRef.current) {
       descriptionRef.current.value = rule.description;
     }
-  }, [rule]);
+  });
 
   useEffect(() => {
     if (ruleSourceRef.current) {
@@ -88,7 +104,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
         }, 500);
       });
     }
-  }, [ruleSourceRef.current]);
+  }, [validateNewRule]);
 
   return (
     <PipelineRulesContext.Provider value={{

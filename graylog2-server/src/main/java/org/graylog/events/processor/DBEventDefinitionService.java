@@ -1,27 +1,29 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
@@ -38,19 +40,28 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
     private static final String COLLECTION_NAME = "event_definitions";
 
     private final DBEventProcessorStateService stateService;
+    private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
     public DBEventDefinitionService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
-                                    DBEventProcessorStateService stateService) {
+                                    DBEventProcessorStateService stateService,
+                                    EntityOwnershipService entityOwnerShipService) {
         super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME);
         this.stateService = stateService;
+        this.entityOwnerShipService = entityOwnerShipService;
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
                                                              String sortByField, int page, int perPage) {
         return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
                 getSortBuilder("asc", sortByField), page, perPage);
+    }
+
+    public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
+        final EventDefinitionDto dto = super.save(eventDefinitionDto);
+        entityOwnerShipService.registerNewEventDefinition(dto.id(), user);
+        return dto;
     }
 
     @Override
@@ -60,6 +71,7 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
         } catch (Exception e) {
             LOG.error("Couldn't delete event processor state for <{}>", id, e);
         }
+        entityOwnerShipService.unregisterEventDefinition(id);
         return super.delete(id);
     }
 

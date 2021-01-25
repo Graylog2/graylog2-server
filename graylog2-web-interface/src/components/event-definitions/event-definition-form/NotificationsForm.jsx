@@ -1,12 +1,28 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
-import { Col, Row, Button } from 'components/graylog';
+import { LinkContainer } from 'components/graylog/router';
+import { Alert, Col, Row, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
@@ -58,7 +74,22 @@ class NotificationsForm extends React.Component {
     const { eventDefinition, notifications, defaults, currentUser, onChange } = this.props;
     const { showAddNotificationForm } = this.state;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:read')) {
+    const notificationIds = eventDefinition.notifications.map((n) => n.notification_id);
+    const missingPermissions = notificationIds.filter((id) => !isPermitted(currentUser.permissions, `eventnotifications:read${id}`));
+
+    if (missingPermissions.length > 0) {
+      return (
+        <Row>
+          <Col md={6} lg={5}>
+            <Alert bsStyle="warning">
+              Missing Notifications Permissions for: <br /> {missingPermissions.join(', ')}
+            </Alert>
+          </Col>
+        </Row>
+      );
+    }
+
+    if (!isPermitted(currentUser.permissions, 'eventnotifications:read')) {
       return (
         <Row>
           <Col md={6} lg={5}>
@@ -74,7 +105,7 @@ class NotificationsForm extends React.Component {
                              onChange={this.handleAssignNotification}
                              onCancel={this.toggleAddNotificationForm}
                              hasCreationPermissions={
-                               PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')
+                               isPermitted(currentUser.permissions, 'eventnotifications:create')
                              } />
       );
     }

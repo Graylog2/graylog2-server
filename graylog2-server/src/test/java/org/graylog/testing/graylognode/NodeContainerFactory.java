@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.testing.graylognode;
 
@@ -32,7 +32,7 @@ import java.time.Duration;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
 import static org.graylog.testing.graylognode.NodeContainerConfig.DEBUG_PORT;
-import static org.graylog.testing.graylognode.ResourceUtil.resourceToTmpFile;
+import static org.graylog.testing.ResourceUtil.resourceToTmpFile;
 
 public class NodeContainerFactory {
     private static final Logger LOG = LoggerFactory.getLogger(NodeContainerFactory.class);
@@ -62,8 +62,7 @@ public class NodeContainerFactory {
                 // set mode here explicitly, because file system permissions can get lost when executing from maven
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
-                .withFileFromClasspath("log4j2.xml", "log4j2.xml")
-                .withFileFromPath("sigar", pathTo("sigar_dir"));
+                .withFileFromClasspath("log4j2.xml", "log4j2.xml");
         if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
         }
@@ -81,6 +80,7 @@ public class NodeContainerFactory {
                 .withFileSystemBind(property("threatintel_plugin_jar"), graylogHome + "/plugin/graylog-plugin-threatintel.jar", BindMode.READ_ONLY)
                 .withFileSystemBind(property("collector_plugin_jar"), graylogHome + "/plugin/graylog-plugin-collector.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
+                .withEnv("DEVELOPMENT", "true")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion)

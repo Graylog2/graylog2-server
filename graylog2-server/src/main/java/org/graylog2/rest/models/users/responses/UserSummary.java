@@ -1,26 +1,31 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.rest.models.users.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.auto.value.AutoValue;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.security.permissions.GRNPermission;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.users.requests.Startpage;
 
 import javax.annotation.Nullable;
@@ -48,7 +53,11 @@ public abstract class UserSummary {
     public abstract String fullName();
 
     @JsonProperty
-    public abstract List<String> permissions();
+    @JsonSerialize(contentUsing = ToStringSerializer.class)
+    public abstract List<WildcardPermission> permissions();
+
+    @JsonProperty
+    public abstract List<GRNPermission> grnPermissions();
 
     @JsonProperty
     @Nullable
@@ -87,12 +96,16 @@ public abstract class UserSummary {
     @Nullable
     public abstract String clientAddress();
 
+    @JsonProperty("account_status")
+    public abstract User.AccountStatus accountStatus();
+
     @JsonCreator
     public static UserSummary create(@JsonProperty("id") @Nullable String id,
                                      @JsonProperty("username") String username,
                                      @JsonProperty("email") String email,
                                      @JsonProperty("full_name") @Nullable String fullName,
-                                     @JsonProperty("permissions") @Nullable List<String> permissions,
+                                     @JsonProperty("permissions") @Nullable List<WildcardPermission> permissions,
+                                     @JsonProperty("grn_permissions") @Nullable List<GRNPermission> grnPermissions,
                                      @JsonProperty("preferences") @Nullable Map<String, Object> preferences,
                                      @JsonProperty("timezone") @Nullable String timezone,
                                      @JsonProperty("session_timeout_ms") @Nullable Long sessionTimeoutMs,
@@ -102,12 +115,14 @@ public abstract class UserSummary {
                                      @JsonProperty("roles") @Nullable Set<String> roles,
                                      @JsonProperty("session_active") boolean sessionActive,
                                      @JsonProperty("last_activity") @Nullable Date lastActivity,
-                                     @JsonProperty("client_address") @Nullable String clientAddress) {
+                                     @JsonProperty("client_address") @Nullable String clientAddress,
+                                     @JsonProperty("account_status") User.AccountStatus accountStatus) {
         return new AutoValue_UserSummary(id,
                                          username,
                                          email,
                                          fullName,
                                          permissions,
+                                         grnPermissions,
                                          preferences,
                                          timezone,
                                          sessionTimeoutMs,
@@ -117,6 +132,7 @@ public abstract class UserSummary {
                                          roles,
                                          sessionActive,
                                          lastActivity,
-                                         clientAddress);
+                                         clientAddress,
+                                         accountStatus);
     }
 }

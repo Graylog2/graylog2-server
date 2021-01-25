@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.grok;
 
@@ -31,7 +31,12 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 public abstract class GrokPattern {
 
-    @JsonProperty("id")
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_PATTERN = "pattern";
+    public static final String FIELD_CONTENT_PACK = "content_pack";
+
+    @JsonProperty(FIELD_ID)
     @Nullable
     @Id
     @ObjectId
@@ -49,9 +54,9 @@ public abstract class GrokPattern {
 
     @JsonCreator
     public static GrokPattern create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                     @JsonProperty("name") String name,
-                                     @JsonProperty("pattern") String pattern,
-                                     @JsonProperty("content_pack") @Nullable String contentPack) {
+                                     @JsonProperty(FIELD_NAME) String name,
+                                     @JsonProperty(FIELD_PATTERN) String pattern,
+                                     @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack) {
         return builder()
                 .id(id)
                 .name(name)

@@ -1,11 +1,27 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link } from 'react-router';
-import { LinkContainer } from 'react-router-bootstrap';
 import styled, { css } from 'styled-components';
 
+import EntityShareModal from 'components/permissions/EntityShareModal';
+import { Link, LinkContainer } from 'components/graylog/router';
 import { Button, Tooltip } from 'components/graylog';
-import { OverlayElement, Icon } from 'components/common';
+import { OverlayElement, Icon, ShareButton } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
@@ -61,7 +77,7 @@ const StreamListItem = styled.li(({ theme }) => css`
 `);
 
 const ToggleButton = styled(Button)`
-  width: 8.5em;
+  min-width: 8.8em;
 `;
 
 class Stream extends React.Component {
@@ -79,6 +95,7 @@ class Stream extends React.Component {
     this.state = {
       loading: false,
       showStreamRuleForm: false,
+      showEntityShareModal: false,
     };
   }
 
@@ -88,6 +105,14 @@ class Stream extends React.Component {
 
   _openStreamRuleForm = () => {
     this.setState({ showStreamRuleForm: true });
+  };
+
+  _closeEntityShareModal = () => {
+    this.setState({ showEntityShareModal: false });
+  };
+
+  _openEntityShareModal = () => {
+    this.setState({ showEntityShareModal: true });
   };
 
   _onDelete= (stream) => {
@@ -146,38 +171,33 @@ class Stream extends React.Component {
 
   render() {
     const { indexSets, stream, permissions, streamRuleTypes, user } = this.props;
-    const { loading, showStreamRuleForm } = this.state;
+    const { loading, showStreamRuleForm, showEntityShareModal } = this.state;
 
     const isDefaultStream = stream.is_default;
     const defaultStreamTooltip = isDefaultStream
       ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
     let editRulesLink;
-    let manageOutputsLink;
     let manageAlertsLink;
 
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
           <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
-            <Button bsStyle="info">Manage Rules</Button>
+            <Button bsStyle="info">
+              <Icon name="stream" /> Manage Rules
+            </Button>
           </LinkContainer>
         </OverlayElement>
       );
 
       manageAlertsLink = (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info">Manage Alerts</Button>
+          <Button bsStyle="info">
+            <Icon name="bell" /> Manage Alerts
+          </Button>
         </LinkContainer>
       );
-
-      if (isPermitted(permissions, ['stream_outputs:read'])) {
-        manageOutputsLink = (
-          <LinkContainer to={Routes.stream_outputs(stream.id)}>
-            <Button bsStyle="info">Manage Outputs</Button>
-          </LinkContainer>
-        );
-      }
     }
 
     let toggleStreamLink;
@@ -189,7 +209,7 @@ class Stream extends React.Component {
             <ToggleButton bsStyle="success"
                           onClick={this._onResume}
                           disabled={isDefaultStream || loading}>
-              {loading ? 'Starting...' : 'Start Stream'}
+              <Icon name="play" /> {loading ? 'Starting...' : 'Start Stream'}
             </ToggleButton>
           </OverlayElement>
         );
@@ -199,7 +219,7 @@ class Stream extends React.Component {
             <ToggleButton bsStyle="primary"
                           onClick={this._onPause}
                           disabled={isDefaultStream || loading}>
-              {loading ? 'Pausing...' : 'Pause Stream'}
+              <Icon name="pause" /> {loading ? 'Pausing...' : 'Pause Stream'}
             </ToggleButton>
           </OverlayElement>
         );
@@ -210,7 +230,7 @@ class Stream extends React.Component {
       ? <Icon name="cube" title="Created from content pack" /> : null);
 
     const streamControls = (
-      <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+      <OverlayElement overlay={defaultStreamTooltip} placement="top">
         <StreamControls stream={stream}
                         permissions={permissions}
                         user={user}
@@ -230,8 +250,8 @@ class Stream extends React.Component {
       <StreamListItem>
         <div className="stream-actions pull-right">
           {editRulesLink}{' '}
-          {manageOutputsLink}{' '}
           {manageAlertsLink}{' '}
+          <ShareButton entityId={stream.id} entityType="stream" onClick={this._openEntityShareModal} />
           {toggleStreamLink}{' '}
 
           {streamControls}
@@ -260,6 +280,13 @@ class Stream extends React.Component {
                           onSubmit={this._onSaveStreamRule}
                           streamRuleTypes={streamRuleTypes} />
         ) }
+        { showEntityShareModal && (
+          <EntityShareModal entityId={stream.id}
+                            entityType="stream"
+                            entityTitle={stream.title}
+                            description="Search for a User or Team to add as collaborator on this stream."
+                            onClose={this._closeEntityShareModal} />
+        )}
       </StreamListItem>
     );
   }

@@ -1,23 +1,26 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.plugins.views.search;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.plugin.database.users.User;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,8 +36,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,13 +52,13 @@ public class SearchDomainTest {
     private List<Search> allSearchesInDb = new ArrayList<>();
 
     @Mock
-    private ViewPermissions viewPermissions;
+    private ViewService viewService;
 
     @Before
     public void setUp() throws Exception {
         allSearchesInDb.clear();
         when(dbService.streamAll()).thenReturn(allSearchesInDb.stream());
-        sut = new SearchDomain(dbService, viewPermissions);
+        sut = new SearchDomain(dbService, viewService);
     }
 
     @Test
@@ -84,7 +86,9 @@ public class SearchDomainTest {
         final User user = user("someone");
         final Search search = mockSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(true);
+
+        final ViewDTO viewDTO = mock(ViewDTO.class);
+        when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of(viewDTO));
 
         final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
 
@@ -96,7 +100,7 @@ public class SearchDomainTest {
         final User user = user("someone");
         final Search search = mockSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(false);
+        when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of());
 
         assertThatExceptionOfType(PermissionException.class)
                 .isThrownBy(() -> sut.getForUser(search.id(), user, id -> true));
@@ -121,9 +125,16 @@ public class SearchDomainTest {
         final Search permittedSearch = mockSearchWithOwner("someone else");
         mockSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(permittedSearch.id()), eq(user), any())).thenReturn(true);
+        final ViewDTO viewDTO = mock(ViewDTO.class);
+        when(viewService.forSearch(anyString())).thenAnswer(invocation -> {
+            if (invocation.getArgument(0).equals(permittedSearch.id())) {
+                return ImmutableList.of(viewDTO);
+            } else {
+                return ImmutableList.of();
+            }
+        });
 
-        List<Search> result = sut.getAllForUser(user, id -> true);
+        List<Search> result = sut.getAllForUser(user, view -> true);
 
         assertThat(result).containsExactly(permittedSearch);
     }

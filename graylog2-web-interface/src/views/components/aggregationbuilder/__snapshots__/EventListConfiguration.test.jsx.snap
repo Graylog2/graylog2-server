@@ -2,23 +2,17 @@
 
 exports[`EventListConfiguration should render minimal 1`] = `
 <div>
-  <form>
-    <div
-      class="form-group"
+  <div
+    class="checkbox"
+  >
+    <label
+      title=""
     >
-      <div
-        class="checkbox"
-      >
-        <label
-          title=""
-        >
-          <input
-            type="checkbox"
-          />
-          Enable Event Annotation
-        </label>
-      </div>
-    </div>
-  </form>
+      <input
+        type="checkbox"
+      />
+      Enable Event Annotation
+    </label>
+  </div>
 </div>
 `;

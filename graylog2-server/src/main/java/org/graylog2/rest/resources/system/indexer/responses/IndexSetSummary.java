@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.rest.resources.system.indexer.responses;
 
@@ -32,6 +32,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @AutoValue
 @WithBeanGetter
@@ -101,6 +102,9 @@ public abstract class IndexSetSummary {
     @JsonProperty("field_type_refresh_interval")
     public abstract Duration fieldTypeRefreshInterval();
 
+    @JsonProperty("index_template_type")
+    public abstract Optional<IndexSetConfig.TemplateType> templateType();
+
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
                                          @JsonProperty("title") @NotBlank String title,
@@ -118,10 +122,12 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
                                          @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
-                                         @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval) {
+                                         @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
+                                         @JsonProperty("index_template_type") @Nullable IndexSetConfig.TemplateType templateType) {
         return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval);
+                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
+                Optional.ofNullable(templateType));
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -142,12 +148,13 @@ public abstract class IndexSetSummary {
                 indexSet.indexAnalyzer(),
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled(),
-                indexSet.fieldTypeRefreshInterval());
+                indexSet.fieldTypeRefreshInterval(),
+                indexSet.indexTemplateType().orElse(null));
 
     }
 
     public IndexSetConfig toIndexSetConfig() {
-        return IndexSetConfig.builder()
+        final IndexSetConfig.Builder builder = IndexSetConfig.builder()
                 .id(id())
                 .title(title())
                 .description(description())
@@ -164,7 +171,9 @@ public abstract class IndexSetSummary {
                 .indexTemplateName(indexPrefix() + "-template")
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
-                .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
-                .build();
+                .fieldTypeRefreshInterval(fieldTypeRefreshInterval());
+
+        final IndexSetConfig.Builder builderWithTemplateType = templateType().map(builder::indexTemplateType).orElse(builder);
+        return builderWithTemplateType.build();
     }
 }

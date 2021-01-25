@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.rest.resources.system;
 
@@ -27,11 +27,17 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
+import org.graylog2.grok.PaginatedGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.rest.models.system.responses.GrokPatternList;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -63,7 +69,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
 @RequiresAuthentication
 @Path("/system/grok")
 @Produces("application/json")
@@ -72,20 +77,61 @@ import java.util.stream.Collectors;
 public class GrokResource extends RestResource {
     private static final Pattern GROK_LINE_PATTERN = Pattern.compile("^(\\w+)[ \t]+(.*)$");
 
+    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(GrokPattern.FIELD_NAME, SearchQueryField.create(GrokPattern.FIELD_NAME))
+            .put(GrokPattern.FIELD_PATTERN, SearchQueryField.create(GrokPattern.FIELD_PATTERN))
+            .build();
+
     private final GrokPatternService grokPatternService;
+    private final SearchQueryParser searchQueryParser;
+    private final PaginatedGrokPatternService paginatedGrokPatternService;
 
     @Inject
-    public GrokResource(GrokPatternService grokPatternService) {
+    public GrokResource(GrokPatternService grokPatternService,
+                        PaginatedGrokPatternService paginatedGrokPatternService) {
+
+        this.paginatedGrokPatternService = paginatedGrokPatternService;
         this.grokPatternService = grokPatternService;
+        this.searchQueryParser = new SearchQueryParser(GrokPattern.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
     @Timed
+    @Deprecated
     @ApiOperation("Get all existing grok patterns")
     public GrokPatternList listGrokPatterns() {
         checkPermission(RestPermissions.INPUTS_READ);
 
         return GrokPatternList.create(grokPatternService.loadAll());
+    }
+
+    @GET
+    @Timed
+    @Path("/paginated")
+    @ApiOperation("Get existing grok patterns paged")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PaginatedResponse<GrokPattern> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                     @ApiParam(name = "sort",
+                                               value = "The field to sort the result on",
+                                               required = true,
+                                               allowableValues = "title,description,id")
+                                       @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
+                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                       @DefaultValue("asc") @QueryParam("order") String order) {
+        checkPermission(RestPermissions.INPUTS_READ);
+
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+        final PaginatedList<GrokPattern> result = paginatedGrokPatternService
+                .findPaginated(searchQuery, page, perPage, sort, order);
+
+        return PaginatedResponse.create("patterns", result);
     }
 
     @GET

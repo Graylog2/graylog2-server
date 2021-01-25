@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.scheduler;
 
@@ -48,6 +48,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private final Duration loopSleepDuration;
     private final InterruptibleSleeper sleeper = new InterruptibleSleeper();
+    private Thread executionThread;
 
     @Inject
     public JobSchedulerService(JobExecutionEngine.Factory engineFactory,
@@ -69,14 +70,21 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     @Override
     protected void startUp() throws Exception {
         schedulerEventBus.register(this);
+        this.executionThread = Thread.currentThread();
     }
 
     @Override
     protected void run() throws Exception {
         // Safety measure to make sure everything is started before we start job scheduling.
         LOG.debug("Waiting for server to enter RUNNING status before starting the scheduler loop");
-        serverStatus.awaitRunning(() -> LOG.debug("Server entered RUNNING state, starting scheduler loop"));
-
+        try {
+            serverStatus.awaitRunning();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOG.debug("Was interrupted while waiting for server to enter RUNNING state. Aborting.");
+            return;
+        }
+        LOG.debug("Server entered RUNNING state, starting scheduler loop");
 
         if (schedulerConfig.canStart()) {
             boolean executionEnabled = true;
@@ -124,6 +132,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
         schedulerEventBus.unregister(this);
         shutdownLatch.countDown();
         jobExecutionEngine.shutdown();
+        executionThread.interrupt();
     }
 
     /**

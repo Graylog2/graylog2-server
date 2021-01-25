@@ -1,0 +1,55 @@
+{
+  "views": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "title": "Search 1",
+      "summary": "",
+      "description": "",
+      "search_id": "54e3deadbeefdeadbeef0001",
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2016-08-24T12:13:47.628Z"
+      },
+      "type": "SEARCH",
+      "properties": [],
+      "requires": {}
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "title": "Dashboard 1",
+      "summary": "",
+      "description": "",
+      "search_id": "54e3deadbeefdeadbeef0002",
+      "state": {},
+      "owner": "testuser",
+      "created_at": {
+        "$date": "2016-08-24T12:13:47.628Z"
+      },
+      "type": "DASHBOARD",
+      "properties": [],
+      "requires": {}
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "title": "Dashboard 2",
+      "summary": "",
+      "description": "",
+      "search_id": "54e3deadbeefdeadbeef0003",
+      "state": {},
+      "owner": "olduser",
+      "created_at": {
+        "$date": "2016-08-24T12:13:47.628Z"
+      },
+      "type": "DASHBOARD",
+      "properties": [],
+      "requires": {}
+    }
+  ]
+}

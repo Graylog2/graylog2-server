@@ -1,0 +1,29 @@
+#toast-container .toast {
+  display: grid;
+  grid-template-columns: 8fr 0.5fr;
+  grid-template-rows: repeat(2, 1fr);
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+}
+
+#toast-container .toast-title {
+  grid-area: 1 / 1 / 2 / 1;
+}
+
+#toast-container .toast-message {
+  grid-area: 2 / 2 / 2 / 1;
+}
+
+#toast-container button.toast-close-button {
+  font-size: 0.889rem; /* theme.fonts.size.small */
+  grid-area: 1 / 2 / 3 / 3;
+  height: 100%;
+  top: 0;
+  right: 0;
+  font-weight: normal;
+}
+
+#toast-container button.toast-close-button:focus,
+#toast-container button.toast-close-button:hover {
+  color: #fff;
+}

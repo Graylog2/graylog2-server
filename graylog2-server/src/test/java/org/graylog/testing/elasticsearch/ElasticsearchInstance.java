@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.testing.elasticsearch;
 
@@ -22,12 +22,15 @@ import org.junit.rules.ExternalResource;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static java.util.Objects.isNull;
 
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link Client}.
@@ -36,7 +39,6 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
-    private static final String DEFAULT_IMAGE = "elasticsearch";
 
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
@@ -45,15 +47,11 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     protected final ElasticsearchContainer container;
 
     protected abstract Client client();
+
     protected abstract FixtureImporter fixtureImporter();
 
     protected static String imageNameFrom(Version version) {
-        final String defaultImage = version.satisfies("^6.0.0")
-                // The OSS image only exists for 6.0.0 and later
-                ? DEFAULT_IMAGE_OSS
-                // For older versions do not use the official image because it contains x-pack stuff we don't want
-                : DEFAULT_IMAGE;
-        return defaultImage + ":" + version.toString();
+        return DEFAULT_IMAGE_OSS + ":" + version.toString();
     }
 
     protected ElasticsearchInstance(String image, Version version, Network network) {
@@ -72,11 +70,12 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     }
 
     private ElasticsearchContainer buildContainer(String image, Network network) {
-        return new ElasticsearchContainer(image)
-                .withReuse(true)
+        return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
+                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
+                .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("ES_JAVA_OPTS", "-Xms2g -Xmx2g")
                 .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", ".watches,.triggered_watches,.watcher-history-*")
+                .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
@@ -103,7 +102,8 @@ public abstract class ElasticsearchInstance extends ExternalResource {
     public void importFixtureResource(String resourcePath, Class<?> testClass) {
         boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;
 
-        @SuppressWarnings("UnstableApiUsage") final URL fixtureResource = isFullResourcePath
+        @SuppressWarnings("UnstableApiUsage")
+        final URL fixtureResource = isFullResourcePath
                 ? Resources.getResource(resourcePath)
                 : Resources.getResource(testClass, resourcePath);
 

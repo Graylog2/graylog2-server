@@ -1,25 +1,24 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.plugin.Tools;
 
 import java.util.Map;
 
@@ -121,25 +120,25 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("timestamp_processing", map()
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("timerange_start", map()
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("timerange_end", map()
                         .put("type", "date")
                         // Use the same format we use for the "message" mapping to make sure we
                         // can use the search.
-                        .put("format", Tools.ES_DATE_FORMAT)
+                        .put("format", dateFormat())
                         .build())
                 .put("streams", map()
                         .put("type", "keyword")
@@ -211,5 +210,9 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
 
     protected ImmutableList.Builder<Object> list() {
         return ImmutableList.builder();
+    }
+
+    protected String dateFormat() {
+        return Constants.ES_DATE_FORMAT;
     }
 }

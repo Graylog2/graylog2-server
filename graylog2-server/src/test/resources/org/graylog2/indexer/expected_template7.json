@@ -25,18 +25,18 @@
       },
       "timestamp": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss.SSS"
+        "format": "uuuu-MM-dd HH:mm:ss.SSS"
       },
       "gl2_accounted_message_size": {
         "type": "long"
       },
       "gl2_receive_timestamp": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss.SSS"
+        "format": "uuuu-MM-dd HH:mm:ss.SSS"
       },
       "gl2_processing_timestamp": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss.SSS"
+        "format": "uuuu-MM-dd HH:mm:ss.SSS"
       },
       "source": {
         "type": "text",

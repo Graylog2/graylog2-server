@@ -1,13 +1,30 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EventsContainer from 'components/events/events/EventsContainer';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import withLocation from 'routing/withLocation';
 
 const EventsPage = ({ location }) => {
   const filteredSourceStream = location.query.stream_id;
@@ -28,18 +45,14 @@ const EventsPage = ({ location }) => {
 
           <ButtonToolbar>
             <LinkContainer to={Routes.ALERTS.LIST}>
-              <Button bsStyle="info" className="active">Alerts &amp; Events</Button>
+              <Button bsStyle="info">Alerts &amp; Events</Button>
             </LinkContainer>
-            <IfPermitted permissions="eventdefinitions:read">
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info">Event Definitions</Button>
-              </LinkContainer>
-            </IfPermitted>
-            <IfPermitted permissions="eventnotifications:read">
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-                <Button bsStyle="info">Notifications</Button>
-              </LinkContainer>
-            </IfPermitted>
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
+              <Button bsStyle="info">Event Definitions</Button>
+            </LinkContainer>
+            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
+              <Button bsStyle="info">Notifications</Button>
+            </LinkContainer>
           </ButtonToolbar>
         </PageHeader>
 
@@ -57,4 +70,4 @@ EventsPage.propTypes = {
   location: PropTypes.object.isRequired,
 };
 
-export default EventsPage;
+export default withLocation(EventsPage);

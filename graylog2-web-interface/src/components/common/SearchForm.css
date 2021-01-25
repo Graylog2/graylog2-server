@@ -1,7 +1,0 @@
-:local(.helpFeedback).form-control-feedback {
-    pointer-events: auto;
-}
-
-:local(.helpFeedback) .btn {
-    max-width: 34px;
-}

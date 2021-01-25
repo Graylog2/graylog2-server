@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import { css } from 'styled-components';
 
 const aceEditorStyles = ({ colors }) => {
@@ -48,12 +64,12 @@ const aceEditorStyles = ({ colors }) => {
         }
 
         .ace_active-line {
-          background: ${colors.gray[90]};
+          background: ${colors.variant.lighter.default};
         }
       }
 
       .ace_gutter-active-line {
-        background-color: ${colors.gray[80]};
+        background-color: ${colors.variant.lighter.default};
       }
 
       .ace_invisible {
@@ -65,7 +81,7 @@ const aceEditorStyles = ({ colors }) => {
       .ace_storage,
       .ace_storage.ace_type,
       .ace_support.ace_type {
-        color: ${colors.variant.primary};
+        color: ${colors.global.link};
       }
 
       .ace_keyword.ace_operator {

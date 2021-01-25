@@ -13,15 +13,8 @@
             <directory>${project.basedir}/..</directory>
             <includes>
                 <include>README.markdown</include>
-                <include>COPYING</include>
+                <include>LICENSE</include>
                 <include>UPGRADING.rst</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/../lib/sigar-${sigar.version}</directory>
-            <outputDirectory>lib/sigar</outputDirectory>
-            <includes>
-                <include>**/*</include>
             </includes>
         </fileSet>
 

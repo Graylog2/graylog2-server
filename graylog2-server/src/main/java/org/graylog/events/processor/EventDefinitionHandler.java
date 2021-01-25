@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.processor;
 
@@ -21,6 +21,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,10 +62,11 @@ public class EventDefinitionHandler {
      * Creates a new event definition and a corresponding scheduler job definition and trigger.
      *
      * @param unsavedEventDefinition the event definition to save
+     * @param user the user who created this eventDefinition. If empty, no ownership will be registered.
      * @return the created event definition
      */
-    public EventDefinitionDto create(EventDefinitionDto unsavedEventDefinition) {
-        final EventDefinitionDto eventDefinition = createEventDefinition(unsavedEventDefinition);
+    public EventDefinitionDto create(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
+        final EventDefinitionDto eventDefinition = createEventDefinition(unsavedEventDefinition, user);
 
         try {
             createJobDefinitionAndTriggerIfScheduledType(eventDefinition);
@@ -80,15 +82,15 @@ public class EventDefinitionHandler {
     }
 
     /**
-     * Creates a new event definition without scheduling it. Normally the {@link #create(EventDefinitionDto)} method
+     * Creates a new event definition without scheduling it. Normally the {@link #create(EventDefinitionDto, Optional<User>)} method
      * should be used to ensure proper scheduling of the event definition. In some cases new event definitions
      * must be created without a schedule, though. (e.g. content packs)
      *
      * @param unsavedEventDefinition the event definition to save
      * @return the created event definition
      */
-    public EventDefinitionDto createWithoutSchedule(EventDefinitionDto unsavedEventDefinition) {
-        return createEventDefinition(unsavedEventDefinition);
+    public EventDefinitionDto createWithoutSchedule(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
+        return createEventDefinition(unsavedEventDefinition, user);
     }
 
     /**
@@ -169,9 +171,15 @@ public class EventDefinitionHandler {
     }
 
 
-    private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition) {
-        final EventDefinitionDto eventDefinition = eventDefinitionService.save(unsavedEventDefinition);
-        LOG.debug("Created event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
+    private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
+        EventDefinitionDto eventDefinition;
+        if (user.isPresent()) {
+            eventDefinition = eventDefinitionService.saveWithOwnership(unsavedEventDefinition, user.get());
+            LOG.debug("Created event definition <{}/{}> with user <{}>", eventDefinition.id(), eventDefinition.title(), user.get());
+        } else {
+            eventDefinition = eventDefinitionService.save(unsavedEventDefinition);
+            LOG.debug("Created event definition <{}/{}> without user", eventDefinition.id(), eventDefinition.title());
+        }
         return eventDefinition;
     }
 

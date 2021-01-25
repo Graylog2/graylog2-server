@@ -1,6 +1,22 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import { createGlobalStyle, css } from 'styled-components';
 
-const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
+const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
     height: 256px;
   }
@@ -89,6 +105,7 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
 
   input.form-control,
   select.form-control,
+  textarea,
   textarea.form-control {
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
@@ -110,10 +127,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
       background-color: ${theme.colors.input.backgroundDisabled};
       color: ${theme.colors.input.colorDisabled};
     }
-  }
-
-  label {
-    font-size: ${theme.fonts.size.large};
   }
 
   legend small {
@@ -144,7 +157,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
   }
 
   .actions-lg .actions-container {
-    height: 60px;
     margin-top: 10px;
     padding-left: 50px;
   }
@@ -157,17 +169,12 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     margin-top: 10px;
   }
 
-  .row {
-    margin-bottom: 15px;
-  }
-
   .no-bm {
     margin-bottom: 0;
   }
 
-  .alert {
-    margin-bottom: 0;
-    margin-top: 5px;
+  .has-bm {
+    margin-bottom: 10px;
   }
 
   .modal form {
@@ -238,32 +245,8 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     margin-bottom: 15px !important;
   }
 
-  dl.metric-def dt {
-    float: left;
-  }
-
   dl.metric-timer dd {
-    margin-left: 125px;
-  }
-
-  dl.metric-meter dd {
-    margin-left: 95px;
-  }
-
-  dl.metric-gauge dd {
-    margin-left: 80px;
-  }
-
-  dl.metric-counter dd {
-    margin-left: 80px;
-  }
-
-  dl.metric-histogram dd {
-    margin-left: 125px;
-  }
-
-  #user-list th.user-type {
-    width: 50px;
+    margin-left: 145px;
   }
 
   td.centered {
@@ -333,14 +316,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     margin-top: 5px;
   }
 
-  .system-system dt {
-    float: left;
-  }
-
-  .system-system dd {
-    margin-left: 75px;
-  }
-
   dl.system-journal {
     margin-top: 5px;
     margin-bottom: 0;
@@ -365,14 +340,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
 
   .system-dl dd {
     margin-left: 180px;
-  }
-
-  .system-rest dt {
-    float: left;
-  }
-
-  .system-rest dd {
-    margin-left: 120px;
   }
 
   .search-help {
@@ -557,12 +524,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     margin-bottom: 5px;
   }
 
-  dl.system-system,
-  dl.system-rest {
-    margin-top: 5px;
-    margin-bottom: 0;
-  }
-
   .table-sm {
     margin-bottom: 0;
   }
@@ -612,6 +573,19 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     display: inline-block;
     vertical-align: middle;
     width: auto;
+  }
+  
+  .typeahead-wrapper .tt-menu {
+    background-color: ${theme.colors.global.contentBackground};
+    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
+    color: ${theme.colors.global.textDefault};
+    
+    .tt-suggestion:hover,
+    .tt-suggestion.tt-cursor {
+      color: ${theme.colors.variant.darkest.info};
+      background-color: ${theme.colors.variant.lighter.info};
+      background-image: none;
+    }
   }
 
   .form-group-inline {
@@ -697,8 +671,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     box-shadow: none;
     height: auto;
   }
-
-  ${additionalStyles}
 `);
 
 export default GlobalThemeStyles;

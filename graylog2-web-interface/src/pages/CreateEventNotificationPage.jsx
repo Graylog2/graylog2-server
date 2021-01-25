@@ -1,7 +1,23 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LinkContainer } from 'react-router-bootstrap';
 
+import { LinkContainer } from 'components/graylog/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -15,7 +31,7 @@ import EventNotificationFormContainer from 'components/event-notifications/event
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const CreateEventDefinitionPage = ({ currentUser, route }) => {
+const CreateEventDefinitionPage = ({ currentUser }) => {
   if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')) {
     history.push(Routes.NOTFOUND);
   }
@@ -54,7 +70,7 @@ const CreateEventDefinitionPage = ({ currentUser, route }) => {
 
         <Row className="content">
           <Col md={12}>
-            <EventNotificationFormContainer action="create" route={route} />
+            <EventNotificationFormContainer action="create" />
           </Col>
         </Row>
       </span>
@@ -64,7 +80,6 @@ const CreateEventDefinitionPage = ({ currentUser, route }) => {
 
 CreateEventDefinitionPage.propTypes = {
   currentUser: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
 };
 
 export default connect(CreateEventDefinitionPage, {

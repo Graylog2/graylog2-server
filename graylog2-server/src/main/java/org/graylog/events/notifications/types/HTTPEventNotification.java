@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.events.notifications.types;
 
@@ -32,8 +32,6 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
-import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
@@ -42,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -55,7 +52,6 @@ public class HTTPEventNotification implements EventNotification {
     private static final Logger LOG = LoggerFactory.getLogger(HTTPEventNotification.class);
 
     private static final MediaType CONTENT_TYPE = MediaType.parse(APPLICATION_JSON);
-    private static final String UNKNOWN = "<unknown>";
 
     private final EventNotificationService notificationCallbackService;
     private final ObjectMapper objectMapper;
@@ -85,7 +81,7 @@ public class HTTPEventNotification implements EventNotification {
         }
 
         ImmutableList<MessageSummary> backlog = notificationCallbackService.getBacklogForEvent(ctx);
-        final EventNotificationModelData model = getModel(ctx, backlog);
+        final EventNotificationModelData model = EventNotificationModelData.of(ctx, backlog);
 
         if (!whitelistService.isWhitelisted(config.url())) {
             if (!NotificationTestData.TEST_NOTIFICATION_ID.equals(ctx.notificationId())) {
@@ -117,22 +113,6 @@ public class HTTPEventNotification implements EventNotification {
         } catch (IOException e) {
             throw new PermanentEventNotificationException(e.getMessage());
         }
-    }
-
-    private EventNotificationModelData getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) {
-        final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
-        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
-
-        return EventNotificationModelData.builder()
-                .eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN))
-                .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
-                .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
-                .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
-                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
-                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
-                .event(ctx.event())
-                .backlog(backlog)
-                .build();
     }
 
     private void publishSystemNotificationForWhitelistFailure(String url, String eventNotificationTitle) {

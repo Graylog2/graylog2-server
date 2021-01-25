@@ -1,18 +1,18 @@
-/**
- * This file is part of Graylog.
+/*
+ * Copyright (C) 2020 Graylog, Inc.
  *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
  *
- * Graylog is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog2.contentpacks.facades;
 
@@ -44,6 +44,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationCon
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -67,8 +68,12 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -83,6 +88,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ViewFacadeTest {
     @Rule
@@ -102,7 +109,7 @@ public class ViewFacadeTest {
                                   MongoJackObjectMapperProvider mapper,
                                   ClusterConfigService clusterConfigService) {
             super(mongoConnection, mapper, clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto));
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class));
         }
     }
 
@@ -113,6 +120,7 @@ public class ViewFacadeTest {
     private final String newViewId = "5def958063303ae5f68edead";
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
+    private UserService userService;
 
 
     @Before
@@ -134,7 +142,8 @@ public class ViewFacadeTest {
                 new MongoJackObjectMapperProvider(objectMapper));
         viewService = new TestViewService(mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
-        facade = new SearchFacade(objectMapper, searchDbService, viewService);
+        userService = mock(UserService.class);
+        facade = new SearchFacade(objectMapper, searchDbService, viewService, userService);
     }
 
     @Test
@@ -213,8 +222,10 @@ public class ViewFacadeTest {
         final Entity viewEntity = createViewEntity();
         final Map<EntityDescriptor, Object> nativeEntities = new HashMap<>(1);
         nativeEntities.put(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        when(userService.load("testuser")).thenReturn(fakeUser);
         final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(viewEntity,
-                Collections.emptyMap(), nativeEntities, "admin");
+                Collections.emptyMap(), nativeEntities, "testuser");
 
         assertThat(nativeEntity.descriptor().title()).isEqualTo("title");
         assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.SEARCH_V1);
