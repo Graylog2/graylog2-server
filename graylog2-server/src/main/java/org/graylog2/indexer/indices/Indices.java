@@ -326,6 +326,11 @@ public class Indices {
         indicesAdapter.optimizeIndex(index, maxNumSegments, timeout);
     }
 
+    public HealthStatus waitForRecovery(String index, int timeout) {
+        LOG.debug("Waiting until index health status of index {} is healthy", index);
+        return indicesAdapter.waitForRecovery(index, timeout);
+    }
+
     public HealthStatus waitForRecovery(String index) {
         LOG.debug("Waiting until index health status of index {} is healthy", index);
         return indicesAdapter.waitForRecovery(index);
