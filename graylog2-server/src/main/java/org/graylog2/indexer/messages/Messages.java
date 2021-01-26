@@ -212,6 +212,7 @@ public class Messages {
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count, IndexingListener indexingListener) {
         final Retryer<List<IndexingError>> BULK_REQUEST_RETRYER = indexingListener == null
                 ? BULK_REQUEST_RETRYER_BUILDER.build()
@@ -229,6 +230,7 @@ public class Messages {
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private RetryListener retryListenerFor(IndexingListener indexingListener) {
         return new RetryListener() {
             @Override
