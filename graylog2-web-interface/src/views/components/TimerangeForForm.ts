@@ -78,7 +78,6 @@ export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValu
         return {
           type: timerange.type,
           from: timerange.range,
-          to: 0,
         };
       }
 
@@ -127,7 +126,7 @@ const migrationStrategies = {
     from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
     to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
   }),
-  relative: () => ({ type: 'relative', from: 300, to: 0 }),
+  relative: () => ({ type: 'relative', from: 300 }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
   disabled: () => undefined,
 };

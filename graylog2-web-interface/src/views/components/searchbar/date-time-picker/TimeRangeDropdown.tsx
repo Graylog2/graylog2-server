@@ -103,7 +103,6 @@ const DEFAULT_RANGES = {
   relative: {
     type: 'relative',
     from: 300,
-    to: 0,
   },
   keyword: {
     type: 'keyword',
