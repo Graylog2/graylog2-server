@@ -127,7 +127,7 @@ const migrationStrategies = {
     from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
     to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
   }),
-  relative: () => ({ type: 'relative', from: 300 }),
+  relative: () => ({ type: 'relative', from: 300, to: 0 }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
   disabled: () => undefined,
 };
