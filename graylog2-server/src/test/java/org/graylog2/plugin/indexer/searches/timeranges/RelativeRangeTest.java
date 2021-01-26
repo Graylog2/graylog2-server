@@ -62,7 +62,7 @@ class RelativeRangeTest {
     }
 
     @Test
-    void doesNotSupportBothRangeAndFromToParameters() throws Exception {
+    void doesNotSupportBothRangeAndFromToParameters() {
         assertThatThrownBy(() -> RelativeRange.Builder.builder()
                 .range(600)
                 .from(300)
@@ -70,5 +70,14 @@ class RelativeRangeTest {
                 .build())
                 .isInstanceOf(InvalidRangeParametersException.class)
                 .hasMessage("Either `range` OR `from`/`to` must be specified, not both!");
+    }
+
+    @Test
+    void doesNotSupportOnlyToParameter() {
+        assertThatThrownBy(() -> RelativeRange.Builder.builder()
+                .to(60)
+                .build())
+                .isInstanceOf(InvalidRangeParametersException.class)
+                .hasMessage("If `to` is specified, `from` must be specified to!");
     }
 }
