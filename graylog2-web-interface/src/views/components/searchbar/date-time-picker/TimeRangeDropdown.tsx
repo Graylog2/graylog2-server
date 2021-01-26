@@ -250,9 +250,9 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
         {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab), false);
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
             } else {
-              setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab], false);
+              setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab]);
             }
 
             setActiveTab(nextTab);
