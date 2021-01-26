@@ -135,6 +135,7 @@ export const dateTimeValidate = (values, limitDuration) => {
   } } = {};
 
   const { nextTimeRange } = values;
+  console.log({ nextTimeRange });
 
   const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
   const rangeLimitError = 'Range is outside limit duration.';
@@ -166,7 +167,7 @@ export const dateTimeValidate = (values, limitDuration) => {
 
   if (nextTimeRange?.type === 'relative') {
     if (limitDuration > 0) {
-      if (nextTimeRange.from >= limitDuration) {
+      if (nextTimeRange.from >= limitDuration || !nextTimeRange.from) {
         errors.nextTimeRange = { ...errors.nextTimeRange, from: rangeLimitError };
       }
     }
@@ -241,6 +242,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    arrowOffsetLeft={34}>
       <Formik initialValues={{ nextTimeRange: currentTimeRange }}
               validate={(values) => dateTimeValidate(values, limitDuration)}
+              validateOnMount
               onSubmit={handleSubmit}>
         {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
           const handleActiveTab = (nextTab) => {
