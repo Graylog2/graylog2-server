@@ -166,11 +166,11 @@ export const dateTimeValidate = (values, limitDuration) => {
 
   if (nextTimeRange?.type === 'relative') {
     if (limitDuration > 0) {
-      if (nextTimeRange.from >= limitDuration || !nextTimeRange.from) {
+      if (nextTimeRange.from > limitDuration || !nextTimeRange.from) {
         errors.nextTimeRange = { ...errors.nextTimeRange, from: rangeLimitError };
       }
 
-      if (nextTimeRange.to >= limitDuration) {
+      if (nextTimeRange.to > limitDuration) {
         errors.nextTimeRange = { ...errors.nextTimeRange, to: rangeLimitError };
       }
     }
