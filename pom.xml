@@ -475,8 +475,14 @@
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
                             <goals>deploy</goals>
-                            <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-deploy-plugin</artifactId>
+                      <configuration>
+                        <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
+                      </configuration>
                     </plugin>
                 </plugins>
             </build>
