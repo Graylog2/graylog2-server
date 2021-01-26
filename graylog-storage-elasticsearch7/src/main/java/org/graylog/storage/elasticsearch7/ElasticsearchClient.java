@@ -25,6 +25,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.messages.InvalidWriteTargetException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -118,8 +119,20 @@ public class ElasticsearchClient {
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
+            if (isInvalidWriteTargetException(elasticsearchException)) {
+                throw new InvalidWriteTargetException("Write target for indexing is invalid.", elasticsearchException);
+            }
         }
         return new ElasticsearchException(errorMessage, e);
+    }
+
+    private boolean isInvalidWriteTargetException(ElasticsearchException elasticsearchException) {
+        try {
+            final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
+            return parsedException.reason().startsWith("no write index is defined for alias");
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean isIndexNotFoundException(ElasticsearchException e) {
