@@ -131,7 +131,7 @@ class SourceCodeEditor extends React.Component {
     readOnly: false,
     resizable: true,
     toolbar: true,
-    value: '',
+    value: undefined,
     width: Infinity,
   };
 
