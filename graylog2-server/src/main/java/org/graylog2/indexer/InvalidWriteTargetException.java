@@ -14,12 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
+package org.graylog2.indexer;
 
-import org.graylog2.indexer.ElasticsearchException;
+import java.util.Collections;
 
 public class InvalidWriteTargetException extends ElasticsearchException {
-    public InvalidWriteTargetException(String errorMessage, Exception elasticsearchException) {
-        super(errorMessage, elasticsearchException);
+
+    private InvalidWriteTargetException(String target, Throwable cause) {
+        super("Write target for indexing is invalid. This can happen if the deflector points to zero or multiple targets.", Collections.singletonList("target=" + target), cause);
+    }
+
+    public static InvalidWriteTargetException create(String target, Throwable cause) {
+        return new InvalidWriteTargetException(target, cause);
+    }
+
+    public static InvalidWriteTargetException create(String target) {
+        return new InvalidWriteTargetException(target, null);
     }
 }

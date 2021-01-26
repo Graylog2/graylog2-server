@@ -25,17 +25,21 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.messages.InvalidWriteTargetException;
+import org.graylog2.indexer.InvalidWriteTargetException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class ElasticsearchClient {
+    private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
+
     private final RestHighLevelClient client;
     private final boolean compressionEnabled;
 
@@ -120,7 +124,11 @@ public class ElasticsearchClient {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
             if (isInvalidWriteTargetException(elasticsearchException)) {
-                throw new InvalidWriteTargetException("Write target for indexing is invalid.", elasticsearchException);
+                final Matcher matcher = invalidWriteTarget.matcher(elasticsearchException.getMessage());
+                if (matcher.find()) {
+                    final String target = matcher.group("target");
+                    throw InvalidWriteTargetException.create(target);
+                }
             }
         }
         return new ElasticsearchException(errorMessage, e);
