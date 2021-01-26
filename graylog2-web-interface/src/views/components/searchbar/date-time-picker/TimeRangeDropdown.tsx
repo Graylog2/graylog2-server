@@ -135,7 +135,6 @@ export const dateTimeValidate = (values, limitDuration) => {
   } } = {};
 
   const { nextTimeRange } = values;
-  console.log({ nextTimeRange });
 
   const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
   const rangeLimitError = 'Range is outside limit duration.';
@@ -169,6 +168,10 @@ export const dateTimeValidate = (values, limitDuration) => {
     if (limitDuration > 0) {
       if (nextTimeRange.from >= limitDuration || !nextTimeRange.from) {
         errors.nextTimeRange = { ...errors.nextTimeRange, from: rangeLimitError };
+      }
+
+      if (nextTimeRange.to >= limitDuration) {
+        errors.nextTimeRange = { ...errors.nextTimeRange, to: rangeLimitError };
       }
     }
 
