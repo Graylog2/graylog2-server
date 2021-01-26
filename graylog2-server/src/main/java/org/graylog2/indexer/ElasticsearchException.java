@@ -73,6 +73,11 @@ public class ElasticsearchException extends RuntimeException {
     public String getMessage() {
         final StringBuilder sb = new StringBuilder(super.getMessage());
 
+        if(!errorDetails.isEmpty()) {
+            sb.append("\n\n");
+            errorDetails.forEach(sb::append);
+        }
+
         return sb.toString();
     }
 
@@ -81,7 +86,6 @@ public class ElasticsearchException extends RuntimeException {
         return MoreObjects.toStringHelper(this)
                 .add("message", getMessage())
                 .add("errorDetails", getErrorDetails())
-                .add("cause", getCause())
                 .toString();
     }
 }
