@@ -165,6 +165,12 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
                             .withWaitTimeSeconds(20));
             return result.getMessages();
         } catch (Exception e) {
+            try {
+                // TODO maybe use exponential backoff
+                Thread.sleep(500);
+            } catch (InterruptedException ex) {
+                LOG.error("Interrupted sleep in error path", ex);
+            }
             LOG.error("Error consuming messages.", e);
         }
         return Collections.emptyList();
