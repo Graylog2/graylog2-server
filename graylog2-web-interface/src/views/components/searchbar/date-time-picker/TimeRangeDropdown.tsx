@@ -111,7 +111,7 @@ const DEFAULT_RANGES = {
   disabled: undefined,
 };
 
-const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTypes.map(({ type, name }) => {
+const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword }) => availableTimeRangeTypes.map(({ type, name }) => {
   const TimeRangeTypeTabs = timeRangeTypes[type];
 
   return (
@@ -120,21 +120,39 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration }) => availableTimeRangeTy
          eventKey={type}>
       {type === activeTab && (
         <TimeRangeTypeTabs disabled={false}
-                           limitDuration={limitDuration} />
+                           limitDuration={limitDuration}
+                           setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
       )}
     </Tab>
   );
 });
 
-export const dateTimeValidate = (values, limitDuration) => {
+const exceedsDuration = (timerange, limitDuration) => {
+  if (limitDuration === 0) {
+    return false;
+  }
+
+  switch (timerange?.type) {
+    case 'absolute':
+    case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
+      const durationFrom = timerange.from;
+      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      return moment(durationFrom).isBefore(durationLimit);
+    }
+
+    default:
+      return false;
+  }
+};
+
+export const dateTimeValidate = (nextTimeRange, limitDuration) => {
   const errors: { nextTimeRange?: {
     from?: string,
     to?: string,
     range?: string,
     keyword?: string,
   } } = {};
-
-  const { nextTimeRange } = values;
 
   const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
   const rangeLimitError = 'Range is outside limit duration.';
@@ -154,13 +172,8 @@ export const dateTimeValidate = (values, limitDuration) => {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: timeRangeError };
     }
 
-    if (limitDuration !== 0) {
-      const durationFrom = nextTimeRange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-
-      if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { ...errors.nextTimeRange, from: dateLimitError };
-      }
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: dateLimitError };
     }
   }
 
@@ -181,13 +194,8 @@ export const dateTimeValidate = (values, limitDuration) => {
   }
 
   if (nextTimeRange?.type === 'keyword') {
-    if (limitDuration !== 0) {
-      const durationFrom = nextTimeRange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-
-      if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { keyword: dateLimitError };
-      }
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
+      errors.nextTimeRange = { keyword: rangeLimitError };
     }
   }
 
@@ -196,7 +204,7 @@ export const dateTimeValidate = (values, limitDuration) => {
 
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange }: Props) => {
   const { limitDuration } = useContext(DateTimeContext);
-
+  const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
 
   const handleNoOverride = () => {
@@ -244,9 +252,9 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    title={title}
                    arrowOffsetLeft={34}>
       <Formik initialValues={{ nextTimeRange: currentTimeRange }}
-              validate={(values) => dateTimeValidate(values, limitDuration)}
-              validateOnMount
-              onSubmit={handleSubmit}>
+              validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+              onSubmit={handleSubmit}
+              validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
@@ -272,6 +280,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                     {timeRangeTypeTabs({
                       activeTab,
                       limitDuration,
+                      setValidatingKeyword,
                     })}
 
                     {!activeTab && (<TabDisabledTimeRange />)}
@@ -290,7 +299,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                       <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
                     )}
                     <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
-                    <Button bsStyle="success" disabled={!isValid} type="submit">Apply</Button>
+                    <Button bsStyle="success" disabled={!isValid || validatingKeyword} type="submit">Apply</Button>
                   </div>
                 </Col>
               </Row>

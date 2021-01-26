@@ -80,6 +80,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                            currentTimeRange={values?.timerange}
+                                           hasErrorOnMount={!isValid}
                                            noOverride />
                     <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
