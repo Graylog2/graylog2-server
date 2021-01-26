@@ -18,7 +18,6 @@ package org.graylog2.indexer;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
-import joptsimple.internal.Strings;
 
 import java.util.Collections;
 import java.util.List;
@@ -74,11 +73,6 @@ public class ElasticsearchException extends RuntimeException {
     public String getMessage() {
         final StringBuilder sb = new StringBuilder(super.getMessage());
 
-        if(!errorDetails.isEmpty()) {
-            sb.append("\n\n");
-            errorDetails.forEach(sb::append);
-        }
-
         return sb.toString();
     }
 
@@ -87,6 +81,7 @@ public class ElasticsearchException extends RuntimeException {
         return MoreObjects.toStringHelper(this)
                 .add("message", getMessage())
                 .add("errorDetails", getErrorDetails())
+                .add("cause", getCause())
                 .toString();
     }
 }
