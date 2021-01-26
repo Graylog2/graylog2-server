@@ -50,10 +50,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -187,11 +189,13 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     @Test
     public void retryIndexingMessagesDuringFloodStage() throws Exception {
         triggerFloodStage(INDEX_NAME);
-
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final AtomicBoolean succeeded = new AtomicBoolean(false);
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch));
 
-        Thread.sleep(1000);
+        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+
+        countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
 
@@ -201,6 +205,24 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().refreshNode();
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+        assertThat(succeeded.get()).isTrue();
+    }
+
+    private Messages.IndexingListener createIndexingListener(CountDownLatch retryLatch, AtomicBoolean successionFlag) {
+        return new Messages.IndexingListener() {
+            @Override
+            public void onRetry(long attemptNumber) {
+                retryLatch.countDown();
+            }
+
+            @Override
+            public void onSuccess(long delaySinceFirstAttempt) {
+                if (retryLatch.getCount() > 0) {
+                    retryLatch.countDown();
+                }
+                successionFlag.set(true);
+            }
+        };
     }
 
     @Test
@@ -213,9 +235,12 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().addAliasMapping(index2, INDEX_NAME);
 
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch));
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final AtomicBoolean succeeded = new AtomicBoolean(false);
 
-        Thread.sleep(10000);
+        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+
+        countDownLatch.await();
 
         client().removeAliasMapping(index2, INDEX_NAME);
 
@@ -225,6 +250,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().refreshNode();
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+        assertThat(succeeded.get()).isTrue();
     }
 
     @Test
