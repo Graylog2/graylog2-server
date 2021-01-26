@@ -117,7 +117,8 @@ const SearchBar = ({
                   <FlexCol md={5}>
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange} />
+                                           currentTimeRange={values?.timerange}
+                                           hasErrorOnMount={!isValid} />
                     <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
 
