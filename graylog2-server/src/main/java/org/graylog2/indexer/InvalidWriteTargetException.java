@@ -17,18 +17,18 @@
 package org.graylog2.indexer;
 
 import java.util.Collections;
-import java.util.List;
 
-public class IndexNotFoundException extends ElasticsearchException {
-    public IndexNotFoundException(String message) {
-        super(message);
+public class InvalidWriteTargetException extends ElasticsearchException {
+
+    private InvalidWriteTargetException(String target, Throwable cause) {
+        super("Write target for indexing is invalid. This can happen if the deflector points to zero or multiple targets.", Collections.singletonList("target=" + target), cause);
     }
 
-    public IndexNotFoundException(String message, List<String> errorDetails) {
-        super(message, errorDetails);
+    public static InvalidWriteTargetException create(String target, Throwable cause) {
+        return new InvalidWriteTargetException(target, cause);
     }
 
-    public static IndexNotFoundException create(String errorMessage, String index) {
-        return new IndexNotFoundException(errorMessage, Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
+    public static InvalidWriteTargetException create(String target) {
+        return new InvalidWriteTargetException(target, null);
     }
 }
