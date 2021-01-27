@@ -91,18 +91,34 @@ public class Messages {
 
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
             .retryIfException(t -> t instanceof IOException)
+            .retryIfResult(Messages::requestFailedForRetryableReason)
             .withWaitStrategy(exponentialWaitMilliseconds)
             .withRetryListener(new RetryListener() {
                 @Override
                 public <V> void onRetry(Attempt<V> attempt) {
                     if (attempt.hasException()) {
                         LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                    } else if (attempt.getResult() instanceof BulkResult && requestFailedForRetryableReason((BulkResult)attempt.getResult())) {
+                        final BulkResult bulkResult = (BulkResult) attempt.getResult();
+                        LOG.error("Bulk indexing failed: {}, retrying (attempt #{})", reasonOfFailure(bulkResult), attempt.getAttemptNumber());
                     } else if (attempt.getAttemptNumber() > 1) {
                         LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
                     }
                 }
             })
             .build();
+
+    private static boolean requestFailedForRetryableReason(BulkResult result) {
+        return isAliasWithInvalidTargets(result);
+    }
+
+    private static boolean isAliasWithInvalidTargets(BulkResult result) {
+        return result.getResponseCode() == 400 && reasonOfFailure(result).startsWith("no write index is defined for alias");
+    }
+
+    private static String reasonOfFailure(BulkResult result) {
+        return result.getJsonObject().path("error").path("reason").asText();
+    }
 
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String INDEX_BLOCK_REASON = "blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];";
