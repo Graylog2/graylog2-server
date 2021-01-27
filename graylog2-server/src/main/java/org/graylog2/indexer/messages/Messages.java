@@ -38,6 +38,7 @@ import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -75,19 +76,21 @@ public class Messages {
     static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
 
     @SuppressWarnings("UnstableApiUsage")
-    private static final RetryerBuilder<List<IndexingError>> BULK_REQUEST_RETRYER_BUILDER = RetryerBuilder.<List<IndexingError>>newBuilder()
-            .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException)
-            .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
-            .withRetryListener(new RetryListener() {
-                @Override
-                public <V> void onRetry(Attempt<V> attempt) {
-                    if (attempt.hasException()) {
-                        LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
-                    } else if (attempt.getAttemptNumber() > 1) {
-                        LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
+    private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
+        return RetryerBuilder.<List<IndexingError>>newBuilder()
+                .retryIfException(t -> t instanceof IOException || t instanceof InvalidWriteTargetException)
+                .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        if (attempt.hasException()) {
+                            LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                        } else if (attempt.getAttemptNumber() > 1) {
+                            LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
+                        }
                     }
-                }
-            });
+                });
+    }
 
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
     private final MessagesAdapter messagesAdapter;
@@ -214,13 +217,13 @@ public class Messages {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count, IndexingListener indexingListener) {
-        final Retryer<List<IndexingError>> BULK_REQUEST_RETRYER = indexingListener == null
-                ? BULK_REQUEST_RETRYER_BUILDER.build()
-                : BULK_REQUEST_RETRYER_BUILDER.withRetryListener(retryListenerFor(indexingListener)).build();
+    private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count, @Nullable IndexingListener indexingListener) {
+        final Retryer<List<IndexingError>> bulkRequestRetryer = indexingListener == null
+                ? createBulkRequestRetryerBuilder().build()
+                : createBulkRequestRetryerBuilder().withRetryListener(retryListenerFor(indexingListener)).build();
 
         try {
-            return BULK_REQUEST_RETRYER.call(() -> messagesAdapter.bulkIndex(indexingRequestList));
+            return bulkRequestRetryer.call(() -> messagesAdapter.bulkIndex(indexingRequestList));
         } catch (ExecutionException | RetryException e) {
             if (e instanceof RetryException) {
                 LOG.error("Could not bulk index {} messages. Giving up after {} attempts.", count, ((RetryException) e).getNumberOfFailedAttempts());
