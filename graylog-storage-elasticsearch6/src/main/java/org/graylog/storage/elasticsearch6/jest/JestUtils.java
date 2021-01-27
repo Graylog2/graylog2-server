@@ -25,6 +25,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.QueryParsingException;
 
 import java.io.IOException;
@@ -33,11 +34,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 
 public class JestUtils {
+    private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
+
     private JestUtils() {
     }
 
@@ -98,6 +103,13 @@ public class JestUtils {
                     final String reasonText = reason.asText();
                     if (reasonText.startsWith("Expected numeric type on field")) {
                         return buildFieldTypeException(errorMessage, reasonText);
+                    }
+                    if (reasonText.startsWith("no write index is defined for alias")) {
+                        final Matcher matcher = invalidWriteTarget.matcher(reasonText);
+                        if (matcher.find()) {
+                            final String target = matcher.group("target");
+                            return InvalidWriteTargetException.create(target);
+                        }
                     }
                     break;
             }

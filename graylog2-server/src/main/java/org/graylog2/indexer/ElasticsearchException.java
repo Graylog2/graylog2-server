@@ -18,7 +18,6 @@ package org.graylog2.indexer;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
-import joptsimple.internal.Strings;
 
 import java.util.Collections;
 import java.util.List;
