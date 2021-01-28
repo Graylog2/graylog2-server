@@ -151,13 +151,20 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
                 .length());
         byteMeter.mark(message.body()
                 .length());
+
+        RawMessage rawMessage = null;
         try {
             final MessageQueue.Entry entry = SqsMessageQueueEntry.fromMessage(message);
-            final RawMessage rawMessage = RawMessage.decode(entry.value(), entry.commitId());
-            processBuffer.insertBlocking(rawMessage);
+            rawMessage = RawMessage.decode(entry.value(), entry.commitId());
         } catch (Exception e) {
-            LOG.error("Unable to convert message <" + message.messageId() + ">. Message will be deleted from " +
-                    "message bus.", e);
+            LOG.error("Failure to convert message <" + message.messageId() + ">.", e);
+        }
+
+        if (rawMessage != null) {
+            processBuffer.insertBlocking(rawMessage);
+        } else {
+            LOG.error("Unable to convert message <{}>. Message will be deleted from message queue.",
+                    message.messageId());
             acknowledger.acknowledge(message.receiptHandle());
         }
     }
