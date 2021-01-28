@@ -49,6 +49,10 @@ const StyledFooter = styled.footer(({ theme }) => css`
   color: ${theme.colors.gray[70]};
   height: 20px;
 
+  /* This combination of padding and box-sizing is required to fix a firefox flexbox bug */
+  box-sizing: content-box;
+  padding-bottom: 15px;
+
   @media print {
     display: none;
   }
