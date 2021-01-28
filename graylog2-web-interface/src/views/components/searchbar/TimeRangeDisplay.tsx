@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
+import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
@@ -69,11 +70,11 @@ const dateOutput = (timerange: TimeRange) => {
   switch (timerange.type) {
     case 'relative':
 
-      if ('range' in timerange) {
+      if (isTypeRelativeWithStartOnly(timerange)) {
         from = readableRange(timerange, 'range');
       }
 
-      if ('from' in timerange) {
+      if (isTypeRelativeWithEnd(timerange)) {
         from = readableRange(timerange, 'from');
       }
 
@@ -97,7 +98,7 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   const dateTested = useRef(false);
 
   useEffect(() => {
-    if (timerange && 'type' in timerange && timerange.type === 'keyword' && !timerange.from) {
+    if (isTypeKeyword(timerange) && !timerange.from) {
       if (!dateTested.current) {
         ToolsStore.testNaturalDate(timerange.keyword)
           .then((response) => {

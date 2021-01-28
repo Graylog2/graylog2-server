@@ -20,6 +20,7 @@ import { $PropertyType } from 'utility-types';
 
 import Routes from 'routing/Routes';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
 import { addToQuery, escape } from '../../views/logic/queries/QueryHelper';
 
@@ -38,11 +39,11 @@ const _searchTimerange = (timerange: TimeRange) => {
 
   switch (timerange.type) {
     case 'relative':
-      if ('range' in timerange) {
+      if (isTypeRelativeWithStartOnly(timerange)) {
         return { ...result, relative: timerange.range };
       }
 
-      if ('from' in timerange) {
+      if (isTypeRelativeWithEnd(timerange)) {
         if ('to' in timerange) {
           return { ...result, from: timerange.from, to: timerange.to };
         }

@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
 
+import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
@@ -81,12 +82,12 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
     return EMPTY_OUTPUT;
   }
 
-  if ('type' in timerange && timerange.type === 'relative') {
-    if ('range' in timerange) {
+  if (isTypeRelative(timerange)) {
+    if (isTypeRelativeWithStartOnly(timerange)) {
       from = readableRange(timerange, 'range');
     }
 
-    if ('from' in timerange) {
+    if (isTypeRelativeWithEnd(timerange)) {
       from = readableRange(timerange, 'from');
     }
 

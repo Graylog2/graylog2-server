@@ -28,6 +28,7 @@ import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
+import { isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -203,8 +204,8 @@ export const dateTimeValidate = (nextTimeRange, limitDuration) => {
   return errors;
 };
 
-const onInitializingNextTimerange = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
-  if ('range' in currentTimeRange) {
+const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
+  if (isTypeRelativeWithStartOnly(currentTimeRange)) {
     return {
       type: currentTimeRange.type,
       from: currentTimeRange.range,
@@ -215,7 +216,7 @@ const onInitializingNextTimerange = (currentTimeRange: SearchBarFormValues['time
 };
 
 const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']) => {
-  if ('type' in nextTimeRange && nextTimeRange.type === 'relative' && nextTimeRange.from === 0) {
+  if (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === 0) {
     return {
       type: nextTimeRange.type,
       range: nextTimeRange.from,
@@ -275,7 +276,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    positionTop={36}
                    title={title}
                    arrowOffsetLeft={34}>
-      <Formik initialValues={{ nextTimeRange: onInitializingNextTimerange(currentTimeRange) }}
+      <Formik initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
               validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
               onSubmit={handleSubmit}
               validateOnMount>

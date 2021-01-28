@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
+import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
 
@@ -43,7 +44,7 @@ const StyledIcon = styled(Icon)`
 
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
   const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues>();
-  const disableUntil = disabled || ('type' in nextTimeRange && nextTimeRange.type === 'relative' && 'from' in nextTimeRange && nextTimeRange?.from === RELATIVE_ALL_TIME);
+  const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
 
   return (
     <RelativeWrapper>

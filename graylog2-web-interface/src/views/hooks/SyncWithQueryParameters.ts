@@ -24,6 +24,7 @@ import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
+import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
 const useActionListeners = (actions, callback, dependencies) => {
   useEffect(() => {
@@ -41,11 +42,11 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
 
   switch (timerange.type) {
     case 'relative':
-      if ('range' in timerange) {
+      if (isTypeRelativeWithStartOnly(timerange)) {
         return formatResult({ ...result, relative: timerange.range });
       }
 
-      if ('from' in timerange) {
+      if (isTypeRelativeWithEnd(timerange)) {
         if ('to' in timerange) {
           return formatResult({ ...result, from: timerange.from, to: timerange.to });
         }

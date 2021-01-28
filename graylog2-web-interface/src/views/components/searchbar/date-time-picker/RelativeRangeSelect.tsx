@@ -22,6 +22,7 @@ import moment from 'moment';
 import { RELATIVE_RANGE_TYPES } from 'views/Constants';
 import Input from 'components/bootstrap/Input';
 import { Select } from 'components/common';
+import { isTypeRelative } from 'views/typeGuards/timeRange';
 
 import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import ConfiguredRelativeTimeRangeSelector from './ConfiguredRelativeTimeRangeSelector';
@@ -158,7 +159,7 @@ const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLab
         };
 
         const _onUnsetRange = (event) => {
-          const hasInitialRelativeRange = 'type' in initialValues.nextTimeRange && initialValues.nextTimeRange.type === 'relative';
+          const hasInitialRelativeRange = isTypeRelative(initialValues.nextTimeRange);
           const _defaultRange = (
             hasInitialRelativeRange
             && fieldName in initialValues.nextTimeRange

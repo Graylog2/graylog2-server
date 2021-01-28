@@ -16,10 +16,11 @@
  */
 import moment from 'moment';
 
-import { DEFAULT_RELATIVE_FROM } from 'views/Constants';
+import { DEFAULT_RELATIVE_FROM, RELATIVE_ALL_TIME } from 'views/Constants';
 import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
+import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
 const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
 
@@ -34,14 +35,14 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
         to: DateTime.parseFromString(timerange.to).toISOString(),
       };
     case 'relative':
-      if ('range' in timerange) {
+      if (isTypeRelativeWithStartOnly(timerange)) {
         return {
           type: timerange.type,
           range: timerange.range,
         };
       }
 
-      if ('from' in timerange) {
+      if (isTypeRelativeWithEnd(timerange)) {
         if ('to' in timerange) {
           return {
             type: timerange.type,
@@ -74,8 +75,8 @@ export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValu
         to: formatDatetime(DateTime.parseFromString(timerange.to)),
       };
     case 'relative':
-      if ('range' in timerange) {
-        if (timerange.range === 0) {
+      if (isTypeRelativeWithStartOnly(timerange)) {
+        if (timerange.range === RELATIVE_ALL_TIME) {
           return {
             type: timerange.type,
             range: timerange.range,
@@ -88,11 +89,18 @@ export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValu
         };
       }
 
-      if ('from' in timerange) {
+      if (isTypeRelativeWithEnd(timerange)) {
+        if ('to' in timerange) {
+          return {
+            type: timerange.type,
+            from: timerange.from,
+            to: timerange.to,
+          };
+        }
+
         return {
           type: timerange.type,
           from: timerange.from,
-          to: timerange.to,
         };
       }
 
@@ -104,14 +112,12 @@ export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValu
 };
 
 const getDefaultAbsoluteFromRange = (oldTimeRange: TimeRange | undefined | null) => {
-  if (oldTimeRange?.type === 'relative') {
-    if ('range' in oldTimeRange && oldTimeRange.range) {
-      return oldTimeRange.range;
-    }
+  if (isTypeRelativeWithStartOnly(oldTimeRange)) {
+    return oldTimeRange.range;
+  }
 
-    if ('from' in oldTimeRange && oldTimeRange.from) {
-      return oldTimeRange.from;
-    }
+  if (isTypeRelativeWithEnd(oldTimeRange)) {
+    return oldTimeRange.from;
   }
 
   return DEFAULT_RELATIVE_FROM;
