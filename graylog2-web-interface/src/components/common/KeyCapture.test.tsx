@@ -34,4 +34,19 @@ describe('<KeyCapture />', () => {
 
     expect(onEnter).toHaveBeenCalledTimes(1);
   });
+
+  it('resets shortcuts after unmount', () => {
+    const onEnter = jest.fn();
+    const { unmount } = render(<KeyCapture keys={{ enter: onEnter }} />);
+
+    fireEvent.keyDown(document.body, { key: 'Enter', which: 13 });
+
+    expect(onEnter).toHaveBeenCalledTimes(1);
+
+    unmount();
+
+    fireEvent.keyDown(document.body, { key: 'Enter', which: 13 });
+
+    expect(onEnter).toHaveBeenCalledTimes(1);
+  });
 });

@@ -23,14 +23,14 @@ type Props = {
   keys: { [key: string ]: () => void },
 }
 
+const _executeForEachKey = (keys, callback) => Object.entries(keys).forEach(([key, onKeyPress]) => callback(key, onKeyPress));
+
 const KeyCapture = ({ children, keys } : Props) => {
   useEffect(() => {
-    Object.entries(keys).forEach(([key, onKeyPress]) => {
-      Mousetrap.bind(key, onKeyPress);
-    });
+    _executeForEachKey(keys, (key, onKeyPress) => Mousetrap.bind(key, onKeyPress));
 
     return () => {
-      Mousetrap.reset();
+      _executeForEachKey(keys, (key) => Mousetrap.unbind(key));
     };
   }, [keys]);
 
