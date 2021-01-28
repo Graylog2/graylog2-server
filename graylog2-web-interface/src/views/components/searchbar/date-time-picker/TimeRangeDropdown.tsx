@@ -235,6 +235,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
 
   return (
     <StyledPopover id="timerange-type"
+                   data-testid="timerange-type"
                    placement="bottom"
                    positionTop={36}
                    title={title}

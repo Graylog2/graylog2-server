@@ -15,11 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
-// import { act } from 'react-dom/test-utils';
+import { render, screen } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
-
-// import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
@@ -48,94 +45,8 @@ describe('DashboardSearchBar', () => {
   const onExecute = jest.fn();
 
   it('defaults to no override being selected', () => {
-    const { container } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
-    expect(container).not.toBeNull();
-    // expect(getByTitle('There is no override for the timerange currently selected')).toBeVisible();
+    expect(screen.getByText('No Override')).toBeVisible();
   });
-
-  // it('allows selecting relative time range', async () => {
-  //   const { getByText, queryByText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
-  //
-  //   expect(queryByText('Search in last five minutes')).toBeNull();
-  //
-  //   const relativeTimerange = getByText('Relative');
-  //
-  //   fireEvent.click(relativeTimerange);
-  //
-  //   const searchButton = getByTitle(/Perform search/);
-  //
-  //   fireEvent.click(searchButton);
-  //
-  //   expect(getByText('Search in last five minutes')).toBeVisible();
-  //
-  //   await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', range: 300 }, ''));
-  //
-  //   expect(onExecute).toHaveBeenCalled();
-  // });
-  //
-  // it('allows selecting absolute time range', async () => {
-  //   const { getByText, getAllByPlaceholderText, queryByPlaceholderText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
-  //
-  //   expect(queryByPlaceholderText('YYYY-MM-DD HH:mm:ss')).toBeNull();
-  //
-  //   const absoluteTimerange = getByText('Absolute');
-  //
-  //   fireEvent.click(absoluteTimerange);
-  //
-  //   getAllByPlaceholderText('YYYY-MM-DD HH:mm:ss').map((input) => expect(input).toBeVisible());
-  //
-  //   const searchButton = getByTitle(/Perform search/);
-  //
-  //   fireEvent.click(searchButton);
-  //
-  //   await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(expect.objectContaining({
-  //     type: 'absolute',
-  //     from: expect.anything(),
-  //     to: expect.anything(),
-  //   }), ''));
-  //
-  //   expect(onExecute).toHaveBeenCalled();
-  // });
-  //
-  // it('allows selecting keyword time range', async () => {
-  //   const { getByText, getByPlaceholderText, queryByPlaceholderText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
-  //
-  //   expect(queryByPlaceholderText('Last week')).toBeNull();
-  //
-  //   const keywordTimerange = getByText('Keyword');
-  //
-  //   await act(async () => {
-  //     fireEvent.click(keywordTimerange);
-  //   });
-  //
-  //   expect(getByPlaceholderText('Last week')).toBeVisible();
-  //
-  //   const searchButton = getByTitle(/Perform search/);
-  //
-  //   fireEvent.click(searchButton);
-  //
-  //   await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'keyword', keyword: 'Last five minutes' }, ''));
-  //
-  //   expect(onExecute).toHaveBeenCalled();
-  // });
-  //
-  // it('allows resetting the timerange override', async () => {
-  //   const { getByText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
-  //   const relativeTimerange = getByText('Relative');
-  //
-  //   fireEvent.click(relativeTimerange);
-  //
-  //   const disableOverride = getByText('No Override');
-  //
-  //   fireEvent.click(disableOverride);
-  //
-  //   const searchButton = getByTitle(/Perform search/);
-  //
-  //   fireEvent.click(searchButton);
-  //
-  //   await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, ''));
-  //
-  //   expect(onExecute).toHaveBeenCalled();
-  // });
 });

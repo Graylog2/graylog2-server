@@ -36,7 +36,8 @@ const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, to
     <div ref={containerRef}>
       <Button bsStyle={hasErrorOnMount ? 'danger' : 'info'}
               disabled={disabled}
-              onClick={toggleShow}>
+              onClick={toggleShow}
+              aria-label="Open Time Range Selector">
         <Icon name={hasErrorOnMount ? 'exclamation-triangle' : 'clock'} />
       </Button>
 
