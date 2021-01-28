@@ -27,6 +27,7 @@ import org.graylog2.shared.messageq.MessageQueueWriter;
 public class SqsMessageQueueModule extends PluginModule {
     @Override
     protected void configure() {
+        serviceBinder().addBinding().to(SqsMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
         bind(MessageQueueAcknowledger.class).to(SqsMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
 
         serviceBinder().addBinding().to(SqsMessageQueueReader.class).in(Scopes.SINGLETON);

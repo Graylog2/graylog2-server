@@ -34,16 +34,11 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.SqsAsyncClientBuilder;
-import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequestEntry;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -59,20 +54,18 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
     private final Counter byteCounter;
     private final Meter byteMeter;
     private final Timer readTimer;
+    private final SqsMessageQueueAcknowledger acknowledger;
 
     private final Provider<ProcessBuffer> processBufferProvider;
     private ProcessBuffer processBuffer;
 
-    // TODO: check if having two distinct clients for receiving and deleting really gains us much
     private SqsAsyncClient receiveClient;
-    private SqsAsyncClient deleteClient;
 
     private final Semaphore receiveSemaphore;
-    private final Semaphore deleteSemaphore;
 
     @Inject
     public SqsMessageQueueReader(MetricRegistry metricRegistry, Provider<ProcessBuffer> processBufferProvider,
-            EventBus eventBus, BaseConfiguration config) {
+            EventBus eventBus, BaseConfiguration config, SqsMessageQueueAcknowledger acknowledger) {
         super(eventBus);
 
         // Using a ProcessBuffer directly will lead to guice error:
@@ -82,12 +75,12 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
                 .toString();
 
         receiveSemaphore = new Semaphore(config.getSqsMaxInflightReceiveBatches());
-        deleteSemaphore = new Semaphore(config.getSqsMaxInflightOutboundBatches());
 
         this.messageMeter = metricRegistry.meter("system.message-queue.sqs.reader.messages");
         this.byteCounter = metricRegistry.counter("system.message-queue.sqs.reader.byte-count");
         this.byteMeter = metricRegistry.meter("system.message-queue.sqs.reader.bytes");
         this.readTimer = metricRegistry.timer("system.message-queue.sqs.reader.reads");
+        this.acknowledger = acknowledger;
         metricRegistry.register("system.message-queue.sqs.reader.in-flight-receive-batches",
                 (Gauge<Integer>) () -> config.getSqsMaxInflightReceiveBatches() - receiveSemaphore.availablePermits());
     }
@@ -101,7 +94,6 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
         final SqsAsyncClientBuilder clientBuilder = SqsAsyncClient.builder()
                 .httpClientBuilder(NettyNioAsyncHttpClient.builder());
         this.receiveClient = clientBuilder.build();
-        this.deleteClient = clientBuilder.build();
 
         processBuffer = processBufferProvider.get();
     }
@@ -110,9 +102,6 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
     protected void shutDown() throws Exception {
         if (receiveClient != null) {
             receiveClient.close();
-        }
-        if (deleteClient != null) {
-            deleteClient.close();
         }
 
         super.shutDown();
@@ -169,58 +158,7 @@ public class SqsMessageQueueReader extends AbstractMessageQueueReader {
         } catch (Exception e) {
             LOG.error("Unable to convert message <" + message.messageId() + ">. Message will be deleted from " +
                     "message bus.", e);
-            commit(message.receiptHandle());
+            acknowledger.acknowledge(message.receiptHandle());
         }
-    }
-
-    // TODO: this method shouldn't be used because sending batches with only a single item is really hurting
-    //  performance. Unfortunately it's the main method used by the BenchmarkOutput so we probably need to buffer
-    //  messages manually until we have enough of them to create a batch.
-    public void commit(Object receiptHandle) {
-        commit(Collections.singletonList(receiptHandle));
-    }
-
-    public void commit(List<Object> messageIds) {
-        final Iterator<Object> iterator = messageIds.iterator();
-
-        List<DeleteMessageBatchRequestEntry> currentBatch = new ArrayList<>(10);
-
-        while (iterator.hasNext()) {
-            Object receiptHandle = iterator.next();
-            if (!(receiptHandle instanceof String)) {
-                LOG.error("Couldn't delete message. Expected <" + receiptHandle + "> to be a String receipt handle");
-                continue;
-            }
-            final DeleteMessageBatchRequestEntry entry = DeleteMessageBatchRequestEntry.builder()
-                    .receiptHandle((String) receiptHandle)
-                    .id(String.valueOf(currentBatch.size() + 1))
-                    .build();
-            currentBatch.add(entry);
-
-            if (currentBatch.size() == 10) {
-                deleteBatch(currentBatch);
-                currentBatch = new ArrayList<>(10);
-            }
-        }
-        if (!currentBatch.isEmpty()) {
-            deleteBatch(currentBatch);
-        }
-    }
-
-    private void deleteBatch(List<DeleteMessageBatchRequestEntry> entries) {
-        try {
-            deleteSemaphore.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return;
-        }
-        deleteClient.deleteMessageBatch(request -> request.queueUrl(queueUrl)
-                .entries(entries))
-                .whenComplete((response, error) -> {
-                    if (error != null) {
-                        LOG.error("Couldn't delete message", error);
-                    }
-                    deleteSemaphore.release();
-                });
     }
 }
