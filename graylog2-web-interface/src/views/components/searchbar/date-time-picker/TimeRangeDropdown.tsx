@@ -97,8 +97,8 @@ const CancelButton = styled(Button)`
 const DEFAULT_RANGES = {
   absolute: {
     type: 'absolute',
-    from: moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: moment().format(DateTime.Formats.TIMESTAMP),
+    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
+    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
   },
   relative: {
     type: 'relative',
@@ -247,6 +247,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
 
   return (
     <StyledPopover id="timerange-type"
+                   data-testid="timerange-type"
                    placement="bottom"
                    positionTop={36}
                    title={title}

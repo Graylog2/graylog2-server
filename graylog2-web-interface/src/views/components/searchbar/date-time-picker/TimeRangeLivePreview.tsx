@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
 
@@ -69,7 +68,7 @@ const MiddleIcon = styled.span(({ theme }) => css`
 `);
 
 const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
-  return !timerange[fieldName] ? placeholder : moment()
+  return !timerange[fieldName] ? placeholder : DateTime.now()
     .subtract(timerange[fieldName] * 1000)
     .fromNow();
 };

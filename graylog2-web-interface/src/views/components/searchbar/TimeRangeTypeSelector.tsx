@@ -18,9 +18,9 @@ import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
+import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 
 type Props = {

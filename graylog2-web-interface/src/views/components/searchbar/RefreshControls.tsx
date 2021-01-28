@@ -38,7 +38,7 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = styled.div`
+const ButtonLabel = styled.span`
   display: inline-block;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -113,7 +113,7 @@ class RefreshControls extends React.Component<Props> {
     const buttonLabel = this._buttonLabel(refreshConfig.enabled, naturalInterval);
 
     return (
-      <ControlsContainer className="pull-right">
+      <ControlsContainer className="pull-right" aria-label="Refresh Search Controls">
         <FlexibleButtonGroup>
           <Button onClick={this._toggleEnable}>
             {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}

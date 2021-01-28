@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import moment from 'moment';
 
+import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -53,7 +53,7 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
 `);
 
 const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
-  return !timerange[fieldName] ? placeholder : moment()
+  return !timerange[fieldName] ? placeholder : DateTime.now()
     .subtract(timerange[fieldName] * 1000)
     .fromNow();
 };
@@ -117,7 +117,7 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   }, [dateTested, timerange]);
 
   return (
-    <TimeRangeWrapper>
+    <TimeRangeWrapper aria-label="Search Time Range">
       {!(timerange && 'type' in timerange)
         ? <span><code>No Override</code></span>
         : (

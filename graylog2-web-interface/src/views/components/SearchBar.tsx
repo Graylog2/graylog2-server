@@ -165,7 +165,7 @@ const SearchBar = ({
                       )}
                     </Field>
                   </Col>
-                  <Col md={3} xs={4} className="pull-right">
+                  <Col md={3} xs={4} className="pull-right" aria-label="Search Meta Buttons">
                     <SavedSearchControls />
                   </Col>
                 </Row>
