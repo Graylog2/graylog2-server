@@ -124,10 +124,8 @@ const getDefaultAbsoluteFromRange = (oldTimeRange: TimeRange | undefined | null)
 };
 
 const getDefaultAbsoluteToRange = (oldTimeRange: TimeRange | undefined | null) => {
-  if (oldTimeRange?.type === 'relative') {
-    if ('to' in oldTimeRange && oldTimeRange.to) {
-      return oldTimeRange.to;
-    }
+  if (isTypeRelativeWithEnd(oldTimeRange) && oldTimeRange.to) {
+    return oldTimeRange.to;
   }
 
   return 0;

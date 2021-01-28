@@ -49,6 +49,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children 
     });
   }, [onSubmit]);
   const { timerange, queryString } = initialValues;
+  console.log(timerange);
   const initialTimeRange = timerange ? onInitializingTimerange(timerange) : {};
   const _initialValues = {
     timerange: initialTimeRange,

@@ -23,7 +23,7 @@ import Mousetrap from 'mousetrap';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
-import { availableTimeRangeTypes } from 'views/Constants';
+import { availableTimeRangeTypes, RELATIVE_ALL_TIME } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
 import type { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
@@ -216,7 +216,7 @@ const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['time
 };
 
 const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']) => {
-  if (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === 0) {
+  if (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME) {
     return {
       type: nextTimeRange.type,
       range: nextTimeRange.from,

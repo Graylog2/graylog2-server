@@ -83,7 +83,7 @@ jest.mock('stores/tools/ToolsStore', () => ({}));
 const defaultProps = {
   currentTimeRange: {
     type: 'relative',
-    range: 300,
+    from: 300,
   },
   noOverride: false,
   setCurrentTimeRange: jest.fn(),
