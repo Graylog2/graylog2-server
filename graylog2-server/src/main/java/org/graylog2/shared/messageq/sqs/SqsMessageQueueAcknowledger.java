@@ -36,8 +36,6 @@ public class SqsMessageQueueAcknowledger implements MessageQueueAcknowledger {
 
     @Override
     public void acknowledge(List<Object> messageIds) {
-        for (Object messageId : messageIds) {
-            sqsMessageQueueReader.commit(messageId);
-        }
+        sqsMessageQueueReader.commit(messageIds);
     }
 }

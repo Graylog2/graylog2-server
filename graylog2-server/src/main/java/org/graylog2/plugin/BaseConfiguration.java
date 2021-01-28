@@ -84,13 +84,10 @@ public abstract class BaseConfiguration extends PathConfiguration {
     private URI sqsQueueUrl;
 
     @Parameter(value = "sqs_max_inflight_outbound_batches", validators = PositiveIntegerValidator.class)
-    private int sqsMaxInflightOutboundBatches = 5;
+    private int sqsMaxInflightOutboundBatches = 50;
 
     @Parameter(value = "sqs_max_inflight_receive_batches", validators = PositiveIntegerValidator.class)
-    private int sqsMaxInflightReceiveBatches = 10;
-
-    @Parameter(value = "sqs_max_done_receive_batches", validators = PositiveIntegerValidator.class)
-    private int sqsMaxDoneReceiveBatches = 10;
+    private int sqsMaxInflightReceiveBatches = 50;
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
@@ -187,10 +184,6 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public int getSqsMaxInflightReceiveBatches() {
         return sqsMaxInflightReceiveBatches;
-    }
-
-    public int getSqsMaxDoneReceiveBatches() {
-        return sqsMaxDoneReceiveBatches;
     }
 
     public void setMessageJournalEnabled(boolean messageJournalEnabled) {

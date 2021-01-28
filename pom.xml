@@ -92,7 +92,7 @@
         <apache-directory-version>1.0.3</apache-directory-version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-java-sdk.version>1.11.939</aws-java-sdk.version>
+        <aws-sdk.version>2.15.69</aws-sdk.version>
         <bouncycastle.version>1.64</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>

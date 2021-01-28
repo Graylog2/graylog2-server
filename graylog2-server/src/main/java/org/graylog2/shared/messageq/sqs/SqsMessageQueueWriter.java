@@ -16,16 +16,12 @@
  */
 package org.graylog2.shared.messageq.sqs;
 
-import com.amazonaws.handlers.AsyncHandler;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import com.amazonaws.services.sqs.buffered.AmazonSQSBufferedAsyncClient;
-import com.amazonaws.services.sqs.buffered.QueueBufferConfig;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageResult;
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.plugin.BaseConfiguration;
@@ -34,17 +30,22 @@ import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 @Singleton
 public class SqsMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
-
     private static final Logger LOG = LoggerFactory.getLogger(SqsMessageQueueWriter.class);
-    private static final int MESSAGE_SIZE_LIMIT = 256 * 1024;
 
     private final String queueUrl;
 
@@ -53,29 +54,33 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
     private final Counter byteCounter;
     private final Meter byteMeter;
     private final Timer writeTimer;
-    private final BaseConfiguration config;
 
-    private AmazonSQSBufferedAsyncClient sqsClient;
+    private SqsAsyncClient sqsClient;
+
+    private final Semaphore inFlightBatchesSemaphore;
 
     @Inject
-    public SqsMessageQueueWriter(MetricRegistry metricRegistry, BaseConfiguration config) {
+    public SqsMessageQueueWriter(MetricRegistry metricRegistry, @Named("sqs_queue_url") URI queueUrl,
+            BaseConfiguration config) {
+        this.queueUrl = queueUrl.toString();
+
+        inFlightBatchesSemaphore = new Semaphore(config.getSqsMaxInflightOutboundBatches());
+
         this.messageMeter = metricRegistry.meter("system.message-queue.sqs.writer.messages");
         this.byteCounter = metricRegistry.counter("system.message-queue.sqs.writer.byte-count");
         this.byteMeter = metricRegistry.meter("system.message-queue.sqs.writer.bytes");
         this.writeTimer = metricRegistry.timer("system.message-queue.sqs.writer.writes");
-        this.config = config;
-        this.queueUrl = config.getSqsQueueUrl().toString();
+        metricRegistry.register("system.message-queue.sqs.writer.in-flight-outbound-batches",
+                (Gauge<Integer>) () -> config.getSqsMaxInflightOutboundBatches() -
+                        inFlightBatchesSemaphore.availablePermits());
     }
 
     @Override
     protected void startUp() throws Exception {
         LOG.info("Starting sqs message queue writer service");
 
-        final QueueBufferConfig bufferConfig = new QueueBufferConfig()
-                .withFlushOnShutdown(true)
-                .withMaxInflightOutboundBatches(config.getSqsMaxInflightOutboundBatches());
-
-        sqsClient = new AmazonSQSBufferedAsyncClient(AmazonSQSAsyncClientBuilder.defaultClient(), bufferConfig);
+        this.sqsClient = SqsAsyncClient.builder()
+                .httpClientBuilder(NettyNioAsyncHttpClient.builder()).build();
 
         // Service is ready for writing
         latch.countDown();
@@ -84,56 +89,59 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
     @Override
     protected void shutDown() throws Exception {
         if (sqsClient != null) {
-            sqsClient.shutdown();
+            sqsClient.close();
         }
     }
 
     @Override
     public void write(List<RawMessageEvent> entries) throws MessageQueueException {
+        // TODO: decide what we want to do in case of an error. We really don't want to simply discard messages just
+        //  because SQS is down.
         try {
             latch.await();
+            if (!isRunning()) {
+                throw new MessageQueueException("Message queue service is not running");
+            }
+            // TODO: is it worth creating batches manually (performance-wise)?
+            for (List<RawMessageEvent> batch : Lists.partition(entries, 10)) {
+                sendBatchAsync(batch);
+            }
         } catch (InterruptedException e) {
             LOG.info("Got interrupted", e);
             Thread.currentThread().interrupt();
-            return;
-        }
-
-        if (!isRunning()) {
-            throw new MessageQueueException("Message queue service is not running");
-        }
-
-        for (final RawMessageEvent entry : entries) {
-            final String body = BaseEncoding.base64()
-                    .omitPadding()
-                    .encode(entry.getEncodedRawMessage());
-            if (body.length() > MESSAGE_SIZE_LIMIT) {
-                LOG.error("Base64 encoded message <{}> of size {} bytes exceeds size limit of {} bytes. Message will " +
-                                "be discarded.", entry.getMessageId(), body.length(), MESSAGE_SIZE_LIMIT);
-            } else {
-                sendAsync(body);
-            }
         }
     }
 
-    private void sendAsync(String body) {
-        // This is not only tracking the actual time it takes to transfer the messages to SQS but also includes the
-        // time a messages spends waiting in the send queue until a batch is ready to be sent out.
-        final Timer.Context writeTime = writeTimer.time();
-        sqsClient.sendMessageAsync(new SendMessageRequest(this.queueUrl, body),
-                new AsyncHandler<SendMessageRequest, SendMessageResult>() {
-            @Override
-            public void onError(Exception exception) {
-                LOG.error("Unable to write message to SQS.", exception);
-                writeTime.stop();
-            }
+    private void sendBatchAsync(List<RawMessageEvent> rawMessageEvents) throws InterruptedException {
+        int batchSizeBytes = 0;
+        List<SendMessageBatchRequestEntry> batchRequestEntries = new ArrayList<>();
 
-            @Override
-            public void onSuccess(SendMessageRequest request, SendMessageResult sendMessageResult) {
-                writeTime.stop();
-            }
-        });
-        messageMeter.mark();
-        byteCounter.inc(body.length());
-        byteMeter.mark(body.length());
+        for (int i = 0; i < rawMessageEvents.size(); i++) {
+            final RawMessageEvent rawMessageEvent = rawMessageEvents.get(i);
+            final String encodedMessage = BaseEncoding.base64()
+                    .omitPadding()
+                    .encode(rawMessageEvent.getEncodedRawMessage());
+            batchSizeBytes += encodedMessage.length();
+            batchRequestEntries.add(SendMessageBatchRequestEntry.builder()
+                    .messageBody(encodedMessage)
+                    .id(String.valueOf(i))
+                    .build());
+        }
+
+        inFlightBatchesSemaphore.acquire();
+        final Timer.Context writeTime = writeTimer.time();
+
+        sqsClient.sendMessageBatch(batchRequest -> batchRequest.entries(batchRequestEntries)
+                .queueUrl(queueUrl))
+                .whenComplete((response, error) -> {
+                    writeTime.stop();
+                    if (error != null) {
+                        LOG.error("Sending message batch failed", error);
+                    }
+                    inFlightBatchesSemaphore.release();
+                });
+        messageMeter.mark(batchRequestEntries.size());
+        byteCounter.inc(batchSizeBytes);
+        byteMeter.mark(batchSizeBytes);
     }
 }

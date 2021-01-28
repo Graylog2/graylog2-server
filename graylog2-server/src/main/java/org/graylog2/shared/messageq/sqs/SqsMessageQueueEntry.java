@@ -16,9 +16,9 @@
  */
 package org.graylog2.shared.messageq.sqs;
 
-import com.amazonaws.services.sqs.model.Message;
 import com.google.common.io.BaseEncoding;
 import org.graylog2.shared.messageq.MessageQueue;
+import software.amazon.awssdk.services.sqs.model.Message;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
@@ -34,9 +34,9 @@ public class SqsMessageQueueEntry implements MessageQueue.Entry {
     }
 
     private SqsMessageQueueEntry(Message message) {
-        this.encodedRawMessage = BaseEncoding.base64().omitPadding().decode(message.getBody());
-        this.messageId = message.getMessageId().getBytes(StandardCharsets.UTF_8);
-        this.receiptHandle = message.getReceiptHandle();
+        this.encodedRawMessage = BaseEncoding.base64().omitPadding().decode(message.body());
+        this.messageId = message.messageId().getBytes(StandardCharsets.UTF_8);
+        this.receiptHandle = message.receiptHandle();
     }
 
     @Override
