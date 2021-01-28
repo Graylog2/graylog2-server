@@ -117,7 +117,8 @@ const SearchBar = ({
                   <FlexCol md={5}>
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange} />
+                                           currentTimeRange={values?.timerange}
+                                           hasErrorOnMount={!isValid} />
                     <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
 
@@ -163,7 +164,7 @@ const SearchBar = ({
                       )}
                     </Field>
                   </Col>
-                  <Col md={3} xs={4} className="pull-right">
+                  <Col md={3} xs={4} className="pull-right" aria-label="Search Meta Buttons">
                     <SavedSearchControls />
                   </Col>
                 </Row>

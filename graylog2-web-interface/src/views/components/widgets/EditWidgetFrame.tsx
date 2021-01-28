@@ -101,7 +101,8 @@ const EditWidgetFrame = ({ children }: Props) => {
            enforceFocus={false}>
       <SearchBarForm initialValues={{ timerange, streams, queryString }}
                      limitDuration={limitDuration}
-                     onSubmit={_onSubmit}>
+                     onSubmit={_onSubmit}
+                     validateOnMount={false}>
         <div className={styles.gridContainer}>
           <IfDashboard>
             <Modal.Header className={styles.QueryControls}>

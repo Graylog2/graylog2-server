@@ -26,12 +26,14 @@ import { onInitializingTimerange, onSubmittingTimerange } from 'views/components
 import type { SearchBarFormValues } from 'views/Constants';
 
 import DateTimeProvider from './date-time-picker/DateTimeProvider';
+import { dateTimeValidate } from './date-time-picker/TimeRangeDropdown';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: SearchBarFormValues,
   limitDuration: number,
   onSubmit: (Values) => void | Promise<any>,
+  validateOnMount?: boolean,
 }
 
 const StyledForm = styled(Form)`
@@ -40,7 +42,7 @@ const StyledForm = styled(Form)`
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
-const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children }: Props) => {
+const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     const newTimeRange = onSubmittingTimerange(timerange);
 
@@ -61,7 +63,9 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children }: Pro
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}>
+            onSubmit={_onSubmit}
+            validate={({ timerange: nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+            validateOnMount={validateOnMount}>
       {(...args) => (
         <DateTimeProvider limitDuration={limitDuration}>
           <StyledForm>
@@ -81,6 +85,11 @@ SearchBarForm.propTypes = {
   }).isRequired,
   onSubmit: PropTypes.func.isRequired,
   limitDuration: PropTypes.number.isRequired,
+  validateOnMount: PropTypes.bool,
+};
+
+SearchBarForm.defaultProps = {
+  validateOnMount: true,
 };
 
 export default SearchBarForm;

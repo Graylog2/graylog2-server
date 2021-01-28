@@ -96,8 +96,8 @@ const CancelButton = styled(Button)`
 const DEFAULT_RANGES = {
   absolute: {
     type: 'absolute',
-    from: moment().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
-    to: moment().format(DateTime.Formats.TIMESTAMP),
+    from: DateTime.now().subtract(300, 'seconds').format(DateTime.Formats.TIMESTAMP),
+    to: DateTime.now().format(DateTime.Formats.TIMESTAMP),
   },
   relative: {
     type: 'relative',
@@ -126,15 +126,35 @@ const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword }) =
   );
 });
 
-export const dateTimeValidate = (values, limitDuration) => {
+const exceedsDuration = (timerange, limitDuration) => {
+  if (limitDuration === 0) {
+    return false;
+  }
+
+  switch (timerange?.type) {
+    case 'absolute':
+    case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
+      const durationFrom = timerange.from;
+      const durationLimit = DateTime.now().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
+
+      return moment(durationFrom).isBefore(durationLimit);
+    }
+
+    case 'relative':
+      return timerange.range > limitDuration;
+
+    default:
+      return false;
+  }
+};
+
+export const dateTimeValidate = (nextTimeRange, limitDuration) => {
   const errors: { nextTimeRange?: {
     from?: string,
     to?: string,
     range?: string,
     keyword?: string,
   } } = {};
-
-  const { nextTimeRange } = values;
 
   if (nextTimeRange?.type === 'absolute') {
     if (!DateTime.isValidDateString(nextTimeRange.from)) {
@@ -149,30 +169,20 @@ export const dateTimeValidate = (values, limitDuration) => {
       errors.nextTimeRange = { ...errors.nextTimeRange, to: 'The "Until" date must come after the "From" date.' };
     }
 
-    if (limitDuration !== 0) {
-      const durationFrom = nextTimeRange.from;
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').format(DateTime.Formats.TIMESTAMP);
-
-      if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
-      }
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
+      errors.nextTimeRange = { ...errors.nextTimeRange, from: 'Date is outside limit duration.' };
     }
   }
 
   if (nextTimeRange?.type === 'relative') {
-    if (!(limitDuration === 0 || (nextTimeRange.range <= limitDuration && limitDuration !== 0))) {
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
       errors.nextTimeRange = { range: 'Range is outside limit duration.' };
     }
   }
 
   if (nextTimeRange?.type === 'keyword') {
-    if (limitDuration !== 0) {
-      const durationFrom = moment(nextTimeRange.from).utc();
-      const durationLimit = moment().subtract(Number(limitDuration), 'seconds').utc().format(DateTime.Formats.TIMESTAMP);
-
-      if (moment(durationFrom).isBefore(durationLimit)) {
-        errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
-      }
+    if (exceedsDuration(nextTimeRange, limitDuration)) {
+      errors.nextTimeRange = { keyword: 'Date is outside limit duration.' };
     }
   }
 
@@ -212,17 +222,19 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
 
   return (
     <StyledPopover id="timerange-type"
+                   data-testid="timerange-type"
                    placement="bottom"
                    positionTop={36}
                    title={title}
                    arrowOffsetLeft={34}>
       <Formik initialValues={{ nextTimeRange: currentTimeRange }}
-              validate={(values) => dateTimeValidate(values, limitDuration)}
-              onSubmit={handleSubmit}>
+              validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+              onSubmit={handleSubmit}
+              validateOnMount>
         {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab), false);
+              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab), true);
             } else {
               setFieldValue('nextTimeRange', DEFAULT_RANGES[nextTab], false);
             }
