@@ -78,6 +78,7 @@ type Props = {
   children: React.ReactNode,
   config: AggregationWidgetConfig,
   chartData: any,
+  labelMapper?: (data: Array<any>) => Array<string> | undefined | null,
 };
 
 type ColorPickerConfig = {
@@ -85,10 +86,12 @@ type ColorPickerConfig = {
   target: EventTarget,
 };
 
-const PlotLegend = ({ children, config, chartData }: Props) => {
+const defaultLabelMapper = (data: Array<{ name: string }>) => data.map(({ name }) => name);
+
+const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper }: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { columnPivots } = config;
-  const values: Array<string> = chartData.map(({ name }) => name);
+  const labels: Array<string> = labelMapper(chartData);
   const { activeQuery } = useStore(CurrentViewStateStore);
   const { colors, setColor } = useContext(ChartColorContext);
 
@@ -140,7 +143,7 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
     setColorPickerConfig(undefined);
   }, [setColor]);
 
-  const tableCells = values.sort(stringLenSort).map((value) => {
+  const tableCells = labels.sort(stringLenSort).map((value) => {
     let val: React.ReactNode = value;
 
     if (columnPivots.length === 1) {
@@ -189,6 +192,10 @@ const PlotLegend = ({ children, config, chartData }: Props) => {
       )}
     </Container>
   );
+};
+
+PlotLegend.defaultProps = {
+  labelMapper: defaultLabelMapper,
 };
 
 export default PlotLegend;
