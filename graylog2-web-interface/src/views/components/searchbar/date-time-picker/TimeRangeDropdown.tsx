@@ -243,7 +243,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
           };
 
           return (
-            <KeyCapture keys={{ enter: submitForm, esc: handleCancel }}>
+            <KeyCapture shortcuts={{ enter: submitForm, esc: handleCancel }}>
               <Form>
                 <Row>
                   <Col md={12}>

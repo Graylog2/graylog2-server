@@ -20,19 +20,19 @@ import Mousetrap from 'mousetrap';
 
 type Props = {
   children?: React.ReactElement,
-  keys: { [key: string ]: () => void },
+  shortcuts: { [key: string ]: () => void },
 }
 
-const _executeForEachKey = (keys, callback) => Object.entries(keys).forEach(([key, onKeyPress]) => callback(key, onKeyPress));
+const _executeForEachKey = (shortcuts, callback) => Object.entries(shortcuts).forEach(([key, onKeyPress]) => callback(key, onKeyPress));
 
-const KeyCapture = ({ children, keys } : Props) => {
+const KeyCapture = ({ children, shortcuts } : Props) => {
   useEffect(() => {
-    _executeForEachKey(keys, (key, onKeyPress) => Mousetrap.bind(key, onKeyPress));
+    _executeForEachKey(shortcuts, (key, onKeyPress) => Mousetrap.bind(key, onKeyPress));
 
     return () => {
-      _executeForEachKey(keys, (key) => Mousetrap.unbind(key));
+      _executeForEachKey(shortcuts, (key) => Mousetrap.unbind(key));
     };
-  }, [keys]);
+  }, [shortcuts]);
 
   if (!children) {
     return null;

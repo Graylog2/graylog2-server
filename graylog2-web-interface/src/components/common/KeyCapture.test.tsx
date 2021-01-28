@@ -21,14 +21,14 @@ import KeyCapture from './KeyCapture';
 
 describe('<KeyCapture />', () => {
   it('renders its children', () => {
-    render(<KeyCapture keys={{ enter: () => {} }}><>The children</></KeyCapture>);
+    render(<KeyCapture shortcuts={{ enter: () => {} }}><>The children</></KeyCapture>);
 
     expect(screen.getByText('The children')).toBeInTheDocument();
   });
 
   it('triggers function defined for a specific key on key press', () => {
     const onEnter = jest.fn();
-    render(<KeyCapture keys={{ enter: onEnter }} />);
+    render(<KeyCapture shortcuts={{ enter: onEnter }} />);
 
     fireEvent.keyDown(document.body, { key: 'Enter', which: 13 });
 
@@ -37,7 +37,7 @@ describe('<KeyCapture />', () => {
 
   it('resets shortcuts after unmount', () => {
     const onEnter = jest.fn();
-    const { unmount } = render(<KeyCapture keys={{ enter: onEnter }} />);
+    const { unmount } = render(<KeyCapture shortcuts={{ enter: onEnter }} />);
 
     fireEvent.keyDown(document.body, { key: 'Enter', which: 13 });
 
