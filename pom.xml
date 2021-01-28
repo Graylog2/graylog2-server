@@ -414,6 +414,13 @@
                             <goals>deploy</goals>
                         </configuration>
                     </plugin>
+                    <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-deploy-plugin</artifactId>
+                      <configuration>
+                        <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
+                      </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
