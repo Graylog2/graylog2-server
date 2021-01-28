@@ -16,24 +16,19 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
 
-import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
+public class InvalidWriteTargetException extends ElasticsearchException {
 
-public class EventsIndexMapping7 extends EventsIndexMapping {
-    @Override
-    protected ImmutableMap<String, Object> fieldProperties() {
-        return map()
-                .putAll(super.fieldProperties())
-                .put(FIELD_GL2_MESSAGE_ID, map()
-                        .put("type", "alias")
-                        .put("path", "id")
-                        .build())
-                .build();
+    private InvalidWriteTargetException(String target, Throwable cause) {
+        super("Write target for indexing is invalid. This can happen if the deflector points to zero or multiple targets.", Collections.singletonList("target=" + target), cause);
     }
 
-    @Override
-    protected String dateFormat() {
-        return ConstantsES7.ES_DATE_FORMAT;
+    public static InvalidWriteTargetException create(String target, Throwable cause) {
+        return new InvalidWriteTargetException(target, cause);
+    }
+
+    public static InvalidWriteTargetException create(String target) {
+        return new InvalidWriteTargetException(target, null);
     }
 }

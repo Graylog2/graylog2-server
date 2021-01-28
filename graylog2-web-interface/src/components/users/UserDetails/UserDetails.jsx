@@ -45,9 +45,7 @@ const UserDetails = ({ user }: Props) => {
         <IfPermitted permissions={`users:edit:${user.username}`}>
           <div>
             <ProfileSection user={user} />
-            <IfPermitted permissions="*">
-              <SettingsSection user={user} />
-            </IfPermitted>
+            <SettingsSection user={user} />
             <PreferencesSection user={user} />
           </div>
           <div>
