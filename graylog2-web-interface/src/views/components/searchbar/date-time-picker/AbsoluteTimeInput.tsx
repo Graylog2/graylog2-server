@@ -166,7 +166,7 @@ const fieldUpdate = (value) => {
   };
 
   const handleClickTimeNow = () => {
-    const newTime = moment().toObject();
+    const newTime = DateTime.now().toObject();
 
     return moment({
       ...initialDateTime,

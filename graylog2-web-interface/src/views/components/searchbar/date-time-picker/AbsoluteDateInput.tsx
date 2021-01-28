@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import styled from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -34,7 +33,7 @@ const Wrapper = styled.div`
 `;
 
 const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError }) => {
-  const _onSetTimeToNow = () => onChange(moment().format(DateTime.Formats.TIMESTAMP));
+  const _onSetTimeToNow = () => onChange(DateTime.now().format(DateTime.Formats.TIMESTAMP));
   const _onChange = (event) => onChange(event.target.value);
 
   return (

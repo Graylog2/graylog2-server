@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
 
@@ -76,7 +75,7 @@ const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
   }
 
   if ('range' in timerange) {
-    range = !timerange.range ? 'All Time' : moment()
+    range = !timerange.range ? 'All Time' : DateTime.now()
       .subtract(timerange.range * 1000)
       .fromNow();
 
