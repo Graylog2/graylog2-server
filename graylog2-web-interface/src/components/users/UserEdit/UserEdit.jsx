@@ -78,10 +78,8 @@ const UserEdit = ({ user }: Props) => {
           <ProfileSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           ) }
-          <IfPermitted permissions="*">
-            <SettingsSection user={user}
-                             onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
-          </IfPermitted>
+          <SettingsSection user={user}
+                           onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           <IfPermitted permissions={`users:passwordchange:${user.username}`}>
             { !user.external && <PasswordSection user={user} /> }
           </IfPermitted>

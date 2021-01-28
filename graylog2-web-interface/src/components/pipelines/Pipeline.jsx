@@ -119,6 +119,8 @@ const Pipeline = createReactClass({
       .sort((s1, s2) => s1.stage - s2.stage)
       .map((stage) => this._formatStage(stage, maxStage));
 
+    const stageKey = pipeline.stages.map((s) => s.stage).join('-');
+
     return (
       <div>
         {this._connections_warning()}
@@ -145,7 +147,7 @@ const Pipeline = createReactClass({
         <Row className="row-sm row-margin-top">
           <Col md={12}>
             <div className="pull-right">
-              <StageForm create save={this._saveStage} />
+              <StageForm key={stageKey} create pipeline={pipeline} save={this._saveStage} />
             </div>
             <h2>Pipeline Stages</h2>
             <p className="description-margin-top">

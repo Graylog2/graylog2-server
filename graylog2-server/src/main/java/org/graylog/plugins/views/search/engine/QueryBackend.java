@@ -17,11 +17,8 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.GlobalOverride;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.errors.QueryError;
@@ -113,12 +110,4 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * @throws RuntimeException if the query could not be executed for some reason
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext, Set<QueryResult> predecessorResults);
-
-    /**
-     * Parse the query and return structural information about it.
-     * <p>
-     * This method decomposes the backend-specific query and returns information about used parameters, optionally the
-     * AST for syntax highlight and other information the UI can use to offer help.
-     */
-    QueryMetadata parse(ImmutableSet<Parameter> parameters, Query query);
 }

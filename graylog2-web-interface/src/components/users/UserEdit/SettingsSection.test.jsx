@@ -17,8 +17,10 @@
 // @flow strict
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
-import { alice } from 'fixtures/users';
+import { alice, admin } from 'fixtures/users';
 import selectEvent from 'react-select-event';
+
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import SettingsSection from './SettingsSection';
 
@@ -46,7 +48,12 @@ describe('<SettingsSection />', () => {
 
   it('should allow session timeout name and timezone change', async () => {
     const onSubmitStub = jest.fn();
-    render(<SettingsSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
+
+    render(
+      <CurrentUserContext.Provider value={admin}>
+        <SettingsSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />
+      </CurrentUserContext.Provider>,
+    );
 
     const timeoutAmountInput = screen.getByPlaceholderText('Timeout amount');
     const timezoneSelect = screen.getByLabelText('Time Zone');

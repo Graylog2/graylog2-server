@@ -24,7 +24,7 @@ import { Link } from 'components/graylog/router';
 import { Button, FormGroup, ControlLabel } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -34,6 +34,7 @@ const StageForm = createReactClass({
   displayName: 'StageForm',
 
   propTypes: {
+    pipeline: PropTypes.object.isRequired,
     stage: PropTypes.object,
     create: PropTypes.bool,
     save: PropTypes.func.isRequired,
@@ -45,7 +46,7 @@ const StageForm = createReactClass({
     return {
       create: false,
       stage: {
-        stage: 0,
+        stage: undefined,
         match_all: false,
         rules: [],
       },
@@ -53,17 +54,13 @@ const StageForm = createReactClass({
   },
 
   getInitialState() {
-    let { stage } = this.props;
-
-    stage = cloneDeep(stage);
+    const { create, pipeline, stage } = this.props;
+    const initialStageNumber = (create ? Math.max(...pipeline.stages.map((s) => s.stage)) + 1 : stage.stage);
 
     return {
+      initialStageNumber: initialStageNumber,
       // when editing, take the stage that's been passed in
-      stage: {
-        stage: stage.stage,
-        match_all: stage.match_all,
-        rules: stage.rules,
-      },
+      stage: { ...cloneDeep(stage), stage: initialStageNumber },
     };
   },
 
@@ -75,7 +72,7 @@ const StageForm = createReactClass({
     let { stage } = this.state;
 
     stage = cloneDeep(stage);
-    stage[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    stage[event.target.name] = getValueFromInput(event.target);
     this.setState({ stage });
   },
 
@@ -91,20 +88,24 @@ const StageForm = createReactClass({
     this.modal.close();
   },
 
+  _isOverridingStage() {
+    const { pipeline } = this.props;
+    const { initialStageNumber, stage } = this.state;
+
+    return (stage.stage !== initialStageNumber && pipeline.stages.some(({ stage: s }) => s === stage.stage));
+  },
+
   _saved() {
     this._closeModal();
-    const { create } = this.props;
-
-    if (create) {
-      this.setState(this.getInitialState());
-    }
   },
 
   _save() {
     const { stage } = this.state;
     const { save } = this.props;
 
-    save(stage, this._saved);
+    if (!this._isOverridingStage()) {
+      save(stage, this._saved);
+    }
   },
 
   _getFormattedOptions(rules) {
@@ -140,6 +141,8 @@ const StageForm = createReactClass({
       </span>
     );
 
+    const isOverridingStage = this._isOverridingStage();
+
     return (
       <span>
         <Button onClick={this.openModal}
@@ -157,7 +160,10 @@ const StageForm = createReactClass({
                    label="Stage"
                    autoFocus
                    onChange={this._onChange}
-                   help="Stage priority. The lower the number, the earlier it will execute."
+                   bsStyle={isOverridingStage ? 'error' : null}
+                   help={isOverridingStage
+                     ? 'Stage is already in use, please use another number or edit the existing stage.'
+                     : 'Stage priority. The lower the number, the earlier it will execute.'}
                    value={stage.stage} />
 
             <FormGroup>
