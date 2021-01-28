@@ -144,7 +144,7 @@ describe('TimeRangeDropdown', () => {
 
     await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalledWith({
       type: 'relative',
-      range: 300,
+      from: 300,
     }));
   });
 
