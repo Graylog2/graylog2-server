@@ -47,6 +47,9 @@ public class SqsMessageQueueAcknowledger extends AbstractIdleService implements 
 
     private SqsAsyncClient sqsClient;
 
+    private List<DeleteMessageBatchRequestEntry> currentBatch = new ArrayList<>(10);
+
+
     @Inject
     public SqsMessageQueueAcknowledger(BaseConfiguration config) {
         this.queueUrl = config.getSqsQueueUrl().toString();
@@ -72,15 +75,13 @@ public class SqsMessageQueueAcknowledger extends AbstractIdleService implements 
         }
     }
 
-    // TODO: this method shouldn't be used because sending batches with only a single item is really hurting
-    //  performance. Unfortunately it's the main method used by the BenchmarkOutput so we probably need to buffer
-    //  messages manually until we have enough of them to create a batch.
     @Override
     public void acknowledge(Object receiptHandle) {
         acknowledge(Collections.singletonList(receiptHandle));
     }
 
     @Override
+    // TODO: periodically flush batches which have been left hanging
     public void acknowledge(List<Object> messageIds) {
         try {
             readyLatch.await();
@@ -91,28 +92,29 @@ public class SqsMessageQueueAcknowledger extends AbstractIdleService implements 
 
         final Iterator<Object> iterator = messageIds.iterator();
 
-        List<DeleteMessageBatchRequestEntry> currentBatch = new ArrayList<>(10);
+        List<List<DeleteMessageBatchRequestEntry>> batchesToSend = new ArrayList<>();
 
-        while (iterator.hasNext()) {
-            Object receiptHandle = iterator.next();
-            if (!(receiptHandle instanceof String)) {
-                LOG.error("Couldn't delete message. Expected <" + receiptHandle + "> to be a String receipt handle");
-                continue;
-            }
-            final DeleteMessageBatchRequestEntry entry = DeleteMessageBatchRequestEntry.builder()
-                    .receiptHandle((String) receiptHandle)
-                    .id(String.valueOf(currentBatch.size() + 1))
-                    .build();
-            currentBatch.add(entry);
+        synchronized(this) {
+            while (iterator.hasNext()) {
+                Object receiptHandle = iterator.next();
+                if (!(receiptHandle instanceof String)) {
+                    LOG.error("Couldn't delete message. Expected <" + receiptHandle + "> to be a String receipt handle");
+                    continue;
+                }
+                final DeleteMessageBatchRequestEntry entry = DeleteMessageBatchRequestEntry.builder()
+                        .receiptHandle((String) receiptHandle)
+                        .id(String.valueOf(currentBatch.size() + 1))
+                        .build();
+                currentBatch.add(entry);
 
-            if (currentBatch.size() == 10) {
-                deleteBatch(currentBatch);
-                currentBatch = new ArrayList<>(10);
+                if (currentBatch.size() == 10) {
+                    batchesToSend.add(currentBatch);
+                    currentBatch = new ArrayList<>(10);
+                }
             }
         }
-        if (!currentBatch.isEmpty()) {
-            deleteBatch(currentBatch);
-        }
+
+        batchesToSend.forEach(this::deleteBatch);
     }
 
     private void deleteBatch(List<DeleteMessageBatchRequestEntry> entries) {
