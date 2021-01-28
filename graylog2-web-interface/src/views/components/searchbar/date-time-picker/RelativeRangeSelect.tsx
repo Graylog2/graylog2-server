@@ -95,8 +95,8 @@ const ConfiguredWrapper = styled.div`
   justify-self: end;
 `;
 
-const getValue = (fieldName, value: number) => RELATIVE_RANGE_TYPES.map(({ type }) => {
-  const unsetRange = value === 0 || value === undefined;
+const getValue = (fieldName, value: number, unsetRangeValue) => RELATIVE_RANGE_TYPES.map(({ type }) => {
+  const unsetRange = value === unsetRangeValue;
   const diff = moment.duration(value, 'seconds').as(type);
 
   if (diff - Math.floor(diff) === 0) {
@@ -126,19 +126,20 @@ type Props = {
   fieldName: 'range' | 'from' | 'to',
   limitDuration: number,
   unsetRangeLabel: string,
+  unsetRangeValue: number | undefined
   title: string,
   defaultRange: number
   disableUnsetRange?: boolean
 }
 
-const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLabel, defaultRange, title, disableUnsetRange }: Props) => {
+const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLabel, defaultRange, title, disableUnsetRange, unsetRangeValue }: Props) => {
   const { initialValues } = useFormikContext<TimeRangeDropDownFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
 
   return (
     <Field name={`nextTimeRange.${fieldName}`}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
-        const inputValue = getValue(fieldName, value);
+        const inputValue = getValue(fieldName, value, unsetRangeValue);
 
         const _onChange = (nextValue) => {
           onChange({ target: { name, value: nextValue } });
@@ -164,11 +165,11 @@ const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLab
             && initialValues.nextTimeRange[fieldName]
           ) ? initialValues.nextTimeRange[fieldName] : defaultRange;
 
-          _onChange(event.target.checked ? 0 : _defaultRange);
+          _onChange(event.target.checked ? unsetRangeValue : _defaultRange);
         };
 
         const _onSetPreset = (range) => {
-          const newFromValue = getValue(fieldName, range);
+          const newFromValue = getValue(fieldName, range, unsetRangeValue);
 
           _onChange(newFromValue[fieldName]);
         };
@@ -216,7 +217,7 @@ const RelativeRangeSelect = ({ disabled, fieldName, limitDuration, unsetRangeLab
             )}
 
             <ConfiguredWrapper>
-              <ConfiguredRelativeTimeRangeSelector onChange={_onSetPreset} />
+              <ConfiguredRelativeTimeRangeSelector onChange={_onSetPreset} disabled={disabled} />
             </ConfiguredWrapper>
           </RangeWrapper>
 

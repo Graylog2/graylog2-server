@@ -17,10 +17,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
-import { DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
+import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
 import { Icon } from 'components/common';
 
+import type { TimeRangeDropDownFormValues } from './TimeRangeDropdown';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
 type Props = {
@@ -40,20 +42,26 @@ const StyledIcon = styled(Icon)`
 `;
 
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
+  const { values: { nextTimeRange } } = useFormikContext<TimeRangeDropDownFormValues>();
+  const disableUntil = disabled || ('type' in nextTimeRange && nextTimeRange.type === 'relative' && 'from' in nextTimeRange && nextTimeRange?.from === RELATIVE_ALL_TIME);
+
   return (
     <RelativeWrapper>
       <RelativeRangeSelect disabled={disabled}
                            title="From:"
                            limitDuration={limitDuration}
                            unsetRangeLabel="All Time"
+                           unsetRangeValue={RELATIVE_ALL_TIME}
                            disableUnsetRange={limitDuration !== 0}
                            defaultRange={DEFAULT_RELATIVE_FROM}
                            fieldName="from" />
       <StyledIcon name="arrow-right" />
 
-      <RelativeRangeSelect disabled={disabled}
+      <RelativeRangeSelect disabled={disableUntil}
                            limitDuration={limitDuration}
                            defaultRange={DEFAULT_RELATIVE_TO}
+                           unsetRangeValue={undefined}
+                           disableUnsetRange={disableUntil}
                            title="Until:"
                            unsetRangeLabel="Now"
                            fieldName="to" />

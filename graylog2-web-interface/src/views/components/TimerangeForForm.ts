@@ -75,6 +75,13 @@ export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValu
       };
     case 'relative':
       if ('range' in timerange) {
+        if (timerange.range === 0) {
+          return {
+            type: timerange.type,
+            range: timerange.range,
+          };
+        }
+
         return {
           type: timerange.type,
           from: timerange.range,

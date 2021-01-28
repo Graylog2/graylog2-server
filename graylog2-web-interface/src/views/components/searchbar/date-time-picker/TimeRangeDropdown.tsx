@@ -26,7 +26,8 @@ import { Icon } from 'components/common';
 import { availableTimeRangeTypes } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
-import type { NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
+import type { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride, TimeRange } from 'views/logic/queries/Query';
+import type { SearchBarFormValues } from 'views/Constants';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -36,7 +37,7 @@ import TimeRangeLivePreview from './TimeRangeLivePreview';
 import { DateTimeContext } from './DateTimeProvider';
 
 export type TimeRangeDropDownFormValues = {
-  nextTimeRange: TimeRange | NoTimeRangeOverride,
+  nextTimeRange: RelativeTimeRangeWithEnd | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
 };
 
 const timeRangeTypes = {
@@ -47,8 +48,8 @@ const timeRangeTypes = {
 
 type Props = {
   noOverride?: boolean,
-  currentTimeRange: TimeRange | NoTimeRangeOverride,
-  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
 };
 
@@ -202,6 +203,28 @@ export const dateTimeValidate = (nextTimeRange, limitDuration) => {
   return errors;
 };
 
+const onInitializingNextTimerange = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
+  if ('range' in currentTimeRange) {
+    return {
+      type: currentTimeRange.type,
+      from: currentTimeRange.range,
+    };
+  }
+
+  return currentTimeRange;
+};
+
+const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['nextTimeRange']) => {
+  if ('type' in nextTimeRange && nextTimeRange.type === 'relative' && nextTimeRange.from === 0) {
+    return {
+      type: nextTimeRange.type,
+      range: nextTimeRange.from,
+    };
+  }
+
+  return (nextTimeRange as SearchBarFormValues['timerange']);
+};
+
 const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange }: Props) => {
   const { limitDuration } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
@@ -217,7 +240,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
   }, [toggleDropdownShow]);
 
   const handleSubmit = ({ nextTimeRange }) => {
-    setCurrentTimeRange(nextTimeRange);
+    setCurrentTimeRange(onSettingCurrentTimeRange(nextTimeRange));
     toggleDropdownShow();
   };
 
@@ -252,7 +275,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                    positionTop={36}
                    title={title}
                    arrowOffsetLeft={34}>
-      <Formik initialValues={{ nextTimeRange: currentTimeRange }}
+      <Formik initialValues={{ nextTimeRange: onInitializingNextTimerange(currentTimeRange) }}
               validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
               onSubmit={handleSubmit}
               validateOnMount>

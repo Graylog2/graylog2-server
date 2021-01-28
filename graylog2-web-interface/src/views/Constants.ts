@@ -16,16 +16,17 @@
  */
 import chroma from 'chroma-js';
 
-import { RelativeTimeRangeWithEnd, AbsoluteTimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
+import { TimeRange, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 
 export type SearchBarFormValues = {
-  timerange: RelativeTimeRangeWithEnd | AbsoluteTimeRange | KeywordTimeRange,
+  timerange: TimeRange,
   streams: Array<string>,
   queryString: string,
 };
 
 export const TIMESTAMP_FIELD = 'timestamp';
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, 'source'];
+export const RELATIVE_ALL_TIME = 0; // value for time range `range` property, which represents all time
 export const Messages = {
   DEFAULT_LIMIT: 150,
 };
