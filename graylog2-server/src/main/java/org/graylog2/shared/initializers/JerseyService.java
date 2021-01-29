@@ -22,9 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -273,8 +277,7 @@ public class JerseyService extends AbstractIdleService {
                     }
                 })
                 .register(new UserContextBinder())
-                .packages(true, controllerPackages)
-                .packages(true, RESOURCE_PACKAGE_WEB)
+                .registerClasses(findResources(controllerPackages))
                 .registerResources(additionalResources);
 
         exceptionMappers.forEach(rc::registerClasses);
@@ -292,6 +295,19 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return rc;
+    }
+
+    private Set<Class<?>> findResources(String[] controllerPackages) {
+        final ImmutableSet.Builder<Class<?>> resources = ImmutableSet.builder();
+        final ClassGraph classGraph = new ClassGraph().enableAnnotationInfo().acceptPackages(controllerPackages);
+
+        try (final ScanResult scanResult = classGraph.scan()) {
+            for (final ClassInfo classInfo : scanResult.getClassesWithAnnotation("javax.ws.rs.Path")) {
+                resources.add(classInfo.loadClass());
+            }
+        }
+
+        return resources.build();
     }
 
     private HttpServer setUp(URI listenUri,
