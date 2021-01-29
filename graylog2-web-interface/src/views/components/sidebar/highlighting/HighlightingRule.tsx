@@ -84,15 +84,17 @@ const onDelete = (e, rule) => {
 
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color } = rule;
+  const overlayContainerRef = React.useRef();
 
   return (
-    <HighlightingRuleGrid>
+    <HighlightingRuleGrid ref={overlayContainerRef}>
       <ColorPickerPopover id="formatting-rule-color"
                           placement="right"
                           color={color}
                           colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
                           triggerNode={<ColorPreview color={color} />}
-                          onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)} />
+                          onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)}
+                          container={overlayContainerRef.current} />
       <div>
         for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
       </div>

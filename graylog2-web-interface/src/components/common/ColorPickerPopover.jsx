@@ -66,7 +66,7 @@ const ColorPickerPopover = createReactClass({
   },
 
   render() {
-    const { id, placement, title, triggerNode, triggerAction, ...colorPickerProps } = this.props;
+    const { container, id, placement, title, triggerNode, triggerAction, ...colorPickerProps } = this.props;
     const popover = (
       <Popover id={id} title={title} className={style.customPopover}>
         <ColorPicker {...colorPickerProps} onChange={this.handleChange} />
@@ -78,6 +78,7 @@ const ColorPickerPopover = createReactClass({
                       trigger={triggerAction}
                       placement={placement}
                       overlay={popover}
+                      container={container}
                       rootClose>
         {triggerNode}
       </OverlayTrigger>

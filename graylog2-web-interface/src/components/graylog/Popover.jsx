@@ -19,8 +19,6 @@ import React from 'react';
 import { Popover as BootstrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-
 const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
@@ -82,9 +80,7 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
 
 const Popover = (props) => {
   return (
-    <ThemeAndUserProvider>
-      <StyledPopover {...props} />
-    </ThemeAndUserProvider>
+    <StyledPopover {...props} />
   );
 };
 
