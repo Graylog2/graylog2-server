@@ -28,7 +28,6 @@ export {
   Grid,
   MenuItem,
   NavItem,
-  OverlayTrigger,
   Pager,
   PanelGroup,
   Radio, // NOTE: do we want custom or keep OS styles

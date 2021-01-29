@@ -34,6 +34,7 @@ import Modal from './Modal';
 import Nav from './Nav';
 import Navbar from './Navbar';
 import NavDropdown from './NavDropdown';
+import OverlayTrigger from './OverlayTrigger';
 import Panel from './Panel';
 import Popover from './Popover';
 import ProgressBar from './ProgressBar';
@@ -66,6 +67,7 @@ export {
   Nav,
   Navbar,
   NavDropdown,
+  OverlayTrigger,
   Panel,
   Popover,
   ProgressBar,
