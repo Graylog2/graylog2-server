@@ -16,7 +16,6 @@
  */
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import { newDashboardsPath } from 'views/Constants';
 import View from 'views/logic/views/View';
 
 export const loadNewView = () => history.push(`${Routes.SEARCH}/new`);
@@ -30,7 +29,7 @@ export const loadView = (viewId: string) => history.push(`${Routes.SEARCH}/${vie
 export const loadDashboard = (dashboardId: string) => history.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
 
 export const loadAsDashboard = (view: View) => history.push({
-  pathname: newDashboardsPath,
+  pathname: Routes.pluginRoute('DASHBOARDS_NEW'),
   state: {
     view,
   },
