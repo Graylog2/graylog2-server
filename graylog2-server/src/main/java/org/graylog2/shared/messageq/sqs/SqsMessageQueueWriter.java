@@ -21,9 +21,10 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.Lists;
+import com.google.auto.value.AutoValue;
 import com.google.common.io.BaseEncoding;
 import com.google.common.util.concurrent.AbstractIdleService;
+import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.messageq.MessageQueueException;
@@ -34,6 +35,7 @@ import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -46,9 +48,11 @@ import java.util.concurrent.Semaphore;
 @Singleton
 public class SqsMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
     private static final Logger LOG = LoggerFactory.getLogger(SqsMessageQueueWriter.class);
+    private static final int REQUEST_SIZE_LIMIT = 256 * 1024;
 
     private final String queueUrl;
 
+    private final ULID ulid = new ULID();
     private final CountDownLatch latch = new CountDownLatch(1);
     private final Meter messageMeter;
     private final Counter byteCounter;
@@ -56,8 +60,17 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
     private final Timer writeTimer;
 
     private SqsAsyncClient sqsClient;
-
     private final Semaphore inFlightBatchesSemaphore;
+
+    @AutoValue
+    static abstract class Batch {
+        abstract List<SendMessageBatchRequestEntry> entries();
+        abstract long batchSizeBytes();
+
+        public static Batch create(List<SendMessageBatchRequestEntry> entries, long batchSizeBytes) {
+            return new AutoValue_SqsMessageQueueWriter_Batch(entries, batchSizeBytes);
+        }
+    }
 
     @Inject
     public SqsMessageQueueWriter(MetricRegistry metricRegistry, @Named("sqs_queue_url") URI queueUrl,
@@ -102,46 +115,74 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
             if (!isRunning()) {
                 throw new MessageQueueException("Message queue service is not running");
             }
-            // TODO: is it worth creating batches manually (performance-wise)?
-            for (List<RawMessageEvent> batch : Lists.partition(entries, 10)) {
-                sendBatchAsync(batch);
-            }
+            sendBatchesAsync(entries);
         } catch (InterruptedException e) {
             LOG.info("Got interrupted", e);
             Thread.currentThread().interrupt();
         }
     }
 
-    private void sendBatchAsync(List<RawMessageEvent> rawMessageEvents) throws InterruptedException {
-        int batchSizeBytes = 0;
-        List<SendMessageBatchRequestEntry> batchRequestEntries = new ArrayList<>();
+    private void sendBatchesAsync(List<RawMessageEvent> rawMessageEvents) throws InterruptedException {
 
-        for (int i = 0; i < rawMessageEvents.size(); i++) {
-            final RawMessageEvent rawMessageEvent = rawMessageEvents.get(i);
-            final String encodedMessage = BaseEncoding.base64()
-                    .omitPadding()
-                    .encode(rawMessageEvent.getEncodedRawMessage());
-            batchSizeBytes += encodedMessage.length();
-            batchRequestEntries.add(SendMessageBatchRequestEntry.builder()
-                    .messageBody(encodedMessage)
-                    .id(String.valueOf(i))
-                    .build());
+        for (Batch batch : createBatches(rawMessageEvents)) {
+            inFlightBatchesSemaphore.acquire();
+            final Timer.Context writeTime = writeTimer.time();
+
+            sqsClient.sendMessageBatch(batchRequest -> batchRequest.entries(batch.entries())
+                    .queueUrl(queueUrl))
+                    .whenComplete((response, error) -> {
+                        writeTime.stop();
+                        if (error != null) {
+                            LOG.error("Sending message batch failed", error);
+                        }
+                        inFlightBatchesSemaphore.release();
+                    });
+            messageMeter.mark(batch.entries().size());
+            byteCounter.inc(batch.batchSizeBytes());
+            byteMeter.mark(batch.batchSizeBytes());
         }
 
-        inFlightBatchesSemaphore.acquire();
-        final Timer.Context writeTime = writeTimer.time();
+    }
 
-        sqsClient.sendMessageBatch(batchRequest -> batchRequest.entries(batchRequestEntries)
-                .queueUrl(queueUrl))
-                .whenComplete((response, error) -> {
-                    writeTime.stop();
-                    if (error != null) {
-                        LOG.error("Sending message batch failed", error);
-                    }
-                    inFlightBatchesSemaphore.release();
-                });
-        messageMeter.mark(batchRequestEntries.size());
-        byteCounter.inc(batchSizeBytes);
-        byteMeter.mark(batchSizeBytes);
+    private List<Batch> createBatches(List<RawMessageEvent> rawMessageEvents) {
+        final List<Batch> batches = new ArrayList<>();
+
+        long currentBatchBytes = 0;
+        List<SendMessageBatchRequestEntry> currentBatchEntries = new ArrayList<>(10);
+        for (RawMessageEvent rawMessageEvent : rawMessageEvents) {
+            final String encodedMessage = encode(rawMessageEvent);
+            if (encodedMessage == null) {
+                continue;
+            }
+            // individual message is guaranteed to be <= REQUEST_SIZE_LIMIT
+            if (currentBatchBytes + encodedMessage.length() > REQUEST_SIZE_LIMIT || currentBatchEntries.size() >= 10) {
+                batches.add(Batch.create(currentBatchEntries, currentBatchBytes));
+                currentBatchEntries = new ArrayList<>(10);
+                currentBatchBytes = 0;
+            }
+            currentBatchEntries.add(SendMessageBatchRequestEntry.builder()
+                    .messageBody(encodedMessage)
+                    .id(ulid.nextULID())
+                    .build());
+            currentBatchBytes += encodedMessage.length();
+        }
+        if (!currentBatchEntries.isEmpty()) {
+            batches.add(Batch.create(currentBatchEntries, currentBatchBytes));
+        }
+
+        return batches;
+    }
+
+    @Nullable
+    private String encode(RawMessageEvent rawMessageEvent) {
+        final String encodedMessage = BaseEncoding.base64()
+                .omitPadding()
+                .encode(rawMessageEvent.getEncodedRawMessage());
+        if (encodedMessage.length() > REQUEST_SIZE_LIMIT) {
+            LOG.error("Base64 encoded message <{}> of size {} bytes exceeds size limit of {} bytes. Message will " +
+                    "be discarded.", rawMessageEvent.getMessageId(), encodedMessage.length(), REQUEST_SIZE_LIMIT);
+            return null;
+        }
+        return encodedMessage;
     }
 }
