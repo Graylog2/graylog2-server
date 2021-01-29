@@ -8,7 +8,6 @@ import { type ThemeInterface } from 'theme';
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
-import { newDashboardsPath } from 'views/Constants';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -181,7 +180,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { view } = viewStoreState;
 
     browserHistory.push({
-      pathname: newDashboardsPath,
+      pathname: Routes.pluginRoute('DASHBOARDS_NEW')
       state: {
         view: view,
       },
