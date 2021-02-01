@@ -78,8 +78,11 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
   const newWidget = widget.toBuilder().id(uuid()).build();
   const newWidgets = viewState.widgets.push(newWidget);
   const { widgetPositions } = viewState;
-  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositions),
-    newWidgets.toArray(), Immutable.Map({ [newWidget.id]: oldPosition }));
+  const widgetPositionsMap = oldPosition ? {
+    ...widgetPositions,
+    [newWidget.id]: oldPosition.toBuilder().row(0).col(0).build(),
+  } : widgetPositions;
+  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositionsMap), newWidgets.toArray());
   const newTitleMap = _setWidgetTitle(viewState.titles, newWidget.id, widgetTitle);
   const newViewState = viewState.toBuilder()
     .widgets(newWidgets)

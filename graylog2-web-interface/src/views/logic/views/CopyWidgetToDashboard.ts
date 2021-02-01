@@ -27,12 +27,16 @@ import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 
 type QueryId = string;
 
-const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPositions: WidgetPosition): View => {
+const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPosition: WidgetPosition): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
   const viewState = dashboard.state.get(dashboardQueryId);
   const widgets = viewState.widgets.push(widget);
   const { widgetPositions } = viewState;
-  const newWidgetPositions = GenerateNextPosition(Map(widgetPositions), widgets.toArray(), Map({ [widget.id]: oldPositions }));
+  const widgetPositionsMap = oldPosition ? {
+    ...widgetPositions,
+    [widget.id]: oldPosition.toBuilder().row(0).col(0).build(),
+  } : widgetPositions;
+  const newWidgetPositions = GenerateNextPosition(Map(widgetPositionsMap), widgets.toArray());
   const newViewState = viewState.toBuilder()
     .widgets(widgets)
     .widgetPositions(newWidgetPositions)
