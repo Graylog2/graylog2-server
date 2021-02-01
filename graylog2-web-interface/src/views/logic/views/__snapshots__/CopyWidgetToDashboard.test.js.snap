@@ -21,7 +21,7 @@ Object {
           "width": "Infinity",
         },
         "dead-beef": Object {
-          "col": 1,
+          "col": 0,
           "height": 4,
           "row": 1,
           "width": 4,
