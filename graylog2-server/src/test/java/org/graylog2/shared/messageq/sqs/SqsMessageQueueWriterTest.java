@@ -28,6 +28,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -81,7 +82,7 @@ public class SqsMessageQueueWriterTest {
 
     private RawMessageEvent createEvent(String body) {
         final RawMessageEvent rawMessageEvent = new RawMessageEvent();
-        rawMessageEvent.setEncodedRawMessage(body.getBytes());
+        rawMessageEvent.setEncodedRawMessage(body.getBytes(StandardCharsets.UTF_8));
         return rawMessageEvent;
     }
 
