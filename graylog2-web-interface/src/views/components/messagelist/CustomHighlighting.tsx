@@ -25,6 +25,7 @@ import HighlightingRulesContext from 'views/components/contexts/HighlightingRule
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { formatDateTime } from 'components/common/Timestamp';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import PossiblyHighlight from './PossiblyHighlight';
 import Highlight from './Highlight';
@@ -40,8 +41,13 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
   const highlightingRules = useContext(HighlightingRulesContext) ?? [];
   const currentUser = useContext(CurrentUserContext);
   const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
-  const { all } = useContext(FieldTypesContext);
-  const { type } = all.find((f) => f.name === fieldName).type;
+  const fieldTypes = useContext(FieldTypesContext);
+  let type;
+
+  if (fieldTypes) {
+    const { all } = fieldTypes;
+    type = (all.find((f) => f.name === fieldName) || { type: FieldType.Unknown }).type.type;
+  }
 
   const highlightingRulesMap = highlightingRules.reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {});
   const rules = highlightingRulesMap[fieldName] ?? [];

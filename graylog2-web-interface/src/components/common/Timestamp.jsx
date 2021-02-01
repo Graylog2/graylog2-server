@@ -88,7 +88,7 @@ class Timestamp extends React.Component {
     format: DateTime.Formats.TIMESTAMP,
     relative: false,
     tz: undefined,
-    render: ({ value }) => <>{value}</>,
+    render: ({ value }) => value,
   };
 
   _formatDateTime = () => {
