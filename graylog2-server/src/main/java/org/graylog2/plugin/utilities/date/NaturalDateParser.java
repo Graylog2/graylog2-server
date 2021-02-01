@@ -22,7 +22,6 @@ import com.joestelmach.natty.Parser;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
 
 import java.util.Collections;
 import java.util.Date;
@@ -93,7 +92,7 @@ public class NaturalDateParser {
         }
 
         private String dateFormat(final DateTime x) {
-            return x.toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC());
+            return x.toString(Tools.ES_DATE_FORMAT_NO_MS_FORMATTER.withZoneUTC());
         }
     }
 

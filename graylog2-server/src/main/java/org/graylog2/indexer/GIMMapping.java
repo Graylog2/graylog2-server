@@ -348,9 +348,11 @@ public abstract class GIMMapping extends IndexMapping {
     private Map<String, Object> dateField() {
         return merge(typeField("date"), Collections.singletonMap(
                 "format",
-                "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
+                dateFormats() + "||basic_date_time||basic_date_time_no_millis||epoch_second||date_time_no_millis||date_hour_minute_second_fraction||epoch_millis"
         ));
     }
+
+    protected abstract String dateFormats();
 
     private Map<String, Object> textField() {
         return typeField("text");

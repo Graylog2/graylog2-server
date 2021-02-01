@@ -31,5 +31,4 @@ public class IndexNotFoundException extends ElasticsearchException {
     public static IndexNotFoundException create(String errorMessage, String index) {
         return new IndexNotFoundException(errorMessage, Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
     }
-
 }

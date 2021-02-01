@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
@@ -29,6 +30,10 @@ import type { Location } from 'routing/withLocation';
 const SystemStore = StoreProvider.getStore('System');
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
+
+const StyledRow = styled(Row)`
+  height: 100%;
+`;
 
 type Props = {
   system: {
@@ -49,14 +54,14 @@ const GettingStartedPage = ({ system, location }: Props) => {
 
   return (
     <DocumentTitle title="Getting started">
-      <Row>
+      <StyledRow>
         <GettingStarted clusterId={clusterId}
                         masterOs={operatingSystem}
                         masterVersion={version}
                         gettingStartedUrl={GETTING_STARTED_URL}
                         noDismissButton={Boolean(location.query.menu)}
                         onDismiss={_onDismiss} />
-      </Row>
+      </StyledRow>
     </DocumentTitle>
   );
 };
