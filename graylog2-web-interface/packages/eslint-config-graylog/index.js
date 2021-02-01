@@ -42,10 +42,18 @@ module.exports = {
     },
     {
       files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
-      plugins: ['jest'],
-      extends: ['plugin:jest/recommended'],
+      plugins: [
+        'jest',
+        'testing-library',
+      ],
+      extends: [
+        'plugin:jest/recommended',
+        'plugin:testing-library/react',
+        'plugin:testing-library/recommended',
+      ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
+        'testing-library/no-debug': 'warn',
       },
     },
   ],
