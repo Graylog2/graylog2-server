@@ -180,7 +180,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { view } = viewStoreState;
 
     browserHistory.push({
-      pathname: Routes.pluginRoute('DASHBOARDS_NEW')
+      pathname: Routes.pluginRoute('DASHBOARDS_NEW'),
       state: {
         view: view,
       },
