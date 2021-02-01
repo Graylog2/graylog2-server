@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 @AutoValue
 abstract class ParsedElasticsearchException {
     private static final Pattern exceptionPattern = Pattern
-            .compile("ElasticsearchException\\[Elasticsearch exception \\[type=(?<type>[\\w_]+), (?:reason=(?<reason>.+?)(\\]+;|\\]$))");
+            .compile("(ElasticsearchException\\[)?Elasticsearch exception \\[type=(?<type>[\\w_]+), (?:reason=(?<reason>.+?)(\\]+;|\\]$))");
 
     abstract String type();
     abstract String reason();

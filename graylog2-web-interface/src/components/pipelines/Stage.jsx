@@ -105,19 +105,19 @@ const Stage = createReactClass({
   },
 
   render() {
-    const { stage } = this.props;
+    const { onUpdate, pipeline, stage } = this.props;
 
     const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
 
     const throughput = (
-      <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${this.props.pipeline.id}.stage.${stage.stage}.executed`}>
+      <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}>
         <CounterRate showTotal={false} prefix="Throughput: " suffix="msg/s" />
       </MetricContainer>
     );
 
     const actions = [
       <Button key="delete-stage" bsStyle="primary" onClick={this.props.onDelete}>Delete</Button>,
-      <StageForm key="edit-stage" stage={stage} save={this.props.onUpdate} />,
+      <StageForm key={`edit-stage-${stage.stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,
     ];
 
     let description;
@@ -144,7 +144,7 @@ const Stage = createReactClass({
 
     // We check if we have the rules details before trying to render them
     if (this.state.rules) {
-      content = this._formatRules(stage, this.props.stage.rules.map((name) => this.state.rules.filter((r) => r.title === name)[0]));
+      content = this._formatRules(stage, stage.rules.map((name) => this.state.rules.filter((r) => r.title === name)[0]));
     } else {
       content = <Spinner />;
     }

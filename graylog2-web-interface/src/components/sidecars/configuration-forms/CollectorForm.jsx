@@ -256,7 +256,7 @@ const CollectorForm = createReactClass({
             <FormGroup controlId="defaultTemplate">
               <ControlLabel><span>Default Template <small className="text-muted">(Optional)</small></span></ControlLabel>
               <SourceCodeEditor id="template"
-                                value={formData.default_template}
+                                value={formData.default_template || ''}
                                 onChange={this._formDataUpdate('default_template')} />
               <HelpBlock>The default Collector configuration.</HelpBlock>
             </FormGroup>

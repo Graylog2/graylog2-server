@@ -50,10 +50,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -95,7 +97,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @After
     public void tearDown() {
-        client().deleteIndices(INDEX_NAME);
+        client().cleanUp();
     }
 
     protected abstract boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id);
@@ -187,9 +189,13 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     @Test
     public void retryIndexingMessagesDuringFloodStage() throws Exception {
         triggerFloodStage(INDEX_NAME);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final AtomicBoolean succeeded = new AtomicBoolean(false);
+        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
 
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024 * 1024, 50);
-        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch));
+        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+
+        countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
 
@@ -199,6 +205,52 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().refreshNode();
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+        assertThat(succeeded.get()).isTrue();
+    }
+
+    private Messages.IndexingListener createIndexingListener(CountDownLatch retryLatch, AtomicBoolean successionFlag) {
+        return new Messages.IndexingListener() {
+            @Override
+            public void onRetry(long attemptNumber) {
+                retryLatch.countDown();
+            }
+
+            @Override
+            public void onSuccess(long delaySinceFirstAttempt) {
+                if (retryLatch.getCount() > 0) {
+                    retryLatch.countDown();
+                }
+                successionFlag.set(true);
+            }
+        };
+    }
+
+    @Test
+    public void retryIndexingMessagesIfTargetAliasIsInvalid() throws Exception {
+        final String prefix = "multiple_targets";
+        final String index1 = client().createRandomIndex(prefix);
+        final String index2 = client().createRandomIndex(prefix);
+        client().deleteIndices(INDEX_NAME);
+        client().addAliasMapping(index1, INDEX_NAME);
+        client().addAliasMapping(index2, INDEX_NAME);
+
+        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final AtomicBoolean succeeded = new AtomicBoolean(false);
+
+        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+
+        countDownLatch.await();
+
+        client().removeAliasMapping(index2, INDEX_NAME);
+
+        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
+        assertThat(failedItems).isEmpty();
+
+        client().refreshNode();
+
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+        assertThat(succeeded.get()).isTrue();
     }
 
     @Test

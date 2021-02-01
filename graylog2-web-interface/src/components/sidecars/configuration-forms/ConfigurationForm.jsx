@@ -337,7 +337,7 @@ const ConfigurationForm = createReactClass({
               <ControlLabel>Configuration</ControlLabel>
               <SourceCodeEditor id="template"
                                 height={400}
-                                value={formData.template}
+                                value={formData.template || ''}
                                 onChange={this._onTemplateChange} />
               <Button className="pull-right"
                       bsStyle="link"
