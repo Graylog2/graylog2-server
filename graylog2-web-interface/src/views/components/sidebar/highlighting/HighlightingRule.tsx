@@ -88,7 +88,7 @@ const HighlightingRule = ({ rule }: Props) => {
                             triggerNode={<ColorPreview color={color} />}
                             onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)} />
         <RuleContainer>
-          <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{value}&quot;</i>.
+          <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
           <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />

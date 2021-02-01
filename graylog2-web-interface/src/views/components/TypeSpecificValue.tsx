@@ -46,6 +46,8 @@ type Props = {
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
 const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false }: Props) => {
+  const Component = render;
+
   if (value === undefined) {
     return null;
   }
@@ -56,7 +58,7 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
 
   switch (type.type) {
     case 'date': return <UserTimezoneTimestamp dateTime={value} />;
-    case 'boolean': return <>{String(value)}</>;
+    case 'boolean': return <Component value={String(value)} type={type} field={field} />;
     default: return _formatValue(field, value, truncate, render, type);
   }
 };
