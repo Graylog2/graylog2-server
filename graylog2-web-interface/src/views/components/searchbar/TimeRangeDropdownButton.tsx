@@ -32,11 +32,16 @@ type Props = {
 const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, toggleShow }: Props) => {
   const containerRef = useRef();
 
+  const _onClick = (e) => {
+    e.currentTarget.blur();
+    toggleShow();
+  };
+
   return (
     <div ref={containerRef}>
       <Button bsStyle={hasErrorOnMount ? 'danger' : 'info'}
               disabled={disabled}
-              onClick={toggleShow}
+              onClick={_onClick}
               aria-label="Open Time Range Selector">
         <Icon name={hasErrorOnMount ? 'exclamation-triangle' : 'clock'} />
       </Button>
