@@ -22,6 +22,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.auto.value.AutoValue;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.BaseEncoding;
 import com.google.common.util.concurrent.AbstractIdleService;
 import de.huxhorn.sulky.ulid.ULID;
@@ -37,9 +38,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -48,7 +47,7 @@ import java.util.concurrent.Semaphore;
 @Singleton
 public class SqsMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
     private static final Logger LOG = LoggerFactory.getLogger(SqsMessageQueueWriter.class);
-    private static final int REQUEST_SIZE_LIMIT = 256 * 1024;
+    public static final int REQUEST_SIZE_LIMIT = 256 * 1024;
 
     private final String queueUrl;
 
@@ -73,9 +72,8 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
     }
 
     @Inject
-    public SqsMessageQueueWriter(MetricRegistry metricRegistry, @Named("sqs_queue_url") URI queueUrl,
-            BaseConfiguration config) {
-        this.queueUrl = queueUrl.toString();
+    public SqsMessageQueueWriter(MetricRegistry metricRegistry, BaseConfiguration config) {
+        this.queueUrl = config.getSqsQueueUrl().toString();
 
         inFlightBatchesSemaphore = new Semaphore(config.getSqsMaxInflightOutboundBatches());
 
@@ -144,7 +142,8 @@ public class SqsMessageQueueWriter extends AbstractIdleService implements Messag
 
     }
 
-    private List<Batch> createBatches(List<RawMessageEvent> rawMessageEvents) {
+    @VisibleForTesting
+    List<Batch> createBatches(List<RawMessageEvent> rawMessageEvents) {
         final List<Batch> batches = new ArrayList<>();
 
         long currentBatchBytes = 0;
