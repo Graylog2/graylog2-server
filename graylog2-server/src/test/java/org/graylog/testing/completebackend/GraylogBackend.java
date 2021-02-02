@@ -61,15 +61,17 @@ public class GraylogBackend {
 
         MongoDBInstance mongoDB = MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
 
-        NodeInstance node = NodeInstance.createStarted(
-                network,
-                MongoDBInstance.internalUri(),
-                ElasticsearchInstance.internalUri(),
-                elasticsearchInstanceFactory.version(),
-                extraPorts);
-
         try {
-            return new GraylogBackend(esFuture.get(), mongoDB, node);
+            // Wait for ES before starting the Graylog node to avoid any race conditions
+            ElasticsearchInstance esInstance = esFuture.get();
+            NodeInstance node = NodeInstance.createStarted(
+                    network,
+                    MongoDBInstance.internalUri(),
+                    ElasticsearchInstance.internalUri(),
+                    elasticsearchInstanceFactory.version(),
+                    extraPorts);
+
+            return new GraylogBackend(esInstance, mongoDB, node);
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("Container creation aborted", e);
             throw new RuntimeException(e);
