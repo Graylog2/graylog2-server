@@ -18,7 +18,9 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppConfig from 'util/AppConfig';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Button, Row, Col } from 'components/graylog';
@@ -29,14 +31,25 @@ import { FormikFormGroup } from 'components/common';
 
 import { validatePasswords } from '../UserCreate/PasswordFormGroup';
 
+const isCloud = AppConfig.isCloud();
+
+const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
 type Props = {
   user: User,
 };
 
 const _validate = (values) => {
   let errors = {};
+
   const { password, password_repeat: passwordRepeat } = values;
-  errors = validatePasswords(errors, password, passwordRepeat);
+
+  if (isCloud && oktaUserForm) {
+    const { validations: { password: validateCloudPasswords } } = oktaUserForm;
+
+    errors = validateCloudPasswords(errors, password, passwordRepeat);
+  } else {
+    errors = validatePasswords(errors, password, passwordRepeat);
+  }
 
   return errors;
 };
@@ -57,6 +70,36 @@ const PasswordSection = ({ user: { id } }: Props) => {
     requiresOldPassword = id === currentUser?.id;
   }
 
+  const _getPasswordGroup = () => {
+    if (isCloud && oktaUserForm) {
+      const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+
+      return <CloudPasswordFormGroup />;
+    }
+
+    return (
+      <>
+        <FormikFormGroup label="New Password"
+                         name="password"
+                         type="password"
+                         help="Passwords must be at least 6 characters long. We recommend using a strong password."
+                         maxLength={100}
+                         minLength={6}
+                         labelClassName="col-sm-3"
+                         wrapperClassName="col-sm-9"
+                         required />
+        <FormikFormGroup label="Repeat Password"
+                         name="password_repeat"
+                         type="password"
+                         minLength={6}
+                         maxLength={100}
+                         required
+                         labelClassName="col-sm-3"
+                         wrapperClassName="col-sm-9" />
+      </>
+    );
+  };
+
   return (
     <SectionComponent title="Password">
       <Formik onSubmit={(formData) => _onSubmit(formData, id)}
@@ -73,23 +116,7 @@ const PasswordSection = ({ user: { id } }: Props) => {
                                labelClassName="col-sm-3"
                                wrapperClassName="col-sm-9" />
             )}
-            <FormikFormGroup label="New Password"
-                             name="password"
-                             type="password"
-                             help="Passwords must be at least 6 characters long. We recommend using a strong password."
-                             maxLength={100}
-                             minLength={6}
-                             labelClassName="col-sm-3"
-                             wrapperClassName="col-sm-9"
-                             required />
-            <FormikFormGroup label="Repeat Password"
-                             name="password_repeat"
-                             type="password"
-                             minLength={6}
-                             maxLength={100}
-                             required
-                             labelClassName="col-sm-3"
-                             wrapperClassName="col-sm-9" />
+            {_getPasswordGroup()}
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
