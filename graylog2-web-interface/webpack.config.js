@@ -163,7 +163,9 @@ const webpackConfig = {
           { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
           {
             loader: 'css-loader',
-            options: getCssLoaderOptions(),
+            options: {
+              modules: 'global',
+            },
           },
         ],
       },
