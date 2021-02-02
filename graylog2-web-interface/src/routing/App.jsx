@@ -28,6 +28,17 @@ import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
 import 'stylesheets/typeahead.less';
 
+const AppLayout = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
+const PageContent = styled.div`
+  height: 100%;
+  overflow: auto;
+`;
+
 const ScrollToHint = styled.div(({ theme }) => css`
   position: fixed;
   left: 50%;
@@ -54,16 +65,20 @@ const App = ({ children }) => (
 
       return (
         <ScratchpadProvider loginName={currentUser.username}>
-          <Navigation />
-          <ScrollToHint id="scroll-to-hint">
-            <Icon name="arrow-up" />
-          </ScrollToHint>
-          <Scratchpad />
-          <ReportedErrorBoundary>
-            <RuntimeErrorBoundary>
-              {children}
-            </RuntimeErrorBoundary>
-          </ReportedErrorBoundary>
+          <AppLayout>
+            <Navigation />
+            <ScrollToHint id="scroll-to-hint">
+              <Icon name="arrow-up" />
+            </ScrollToHint>
+            <Scratchpad />
+            <ReportedErrorBoundary>
+              <RuntimeErrorBoundary>
+                <PageContent>
+                  {children}
+                </PageContent>
+              </RuntimeErrorBoundary>
+            </ReportedErrorBoundary>
+          </AppLayout>
         </ScratchpadProvider>
       );
     }}

@@ -65,4 +65,18 @@ class ParsedElasticsearchExceptionTest {
                     "request: [BulkShardRequest [[graylog_0][2]] containing [125] requests]]");
         });
     }
+
+    @Test
+    void parsingInvalidWriteTargetMessage() {
+        final String exception = "Elasticsearch exception [type=illegal_argument_exception, reason=no write index is defined for alias [messages_it_deflector]. The write index may be explicitly disabled using is_write_index=false or the alias points to multiple indices without one being designated as a write index]";
+
+        final ParsedElasticsearchException parsed = ParsedElasticsearchException.from(exception);
+
+        assertThat(parsed).satisfies(p -> {
+            assertThat(p.type()).isEqualTo("illegal_argument_exception");
+            assertThat(p.reason()).isEqualTo("no write index is defined for alias [messages_it_deflector]. " +
+                    "The write index may be explicitly disabled using is_write_index=false or the alias points to " +
+                    "multiple indices without one being designated as a write index");
+        });
+    }
 }
