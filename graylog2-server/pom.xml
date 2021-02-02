@@ -504,6 +504,10 @@
             <artifactId>amqp-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>kafka09_2.11</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_2.11</artifactId>
         </dependency>
