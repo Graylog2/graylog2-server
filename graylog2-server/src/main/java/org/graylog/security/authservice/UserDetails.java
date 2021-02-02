@@ -43,6 +43,8 @@ public abstract class UserDetails {
 
     public abstract String fullName();
 
+    public abstract boolean isExternal();
+
     public abstract Set<String> defaultRoles();
 
     public UserDetails withDatabaseId(String id) {
@@ -78,6 +80,8 @@ public abstract class UserDetails {
         public abstract Builder email(String email);
 
         public abstract Builder fullName(String fullName);
+
+        public abstract Builder isExternal(boolean isExternal);
 
         public abstract Builder defaultRoles(Set<String> defaultRoles);
 
