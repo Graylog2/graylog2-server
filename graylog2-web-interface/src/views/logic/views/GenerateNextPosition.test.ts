@@ -20,9 +20,9 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
-import AddNewWidgetsToPositions from './AddNewWidgetsToPositions';
+import GenerateNextPosition from './GenerateNextPosition';
 
-describe('AddNewWidgetsToPositions', () => {
+describe('GenerateNextPosition', () => {
   PluginStore.exports = () => {
     return [{ type: 'MESSAGES', defaultHeight: 5, defaultWidth: 6 }];
   };
@@ -31,7 +31,7 @@ describe('AddNewWidgetsToPositions', () => {
     const newMessageList = Widget.builder().id('foo-1').type('MESSAGES').build();
     const widgets = [newMessageList];
     const positions = Immutable.Map<string, WidgetPosition>();
-    const newPositions = AddNewWidgetsToPositions(positions, widgets);
+    const newPositions = GenerateNextPosition(positions, widgets);
 
     expect(newPositions).toMatchSnapshot();
   });
@@ -47,7 +47,7 @@ describe('AddNewWidgetsToPositions', () => {
       .build();
     const widgets = [newMessageList, oldMessageList];
     const positions = Immutable.Map({ foo: oldWidgetPosition });
-    const newPositions = AddNewWidgetsToPositions(positions, widgets);
+    const newPositions = GenerateNextPosition(positions, widgets);
 
     expect(newPositions).toMatchSnapshot();
   });
