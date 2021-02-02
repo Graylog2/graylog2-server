@@ -297,6 +297,13 @@ public class JerseyService extends AbstractIdleService {
         return rc;
     }
 
+    // Finds all resource classes in the classpath.
+    // Similar to AnnotationAcceptingListener#newJaxrsResourceAndProviderListener(java.lang.ClassLoader), it finds
+    // all classes that have a javax.ws.rs.Path annotation. This method doesn't look for classes with Provider
+    // annotations because we register those explicitly.
+    //
+    // See: AnnotationAcceptingListener#newJaxrsResourceAndProviderListener(java.lang.ClassLoader)
+    // See: ResourceConfig#scanClasses()
     private Set<Class<?>> findResources(String[] controllerPackages) {
         final ImmutableSet.Builder<Class<?>> resources = ImmutableSet.builder();
         final ClassGraph classGraph = new ClassGraph().enableAnnotationInfo().acceptPackages(controllerPackages);
