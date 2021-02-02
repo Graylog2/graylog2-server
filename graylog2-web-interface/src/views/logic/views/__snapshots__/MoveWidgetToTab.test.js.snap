@@ -65,7 +65,7 @@ Object {
       },
       "positions": Immutable.Map {
         "dead-beef": Object {
-          "col": 0,
+          "col": 1,
           "height": 4,
           "row": 1,
           "width": 4,
@@ -74,7 +74,12 @@ Object {
       "selected_fields": undefined,
       "titles": Immutable.Map {
         "widget": Immutable.Map {
-          "dead-beef": "Widget Title",
+          "dead-beef": Object {
+            "col": 1,
+            "height": 4,
+            "row": 1,
+            "width": 4,
+          },
         },
       },
       "widget_mapping": Immutable.Map {
@@ -143,7 +148,7 @@ Object {
       },
       "positions": Immutable.Map {
         "dead-beef": Object {
-          "col": 0,
+          "col": 1,
           "height": 4,
           "row": 1,
           "width": 4,
@@ -152,7 +157,12 @@ Object {
       "selected_fields": undefined,
       "titles": Immutable.Map {
         "widget": Immutable.Map {
-          "dead-beef": "Widget Title",
+          "dead-beef": Object {
+            "col": 1,
+            "height": 4,
+            "row": 1,
+            "width": 4,
+          },
         },
       },
       "widget_mapping": Immutable.Map {
@@ -228,11 +238,7 @@ Object {
         },
       },
       "selected_fields": undefined,
-      "titles": Immutable.Map {
-        "widget": Immutable.Map {
-          "dead-beef": "Widget Title",
-        },
-      },
+      "titles": Immutable.Map {},
       "widget_mapping": Immutable.Map {
         "dead-beef": Immutable.Set [
           "dead-beef",
@@ -297,14 +303,23 @@ Object {
       },
       "positions": Immutable.Map {
         "dead-beef": Object {
-          "col": 0,
+          "col": 1,
           "height": 4,
           "row": 1,
           "width": 4,
         },
       },
       "selected_fields": undefined,
-      "titles": Immutable.Map {},
+      "titles": Immutable.Map {
+        "widget": Immutable.Map {
+          "dead-beef": Object {
+            "col": 1,
+            "height": 4,
+            "row": 1,
+            "width": 4,
+          },
+        },
+      },
       "widget_mapping": Immutable.Map {
         "dead-beef": Immutable.Set [
           "dead-beef",
