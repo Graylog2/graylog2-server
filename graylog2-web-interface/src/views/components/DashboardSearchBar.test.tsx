@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
+
+import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
@@ -44,9 +46,35 @@ describe('DashboardSearchBar', () => {
 
   const onExecute = jest.fn();
 
+  it('should render the DashboardSearchBar', () => {
+    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangeDisplay = screen.getByLabelText('Search Time Range');
+    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
+    const searchButton = screen.getByTitle('Perform search');
+
+    expect(timeRangeButton).not.toBeNull();
+    expect(timeRangeDisplay).not.toBeNull();
+    expect(liveUpdate).not.toBeNull();
+    expect(searchButton).not.toBeNull();
+  });
+
   it('defaults to no override being selected', () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
     expect(screen.getByText('No Override')).toBeVisible();
+  });
+
+  it('should call onExecute and set global override when search is performed', async () => {
+    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
+    const searchButton = screen.getByTitle('Perform search');
+
+    fireEvent.click(searchButton);
+
+    await waitFor(() => expect(onExecute).toHaveBeenCalledTimes(1));
+
+    expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, '');
   });
 });

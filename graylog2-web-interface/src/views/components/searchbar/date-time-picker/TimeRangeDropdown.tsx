@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useCallback, useEffect, useState } from 'react';
+import { useContext, useCallback, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
-import Mousetrap from 'mousetrap';
 
 import { Button, Col, Tabs, Tab, Row, Popover } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Icon, KeyCapture } from 'components/common';
 import { availableTimeRangeTypes, RELATIVE_ALL_TIME } from 'views/Constants';
 import { migrateTimeRangeToNewType } from 'views/components/TimerangeForForm';
 import DateTime from 'logic/datetimes/DateTime';
@@ -245,18 +244,6 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
     toggleDropdownShow();
   };
 
-  const handleEscKeyPress = useCallback(() => {
-    handleCancel();
-  }, [handleCancel]);
-
-  useEffect(() => {
-    Mousetrap.bind('esc', handleEscKeyPress);
-
-    return () => {
-      Mousetrap.reset();
-    };
-  }, [handleEscKeyPress]);
-
   const title = (
     <PopoverTitle>
       <span>Search Time Range</span>
@@ -280,7 +267,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
               validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
               onSubmit={handleSubmit}
               validateOnMount>
-        {(({ values: { nextTimeRange }, isValid, setFieldValue }) => {
+        {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
           const handleActiveTab = (nextTab) => {
             if ('type' in nextTimeRange) {
               setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab));
@@ -292,43 +279,45 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
           };
 
           return (
-            <Form>
-              <Row>
-                <Col md={12}>
-                  <TimeRangeLivePreview timerange={nextTimeRange} />
+            <KeyCapture shortcuts={{ enter: submitForm, esc: handleCancel }}>
+              <Form>
+                <Row>
+                  <Col md={12}>
+                    <TimeRangeLivePreview timerange={nextTimeRange} />
 
-                  <StyledTabs id="dateTimeTypes"
-                              defaultActiveKey={availableTimeRangeTypes[0].type}
-                              activeKey={activeTab ?? -1}
-                              onSelect={handleActiveTab}
-                              animation={false}>
-                    {timeRangeTypeTabs({
-                      activeTab,
-                      limitDuration,
-                      setValidatingKeyword,
-                    })}
+                    <StyledTabs id="dateTimeTypes"
+                                defaultActiveKey={availableTimeRangeTypes[0].type}
+                                activeKey={activeTab ?? -1}
+                                onSelect={handleActiveTab}
+                                animation={false}>
+                      {timeRangeTypeTabs({
+                        activeTab,
+                        limitDuration,
+                        setValidatingKeyword,
+                      })}
 
-                    {!activeTab && (<TabDisabledTimeRange />)}
+                      {!activeTab && (<TabDisabledTimeRange />)}
 
-                  </StyledTabs>
-                </Col>
-              </Row>
+                    </StyledTabs>
+                  </Col>
+                </Row>
 
-              <Row className="row-sm">
-                <Col md={6}>
-                  <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
-                </Col>
-                <Col md={6}>
-                  <div className="pull-right">
-                    {noOverride && (
-                      <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
-                    )}
-                    <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
-                    <Button bsStyle="success" disabled={!isValid || validatingKeyword} type="submit">Apply</Button>
-                  </div>
-                </Col>
-              </Row>
-            </Form>
+                <Row className="row-sm">
+                  <Col md={6}>
+                    <Timezone>All timezones using: <b>{DateTime.getUserTimezone()}</b></Timezone>
+                  </Col>
+                  <Col md={6}>
+                    <div className="pull-right">
+                      {noOverride && (
+                        <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>
+                      )}
+                      <CancelButton bsStyle="default" onClick={handleCancel}>Cancel</CancelButton>
+                      <Button bsStyle="success" disabled={!isValid || validatingKeyword} type="submit">Apply</Button>
+                    </div>
+                  </Col>
+                </Row>
+              </Form>
+            </KeyCapture>
           );
         })}
       </Formik>
