@@ -37,6 +37,9 @@ module.exports = {
         '@typescript-eslint/no-shadow': ['error'],
       },
     },
+    {
+      files: ['*.js', '*.jsx'],
+    },
   ],
   extends: [
     'eslint:recommended',
