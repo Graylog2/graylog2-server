@@ -29,7 +29,7 @@ import { ColorPickerPopover } from 'components/common';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import ColorPreview from 'views/components/sidebar/highlighting/ColorPreview';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
-import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingRule, { ConditionLabelMap, StringConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 type Props = {
   onClose: () => void,
@@ -44,8 +44,8 @@ const _isRequired = (field) => (value) => {
   return undefined;
 };
 
-const numberConditionOptions = ['==', '!=', '<=', '>=', '<', '>'].map((cond) => ({ value: cond, label: cond }));
-const otherConditionOptions = ['==', '!='].map((cond) => ({ value: cond, label: cond }));
+const numberConditionOptions = Object.entries(ConditionLabelMap).map(([value, label]) => ({ value, label }));
+const otherConditionOptions = Object.entries(StringConditionLabelMap).map(([value, label]) => ({ value, label }));
 
 const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);

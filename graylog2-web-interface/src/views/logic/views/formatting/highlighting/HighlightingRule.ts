@@ -18,9 +18,22 @@ import * as Immutable from 'immutable';
 
 import highlightConditionFunctions from 'views/logic/views/formatting/highlighting/highlightConditionFunctions';
 
+export const StringConditionLabelMap = {
+  equal: '==',
+  not_equal: '!=',
+};
+
+export const ConditionLabelMap = {
+  ...StringConditionLabelMap,
+  less_equal: '<=',
+  greater_equal: '>=',
+  less: '<',
+  greater: '>',
+};
+
 export type Value = string;
 export type Color = string;
-export type Condition = '==' | '!=' | '<=' | '>=' | '<' | '>';
+export type Condition = keyof typeof ConditionLabelMap;
 
 export type HighlightingRuleJSON = {
   field: string,
@@ -52,11 +65,11 @@ export default class HighlightingRule {
   }
 
   get condition() {
-    return this._value.condition ?? '==';
+    return this._value.condition ?? 'equal';
   }
 
   get conditionFunc() {
-    return highlightConditionFunctions[this._value.condition ?? '=='];
+    return highlightConditionFunctions[this._value.condition ?? 'equal'];
   }
 
   get color() {

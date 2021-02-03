@@ -34,12 +34,12 @@ const checkNumeric = (a: any, b: any, callback: (a: any, b: any) => boolean): bo
 };
 
 const highlightConditionFunctions = {
-  '==': (a, b) => String(a) === String(b),
-  '!=': (a, b) => String(a) !== String(b),
-  '<=': (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat <= bFloat),
-  '>=': (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat >= bFloat),
-  '>': (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat > bFloat),
-  '<': (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat < bFloat),
+  equal: (a, b) => String(a) === String(b),
+  not_equal: (a, b) => String(a) !== String(b),
+  less_equal: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat <= bFloat),
+  greater_equal: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat >= bFloat),
+  greater: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat > bFloat),
+  less: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat < bFloat),
 };
 
 export default highlightConditionFunctions;

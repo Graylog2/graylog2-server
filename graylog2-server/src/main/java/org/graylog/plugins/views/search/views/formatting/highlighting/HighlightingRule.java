@@ -41,7 +41,7 @@ public abstract class HighlightingRule {
     public abstract String color();
 
     @JsonProperty(FIELD_CONDITION)
-    public abstract String condition();
+    public abstract Condition condition();
 
 
     @AutoValue.Builder
@@ -53,13 +53,13 @@ public abstract class HighlightingRule {
         @JsonProperty(FIELD_COLOR)
         public abstract Builder color(String color);
         @JsonProperty(FIELD_CONDITION)
-        public abstract Builder condition(String condition);
+        public abstract Builder condition(Condition condition);
 
         public abstract HighlightingRule build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_HighlightingRule.Builder().condition("==");
+            return new AutoValue_HighlightingRule.Builder().condition(Condition.EQUAL);
         }
     }
 }

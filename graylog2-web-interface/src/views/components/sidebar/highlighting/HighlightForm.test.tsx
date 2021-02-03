@@ -30,7 +30,7 @@ jest.mock('views/stores/HighlightingRulesStore', () => ({
 
 const rule = HighlightingRule.builder()
   .color('#333333')
-  .condition('!=')
+  .condition('not_equal')
   .field('foob')
   .value('noob')
   .build();

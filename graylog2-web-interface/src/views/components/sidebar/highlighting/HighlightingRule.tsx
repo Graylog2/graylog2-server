@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ColorPickerPopover, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 
@@ -90,7 +90,7 @@ const HighlightingRule = ({ rule }: Props) => {
                             triggerNode={<ColorPreview color={color} />}
                             onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)} />
         <RuleContainer>
-          <strong>{field}</strong> {condition} <i>&quot;{value}&quot;</i>.
+          <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{value}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
           <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
