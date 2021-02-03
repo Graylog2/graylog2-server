@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
 
+import { isTypeRelative, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
@@ -67,27 +68,40 @@ const MiddleIcon = styled.span(({ theme }) => css`
   padding: 0 15px;
 `);
 
+const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
+  return !timerange[fieldName] ? placeholder : DateTime.now()
+    .subtract(timerange[fieldName] * 1000)
+    .fromNow();
+};
+
 const dateOutput = (timerange: TimeRange | NoTimeRangeOverride) => {
-  let range = EMPTY_RANGE;
+  let from = EMPTY_RANGE;
+  let to = EMPTY_RANGE;
 
   if (!timerange) {
     return EMPTY_OUTPUT;
   }
 
-  if ('range' in timerange) {
-    range = !timerange.range ? 'All Time' : DateTime.now()
-      .subtract(timerange.range * 1000)
-      .fromNow();
+  if (isTypeRelative(timerange)) {
+    if (isTypeRelativeWithStartOnly(timerange)) {
+      from = readableRange(timerange, 'range');
+    }
+
+    if (isTypeRelativeWithEnd(timerange)) {
+      from = readableRange(timerange, 'from');
+    }
+
+    to = readableRange(timerange, 'to', 'Now');
 
     return {
-      from: range,
-      until: 'Now',
+      from,
+      until: to,
     };
   }
 
   return {
-    from: 'from' in timerange ? timerange.from : range,
-    until: 'to' in timerange ? timerange.to : range,
+    from: 'from' in timerange ? timerange.from : from,
+    until: 'to' in timerange ? timerange.to : to,
   };
 };
 
@@ -127,8 +141,8 @@ const TimeRangeLivePreview = ({ timerange }: Props) => {
 TimeRangeLivePreview.propTypes = {
   timerange: PropTypes.shape({
     range: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    from: PropTypes.string,
-    to: PropTypes.string,
+    from: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    to: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }),
 };
 

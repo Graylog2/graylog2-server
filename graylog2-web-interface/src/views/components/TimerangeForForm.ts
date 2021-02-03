@@ -16,8 +16,11 @@
  */
 import moment from 'moment';
 
+import { DEFAULT_RELATIVE_FROM, RELATIVE_ALL_TIME } from 'views/Constants';
 import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
+import type { SearchBarFormValues } from 'views/Constants';
+import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
 const formatDatetime = (datetime) => datetime.toString(DateTime.Formats.TIMESTAMP);
 
@@ -32,17 +35,36 @@ export const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
         to: DateTime.parseFromString(timerange.to).toISOString(),
       };
     case 'relative':
-      return {
-        type: timerange.type,
-        range: timerange.range,
-      };
+      if (isTypeRelativeWithStartOnly(timerange)) {
+        return {
+          type: timerange.type,
+          range: timerange.range,
+        };
+      }
+
+      if (isTypeRelativeWithEnd(timerange)) {
+        if ('to' in timerange) {
+          return {
+            type: timerange.type,
+            from: timerange.from,
+            to: timerange.to,
+          };
+        }
+
+        return {
+          type: timerange.type,
+          from: timerange.from,
+        };
+      }
+
+      throw new Error('Invalid relative time range');
     case 'keyword':
       return timerange;
     default: throw new Error(`Invalid time range type: ${type}`);
   }
 };
 
-export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
+export const onInitializingTimerange = (timerange: TimeRange): SearchBarFormValues['timerange'] => {
   const { type } = timerange;
 
   switch (timerange.type) {
@@ -53,37 +75,83 @@ export const onInitializingTimerange = (timerange: TimeRange): TimeRange => {
         to: formatDatetime(DateTime.parseFromString(timerange.to)),
       };
     case 'relative':
-      return {
-        type: timerange.type,
-        range: timerange.range,
-      };
+      if (isTypeRelativeWithStartOnly(timerange)) {
+        if (timerange.range === RELATIVE_ALL_TIME) {
+          return {
+            type: timerange.type,
+            range: timerange.range,
+          };
+        }
+
+        return {
+          type: timerange.type,
+          from: timerange.range,
+        };
+      }
+
+      if (isTypeRelativeWithEnd(timerange)) {
+        if ('to' in timerange) {
+          return {
+            type: timerange.type,
+            from: timerange.from,
+            to: timerange.to,
+          };
+        }
+
+        return {
+          type: timerange.type,
+          from: timerange.from,
+        };
+      }
+
+      throw new Error('Invalid relative time range');
     case 'keyword':
       return timerange;
     default: throw new Error(`Invalid time range type: ${type}`);
   }
 };
 
+const getDefaultAbsoluteFromRange = (oldTimeRange: TimeRange | undefined | null) => {
+  if (isTypeRelativeWithStartOnly(oldTimeRange)) {
+    return oldTimeRange.range;
+  }
+
+  if (isTypeRelativeWithEnd(oldTimeRange)) {
+    return oldTimeRange.from;
+  }
+
+  return DEFAULT_RELATIVE_FROM;
+};
+
+const getDefaultAbsoluteToRange = (oldTimeRange: TimeRange | undefined | null) => {
+  if (isTypeRelativeWithEnd(oldTimeRange) && oldTimeRange.to) {
+    return oldTimeRange.to;
+  }
+
+  return 0;
+};
+
 const migrationStrategies = {
-  absolute: (oldTimerange: TimeRange | undefined | null) => ({
+  absolute: (oldTimeRange: TimeRange | undefined | null) => ({
     type: 'absolute',
-    from: formatDatetime(new DateTime(moment().subtract((oldTimerange?.type === 'relative') ? oldTimerange.range : 300, 'seconds'))),
-    to: formatDatetime(new DateTime(moment())),
+    from: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'))),
+    to: formatDatetime(new DateTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'))),
   }),
-  relative: () => ({ type: 'relative', range: 300 }),
+  relative: () => ({ type: 'relative', from: 300 }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
   disabled: () => undefined,
 };
 
-export const migrateTimeRangeToNewType = (oldTimerange: TimeRange | undefined | null, type: string): TimeRange | undefined | null => {
-  const oldType = oldTimerange && 'type' in oldTimerange ? oldTimerange.type : 'disabled';
+export const migrateTimeRangeToNewType = (oldTimeRange: TimeRange | undefined | null, type: string): TimeRange | undefined | null => {
+  const oldType = oldTimeRange && 'type' in oldTimeRange ? oldTimeRange.type : 'disabled';
 
   if (type === oldType) {
-    return oldTimerange;
+    return oldTimeRange;
   }
 
   if (!migrationStrategies[type]) {
     throw new Error(`Invalid time range type: ${type}`);
   }
 
-  return migrationStrategies[type](oldTimerange);
+  return migrationStrategies[type](oldTimeRange);
 };

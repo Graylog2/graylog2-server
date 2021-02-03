@@ -16,7 +16,7 @@
  */
 import chroma from 'chroma-js';
 
-import { RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
+import { TimeRange, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 
 export type SearchBarFormValues = {
   timerange: TimeRange,
@@ -26,12 +26,15 @@ export type SearchBarFormValues = {
 
 export const TIMESTAMP_FIELD = 'timestamp';
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, 'source'];
+export const RELATIVE_ALL_TIME = 0; // value for time range `range` property, which represents all time
 export const Messages = {
   DEFAULT_LIMIT: 150,
 };
 
 export const DEFAULT_RANGE_TYPE = 'relative';
-export const DEFAULT_TIMERANGE: RelativeTimeRange = { type: DEFAULT_RANGE_TYPE, range: 300 };
+export const DEFAULT_RELATIVE_FROM = 300;
+export const DEFAULT_RELATIVE_TO = DEFAULT_RELATIVE_FROM - 60;
+export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE_TYPE, from: DEFAULT_RELATIVE_FROM };
 
 export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
@@ -46,6 +49,25 @@ export const TimeUnits = {
   weeks: 'Weeks',
   months: 'Months',
 };
+
+export const RELATIVE_RANGE_TYPES = [
+  {
+    type: 'seconds',
+    label: 'Seconds',
+  }, {
+    type: 'minutes',
+    label: 'Minutes',
+  }, {
+    type: 'hours',
+    label: 'Hours',
+  }, {
+    type: 'days',
+    label: 'Days',
+  }, {
+    type: 'weeks',
+    label: 'Weeks',
+  },
+] as const;
 
 export type TimeUnit = keyof typeof TimeUnits;
 

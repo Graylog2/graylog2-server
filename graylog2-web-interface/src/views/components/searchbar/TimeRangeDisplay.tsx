@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
+import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
@@ -52,8 +53,15 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 `);
 
+const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
+  return !timerange[fieldName] ? placeholder : DateTime.now()
+    .subtract(timerange[fieldName] * 1000)
+    .fromNow();
+};
+
 const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
+  let to = EMPTY_RANGE;
 
   if (!timerange) {
     return EMPTY_OUTPUT;
@@ -61,13 +69,20 @@ const dateOutput = (timerange: TimeRange) => {
 
   switch (timerange.type) {
     case 'relative':
-      from = !timerange.range ? 'All Time' : DateTime.now()
-        .subtract(timerange.range * 1000)
-        .fromNow();
+
+      if (isTypeRelativeWithStartOnly(timerange)) {
+        from = readableRange(timerange, 'range');
+      }
+
+      if (isTypeRelativeWithEnd(timerange)) {
+        from = readableRange(timerange, 'from');
+      }
+
+      to = readableRange(timerange, 'to', 'Now');
 
       return {
         from,
-        until: 'Now',
+        until: to,
       };
 
     case 'absolute':
@@ -83,7 +98,7 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   const dateTested = useRef(false);
 
   useEffect(() => {
-    if (timerange && 'type' in timerange && timerange.type === 'keyword' && !timerange.from) {
+    if (isTypeKeyword(timerange) && !timerange.from) {
       if (!dateTested.current) {
         ToolsStore.testNaturalDate(timerange.keyword)
           .then((response) => {

@@ -43,7 +43,7 @@ jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => '
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
-    .timerange({ type: 'relative', range: 300 })
+    .timerange({ type: 'relative', from: 300 })
     .query({ type: 'elasticsearch', query_string: '*' })
     .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
     .build()]),

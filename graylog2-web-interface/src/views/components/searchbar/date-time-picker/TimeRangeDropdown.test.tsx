@@ -16,9 +16,10 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import { NoTimeRangeOverride, TimeRange } from 'src/views/logic/queries/Query';
+import { NoTimeRangeOverride } from 'src/views/logic/queries/Query';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import { act } from 'react-dom/test-utils';
+import { SearchBarFormValues } from 'src/views/Constants';
 
 import ToolsStore from 'stores/tools/ToolsStore';
 
@@ -82,7 +83,7 @@ jest.mock('stores/tools/ToolsStore', () => ({}));
 const defaultProps = {
   currentTimeRange: {
     type: 'relative',
-    range: 300,
+    from: 300,
   },
   noOverride: false,
   setCurrentTimeRange: jest.fn(),
@@ -91,8 +92,8 @@ const defaultProps = {
 
 type Props = {
   noOverride?: boolean,
-  currentTimeRange: TimeRange | NoTimeRangeOverride,
-  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
 };
 
@@ -143,7 +144,7 @@ describe('TimeRangeDropdown', () => {
 
     await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalledWith({
       type: 'relative',
-      range: 300,
+      from: 300,
     }));
   });
 

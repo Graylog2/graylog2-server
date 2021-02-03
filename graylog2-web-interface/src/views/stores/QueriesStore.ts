@@ -153,15 +153,15 @@ export const QueriesStore: QueriesStoreType = singletonStore(
           case 'absolute':
             newTimeRange = {
               type,
-              from: moment().subtract(oldTimerange.range, 'seconds').toISOString(),
-              to: moment().toISOString(),
+              from: moment().subtract(oldTimerange.from ?? oldTimerange.range, 'seconds').toISOString(),
+              to: moment().subtract(oldTimerange.to, 'seconds').toISOString(),
             };
 
             break;
           case 'relative':
             newTimeRange = {
               type,
-              range: 300,
+              from: 300,
             };
 
             break;

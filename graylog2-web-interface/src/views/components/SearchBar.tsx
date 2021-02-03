@@ -40,8 +40,9 @@ import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
-import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
+import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import type { SearchBarFormValues } from 'views/Constants';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
@@ -51,7 +52,7 @@ type Props = {
   config: SearchesConfig,
   currentQuery: Query,
   disableSearch?: boolean,
-  onSubmit?: (update: { timerange: TimeRange, streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
+  onSubmit?: (update: { timerange: SearchBarFormValues['timerange'], streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
