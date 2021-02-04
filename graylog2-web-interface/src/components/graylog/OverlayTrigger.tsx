@@ -55,10 +55,9 @@ class OverlayTrigger extends React.Component<Props, State> {
 
     return (
       <>
-        {React.cloneElement(children, {
-          onClick: toggleShow,
-          ref: this.targetRef,
-        })}
+        <span ref={this.targetRef}>
+          {React.cloneElement(children, { onClick: toggleShow })}
+        </span>
 
         {show && (
           <Overlay show={show}

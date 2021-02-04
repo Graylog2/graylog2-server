@@ -17,21 +17,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Overlay } from 'react-overlays';
 
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { ColorPicker, ColorPickerPopover, Icon } from 'components/common';
-import { Popover } from 'components/graylog';
+import { ColorPickerPopover, Icon } from 'components/common';
 
 import ColorPreview from './ColorPreview';
-
-const StyledPopover = styled(Popover)`
-  .popover-content {
-    padding: 0;
-  }
-`;
 
 export const HighlightingRuleGrid = styled.div`
   display: grid;
@@ -94,13 +86,6 @@ const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color } = rule;
   const overlayContainerRef = React.useRef();
 
-  const [show, setShow] = React.useState(false);
-  const toggleTarget = React.useRef();
-
-  const handleToggle = () => {
-    setShow(!show);
-  };
-
   const handleChange = (newColor, _, hidePopover) => {
     return updateColor(rule, newColor, hidePopover);
   };
@@ -108,28 +93,13 @@ const HighlightingRule = ({ rule }: Props) => {
   return (
     <HighlightingRuleGrid ref={overlayContainerRef}>
 
-      {/* <ColorPickerPopover id="formatting-rule-color" */}
-      {/*                    placement="right" */}
-      {/*                    title="Pick a color" */}
-      {/*                    color={color} */}
-      {/*                    colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])} */}
-      {/*                    triggerNode={<ColorPreview color={color} />} */}
-      {/*                    onChange={handleChange} /> */}
-
-      <ColorPreview color={color} ref={toggleTarget} onClick={handleToggle} />
-      <Overlay show={show}
-               containerPadding={10}
-               placement="right"
-               shouldUpdatePosition
-               target={toggleTarget.current}
-               rootClose
-               onHide={handleToggle}>
-        <StyledPopover id="formatting-rule-color" title="Pick a color">
-          <ColorPicker color={color}
-                       colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                       onChange={handleChange} />
-        </StyledPopover>
-      </Overlay>
+      <ColorPickerPopover id="formatting-rule-color"
+                          placement="right"
+                          title="Pick a color"
+                          color={color}
+                          colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+                          triggerNode={<ColorPreview color={color} />}
+                          onChange={handleChange} />
 
       <div>
         for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.

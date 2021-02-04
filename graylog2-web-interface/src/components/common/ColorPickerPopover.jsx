@@ -38,7 +38,7 @@ const StyledPopover = styled(Popover)`
  * information.
  */
 const ColorPickerPopover = ({ id, placement, title, triggerNode, triggerAction, onChange, ...rest }) => {
-  const [show, setShow] = React.useState;
+  const [show, setShow] = React.useState(false);
   const toggleTarget = React.useRef();
 
   const handleToggle = () => {
