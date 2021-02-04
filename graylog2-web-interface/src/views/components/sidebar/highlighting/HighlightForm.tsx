@@ -94,6 +94,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                     <Select inputId="field-select"
                             onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                             options={fieldOptions}
+                            allowCreate
                             value={value}
                             placeholder="Pick a field" />
                   </Input>
