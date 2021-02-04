@@ -325,7 +325,7 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
         title="Sharing not possible"
       >
         <OverlayTrigger
-          defaultOverlayShown={false}
+          container={null}
           overlay={
             <Popover
               id="help-popover"
@@ -335,6 +335,7 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
             </Popover>
           }
           placement="bottom"
+          rootClose={false}
           trigger={
             Array [
               "hover",
@@ -342,35 +343,29 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
             ]
           }
         >
-          <Icon
-            className="c1 "
-            name="question-circle"
-            onBlur={[Function]}
-            onClick={null}
-            onFocus={[Function]}
-            onMouseOut={[Function]}
-            onMouseOver={[Function]}
-            type="solid"
-          >
-            <FontAwesomeIcon
+          <span>
+            <Icon
               className="c1 "
-              icon={
-                Object {
-                  "iconName": "question-circle",
-                  "prefix": "fas",
-                }
-              }
-              onBlur={[Function]}
-              onClick={null}
-              onFocus={[Function]}
-              onMouseOut={[Function]}
-              onMouseOver={[Function]}
+              name="question-circle"
+              onClick={[Function]}
+              type="solid"
             >
-              <svg
-                className="svg-inline--fa fa-question-circle"
-              />
-            </FontAwesomeIcon>
-          </Icon>
+              <FontAwesomeIcon
+                className="c1 "
+                icon={
+                  Object {
+                    "iconName": "question-circle",
+                    "prefix": "fas",
+                  }
+                }
+                onClick={[Function]}
+              >
+                <svg
+                  className="svg-inline--fa fa-question-circle"
+                />
+              </FontAwesomeIcon>
+            </Icon>
+          </span>
         </OverlayTrigger>
       </HoverForHelp>
     </SharingDisabledPopover__StyledHoverForHelp>
