@@ -23,7 +23,7 @@ import type { RefluxActions } from 'stores/StoreTypes';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import AddNewWidgetsToPositions from 'views/logic/views/AddNewWidgetsToPositions';
+import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
@@ -106,7 +106,7 @@ export const CurrentViewStateStore = singletonStore(
       const positionsMap = Immutable.Map(this._activeState().widgetPositions);
       const nextWidgetIds = nextWidgets.map(({ id }) => id);
       const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId));
-      const newPositionMap = AddNewWidgetsToPositions(cleanedPositionsMap, nextWidgets);
+      const newPositionMap = GenerateNextPosition(cleanedPositionsMap, nextWidgets);
 
       const newActiveState = this._activeState().toBuilder()
         .widgets(nextWidgets)
