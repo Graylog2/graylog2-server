@@ -40,6 +40,11 @@ module.exports = {
     {
       files: ['*.js', '*.jsx'],
     },
+    {
+      files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
+      plugins: ['jest'],
+      extends: ['plugin:jest/recommended'],
+    },
   ],
   extends: [
     'eslint:recommended',
