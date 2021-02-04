@@ -83,6 +83,8 @@ describe('TabKeywordTimeRange', () => {
     const input = getByDisplayValue('Last hour');
 
     await changeInput(input, 'last year');
+
+    expect(input).toHaveValue('last year');
   });
 
   it('calls testNaturalDate', async () => {
