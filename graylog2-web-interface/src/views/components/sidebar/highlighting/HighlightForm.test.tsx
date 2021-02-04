@@ -25,6 +25,7 @@ jest.mock('views/stores/HighlightingRulesStore', () => ({
   HighlightingRulesActions: {
     add: jest.fn(() => Promise.resolve()),
     remove: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -37,19 +38,16 @@ const rule = HighlightingRule.builder()
 
 describe('HighlightForm', () => {
   it('should render for edit', async () => {
-    const { findByText } = render(<HighlightForm onClose={() => {}} rule={rule} />);
+    const { findByText, findByDisplayValue } = render(<HighlightForm onClose={() => {}} rule={rule} />);
 
-    const elem = await findByText('Edit Highlighting Rule');
-
-    expect(elem).not.toBeEmptyDOMElement();
+    await findByText('Edit Highlighting Rule');
+    await findByDisplayValue(rule.value);
   });
 
   it('should render for new', async () => {
     const { findByText } = render(<HighlightForm onClose={() => {}} />);
 
-    const elem = await findByText('New Highlighting Rule');
-
-    expect(elem).not.toBeEmptyDOMElement();
+    await findByText('New Highlighting Rule');
   });
 
   it('should fire onClose on cancel', async () => {
@@ -70,6 +68,7 @@ describe('HighlightForm', () => {
 
     fireEvent.click(elem);
 
-    await waitFor(() => expect(HighlightingRulesActions.remove).toBeCalledTimes(1));
+    await waitFor(() => expect(HighlightingRulesActions.update)
+      .toBeCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
   });
 });

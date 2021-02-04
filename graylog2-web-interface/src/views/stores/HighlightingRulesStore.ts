@@ -27,10 +27,17 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
+type UpdatePayload = {
+  field: string,
+  value: string,
+  condition: Condition,
+  color: string,
+};
+
 type HighlightingRulesActionsType = RefluxActions<{
   add: (rule: HighlightingRule) => Promise<Array<HighlightingRule>>,
   remove: (rule: HighlightingRule) => Promise<Array<HighlightingRule>>,
-  update: (rule: HighlightingRule) => Promise<Array<HighlightingRule>>,
+  update: (rule: HighlightingRule, payload: UpdatePayload) => Promise<Array<HighlightingRule>>,
 }>;
 
 const HighlightingRulesActions: HighlightingRulesActionsType = singletonActions(
@@ -113,10 +120,11 @@ const HighlightingRulesStore: Store<Array<HighlightingRule>> = singletonStore(
 
       return promise;
     },
-    update(rule: HighlightingRule): Promise<Array<HighlightingRule>> {
-      const { field, value, condition, color } = rule;
-      const key = makeKey(field, value, condition);
-      const promise = this._propagateAndTrigger(this.state.set(key, color));
+    update(rule: HighlightingRule, { field, value, condition, color }): Promise<Array<HighlightingRule>> {
+      const oldKey = makeKey(rule.field, rule.value, rule.condition);
+      this.state.delete(oldKey);
+      const newKey = makeKey(field, value, condition);
+      const promise = this._propagateAndTrigger(this.state.set(newKey, color));
 
       HighlightingRulesActions.update.promise(promise);
 

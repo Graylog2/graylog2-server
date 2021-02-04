@@ -19,6 +19,7 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 import { Input, BootstrapModalWrapper } from 'components/bootstrap';
 import { Button, Modal } from 'components/graylog';
@@ -52,20 +53,18 @@ const HighlightForm = ({ onClose, rule }: Props) => {
   const fields = fieldTypes?.all
     ? fieldTypes.all
     : Immutable.List<FieldTypeMapping>();
-  const fieldOptions = fields.map(({ name }) => ({ value: name, label: name })).toArray();
+  const fieldOptions = fields.map(({ name }) => ({ value: name, label: name }))
+    .sort((optA, optB) => defaultCompare(optA.label, optB.label))
+    .toArray();
 
   const onSubmit = ({ field, value, color, condition }) => {
     if (rule) {
-      HighlightingRulesActions.remove(rule).then(() => HighlightingRulesActions.add(
-        HighlightingRule.create(field, value, condition, color),
-      ).then(onClose));
+      HighlightingRulesActions.update(rule, { field, value, condition, color }).then(onClose);
 
       return;
     }
 
-    HighlightingRulesActions.add(
-      HighlightingRule.create(field, value, condition, color),
-    ).then(onClose);
+    HighlightingRulesActions.add(HighlightingRule.create(field, value, condition, color)).then(onClose);
   };
 
   const headerTxt = rule ? 'Edit' : 'New';
