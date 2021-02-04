@@ -42,7 +42,7 @@ const SourceCodeContainer = styled.div(({ resizable, theme }) => css`
 `);
 
 const StyledTooltip = styled(Tooltip)`
-  //width: 250px;
+  width: 250px;
 `;
 
 const Toolbar = styled.div(({ theme }) => css`

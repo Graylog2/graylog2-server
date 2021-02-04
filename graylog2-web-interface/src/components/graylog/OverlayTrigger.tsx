@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { createRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
+import styled from 'styled-components';
 
 type Props = {
   children: React.ReactElement,
@@ -29,6 +30,10 @@ type Props = {
 type State = {
   show: boolean,
 }
+
+const TriggerWrap = styled.span`
+  display: inline-block;
+`;
 
 class OverlayTrigger extends React.Component<Props, State> {
   targetRef = createRef<HTMLElement>();
@@ -55,9 +60,9 @@ class OverlayTrigger extends React.Component<Props, State> {
 
     return (
       <>
-        <span ref={this.targetRef}>
+        <TriggerWrap ref={this.targetRef}>
           {React.cloneElement(children, { onClick: toggleShow })}
-        </span>
+        </TriggerWrap>
 
         {show && (
           <Overlay show={show}
