@@ -70,6 +70,8 @@ const defaultProps = {
 };
 
 const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = defaultProps.disableSearch, queryFilters, onSubmit = defaultProps.onSubmit }: Props) => {
+  const _onSubmit = useCallback((values) => onSubmit(values, currentQuery), [onSubmit, currentQuery]);
+
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -78,8 +80,6 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
   const { query_string: queryString } = query;
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
-
-  const _onSubmit = useCallback((values) => onSubmit(values, currentQuery), [query, onSubmit]);
 
   return (
     <ScrollToHint value={query.query_string}>
