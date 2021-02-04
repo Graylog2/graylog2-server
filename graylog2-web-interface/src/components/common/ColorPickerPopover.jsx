@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { cloneElement, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Overlay } from 'react-overlays';
@@ -38,8 +39,8 @@ const StyledPopover = styled(Popover)`
  * information.
  */
 const ColorPickerPopover = ({ id, placement, title, triggerNode, triggerAction, onChange, ...rest }) => {
-  const [show, setShow] = React.useState(false);
-  const toggleTarget = React.useRef();
+  const [show, setShow] = useState(false);
+  const toggleTarget = useRef();
 
   const handleToggle = () => {
     setShow(!show);
@@ -51,7 +52,7 @@ const ColorPickerPopover = ({ id, placement, title, triggerNode, triggerAction, 
 
   return (
     <>
-      {React.cloneElement(triggerNode, {
+      {cloneElement(triggerNode, {
         onClick: handleToggle,
         ref: toggleTarget,
       })}

@@ -31,6 +31,8 @@ type State = {
 }
 
 class OverlayTrigger extends React.Component<Props, State> {
+  targetRef = createRef<HTMLElement>();
+
   static defaultProps = {
     trigger: 'click',
     rootClose: false,
@@ -43,8 +45,6 @@ class OverlayTrigger extends React.Component<Props, State> {
     this.state = {
       show: false,
     };
-
-    this.targetRef = createRef();
   }
 
   render() {
