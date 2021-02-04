@@ -145,7 +145,7 @@
         <protobuf.version>3.11.4</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.2</shiro.version>
         <oshi.version>5.3.7</oshi.version>
