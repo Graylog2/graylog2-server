@@ -64,9 +64,7 @@ type Props = {
 };
 
 const updateColor = (rule, newColor, hidePopover) => {
-  const newRule = rule.toBuilder().color(newColor).build();
-
-  return HighlightingRulesActions.update(newRule).then(hidePopover);
+  return HighlightingRulesActions.update(rule, { color: newColor }).then(hidePopover);
 };
 
 const onDelete = (rule) => {

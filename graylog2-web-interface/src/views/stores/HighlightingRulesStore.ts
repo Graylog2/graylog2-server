@@ -28,9 +28,9 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type UpdatePayload = {
-  field: string,
-  value: string,
-  condition: Condition,
+  field?: string,
+  value?: string,
+  condition?: Condition,
   color: string,
 };
 
@@ -120,7 +120,8 @@ const HighlightingRulesStore: Store<Array<HighlightingRule>> = singletonStore(
 
       return promise;
     },
-    update(rule: HighlightingRule, { field, value, condition, color }): Promise<Array<HighlightingRule>> {
+    update(rule: HighlightingRule, payload): Promise<Array<HighlightingRule>> {
+      const { field = rule.field, value = rule.value, condition = rule.condition, color = rule.color } = payload;
       const oldKey = makeKey(rule.field, rule.value, rule.condition);
       this.state.delete(oldKey);
       const newKey = makeKey(field, value, condition);

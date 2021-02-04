@@ -19,8 +19,8 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
-import { defaultCompare } from 'views/logic/DefaultCompare';
 
+import { defaultCompare } from 'views/logic/DefaultCompare';
 import { Input, BootstrapModalWrapper } from 'components/bootstrap';
 import { Button, Modal } from 'components/graylog';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
