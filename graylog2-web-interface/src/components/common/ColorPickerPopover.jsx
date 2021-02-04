@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import createReactClass from 'create-react-class';
+import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { Overlay } from 'react-overlays';
 
-import { OverlayTrigger, Popover } from 'components/graylog';
+import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 
-import style from './ColorPickerPopover.css';
+const StyledPopover = styled(Popover)`
+  .popover-content {
+    padding: 0;
+  }
+`;
 
 /**
  * Component that renders a `ColorPicker` component inside a react bootstrap
@@ -32,58 +37,67 @@ import style from './ColorPickerPopover.css';
  * is left for that component. Please look at `ColorPicker`'s documentation for more
  * information.
  */
-const ColorPickerPopover = createReactClass({
-  propTypes: {
-    /** Provides an ID for this popover element. */
-    id: PropTypes.string.isRequired,
-    /** Indicates where the popover should appear. */
-    placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-    /** Title to use in the popover header. */
-    title: PropTypes.string,
-    /** React node that will be used as trigger to show/hide the popover. */
-    triggerNode: PropTypes.node.isRequired,
-    /** Event that will show/hide the popover. */
-    triggerAction: PropTypes.oneOf(['click', 'hover', 'focus']),
-    /**
+const ColorPickerPopover = ({ id, placement, title, triggerNode, triggerAction, onChange, ...rest }) => {
+  const [show, setShow] = React.useState;
+  const toggleTarget = React.useRef();
+
+  const handleToggle = () => {
+    setShow(!show);
+  };
+
+  const handleChange = (newColor, event) => {
+    onChange(newColor, event, handleToggle);
+  };
+
+  return (
+    <>
+      {React.cloneElement(triggerNode, {
+        onClick: handleToggle,
+        ref: toggleTarget,
+      })}
+
+      {show && (
+        <Overlay show={show}
+                 containerPadding={10}
+                 placement={placement}
+                 shouldUpdatePosition
+                 target={toggleTarget.current}
+                 rootClose
+                 onHide={handleToggle}>
+          <StyledPopover id={id} title={title}>
+            <ColorPicker onChange={handleChange}
+                         {...rest} />
+          </StyledPopover>
+        </Overlay>
+      )}
+    </>
+  );
+};
+
+ColorPickerPopover.propTypes = {
+  /** Provides an ID for this popover element. */
+  id: PropTypes.string.isRequired,
+  /** Indicates where the popover should appear. */
+  placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+  /** Title to use in the popover header. */
+  title: PropTypes.string,
+  /** React node that will be used as trigger to show/hide the popover. */
+  triggerNode: PropTypes.node.isRequired,
+  /** Event that will show/hide the popover. */
+  triggerAction: PropTypes.oneOf(['click', 'hover', 'focus']),
+  /**
      * Function that will be called when the selected color changes.
      * The function receives the color in hexadecimal format as first argument,
      * the event as the second argument, and a callback function to hide the
      * overlay as third argument.
      */
-    onChange: PropTypes.func.isRequired,
-  },
+  onChange: PropTypes.func.isRequired,
+};
 
-  getDefaultProps() {
-    return {
-      placement: 'bottom',
-      triggerAction: 'click',
-      title: 'Pick a color',
-    };
-  },
-
-  handleChange(color, event) {
-    this.props.onChange(color, event, () => this.overlay.hide());
-  },
-
-  render() {
-    const { container, id, placement, title, triggerNode, triggerAction, ...colorPickerProps } = this.props;
-    const popover = (
-      <Popover id={id} title={title} className={style.customPopover}>
-        <ColorPicker {...colorPickerProps} onChange={this.handleChange} />
-      </Popover>
-    );
-
-    return (
-      <OverlayTrigger ref={(c) => { this.overlay = c; }}
-                      trigger={triggerAction}
-                      placement={placement}
-                      overlay={popover}
-                      container={container}
-                      rootClose>
-        {triggerNode}
-      </OverlayTrigger>
-    );
-  },
-});
+ColorPickerPopover.defaultProps = {
+  placement: 'bottom',
+  triggerAction: 'click',
+  title: 'Pick a color',
+};
 
 export default ColorPickerPopover;
