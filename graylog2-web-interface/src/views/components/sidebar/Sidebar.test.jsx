@@ -225,7 +225,7 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
 
-  it('should render placeholder if dashboard has no summary or description ', () => {
+  it('should render placeholder if dashboard has no summary or description', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
@@ -245,7 +245,7 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no summary');
   });
 
-  it('should render placeholder if saved search has no summary or description ', () => {
+  it('should render placeholder if saved search has no summary or description', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}

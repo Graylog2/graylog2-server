@@ -64,8 +64,8 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
     display: flex;
-    height: calc(100vh - 50px);
     overflow: auto;
+    height: 100%;
 
     > *:nth-child(2) {
       flex-grow: 1;

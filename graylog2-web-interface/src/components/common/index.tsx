@@ -25,6 +25,7 @@ export { default as ConfirmLeaveDialog } from './ConfirmLeaveDialog';
 export { default as ContentHeadRow } from './ContentHeadRow';
 export { default as ContentPackMarker } from './ContentPackMarker';
 export { default as ControlledTableList } from './ControlledTableList';
+export { default as CopyToClipboardCapture } from './CopyToClipboardCapture';
 export { default as CountBadge } from './CountBadge';
 export { default as DataTable } from './DataTable';
 export { default as DatePicker } from './DatePicker';

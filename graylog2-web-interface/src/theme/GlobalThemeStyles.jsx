@@ -29,9 +29,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.colors.global.background};
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
-    overflow-x: hidden;
-    margin-top: 50px;
-    min-height: calc(100vh - 50px);
+    height: 100vh;
+  }
+
+  #app-root {
+    height: 100%;
   }
 
   ul {

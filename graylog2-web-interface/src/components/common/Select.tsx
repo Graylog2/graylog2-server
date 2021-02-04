@@ -481,7 +481,10 @@ class Select extends React.Component<Props, State> {
     if (formattedValue && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
-      formattedValue = (value || '').split(delimiter).map((v) => options.find((option) => option[valueKey || ''] === v));
+      formattedValue = (typeof value === 'string'
+        ? (value ?? '').split(delimiter)
+        : [value])
+        .map((v) => options.find((option) => option[valueKey || ''] === v));
     }
 
     const {

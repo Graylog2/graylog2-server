@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+import { widgetDefinition } from 'views/logic/Widgets';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import Widget from 'views/logic/widgets/Widget';
 
-import java.util.Collections;
-import java.util.List;
+const GetPositionForNewWidget = (widget: Widget) => {
+  const { defaultHeight, defaultWidth } = widgetDefinition(widget.type);
 
-public class IndexNotFoundException extends ElasticsearchException {
-    public IndexNotFoundException(String message) {
-        super(message);
-    }
+  return WidgetPosition.builder()
+    .height(defaultHeight)
+    .width(defaultWidth)
+    .col(1)
+    .row(1)
+    .build();
+};
 
-    public IndexNotFoundException(String message, List<String> errorDetails) {
-        super(message, errorDetails);
-    }
-
-    public static IndexNotFoundException create(String errorMessage, String index) {
-        return new IndexNotFoundException(errorMessage, Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
-    }
-}
+export default GetPositionForNewWidget;
