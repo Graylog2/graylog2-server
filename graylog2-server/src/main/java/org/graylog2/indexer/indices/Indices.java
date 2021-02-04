@@ -326,7 +326,7 @@ public class Indices {
         indicesAdapter.optimizeIndex(index, maxNumSegments, timeout);
     }
 
-    public HealthStatus waitForRecovery(String index, int timeout) {
+    HealthStatus waitForRecovery(String index, int timeout) {
         LOG.debug("Waiting until index health status of index {} is healthy", index);
         return indicesAdapter.waitForRecovery(index, timeout);
     }
@@ -334,6 +334,12 @@ public class Indices {
     public HealthStatus waitForRecovery(String index) {
         LOG.debug("Waiting until index health status of index {} is healthy", index);
         return indicesAdapter.waitForRecovery(index);
+    }
+
+    public static <E extends Exception> void checkIfHealthy(HealthStatus healthStatus, Function<HealthStatus, E> errorMessageSupplier) throws E {
+        if (healthStatus.equals(HealthStatus.Red)) {
+            throw errorMessageSupplier.apply(healthStatus);
+        }
     }
 
     public Optional<DateTime> indexCreationDate(String index) {
