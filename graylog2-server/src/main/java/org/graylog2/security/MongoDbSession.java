@@ -99,7 +99,15 @@ public class MongoDbSession extends PersistedImpl {
         if (attributes == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(String.valueOf(attributes.get(DefaultSubjectContext.PRINCIPALS_SESSION_KEY)));
+        // A subject can have more than one principal. If that's the case, the user ID is required to be the first one.
+        final Object principals = attributes.get(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+        final String sessionId;
+        if (principals instanceof Iterable) {
+            sessionId = String.valueOf(((Iterable<?>) principals).iterator().next());
+        } else {
+            sessionId = String.valueOf(principals);
+        }
+        return Optional.ofNullable(sessionId);
     }
 
     public String getHost() {
