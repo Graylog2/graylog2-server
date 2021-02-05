@@ -53,8 +53,8 @@ describe('HighlightingRule', () => {
         .toHaveBeenCalledWith(Rule.builder()
           .field('response_time')
           .value('250')
-          .color('#416af4')
-          .build());
+          .color('#f44242')
+          .build(), { color: '#416af4' });
     });
   });
 
