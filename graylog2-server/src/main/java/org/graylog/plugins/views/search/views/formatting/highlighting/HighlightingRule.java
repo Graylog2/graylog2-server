@@ -53,11 +53,6 @@ public abstract class HighlightingRule {
         public abstract Builder value(String value);
 
         @JsonProperty(FIELD_COLOR)
-        public Builder color(String color) {
-            return this.color(StaticColor.create(color));
-        }
-
-        @JsonProperty(FIELD_COLOR)
         @JsonDeserialize(using = LegacyColorDeserializer.class)
         public abstract Builder color(HighlightingColor color);
 

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
 import java.io.IOException;
 
@@ -32,5 +33,16 @@ public class LegacyColorDeserializer extends JsonDeserializer<HighlightingColor>
         }
 
         return p.getCodec().readValue(p, HighlightingColor.class);
+    }
+
+    @Override
+    public Object deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
+        final JsonToken token = p.getCurrentToken();
+        if (token.isScalarValue()) {
+            final String color = p.getCodec().readValue(p, String.class);
+            return StaticColor.create(color);
+        }
+
+        return super.deserializeWithType(p, ctxt, typeDeserializer);
     }
 }
