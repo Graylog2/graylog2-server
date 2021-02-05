@@ -30,16 +30,14 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
+import styles from './EditWidgetFrame.css';
+import globalStyles from './EditWidgetFrame.global.lazy.css';
+
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 import SearchBarForm from '../searchbar/SearchBarForm';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
 
 type DialogProps = {
   bsClass: string,
