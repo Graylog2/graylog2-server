@@ -19,11 +19,15 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 
 describe('HighlightingColorForm', () => {
+  const field = FieldTypeMapping.create('foo', FieldType.create('number', [Properties.Numeric]));
+
   it('shows color picker for static color', async () => {
     const color = StaticColor.create('#666666');
-    render(<HighlightingColorForm name="color" value={color} onChange={jest.fn()} />);
+    render(<HighlightingColorForm name="color" field={field} value={color} onChange={jest.fn()} />);
 
     const typeInput = await screen.findByLabelText('Static Color');
 

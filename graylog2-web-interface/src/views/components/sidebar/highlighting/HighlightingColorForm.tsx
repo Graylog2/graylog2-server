@@ -28,6 +28,7 @@ import HighlightingColor, {
 } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type ChangeEvent = {
   target: {
@@ -38,6 +39,7 @@ type ChangeEvent = {
 
 type Props = {
   name: string,
+  field: FieldTypeMapping,
   value: HighlightingColor,
   onChange: (e: ChangeEvent) => void,
 };
@@ -116,9 +118,12 @@ const Container = styled.div`
   margin-left: 10px;
 `;
 
-const HighlightingColorForm = ({ name, value, onChange }: Props) => {
+const HighlightingColorForm = ({ name, field, value, onChange }: Props) => {
   const onChangeType = useCallback(({ target: { value: newValue } }) => onChange({ target: { name, value: createNewColor(newValue) } }), [name, onChange]);
   const _onChange = useCallback((newColor: HighlightingColor) => onChange({ target: { name, value: newColor } }), [name, onChange]);
+
+  const isNumeric = field?.type?.isNumeric() ?? false;
+  const isDisabled = field === undefined;
 
   return (
     <>
@@ -128,6 +133,7 @@ const HighlightingColorForm = ({ name, value, onChange }: Props) => {
           <Input checked={value?.type === 'static'}
                  formGroupClassName=""
                  id={name}
+                 disabled={isDisabled}
                  label="Static Color"
                  onChange={onChangeType}
                  type="radio"
@@ -135,6 +141,7 @@ const HighlightingColorForm = ({ name, value, onChange }: Props) => {
           <Input checked={value?.type === 'gradient'}
                  formGroupClassName=""
                  id={name}
+                 disabled={isDisabled || !isNumeric}
                  label="Gradient"
                  onChange={onChangeType}
                  type="radio"

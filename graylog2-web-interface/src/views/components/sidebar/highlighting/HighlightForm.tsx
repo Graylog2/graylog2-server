@@ -33,6 +33,8 @@ import HighlightingRule, {
   StringConditionLabelMap,
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
+import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 type Props = {
   onClose: () => void,
@@ -49,6 +51,8 @@ const _isRequired = (field) => (value) => {
 
 const numberConditionOptions = Object.entries(ConditionLabelMap).map(([value, label]) => ({ value, label }));
 const otherConditionOptions = Object.entries(StringConditionLabelMap).map(([value, label]) => ({ value, label }));
+
+const fieldTypeFor = (fields: FieldTypeMappingsList, selectedField: string) => fields.find((field) => field.name === selectedField);
 
 const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
@@ -102,9 +106,9 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                 )}
               </Field>
               <Field name="condition" validate={_isRequired('Condition')}>
-                {({ field: { name, value, onChange }, form: { values: { field: fieldValue } }, meta }) => {
-                  const fieldType = fields.find(({ name: fieldName }) => fieldName === fieldValue);
-                  const { type } = fieldType?.type || { type: 'string' };
+                {({ field: { name, value, onChange }, form: { values: { field: selectedField } }, meta }) => {
+                  const selectedFieldType = fieldTypeFor(fields, selectedField);
+                  const isNumeric = selectedFieldType?.type?.isNumeric() ?? false;
 
                   return (
                     <Input id="condition-controls"
@@ -112,7 +116,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                            label="Condition">
                       <Select inputId="condition-select"
                               onChange={(newValue) => onChange({ target: { name, value: newValue } })}
-                              options={type === 'long' ? numberConditionOptions : otherConditionOptions}
+                              options={isNumeric ? numberConditionOptions : otherConditionOptions}
                               value={value}
                               placeholder="Choose a condition" />
                     </Input>
@@ -130,9 +134,13 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                 )}
               </Field>
               <Field name="color">
-                {({ field: { name, value, onChange } }) => (
-                  <HighlightingColorForm name={name} value={value} onChange={onChange} />
-                )}
+                {({ field: { name, value, onChange }, form: { values: { field: selectedField } } }) => {
+                  const selectedFieldType = fieldTypeFor(fields, selectedField);
+
+                  return (
+                    <HighlightingColorForm name={name} field={selectedFieldType} value={value} onChange={onChange} />
+                  );
+                } }
               </Field>
             </Modal.Body>
             <Modal.Footer>
