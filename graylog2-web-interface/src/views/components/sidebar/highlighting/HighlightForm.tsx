@@ -30,7 +30,11 @@ import { ColorPickerPopover } from 'components/common';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import ColorPreview from 'views/components/sidebar/highlighting/ColorPreview';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
-import HighlightingRule, { ConditionLabelMap, StringConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingRule, {
+  ConditionLabelMap,
+  randomColor,
+  StringConditionLabelMap,
+} from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 type Props = {
   onClose: () => void,
@@ -75,7 +79,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
               field: rule?.field ?? undefined,
               value: rule?.value ?? '',
               condition: rule?.condition ?? 'equal',
-              color: rule?.color ?? '#6fecc2',
+              color: rule?.color ?? randomColor(),
             }}>
       {() => (
         <BootstrapModalWrapper showModal

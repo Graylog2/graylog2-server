@@ -17,6 +17,7 @@
 import * as Immutable from 'immutable';
 
 import highlightConditionFunctions from 'views/logic/views/formatting/highlighting/highlightConditionFunctions';
+import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 
 export const StringConditionLabelMap = {
   equal: '==',
@@ -48,6 +49,10 @@ type InternalState = {
   condition: Condition,
   color: Color,
 };
+
+export const randomColor = () => DEFAULT_CUSTOM_HIGHLIGHT_RANGE[
+  Math.floor(Math.random() * DEFAULT_CUSTOM_HIGHLIGHT_RANGE.length)
+];
 
 export default class HighlightingRule {
   _value: InternalState;
