@@ -36,7 +36,6 @@ import HighlightingColorForm from 'views/components/sidebar/highlighting/Highlig
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
-import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
 
 type Props = {
