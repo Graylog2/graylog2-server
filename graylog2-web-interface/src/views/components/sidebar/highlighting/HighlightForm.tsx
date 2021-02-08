@@ -74,7 +74,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
             initialValues={{
               field: rule?.field ?? undefined,
               value: rule?.value ?? '',
-              condition: rule?.condition ?? '==',
+              condition: rule?.condition ?? 'equal',
               color: rule?.color ?? '#6fecc2',
             }}>
       {() => (
