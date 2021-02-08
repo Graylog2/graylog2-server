@@ -33,6 +33,14 @@ abstract class HighlightingColor {
   }
 
   abstract colorFor(value: any);
+
+  isStatic(): this is StaticColor {
+    return this.type === 'static';
+  }
+
+  isGradient(): this is GradientColor {
+    return this.type === 'gradient';
+  }
 }
 
 type StaticColorJson = {

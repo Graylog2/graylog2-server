@@ -45,12 +45,17 @@ export const GradientColorPreview = styled(ColorPreviewBase)(({ gradient }: { gr
   }
 });
 
-const ColorPreview = ({ color }: { color: HighlightingColor }) => {
+type ColorPreviewProps = {
+  color: HighlightingColor,
+  onClick?: () => void,
+};
+
+const ColorPreview = ({ color, onClick = () => {} }: ColorPreviewProps) => {
   switch (color.type) {
-    case 'static': return <StaticColorPreview color={(color as StaticColor).color} />;
-    case 'gradient': return <GradientColorPreview gradient={(color as GradientColor).gradient} />;
+    case 'static': return <StaticColorPreview onClick={onClick} color={(color as StaticColor).color} />;
+    case 'gradient': return <GradientColorPreview onClick={onClick} gradient={(color as GradientColor).gradient} />;
     default: throw new Error(`Invalid highlighting color type: ${color.type}`);
   }
 };
 
-export default ColorPreview;
+export default React.forwardRef(ColorPreview);

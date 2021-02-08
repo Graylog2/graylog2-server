@@ -20,7 +20,6 @@ import { useContext, useState } from 'react';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import IconButton from 'components/common/IconButton';
-import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import HighlightingRule, { HighlightingRuleGrid, RuleContainer } from './HighlightingRule';
 import ColorPreview from './ColorPreview';
@@ -28,8 +27,6 @@ import HighlightForm from './HighlightForm';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
-
-const defaultHighlightingColor = StaticColor.create(DEFAULT_HIGHLIGHT_COLOR);
 
 const HighlightingRules = () => {
   const [showForm, setShowForm] = useState(false);
@@ -45,7 +42,7 @@ const HighlightingRules = () => {
       <SectionSubheadline>Active highlights <IconButton className="pull-right" name="plus" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
       { showForm && <HighlightForm onClose={() => setShowForm(false)} />}
       <HighlightingRuleGrid>
-        <ColorPreview color={defaultHighlightingColor} />
+        <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
         <RuleContainer>Search terms</RuleContainer>
       </HighlightingRuleGrid>
       {rules.map((rule) => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}-${rule.condition}`} rule={rule} />)}

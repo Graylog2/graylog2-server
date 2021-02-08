@@ -14,26 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-class InputWrapper extends React.Component {
-  static propTypes = {
-    className: PropTypes.string,
-    children: PropTypes.node.isRequired,
-  };
+import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
-  static defaultProps = {
-    className: undefined,
-  };
+describe('HighlightingColorForm', () => {
+  it('shows color picker for static color', async () => {
+    const color = StaticColor.create('#666666');
+    render(<HighlightingColorForm name="color" value={color} onChange={jest.fn()} />);
 
-  render() {
-    if (this.props.className) {
-      return <div className={this.props.className}>{this.props.children}</div>;
-    }
+    const typeInput = await screen.findByLabelText('Static Color');
 
-    return <span>{this.props.children}</span>;
-  }
-}
-
-export default InputWrapper;
+    expect(typeInput).toBeChecked();
+  });
+});

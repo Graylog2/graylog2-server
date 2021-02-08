@@ -32,7 +32,7 @@ type UpdatePayload = {
   field?: string,
   value?: string,
   condition?: Condition,
-  color: string,
+  color: HighlightingColor,
 };
 
 type HighlightingRulesActionsType = RefluxActions<{

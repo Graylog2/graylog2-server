@@ -22,10 +22,7 @@ import { withTheme, DefaultTheme } from 'styled-components';
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import HighlightingColor, {
-  GradientColor,
-  StaticColor,
-} from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import formatNumber from './FormatNumber';
 import isNumeric from './IsNumeric';
@@ -60,9 +57,7 @@ function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
 
 const shouldBeFormatted = (field, value) => isFunction(field) && isNumeric(value);
 
-const defaultHighlightColor = StaticColor.create(DEFAULT_HIGHLIGHT_COLOR);
-
-const PossiblyHighlight = ({ color = defaultHighlightColor, field, value, highlightRanges = {}, theme }: Props) => {
+const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {}, theme }: Props) => {
   if (value === undefined || value === null) {
     return '';
   }
@@ -115,7 +110,7 @@ const PossiblyHighlight = ({ color = defaultHighlightColor, field, value, highli
 };
 
 PossiblyHighlight.propTypes = {
-  color: PropTypes.string,
+  color: PropTypes.object,
   field: PropTypes.string.isRequired,
   value: PropTypes.any,
   highlightRanges: PropTypes.object,
