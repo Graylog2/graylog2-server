@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled from 'styled-components';
@@ -56,12 +57,12 @@ type Props = {
 };
 
 const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onExecute: performSearch }: Props) => {
+  const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
+    .then(() => performSearch()), [performSearch]);
+
   if (!config) {
     return <Spinner />;
   }
-
-  const submitForm = ({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
-    .then(() => performSearch());
 
   const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;

@@ -60,7 +60,7 @@ export default class HighlightingRule {
   toBuilder() {
     const { field, value, condition, color } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ field, value, condition, color }));
   }
 
@@ -68,9 +68,8 @@ export default class HighlightingRule {
     return new HighlightingRule(field, value, condition, color);
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 

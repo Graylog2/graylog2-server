@@ -21,7 +21,7 @@ import lodash from 'lodash';
 import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { MultiSelect, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------

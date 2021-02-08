@@ -43,7 +43,7 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
   toBuilder() {
     const { viewport } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ viewport }));
   }
 
@@ -67,9 +67,9 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
       .build();
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }
