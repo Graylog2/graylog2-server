@@ -44,6 +44,9 @@ module.exports = {
       files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
       plugins: ['jest'],
       extends: ['plugin:jest/recommended'],
+      rules: {
+        'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', 'findBy*'] }],
+      },
     },
   ],
   extends: [
