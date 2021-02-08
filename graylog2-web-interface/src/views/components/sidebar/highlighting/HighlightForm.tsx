@@ -35,6 +35,9 @@ import HighlightingRule, {
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
+import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
+import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
 
 type Props = {
   onClose: () => void,
@@ -52,7 +55,9 @@ const _isRequired = (field) => (value) => {
 const numberConditionOptions = Object.entries(ConditionLabelMap).map(([value, label]) => ({ value, label }));
 const otherConditionOptions = Object.entries(StringConditionLabelMap).map(([value, label]) => ({ value, label }));
 
-const fieldTypeFor = (fields: FieldTypeMappingsList, selectedField: string) => fields.find((field) => field.name === selectedField);
+const fieldTypeFor = (fields: FieldTypeMappingsList, selectedField: string) => (isFunction(selectedField)
+  ? inferTypeForSeries(Series.forFunction(selectedField), fields)
+  : fields.find((field) => field.name === selectedField));
 
 const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
