@@ -22,6 +22,10 @@ import { withTheme, DefaultTheme } from 'styled-components';
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
+import HighlightingColor, {
+  GradientColor,
+  StaticColor,
+} from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import formatNumber from './FormatNumber';
 import isNumeric from './IsNumeric';
@@ -36,7 +40,7 @@ type Ranges = { [key: string]: Array<HighlightRange> };
 const highlight = (value: any, idx: number, style = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
 
 type Props = {
-  color: string,
+  color: HighlightingColor,
   field: string,
   value?: any,
   highlightRanges: Ranges,
@@ -56,7 +60,9 @@ function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
 
 const shouldBeFormatted = (field, value) => isFunction(field) && isNumeric(value);
 
-const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {}, theme }: Props) => {
+const defaultHighlightColor = StaticColor.create(DEFAULT_HIGHLIGHT_COLOR);
+
+const PossiblyHighlight = ({ color = defaultHighlightColor, field, value, highlightRanges = {}, theme }: Props) => {
   if (value === undefined || value === null) {
     return '';
   }
@@ -67,9 +73,11 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
       : value;
   }
 
+  const backgroundColor = color.colorFor(value);
+
   const style = {
-    backgroundColor: color,
-    color: theme.utils.contrastingColor(color),
+    backgroundColor: backgroundColor,
+    color: theme.utils.contrastingColor(backgroundColor),
     padding: '0 1px',
   };
 

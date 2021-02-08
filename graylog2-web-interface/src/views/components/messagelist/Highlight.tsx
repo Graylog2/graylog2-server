@@ -20,6 +20,7 @@ import { get } from 'lodash';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import PossiblyHighlight from './PossiblyHighlight';
 
@@ -28,11 +29,13 @@ type Props = {
   value: any,
 };
 
+const defaultHighlightColor = StaticColor.create(DEFAULT_HIGHLIGHT_COLOR);
+
 const Highlight = ({ field, value }: Props) => (
   <AdditionalContext.Consumer>
     {({ message }) => (
       <PossiblyHighlight field={field}
-                         color={DEFAULT_HIGHLIGHT_COLOR}
+                         color={defaultHighlightColor}
                          value={value}
                          highlightRanges={get(message, 'highlight_ranges')} />
     )}

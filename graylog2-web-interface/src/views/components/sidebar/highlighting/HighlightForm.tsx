@@ -26,15 +26,13 @@ import { Button, Modal } from 'components/graylog';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
-import { ColorPickerPopover } from 'components/common';
-import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import ColorPreview from 'views/components/sidebar/highlighting/ColorPreview';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule, {
   ConditionLabelMap,
   randomColor,
   StringConditionLabelMap,
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
 
 type Props = {
   onClose: () => void,
@@ -133,18 +131,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
               </Field>
               <Field name="color">
                 {({ field: { name, value, onChange } }) => (
-                  <Input id={name}
-                         label="Color">
-                    <ColorPickerPopover id="formatting-rule-color"
-                                        placement="right"
-                                        color={value}
-                                        colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                                        triggerNode={<ColorPreview color={value} />}
-                                        onChange={(newColor, _, hidePopover) => {
-                                          hidePopover();
-                                          onChange({ target: { name, value: newColor } });
-                                        }} />
-                  </Input>
+                  <HighlightingColorForm name={name} value={value} onChange={onChange} />
                 )}
               </Field>
             </Modal.Body>

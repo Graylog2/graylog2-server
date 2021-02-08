@@ -21,6 +21,7 @@ import mockAction from 'helpers/mocking/MockAction';
 
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import HighlightingRule from './HighlightingRule';
 
@@ -32,7 +33,7 @@ type ColorPickerProps = HTMLAttributes & {
 };
 
 describe('HighlightingRule', () => {
-  const rule = Rule.create('response_time', '250', undefined, '#f44242');
+  const rule = Rule.create('response_time', '250', undefined, StaticColor.create('#f44242'));
 
   it('should display field and value of rule', () => {
     const wrapper = mount(<HighlightingRule rule={rule} />);
@@ -53,7 +54,7 @@ describe('HighlightingRule', () => {
         .toHaveBeenCalledWith(Rule.builder()
           .field('response_time')
           .value('250')
-          .color('#f44242')
+          .color(StaticColor.create('#f44242'))
           .build(), { color: '#416af4' });
     });
   });

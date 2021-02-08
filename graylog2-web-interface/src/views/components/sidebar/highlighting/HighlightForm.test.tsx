@@ -20,6 +20,7 @@ import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 jest.mock('views/stores/HighlightingRulesStore', () => ({
   HighlightingRulesActions: {
@@ -30,7 +31,7 @@ jest.mock('views/stores/HighlightingRulesStore', () => ({
 }));
 
 const rule = HighlightingRule.builder()
-  .color('#333333')
+  .color(StaticColor.create('#333333'))
   .condition('not_equal')
   .field('foob')
   .value('noob')
