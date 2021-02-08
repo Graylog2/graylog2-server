@@ -112,6 +112,10 @@ const ColorForm = ({ color, name, onChange }: { color: HighlightingColor, name: 
   }
 };
 
+const Container = styled.div`
+  margin-left: 10px;
+`;
+
 const HighlightingColorForm = ({ name, value, onChange }: Props) => {
   const onChangeType = useCallback(({ target: { value: newValue } }) => onChange({ target: { name, value: createNewColor(newValue) } }), [name, onChange]);
   const _onChange = useCallback((newColor: HighlightingColor) => onChange({ target: { name, value: newColor } }), [name, onChange]);
@@ -120,20 +124,22 @@ const HighlightingColorForm = ({ name, value, onChange }: Props) => {
     <>
       <Input id={name}
              label="Color">
-        <Input checked={value?.type === 'static'}
-               formGroupClassName=""
-               id={name}
-               label="Static Color"
-               onChange={onChangeType}
-               type="radio"
-               value="static" />
-        <Input checked={value?.type === 'gradient'}
-               formGroupClassName=""
-               id={name}
-               label="Gradient"
-               onChange={onChangeType}
-               type="radio"
-               value="gradient" />
+        <Container>
+          <Input checked={value?.type === 'static'}
+                 formGroupClassName=""
+                 id={name}
+                 label="Static Color"
+                 onChange={onChangeType}
+                 type="radio"
+                 value="static" />
+          <Input checked={value?.type === 'gradient'}
+                 formGroupClassName=""
+                 id={name}
+                 label="Gradient"
+                 onChange={onChangeType}
+                 type="radio"
+                 value="gradient" />
+        </Container>
       </Input>
       <ColorForm color={value} onChange={_onChange} name={name} />
     </>
