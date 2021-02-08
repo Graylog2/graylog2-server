@@ -44,6 +44,24 @@ const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 // eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
+const getCssLoaderOptions = () => {
+  // Development
+  if (TARGET === 'start') {
+    return {
+      modules: {
+        localIdentName: '[name]__[local]--[hash:base64:5]',
+        mode: 'global',
+      },
+    };
+  }
+
+  return {
+    modules: {
+      mode: 'global',
+    },
+  };
+};
+
 const chunksSortMode = (c1, c2) => {
   // Render the polyfill chunk first
   if (c1 === 'polyfill') {
@@ -140,9 +158,7 @@ const webpackConfig = {
           'style-loader',
           {
             loader: 'css-loader',
-            options: {
-              modules: 'global',
-            },
+            options: getCssLoaderOptions(),
           },
         ],
       },
@@ -152,9 +168,7 @@ const webpackConfig = {
           { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
           {
             loader: 'css-loader',
-            options: {
-              modules: 'global',
-            },
+            options: getCssLoaderOptions(),
           },
         ],
       },
