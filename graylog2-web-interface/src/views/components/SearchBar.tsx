@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
+import styled from 'styled-components';
+import moment from 'moment';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -28,7 +29,6 @@ import { Col, Row } from 'components/graylog';
 import TopRow from 'views/components/searchbar/TopRow';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
-import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
@@ -40,19 +40,35 @@ import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
-import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
-import { SearchesConfig } from 'components/search/SearchConfig';
+import type { FilterType, QueryId } from 'views/logic/queries/Query';
+import type { SearchesConfig } from 'components/search/SearchConfig';
+import type { SearchBarFormValues } from 'views/Constants';
 
 import SearchBarForm from './searchbar/SearchBarForm';
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
   config: SearchesConfig,
   currentQuery: Query,
   disableSearch?: boolean,
-  onSubmit?: (update: { timerange: TimeRange, streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
+  onSubmit?: (update: { timerange: SearchBarFormValues['timerange'], streams: Array<string>, queryString: string }, query: Query) => Promise<any>,
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
+
+const FlexCol = styled(Col)`
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+`;
+
+const StreamWrap = styled.div`
+  flex: 1;
+  
+  > div {
+    margin-right: 24px;
+  }
+`;
 
 const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   const newQuery = currentQuery.toBuilder()
@@ -69,9 +85,14 @@ const defaultProps = {
   onSubmit: defaultOnSubmit,
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = defaultProps.disableSearch, queryFilters, onSubmit = defaultProps.onSubmit }: Props) => {
-  const _onSubmit = useCallback((values) => onSubmit(values, currentQuery), [onSubmit, currentQuery]);
-
+const SearchBar = ({
+  availableStreams,
+  config,
+  currentQuery,
+  disableSearch = defaultProps.disableSearch,
+  queryFilters,
+  onSubmit = defaultProps.onSubmit,
+}: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -80,38 +101,45 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
   const { query_string: queryString } = query;
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
+
+  const _onSubmit = (values) => onSubmit(values, currentQuery);
 
   return (
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
           <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                         limitDuration={limitDuration}
                          onSubmit={_onSubmit}>
-            {({ dirty, isSubmitting, isValid, handleSubmit }) => (
+            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
               <>
                 <TopRow>
-                  <Col md={4}>
-                    <TimeRangeTypeSelector />
-                    <TimeRangeInput config={config} />
-                  </Col>
+                  <FlexCol md={5}>
+                    <TimeRangeTypeSelector disabled={disableSearch}
+                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                           currentTimeRange={values?.timerange}
+                                           hasErrorOnMount={!isValid} />
+                    <TimeRangeDisplay timerange={values?.timerange} />
+                  </FlexCol>
 
                   <Col mdHidden lgHidden>
                     <HorizontalSpacer />
                   </Col>
 
-                  <Col md={5} xs={8}>
-                    <Field name="streams">
-                      {({ field: { name, value, onChange } }) => (
-                        <StreamsFilter value={value}
-                                       streams={availableStreams}
-                                       onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
-                      )}
-                    </Field>
-                  </Col>
+                  <FlexCol md={7}>
+                    <StreamWrap>
+                      <Field name="streams">
+                        {({ field: { name, value, onChange } }) => (
+                          <StreamsFilter value={value}
+                                         streams={availableStreams}
+                                         onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                        )}
+                      </Field>
+                    </StreamWrap>
 
-                  <Col md={3} xs={4}>
                     <RefreshControls />
-                  </Col>
+                  </FlexCol>
                 </TopRow>
 
                 <Row className="no-bm">
@@ -137,7 +165,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                       )}
                     </Field>
                   </Col>
-                  <Col md={3} xs={4} className="pull-right">
+                  <Col md={3} xs={4} className="pull-right" aria-label="Search Meta Buttons">
                     <SavedSearchControls />
                   </Col>
                 </Row>

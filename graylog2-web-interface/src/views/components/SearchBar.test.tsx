@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 
@@ -44,7 +43,7 @@ jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => '
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
-    .timerange({ type: 'relative', range: 300 })
+    .timerange({ type: 'relative', from: 300 })
     .query({ type: 'elasticsearch', query_string: '*' })
     .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
     .build()]),
@@ -64,16 +63,27 @@ describe('SearchBar', () => {
   });
 
   it('should render the SearchBar', () => {
-    const { getByText } = render(<SearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
-    expect(getByText('Search in last day')).not.toBeNull();
-    expect(getByText('Search in all messages')).not.toBeNull();
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const timeRangeDisplay = screen.getByLabelText('Search Time Range');
+    const streamsFilter = screen.getByTestId('streams-filter');
+    const liveUpdate = screen.getByLabelText('Refresh Search Controls');
+    const searchButton = screen.getByTitle('Perform search');
+    const metaButtons = screen.getByLabelText('Search Meta Buttons');
+
+    expect(timeRangeButton).not.toBeNull();
+    expect(timeRangeDisplay).not.toBeNull();
+    expect(streamsFilter).not.toBeNull();
+    expect(liveUpdate).not.toBeNull();
+    expect(searchButton).not.toBeNull();
+    expect(metaButtons).not.toBeNull();
   });
 
   it('should update query when search is performed', async () => {
-    const { getByTitle } = render(<SearchBar config={config} />);
+    render(<SearchBar config={config} />);
 
-    const searchButton = getByTitle('Perform search');
+    const searchButton = screen.getByTitle('Perform search');
 
     fireEvent.click(searchButton);
 
@@ -82,32 +92,15 @@ describe('SearchBar', () => {
     await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
   });
 
-  it('changing the time range type does not execute a new search', async () => {
-    const onSubmit = jest.fn(() => Promise.resolve());
-    const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
-    const absoluteTimeRange = getByText('Absolute');
+  it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
+    render(<SearchBar config={{ ...config, query_time_range_limit: 'PT1M' }} />);
 
-    fireEvent.click(absoluteTimeRange);
+    const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
+    const searchButton = screen.getByTitle('Perform search');
 
-    await waitFor(() => expect(onSubmit).not.toHaveBeenCalled());
-  });
-
-  const selectOption = (option) => {
-    const { parentNode, value } = asElement(option, HTMLOptionElement);
-    const input = asElement(parentNode, HTMLSelectElement);
-    const { name } = input;
-
-    fireEvent.change(input, { target: { name, value: String(value) } });
-  };
-
-  it('changing the relative time range value does not execute a new search', async () => {
-    const onSubmit = jest.fn();
-    const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
-
-    const lastDay = getByText('Search in last day');
-
-    await act(async () => selectOption(lastDay));
-
-    expect(onSubmit).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(searchButton).toHaveAttribute('disabled');
+      expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
+    });
   });
 });

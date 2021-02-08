@@ -38,7 +38,7 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = styled.div`
+const ButtonLabel = styled.span`
   display: inline-block;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -63,6 +63,16 @@ class RefreshControls extends React.Component<Props> {
     }).isRequired,
   };
 
+  static INTERVAL_OPTIONS: Array<[string, number]> = [
+    ['1 Second', 1000],
+    ['2 Seconds', 2000],
+    ['5 Seconds', 5000],
+    ['10 Seconds', 10000],
+    ['30 Seconds', 30000],
+    ['1 Minute', 60000],
+    ['5 Minutes', 300000],
+  ];
+
   componentWillUnmount(): void {
     RefreshActions.disable();
   }
@@ -85,21 +95,11 @@ class RefreshControls extends React.Component<Props> {
     let buttonText: React.ReactNode = 'Not updating';
 
     if (refreshConfigEnabled) {
-      buttonText = <>Update every {naturalInterval}</>;
+      buttonText = <>Every {naturalInterval}</>;
     }
 
     return <ButtonLabel>{buttonText}</ButtonLabel>;
   }
-
-  static INTERVAL_OPTIONS: Array<[string, number]> = [
-    ['1 Second', 1000],
-    ['2 Seconds', 2000],
-    ['5 Seconds', 5000],
-    ['10 Seconds', 10000],
-    ['30 Seconds', 30000],
-    ['1 Minute', 60000],
-    ['5 Minutes', 300000],
-  ];
 
   render() {
     const { refreshConfig } = this.props;
@@ -113,7 +113,7 @@ class RefreshControls extends React.Component<Props> {
     const buttonLabel = this._buttonLabel(refreshConfig.enabled, naturalInterval);
 
     return (
-      <ControlsContainer className="pull-right">
+      <ControlsContainer className="pull-right" aria-label="Refresh Search Controls">
         <FlexibleButtonGroup>
           <Button onClick={this._toggleEnable}>
             {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}

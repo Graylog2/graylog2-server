@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import Accordion from './Accordion';
+import AccordionItem from './AccordionItem';
 import Alert from './Alert';
 import Badge from './Badge';
 import Button from './Button';
@@ -46,6 +48,8 @@ import Tooltip from './Tooltip';
 import Well from './Well';
 
 export {
+  Accordion,
+  AccordionItem,
   Alert,
   Badge,
   Button,

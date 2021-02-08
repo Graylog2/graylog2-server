@@ -18,6 +18,8 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
+import styled from 'styled-components';
+import moment from 'moment';
 
 import { Col, Row } from 'components/graylog';
 import connect from 'stores/connect';
@@ -26,7 +28,6 @@ import DocsHelper from 'util/DocsHelper';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { Icon, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
-import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeOverrideTypeSelector';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
@@ -36,7 +37,14 @@ import TopRow from 'views/components/searchbar/TopRow';
 import { SearchesConfig } from 'components/search/SearchConfig';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
-import TimeRangeInput from './searchbar/TimeRangeInput';
+import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
+
+const FlexCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
 
 type Props = {
   config: SearchesConfig,
@@ -57,20 +65,27 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
   }
 
   const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
+  const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   return (
     <ScrollToHint value={queryString}>
       <Row className="content">
         <Col md={12}>
-          <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm}>
-            {({ dirty, isSubmitting, isValid, handleSubmit }) => (
+          <DashboardSearchForm initialValues={{ timerange, queryString }}
+                               limitDuration={limitDuration}
+                               onSubmit={submitForm}>
+            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
               <>
                 <TopRow>
-                  <Col lg={4} md={6} xs={8}>
-                    <TimeRangeOverrideTypeSelector />
-                    <TimeRangeInput config={config} />
-                  </Col>
-                  <Col lg={8} md={6} xs={4}>
+                  <FlexCol lg={8} md={9} xs={10}>
+                    <TimeRangeTypeSelector disabled={disableSearch}
+                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                           currentTimeRange={values?.timerange}
+                                           hasErrorOnMount={!isValid}
+                                           noOverride />
+                    <TimeRangeDisplay timerange={values?.timerange} />
+                  </FlexCol>
+                  <Col lg={4} md={3} xs={2}>
                     <RefreshControls />
                   </Col>
                 </TopRow>

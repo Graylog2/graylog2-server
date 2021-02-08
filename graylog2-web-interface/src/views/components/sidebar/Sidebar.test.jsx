@@ -53,7 +53,7 @@ describe('<Sidebar />', () => {
     id: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
     query: { type: 'elasticsearch', query_string: '*' },
     search_types: [],
-    timerange: { type: 'relative', range: 300 },
+    timerange: { type: 'relative', from: 300 },
   };
   const errors = [];
   const executionStats = { effective_timerange: effectiveTimerange, duration, timestamp };

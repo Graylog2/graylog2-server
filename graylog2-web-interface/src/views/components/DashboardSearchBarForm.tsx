@@ -23,7 +23,9 @@ import type { FormikProps } from 'formik';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 
+import DateTimeProvider from './searchbar/date-time-picker/DateTimeProvider';
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
+import { dateTimeValidate } from './searchbar/date-time-picker/TimeRangeDropdown';
 
 type Values = {
   timerange: TimeRange | undefined | null,
@@ -32,33 +34,40 @@ type Values = {
 
 type Props = {
   initialValues: Values,
+  limitDuration: number,
   onSubmit: (Values) => void | Promise<any>,
   children: ((props: FormikProps<Values>) => React.ReactElement) | React.ReactElement,
 };
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<Values>) => React.ReactElement => isFunction(children);
 
-const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
+const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, queryString }) => {
     return onSubmit({
-      timerange: timerange ? onSubmittingTimerange(timerange) : undefined,
+      timerange: Object.keys(timerange).length ? onSubmittingTimerange(timerange) : undefined,
       queryString,
     });
   }, [onSubmit]);
   const { timerange, queryString } = initialValues;
+  const initialTimeRange = timerange ? onInitializingTimerange(timerange) : {};
   const _initialValues = {
-    timerange: timerange ? onInitializingTimerange(timerange) : timerange,
+    timerange: initialTimeRange,
+    nextTimeRange: initialTimeRange,
     queryString,
   };
 
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}>
+            onSubmit={_onSubmit}
+            validate={({ timerange: nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
+            validateOnMount>
       {(...args) => (
-        <Form>
-          {_isFunction(children) ? children(...args) : children}
-        </Form>
+        <DateTimeProvider limitDuration={limitDuration}>
+          <Form>
+            {_isFunction(children) ? children(...args) : children}
+          </Form>
+        </DateTimeProvider>
       )}
     </Formik>
   );
@@ -69,6 +78,7 @@ DashboardSearchForm.propTypes = {
     timerange: PropTypes.object,
     queryString: PropTypes.string,
   }).isRequired,
+  limitDuration: PropTypes.number.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 

@@ -102,7 +102,7 @@ describe('DrilldownContextProvider', () => {
       const wrapper = renderSUT(View.Type.Search);
 
       expectDrilldown([],
-        { type: 'relative', range: 300 },
+        { type: 'relative', from: 300 },
         { type: 'elasticsearch', query_string: '' },
         wrapper);
     });
