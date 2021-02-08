@@ -18,6 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
+import { scales } from 'plotly.js/src/components/colorscale';
 
 import HighlightingColor, { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
@@ -34,16 +35,38 @@ const StaticColorPreview = styled(ColorPreviewBase)(({ color }) => css`
   background-color: ${color}
 `);
 
-export const GradientColorPreview = styled(ColorPreviewBase)(({ gradient }: { gradient: string }) => {
-  try {
-    const colors = chroma.scale(gradient).colors(5);
+const plotlyScaleToChroma = (plotlyScale: Array<[domain: number, color: string]>) => {
+  const domains = plotlyScale.map(([domain]) => domain);
+  const colors = plotlyScale.map(([, color]) => color);
 
-    return css`
-    background: linear-gradient(0deg, ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(', ')});
-  `;
-  } catch (e) {
-    console.log(`Error for ${gradient}: ${e}`);
+  return chroma.scale(colors).domain(domains);
+};
+
+const scaleForGradient = (gradient: string): chroma.Scale => {
+  switch (gradient) {
+    case 'Blackbody':
+    case 'Bluered':
+    case 'Cividis':
+    case 'Earth':
+    case 'Electric':
+    case 'Hot':
+    case 'Jet':
+    case 'Picnic':
+    case 'Portland':
+    case 'Rainbow': return plotlyScaleToChroma(scales[gradient]);
+    default: return chroma.scale(gradient);
   }
+};
+
+const colorsForGradient = (gradient: string, count = 5): Array<string> => scaleForGradient(gradient).colors(count);
+
+export const GradientColorPreview = styled(ColorPreviewBase)(({ gradient }: { gradient: string }) => {
+  const colors = colorsForGradient(gradient);
+
+  return css`
+      border: none;
+      background: linear-gradient(0deg, ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(', ')});
+    `;
 });
 
 type ColorPreviewProps = {
