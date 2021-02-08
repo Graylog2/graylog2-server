@@ -50,12 +50,16 @@ type ColorPreviewProps = {
   onClick?: () => void,
 };
 
-const ColorPreview = ({ color, onClick = () => {} }: ColorPreviewProps) => {
-  switch (color.type) {
-    case 'static': return <StaticColorPreview onClick={onClick} color={(color as StaticColor).color} />;
-    case 'gradient': return <GradientColorPreview onClick={onClick} gradient={(color as GradientColor).gradient} />;
-    default: throw new Error(`Invalid highlighting color type: ${color.type}`);
+const ColorPreview = React.forwardRef(({ color, onClick = () => {} }: ColorPreviewProps, ref) => {
+  if (color.isStatic()) {
+    return <StaticColorPreview ref={ref} onClick={onClick} color={(color as StaticColor).color} />;
   }
-};
 
-export default React.forwardRef(ColorPreview);
+  if (color.isGradient()) {
+    return <GradientColorPreview ref={ref} onClick={onClick} gradient={(color as GradientColor).gradient} />;
+  }
+
+  throw new Error(`Invalid highlighting color type: ${color}`);
+});
+
+export default ColorPreview;

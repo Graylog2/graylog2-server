@@ -55,7 +55,7 @@ describe('HighlightingRule', () => {
           .field('response_time')
           .value('250')
           .color(StaticColor.create('#f44242'))
-          .build(), { color: '#416af4' });
+          .build(), { color: StaticColor.create('#416af4') });
     });
   });
 
