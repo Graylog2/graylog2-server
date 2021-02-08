@@ -27,12 +27,10 @@ import { colors as defaultColors } from 'views/components/visualizations/Colors'
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import ChartColorContext from './ChartColorContext';
+import styles from './GenericPlot.lazy.css';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!style/useable!css!./GenericPlot.css';
 
 type LegendConfig = {
   name: string,
