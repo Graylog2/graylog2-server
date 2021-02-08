@@ -50,11 +50,16 @@ const getCssLoaderOptions = () => {
     return {
       modules: {
         localIdentName: '[name]__[local]--[hash:base64:5]',
+        mode: 'global',
       },
     };
   }
 
-  return {};
+  return {
+    modules: {
+      mode: 'global',
+    },
+  };
 };
 
 const chunksSortMode = (c1, c2) => {
@@ -163,9 +168,7 @@ const webpackConfig = {
           { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
           {
             loader: 'css-loader',
-            options: {
-              modules: 'global',
-            },
+            options: getCssLoaderOptions(),
           },
         ],
       },
