@@ -37,6 +37,7 @@ const HighlightingRules = () => {
       <SectionInfo>
         Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the graylog server config.
         Any field value can be highlighted by clicking on the value and selecting &quot;Highlight this value&quot;.
+        If a term or a value has more than one rule, the last matching rule is used.
       </SectionInfo>
       <SectionSubheadline>Active highlights <IconButton className="pull-right" name="plus" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
       { showForm && <HighlightForm onClose={() => setShowForm(false)} />}
