@@ -42,6 +42,7 @@ type DialogProps = {
   children: React.ReactNode,
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EditWidgetDialog = ({ className, children, bsClass, ...rest }: DialogProps) => (
   <Modal.Dialog {...rest} dialogClassName={styles.editWidgetDialog}>
     {children}
@@ -76,6 +77,7 @@ const EditWidgetFrame = ({ children }: Props) => {
   }, []);
 
   const widget = useContext(WidgetContext);
+  const _onSubmit = useCallback((values) => onSubmit(values, widget), [widget]);
 
   if (!widget) {
     return <Spinner text="Loading widget ..." />;
@@ -84,7 +86,6 @@ const EditWidgetFrame = ({ children }: Props) => {
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
-  const _onSubmit = useCallback((values) => onSubmit(values, widget), [widget]);
 
   return (
     <Modal show

@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { FormControl, HelpBlock } from 'components/graylog';
 import { Icon } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 import type { AutoInterval, Interval } from './Interval';
 import styles from './AutoTimeHistogramPivot.css';

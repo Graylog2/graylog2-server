@@ -46,7 +46,7 @@ export default class Search {
   }
 
   static create(): Search {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()
       .newId()
       .queries([])
@@ -71,11 +71,11 @@ export default class Search {
       .filter((p) => (!p.optional && !p.defaultValue)).toSet();
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, queries, parameters } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ id, queries, parameters }));
   }
 
@@ -97,9 +97,9 @@ export default class Search {
     return new Search(id, queries, parameters.map((p) => Parameter.fromJSON(p)));
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

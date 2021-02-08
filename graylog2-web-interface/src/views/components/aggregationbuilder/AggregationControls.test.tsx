@@ -46,7 +46,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 class DummyVisualizationConfig extends VisualizationConfig {}
 
 describe('AggregationControls', () => {
-  // eslint-disable-next-line no-unused-vars, react/prop-types
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, react/prop-types
   const DummyComponent = () => <div data-testid="dummy-component">The spice must flow.</div>;
   const children = <DummyComponent />;
   const config = AggregationWidgetConfig.builder().visualization('table').build();

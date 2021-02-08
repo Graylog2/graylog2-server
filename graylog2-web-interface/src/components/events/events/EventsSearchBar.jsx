@@ -22,7 +22,7 @@ import lodash from 'lodash';
 import { ButtonGroup, ControlLabel, FormControl, FormGroup, Button } from 'components/graylog';
 import { SearchForm, TimeUnitInput, Icon } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 import styles from './EventsSearchBar.css';
 
