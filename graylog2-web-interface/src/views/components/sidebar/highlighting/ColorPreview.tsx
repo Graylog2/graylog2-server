@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
@@ -50,7 +51,7 @@ type ColorPreviewProps = {
   onClick?: () => void,
 };
 
-const ColorPreview = React.forwardRef(({ color, onClick = () => {} }: ColorPreviewProps, ref) => {
+const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ color, onClick = () => {} }, ref) => {
   if (color.isStatic()) {
     return <StaticColorPreview ref={ref} onClick={onClick} color={(color as StaticColor).color} />;
   }
@@ -61,5 +62,14 @@ const ColorPreview = React.forwardRef(({ color, onClick = () => {} }: ColorPrevi
 
   throw new Error(`Invalid highlighting color type: ${color}`);
 });
+
+ColorPreview.propTypes = {
+  color: PropTypes.any.isRequired,
+  onClick: PropTypes.func,
+};
+
+ColorPreview.defaultProps = {
+  onClick: () => {},
+};
 
 export default ColorPreview;
