@@ -49,6 +49,8 @@ const _isRequired = (field) => (value) => {
   return undefined;
 };
 
+const _validateColor = (value) => (!value ? 'Color is required' : undefined);
+
 const numberConditionOptions = Object.entries(ConditionLabelMap).map(([value, label]) => ({ value, label }));
 const otherConditionOptions = Object.entries(StringConditionLabelMap).map(([value, label]) => ({ value, label }));
 
@@ -135,12 +137,12 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                          label="Value" />
                 )}
               </Field>
-              <Field name="color">
-                {({ field: { name, value, onChange }, form: { values: { field: selectedField } } }) => {
+              <Field name="color" validate={_validateColor}>
+                {({ field: { name, value, onChange }, form: { values: { field: selectedField } }, meta }) => {
                   const selectedFieldType = fieldTypeFor(fields, selectedField);
 
                   return (
-                    <HighlightingColorForm name={name} field={selectedFieldType} value={value} onChange={onChange} />
+                    <HighlightingColorForm name={name} field={selectedFieldType} value={value} onChange={onChange} error={meta?.error} />
                   );
                 } }
               </Field>

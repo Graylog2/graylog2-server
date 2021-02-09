@@ -43,6 +43,7 @@ type Props = {
   field: FieldTypeMapping,
   value: HighlightingColor,
   onChange: (e: ChangeEvent) => void,
+  error?: string,
 };
 
 const StaticColorPicker = ({ name, value, onChange }: { name: string, value: StaticColor, onChange: (newColor: HighlightingColor) => void}) => (
@@ -119,7 +120,7 @@ const Container = styled.div`
   margin-left: 10px;
 `;
 
-const HighlightingColorForm = ({ name, field, value, onChange }: Props) => {
+const HighlightingColorForm = ({ name, field, value, onChange, error }: Props) => {
   const onChangeType = useCallback(({ target: { value: newValue } }) => onChange({ target: { name, value: createNewColor(newValue) } }), [name, onChange]);
   const _onChange = useCallback((newColor: HighlightingColor) => onChange({ target: { name, value: newColor } }), [name, onChange]);
 
@@ -129,7 +130,8 @@ const HighlightingColorForm = ({ name, field, value, onChange }: Props) => {
   return (
     <>
       <Input id={name}
-             label="Color">
+             label="Coloring"
+             error={error}>
         <Container>
           <Input checked={value?.type === 'static'}
                  formGroupClassName=""
