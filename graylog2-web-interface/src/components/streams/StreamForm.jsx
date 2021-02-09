@@ -21,7 +21,7 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 const { IndexSetsActions } = CombinedProvider.get('IndexSets');
 

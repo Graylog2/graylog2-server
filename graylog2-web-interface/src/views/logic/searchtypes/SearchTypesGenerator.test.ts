@@ -63,7 +63,7 @@ describe('SearchTypesGenerator', () => {
 
   it('allows search type to override timerange', () => {
     const widgetWithTimerange = dummyWidget.toBuilder()
-      .timerange({ type: 'relative', range: 300 })
+      .timerange({ type: 'relative', from: 300 })
       .build();
 
     mockSearchType(() => ([{ timerange: { type: 'keyword', keyword: 'yesterday' } }]));

@@ -22,8 +22,7 @@ import { Row, Col } from 'components/graylog';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
 import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.
-
-const style = require('!style/useable!css!components/configurations/ConfigurationStyles.css');
+import style from 'components/configurations/ConfigurationStyles.lazy.css';
 
 class IndicesConfiguration extends React.Component {
   static propTypes = {
@@ -39,7 +38,9 @@ class IndicesConfiguration extends React.Component {
   }
 
   render() {
-    if (!this.props.indexSet.writable) {
+    const { indexSet } = this.props;
+
+    if (!indexSet.writable) {
       return (
         <Row>
           <Col md={12}>
@@ -51,12 +52,12 @@ class IndicesConfiguration extends React.Component {
     }
 
     const rotationConfig = {
-      strategy: this.props.indexSet.rotation_strategy_class,
-      config: this.props.indexSet.rotation_strategy,
+      strategy: indexSet.rotation_strategy_class,
+      config: indexSet.rotation_strategy,
     };
     const retentionConfig = {
-      strategy: this.props.indexSet.retention_strategy_class,
-      config: this.props.indexSet.retention_strategy,
+      strategy: indexSet.retention_strategy_class,
+      config: indexSet.retention_strategy,
     };
 
     return (

@@ -47,7 +47,7 @@ export default class SearchExecutionState {
     return this._value.globalOverride;
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { globalOverride, parameterBindings } = this._value;
 

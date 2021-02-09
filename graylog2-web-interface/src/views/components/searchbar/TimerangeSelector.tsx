@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -32,7 +32,13 @@ const TimerangeWrap = styled.div(({ theme }) => css`
   }
 `);
 
-const TimerangeSelector = ({ className, children, ...restProps }) => {
+type Props = {
+  className?: string,
+  children: React.ReactNode
+  style?: React.CSSProperties
+}
+
+const TimerangeSelector = ({ className, children, ...restProps }: Props) => {
   return (
     <TimerangeWrap className={className} {...restProps}>
       {children}
@@ -43,10 +49,12 @@ const TimerangeSelector = ({ className, children, ...restProps }) => {
 TimerangeSelector.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node.isRequired,
+  style: PropTypes.object,
 };
 
 TimerangeSelector.defaultProps = {
   className: undefined,
+  style: undefined,
 };
 
 export default TimerangeSelector;

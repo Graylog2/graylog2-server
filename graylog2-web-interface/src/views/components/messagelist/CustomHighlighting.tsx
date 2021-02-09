@@ -40,10 +40,10 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
   rules.forEach((rule) => {
     const ranges = [];
 
-    if (String(fieldValue) === String(rule.value)) {
+    if (rule.conditionFunc(fieldValue, rule.value)) {
       ranges.push({
-        start: String(fieldValue).indexOf(rule.value),
-        length: String(rule.value).length,
+        start: String(fieldValue).indexOf(fieldValue),
+        length: String(fieldValue).length,
       });
     }
 

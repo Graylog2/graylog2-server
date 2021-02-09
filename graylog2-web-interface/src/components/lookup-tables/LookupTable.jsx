@@ -21,7 +21,7 @@ import { LinkContainer, Link } from 'components/graylog/router';
 import { ButtonToolbar, Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import { ContentPackMarker } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 

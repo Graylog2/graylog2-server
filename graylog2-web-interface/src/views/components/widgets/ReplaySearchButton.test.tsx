@@ -60,7 +60,7 @@ describe('ReplaySearchButton', () => {
       const { getByTitle } = render(<ReplaySearchButton />);
       const button = asElement(getByTitle('Replay search'), HTMLAnchorElement);
 
-      expect(button.href).toEqual('http://localhost/search?rangetype=relative&relative=300');
+      expect(button.href).toEqual('http://localhost/search?rangetype=relative&from=300');
     });
 
     it('opening in a new page', () => {

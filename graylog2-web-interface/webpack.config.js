@@ -48,11 +48,18 @@ const getCssLoaderOptions = () => {
   // Development
   if (TARGET === 'start') {
     return {
-      localIdentName: '[name]__[local]--[hash:base64:5]',
+      modules: {
+        localIdentName: '[name]__[local]--[hash:base64:5]',
+        mode: 'global',
+      },
     };
   }
 
-  return {};
+  return {
+    modules: {
+      mode: 'global',
+    },
+  };
 };
 
 const chunksSortMode = (c1, c2) => {
@@ -101,7 +108,7 @@ const webpackConfig = {
       { test: /\.[jt]s(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
       { test: /\.(svg)(\?.+)?$/, loader: 'file-loader' },
       {
-        test: /\.(woff(2)?|ttf)(\?.+)?$/,
+        test: /\.(woff(2)?|ttf|eot)(\?.+)?$/,
         use: [{
           loader: 'file-loader', options: { esModule: false },
         }],
@@ -113,14 +120,32 @@ const webpackConfig = {
           {
             loader: 'style-loader',
             options: {
-              insertAt: 'top',
+              // implementation to insert at the top of the head tag: https://github.com/webpack-contrib/style-loader#function
+              insert: function insertAtTop(element) {
+                const parent = document.querySelector('head');
+                // eslint-disable-next-line no-underscore-dangle
+                const lastInsertedElement = window._lastElementInsertedByStyleLoader;
+
+                if (!lastInsertedElement) {
+                  parent.insertBefore(element, parent.firstChild);
+                } else if (lastInsertedElement.nextSibling) {
+                  parent.insertBefore(element, lastInsertedElement.nextSibling);
+                } else {
+                  parent.appendChild(element);
+                }
+
+                // eslint-disable-next-line no-underscore-dangle
+                window._lastElementInsertedByStyleLoader = element;
+              },
             },
           },
           'css-loader',
           {
             loader: 'less-loader',
             options: {
-              modifyVars: BOOTSTRAPVARS,
+              lessOptions: {
+                modifyVars: BOOTSTRAPVARS,
+              },
             },
           },
         ],
@@ -128,8 +153,19 @@ const webpackConfig = {
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
       {
         test: /\.css$/,
+        exclude: /(\.lazy|leaflet)\.css$/,
         use: [
           'style-loader',
+          {
+            loader: 'css-loader',
+            options: getCssLoaderOptions(),
+          },
+        ],
+      },
+      {
+        test: /(\.lazy|leaflet)\.css$/,
+        use: [
+          { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
           {
             loader: 'css-loader',
             options: getCssLoaderOptions(),

@@ -46,7 +46,7 @@ public class JestUtils {
     private JestUtils() {
     }
 
-    public static <T extends JestResult> T execute(JestClient client, RequestConfig requestConfig,
+    public static <T extends JestResult> T executeUnsafe(JestClient client, RequestConfig requestConfig,
                                                    Action<T> request, Supplier<String> errorMessage) {
         final T result;
         try {
@@ -59,6 +59,12 @@ public class JestUtils {
             throw new ElasticsearchException(errorMessage.get(), e);
         }
 
+        return result;
+    }
+
+    public static <T extends JestResult> T execute(JestClient client, RequestConfig requestConfig,
+                                                   Action<T> request, Supplier<String> errorMessage) {
+        final T result = executeUnsafe(client, requestConfig, request, errorMessage);
         if (result.isSucceeded()) {
             return result;
         } else {

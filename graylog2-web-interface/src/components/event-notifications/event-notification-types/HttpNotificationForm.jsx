@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { URLWhiteListInput } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 class HttpNotificationForm extends React.Component {
   static propTypes = {
