@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.audit.AuditEventTypes.ES_WRITE_INDEX_UPDATE;
+import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
 
 public class MongoIndexSet implements IndexSet {
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
@@ -295,7 +296,8 @@ public class MongoIndexSet implements IndexSet {
         }
 
         LOG.info("Waiting for allocation of index <{}>.", newTarget);
-        HealthStatus healthStatus = indices.waitForRecovery(newTarget);
+        final HealthStatus healthStatus = indices.waitForRecovery(newTarget);
+        checkIfHealthy(healthStatus, (status) -> new RuntimeException("New target index did not become healthy (target index: <" + newTarget + ">)"));
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
         addDeflectorIndexRange(newTarget);

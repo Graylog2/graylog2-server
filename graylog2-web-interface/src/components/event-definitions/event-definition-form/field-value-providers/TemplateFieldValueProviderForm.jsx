@@ -21,7 +21,7 @@ import lodash from 'lodash';
 import { Checkbox, Col, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ExternalLink } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 import TemplateFieldValueProviderPreview from './TemplateFieldValueProviderPreview';
 

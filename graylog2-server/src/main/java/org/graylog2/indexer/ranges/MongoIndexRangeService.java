@@ -54,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
+import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
 
 public class MongoIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRangeService.class);
@@ -134,7 +135,8 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public IndexRange calculateRange(String index) {
-        indices.waitForRecovery(index);
+        checkIfHealthy(indices.waitForRecovery(index),
+                (status) -> new RuntimeException("Unable to calculate range for index <" + index + ">, index is unhealthy: " + status));
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final Stopwatch sw = Stopwatch.createStarted();
         final IndexRangeStats stats = indices.indexRangeStatsOfIndex(index);
@@ -205,7 +207,7 @@ public class MongoIndexRangeService implements IndexRangeService {
             }
             LOG.debug("Index \"{}\" has been reopened. Calculating index range.", index);
 
-            indices.waitForRecovery(index);
+            checkIfHealthy(indices.waitForRecovery(index), (status) -> new RuntimeException("Not handling reopened index <" + index + ">, index is unhealthy: " + status));
 
             final IndexRange indexRange;
             try {

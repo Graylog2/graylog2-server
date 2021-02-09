@@ -26,22 +26,27 @@ import DocsHelper from 'util/DocsHelper';
 import Button from 'components/graylog/Button';
 import TopRow from 'views/components/searchbar/TopRow';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
+import type { SearchBarFormValues } from 'views/Constants';
 
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
+import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<any>,
-  config: any,
   globalOverride: GlobalOverride | undefined | null,
 };
+
+const FlexCol = styled(Col)`
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+`;
 
 const BlurredWrapper = styled.div`
   filter: blur(4px);
@@ -77,12 +82,12 @@ const ResetOverrideHint = () => (
   </CenteredBox>
 );
 
-const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props) => {
+const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const isGloballyOverridden: boolean = globalOverride !== undefined
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
-  const { dirty, isValid, isSubmitting, handleSubmit } = useFormikContext();
+  const { dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue } = useFormikContext<SearchBarFormValues>();
 
   return (
     <>
@@ -90,10 +95,13 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride }: Props
       <Wrapper>
         <>
           <TopRow>
-            <Col md={4}>
-              <TimeRangeTypeSelector disabled={isGloballyOverridden} />
-              <TimeRangeInput disabled={isGloballyOverridden} config={config} />
-            </Col>
+            <FlexCol md={4}>
+              <TimeRangeTypeSelector disabled={isGloballyOverridden}
+                                     setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                     currentTimeRange={values?.timerange}
+                                     hasErrorOnMount={!isValid} />
+              <TimeRangeDisplay timerange={values?.timerange} />
+            </FlexCol>
 
             <Col md={8}>
               <Field name="streams">
@@ -144,12 +152,10 @@ export default connect(
   WidgetQueryControls,
   {
     availableStreams: StreamsStore,
-    configurations: SearchConfigStore,
     globalOverride: GlobalOverrideStore,
   },
-  ({ availableStreams: { streams = [] }, configurations, ...rest }) => ({
+  ({ availableStreams: { streams = [] }, ...rest }) => ({
     ...rest,
     availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
-    config: configurations.searchesClusterConfig,
   }),
 );

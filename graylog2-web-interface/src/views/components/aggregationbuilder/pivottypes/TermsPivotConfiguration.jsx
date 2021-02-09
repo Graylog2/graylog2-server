@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 
 export default class TermsPivotConfiguration extends React.Component {
