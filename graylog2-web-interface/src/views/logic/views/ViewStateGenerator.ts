@@ -62,7 +62,7 @@ const _defaultWidgets: DefaultWidgets = {
 
     return { titles, widgets, positions };
   },
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   [View.Type.Dashboard]: async (streamId: string | undefined | null) => {
     const widgets = [];
     const titles = {};

@@ -53,7 +53,7 @@ describe('<Sidebar />', () => {
     id: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
     query: { type: 'elasticsearch', query_string: '*' },
     search_types: [],
-    timerange: { type: 'relative', range: 300 },
+    timerange: { type: 'relative', from: 300 },
   };
   const errors = [];
   const executionStats = { effective_timerange: effectiveTimerange, duration, timestamp };
@@ -225,7 +225,7 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
 
-  it('should render placeholder if dashboard has no summary or description ', () => {
+  it('should render placeholder if dashboard has no summary or description', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
@@ -245,7 +245,7 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no summary');
   });
 
-  it('should render placeholder if saved search has no summary or description ', () => {
+  it('should render placeholder if saved search has no summary or description', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}

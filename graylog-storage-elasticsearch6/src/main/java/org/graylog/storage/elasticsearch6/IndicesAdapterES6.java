@@ -362,7 +362,12 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public HealthStatus waitForRecovery(String index) {
-        final Health.Status status = waitForStatus(index, Health.Status.YELLOW);
+        return waitForRecovery(index, 30);
+    }
+
+    @Override
+    public HealthStatus waitForRecovery(String index, int timeout) {
+        final Health.Status status = waitForStatus(index, Health.Status.YELLOW, timeout);
         return mapHealthStatus(status);
     }
 
@@ -370,15 +375,20 @@ public class IndicesAdapterES6 implements IndicesAdapter {
         return HealthStatus.fromString(status.toString());
     }
 
-    private Health.Status waitForStatus(String index, @SuppressWarnings("SameParameterValue") Health.Status clusterHealthStatus) {
+    private Health.Status waitForStatus(String index, @SuppressWarnings("SameParameterValue") Health.Status clusterHealthStatus, int timeout) {
         final Health request = new Health.Builder()
                 .addIndex(index)
                 .waitForStatus(clusterHealthStatus)
+                .timeout(timeout)
                 .build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read health status for index " + index);
+        final JestResult jestResult = JestUtils.executeUnsafe(jestClient, null, request, () -> "Couldn't read health status for index " + index);
 
         final String status = jestResult.getJsonObject().path("status").asText();
         return Health.Status.valueOf(status.toUpperCase(Locale.ENGLISH));
+    }
+
+    private Health.Status waitForStatus(String index, @SuppressWarnings("SameParameterValue") Health.Status clusterHealthStatus) {
+        return waitForStatus(index, clusterHealthStatus, 30);
     }
 
     @Override

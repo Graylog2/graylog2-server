@@ -70,7 +70,10 @@ describe('WidgetQueryControls', () => {
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <WrappingContainer>
-      <SearchBarForm initialValues={{ timerange: DEFAULT_TIMERANGE, queryString: '', streams: [] }} onSubmit={() => {}}>
+      <SearchBarForm initialValues={{ timerange: DEFAULT_TIMERANGE, queryString: '', streams: [] }}
+                     limitDuration={0}
+                     onSubmit={() => {}}
+                     validateOnMount={false}>
         {children}
       </SearchBarForm>
     </WrappingContainer>
@@ -132,13 +135,6 @@ describe('WidgetQueryControls', () => {
       );
 
       expect(queryByText(indicatorText)).toBeNull();
-    });
-
-    it('disables timerange controls when global override is present', () => {
-      const { getByDisplayValue } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const timeRangeSelect = getByDisplayValue('Search in last day');
-
-      expect(timeRangeSelect).toBeDisabled();
     });
   });
 });

@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isEqual } from 'lodash';
 
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';

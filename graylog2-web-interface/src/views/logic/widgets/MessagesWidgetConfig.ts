@@ -103,7 +103,7 @@ export default class MessagesWidgetConfig extends WidgetConfig {
       && isEqualForSearch(other.sort, this.sort);
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()

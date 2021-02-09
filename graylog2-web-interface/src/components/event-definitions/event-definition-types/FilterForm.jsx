@@ -28,7 +28,7 @@ import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { MultiSelect, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import PermissionsMixin from 'util/PermissionsMixin';
