@@ -108,7 +108,7 @@ public class PulsarMessageQueueReader extends AbstractMessageQueueReader {
 
         processBuffer = processBufferProvider.get();
         // Service is ready for consuming
-        latch.countDown();
+        latch.countDown(); // TODO what's the point? We are not wating for that latch
     }
 
     @Override

@@ -17,6 +17,7 @@
 package org.graylog2.shared.messageq.kafka;
 
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -24,6 +25,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.messageq.AbstractMessageQueueReader;
@@ -34,10 +36,13 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.time.Duration;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Singleton
@@ -45,15 +50,13 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaMessageQueueReader.class);
 
     private final CountDownLatch latch = new CountDownLatch(1);
-//    private final Meter messageMeter;
-//    private final Counter byteCounter;
-//    private final Meter byteMeter;
-//    private final Timer readTimer;
+    private final Timer ackTimer;
 
     private Consumer<String, byte[]> consumer;
     private Provider<ProcessBuffer> processBufferProvider;
     private ProcessBuffer processBuffer;
     private final Properties props;
+    private ConcurrentHashMap<TopicPartition, Long> commitableOffsets;
 
     @Inject
     public KafkaMessageQueueReader(MetricRegistry metricRegistry,
@@ -76,6 +79,9 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
         props.put("auto.offset.reset", "earliest");
         // max.poll.records
 
+        commitableOffsets = new ConcurrentHashMap<>();
+
+        this.ackTimer = metricRegistry.timer(name(this.getClass(), "ackTime"));
     }
 
     @Override
@@ -120,13 +126,28 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
                 //  shutting down the server. This will inhibit server shutdown when elastic search is down.
                 processBuffer.insertBlocking(rawMessage);
             });
+            doCommit();
         }
     }
 
     private ConsumerRecords<String, byte[]> read() {
         synchronized (consumer) {
-            final ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(500));
+            final ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(50));
             return records;
+        }
+    }
+
+    private void doCommit() {
+        if (commitableOffsets.isEmpty()) {
+            return;
+        }
+
+        final ConcurrentHashMap<TopicPartition, Long> copy = this.commitableOffsets;
+        this.commitableOffsets = new ConcurrentHashMap<>();
+
+        final Map<TopicPartition, OffsetAndMetadata> commitMap = copy.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> new OffsetAndMetadata(v.getValue() + 1)));
+        try (Timer.Context ignored = ackTimer.time()){
+            consumer.commitSync(commitMap);
         }
     }
 
@@ -139,14 +160,17 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
 
     public void commit(Object object) {
         if (object instanceof KafkaMessageQueueEntry.CommitId) {
-            try {
-                final KafkaMessageQueueEntry.CommitId commitId = (KafkaMessageQueueEntry.CommitId) object;
-                synchronized (consumer) {
-                    consumer.commitAsync(Collections.singletonMap(commitId.getTopicPartition(), new OffsetAndMetadata(commitId.getOffset() + 1)), null);
+            final KafkaMessageQueueEntry.CommitId commitId = (KafkaMessageQueueEntry.CommitId) object;
+
+            commitableOffsets.compute(commitId.getTopicPartition(), (partition, offset) -> {
+                if (offset == null) {
+                    return commitId.getOffset();
                 }
-            } catch (Exception e) {
-                LOG.error("Couldn't acknowledge message", e);
-            }
+                if (offset >= commitId.getOffset()) {
+                    return offset;
+                }
+                return commitId.getOffset();
+            });
         } else {
             LOG.error("Couldn't acknowledge message. Expected <" + object + "> to be a KafkaMessageQueueEntry.CommitId");
         }
