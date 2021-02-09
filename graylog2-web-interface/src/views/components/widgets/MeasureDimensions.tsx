@@ -60,7 +60,7 @@ const MeasureDimensions = createReactClass({
 
   render() {
     return (
-      <span ref={(node) => { this.container = node; }} style={{ display: 'block', height: '100%' }}>
+      <span ref={(node) => { this.container = node; }} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {this._renderChildren()}
       </span>
     );
