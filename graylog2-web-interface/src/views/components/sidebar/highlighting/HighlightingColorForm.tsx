@@ -75,21 +75,21 @@ const GradientColorPicker = ({ name, value, onChange }: { name: string, value: G
 
   return (
     <>
-      <Input id={name}
+      <Input id={`${name}-name`}
              label="Gradient Name">
         <Select options={GRADIENTS}
                 inputProps={{ 'aria-label': 'Select gradient colors' }}
                 value={value.gradient}
                 onChange={_onChangeGradient} />
       </Input>
-      <Input id={name}
+      <Input id={`${name}-lowest`}
              label="Lowest Value"
              type="number"
              value={value.lower}
              onChange={_onChangeLower}
              help="The lowest value expected in the field/series."
              required />
-      <Input id={name}
+      <Input id={`${name}-highest`}
              label="Highest Value"
              type="number"
              value={value.upper}
@@ -129,13 +129,13 @@ const HighlightingColorForm = ({ name, field, value, onChange, error }: Props) =
 
   return (
     <>
-      <Input id={name}
+      <Input id={`${name}-coloring`}
              label="Coloring"
              error={error}>
         <Container>
           <Input checked={value?.type === 'static'}
                  formGroupClassName=""
-                 id={name}
+                 id={`${name}-static`}
                  disabled={isDisabled}
                  label="Static Color"
                  onChange={onChangeType}
@@ -143,7 +143,7 @@ const HighlightingColorForm = ({ name, field, value, onChange, error }: Props) =
                  value="static" />
           <Input checked={value?.type === 'gradient'}
                  formGroupClassName=""
-                 id={name}
+                 id={`${name}-gradient`}
                  disabled={isDisabled || !isNumeric}
                  label="Gradient"
                  onChange={onChangeType}
