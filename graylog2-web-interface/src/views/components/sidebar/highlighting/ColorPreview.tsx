@@ -32,7 +32,7 @@ const ColorPreviewBase = styled.div`
 `;
 
 const StaticColorPreview = styled(ColorPreviewBase)(({ color }) => css`
-  background-color: ${color}
+  background-color: ${color};
 `);
 
 const plotlyScaleToChroma = (plotlyScale: Array<[domain: number, color: string]>) => {

@@ -61,7 +61,7 @@ const StaticColorPicker = ({ name, value, onChange }: { name: string, value: Sta
 );
 
 const OptionContainer = styled.div`
-  display: flex
+  display: flex;
 `;
 const createOption = (name) => ({ label: <OptionContainer><GradientColorPreview gradient={name} />{name}</OptionContainer>, value: name });
 

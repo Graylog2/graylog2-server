@@ -29,7 +29,6 @@ import Select from 'components/common/Select';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule, {
   ConditionLabelMap,
-  randomColor,
   StringConditionLabelMap,
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';

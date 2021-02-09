@@ -17,23 +17,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-class InputWrapper extends React.Component {
-  static propTypes = {
-    className: PropTypes.string,
-    children: PropTypes.node.isRequired,
-  };
+const InputWrapper = ({ children, className }) => (className
+  ? <div className={className}>{children}</div>
+  : <span>{children}</span>);
 
-  static defaultProps = {
-    className: undefined,
-  };
+InputWrapper.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
 
-  render() {
-    if (this.props.className) {
-      return <div className={this.props.className}>{this.props.children}</div>;
-    }
-
-    return <span>{this.props.children}</span>;
-  }
-}
+InputWrapper.defaultProps = {
+  className: undefined,
+};
 
 export default InputWrapper;

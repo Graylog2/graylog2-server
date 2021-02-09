@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { ColorPicker, ColorPickerPopover, IconButton } from 'components/common';
+import { ColorPickerPopover, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingColor, { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
