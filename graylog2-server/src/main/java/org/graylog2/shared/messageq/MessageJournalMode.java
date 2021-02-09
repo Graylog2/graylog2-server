@@ -18,5 +18,6 @@ package org.graylog2.shared.messageq;
 
 public enum MessageJournalMode {
     DISK,
+    KAFKA,
     PULSAR
 }

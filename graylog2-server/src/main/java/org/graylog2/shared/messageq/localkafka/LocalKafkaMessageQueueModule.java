@@ -14,25 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.messageq.kafka;
+package org.graylog2.shared.messageq.localkafka;
 
+import com.google.common.util.concurrent.Service;
 import com.google.inject.Scopes;
-import org.graylog2.plugin.PluginModule;
-import org.graylog2.shared.journal.Journal;
-import org.graylog2.shared.journal.NoopJournal;
+import com.google.inject.multibindings.Multibinder;
+import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.shared.journal.KafkaMessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 
-public class KafkaMessageQueueModule extends PluginModule {
+public class LocalKafkaMessageQueueModule extends Graylog2Module {
     @Override
     protected void configure() {
-        serviceBinder().addBinding().to(KafkaMessageQueueWriter.class).in(Scopes.SINGLETON);
-        serviceBinder().addBinding().to(KafkaMessageQueueReader.class).in(Scopes.SINGLETON);
+        install(new KafkaJournalModule());
         bind(MessageQueueReader.class).to(KafkaMessageQueueReader.class).in(Scopes.SINGLETON);
-        bind(MessageQueueWriter.class).to(KafkaMessageQueueWriter.class).in(Scopes.SINGLETON);
-        bind(MessageQueueAcknowledger.class).to(KafkaMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
+        bind(MessageQueueWriter.class).to(LocalKafkaMessageQueueWriter.class).in(Scopes.SINGLETON);
+        bind(MessageQueueAcknowledger.class).to(LocalKafkaMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
 
-        binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
+        final Multibinder<Service> serviceBinder = serviceBinder();
+        serviceBinder.addBinding().to(KafkaMessageQueueReader.class).in(Scopes.SINGLETON);
+        serviceBinder.addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
     }
 }
