@@ -75,7 +75,7 @@ const GradientColorPicker = ({ name, value, onChange }: { name: string, value: G
   return (
     <>
       <Input id={name}
-             label="Gradient">
+             label="Gradient Name">
         <Select options={GRADIENTS}
                 value={value.gradient}
                 onChange={_onChangeGradient} />

@@ -18,19 +18,28 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
-import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 
 describe('HighlightingColorForm', () => {
   const field = FieldTypeMapping.create('foo', FieldType.create('number', [Properties.Numeric]));
 
-  it('shows color picker for static color', async () => {
-    const color = StaticColor.create('#666666');
-    render(<HighlightingColorForm name="color" field={field} value={color} onChange={jest.fn()} />);
+  it('selects correct type for static color', async () => {
+    const staticColor = StaticColor.create('#666666');
+    render(<HighlightingColorForm name="color" field={field} value={staticColor} onChange={jest.fn()} />);
 
-    const typeInput = await screen.findByLabelText('Static Color');
+    const staticOption = await screen.findByLabelText('Static Color');
 
-    expect(typeInput).toBeChecked();
+    expect(staticOption).toBeChecked();
+  });
+
+  it('selects correct type for gradient', async () => {
+    const gradientColor = GradientColor.create('Viridis', 0, 100);
+    render(<HighlightingColorForm name="color" field={field} value={gradientColor} onChange={jest.fn()} />);
+
+    const gradientOption = await screen.findByLabelText('Gradient');
+
+    expect(gradientOption).toBeChecked();
   });
 });
