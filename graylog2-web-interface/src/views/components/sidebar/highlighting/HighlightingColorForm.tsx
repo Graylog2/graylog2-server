@@ -29,6 +29,7 @@ import HighlightingColor, {
 import { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 type ChangeEvent = {
   target: {
@@ -100,9 +101,8 @@ const GradientColorPicker = ({ name, value, onChange }: { name: string, value: G
 const createNewColor = (type: 'static' | 'gradient') => {
   switch (type) {
     case 'gradient': return GradientColor.create('Viridis', 0, 0);
-    case 'static':
-    default:
-      return StaticColor.create('#dddddd');
+    case 'static': return randomColor();
+    default: throw new Error(`Invalid color type: ${type}`);
   }
 };
 
@@ -148,7 +148,7 @@ const HighlightingColorForm = ({ name, field, value, onChange }: Props) => {
                  value="gradient" />
         </Container>
       </Input>
-      <ColorForm color={value} onChange={_onChange} name={name} />
+      {value && <ColorForm color={value} onChange={_onChange} name={name} />}
     </>
   );
 };

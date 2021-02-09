@@ -34,7 +34,6 @@ import HighlightingRule, {
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
-import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
 
@@ -82,10 +81,10 @@ const HighlightForm = ({ onClose, rule }: Props) => {
   return (
     <Formik onSubmit={onSubmit}
             initialValues={{
-              field: rule?.field ?? undefined,
-              value: rule?.value ?? '',
+              field: rule?.field,
+              value: rule?.value,
               condition: rule?.condition ?? 'equal',
-              color: rule?.color ?? randomColor(),
+              color: rule?.color,
             }}>
       {() => (
         <BootstrapModalWrapper showModal
