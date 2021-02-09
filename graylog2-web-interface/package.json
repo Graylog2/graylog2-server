@@ -113,6 +113,7 @@
     "@babel/polyfill": "^7.8.3",
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-react": "^7.8.3",
+    "@testing-library/user-event": "^12.6.3",
     "@types/lodash": "^4.14.165",
     "@types/react-plotly.js": "^2.2.4",
     "assets-webpack-plugin": "^5.1.2",
