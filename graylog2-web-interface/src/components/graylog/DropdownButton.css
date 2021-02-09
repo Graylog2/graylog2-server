@@ -1,0 +1,10 @@
+@media (max-width: 992px) {
+    .table-responsive .dropdown-menu {
+        position: static !important;
+    }
+}
+@media (min-width: 993px) {
+    .table-responsive {
+        overflow: inherit;
+    }
+}

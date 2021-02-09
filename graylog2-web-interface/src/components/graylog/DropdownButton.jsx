@@ -20,6 +20,8 @@ import styled, { css } from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
 
+import './DropdownButton.css';
+
 const DropdownButton = styled(BootstrapDropdownButton)(({ theme }) => css`
   ${theme.components.button}
   & ~ {
