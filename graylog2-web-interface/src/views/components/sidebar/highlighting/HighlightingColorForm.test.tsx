@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -41,5 +42,57 @@ describe('HighlightingColorForm', () => {
     const gradientOption = await screen.findByLabelText('Gradient');
 
     expect(gradientOption).toBeChecked();
+
+    await screen.findByText('Viridis');
+  });
+
+  it('should not select a type if none is present', async () => {
+    render(<HighlightingColorForm name="color" field={field} value={undefined} onChange={jest.fn()} />);
+    const staticOption = await screen.findByLabelText('Static Color');
+
+    expect(staticOption).not.toBeChecked();
+
+    const gradientOption = await screen.findByLabelText('Gradient');
+
+    expect(gradientOption).not.toBeChecked();
+  });
+
+  it('disables gradient option for non-numeric types', async () => {
+    const nonNumericField = FieldTypeMapping.create('foo', FieldType.create('string', []));
+
+    render(<HighlightingColorForm name="color" field={nonNumericField} value={undefined} onChange={jest.fn()} />);
+    const staticOption = await screen.findByLabelText('Static Color');
+
+    expect(staticOption).not.toBeDisabled();
+
+    const gradientOption = await screen.findByLabelText('Gradient');
+
+    expect(gradientOption).toBeDisabled();
+  });
+
+  it('assigns a new static color when type is selected', async () => {
+    const onChange = jest.fn();
+    render(<HighlightingColorForm name="color" field={field} value={undefined} onChange={onChange} />);
+    userEvent.click(screen.getByLabelText('Static Color'));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
+      target: expect.objectContaining({
+        name: 'color',
+        value: expect.objectContaining({ color: expect.any(String) }),
+      }),
+    })));
+  });
+
+  it('creates a new gradient when type is selected', async () => {
+    const onChange = jest.fn();
+    render(<HighlightingColorForm name="color" field={field} value={undefined} onChange={onChange} />);
+    userEvent.click(screen.getByLabelText('Gradient'));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
+      target: expect.objectContaining({
+        name: 'color',
+        value: expect.objectContaining({ gradient: 'Viridis' }),
+      }),
+    })));
   });
 });

@@ -77,6 +77,7 @@ const GradientColorPicker = ({ name, value, onChange }: { name: string, value: G
       <Input id={name}
              label="Gradient Name">
         <Select options={GRADIENTS}
+                inputProps={{ 'aria-label': 'Select gradient colors' }}
                 value={value.gradient}
                 onChange={_onChangeGradient} />
       </Input>
