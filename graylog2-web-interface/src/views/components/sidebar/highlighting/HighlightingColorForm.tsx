@@ -43,7 +43,7 @@ type Props = {
   field: FieldTypeMapping,
   value: HighlightingColor,
   onChange: (e: ChangeEvent) => void,
-  error?: string,
+  error: string | undefined,
 };
 
 const StaticColorPicker = ({ name, value, onChange }: { name: string, value: StaticColor, onChange: (newColor: HighlightingColor) => void}) => (
