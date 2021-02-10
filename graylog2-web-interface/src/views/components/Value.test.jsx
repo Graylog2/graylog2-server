@@ -20,7 +20,6 @@ import each from 'jest-each';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 
 import Value from './Value';
 import EmptyValue from './EmptyValue';

@@ -33,7 +33,7 @@ export const formatDateTime = (dateTime, format, tz, relative = false) => {
     default:
       return dateTime.toTimeZone(tz).toString(format);
   }
-}
+};
 
 /**
  * Component that renders a `time` HTML element with a given date time. It is
