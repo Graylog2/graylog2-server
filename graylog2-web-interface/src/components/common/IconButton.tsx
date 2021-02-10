@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
-const Wrapper = styled.button(({ theme, disabled }: {theme: any, disabled: boolean}) => css`
+const Wrapper = styled.button(({ theme, disabled }: {theme: DefaultTheme, disabled: boolean}) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;
