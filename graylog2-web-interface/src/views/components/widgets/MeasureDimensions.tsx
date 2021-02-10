@@ -15,56 +15,50 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import createReactClass from 'create-react-class';
-import PropTypes from 'prop-types';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
-const MeasureDimensions = createReactClass({
-  propTypes: {
-    children: PropTypes.node.isRequired,
-  },
+type Props = {
+  children: React.ReactElement,
+};
 
-  getInitialState() {
-    return {
-      height: undefined,
-    };
-  },
+const MeasureDimensions = ({ children }: Props) => {
+  const container = useRef<HTMLSpanElement>(null);
+  const [height, setHeight] = useState<number|undefined>();
 
-  componentDidMount() {
-    window.addEventListener('resize', this._setHeight);
-    this._setHeight();
-  },
+  const _getHeight = useCallback(() => {
+    if (container) {
+      const { current } = container;
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this._setHeight);
-  },
-
-  _setHeight() {
-    this.setState({ height: this._getHeight() });
-  },
-
-  _getHeight() {
-    if (this.container) {
-      return this.container.offsetHeight;
+      return current.offsetHeight;
     }
 
     return undefined;
-  },
+  }, []);
 
-  _renderChildren() {
-    return React.Children.map(this.props.children, (child) => {
+  const _setHeight = useCallback(() => {
+    setHeight(_getHeight());
+  }, [_getHeight]);
+
+  useEffect(() => {
+    window.addEventListener('resize', _setHeight);
+    _setHeight();
+
+    return () => window.removeEventListener('resize', _setHeight);
+  }, [_setHeight]);
+
+  const _renderChildren = () => {
+    return React.Children.map(children, (child) => {
       return React.cloneElement(child, {
-        containerHeight: this.state.height,
+        containerHeight: height,
       });
     });
-  },
+  };
 
-  render() {
-    return (
-      <span ref={(node) => { this.container = node; }} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        {this._renderChildren()}
-      </span>
-    );
-  },
-});
+  return (
+    <span ref={container} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {_renderChildren()}
+    </span>
+  );
+};
 
 export default MeasureDimensions;
