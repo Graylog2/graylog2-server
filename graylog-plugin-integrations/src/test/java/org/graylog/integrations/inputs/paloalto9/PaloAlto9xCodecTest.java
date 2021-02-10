@@ -184,6 +184,19 @@ public class PaloAlto9xCodecTest {
     }
 
     @Test
+    public void decode_runsSuccessfully_whenGoodUserIdInput() {
+        givenGoodInputRawMessage();
+        givenPaloMessageType("USERID");
+        givenStoreFullMessage(false);
+        givenGoodFieldProducer();
+
+        whenDecodeIsCalled();
+
+        thenPaloParserCalledWithPaloMessageType(PaloAltoMessageType.USERID);
+        thenOutputMessageContainsExpectedFields(false);
+    }
+
+    @Test
     public void decode_returnsNull_whenRawPaloParseFails() {
         givenGoodInputRawMessage();
         givenRawParserReturnsNull();

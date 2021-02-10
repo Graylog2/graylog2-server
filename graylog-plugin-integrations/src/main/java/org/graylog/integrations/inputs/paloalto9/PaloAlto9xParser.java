@@ -40,7 +40,8 @@ public class PaloAlto9xParser {
                 new PaloAltoTypeParser(PaloAlto9xTemplates.hipTemplate(), PaloAltoMessageType.HIP),
                 new PaloAltoTypeParser(PaloAlto9xTemplates.systemTemplate(), PaloAltoMessageType.SYSTEM),
                 new PaloAltoTypeParser(PaloAlto9xTemplates.threatTemplate(), PaloAltoMessageType.THREAT),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.trafficTemplate(), PaloAltoMessageType.TRAFFIC));
+                new PaloAltoTypeParser(PaloAlto9xTemplates.trafficTemplate(), PaloAltoMessageType.TRAFFIC),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.userIdTemplate(), PaloAltoMessageType.USERID));
     }
 
     @VisibleForTesting
@@ -51,7 +52,8 @@ public class PaloAlto9xParser {
                                            PaloAltoTypeParser hipParser,
                                            PaloAltoTypeParser systemParser,
                                            PaloAltoTypeParser threatParser,
-                                           PaloAltoTypeParser trafficParser) {
+                                           PaloAltoTypeParser trafficParser,
+                                           PaloAltoTypeParser userIdParser) {
         parsers = Maps.newHashMap();
         parsers.put(PaloAltoMessageType.CONFIG, configParser);
         parsers.put(PaloAltoMessageType.CORRELATION, correlationParser);
@@ -61,6 +63,7 @@ public class PaloAlto9xParser {
         parsers.put(PaloAltoMessageType.SYSTEM, systemParser);
         parsers.put(PaloAltoMessageType.THREAT, threatParser);
         parsers.put(PaloAltoMessageType.TRAFFIC, trafficParser);
+        parsers.put(PaloAltoMessageType.USERID, userIdParser);
     }
 
     public ImmutableMap<String, Object> parseFields(PaloAltoMessageType type, List<String> fields) {
@@ -68,7 +71,7 @@ public class PaloAlto9xParser {
             PaloAltoTypeParser parser = parsers.get(type);
             return parser.parseFields(fields);
         }
-        LOG.error("Unsupported PAN type [{}]. Not adding any parsed fields.", type);
+        LOG.info("Received log for unsupported PAN type [{}]. Will not parse.", type);
         return ImmutableMap.of();
     }
 }

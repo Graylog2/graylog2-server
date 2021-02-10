@@ -577,4 +577,52 @@ public class PaloAlto9xTemplates {
 
         return toTemplate(fields);
     }
+
+    public static PaloAltoMessageTemplate userIdTemplate() {
+        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+
+        // Field 0 is FUTURE USE
+        fields.add(create(EventFields.EVENT_CREATED, 1, STRING));
+        fields.add(create(EventFields.EVENT_OBSERVER_UID, 2, STRING));
+        fields.add(create(EventFields.EVENT_LOG_NAME, 3, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
+
+        // Field 5 is FUTURE USE
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(HostFields.HOST_VIRTFW_ID, 7, STRING));
+        fields.add(create(SourceFields.SOURCE_IP, 8, STRING));
+        fields.add(create(SourceFields.SOURCE_USER, 9, STRING));
+
+        fields.add(create(PaloAlto9xFields.PAN_DATASOURCE_NAME, 10, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_EVENT_NAME, 11, STRING));
+        fields.add(create(EventFields.EVENT_REPEAT_COUNT, 12, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_TIMEOUT, 13, LONG));
+        fields.add(create(SourceFields.SOURCE_PORT, 14, LONG));
+
+        fields.add(create(DestinationFields.DESTINATION_PORT, 15, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DATASOURCE, 16, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DATASOURCE_TYPE, 17, STRING));
+        fields.add(create(EventFields.EVENT_UID, 18, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_LOG_PANORAMA, 19, STRING));
+
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 20, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 21, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 22, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 23, LONG));
+        fields.add(create(HostFields.HOST_VIRTFW_HOSTNAME, 24, STRING));
+
+        fields.add(create(EventFields.EVENT_OBSERVER_HOSTNAME, 25, STRING));
+        fields.add(create(HostFields.HOST_VIRTFW_UID, 26, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_FACTOR_TYPE, 27, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_FACTOR_COMPLETION_TIME, 28, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_FACTOR_NUMBER, 29, LONG));
+
+        // Field 30 is FUTURE USE
+        // Field 31 is FUTURE USE
+        fields.add(create(PaloAlto9xFields.PAN_USER_GROUP_FLAGS, 32, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_SOURCE_USER, 33, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_HIGH_RES_TIME, 34, STRING));
+
+        return toTemplate(fields);
+    }
 }

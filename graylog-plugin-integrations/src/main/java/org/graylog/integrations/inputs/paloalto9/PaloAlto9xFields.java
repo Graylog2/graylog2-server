@@ -25,6 +25,9 @@ public class PaloAlto9xFields {
     public static final String PAN_BEFORE_CHANGE_DETAIL = "pan_before_change_detail";
 
     public static final String PAN_CLOUD_HOSTNAME = "pan_cloud_hostname";
+    public static final String PAN_DATASOURCE = "pan_datasource";
+    public static final String PAN_DATASOURCE_NAME = "pan_datasource_name";
+    public static final String PAN_DATASOURCE_TYPE = "pan_datasource_type";
     public static final String PAN_DESTINATION_PROFILE = "pan_destination_profile";
     public static final String PAN_DEV_GROUP_LEVEL_1 = "pan_dev_group_level_1";
     public static final String PAN_DEV_GROUP_LEVEL_2 = "pan_dev_group_level_2";
@@ -40,6 +43,9 @@ public class PaloAlto9xFields {
     public static final String PAN_EVENT_OBJECT = "pan_event_object";
     public static final String PAN_EVENT_JUSTIFICATION = "pan_event_justification";
     public static final String PAN_EVIDENCE = "pan_evidence";
+    public static final String PAN_FACTOR_COMPLETION_TIME = "pan_factor_completion_time";
+    public static final String PAN_FACTOR_NUMBER = "pan_factor_number";
+    public static final String PAN_FACTOR_TYPE = "pan_factor_type";
     public static final String PAN_FLAGS = "pan_flags";
 
     public static final String PAN_GATEWAY = "pan_gateway";
@@ -94,12 +100,15 @@ public class PaloAlto9xFields {
     public static final String PAN_SESSION_OWNER = "pan_session_owner";
     public static final String PAN_SOURCE_PROFILE = "pan_source_profile";
     public static final String PAN_SOURCE_REGION = "pan_source_region";
+    public static final String PAN_SOURCE_USER = "pan_source_user";
 
     public static final String PAN_SRC_DAG = "pan_src_dag";
     public static final String PAN_SRC_EDL = "pan_src_edl";
+    public static final String PAN_TIMEOUT = "pan_timeout";
     public static final String PAN_TUNNEL_ID = "pan_tunnel_id";
     public static final String PAN_TUNNEL_STAGE = "pan_tunnel_stage";
     public static final String PAN_URL_INDEX = "pan_url_index";
+    public static final String PAN_USER_GROUP_FLAGS = "pan_user_group_flags";
     public static final String PAN_WILDFIRE_HASH = "pan_wildfire_hash";
     public static final String PAN_WILDFIRE_REPORT_ID = "pan_wildfire_report_id";
 }

@@ -43,6 +43,9 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldTemplate.create;
+import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.LONG;
+import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.STRING;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -637,5 +640,61 @@ public class PaloAlto9xTemplatesTest {
          assertThat(out.getField(PaloAlto9xFields.PAN_HIGH_RES_TIME), nullValue());
          assertThat(out.getField(PaloAlto9xFields.PAN_NSDSAI_SST), nullValue());
          assertThat(out.getField(PaloAlto9xFields.PAN_NSDSAI_SD), nullValue());
+    }
+
+    @Test
+    public void verifyUserIdMessageParsing() {
+        String log = "1,2021/01/20 08:55:02,012801190281,USERID,login,2304,2021/01/20 08:55:02,vsys1,172.16.100.1,graylog-user1,,0,1,2592000,0,0,vpn-client,globalprotect,1,0x0,0,0,0,0,,PA-220,1,,2021/01/20 08:55:02,1,0x0,graylog-user1";
+        String rawMessage = SYSLOG_PREFIX + log;
+        RawMessage in = new RawMessage(rawMessage.getBytes());
+
+        Message out = cut.decode(in);
+
+        assertThat(out, notNullValue());
+        assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
+        assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
+
+        assertThat(out.getField(EventFields.EVENT_CREATED), is("2021/01/20 08:55:02"));
+        assertThat(out.getField(EventFields.EVENT_OBSERVER_UID), is("012801190281"));
+        assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("USERID"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("login"));
+
+        // Field 5 is FUTURE USE - 2304
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is("2021/01/20 08:55:02"));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
+        assertThat(out.getField(SourceFields.SOURCE_IP), is("172.16.100.1"));
+        assertThat(out.getField(SourceFields.SOURCE_USER), is("graylog-user1"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_DATASOURCE_NAME), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_EVENT_NAME), is("0"));
+        assertThat(out.getField(EventFields.EVENT_REPEAT_COUNT), is(1L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_TIMEOUT), is(2592000L));
+        assertThat(out.getField(SourceFields.SOURCE_PORT), is(0L));
+
+        assertThat(out.getField(DestinationFields.DESTINATION_PORT), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DATASOURCE), is("vpn-client"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DATASOURCE_TYPE), is("globalprotect"));
+        assertThat(out.getField(EventFields.EVENT_UID), is("1"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_PANORAMA), is("0x0"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is(0L));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_HOSTNAME), nullValue());
+
+        assertThat(out.getField(EventFields.EVENT_OBSERVER_HOSTNAME), is("PA-220"));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_UID), is("1"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_FACTOR_TYPE), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_FACTOR_COMPLETION_TIME), is("2021/01/20 08:55:02"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_FACTOR_NUMBER), is(1L));
+
+        // Field 30 is FUTURE USE - 0x0
+        // Field 31 is FUTURE USE - graylog-user1
+        assertThat(out.getField(PaloAlto9xFields.PAN_USER_GROUP_FLAGS), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_SOURCE_USER), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_HIGH_RES_TIME), nullValue());
     }
 }

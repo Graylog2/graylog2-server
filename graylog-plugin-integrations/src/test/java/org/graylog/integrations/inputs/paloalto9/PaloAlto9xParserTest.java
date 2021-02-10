@@ -57,6 +57,7 @@ public class PaloAlto9xParserTest {
     @Mock PaloAltoTypeParser mockSystemParser;
     @Mock PaloAltoTypeParser mockThreatParser;
     @Mock PaloAltoTypeParser mockTrafficParser;
+    @Mock PaloAltoTypeParser mockUserIdParser;
 
     // Test Objects
     PaloAltoMessageType inputMessageType;
@@ -73,7 +74,8 @@ public class PaloAlto9xParserTest {
                 mockHipParser,
                 mockSystemParser,
                 mockThreatParser,
-                mockTrafficParser);
+                mockTrafficParser,
+                mockUserIdParser);
     }
 
     // Test Cases
@@ -174,6 +176,18 @@ public class PaloAlto9xParserTest {
     }
 
     @Test
+    public void parseFields_returnExpectedFieldMap_whenUserIdMessageType() {
+        givenInputFieldType(PaloAltoMessageType.USERID);
+        givenGoodInputFields();
+        givenGoodParsers();
+
+        whenParseFieldsIsCalled();
+
+        thenUserIdParserIsUsed();
+        thenExpectedOutputIsReturned();
+    }
+
+    @Test
     public void parseFields_returnsEmptyMap_whenNoParserFound() {
         givenInputFieldType(null);
         givenGoodInputFields();
@@ -203,6 +217,7 @@ public class PaloAlto9xParserTest {
         given(mockSystemParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
         given(mockThreatParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
         given(mockTrafficParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
+        given(mockUserIdParser.parseFields(anyList())).willReturn(TEST_FIELD_MAP);
     }
 
     // WHENs
@@ -220,6 +235,7 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockSystemParser);
         verifyNoMoreInteractions(mockThreatParser);
         verifyNoMoreInteractions(mockTrafficParser);
+        verifyNoMoreInteractions(mockUserIdParser);
     }
 
     private void thenCorrelationParserIsUsed() {
@@ -231,6 +247,7 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockSystemParser);
         verifyNoMoreInteractions(mockThreatParser);
         verifyNoMoreInteractions(mockTrafficParser);
+        verifyNoMoreInteractions(mockUserIdParser);
     }
 
     private void thenPre913GlobalProtectParserIsUsed() {
@@ -242,6 +259,7 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockSystemParser);
         verifyNoMoreInteractions(mockThreatParser);
         verifyNoMoreInteractions(mockTrafficParser);
+        verifyNoMoreInteractions(mockUserIdParser);
     }
 
     private void then913GlobalProtectParserIsUsed() {
@@ -253,6 +271,7 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockSystemParser);
         verifyNoMoreInteractions(mockThreatParser);
         verifyNoMoreInteractions(mockTrafficParser);
+        verifyNoMoreInteractions(mockUserIdParser);
     }
 
     private void thenHipParserIsUsed() {
@@ -264,6 +283,7 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockSystemParser);
         verifyNoMoreInteractions(mockThreatParser);
         verifyNoMoreInteractions(mockTrafficParser);
+        verifyNoMoreInteractions(mockUserIdParser);
     }
 
     private void thenSystemParserIsUsed() {
@@ -275,6 +295,7 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockHipParser);
         verifyNoMoreInteractions(mockThreatParser);
         verifyNoMoreInteractions(mockTrafficParser);
+        verifyNoMoreInteractions(mockUserIdParser);
     }
 
     private void thenThreatParserIsUsed() {
@@ -286,6 +307,7 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockHipParser);
         verifyNoMoreInteractions(mockSystemParser);
         verifyNoMoreInteractions(mockTrafficParser);
+        verifyNoMoreInteractions(mockUserIdParser);
     }
 
     private void thenTrafficParserIsUsed() {
@@ -297,6 +319,19 @@ public class PaloAlto9xParserTest {
         verifyNoMoreInteractions(mockHipParser);
         verifyNoMoreInteractions(mockSystemParser);
         verifyNoMoreInteractions(mockThreatParser);
+        verifyNoMoreInteractions(mockUserIdParser);
+    }
+
+    private void thenUserIdParserIsUsed() {
+        ArgumentCaptor<List<String>> fieldsCaptor = ArgumentCaptor.forClass(List.class);
+        verify(mockUserIdParser, times(1)).parseFields(fieldsCaptor.capture());
+        verifyNoMoreInteractions(mockConfigParser);
+        verifyNoMoreInteractions(mockCorrelationParser);
+        verifyNoMoreInteractions(mockGlobalProtectPre913Parser);
+        verifyNoMoreInteractions(mockHipParser);
+        verifyNoMoreInteractions(mockSystemParser);
+        verifyNoMoreInteractions(mockThreatParser);
+        verifyNoMoreInteractions(mockTrafficParser);
     }
 
     private void thenNoParserUsed() {
