@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement | React.ReactElement[],
 };
 
 const MeasureDimensions = ({ children }: Props) => {
