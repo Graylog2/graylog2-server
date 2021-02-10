@@ -56,7 +56,7 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
     private Provider<ProcessBuffer> processBufferProvider;
     private ProcessBuffer processBuffer;
     private final Properties props;
-    private ConcurrentHashMap<TopicPartition, Long> commitableOffsets;
+    private volatile ConcurrentHashMap<TopicPartition, Long> commitableOffsets;
 
     @Inject
     public KafkaMessageQueueReader(MetricRegistry metricRegistry,
@@ -101,6 +101,7 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
     @Override
     protected void shutDown() throws Exception {
         if (consumer != null) {
+            doCommit();
             consumer.close();
         }
         super.shutDown();
@@ -114,6 +115,7 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
 
         while (isRunning()) {
             if (!shouldBeReading()) {
+                doCommit(); // There might be still pending commits.
                 Uninterruptibles.sleepUninterruptibly(100, MILLISECONDS);
                 continue;
             }
