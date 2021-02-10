@@ -48,6 +48,14 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.rest.DashboardsResource;
+import org.graylog.plugins.views.search.rest.FieldTypesResource;
+import org.graylog.plugins.views.search.rest.MessagesResource;
+import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
+import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
+import org.graylog.plugins.views.search.rest.SavedSearchesResource;
+import org.graylog.plugins.views.search.rest.SearchResource;
+import org.graylog.plugins.views.search.rest.ViewsResource;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
@@ -100,7 +108,14 @@ public class ViewsBindings extends ViewsModule {
     protected void configure() {
         registerExportBackendProvider();
 
-        registerRestControllerPackage(getClass().getPackage().getName());
+        addSystemRestResource(DashboardsResource.class);
+        addSystemRestResource(FieldTypesResource.class);
+        addSystemRestResource(MessagesResource.class);
+        addSystemRestResource(PivotSeriesFunctionsResource.class);
+        addSystemRestResource(QualifyingViewsResource.class);
+        addSystemRestResource(SavedSearchesResource.class);
+        addSystemRestResource(SearchResource.class);
+        addSystemRestResource(ViewsResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 

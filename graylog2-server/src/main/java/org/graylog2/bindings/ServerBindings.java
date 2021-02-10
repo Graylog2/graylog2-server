@@ -162,9 +162,6 @@ public class ServerBindings extends Graylog2Module {
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
         bind(Engine.class).toInstance(Engine.createEngine());
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
-
-        registerRestControllerPackage("org.graylog2.rest.resources");
-        registerRestControllerPackage("org.graylog2.shared.rest.resources");
     }
 
     private void bindInterfaces() {
