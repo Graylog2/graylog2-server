@@ -45,7 +45,7 @@ module.exports = {
       plugins: ['jest'],
       extends: ['plugin:jest/recommended'],
       rules: {
-        'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', 'findBy*'] }],
+        'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
       },
     },
   ],
