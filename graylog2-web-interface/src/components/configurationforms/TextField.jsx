@@ -47,9 +47,8 @@ class TextField extends React.Component {
   };
 
   render() {
-    const { field } = this.state;
-    const { title } = this.state;
-    const { typeName } = this.state;
+    const { field, title, typeName } = this.state;
+    const fieldId = `${typeName}-${title}`;
 
     let inputField;
     const isRequired = !field.is_optional;
@@ -57,7 +56,7 @@ class TextField extends React.Component {
 
     if (FieldHelpers.hasAttribute(field.attributes, 'textarea')) {
       inputField = (
-        <textarea id={title}
+        <textarea id={fieldId}
                   className="form-control"
                   rows={10}
                   name={`configuration[${title}]`}
@@ -68,7 +67,7 @@ class TextField extends React.Component {
       );
     } else {
       inputField = (
-        <input id={title}
+        <input id={fieldId}
                type={fieldType}
                className="form-control"
                name={`configuration[${title}]`}
@@ -82,7 +81,7 @@ class TextField extends React.Component {
     // TODO: replace with bootstrap input component
     return (
       <div className="form-group">
-        <label htmlFor={`${typeName}-${title})`}>
+        <label htmlFor={fieldId}>
           {field.human_name}
           {FieldHelpers.optionalMarker(field)}
         </label>

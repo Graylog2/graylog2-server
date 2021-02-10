@@ -32,15 +32,14 @@ class BooleanField extends React.Component {
   };
 
   render() {
-    const { field } = this.props;
-    const { typeName } = this.props;
-    const { title } = this.props;
+    const { field, title, typeName } = this.props;
+    const fieldId = `${typeName}-${title}`;
 
     return (
       <div className="form-group">
         <div className="checkbox">
           <label>
-            <input id={`${typeName}-${title}`}
+            <input id={fieldId}
                    type="checkbox"
                    checked={this.props.value}
                    name={`configuration[${title}]`}
