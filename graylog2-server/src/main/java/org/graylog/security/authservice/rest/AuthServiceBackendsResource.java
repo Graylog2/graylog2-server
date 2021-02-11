@@ -21,6 +21,12 @@ import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -75,6 +81,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "System/Authentication/Services/Backends", description = "Manage authentication service backends")
+@Tag(name = "System/Authentication/Services/Backends", description = "Manage authentication service backends")
 @RequiresAuthentication
 public class AuthServiceBackendsResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -120,6 +127,7 @@ public class AuthServiceBackendsResource extends RestResource {
 
     @GET
     @ApiOperation("Returns available authentication service backends")
+    @Operation(summary = "Returns available authentication service backends")
     public PaginatedResponse<AuthServiceBackendDTO> list(@ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParameters) {
         final AuthServiceBackendDTO activeBackendConfig = globalAuthServiceConfig.getActiveBackendConfig()
                 .filter(this::checkReadPermission)
@@ -136,7 +144,12 @@ public class AuthServiceBackendsResource extends RestResource {
     @GET
     @Path("{backendId}")
     @ApiOperation("Returns the authentication service backend for the given ID")
-    public Response get(@ApiParam(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId) {
+    @Operation(summary = "Returns the authentication service backend for the given ID", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(
+                    schema = @Schema(implementation = AuthServiceBackendDTO.class)
+            ))
+    })
+    public Response get(@ApiParam(name = "backendId", required = true) @Parameter(description = "Backend ID", required = true) @PathParam("backendId") @NotBlank String backendId) {
         checkPermission(RestPermissions.AUTH_SERVICE_BACKEND_READ, backendId);
 
         return toResponse(loadConfig(backendId));
