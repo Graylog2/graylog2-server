@@ -19,18 +19,13 @@ import React from 'react';
 import DayPicker from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
-import { OverlayTrigger, Popover } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 
 import 'react-day-picker/lib/style.css';
 
-const StyledPopover = styled(Popover)`
-  .popover-content {
-    padding: 0;
-  }
-`;
-
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
+  width: 100%;
+
   .DayPicker-Day {
     min-width: 34px;
     max-width: 34px;
@@ -63,11 +58,7 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
-/**
- * Component that renders a given children and wraps a date picker around it. The date picker will show when
- * the children is clicked, and hidden when clicking somewhere else.
- */
-const DatePicker = ({ children, date, id, onChange, title }) => {
+const DatePicker = ({ date, fromDate, onChange, showOutsideDays }) => {
   let selectedDate;
 
   if (date) {
@@ -88,35 +79,20 @@ const DatePicker = ({ children, date, id, onChange, title }) => {
 
       return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
     },
+    disabled: {
+      before: new Date(fromDate),
+    },
   };
 
-  const dayPickerFrom = (
-    <StyledPopover id={id}
-                   placement="bottom"
-                   positionTop={25}
-                   title={title}>
-      <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
-                       onDayClick={onChange}
-                       modifiers={modifiers}
-                       showOutsideDays />
-    </StyledPopover>
-  );
-
   return (
-    <OverlayTrigger trigger="click"
-                    rootClose
-                    placement="bottom"
-                    overlay={dayPickerFrom}>
-      {children}
-    </OverlayTrigger>
+    <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
+                     onDayClick={onChange}
+                     modifiers={modifiers}
+                     showOutsideDays={showOutsideDays} />
   );
 };
 
 DatePicker.propTypes = {
-  /** Element id to use in the date picker Popover. */
-  id: PropTypes.string.isRequired,
-  /** Title to use in the date picker Popover.  */
-  title: PropTypes.string.isRequired,
   /** Initial date to select in the date picker. */
   date: PropTypes.string,
   /**
@@ -124,12 +100,16 @@ DatePicker.propTypes = {
    * `react-day-picker`'s modifiers, and the original event as arguments.
    */
   onChange: PropTypes.func.isRequired,
-  /** Element that will trigger the date picker Popover. */
-  children: PropTypes.node.isRequired,
+  /** Earliest date possible to select in the date picker. */
+  fromDate: PropTypes.instanceOf(Date),
+  /** Earliest date possible to select in the date picker. */
+  showOutsideDays: PropTypes.bool,
 };
 
 DatePicker.defaultProps = {
   date: undefined,
+  fromDate: undefined,
+  showOutsideDays: false,
 };
 
 export default DatePicker;

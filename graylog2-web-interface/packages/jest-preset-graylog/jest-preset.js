@@ -42,7 +42,7 @@ module.exports = {
   moduleNameMapper: {
     c3: require.resolve('./lib/mocking/c3_mock.js'),
     '^file-loader(\\?esModule=false)?!(.+)$': '$2',
-    '^!style/useable!.*\\.(css|less)$': require.resolve('./lib/mocking/useable-css-proxy.js'),
+    '(\\.lazy|leaflet)\\.css$': require.resolve('./lib/mocking/useable-css-proxy.js'),
     '\\.(css|less)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./lib/mocking/fileMock.js'),
   },

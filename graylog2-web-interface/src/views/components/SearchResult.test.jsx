@@ -91,7 +91,7 @@ describe('SearchResult', () => {
     expect(getByText('Loading...')).not.toBeNull();
   });
 
-  it('should display loading indicator, when search is loading ', () => {
+  it('should display loading indicator, when search is loading', () => {
     asMock(SearchLoadingStateStore.getInitialState).mockImplementation(() => ({ isLoading: true }));
     const { getByText } = render(<SimpleSearchResult />);
 

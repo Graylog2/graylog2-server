@@ -43,7 +43,7 @@ const DrilldownContextProvider = ({ children, widget, globalOverride, currentQue
     const { streams, timerange, query } = widget;
     const value: Drilldown = {
       streams,
-      timerange: (globalOverride && globalOverride.timerange ? globalOverride.timerange : timerange) || { type: 'relative', range: 300 },
+      timerange: (globalOverride && globalOverride.timerange ? globalOverride.timerange : timerange) || { type: 'relative', from: 300 },
       query: (globalOverride && globalOverride.query ? globalOverride.query : query) || createElasticsearchQueryString(''),
     };
 

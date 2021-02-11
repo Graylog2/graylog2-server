@@ -148,7 +148,7 @@
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.2</shiro.version>
         <oshi.version>5.3.7</oshi.version>
-        <siv-mode.version>1.3.2</siv-mode.version>
+        <siv-mode.version>1.4.1</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
         <streamex.version>0.7.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
@@ -477,6 +477,13 @@
                             <goals>deploy</goals>
                             <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-deploy-plugin</artifactId>
+                      <configuration>
+                        <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
+                      </configuration>
                     </plugin>
                 </plugins>
             </build>

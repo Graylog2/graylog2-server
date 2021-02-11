@@ -21,7 +21,7 @@ import lodash from 'lodash';
 import { Alert } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 export default class RuleMetricsConfig extends React.Component {
   static propTypes = {

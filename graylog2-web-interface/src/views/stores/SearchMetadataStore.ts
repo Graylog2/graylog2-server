@@ -17,7 +17,7 @@
 import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { RefluxActions, Store } from 'stores/StoreTypes';

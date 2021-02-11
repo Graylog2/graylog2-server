@@ -137,7 +137,7 @@ describe('UsersOverview', () => {
       await waitFor(() => expect(screen.queryByTitle(`Delete user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
 
-    it('see edit and edit tokens link for a modifiable user ', async () => {
+    it('see edit and edit tokens link for a modifiable user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }));
       render(<UsersOverviewAsAdmin />);
 

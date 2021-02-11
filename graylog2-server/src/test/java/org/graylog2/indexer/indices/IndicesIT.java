@@ -434,4 +434,11 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(indexSetStats.indices()).isEqualTo(2L);
         assertThat(indexSetStats.size()).isNotZero();
     }
+
+    @Test
+    public void waitForRedIndexReturnsStatus() {
+        final HealthStatus healthStatus = indices.waitForRecovery("this_index_does_not_exist", 0);
+
+        assertThat(healthStatus).isEqualTo(HealthStatus.Red);
+    }
 }

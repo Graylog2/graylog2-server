@@ -22,7 +22,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { Modal, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
 
 const SessionStore = StoreProvider.getStore('Session');

@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect, useCallback } from 'react';
+import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
+import { useStore } from 'stores/connect';
 import { Modal } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import WidgetContext from 'views/components/contexts/WidgetContext';
@@ -26,6 +28,10 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+
+import styles from './EditWidgetFrame.css';
+import globalStyles from './EditWidgetFrame.global.lazy.css';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -33,18 +39,13 @@ import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 import SearchBarForm from '../searchbar/SearchBarForm';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
-
 type DialogProps = {
   bsClass: string,
   className: string,
   children: React.ReactNode,
 };
 
-const EditWidgetDialog = ({ className, children, bsClass, ...rest }: DialogProps) => (
+const EditWidgetDialog = ({ children, ...rest }: DialogProps) => (
   <Modal.Dialog {...rest} dialogClassName={styles.editWidgetDialog}>
     {children}
   </Modal.Dialog>
@@ -71,6 +72,8 @@ const onSubmit = (values, widget: Widget) => {
 };
 
 const EditWidgetFrame = ({ children }: Props) => {
+  const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
+
   useEffect(() => {
     globalStyles.use();
 
@@ -83,10 +86,11 @@ const EditWidgetFrame = ({ children }: Props) => {
     return <Spinner text="Loading widget ..." />;
   }
 
+  const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const { streams } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
-  const _onSubmit = useCallback((values) => onSubmit(values, widget), [widget]);
+  const _onSubmit = (values) => onSubmit(values, widget);
 
   return (
     <Modal show
@@ -94,7 +98,9 @@ const EditWidgetFrame = ({ children }: Props) => {
            dialogComponentClass={EditWidgetDialog}
            enforceFocus={false}>
       <SearchBarForm initialValues={{ timerange, streams, queryString }}
-                     onSubmit={_onSubmit}>
+                     limitDuration={limitDuration}
+                     onSubmit={_onSubmit}
+                     validateOnMount={false}>
         <div className={styles.gridContainer}>
           <IfDashboard>
             <Modal.Header className={styles.QueryControls}>

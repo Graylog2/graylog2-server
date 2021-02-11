@@ -22,7 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Alert, Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select, Spinner } from 'components/common';
 import { Input } from 'components/bootstrap';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
