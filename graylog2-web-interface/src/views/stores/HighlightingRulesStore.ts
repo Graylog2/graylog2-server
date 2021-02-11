@@ -124,9 +124,10 @@ const HighlightingRulesStore: Store<Array<HighlightingRule>> = singletonStore(
     update(rule: HighlightingRule, payload): Promise<Array<HighlightingRule>> {
       const { field = rule.field, value = rule.value, condition = rule.condition, color = rule.color } = payload;
       const oldKey = makeKey(rule.field, rule.value, rule.condition);
-      this.state.delete(oldKey);
       const newKey = makeKey(field, value, condition);
-      const promise = this._propagateAndTrigger(this.state.set(newKey, color));
+      const newState = this.state.delete(oldKey)
+        .set(newKey, color);
+      const promise = this._propagateAndTrigger(newState);
 
       HighlightingRulesActions.update.promise(promise);
 
