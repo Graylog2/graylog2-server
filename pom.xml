@@ -118,6 +118,7 @@
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
         <javax.inject.version>1</javax.inject.version>
+        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <jaxb-api.version>2.3.0</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
@@ -153,7 +154,8 @@
         <siv-mode.version>1.4.1</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
         <streamex.version>0.7.2</streamex.version>
-        <swagger.version>1.5.13</swagger.version>
+        <swagger-legacy.version>1.5.13</swagger-legacy.version>
+        <swagger.version>2.1.6</swagger.version>
         <syslog4j.version>0.9.60</syslog4j.version>
         <ulid.version>8.2.0</ulid.version>
         <unboundid-ldap.version>5.1.1</unboundid-ldap.version>

@@ -22,9 +22,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -86,6 +99,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -287,7 +301,46 @@ public class JerseyService extends AbstractIdleService {
             rc.registerClasses(PrintModelProcessor.class);
         }
 
+        openAPISetup(controllerPackages, rc);
+
         return rc;
+    }
+
+    private void openAPISetup(String[] controllerPackages, ResourceConfig rc) {
+        final OpenAPI openAPI = new OpenAPI();
+
+        final Info info = new Info()
+                .title("Graylog")
+                .description("This is Graylog")
+                .contact(new Contact().email("hello@graylog.org"))
+                .license(new License().name("SSPL-1"));
+
+        openAPI.info(info);
+        openAPI.servers(Collections.singletonList(new Server().url("/api")));
+        openAPI.addSecurityItem(new SecurityRequirement().addList("basicAuth"));
+        openAPI.components(new Components()
+                .addSecuritySchemes("basicAuth", new SecurityScheme()
+                        .name("basicAuth")
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("basic")));
+
+        final SwaggerConfiguration swaggerConfiguration = new SwaggerConfiguration()
+                .openAPI(openAPI)
+                .prettyPrint(true)
+                .sortOutput(true)
+                .resourcePackages(ImmutableSet.copyOf(controllerPackages));
+
+        try {
+            new JaxrsOpenApiContextBuilder<>()
+                    .openApiConfiguration(swaggerConfiguration)
+                    .application(rc)
+                    .buildContext(true);
+
+            rc.registerClasses(OpenApiResource.class);
+        } catch (OpenApiConfigurationException e) {
+            LOG.error("Couldn't setup OpenAPI", e);
+            throw new RuntimeException(e);
+        }
     }
 
     private Map<String, MediaType> mediaTypeMappings() {
