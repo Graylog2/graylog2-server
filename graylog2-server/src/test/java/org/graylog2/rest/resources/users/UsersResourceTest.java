@@ -76,8 +76,7 @@ public class UsersResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        final Configuration configuration = new Configuration();
-        userImplFactory = new UserImplFactory(configuration,
+        userImplFactory = new UserImplFactory(new Configuration(),
                                               new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                                               roleService, sessionService, new HttpConfiguration(), subject);
