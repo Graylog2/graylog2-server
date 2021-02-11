@@ -16,6 +16,8 @@
  */
 import * as chroma from 'chroma-js';
 
+import { scaleForGradient } from 'views/components/sidebar/highlighting/Scale';
+
 export type HighlightingColorJson = StaticColorJson | GradientColorJson;
 
 abstract class HighlightingColor {
@@ -122,7 +124,7 @@ export class GradientColor extends HighlightingColor {
     this._upper = upper;
     this._gradient = gradient;
 
-    this._scale = chroma.scale(gradient);
+    this._scale = scaleForGradient(gradient);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -140,6 +142,10 @@ export class GradientColor extends HighlightingColor {
 
   get upper(): number {
     return this._upper;
+  }
+
+  get scale(): chroma.Scale {
+    return this._scale;
   }
 
   colorFor(value: any) {

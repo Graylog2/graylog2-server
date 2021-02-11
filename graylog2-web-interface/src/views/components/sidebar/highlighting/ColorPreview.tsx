@@ -17,10 +17,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import chroma from 'chroma-js';
-import { scales } from 'plotly.js/src/components/colorscale';
 
 import HighlightingColor, { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { scaleForGradient } from 'views/components/sidebar/highlighting/Scale';
 
 const ColorPreviewBase = styled.div`
   height: 2rem;
@@ -34,29 +33,6 @@ const ColorPreviewBase = styled.div`
 const StaticColorPreview = styled(ColorPreviewBase)(({ color }) => css`
   background-color: ${color};
 `);
-
-const plotlyScaleToChroma = (plotlyScale: Array<[domain: number, color: string]>) => {
-  const domains = plotlyScale.map(([domain]) => domain);
-  const colors = plotlyScale.map(([, color]) => color);
-
-  return chroma.scale(colors).domain(domains);
-};
-
-const scaleForGradient = (gradient: string): chroma.Scale => {
-  switch (gradient) {
-    case 'Blackbody':
-    case 'Bluered':
-    case 'Cividis':
-    case 'Earth':
-    case 'Electric':
-    case 'Hot':
-    case 'Jet':
-    case 'Picnic':
-    case 'Portland':
-    case 'Rainbow': return plotlyScaleToChroma(scales[gradient]);
-    default: return chroma.scale(gradient);
-  }
-};
 
 const colorsForGradient = (gradient: string, count = 5): Array<string> => scaleForGradient(gradient).colors(count);
 
