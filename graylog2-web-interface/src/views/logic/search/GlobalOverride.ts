@@ -18,31 +18,37 @@ import * as Immutable from 'immutable';
 
 import type { QueryString, TimeRange } from '../queries/Query';
 
-export type MessageListOptions = {
-  [searchTypeId: string]: {
-    limit: number;
-    offset: number;
-  };
+export type PaginatedListOptions = {
+  limit: number,
+  offset: number,
+};
+
+export type ScrollListOptions = {
+  after: Array<any>,
+}
+
+export type SearchTypeOptions = {
+  [searchTypeId: string]: ScrollListOptions | PaginatedListOptions
 };
 
 type InternalState = {
   timerange?: TimeRange,
   query?: QueryString,
   keepSearchTypes?: string[],
-  searchTypes?: MessageListOptions,
+  searchTypes?: SearchTypeOptions,
 };
 
 type JsonRepresentation = {
   timerange?: TimeRange,
   query?: QueryString,
   keep_search_types?: string[],
-  search_types?: MessageListOptions,
+  search_types?: SearchTypeOptions,
 };
 
 export default class GlobalOverride {
   _value: InternalState;
 
-  constructor(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: MessageListOptions) {
+  constructor(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions) {
     this._value = { timerange, query, keepSearchTypes, searchTypes };
   }
 
@@ -58,7 +64,7 @@ export default class GlobalOverride {
     return this._value.keepSearchTypes;
   }
 
-  get searchTypes(): MessageListOptions | undefined | null {
+  get searchTypes(): SearchTypeOptions | undefined | null {
     return this._value.searchTypes;
   }
 
@@ -70,7 +76,7 @@ export default class GlobalOverride {
     return new Builder(Immutable.Map({ timerange, query, keepSearchTypes, searchTypes }));
   }
 
-  static create(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: MessageListOptions): GlobalOverride {
+  static create(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions): GlobalOverride {
     return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes);
   }
 
@@ -117,7 +123,7 @@ class Builder {
     return new Builder(this.value.set('keepSearchTypes', keepSearchTypes));
   }
 
-  searchTypes(searchTypes: MessageListOptions): Builder {
+  searchTypes(searchTypes: SearchTypeOptions): Builder {
     return new Builder(this.value.set('searchTypes', searchTypes));
   }
 
