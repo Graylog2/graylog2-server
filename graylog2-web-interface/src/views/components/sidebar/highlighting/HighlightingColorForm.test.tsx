@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
+import { Formik } from 'formik';
 
 import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
 import { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -26,9 +26,16 @@ import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 describe('HighlightingColorForm', () => {
   const field = FieldTypeMapping.create('foo', FieldType.create('number', [Properties.Numeric]));
 
+  // eslint-disable-next-line react/prop-types
+  const SimpleForm = ({ value = undefined, ...rest }) => (
+    <Formik initialValues={{ color: value }} onSubmit={() => {}}>
+      <HighlightingColorForm field={field} {...rest} />
+    </Formik>
+  );
+
   it('selects correct type for static color', async () => {
     const staticColor = StaticColor.create('#666666');
-    render(<HighlightingColorForm name="color" field={field} value={staticColor} onChange={jest.fn()} />);
+    render(<SimpleForm value={staticColor} />);
 
     const staticOption = await screen.findByLabelText('Static Color');
 
@@ -37,7 +44,7 @@ describe('HighlightingColorForm', () => {
 
   it('selects correct type for gradient', async () => {
     const gradientColor = GradientColor.create('Viridis', 0, 100);
-    render(<HighlightingColorForm name="color" field={field} value={gradientColor} onChange={jest.fn()} />);
+    render(<SimpleForm value={gradientColor} />);
 
     const gradientOption = await screen.findByLabelText('Gradient');
 
@@ -47,7 +54,7 @@ describe('HighlightingColorForm', () => {
   });
 
   it('should not select a type if none is present', async () => {
-    render(<HighlightingColorForm name="color" field={field} value={undefined} onChange={jest.fn()} />);
+    render(<SimpleForm />);
     const staticOption = await screen.findByLabelText('Static Color');
 
     expect(staticOption).not.toBeChecked();
@@ -60,7 +67,7 @@ describe('HighlightingColorForm', () => {
   it('disables gradient option for non-numeric types', async () => {
     const nonNumericField = FieldTypeMapping.create('foo', FieldType.create('string', []));
 
-    render(<HighlightingColorForm name="color" field={nonNumericField} value={undefined} onChange={jest.fn()} />);
+    render(<SimpleForm field={nonNumericField} />);
     const staticOption = await screen.findByLabelText('Static Color');
 
     expect(staticOption).not.toBeDisabled();
@@ -68,31 +75,5 @@ describe('HighlightingColorForm', () => {
     const gradientOption = await screen.findByLabelText('Gradient');
 
     expect(gradientOption).toBeDisabled();
-  });
-
-  it('assigns a new static color when type is selected', async () => {
-    const onChange = jest.fn();
-    render(<HighlightingColorForm name="color" field={field} value={undefined} onChange={onChange} />);
-    userEvent.click(screen.getByLabelText('Static Color'));
-
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
-      target: expect.objectContaining({
-        name: 'color',
-        value: expect.objectContaining({ color: expect.any(String) }),
-      }),
-    })));
-  });
-
-  it('creates a new gradient when type is selected', async () => {
-    const onChange = jest.fn();
-    render(<HighlightingColorForm name="color" field={field} value={undefined} onChange={onChange} />);
-    userEvent.click(screen.getByLabelText('Gradient'));
-
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
-      target: expect.objectContaining({
-        name: 'color',
-        value: expect.objectContaining({ gradient: 'Viridis' }),
-      }),
-    })));
   });
 });
