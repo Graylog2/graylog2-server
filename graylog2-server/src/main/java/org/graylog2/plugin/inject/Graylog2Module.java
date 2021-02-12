@@ -52,6 +52,7 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.web.PluginUISettingsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -463,6 +464,14 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected Multibinder<ConstraintChecker> constraintCheckerBinder() {
         return Multibinder.newSetBinder(binder(), ConstraintChecker.class);
+    }
+
+    protected Multibinder<PluginUISettingsProvider> pluginUISettingsProviderBinder() {
+        return Multibinder.newSetBinder(binder(), PluginUISettingsProvider.class);
+    }
+
+    protected void addPluginUISettingsProvider(Class<? extends PluginUISettingsProvider> uiSettingsProviderClass) {
+        pluginUISettingsProviderBinder().addBinding().to(uiSettingsProviderClass);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
