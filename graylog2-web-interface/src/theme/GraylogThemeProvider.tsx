@@ -31,10 +31,9 @@ const customizedTheme = AppConfig.customTheme();
 
 const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
-  const themeColors = colors[mode];
 
   const theme = useCallback((): DefaultTheme => {
-    const currentTheme = merge(themeColors, customizedTheme);
+    const currentTheme = merge(colors[mode], customizedTheme[mode]);
 
     const formattedUtils = {
       ...utils,
@@ -54,7 +53,7 @@ const GraylogThemeProvider = ({ children }) => {
       },
       utils: formattedUtils,
     };
-  }, [mode, themeColors, changeMode]);
+  }, [mode, changeMode]);
 
   return (
     <ThemeProvider theme={theme}>

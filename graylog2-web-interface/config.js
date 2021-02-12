@@ -14,13 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+const textDefault = '#00f';
+const textAlt = '#0f0';
+
 window.appConfig = {
   gl2ServerUrl: '/api',
   gl2AppPathPrefix: '',
   rootTimeZone: 'Europe/Berlin',
   customTheme: {
-    brand: {
-      primary: '#f0f',
+    teint: {
+      brand: {
+        primary: '#f0f',
+        secondary: textDefault,
+        tertiary: textAlt,
+      },
+      global: {
+        background: 'gray',
+        contentBackground: 'black',
+        link: 'aqua',
+        textDefault,
+        textAlt,
+      },
+      variant: {
+        default: 'orange',
+        danger: 'purple',
+        info: 'blue',
+        primary: 'green',
+        success: 'teal',
+        warning: 'yellow',
+      },
     },
   },
 };
