@@ -77,7 +77,6 @@ const onDelete = (rule) => {
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
-  const overlayContainerRef = React.useRef();
 
   const handleChange = (newColor, _, hidePopover) => {
     return updateColor(rule, newColor, hidePopover);
@@ -85,7 +84,7 @@ const HighlightingRule = ({ rule }: Props) => {
 
   return (
     <>
-      <HighlightingRuleGrid ref={overlayContainerRef}>
+      <HighlightingRuleGrid>
         <ColorPickerPopover id="formatting-rule-color"
                             placement="right"
                             color={color}

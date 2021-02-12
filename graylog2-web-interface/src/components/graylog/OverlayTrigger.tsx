@@ -38,6 +38,8 @@ const TriggerWrap = styled.span`
 class OverlayTrigger extends React.Component<Props, State> {
   targetRef = createRef<HTMLElement>();
 
+  containerRef = createRef<HTMLElement>();
+
   static defaultProps = {
     trigger: 'click',
     rootClose: false,
@@ -59,14 +61,14 @@ class OverlayTrigger extends React.Component<Props, State> {
     const toggleShow = () => this.setState({ show: !show });
 
     return (
-      <>
+      <div ref={() => this.containerRef}>
         <TriggerWrap ref={this.targetRef}>
           {React.cloneElement(children, { onClick: toggleShow })}
         </TriggerWrap>
 
         {show && (
           <Overlay show={show}
-                   container={container ?? this}
+                   container={container ?? this.containerRef.current}
                    containerPadding={10}
                    placement={placement}
                    shouldUpdatePosition
@@ -78,7 +80,7 @@ class OverlayTrigger extends React.Component<Props, State> {
             {overlay}
           </Overlay>
         )}
-      </>
+      </div>
     );
   }
 }
