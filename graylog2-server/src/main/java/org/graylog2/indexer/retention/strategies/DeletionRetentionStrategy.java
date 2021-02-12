@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -69,10 +69,9 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
     }
 
     @Override
-    public void retain(LinkedList<String> indexNames, IndexSet indexSet) {
+    public void retain(List<String> indexNames, IndexSet indexSet) {
 
-        indexNames.descendingIterator()
-                .forEachRemaining(indexName -> {
+        indexNames.forEach(indexName -> {
                     final Stopwatch sw = Stopwatch.createStarted();
 
                     indices.delete(indexName);

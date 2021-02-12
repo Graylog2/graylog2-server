@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -49,7 +50,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     }
 
     protected abstract Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet);
-    protected abstract void retain(LinkedList<String> indexNames, IndexSet indexSet);
+    protected abstract void retain(List<String> indexNames, IndexSet indexSet);
 
     @Override
     public void retain(IndexSet indexSet) {
@@ -90,12 +91,28 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        LinkedList<String> orderedSkippedIndices = orderedIndices
+        LinkedList<String> orderedIndicesDescending = new LinkedList<String>();
+
+        orderedIndices
                 .stream()
                 .skip(orderedIndices.size() - removeCount)
                 // reverse order to archive oldest index first
-                .collect(Collectors.toCollection(LinkedList::new));
+                .collect(Collectors.toCollection(LinkedList::new)).descendingIterator().
+                forEachRemaining(indexName -> orderedIndicesDescending.add(indexName));
 
-        retain(orderedSkippedIndices, indexSet);
+        String indexNames = "";
+        for(String index : orderedIndicesDescending) {
+            if(!indexNames.isEmpty()){
+                indexNames.concat(",");
+            }
+            indexNames.concat(index);
+        }
+
+        final String strategyName = this.getClass().getCanonicalName();
+        final String msg = "Running retention strategy [" + strategyName + "] for indices <" + indexNames + ">";
+        LOG.info(msg);
+        activityWriter.write(new Activity(msg, IndexRetentionThread.class));
+
+        retain(orderedIndicesDescending, indexSet);
     }
 }

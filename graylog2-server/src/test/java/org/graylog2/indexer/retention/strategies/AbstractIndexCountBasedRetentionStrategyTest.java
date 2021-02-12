@@ -32,7 +32,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -82,7 +82,7 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
             }
 
             @Override
-            protected void retain(LinkedList<String> indexNames, IndexSet indexSet) {
+            protected void retain(List indexName, IndexSet indexSet) {
 
             }
 
@@ -105,11 +105,9 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
     public void shouldRetainOldestIndex() throws Exception {
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
-        LinkedList retainedIndexNames = new LinkedList<String>();
-        retainedIndexNames.add(retainedIndexName.capture());
-        verify(retentionStrategy, times(1)).retain(retainedIndexNames, eq(indexSet));
-        assertThat(retainedIndexName.getValue()).isEqualTo("index1");
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
+        assertThat(retainedIndexName.getValue()).containsExactly("index1");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
@@ -120,12 +118,11 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
-        LinkedList retainedIndexNames = new LinkedList<String>();
-        retainedIndexNames.add(retainedIndexName.capture());
-        verify(retentionStrategy, times(2)).retain(retainedIndexNames, eq(indexSet));
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(2)).retain(retainedIndexName.capture(), eq(indexSet));
         // Ensure that the oldest indices come first
-        assertThat(retainedIndexName.getAllValues()).containsExactly("index1", "index2");
+        assertThat(retainedIndexName.getAllValues().get(0)).containsExactly("index1");
+        assertThat(retainedIndexName.getAllValues().get(1)).containsExactly("index2");
 
         verify(activityWriter, times(3)).write(any(Activity.class));
     }
@@ -136,9 +133,7 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        LinkedList retainedIndexNames = new LinkedList<String>();
-        retainedIndexNames.add(anyString());
-        verify(retentionStrategy, never()).retain(retainedIndexNames, eq(indexSet));
+        verify(retentionStrategy, never()).retain(any(List.class), eq(indexSet));
 
         verify(activityWriter, never()).write(any(Activity.class));
     }
@@ -150,11 +145,9 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
-        LinkedList retainedIndexNames = new LinkedList<String>();
-        retainedIndexNames.add(retainedIndexName.capture());
-        verify(retentionStrategy, times(1)).retain(retainedIndexNames, eq(indexSet));
-        assertThat(retainedIndexName.getValue()).isEqualTo("index2");
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
+        assertThat(retainedIndexName.getValue()).containsExactly("index2");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
@@ -169,11 +162,9 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
-        LinkedList retainedIndexNames = new LinkedList<String>();
-        retainedIndexNames.add(retainedIndexName.capture());
-        verify(retentionStrategy, times(1)).retain(retainedIndexNames, eq(indexSet));
-        assertThat(retainedIndexName.getValue()).isEqualTo("index2");
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
+        assertThat(retainedIndexName.getValue()).containsExactly("index2");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }

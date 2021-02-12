@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -69,9 +69,9 @@ public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionSt
     }
 
     @Override
-    public void retain(LinkedList<String> indexNames, IndexSet indexSet) {
-        indexNames.descendingIterator()
-                .forEachRemaining(indexName -> {
+    public void retain(List<String> indexNames, IndexSet indexSet) {
+
+        indexNames.forEach(indexName -> {
                     final Stopwatch sw = Stopwatch.createStarted();
 
                     indices.close(indexName);
