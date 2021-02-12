@@ -25,7 +25,6 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -36,7 +35,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.graylog2.shared.ServerVersion;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,25 +82,21 @@ public class Generator {
     public static final String EMULATED_SWAGGER_VERSION = "1.2";
 
     private static Map<String, Object> overviewResult = Maps.newHashMap();
-    private static Reflections reflections;
 
+    private final Set<Class<?>> resourceClasses;
     private final Map<Class<?>, String> pluginMapping;
     private final String pluginPathPrefix;
     private final ObjectMapper mapper;
 
-    public Generator(Set<String> packageNames, Map<Class<?>, String> pluginMapping, String pluginPathPrefix, ObjectMapper mapper) {
+    public Generator(Set<Class<?>> resourceClasses, Map<Class<?>, String> pluginMapping, String pluginPathPrefix, ObjectMapper mapper) {
+        this.resourceClasses = resourceClasses;
         this.pluginMapping = pluginMapping;
         this.pluginPathPrefix = pluginPathPrefix;
         this.mapper = mapper;
-
-        if (reflections == null) {
-            reflections = new Reflections(packageNames.toArray(),
-                    pluginMapping.keySet().stream().map(Class::getClassLoader).collect(Collectors.toSet()));
-        }
     }
 
-    public Generator(String packageName, ObjectMapper mapper) {
-        this(ImmutableSet.of(packageName), ImmutableMap.of(), "", mapper);
+    public Generator(Set<Class<?>> resourceClasses, ObjectMapper mapper) {
+        this(resourceClasses, ImmutableMap.of(), "", mapper);
     }
 
     private String prefixedPath(Class<?> resourceClass, @Nullable String resourceAnnotationPath) {
@@ -157,7 +151,9 @@ public class Generator {
     }
 
     public Set<Class<?>> getAnnotatedClasses() {
-        return reflections.getTypesAnnotatedWith(Api.class);
+        return resourceClasses.stream()
+                .filter(clazz -> clazz.isAnnotationPresent(Api.class))
+                .collect(Collectors.toSet());
     }
 
     public Map<String, Object> generateForRoute(String route, String basePath) {
