@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { ColorPickerPopover, Icon } from 'components/common';
+import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { ColorPickerPopover, IconButton } from 'components/common';
+import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 
 import ColorPreview from './ColorPreview';
 
@@ -49,33 +51,23 @@ export const HighlightingRuleGrid = styled.div`
   }
 `;
 
-const DeleteIcon = styled.span(({ theme }) => css`
-  width: 2rem;
-  height: 2rem;
-  margin-left: 0.4rem;
-  cursor: pointer;
+const ButtonContainer = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+`;
 
-  :active {
-    background-color: ${theme.colors.gray[90]};
-  }
-`);
+export const RuleContainer = styled.div`
+  padding-top: 4px;
+`;
 
 type Props = {
   rule: Rule,
 };
 
 const updateColor = (rule, newColor, hidePopover) => {
-  const newRule = rule.toBuilder().color(newColor).build();
-
-  return HighlightingRulesActions.update(newRule).then(hidePopover);
+  return HighlightingRulesActions.update(rule, { color: newColor }).then(hidePopover);
 };
 
-const onDelete = (e, rule) => {
-  e.preventDefault();
-
+const onDelete = (rule) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
     HighlightingRulesActions.remove(rule);
@@ -83,7 +75,8 @@ const onDelete = (e, rule) => {
 };
 
 const HighlightingRule = ({ rule }: Props) => {
-  const { field, value, color } = rule;
+  const { field, value, color, condition } = rule;
+  const [showForm, setShowForm] = useState(false);
   const overlayContainerRef = React.useRef();
 
   const handleChange = (newColor, _, hidePopover) => {
@@ -91,23 +84,24 @@ const HighlightingRule = ({ rule }: Props) => {
   };
 
   return (
-    <HighlightingRuleGrid ref={overlayContainerRef}>
-
-      <ColorPickerPopover id="formatting-rule-color"
-                          placement="right"
-                          title="Pick a color"
-                          color={color}
-                          colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                          triggerNode={<ColorPreview color={color} />}
-                          onChange={handleChange} />
-
-      <div>
-        for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
-      </div>
-      <DeleteIcon role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
-        <Icon name="trash-alt" type="regular" />
-      </DeleteIcon>
-    </HighlightingRuleGrid>
+    <>
+      <HighlightingRuleGrid ref={overlayContainerRef}>
+        <ColorPickerPopover id="formatting-rule-color"
+                            placement="right"
+                            color={color}
+                            colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+                            triggerNode={<ColorPreview color={color} />}
+                            onChange={handleChange} />
+        <RuleContainer>
+          <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{value}&quot;</i>.
+        </RuleContainer>
+        <ButtonContainer>
+          <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
+          <IconButton title="Remove this Highlighting Rule" name="trash" onClick={() => onDelete(rule)} />
+        </ButtonContainer>
+      </HighlightingRuleGrid>
+      { showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}
+    </>
   );
 };
 

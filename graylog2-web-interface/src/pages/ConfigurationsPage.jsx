@@ -28,12 +28,10 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+import {} from 'components/maps/configurations';
+import style from 'components/configurations/ConfigurationStyles.lazy.css';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
-import {} from 'components/maps/configurations';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import style from '!style/useable!css!components/configurations/ConfigurationStyles.css';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');

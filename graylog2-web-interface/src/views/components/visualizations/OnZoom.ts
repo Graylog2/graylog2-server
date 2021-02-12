@@ -31,7 +31,7 @@ const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewTyp
   const currentUser = CurrentUserStore.get();
   const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
 
-  const newTimerange = {
+  const newTimeRange = {
     type: 'absolute',
     from: moment.tz(from, timezone).toISOString(),
     to: moment.tz(to, timezone).toISOString(),
@@ -41,7 +41,7 @@ const onZoom = (currentQuery: Query, from: string, to: string, viewType: ViewTyp
     ? (timerange) => GlobalOverrideActions.timerange(timerange).then(SearchActions.refresh)
     : (timerange) => QueriesActions.timerange(currentQuery.id, timerange);
 
-  action(newTimerange);
+  action(newTimeRange);
 
   return false;
 };

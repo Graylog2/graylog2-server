@@ -25,13 +25,10 @@ import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 
 import ChartColorContext from './ChartColorContext';
+import styles from './GenericPlot.lazy.css';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!style/useable!css!./GenericPlot.css';
 
 type LegendConfig = {
   name: string,
@@ -145,7 +142,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
   _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
     .then(this._onCloseColorPopup);
 
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
 
   render() {
