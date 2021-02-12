@@ -281,6 +281,10 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
   color: rgb(88,73,5);
 }
 
+.c2 {
+  display: inline-block;
+}
+
 .c1 {
   margin-left: 8px;
 }
@@ -343,29 +347,35 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
             ]
           }
         >
-          <span>
-            <Icon
-              className="c1 "
-              name="question-circle"
-              onClick={[Function]}
-              type="solid"
-            >
-              <FontAwesomeIcon
-                className="c1 "
-                icon={
-                  Object {
-                    "iconName": "question-circle",
-                    "prefix": "fas",
-                  }
-                }
-                onClick={[Function]}
+          <div>
+            <OverlayTrigger__TriggerWrap>
+              <span
+                className="c2"
               >
-                <svg
-                  className="svg-inline--fa fa-question-circle"
-                />
-              </FontAwesomeIcon>
-            </Icon>
-          </span>
+                <Icon
+                  className="c1 "
+                  name="question-circle"
+                  onClick={[Function]}
+                  type="solid"
+                >
+                  <FontAwesomeIcon
+                    className="c1 "
+                    icon={
+                      Object {
+                        "iconName": "question-circle",
+                        "prefix": "fas",
+                      }
+                    }
+                    onClick={[Function]}
+                  >
+                    <svg
+                      className="svg-inline--fa fa-question-circle"
+                    />
+                  </FontAwesomeIcon>
+                </Icon>
+              </span>
+            </OverlayTrigger__TriggerWrap>
+          </div>
         </OverlayTrigger>
       </HoverForHelp>
     </SharingDisabledPopover__StyledHoverForHelp>
