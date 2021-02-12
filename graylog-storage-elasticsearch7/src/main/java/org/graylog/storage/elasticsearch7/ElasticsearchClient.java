@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.google.common.collect.Streams;
+import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
@@ -30,6 +31,7 @@ import org.graylog2.indexer.InvalidWriteTargetException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,5 +147,15 @@ public class ElasticsearchClient {
 
     private boolean isIndexNotFoundException(ElasticsearchException e) {
         return e.getMessage().contains("index_not_found_exception");
+    }
+
+    public static RequestOptions withTimeout(RequestOptions requestOptions, com.github.joschi.jadconfig.util.Duration timeout) {
+        final RequestConfig requestConfigWithTimeout = RequestConfig.copy(requestOptions.getRequestConfig())
+                .setSocketTimeout(Math.toIntExact(timeout.toMilliseconds()))
+                .build();
+        final RequestOptions requestOptionsWithTimeout = requestOptions.toBuilder()
+                .setRequestConfig(requestConfigWithTimeout)
+                .build();
+
     }
 }
