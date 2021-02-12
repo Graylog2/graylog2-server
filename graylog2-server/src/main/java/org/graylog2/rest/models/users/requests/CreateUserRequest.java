@@ -33,6 +33,7 @@ import java.util.List;
 @AutoValue
 @WithBeanGetter
 public abstract class CreateUserRequest {
+
     @JsonProperty
     public abstract String username();
 
@@ -41,6 +42,12 @@ public abstract class CreateUserRequest {
 
     @JsonProperty
     public abstract String email();
+
+    @JsonProperty
+    public abstract String firstName();
+
+    @JsonProperty
+    public abstract String lastName();
 
     @JsonProperty
     public abstract String fullName();
@@ -68,12 +75,15 @@ public abstract class CreateUserRequest {
     public static CreateUserRequest create(@JsonProperty("username") @NotEmpty String username,
                                            @JsonProperty("password") @NotEmpty String password,
                                            @JsonProperty("email") @Email String email,
-                                           @JsonProperty("full_name") @NotEmpty String fullName,
+                                           @JsonProperty("first_name") @NotEmpty String firstName,
+                                           @JsonProperty("last_name") @NotEmpty String lastName,
+                                           @JsonProperty("full_name") @Nullable String fullName,
                                            @JsonProperty("permissions") @NotNull List<String> permissions,
                                            @JsonProperty("timezone") @Nullable String timezone,
                                            @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs,
                                            @JsonProperty("startpage") @Nullable Startpage startpage,
                                            @JsonProperty("roles") @Nullable List<String> roles) {
-        return new AutoValue_CreateUserRequest(username, password, email, fullName, permissions, timezone, sessionTimeoutMs, startpage, roles);
+        return new AutoValue_CreateUserRequest(username, password, email, firstName, lastName,
+                                               fullName, permissions, timezone, sessionTimeoutMs, startpage, roles);
     }
 }

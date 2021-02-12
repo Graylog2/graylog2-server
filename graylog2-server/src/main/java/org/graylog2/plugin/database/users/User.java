@@ -37,6 +37,10 @@ public interface User extends Persisted {
     @Nullable
     String getAuthServiceUid();
 
+    String getFirstName();
+
+    String getLastName();
+
     String getFullName();
 
     String getName();
@@ -74,6 +78,10 @@ public interface User extends Persisted {
     void setAuthServiceUid(@Nullable String authServiceUid);
 
     void setEmail(String email);
+
+    void setFirstName(String firstName);
+
+    void setLastName(String lastName);
 
     void setFullName(String fullname);
 

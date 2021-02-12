@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class UserImplTest {
     @Rule
@@ -45,6 +47,39 @@ public class UserImplTest {
     private PasswordAlgorithmFactory passwordAlgorithmFactory;
 
     private UserImpl user;
+
+    @Test
+    public void testFirstLastFullNames() {
+        Map<String, Object> fields = ImmutableMap.of(
+                UserImpl.FIRST_NAME, "First",
+                UserImpl.LAST_NAME, "Last",
+                UserImpl.USERNAME, "Another");
+        user = new UserImpl(null, null, fields);
+        assertEquals("First Last", user.getFullName());
+        assertEquals("First", user.getFirstName());
+        assertEquals("Last", user.getLastName());
+    }
+
+    @Test
+    public void testFirstLastOnly() {
+        Map<String, Object> fields = ImmutableMap.of(
+                UserImpl.FIRST_NAME, "First",
+                UserImpl.LAST_NAME, "Last");
+        user = new UserImpl(null, null, fields);
+        assertEquals("First Last", user.getFullName());
+        assertEquals("First", user.getFirstName());
+        assertEquals("Last", user.getLastName());
+    }
+
+    @Test
+    public void testFullOnly() {
+        Map<String, Object> fields = ImmutableMap.of(
+                UserImpl.FULL_NAME, "Full Name");
+        user = new UserImpl(null, null, fields);
+        assertEquals("Full Name", user.getFullName());
+        assertNull(user.getFirstName());
+        assertNull(user.getLastName());
+    }
 
     @Test
     public void getPermissionsWorksWithEmptyPermissions() throws Exception {

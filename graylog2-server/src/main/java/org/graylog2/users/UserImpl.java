@@ -87,6 +87,8 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
+    public static final String FIRST_NAME = "first_name";
+    public static final String LAST_NAME = "last_name";
     public static final String FULL_NAME = "full_name";
     public static final String PERMISSIONS = "permissions";
     public static final String PREFERENCES = "preferences";
@@ -99,7 +101,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
-    public static final int MAX_FULL_NAME_LENGTH = 200;
+    public static final int MAX_NAME_LENGTH = 200;
 
     public static final long DEFAULT_SESSION_TIMEOUT_MS = TimeUnit.HOURS.toMillis(8);
 
@@ -133,7 +135,9 @@ public class UserImpl extends PersistedImpl implements User {
                 .put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH))
                 .put(PASSWORD, new FilledStringValidator())
                 .put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH))
-                .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH))
+                .put(FIRST_NAME, new LimitedOptionalStringValidator(MAX_NAME_LENGTH))
+                .put(LAST_NAME, new LimitedOptionalStringValidator(MAX_NAME_LENGTH))
+                .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_NAME_LENGTH))
                 .put(PERMISSIONS, new ListValidator())
                 .put(ROLES, new ListValidator(true))
                 .build();
@@ -145,8 +149,42 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
+    public String getFirstName() {
+        final Object firstName = fields.get(FIRST_NAME);
+        return firstName != null ? String.valueOf(firstName) : null;
+    }
+
+    @Override
+    public String getLastName() {
+        final Object lastName = fields.get(LAST_NAME);
+        return lastName != null ? String.valueOf(lastName) : null;
+    }
+
+    /**
+     * @return The full user name formatted as "First Last".
+     * first_name and last_name fields were added in Graylog 4.1.
+     * So, they might not be present for users that existed before.
+     * Fall back to full_name when they are not present.
+     */
+    @Override
     public String getFullName() {
+        final Object firstName = fields.get(FIRST_NAME);
+        final Object lastName = fields.get(LAST_NAME);
+        if (firstName != null && lastName != null ) {
+            return String.format(Locale.ENGLISH, "%s %s", firstName, lastName);
+        }
+
         return String.valueOf(fields.get(FULL_NAME));
+    }
+
+    @Override
+    public void setFirstName(String firstName) {
+        fields.put(FIRST_NAME, firstName);
+    }
+
+    @Override
+    public void setLastName(String lastName) {
+        fields.put(LAST_NAME, lastName);
     }
 
     @Override
