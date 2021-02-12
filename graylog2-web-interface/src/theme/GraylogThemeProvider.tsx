@@ -18,33 +18,39 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
+import merge from 'lodash/merge';
 
 import { breakpoints, colors, fonts, utils } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
+import AppConfig from 'util/AppConfig';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
+
+const customizedTheme = AppConfig.customTheme();
 
 const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
   const themeColors = colors[mode];
 
   const theme = useCallback((): DefaultTheme => {
+    const currentTheme = merge(themeColors, customizedTheme);
+
     const formattedUtils = {
       ...utils,
-      colorLevel: utils.colorLevel(themeColors),
-      readableColor: utils.readableColor(themeColors),
+      colorLevel: utils.colorLevel(currentTheme),
+      readableColor: utils.readableColor(currentTheme),
     };
 
     return {
       mode,
       changeMode,
       breakpoints,
-      colors: themeColors,
+      colors: currentTheme,
       fonts,
       components: {
-        button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
-        aceEditor: aceEditorStyles({ colors: themeColors }),
+        button: buttonStyles({ colors: currentTheme, utils: formattedUtils }),
+        aceEditor: aceEditorStyles({ colors: currentTheme }),
       },
       utils: formattedUtils,
     };

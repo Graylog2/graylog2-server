@@ -18,4 +18,9 @@ window.appConfig = {
   gl2ServerUrl: '/api',
   gl2AppPathPrefix: '',
   rootTimeZone: 'Europe/Berlin',
+  customTheme: {
+    brand: {
+      primary: '#f0f',
+    },
+  },
 };

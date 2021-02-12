@@ -47,6 +47,10 @@ const AppConfig = {
     return this.appConfig().rootTimeZone;
   },
 
+  customTheme() {
+    return this.appConfig().customTheme;
+  },
+
   appConfig() {
     return window.appConfig || {};
   },
