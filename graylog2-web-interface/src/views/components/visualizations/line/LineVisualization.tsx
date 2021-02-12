@@ -40,7 +40,7 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
+const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
 
 const LineVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || LineVisualizationConfig.empty()) as LineVisualizationConfig;
