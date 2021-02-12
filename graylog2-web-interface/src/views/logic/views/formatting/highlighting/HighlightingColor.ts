@@ -16,7 +16,7 @@
  */
 import * as chroma from 'chroma-js';
 
-import { scaleForGradient } from 'views/components/sidebar/highlighting/Scale';
+import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 export type HighlightingColorJson = StaticColorJson | GradientColorJson;
 

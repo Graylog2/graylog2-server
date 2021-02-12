@@ -24,7 +24,7 @@ const plotlyScaleToChroma = (plotlyScale: Array<[domain: number, color: string]>
   return chroma.scale(colors).domain(domains);
 };
 
-export const scaleForGradient = (gradient: string): chroma.Scale => {
+const scaleForGradient = (gradient: string): chroma.Scale => {
   switch (gradient) {
     case 'Blackbody':
     case 'Bluered':
@@ -39,3 +39,5 @@ export const scaleForGradient = (gradient: string): chroma.Scale => {
     default: return chroma.scale(gradient);
   }
 };
+
+export default scaleForGradient;

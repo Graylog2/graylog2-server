@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import HighlightingColor, { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import { scaleForGradient } from 'views/components/sidebar/highlighting/Scale';
+import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 const ColorPreviewBase = styled.div`
   height: 2rem;

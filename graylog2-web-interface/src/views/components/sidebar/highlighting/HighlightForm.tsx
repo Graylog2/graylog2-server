@@ -73,11 +73,7 @@ type GradientColorObject = {
 };
 
 const colorToObject = (color: HighlightingColor | undefined): StaticColorObject | GradientColorObject => {
-  if (color === undefined) {
-    return undefined;
-  }
-
-  if (color.type === 'static') {
+  if (color?.type === 'static') {
     const { type, color: staticColor } = color as StaticColor;
 
     return {
@@ -86,7 +82,7 @@ const colorToObject = (color: HighlightingColor | undefined): StaticColorObject 
     };
   }
 
-  if (color.type === 'gradient') {
+  if (color?.type === 'gradient') {
     const { type, gradient, upper, lower } = color as GradientColor;
 
     return {
@@ -96,22 +92,22 @@ const colorToObject = (color: HighlightingColor | undefined): StaticColorObject 
       lower,
     };
   }
+
+  return undefined;
 };
 
 const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
-  if (color === undefined) {
-    return undefined;
-  }
-
-  if (color.type === 'static') {
+  if (color?.type === 'static') {
     return StaticColor.create(color.color);
   }
 
-  if (color.type === 'gradient') {
+  if (color?.type === 'gradient') {
     const { gradient, lower, upper } = color;
 
     return GradientColor.create(gradient, lower, upper);
   }
+
+  return undefined;
 };
 
 const HighlightForm = ({ onClose, rule }: Props) => {
