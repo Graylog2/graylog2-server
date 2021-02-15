@@ -22,6 +22,7 @@ import { withTheme, DefaultTheme } from 'styled-components';
 import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
+import HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import formatNumber from './FormatNumber';
 import isNumeric from './IsNumeric';
@@ -36,7 +37,7 @@ type Ranges = { [key: string]: Array<HighlightRange> };
 const highlight = (value: any, idx: number, style = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
 
 type Props = {
-  color: string,
+  color: HighlightingColor,
   field: string,
   value?: any,
   highlightRanges: Ranges,
@@ -67,9 +68,11 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
       : value;
   }
 
+  const backgroundColor = color.colorFor(value);
+
   const style = {
-    backgroundColor: color,
-    color: theme.utils.contrastingColor(color),
+    backgroundColor: backgroundColor,
+    color: theme.utils.contrastingColor(backgroundColor),
     padding: '0 1px',
   };
 
@@ -107,7 +110,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
 };
 
 PossiblyHighlight.propTypes = {
-  color: PropTypes.string,
+  color: PropTypes.object,
   field: PropTypes.string.isRequired,
   value: PropTypes.any,
   highlightRanges: PropTypes.object,

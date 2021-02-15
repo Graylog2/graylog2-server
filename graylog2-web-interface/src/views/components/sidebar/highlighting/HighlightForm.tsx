@@ -26,15 +26,19 @@ import { Button, Modal } from 'components/graylog';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
-import { ColorPickerPopover } from 'components/common';
-import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import ColorPreview from 'views/components/sidebar/highlighting/ColorPreview';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule, {
   ConditionLabelMap,
-  randomColor,
   StringConditionLabelMap,
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingColorForm from 'views/components/sidebar/highlighting/HighlightingColorForm';
+import { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
+import inferTypeForSeries from 'views/logic/fieldtypes/InferTypeForSeries';
+import HighlightingColor, {
+  GradientColor,
+  StaticColor,
+} from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 type Props = {
   onClose: () => void,
@@ -52,6 +56,60 @@ const _isRequired = (field) => (value) => {
 const numberConditionOptions = Object.entries(ConditionLabelMap).map(([value, label]) => ({ value, label }));
 const otherConditionOptions = Object.entries(StringConditionLabelMap).map(([value, label]) => ({ value, label }));
 
+const fieldTypeFor = (fields: FieldTypeMappingsList, selectedField: string) => (isFunction(selectedField)
+  ? inferTypeForSeries(Series.forFunction(selectedField), fields)
+  : fields.find((field) => field.name === selectedField));
+
+type StaticColorObject = {
+  type: 'static',
+  color: string,
+};
+
+type GradientColorObject = {
+  type: 'gradient',
+  gradient: string,
+  upper: number,
+  lower: number,
+};
+
+const colorToObject = (color: HighlightingColor | undefined): StaticColorObject | GradientColorObject => {
+  if (color?.type === 'static') {
+    const { type, color: staticColor } = color as StaticColor;
+
+    return {
+      type,
+      color: staticColor,
+    };
+  }
+
+  if (color?.type === 'gradient') {
+    const { type, gradient, upper, lower } = color as GradientColor;
+
+    return {
+      type,
+      gradient,
+      upper,
+      lower,
+    };
+  }
+
+  return undefined;
+};
+
+const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
+  if (color?.type === 'static') {
+    return StaticColor.create(color.color);
+  }
+
+  if (color?.type === 'gradient') {
+    const { gradient, lower, upper } = color;
+
+    return GradientColor.create(gradient, lower, upper);
+  }
+
+  return undefined;
+};
+
 const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const fields = fieldTypes?.all
@@ -62,13 +120,15 @@ const HighlightForm = ({ onClose, rule }: Props) => {
     .toArray();
 
   const onSubmit = ({ field, value, color, condition }) => {
+    const newColor = colorFromObject(color);
+
     if (rule) {
-      HighlightingRulesActions.update(rule, { field, value, condition, color }).then(onClose);
+      HighlightingRulesActions.update(rule, { field, value, condition, color: newColor }).then(onClose);
 
       return;
     }
 
-    HighlightingRulesActions.add(HighlightingRule.create(field, value, condition, color)).then(onClose);
+    HighlightingRulesActions.add(HighlightingRule.create(field, value, condition, newColor)).then(onClose);
   };
 
   const headerTxt = rule ? 'Edit' : 'New';
@@ -76,85 +136,70 @@ const HighlightForm = ({ onClose, rule }: Props) => {
   return (
     <Formik onSubmit={onSubmit}
             initialValues={{
-              field: rule?.field ?? undefined,
-              value: rule?.value ?? '',
+              field: rule?.field,
+              value: rule?.value,
               condition: rule?.condition ?? 'equal',
-              color: rule?.color ?? randomColor(),
+              color: colorToObject(rule?.color),
             }}>
-      {() => (
-        <BootstrapModalWrapper showModal
-                               onClose={onClose}>
-          <Form className="form">
-            <Modal.Header>
-              <Modal.Title>{headerTxt} Highlighting Rule</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Field name="field" validate={_isRequired('Field')}>
-                {({ field: { name, value, onChange }, meta }) => (
-                  <Input id="field_type_controls"
-                         error={meta?.error}
-                         label="Field">
-                    <Select inputId="field-select"
-                            onChange={(newValue) => onChange({ target: { name, value: newValue } })}
-                            options={fieldOptions}
-                            allowCreate
-                            value={value}
-                            placeholder="Pick a field" />
-                  </Input>
-                )}
-              </Field>
-              <Field name="condition" validate={_isRequired('Condition')}>
-                {({ field: { name, value, onChange }, form: { values: { field: fieldValue } }, meta }) => {
-                  const fieldType = fields.find(({ name: fieldName }) => fieldName === fieldValue);
-                  const { type } = fieldType?.type || { type: 'string' };
+      {({ isValid, values: { field: selectedField } }) => {
+        const selectedFieldType = fieldTypeFor(fields, selectedField);
+        const isNumeric = selectedFieldType?.type?.isNumeric() ?? false;
 
-                  return (
+        return (
+          <BootstrapModalWrapper showModal
+                                 onClose={onClose}>
+            <Form className="form">
+              <Modal.Header>
+                <Modal.Title>{headerTxt} Highlighting Rule</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Field name="field" validate={_isRequired('Field')}>
+                  {({ field: { name, value, onChange }, meta }) => (
+                    <Input id="field_type_controls"
+                           error={meta?.error}
+                           label="Field">
+                      <Select inputId="field-select"
+                              onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                              options={fieldOptions}
+                              allowCreate
+                              value={value}
+                              placeholder="Pick a field" />
+                    </Input>
+                  )}
+                </Field>
+                <Field name="condition" validate={_isRequired('Condition')}>
+                  {({ field: { name, value, onChange }, meta }) => (
                     <Input id="condition-controls"
                            error={meta?.error}
                            label="Condition">
                       <Select inputId="condition-select"
                               onChange={(newValue) => onChange({ target: { name, value: newValue } })}
-                              options={type === 'long' ? numberConditionOptions : otherConditionOptions}
+                              options={isNumeric ? numberConditionOptions : otherConditionOptions}
                               value={value}
                               placeholder="Choose a condition" />
                     </Input>
-                  );
-                }}
-              </Field>
-              <Field name="value" validate={_isRequired('Value')}>
-                {({ field: { name, value, onChange }, meta }) => (
-                  <Input id={name}
-                         type="text"
-                         error={meta?.error}
-                         onChange={onChange}
-                         value={value}
-                         label="Value" />
-                )}
-              </Field>
-              <Field name="color">
-                {({ field: { name, value, onChange } }) => (
-                  <Input id={name}
-                         label="Color">
-                    <ColorPickerPopover id="formatting-rule-color"
-                                        placement="right"
-                                        color={value}
-                                        colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                                        triggerNode={<ColorPreview color={value} />}
-                                        onChange={(newColor, _, hidePopover) => {
-                                          hidePopover();
-                                          onChange({ target: { name, value: newColor } });
-                                        }} />
-                  </Input>
-                )}
-              </Field>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button type="button" onClick={onClose}>Cancel</Button>
-              <Button type="submit">Save</Button>
-            </Modal.Footer>
-          </Form>
-        </BootstrapModalWrapper>
-      )}
+                  )}
+                </Field>
+                <Field name="value" validate={_isRequired('Value')}>
+                  {({ field: { name, value, onChange }, meta }) => (
+                    <Input id={name}
+                           type="text"
+                           error={meta?.error}
+                           onChange={onChange}
+                           value={value}
+                           label="Value" />
+                  )}
+                </Field>
+                <HighlightingColorForm field={selectedFieldType} />
+              </Modal.Body>
+              <Modal.Footer>
+                <Button type="button" onClick={onClose}>Cancel</Button>
+                <Button type="submit" disabled={!isValid}>Save</Button>
+              </Modal.Footer>
+            </Form>
+          </BootstrapModalWrapper>
+        );
+      }}
 
     </Formik>
   );

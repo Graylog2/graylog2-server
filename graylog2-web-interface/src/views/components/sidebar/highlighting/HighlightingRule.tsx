@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -24,6 +24,7 @@ import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ColorPickerPopover, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
+import HighlightingColor, { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import ColorPreview from './ColorPreview';
 
@@ -63,7 +64,7 @@ type Props = {
   rule: Rule,
 };
 
-const updateColor = (rule, newColor, hidePopover) => {
+const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => {
   return HighlightingRulesActions.update(rule, { color: newColor }).then(hidePopover);
 };
 
@@ -74,29 +75,48 @@ const onDelete = (rule) => {
   }
 };
 
+type RuleColorPreviewProps = {
+  color: HighlightingColor,
+  onChange: (newColor: HighlightingColor, hidePopover: () => void) => void,
+};
+
+const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
+  const _onChange = useCallback((newColor, ignored, hidePopover) => onChange(StaticColor.create(newColor), hidePopover), [onChange]);
+
+  if (color.isStatic()) {
+    return (
+      <ColorPickerPopover id="formatting-rule-color"
+                          placement="right"
+                          color={color.color}
+                          colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+                          triggerNode={<ColorPreview color={color} />}
+                          onChange={_onChange} />
+    );
+  }
+
+  if (color.isGradient()) {
+    return <ColorPreview color={color} />;
+  }
+
+  throw new Error(`Invalid highlighting color: ${color}`);
+};
+
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
 
-  const handleChange = (newColor, _, hidePopover) => {
-    return updateColor(rule, newColor, hidePopover);
-  };
+  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => updateColor(rule, newColor, hidePopover), [rule]);
 
   return (
     <>
       <HighlightingRuleGrid>
-        <ColorPickerPopover id="formatting-rule-color"
-                            placement="right"
-                            color={color}
-                            colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                            triggerNode={<ColorPreview color={color} />}
-                            onChange={handleChange} />
+        <RuleColorPreview color={color} onChange={_onChange} />
         <RuleContainer>
           <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
           <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
-          <IconButton title="Remove this Highlighting Rule" name="trash" onClick={() => onDelete(rule)} />
+          <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={() => onDelete(rule)} />
         </ButtonContainer>
       </HighlightingRuleGrid>
       { showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}
