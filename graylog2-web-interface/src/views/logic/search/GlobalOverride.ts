@@ -18,17 +18,8 @@ import * as Immutable from 'immutable';
 
 import type { QueryString, TimeRange } from '../queries/Query';
 
-export type PaginatedListOptions = {
-  limit: number,
-  offset: number,
-};
-
-export type ScrollListOptions = {
-  after: Array<any>,
-}
-
-export type SearchTypeOptions = {
-  [searchTypeId: string]: ScrollListOptions | PaginatedListOptions
+export type SearchTypeOptions<T = any> = {
+  [searchTypeId: string]: T
 };
 
 type InternalState = {

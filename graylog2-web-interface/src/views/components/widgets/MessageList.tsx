@@ -30,7 +30,7 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-import type { PaginatedListOptions } from 'views/logic/search/GlobalOverride';
+import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
 import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
@@ -118,8 +118,15 @@ class MessageList extends React.Component<Props, State> {
     // execute search with new offset
     const { pageSize, searchTypes, data: { id: searchTypeId }, setLoadingState } = this.props;
     const { effectiveTimerange } = searchTypes[searchTypeId];
-    const messageListOptions: PaginatedListOptions = { limit: pageSize, offset: pageSize * (pageNo - 1) };
-    const searchTypePayload = { [searchTypeId]: messageListOptions };
+    const searchTypePayload: SearchTypeOptions<{
+      limit: number,
+      offset: number,
+    }> = {
+      [searchTypeId]: {
+        limit: pageSize,
+        offset: pageSize * (pageNo - 1),
+      },
+    };
 
     RefreshActions.disable();
     setLoadingState(true);
