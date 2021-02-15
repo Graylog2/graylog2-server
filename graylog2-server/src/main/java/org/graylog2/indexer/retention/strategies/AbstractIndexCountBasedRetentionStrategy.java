@@ -91,25 +91,20 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        LinkedList<String> orderedIndicesDescending = new LinkedList<String>();
+        LinkedList<String> orderedIndicesDescending = new LinkedList<>();
 
         orderedIndices
                 .stream()
                 .skip(orderedIndices.size() - removeCount)
                 // reverse order to archive oldest index first
                 .collect(Collectors.toCollection(LinkedList::new)).descendingIterator().
-                forEachRemaining(indexName -> orderedIndicesDescending.add(indexName));
+                forEachRemaining(orderedIndicesDescending::add);
 
-        String indexNames = "";
-        for(String index : orderedIndicesDescending) {
-            if(!indexNames.isEmpty()){
-                indexNames = indexNames.concat(",");
-            }
-            indexNames = indexNames.concat(index);
-        }
+
+        String indexNamesAsString = String.join(",", orderedIndicesDescending);
 
         final String strategyName = this.getClass().getCanonicalName();
-        final String msg = "Running retention strategy [" + strategyName + "] for indices <" + indexNames + ">";
+        final String msg = "Running retention strategy [" + strategyName + "] for indices <" + indexNamesAsString + ">";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
