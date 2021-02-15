@@ -14,16 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { configure } from '@testing-library/react';
 
-import { singleton } from 'views/logic/singleton';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
+const TIMEOUT_MULTIPLIER = Number.parseFloat(process.env.TIMEOUT_MULTIPLIER);
 
-export type ChartColorMap = ColorMapper;
-export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
-
-const ChartColorContext = React.createContext<{ colors: ChartColorMap, setColor: ChangeColorFunction }>({
-  colors: ColorMapper.create(),
-  setColor: () => Promise.resolve([]),
-});
-export default singleton('views.components.visualizations.ChartColorContext', () => ChartColorContext);
+if (Number.isFinite(TIMEOUT_MULTIPLIER)) {
+  configure((existingConfig) => ({ ...existingConfig, asyncUtilTimeout: TIMEOUT_MULTIPLIER * existingConfig.asyncUtilTimeout }));
+}

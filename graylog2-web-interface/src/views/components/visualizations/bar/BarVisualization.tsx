@@ -48,7 +48,7 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
+const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
 
 const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom: string, timeRangeTo: string) => {
   const barWidth = 0.03; // width in percentage, relative to chart width

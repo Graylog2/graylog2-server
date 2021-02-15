@@ -23,6 +23,8 @@ import { Overlay, RootCloseWrapper } from 'react-overlays';
 import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
+import { colors as defaultColors } from 'views/components/visualizations/Colors';
+import ColorMapper from 'views/components/visualizations/ColorMapper';
 
 import ChartColorContext from './ChartColorContext';
 import styles from './GenericPlot.lazy.css';
@@ -65,7 +67,7 @@ type Props = {
   getChartColor?: (data: Array<ChartConfig>, name: string) => string | undefined | null,
   layout: {},
   onZoom: (from: string, to: string) => boolean,
-  setChartColor?: (data: ChartConfig, color: ColorMap) => ChartColor,
+  setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
 };
 
 type GenericPlotProps = Props & { theme: DefaultTheme };
@@ -251,6 +253,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
                                      title={`Configuration for ${legendConfig.name}`}
                                      className={styles.locals.customPopover}>
                               <ColorPicker color={legendConfig.color}
+                                           colors={defaultColors}
                                            onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />
                             </Popover>
                           </Overlay>

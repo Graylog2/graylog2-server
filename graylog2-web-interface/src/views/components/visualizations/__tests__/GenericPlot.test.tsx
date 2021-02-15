@@ -19,6 +19,8 @@ import type { HTMLAttributes } from 'enzyme';
 import { mount } from 'wrappedEnzyme';
 import { PlotParams } from 'react-plotly.js';
 
+import ColorMapper from 'views/components/visualizations/ColorMapper';
+
 import ChartColorContext from '../ChartColorContext';
 import GenericPlot from '../GenericPlot';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
@@ -112,12 +114,10 @@ describe('GenericPlot', () => {
 
   it('extracts series color from context', () => {
     const lens = {
-      colors: {
-        'count()': '#783a8e',
-      },
+      colors: ColorMapper.builder().set('count()', '#783a8e').build(),
       setColor: jest.fn(),
     };
-    const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
+    const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
     const wrapper = mount((
       <ChartColorContext.Provider value={lens}>
         <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} setChartColor={setChartColor} />
@@ -127,7 +127,7 @@ describe('GenericPlot', () => {
     const { data: newChartData } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & PlotParams;
 
     expect(newChartData.find((chart) => chart.name === 'count()').marker.color).toEqual('#783a8e');
-    expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toBeUndefined();
+    expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toEqual('#fd9e48');
   });
 
   describe('has color picker', () => {
@@ -190,7 +190,7 @@ describe('GenericPlot', () => {
 
     it('calling onChange when new color is selected', () => {
       const lens = {
-        colors: {},
+        colors: ColorMapper.create(),
         setColor: jest.fn(() => Promise.resolve([])),
       };
       let genericPlot = null;

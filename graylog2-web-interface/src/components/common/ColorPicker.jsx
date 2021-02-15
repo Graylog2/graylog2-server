@@ -15,23 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { SwatchesPicker } from 'react-color';
 
 /**
  * Color picker component that let the user select a color from a list of 95 colors grouped by hue.
  */
-const ColorPicker = ({ onChange, color, colors, height, width }) => {
-  const onColorChange = ({ hex }, event) => {
-    onChange(hex, event);
-  };
+const ColorPicker = ({ onChange, ...rest }) => {
+  const onColorChange = useCallback((color, event) => {
+    onChange(color.hex, event);
+  }, [onChange]);
 
   return (
-    <SwatchesPicker color={color}
-                    colors={colors}
-                    height={height}
-                    width={width}
-                    onChange={onColorChange} />
+    <SwatchesPicker {...rest} onChange={onColorChange} />
   );
 };
 
@@ -70,7 +67,7 @@ ColorPicker.defaultProps = {
   color: undefined,
   colors: undefined, // Use default color palette.
   height: (135 * 2) + 24 + 16, // 135px color row * 2 rows + 24px first color 3rd row + 16px padding
-  width: (50 * 5) + 16 + 6, // 50px color columns * 5 columns + 22px padding
+  width: (50 * 5), // 50px color columns * 5 columns
 };
 
 export default ColorPicker;
