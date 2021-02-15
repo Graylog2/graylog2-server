@@ -46,8 +46,13 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
     }
 
     @Override
-    public String update(User model) throws ValidationException {
-        return super.save(model);
+    public String create(User user) throws ValidationException {
+        return super.save(user);
+    }
+
+    @Override
+    public String update(User user) throws ValidationException {
+        return super.save(user);
     }
 
     @Override

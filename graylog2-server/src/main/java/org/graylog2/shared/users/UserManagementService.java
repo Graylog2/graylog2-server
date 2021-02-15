@@ -28,10 +28,16 @@ import org.graylog2.plugin.database.users.User;
 public interface UserManagementService extends UserService {
 
     /**
+     * Additional method allows explicit create operation to be carried out
+     * (as opposed to calling .save)
+     */
+    String create(User user) throws ValidationException;
+
+    /**
      * Additional method allows explicit update operations to be carried out
      * (as opposed to calling .save)
      */
-    String update(User model) throws ValidationException;
+    String update(User user) throws ValidationException;
 
     void setUserStatus(User user, User.AccountStatus status) throws ValidationException;
 
