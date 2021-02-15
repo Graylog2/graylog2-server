@@ -103,9 +103,9 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         String indexNames = "";
         for(String index : orderedIndicesDescending) {
             if(!indexNames.isEmpty()){
-                indexNames.concat(",");
+                indexNames = indexNames.concat(",");
             }
-            indexNames.concat(index);
+            indexNames = indexNames.concat(index);
         }
 
         final String strategyName = this.getClass().getCanonicalName();
