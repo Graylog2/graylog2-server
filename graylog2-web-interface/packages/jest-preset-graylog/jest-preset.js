@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+const TIMEOUT_MULTIPLIER = Number.parseFloat(process.env.TIMEOUT_MULTIPLIER);
+
 module.exports = {
   rootDir: '../../',
   collectCoverageFrom: [
@@ -49,4 +52,5 @@ module.exports = {
   testPathIgnorePatterns: [
     '.fixtures.[jt]s$',
   ],
+  testTimeout: (Number.isFinite(TIMEOUT_MULTIPLIER) ? TIMEOUT_MULTIPLIER : 1.0) * 5000,
 };
