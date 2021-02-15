@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import com.google.common.collect.Iterables;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
@@ -99,15 +100,17 @@ public class MongoDbSession extends PersistedImpl {
         if (attributes == null) {
             return Optional.empty();
         }
+
+        final Object sessionId;
+
         // A subject can have more than one principal. If that's the case, the user ID is required to be the first one.
         final Object principals = attributes.get(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-        final String sessionId;
         if (principals instanceof Iterable) {
-            sessionId = String.valueOf(((Iterable<?>) principals).iterator().next());
+            sessionId = Iterables.getFirst((Iterable<?>) principals, null);
         } else {
-            sessionId = String.valueOf(principals);
+            sessionId = principals;
         }
-        return Optional.ofNullable(sessionId);
+        return Optional.ofNullable(sessionId).map(String::valueOf);
     }
 
     public String getHost() {
