@@ -15,11 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import * as Immutable from 'immutable';
 
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 
 jest.mock('views/stores/HighlightingRulesStore', () => ({
   HighlightingRulesActions: {
@@ -30,15 +36,25 @@ jest.mock('views/stores/HighlightingRulesStore', () => ({
 }));
 
 const rule = HighlightingRule.builder()
-  .color('#333333')
+  .color(StaticColor.create('#333333'))
   .condition('not_equal')
   .field('foob')
   .value('noob')
   .build();
 
 describe('HighlightForm', () => {
+  const fieldTypes: FieldTypes = {
+    all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
+    queryFields: Immutable.Map(),
+  };
+  const HighlightFormWithContext = (props) => (
+    <FieldTypesContext.Provider value={fieldTypes}>
+      <HighlightForm {...props} />
+    </FieldTypesContext.Provider>
+  );
+
   it('should render for edit', async () => {
-    const { findByText, findByDisplayValue } = render(<HighlightForm onClose={() => {}} rule={rule} />);
+    const { findByText, findByDisplayValue } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
 
     const form = await findByText('Edit Highlighting Rule');
     const value = await findByDisplayValue(rule.value);
@@ -48,7 +64,7 @@ describe('HighlightForm', () => {
   });
 
   it('should render for new', async () => {
-    const { findByText } = render(<HighlightForm onClose={() => {}} />);
+    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} />);
 
     const form = await findByText('New Highlighting Rule');
 
@@ -57,7 +73,7 @@ describe('HighlightForm', () => {
 
   it('should fire onClose on cancel', async () => {
     const onClose = jest.fn();
-    const { findByText } = render(<HighlightForm onClose={onClose} />);
+    const { findByText } = render(<HighlightFormWithContext onClose={onClose} />);
 
     const elem = await findByText('Cancel');
 
@@ -67,7 +83,7 @@ describe('HighlightForm', () => {
   });
 
   it('should fire remove action when saving a existing rule', async () => {
-    const { findByText } = render(<HighlightForm onClose={() => {}} rule={rule} />);
+    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
 
     const elem = await findByText('Save');
 
@@ -75,5 +91,35 @@ describe('HighlightForm', () => {
 
     await waitFor(() => expect(HighlightingRulesActions.update)
       .toBeCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
+  });
+
+  it('assigns a new static color when type is selected', async () => {
+    render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+
+    userEvent.click(screen.getByLabelText('Static Color'));
+
+    userEvent.click(screen.getByText('Save'));
+
+    await waitFor(() => expect(HighlightingRulesActions.update)
+      .toBeCalledWith(rule, expect.objectContaining({
+        color: expect.objectContaining({ type: 'static', color: expect.any(String) }),
+      })));
+  });
+
+  it('creates a new gradient when type is selected', async () => {
+    render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+
+    userEvent.click(screen.getByLabelText('Gradient'));
+
+    const highestValue = await screen.findByLabelText('Specify highest value');
+    userEvent.clear(highestValue);
+    userEvent.type(highestValue, '100');
+
+    userEvent.click(screen.getByText('Save'));
+
+    await waitFor(() => expect(HighlightingRulesActions.update)
+      .toBeCalledWith(rule, expect.objectContaining({
+        color: expect.objectContaining({ gradient: 'Viridis' }),
+      })));
   });
 });

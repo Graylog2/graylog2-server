@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+package org.graylog.plugins.views.search.views.formatting.highlighting;
 
-const InputWrapper = ({ children, className }) => (className
-  ? <div className={className}>{children}</div>
-  : <span>{children}</span>);
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-InputWrapper.propTypes = {
-  className: PropTypes.string,
-  children: PropTypes.node.isRequired,
-};
-
-InputWrapper.defaultProps = {
-  className: undefined,
-};
-
-export default InputWrapper;
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = StaticColor.class, name = StaticColor.TYPE),
+        @JsonSubTypes.Type(value = GradientColor.class, name = GradientColor.TYPE)
+})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+public interface HighlightingColor {
+    String type();
+}

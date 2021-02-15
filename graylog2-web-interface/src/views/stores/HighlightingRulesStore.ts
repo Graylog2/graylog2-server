@@ -24,6 +24,7 @@ import FormattingSettings from 'views/logic/views/formatting/FormattingSettings'
 import HighlightingRule, { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { Value } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
@@ -31,7 +32,7 @@ type UpdatePayload = {
   field?: string,
   value?: string,
   condition?: Condition,
-  color: string,
+  color: HighlightingColor,
 };
 
 type HighlightingRulesActionsType = RefluxActions<{
@@ -53,7 +54,7 @@ class Key extends Immutable.Record({ field: null, value: undefined, condition: u
 
 const makeKey = (field: string, value: Value, condition: Condition) => new Key({ field, value, condition });
 
-type StateType = Immutable.OrderedMap<Key, string>;
+type StateType = Immutable.OrderedMap<Key, HighlightingColor>;
 
 const HighlightingRulesStore: Store<Array<HighlightingRule>> = singletonStore(
   'views.HighlightingRules',
@@ -73,7 +74,7 @@ const HighlightingRulesStore: Store<Array<HighlightingRule>> = singletonStore(
       const { highlighting } = formatting;
       const rules = highlighting.reduce(
         (prev: StateType, rule: HighlightingRule) => prev.set(makeKey(rule.field, rule.value, rule.condition), rule.color),
-        Immutable.OrderedMap<Key, string>(),
+        Immutable.OrderedMap<Key, HighlightingColor>(),
       );
 
       if (!isEqual(rules, this.state)) {
@@ -123,9 +124,10 @@ const HighlightingRulesStore: Store<Array<HighlightingRule>> = singletonStore(
     update(rule: HighlightingRule, payload): Promise<Array<HighlightingRule>> {
       const { field = rule.field, value = rule.value, condition = rule.condition, color = rule.color } = payload;
       const oldKey = makeKey(rule.field, rule.value, rule.condition);
-      this.state.delete(oldKey);
       const newKey = makeKey(field, value, condition);
-      const promise = this._propagateAndTrigger(this.state.set(newKey, color));
+      const newState = this.state.delete(oldKey)
+        .set(newKey, color);
+      const promise = this._propagateAndTrigger(newState);
 
       HighlightingRulesActions.update.promise(promise);
 
