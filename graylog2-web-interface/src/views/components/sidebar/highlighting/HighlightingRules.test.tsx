@@ -19,6 +19,7 @@ import { mount } from 'wrappedEnzyme';
 
 import HighlightingRuleContext from 'views/components/contexts/HighlightingRulesContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import HighlightingRules from './HighlightingRules';
 
@@ -43,8 +44,8 @@ describe('HighlightingRules', () => {
 
   it('renders element for each HighlightingRule', () => {
     const rules = [
-      HighlightingRule.create('foo', 'bar', undefined, '#f4f141'),
-      HighlightingRule.create('response_time', '250', undefined, '#f44242'),
+      HighlightingRule.create('foo', 'bar', undefined, StaticColor.create('#f4f141')),
+      HighlightingRule.create('response_time', '250', undefined, StaticColor.create('#f44242')),
     ];
     const wrapper = mount(
       <HighlightingRuleContext.Provider value={rules}>

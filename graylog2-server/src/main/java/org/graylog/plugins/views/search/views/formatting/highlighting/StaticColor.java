@@ -14,16 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.plugins.views.search.views.formatting.highlighting;
 
-import { singleton } from 'views/logic/singleton';
-import ColorMapper from 'views/components/visualizations/ColorMapper';
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-export type ChartColorMap = ColorMapper;
-export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
+@AutoValue
+public abstract class StaticColor implements HighlightingColor {
+    static final String TYPE = "static";
 
-const ChartColorContext = React.createContext<{ colors: ChartColorMap, setColor: ChangeColorFunction }>({
-  colors: ColorMapper.create(),
-  setColor: () => Promise.resolve([]),
-});
-export default singleton('views.components.visualizations.ChartColorContext', () => ChartColorContext);
+    @JsonProperty
+    @Override
+    public String type() {
+        return TYPE;
+    }
+
+    @JsonProperty
+    public abstract String color();
+
+    @JsonCreator
+    public static StaticColor create(@JsonProperty("color") String color) {
+        return new AutoValue_StaticColor(color);
+    }
+}
