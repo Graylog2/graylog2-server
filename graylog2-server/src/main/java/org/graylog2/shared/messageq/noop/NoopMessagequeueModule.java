@@ -14,16 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.journal;
+package org.graylog2.shared.messageq.noop;
 
 import com.google.inject.Scopes;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.journal.NoopJournal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.shared.messageq.MessageQueueReader;
+import org.graylog2.shared.messageq.MessageQueueWriter;
 
-public class NoopJournalModule extends Graylog2Module {
+public class NoopMessagequeueModule extends Graylog2Module {
     @Override
     protected void configure() {
-        serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
         binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
-
+        bind(MessageQueueWriter.class).to(NoopMessageQueueWriter.class).in(Scopes.SINGLETON);
+        bind(MessageQueueReader.class).to(NoopMessageQueueReader.class).in(Scopes.SINGLETON);
+        bind(MessageQueueAcknowledger.class).to(NoopMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
+        serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
     }
 }

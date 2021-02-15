@@ -66,7 +66,7 @@ public class RawMessage implements Serializable {
 
     private transient final JournalMessage.Builder msgBuilder;
     private final UUID id;
-    private final long journalOffset;
+    private Object messageQueueId;
     private Configuration codecConfig;
 
     public RawMessage(@Nonnull byte[] payload) {
@@ -97,7 +97,7 @@ public class RawMessage implements Serializable {
 
         msgBuilder = JournalMessage.newBuilder();
 
-        this.journalOffset = journalOffset;
+        this.messageQueueId = journalOffset;
         msgBuilder.setVersion(CURRENT_VERSION);
 
         this.id = id;
@@ -120,11 +120,25 @@ public class RawMessage implements Serializable {
                   .build();
     }
 
-    public RawMessage(JournalMessage journalMessage, long journalOffset) {
-        this.journalOffset = journalOffset;
+    public RawMessage(JournalMessage journalMessage, Object messageQueueId) {
+        this.messageQueueId = messageQueueId;
         id = new UUID(journalMessage.getUuidTime(), journalMessage.getUuidClockseq());
         msgBuilder = JournalMessage.newBuilder(journalMessage);
         codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
+    }
+
+    @Nullable
+    public static RawMessage decode(final byte[] buffer, final Object messageQueueId) {
+        try {
+            final JournalMessage journalMessage = JournalMessage.parseFrom(buffer);
+
+            // TODO validate message based on field contents and version number
+
+            return new RawMessage(journalMessage, messageQueueId);
+        } catch (IOException e) {
+            log.error("Cannot read raw message from journal, ignoring this message.", e);
+            return null;
+        }
     }
 
     @Nullable
@@ -260,8 +274,14 @@ public class RawMessage implements Serializable {
         return helper.toString();
     }
 
+    public Object getMessageQueueId() {
+        return messageQueueId;
+    }
     public long getJournalOffset() {
-        return journalOffset;
+        if (messageQueueId == null) {
+            return Long.MIN_VALUE;
+        }
+        return (long) messageQueueId;
     }
 
     public static class SourceNode {
