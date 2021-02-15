@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, createContext } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 import merge from 'lodash/merge';
@@ -28,9 +28,14 @@ import AppConfig from 'util/AppConfig';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
 const customizedTheme = AppConfig.customTheme();
+const UpdateThemeContext = createContext(customizedTheme);
 
 const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
+
+  const updateTheme = (updatedColors) => {
+    console.log({ updatedColors });
+  };
 
   const theme = useCallback((): DefaultTheme => {
     const currentTheme = merge(colors[mode], customizedTheme[mode]);
@@ -56,9 +61,11 @@ const GraylogThemeProvider = ({ children }) => {
   }, [mode, changeMode]);
 
   return (
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
+    <UpdateThemeContext.Provider value={{ updateTheme }}>
+      <ThemeProvider theme={theme}>
+        {children}
+      </ThemeProvider>
+    </UpdateThemeContext.Provider>
   );
 };
 
