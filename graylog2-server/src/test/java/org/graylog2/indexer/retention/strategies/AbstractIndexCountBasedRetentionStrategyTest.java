@@ -82,7 +82,7 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
             }
 
             @Override
-            protected void retain(List indexName, IndexSet indexSet) {
+            protected void retain(List<String> indexName, IndexSet indexSet) {
 
             }
 
