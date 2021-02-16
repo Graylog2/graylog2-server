@@ -466,14 +466,6 @@ public abstract class Graylog2Module extends AbstractModule {
         return Multibinder.newSetBinder(binder(), ConstraintChecker.class);
     }
 
-    protected Multibinder<PluginUISettingsProvider> pluginUISettingsProviderBinder() {
-        return Multibinder.newSetBinder(binder(), PluginUISettingsProvider.class);
-    }
-
-    protected void addPluginUISettingsProvider(Class<? extends PluginUISettingsProvider> uiSettingsProviderClass) {
-        pluginUISettingsProviderBinder().addBinding().to(uiSettingsProviderClass);
-    }
-
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
 
     private static class ContainerResponseFilterType extends TypeLiteral<Class<? extends ContainerResponseFilter>> {}

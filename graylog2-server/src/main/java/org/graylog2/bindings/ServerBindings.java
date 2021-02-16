@@ -121,7 +121,6 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindProviders() {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
-        pluginUISettingsProviderBinder();
     }
 
     private void bindFactoryModules() {

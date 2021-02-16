@@ -16,6 +16,8 @@
  */
 package org.graylog2.web;
 
+import java.util.Map;
+
 /**
  * Some plugins may have dynamic data that needs to be made available to the UI at server startup.  This interface
  * provides a mechanism for providing that data via the generated config.js file's pluginUISettings map.  When an
@@ -25,12 +27,7 @@ package org.graylog2.web;
 public interface PluginUISettingsProvider {
 
     /**
-     * @return The key used to store the plugin's UI settings in the pluginUISettings map in config.js
-     */
-    String pluginSettingsKey();
-
-    /**
      * @return The JSON data to be stored in the pluginUISettings map in config.js
      */
-    String pluginSettingsJson();
+    Map<String,Object> pluginSettings();
 }

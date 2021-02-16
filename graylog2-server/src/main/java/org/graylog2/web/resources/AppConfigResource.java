@@ -38,7 +38,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -48,20 +48,19 @@ public class AppConfigResource {
     private final Configuration configuration;
     private final HttpConfiguration httpConfiguration;
     private final Engine templateEngine;
-    private final Map<String, String> pluginUISettings;
+    private final Map<String, PluginUISettingsProvider> settingsProviders;
     private final ObjectMapper objectMapper;
 
     @Inject
     public AppConfigResource(Configuration configuration,
                              HttpConfiguration httpConfiguration,
                              Engine templateEngine,
-                             Set<PluginUISettingsProvider> settingsProviders,
+                             Map<String, PluginUISettingsProvider> settingsProviders,
                              ObjectMapper objectMapper) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
-        this.pluginUISettings = requireNonNull(settingsProviders, "settingsProviders").stream()
-                .collect(Collectors.toMap(PluginUISettingsProvider::pluginSettingsKey, PluginUISettingsProvider::pluginSettingsJson));
+        this.settingsProviders = requireNonNull(settingsProviders);
         this.objectMapper = objectMapper;
     }
 
@@ -86,6 +85,9 @@ public class AppConfigResource {
     }
 
     private String buildPluginUISettings() {
+        Map<String, Object> pluginUISettings = settingsProviders.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().pluginSettings()));
         try {
             return objectMapper.writeValueAsString(pluginUISettings);
         } catch (JsonProcessingException ex) {
