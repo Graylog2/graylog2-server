@@ -20,6 +20,8 @@ import { userList as userOverviewList, admin } from 'fixtures/userOverviews';
 import { UsersActions } from 'stores/users/UsersStore';
 import fetch from 'logic/rest/FetchProvider';
 
+jest.mock('logic/rest/FetchProvider', () => jest.fn());
+
 const pagination = {
   page: 1,
   perPage: 10,
