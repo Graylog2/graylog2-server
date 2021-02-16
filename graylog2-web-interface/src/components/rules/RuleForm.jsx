@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'components/graylog';
-import { SourceCodeEditor } from 'components/common';
+import { ConfirmLeaveDialog, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -34,17 +34,31 @@ const RuleForm = ({ create }) => {
     ruleSourceRef,
   } = useContext(PipelineRulesContext);
 
+  const [isDirty, setIsDirty] = useState(false);
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    handleSavePipelineRule(() => { history.goBack(); });
+
+    handleSavePipelineRule(() => {
+      setIsDirty(false);
+      history.goBack();
+    });
   };
 
   const handleApply = () => {
-    handleSavePipelineRule((rule) => { history.replace(Routes.SYSTEM.PIPELINES.RULE(rule.id)); });
+    handleSavePipelineRule((rule) => {
+      setIsDirty(false);
+      history.replace(Routes.SYSTEM.PIPELINES.RULE(rule.id));
+    });
   };
 
   const handleDescriptionChange = (event) => {
+    setIsDirty(true);
     handleDescription(event.target.value);
+  };
+
+  const handleSourceChange = () => {
+    setIsDirty(true);
   };
 
   const handleCancel = () => {
@@ -58,6 +72,10 @@ const RuleForm = ({ create }) => {
           <ControlLabel>Title</ControlLabel>
           <FormControl.Static>You can set the rule title in the rule source. See the quick reference for more information.</FormControl.Static>
         </FormGroup>
+
+        {isDirty && (
+          <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
+        )}
 
         <Input type="textarea"
                id="description"
@@ -73,6 +91,7 @@ const RuleForm = ({ create }) => {
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
                             mode="pipeline"
+                            onChange={handleSourceChange}
                             innerRef={ruleSourceRef} />
         </Input>
       </fieldset>
