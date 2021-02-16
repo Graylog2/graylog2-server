@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "3.3.11-SNAPSHOT",
+  "version": "3.3.11",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "scripts": {
