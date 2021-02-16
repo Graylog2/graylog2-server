@@ -18,8 +18,10 @@ package org.graylog2.shared.messageq.noop;
 
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
+import javax.inject.Singleton;
 import java.util.List;
 
+@Singleton
 public class NoopMessageQueueAcknowledger implements MessageQueueAcknowledger {
 
     @Override

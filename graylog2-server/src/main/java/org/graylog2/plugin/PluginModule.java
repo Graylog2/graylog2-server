@@ -58,6 +58,9 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.shared.messageq.MessageQueueReader;
+import org.graylog2.shared.messageq.MessageQueueWriter;
 
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
@@ -330,5 +333,15 @@ public abstract class PluginModule extends Graylog2Module {
      */
     protected boolean isCloud() {
         return Boolean.parseBoolean(System.getProperty("graylog.cloud"));
+    }
+
+    protected void addMessageQueueImplementation(String name, Class<? extends MessageQueueReader> readerClass,
+            Class<? extends MessageQueueWriter> writerClass,
+            Class<? extends MessageQueueAcknowledger> acknowledgerClass) {
+
+        MapBinder.newMapBinder(binder(), String.class, MessageQueueReader.class).addBinding(name).to(readerClass);
+        MapBinder.newMapBinder(binder(), String.class, MessageQueueWriter.class).addBinding(name).to(writerClass);
+        MapBinder.newMapBinder(binder(), String.class, MessageQueueAcknowledger.class).addBinding(name)
+                .to(acknowledgerClass);
     }
 }

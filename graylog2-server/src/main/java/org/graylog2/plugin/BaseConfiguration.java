@@ -27,8 +27,7 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import org.graylog2.configuration.PathConfiguration;
-import org.graylog2.shared.messageq.MessageJournalMode;
-import org.graylog2.shared.messageq.MessageJournalModeConverter;
+import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.graylog2.utilities.ProxyHostsPatternConverter;
 import org.slf4j.Logger;
@@ -67,8 +66,8 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter("message_journal_enabled")
     private boolean messageJournalEnabled = true;
 
-    @Parameter(value = "message_journal_mode", converter = MessageJournalModeConverter.class)
-    private MessageJournalMode messageJournalMode = MessageJournalMode.DISK;
+    @Parameter(value = "message_journal_mode", validators = StringNotBlankValidator.class)
+    private String messageJournalMode = MessageQueueModule.DISK_IMPLEMENTATION;
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
@@ -147,8 +146,16 @@ public abstract class BaseConfiguration extends PathConfiguration {
         return messageJournalEnabled;
     }
 
-    public MessageJournalMode getMessageJournalMode() {
-        return messageJournalMode;
+    /**
+     * Get active message journal mode. If the journal is disabled, this will always be
+     * {@link MessageQueueModule#NOOP_IMPLEMENTATION}
+     */
+    public String getMessageJournalMode() {
+        if (!isMessageJournalEnabled()) {
+            return MessageQueueModule.NOOP_IMPLEMENTATION;
+        } else {
+            return messageJournalMode;
+        }
     }
 
     public void setMessageJournalEnabled(boolean messageJournalEnabled) {
