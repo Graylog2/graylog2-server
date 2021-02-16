@@ -172,7 +172,9 @@ public class MigrationHelpersTest {
         when(userService.create()).thenReturn(newUser(permissions));
         when(userService.save(any(User.class))).thenReturn("new-id");
 
-        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test User", "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002")))
+        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
+                                               "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
+                                                                                   "54e3deadbeefdeadbeef0002")))
                 .isEqualTo("new-id");
 
         final ArgumentCaptor<User> userArg = ArgumentCaptor.forClass(User.class);
@@ -210,7 +212,9 @@ public class MigrationHelpersTest {
         when(userService.load("test-user")).thenReturn(existingUser);
         when(userService.save(any(User.class))).thenReturn("new-id");
 
-        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test User", "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002")))
+        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
+                                               "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
+                                                                                   "54e3deadbeefdeadbeef0002")))
                 .isEqualTo("new-id");
 
         final ArgumentCaptor<User> userArg = ArgumentCaptor.forClass(User.class);
@@ -241,7 +245,9 @@ public class MigrationHelpersTest {
         when(userService.create()).thenReturn(newUser(permissions));
         when(userService.save(any(User.class))).thenThrow(ValidationException.class);
 
-        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test User", "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002")))
+        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
+                                               "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
+                                                                                   "54e3deadbeefdeadbeef0002")))
                 .isNull();
     }
 

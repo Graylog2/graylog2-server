@@ -27,6 +27,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 @AutoValue
 public abstract class UserDetails {
+
     public abstract Optional<String> databaseId();
 
     public abstract String authServiceType();
@@ -40,6 +41,10 @@ public abstract class UserDetails {
     public abstract boolean accountIsEnabled();
 
     public abstract String email();
+
+    public abstract String firstName();
+
+    public abstract String lastName();
 
     public abstract String fullName();
 
@@ -76,6 +81,10 @@ public abstract class UserDetails {
         public abstract Builder accountIsEnabled(boolean isEnabled);
 
         public abstract Builder email(String email);
+
+        public abstract Builder firstName(String firstName);
+
+        public abstract Builder lastName(String lastName);
 
         public abstract Builder fullName(String fullName);
 

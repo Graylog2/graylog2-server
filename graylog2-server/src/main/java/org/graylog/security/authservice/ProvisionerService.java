@@ -115,7 +115,7 @@ public class ProvisionerService {
         user.setAuthServiceId(userDetails.authServiceId());
         user.setAuthServiceUid(userDetails.base64AuthServiceUid());
         user.setName(userDetails.username());
-        user.setFullName(userDetails.fullName());
+        user.setFullName(userDetails.firstName(), userDetails.lastName());
         user.setEmail(userDetails.email());
 
         // We don't overwrite the user's password here because we might want to fall back to the internal MongoDB
