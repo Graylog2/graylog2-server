@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, createContext } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 import merge from 'lodash/merge';
@@ -24,17 +24,17 @@ import { breakpoints, colors, fonts, utils } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import AppConfig from 'util/AppConfig';
+import UpdatableThemeContext from 'theme/UpdatableThemeContext';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
 const customizedTheme = AppConfig.customTheme();
-export const UpdateThemeContext = createContext(undefined);
 
 const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
 
-  const updateTheme = (updatedColors) => {
-    console.log({ updatedColors });
+  const updatableTheme = (newColors) => {
+    console.log(newColors);
   };
 
   const theme = useCallback((): DefaultTheme => {
@@ -61,16 +61,16 @@ const GraylogThemeProvider = ({ children }) => {
   }, [mode, changeMode]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <UpdateThemeContext.Provider value={{ updateTheme }}>
+    <UpdatableThemeContext.Provider value={{ updatableTheme }}>
+      <ThemeProvider theme={theme}>
         {children}
-      </UpdateThemeContext.Provider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </UpdatableThemeContext.Provider>
   );
 };
 
 GraylogThemeProvider.propTypes = {
-  children: PropTypes.any.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 export default GraylogThemeProvider;
