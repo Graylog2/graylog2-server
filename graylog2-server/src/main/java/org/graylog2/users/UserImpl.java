@@ -16,12 +16,14 @@
  */
 package org.graylog2.users;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -63,6 +65,9 @@ import static com.google.common.base.Strings.nullToEmpty;
 
 @CollectionName(UserImpl.COLLECTION_NAME)
 public class UserImpl extends PersistedImpl implements User {
+
+    public static final String FULL_NAME_FORMAT = "%s %s";
+
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
     private final Permissions permissions;
 
@@ -177,19 +182,30 @@ public class UserImpl extends PersistedImpl implements User {
         return String.valueOf(fields.get(FULL_NAME));
     }
 
+    /**
+     * Set the user's fullName, firstName, and lastName all together. The fullName is composed with the {@link #FULL_NAME_FORMAT}
+     * @param firstName The user's first name.
+     * @param lastName The users's last name.
+     */
     @Override
-    public void setFirstName(String firstName) {
+    public void setFullName(final String firstName, final String lastName) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(firstName), "A firstName value is required.");
+        Preconditions.checkArgument(StringUtils.isNotBlank(lastName), "A lastName value is required.");
         fields.put(FIRST_NAME, firstName);
-    }
-
-    @Override
-    public void setLastName(String lastName) {
         fields.put(LAST_NAME, lastName);
+        fields.put(FULL_NAME, String.format(Locale.ENGLISH, FULL_NAME_FORMAT, firstName, lastName));
     }
 
+    /**
+     * Set the user's full name.
+     * Starting in Graylog 4.1, this method is no longer supported. Use the {@link #setFullName(String, String)}
+     * method instead.
+     */
     @Override
+    @Deprecated
     public void setFullName(final String fullname) {
-        fields.put(FULL_NAME, fullname);
+        throw new UnsupportedOperationException("This method is no longer supported. " +
+                                                "Use setFullName(firstName, lastName) instead.");
     }
 
     @Override

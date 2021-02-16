@@ -79,9 +79,7 @@ public interface User extends Persisted {
 
     void setEmail(String email);
 
-    void setFirstName(String firstName);
-
-    void setLastName(String lastName);
+    void setFullName(String firstName, String lastName);
 
     void setFullName(String fullname);
 

@@ -18,9 +18,11 @@ package org.graylog2.users;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
 import org.junit.Rule;
@@ -36,8 +38,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class UserImplTest {
     @Rule
@@ -50,35 +54,53 @@ public class UserImplTest {
 
     @Test
     public void testFirstLastFullNames() {
-        Map<String, Object> fields = ImmutableMap.of(
-                UserImpl.FIRST_NAME, "First",
-                UserImpl.LAST_NAME, "Last",
-                UserImpl.USERNAME, "Another");
-        user = new UserImpl(null, null, fields);
+        user = new UserImpl(null, null, null);
+        user.setFullName("First", "Last");
         assertEquals("First Last", user.getFullName());
         assertEquals("First", user.getFirstName());
         assertEquals("Last", user.getLastName());
     }
 
     @Test
-    public void testFirstLastOnly() {
-        Map<String, Object> fields = ImmutableMap.of(
-                UserImpl.FIRST_NAME, "First",
-                UserImpl.LAST_NAME, "Last");
-        user = new UserImpl(null, null, fields);
-        assertEquals("First Last", user.getFullName());
-        assertEquals("First", user.getFirstName());
-        assertEquals("Last", user.getLastName());
+    public void testSetFullNameDeprecated() {
+        user = new UserImpl(null, null, null);
+        assertThatThrownBy(() -> user.setFullName("Full Name"))
+                .isExactlyInstanceOf(UnsupportedOperationException.class)
+                .hasMessageContaining("Use setFullName");
     }
 
     @Test
-    public void testFullOnly() {
-        Map<String, Object> fields = ImmutableMap.of(
-                UserImpl.FULL_NAME, "Full Name");
-        user = new UserImpl(null, null, fields);
-        assertEquals("Full Name", user.getFullName());
-        assertNull(user.getFirstName());
-        assertNull(user.getLastName());
+    public void testFirstLastRequired() {
+        user = new UserImpl(null, null, null);
+        assertThatThrownBy(() -> user.setFullName(null, "Last"))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A firstName value is required");
+
+        assertThatThrownBy(() -> user.setFullName("First", null))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A lastName value is required");
+    }
+
+    @Test
+    public void testFirstNameLengthValidation() {
+        user = new UserImpl(null, null, null);
+        ValidationResult result = user.getValidations().get(UserImpl.FIRST_NAME)
+                                            .validate(StringUtils.repeat("*", 10));
+        assertTrue(result.passed());
+        result = user.getValidations().get(UserImpl.FIRST_NAME)
+                     .validate(StringUtils.repeat("*", 210));
+        assertFalse(result.passed());
+    }
+
+    @Test
+    public void testLastNameLengthValidation() {
+        user = new UserImpl(null, null, null);
+        ValidationResult result = user.getValidations().get(UserImpl.LAST_NAME)
+                                      .validate(StringUtils.repeat("*", 10));
+        assertTrue(result.passed());
+        result = user.getValidations().get(UserImpl.LAST_NAME)
+                     .validate(StringUtils.repeat("*", 210));
+        assertFalse(result.passed());
     }
 
     @Test
