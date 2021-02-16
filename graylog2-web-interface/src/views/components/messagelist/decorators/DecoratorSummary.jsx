@@ -23,7 +23,7 @@ import { ConfigurationForm, ConfigurationWell } from 'components/configurationfo
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import InlineForm from './InlineForm';
 
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from '!style-loader!css-loader!./decoratorStyles.css';
 
 class DecoratorSummary extends React.Component {
   static propTypes = {

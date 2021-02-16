@@ -27,7 +27,7 @@ import { Select } from 'components/common';
 import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
 
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from '!style-loader!css-loader!./decoratorStyles.css';
 
 const ConfigurationFormContainer = styled.div`
   margin-bottom: 10px;

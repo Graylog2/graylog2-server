@@ -26,7 +26,7 @@ import DecoratorSummary from './DecoratorSummary';
 import DecoratorList from './DecoratorList';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from '!style-loader!css-loader!./decoratorStyles.css';
 
 const { DecoratorsActions, DecoratorsStore } = CombinedProvider.get('Decorators');
 
