@@ -34,10 +34,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.SYSTEM;
-import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.THREAT;
-import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.TRAFFIC;
-
 public class PaloAltoCodec implements Codec {
 
     public static final String NAME = "PaloAlto";
@@ -78,15 +74,15 @@ public class PaloAltoCodec implements Codec {
 
         switch (p.panType()) {
             case "THREAT":
-                final PaloAltoTypeParser parserThreat = new PaloAltoTypeParser(templates.getThreatMessageTemplate(), THREAT);
+                final PaloAltoTypeParser parserThreat = new PaloAltoTypeParser(templates.getThreatMessageTemplate());
                 message.addFields(parserThreat.parseFields(p.fields()));
                 break;
             case "SYSTEM":
-                final PaloAltoTypeParser parserSystem = new PaloAltoTypeParser(templates.getSystemMessageTemplate(), SYSTEM);
+                final PaloAltoTypeParser parserSystem = new PaloAltoTypeParser(templates.getSystemMessageTemplate());
                 message.addFields(parserSystem.parseFields(p.fields()));
                 break;
             case "TRAFFIC":
-                final PaloAltoTypeParser parserTraffic = new PaloAltoTypeParser(templates.getTrafficMessageTemplate(), TRAFFIC);
+                final PaloAltoTypeParser parserTraffic = new PaloAltoTypeParser(templates.getTrafficMessageTemplate());
                 message.addFields(parserTraffic.parseFields(p.fields()));
                 break;
             default:

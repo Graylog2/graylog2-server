@@ -26,83 +26,79 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.BOOLEAN;
+import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.LONG;
+import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.STRING;
+
 public class PaloAltoTypeParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(PaloAltoTypeParser.class);
 
     private final PaloAltoMessageTemplate messageTemplate;
-    private final PaloAltoMessageType messageType;
 
-    public PaloAltoTypeParser(PaloAltoMessageTemplate messageTemplate, PaloAltoMessageType messageType) {
-
-        this.messageType = messageType;
+    public PaloAltoTypeParser(PaloAltoMessageTemplate messageTemplate) {
         this.messageTemplate = messageTemplate;
     }
 
     public ImmutableMap<String, Object> parseFields(List<String> fields) {
         Map<String, Object> fieldMap = Maps.newHashMap();
+        List<PaloAltoFieldTemplate> templateFields = Lists.newArrayList(messageTemplate.getFields());
 
-        for (PaloAltoFieldTemplate field : messageTemplate.getFields()) {
-            String rawValue = null;
-            try {
-                rawValue = fields.get(field.position());
-            } catch (IndexOutOfBoundsException e) {
-                // Skip fields at indexes that do not exist.
-                LOG.trace("A [{}] field does not exist at index [{}]", messageType.toString(), field.position());
+        int fieldIndex = 0;
+        int templateIndex = 0;
+
+        while (fieldIndex < fields.size() && templateIndex < templateFields.size()) {
+            String rawValue = fields.get(fieldIndex);
+            PaloAltoFieldTemplate template = templateFields.get(templateIndex);
+
+            if (fieldIndex < template.position()) {
+                fieldIndex++;
                 continue;
-            }
+            } else if (fieldIndex == template.position()) {
+                Object value = rawValue;
 
-            Object value = null;
-
-            switch (field.fieldType()) {
-                case STRING:
-                    // Handle quoted values.
+                if (template.fieldType() == STRING) {
                     if (rawValue.startsWith("\"") && rawValue.endsWith("\"")) {
-                        rawValue = rawValue.substring(1, rawValue.length() - 1);
+                        value = rawValue.substring(1, rawValue.length() - 1);
                     }
-
-                    value = rawValue;
-                    break;
-                case LONG:
-                    if (!Strings.isNullOrEmpty(rawValue)) {
-                        try {
-                            value = Long.valueOf(rawValue);
-                        } catch (NumberFormatException e) {
-                            LOG.error("[{}] is an invalid LONG value for the [{}] [{}] field", rawValue, messageType, field.field() );
-                            continue;
-                        }
-                    } else {
-                        value = 0L;
+                } else if (template.fieldType() == LONG) {
+                    try {
+                        value = Strings.isNullOrEmpty(rawValue) ? 0L : Long.valueOf(rawValue);
+                    } catch (NumberFormatException ex) {
+                        LOG.error("Error parsing field {}, {} is not a valid numeric value", template.field(), rawValue);
+                        value = null;
                     }
-                    break;
-                case BOOLEAN:
-                    if (!Strings.isNullOrEmpty(rawValue)) {
-                        value = Boolean.valueOf(rawValue);
-                    } else {
-                        value = false;
-                    }
-                    break;
-                default:
-                    throw new RuntimeException("Unhandled PAN mapping field type [" + field.fieldType() + "].");
-            }
-
-            // Handling of duplicate keys
-            if (fieldMap.containsKey(field.field())) {
-                if (Strings.isNullOrEmpty(rawValue.trim()) || value.equals(fieldMap.get(field.field()))) {
-                    // Same value, do nothing
-                    continue;
-                } else if (fieldMap.get(field.field()) instanceof List) {
-                    List valueList = (List) fieldMap.get(field.field());
-                    valueList.add(value);
-                    value = valueList;
+                } else if (template.fieldType() == BOOLEAN) {
+                    value = Boolean.valueOf(rawValue);
                 } else {
-                    List valueList = Lists.newArrayList();
-                    valueList.add(fieldMap.get(field.field()));
-                    valueList.add(value);
-                    value = valueList;
+                    LOG.warn("Unrecognized data type [{}] for field [{}], handling as STRING",
+                            template.fieldType(), template.field());
                 }
+
+                // Handling of duplicate keys
+                if (fieldMap.containsKey(template.field())) {
+                    if (Strings.isNullOrEmpty(rawValue.trim()) || null == value
+                            || value.equals(fieldMap.get(template.field()))) {
+                        // Same value, do nothing
+                    } else if (fieldMap.get(template.field()) instanceof List) {
+                        List valueList = (List) fieldMap.get(template.field());
+                        valueList.add(value);
+                        value = valueList;
+                    } else {
+                        List valueList = Lists.newArrayList();
+                        valueList.add(fieldMap.get(template.field()));
+                        valueList.add(value);
+                        value = valueList;
+                    }
+                }
+                fieldMap.put(template.field(), value);
+
+                fieldIndex++;
+                templateIndex++;
+            } else {
+                LOG.error("Not sure the template fields are properly sorted");
+                templateIndex++;
             }
-            fieldMap.put(field.field(), value);
         }
 
         return ImmutableMap.copyOf(fieldMap);

@@ -38,7 +38,7 @@ import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldTemplate.create;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.LONG;
@@ -46,14 +46,14 @@ import static org.graylog.integrations.inputs.paloalto.PaloAltoFieldType.STRING;
 
 public class PaloAlto9xTemplates {
 
-    private static PaloAltoMessageTemplate toTemplate(Set<PaloAltoFieldTemplate> fields) {
+    private static PaloAltoMessageTemplate toTemplate(SortedSet<PaloAltoFieldTemplate> fields) {
         PaloAltoMessageTemplate template = new PaloAltoMessageTemplate();
         template.setFields(fields);
         return template;
     }
 
     public static PaloAltoMessageTemplate configTemplate() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_CREATED, 1, STRING));
@@ -88,7 +88,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate correlationTemplate() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_CREATED, 1, STRING));
@@ -121,7 +121,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate hipTemplate() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_CREATED, 1, STRING));
@@ -165,7 +165,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate globalProtectPre913Template() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_RECEIVED_TIME, 1, STRING));
@@ -216,7 +216,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate globalProtect913Template() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_RECEIVED_TIME, 1, STRING));
@@ -272,7 +272,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate systemTemplate() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_CREATED, 1, STRING));
@@ -307,7 +307,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate threatTemplate() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_RECEIVED_TIME, 1, STRING));
@@ -447,7 +447,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate trafficTemplate() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_RECEIVED_TIME, 1, STRING));
@@ -579,7 +579,7 @@ public class PaloAlto9xTemplates {
     }
 
     public static PaloAltoMessageTemplate userIdTemplate() {
-        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+        SortedSet<PaloAltoFieldTemplate> fields = Sets.newTreeSet();
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_CREATED, 1, STRING));

@@ -33,15 +33,15 @@ public class PaloAlto9xParser {
     private final Map<PaloAltoMessageType, PaloAltoTypeParser> parsers;
 
     public PaloAlto9xParser() {
-        this(new PaloAltoTypeParser(PaloAlto9xTemplates.configTemplate(), PaloAltoMessageType.CONFIG),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.correlationTemplate(), PaloAltoMessageType.CORRELATION),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.globalProtectPre913Template(), PaloAltoMessageType.GLOBAL_PROTECT_PRE_9_1_3),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.globalProtect913Template(), PaloAltoMessageType.GLOBAL_PROTECT_9_1_3),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.hipTemplate(), PaloAltoMessageType.HIP),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.systemTemplate(), PaloAltoMessageType.SYSTEM),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.threatTemplate(), PaloAltoMessageType.THREAT),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.trafficTemplate(), PaloAltoMessageType.TRAFFIC),
-                new PaloAltoTypeParser(PaloAlto9xTemplates.userIdTemplate(), PaloAltoMessageType.USERID));
+        this(new PaloAltoTypeParser(PaloAlto9xTemplates.configTemplate()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.correlationTemplate()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.globalProtectPre913Template()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.globalProtect913Template()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.hipTemplate()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.systemTemplate()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.threatTemplate()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.trafficTemplate()),
+                new PaloAltoTypeParser(PaloAlto9xTemplates.userIdTemplate()));
     }
 
     @VisibleForTesting

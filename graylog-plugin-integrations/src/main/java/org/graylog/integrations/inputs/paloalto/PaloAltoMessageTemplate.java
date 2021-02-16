@@ -17,9 +17,9 @@
 package org.graylog.integrations.inputs.paloalto;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * An object representation of a PAN message template. Defines which fields to pick out from the PAN
@@ -33,15 +33,15 @@ import java.util.Set;
 
 public class PaloAltoMessageTemplate {
 
-    private Set<PaloAltoFieldTemplate> fields = new HashSet<>();
+    private SortedSet<PaloAltoFieldTemplate> fields = new TreeSet<>();
 
     private List<String> parseErrors = new ArrayList<>();
 
-    public Set<PaloAltoFieldTemplate> getFields() {
+    public SortedSet<PaloAltoFieldTemplate> getFields() {
         return fields;
     }
 
-    public void setFields(Set<PaloAltoFieldTemplate> fields) {
+    public void setFields(SortedSet<PaloAltoFieldTemplate> fields) {
         this.fields = fields;
     }
 

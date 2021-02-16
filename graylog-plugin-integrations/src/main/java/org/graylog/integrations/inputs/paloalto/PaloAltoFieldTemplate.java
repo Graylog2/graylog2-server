@@ -19,7 +19,7 @@ package org.graylog.integrations.inputs.paloalto;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class PaloAltoFieldTemplate {
+public abstract class PaloAltoFieldTemplate implements Comparable<PaloAltoFieldTemplate> {
     public abstract int position();
 
     public abstract String field();
@@ -28,5 +28,10 @@ public abstract class PaloAltoFieldTemplate {
 
     public static PaloAltoFieldTemplate create(String field, int position, PaloAltoFieldType fieldType) {
         return new AutoValue_PaloAltoFieldTemplate(position, field, fieldType);
+    }
+
+    @Override
+    public int compareTo(PaloAltoFieldTemplate other) {
+        return position() - other.position();
     }
 }
