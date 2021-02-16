@@ -28,7 +28,7 @@ import AppConfig from 'util/AppConfig';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
 const customizedTheme = AppConfig.customTheme();
-const UpdateThemeContext = createContext(customizedTheme);
+export const UpdateThemeContext = createContext(undefined);
 
 const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
@@ -61,11 +61,11 @@ const GraylogThemeProvider = ({ children }) => {
   }, [mode, changeMode]);
 
   return (
-    <UpdateThemeContext.Provider value={{ updateTheme }}>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <UpdateThemeContext.Provider value={{ updateTheme }}>
         {children}
-      </ThemeProvider>
-    </UpdateThemeContext.Provider>
+      </UpdateThemeContext.Provider>
+    </ThemeProvider>
   );
 };
 

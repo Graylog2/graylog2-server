@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 
 import Store from 'logic/local-storage/Store';
 
-export const ScratchpadContext = createContext();
+export const ScratchpadContext = createContext(undefined, undefined);
 
 export const ScratchpadProvider = ({ children, loginName }) => {
   const localStorageItem = `gl-scratchpad-${loginName}`;
