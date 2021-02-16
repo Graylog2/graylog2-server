@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-manifests",
-  "version": "3.3.11",
+  "version": "3.3.12-SNAPSHOT",
   "description": "Manifests needed to reuse vendor & shared bundles in graylog web interface plugins",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
