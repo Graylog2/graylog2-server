@@ -33,7 +33,7 @@ const customizedTheme = AppConfig.customTheme();
 const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
 
-  const updatableTheme = (newColors) => {
+  const updatableTheme = (newColors: any) => {
     console.log(newColors);
   };
 
