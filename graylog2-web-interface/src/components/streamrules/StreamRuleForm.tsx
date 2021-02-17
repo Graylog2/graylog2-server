@@ -26,7 +26,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import { Store } from 'stores/StoreTypes';
 
 const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');

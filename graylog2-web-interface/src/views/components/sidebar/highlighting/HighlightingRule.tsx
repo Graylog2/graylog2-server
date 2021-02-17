@@ -15,13 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { ColorPickerPopover, Icon } from 'components/common';
+import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { ColorPickerPopover, IconButton } from 'components/common';
+import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
+import HighlightingColor, { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import ColorPreview from './ColorPreview';
 
@@ -49,57 +52,75 @@ export const HighlightingRuleGrid = styled.div`
   }
 `;
 
-const DeleteIcon = styled.span(({ theme }) => css`
-  width: 2rem;
-  height: 2rem;
-  margin-left: 0.4rem;
-  cursor: pointer;
+const ButtonContainer = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+`;
 
-  :active {
-    background-color: ${theme.colors.gray[90]};
-  }
-`);
+export const RuleContainer = styled.div`
+  padding-top: 4px;
+`;
 
 type Props = {
   rule: Rule,
 };
 
-const updateColor = (rule, newColor, hidePopover) => {
-  const newRule = rule.toBuilder().color(newColor).build();
-
-  return HighlightingRulesActions.update(newRule).then(hidePopover);
+const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => {
+  return HighlightingRulesActions.update(rule, { color: newColor }).then(hidePopover);
 };
 
-const onDelete = (e, rule) => {
-  e.preventDefault();
-
+const onDelete = (rule) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
     HighlightingRulesActions.remove(rule);
   }
 };
 
-const HighlightingRule = ({ rule }: Props) => {
-  const { field, value, color } = rule;
+type RuleColorPreviewProps = {
+  color: HighlightingColor,
+  onChange: (newColor: HighlightingColor, hidePopover: () => void) => void,
+};
 
-  return (
-    <HighlightingRuleGrid>
+const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
+  const _onChange = useCallback((newColor, ignored, hidePopover) => onChange(StaticColor.create(newColor), hidePopover), [onChange]);
+
+  if (color.isStatic()) {
+    return (
       <ColorPickerPopover id="formatting-rule-color"
                           placement="right"
-                          color={color}
+                          color={color.color}
                           colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
                           triggerNode={<ColorPreview color={color} />}
-                          onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)} />
-      <div>
-        for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
-      </div>
-      <DeleteIcon role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
-        <Icon name="trash-alt" type="regular" />
-      </DeleteIcon>
-    </HighlightingRuleGrid>
+                          onChange={_onChange} />
+    );
+  }
+
+  if (color.isGradient()) {
+    return <ColorPreview color={color} />;
+  }
+
+  throw new Error(`Invalid highlighting color: ${color}`);
+};
+
+const HighlightingRule = ({ rule }: Props) => {
+  const { field, value, color, condition } = rule;
+  const [showForm, setShowForm] = useState(false);
+
+  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => updateColor(rule, newColor, hidePopover), [rule]);
+
+  return (
+    <>
+      <HighlightingRuleGrid>
+        <RuleColorPreview color={color} onChange={_onChange} />
+        <RuleContainer>
+          <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
+        </RuleContainer>
+        <ButtonContainer>
+          <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
+          <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={() => onDelete(rule)} />
+        </ButtonContainer>
+      </HighlightingRuleGrid>
+      { showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}
+    </>
   );
 };
 

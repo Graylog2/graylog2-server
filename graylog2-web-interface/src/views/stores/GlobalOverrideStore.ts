@@ -63,10 +63,10 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
     getInitialState() {
       return this.globalOverride;
     },
-    set(newTimerange?: TimeRange, newQueryString?: string): Promise<GlobalOverride | undefined> {
+    set(newTimeRange?: TimeRange, newQueryString?: string): Promise<GlobalOverride | undefined> {
       const newQuery = newQueryString ? createElasticsearchQueryString(newQueryString) : undefined;
       const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
-      const newGlobalOverride = currentGlobalOverride.toBuilder().query(newQuery).timerange(newTimerange).build();
+      const newGlobalOverride = currentGlobalOverride.toBuilder().query(newQuery).timerange(newTimeRange).build();
 
       const promise = this._propagateNewGlobalOverride(newGlobalOverride);
 
@@ -74,9 +74,9 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
 
       return promise;
     },
-    timerange(newTimerange: TimeRange) {
+    timerange(newTimeRange: TimeRange) {
       const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
-      const newGlobalOverride = currentGlobalOverride.toBuilder().timerange(newTimerange).build();
+      const newGlobalOverride = currentGlobalOverride.toBuilder().timerange(newTimeRange).build();
 
       const promise = this._propagateNewGlobalOverride(newGlobalOverride);
 

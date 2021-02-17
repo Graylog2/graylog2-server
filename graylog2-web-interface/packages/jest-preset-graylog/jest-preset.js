@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+const TIMEOUT_MULTIPLIER = Number.parseFloat(process.env.TIMEOUT_MULTIPLIER);
+
 module.exports = {
   rootDir: '../../',
   collectCoverageFrom: [
@@ -42,11 +45,12 @@ module.exports = {
   moduleNameMapper: {
     c3: require.resolve('./lib/mocking/c3_mock.js'),
     '^file-loader(\\?esModule=false)?!(.+)$': '$2',
-    '^!style/useable!.*\\.(css|less)$': require.resolve('./lib/mocking/useable-css-proxy.js'),
+    '(\\.lazy|leaflet)\\.css$': require.resolve('./lib/mocking/useable-css-proxy.js'),
     '\\.(css|less)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./lib/mocking/fileMock.js'),
   },
   testPathIgnorePatterns: [
     '.fixtures.[jt]s$',
   ],
+  testTimeout: (Number.isFinite(TIMEOUT_MULTIPLIER) ? TIMEOUT_MULTIPLIER : 1.0) * 5000,
 };

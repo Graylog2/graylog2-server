@@ -38,23 +38,32 @@ public abstract class HighlightingRule {
     public abstract String value();
 
     @JsonProperty(FIELD_COLOR)
-    public abstract String color();
+    public abstract HighlightingColor color();
+
+    @JsonProperty(FIELD_CONDITION)
+    public abstract Condition condition();
 
 
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_FIELD)
         public abstract Builder field(String field);
+
         @JsonProperty(FIELD_VALUE)
         public abstract Builder value(String value);
+
         @JsonProperty(FIELD_COLOR)
-        public abstract Builder color(String color);
+        @JsonDeserialize(using = LegacyColorDeserializer.class)
+        public abstract Builder color(HighlightingColor color);
+
+        @JsonProperty(FIELD_CONDITION)
+        public abstract Builder condition(Condition condition);
 
         public abstract HighlightingRule build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_HighlightingRule.Builder();
+            return new AutoValue_HighlightingRule.Builder().condition(Condition.EQUAL);
         }
     }
 }

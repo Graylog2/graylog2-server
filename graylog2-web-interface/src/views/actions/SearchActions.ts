@@ -27,6 +27,7 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { WidgetMapping } from 'views/logic/views/types';
+import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 
 export type CreateSearchResponse = {
   search: Search,
@@ -43,7 +44,7 @@ type SearchActionsType = RefluxActions<{
   create: (search: Search) => Promise<CreateSearchResponse>,
   execute: (state: SearchExecutionState) => Promise<SearchExecutionResult>,
   reexecuteSearchTypes: (
-    searchTypes: {[searchTypeId: string]: { limit: number, offset: number }},
+    searchTypes: SearchTypeOptions,
     effectiveTimeRange?: TimeRange,
   ) => Promise<SearchExecutionResult>,
   executeWithCurrentState: () => Promise<SearchExecutionResult>,

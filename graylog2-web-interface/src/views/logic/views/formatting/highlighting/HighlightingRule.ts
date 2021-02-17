@@ -16,15 +16,35 @@
  */
 import * as Immutable from 'immutable';
 
+import highlightConditionFunctions from 'views/logic/views/formatting/highlighting/highlightConditionFunctions';
+import HighlightingColor, {
+  HighlightingColorJson,
+  StaticColor,
+} from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
+
+export const StringConditionLabelMap = {
+  equal: '==',
+  not_equal: '!=',
+};
+
+export const ConditionLabelMap = {
+  ...StringConditionLabelMap,
+  less_equal: '<=',
+  greater_equal: '>=',
+  less: '<',
+  greater: '>',
+};
+
 export type Value = string;
-export type Color = string;
-export type Condition = any;
+export type Color = HighlightingColor;
+export type Condition = keyof typeof ConditionLabelMap;
 
 export type HighlightingRuleJSON = {
   field: string,
   value: Value,
   condition: Condition,
-  color: Color,
+  color: HighlightingColorJson,
 };
 
 type InternalState = {
@@ -33,6 +53,12 @@ type InternalState = {
   condition: Condition,
   color: Color,
 };
+
+export const randomColor = () => StaticColor.create(
+  DEFAULT_CUSTOM_HIGHLIGHT_RANGE[
+    Math.floor(Math.random() * DEFAULT_CUSTOM_HIGHLIGHT_RANGE.length)
+  ],
+);
 
 export default class HighlightingRule {
   _value: InternalState;
@@ -50,7 +76,11 @@ export default class HighlightingRule {
   }
 
   get condition() {
-    return this._value.condition;
+    return this._value.condition ?? 'equal';
+  }
+
+  get conditionFunc() {
+    return highlightConditionFunctions[this._value.condition ?? 'equal'];
   }
 
   get color() {
@@ -60,7 +90,7 @@ export default class HighlightingRule {
   toBuilder() {
     const { field, value, condition, color } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ field, value, condition, color }));
   }
 
@@ -68,9 +98,8 @@ export default class HighlightingRule {
     return new HighlightingRule(field, value, condition, color);
   }
 
-  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define,@typescript-eslint/no-use-before-define
     return new Builder();
   }
 
@@ -88,7 +117,7 @@ export default class HighlightingRule {
   static fromJSON(json: HighlightingRuleJSON) {
     const { field, value, condition, color } = json;
 
-    return HighlightingRule.create(field, value, condition, color);
+    return HighlightingRule.create(field, value, condition, HighlightingColor.fromJSON(color));
   }
 }
 

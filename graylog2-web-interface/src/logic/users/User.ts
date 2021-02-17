@@ -213,7 +213,7 @@ export default class User {
       accountStatus,
     } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
       id,
       username,
@@ -306,9 +306,9 @@ export default class User {
     return User.create(id, username, full_name, email, Immutable.List(permissions), timezone, preferences, Immutable.Set(roles), read_only, external, session_timeout_ms, startpage, session_active, client_address, last_activity, account_status);
   }
 
-  // eslint-disable-next-line no-use-before-define
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 }

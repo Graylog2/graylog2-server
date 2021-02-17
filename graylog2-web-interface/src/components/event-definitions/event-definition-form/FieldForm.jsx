@@ -34,7 +34,7 @@ import {
 import { Input } from 'components/bootstrap';
 import { Icon, Select } from 'components/common';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 
 import commonStyles from '../common/commonStyles.css';
 

@@ -30,7 +30,7 @@ import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import type { MessageListOptions } from 'views/logic/search/GlobalOverride';
+import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
@@ -143,7 +143,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
-    reexecuteSearchTypes(searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+    reexecuteSearchTypes(searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
       const { parameterBindings, globalOverride } = this.executionState;
       const searchTypeIds = Object.keys(searchTypes);
       const globalQuery = globalOverride && globalOverride.query ? globalOverride.query : undefined;

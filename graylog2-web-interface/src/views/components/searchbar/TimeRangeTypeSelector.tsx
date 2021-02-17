@@ -15,44 +15,50 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
-import { useField } from 'formik';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 
-import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
-import { ButtonToolbar } from 'components/graylog';
-import PropTypes from 'views/components/CustomPropTypes';
+import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
-import timeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
-
-import { migrateTimeRangeToNewType } from '../TimerangeForForm';
+import TimeRangeDropdownButton from './TimeRangeDropdownButton';
+import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 
 type Props = {
-  disabled: boolean,
+  currentTimeRange: TimeRange | NoTimeRangeOverride,
+  disabled?: boolean,
+  noOverride?: boolean,
+  hasErrorOnMount?: boolean,
+  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
 };
 
-export default function TimeRangeTypeSelector({ disabled }: Props) {
-  const [{ value, onChange, name }] = useField('timerange');
-  const { type: currentType } = value;
-  const onSelect = useCallback((newType) => onChange({
-    target: {
-      value: migrateTimeRangeToNewType(value, newType),
-      name,
-    },
-  }), [onChange, value]);
+const TimeRangeTypeSelector = ({ disabled, hasErrorOnMount, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
+  const [show, setShow] = useState(false);
+
+  const toggleShow = () => setShow(!show);
 
   return (
-    <ButtonToolbar className="pull-left">
-      <TimeRangeDropdownButton disabled={disabled} onSelect={onSelect}>
-        {timeRangeTypeMenuItems(currentType)}
-      </TimeRangeDropdownButton>
-    </ButtonToolbar>
+    <TimeRangeDropdownButton disabled={disabled}
+                             show={show}
+                             toggleShow={toggleShow}
+                             hasErrorOnMount={hasErrorOnMount}>
+      <TimeRangeDropdown currentTimeRange={currentTimeRange}
+                         noOverride={noOverride}
+                         setCurrentTimeRange={setCurrentTimeRange}
+                         toggleDropdownShow={toggleShow} />
+    </TimeRangeDropdownButton>
   );
-}
+};
 
 TimeRangeTypeSelector.propTypes = {
   disabled: PropTypes.bool,
+  hasErrorOnMount: PropTypes.bool,
+  noOverride: PropTypes.bool,
 };
 
 TimeRangeTypeSelector.defaultProps = {
   disabled: false,
+  hasErrorOnMount: false,
+  noOverride: false,
 };
+
+export default TimeRangeTypeSelector;

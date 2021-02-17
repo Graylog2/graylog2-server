@@ -53,7 +53,7 @@ const ContentOverlay = styled.div(({ theme }) => css`
   left: 50px;
   right: 0;
   background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
-  z-index: 2;
+  z-index: 3;
 `);
 
 const _toggleSidebar = (initialSectionKey: string, activeSectionKey: string | undefined | null, setActiveSectionKey) => {

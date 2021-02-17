@@ -21,6 +21,7 @@ import mockAction from 'helpers/mocking/MockAction';
 
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 import HighlightingRule from './HighlightingRule';
 
@@ -32,7 +33,7 @@ type ColorPickerProps = HTMLAttributes & {
 };
 
 describe('HighlightingRule', () => {
-  const rule = Rule.create('response_time', '250', undefined, '#f44242');
+  const rule = Rule.create('response_time', '250', undefined, StaticColor.create('#f44242'));
 
   it('should display field and value of rule', () => {
     const wrapper = mount(<HighlightingRule rule={rule} />);
@@ -53,8 +54,8 @@ describe('HighlightingRule', () => {
         .toHaveBeenCalledWith(Rule.builder()
           .field('response_time')
           .value('250')
-          .color('#416af4')
-          .build());
+          .color(StaticColor.create('#f44242'))
+          .build(), { color: StaticColor.create('#416af4') });
     });
   });
 
@@ -69,6 +70,19 @@ describe('HighlightingRule', () => {
       .then(() => expect(hidePopover).toHaveBeenCalled());
   });
 
+  describe('rule edit', () => {
+    it('should show a edit modal', () => {
+      const wrapper = mount(<HighlightingRule rule={rule} />);
+      const editIcon = wrapper.find('button[title="Edit this Highlighting Rule"]');
+
+      expect(wrapper).not.toIncludeText('Edit Highlighting Rule');
+
+      editIcon.simulate('click');
+
+      expect(wrapper).toIncludeText('Edit Highlighting Rule');
+    });
+  });
+
   describe('rule removal:', () => {
     let oldConfirm = null;
     let deleteIcon;
@@ -80,7 +94,7 @@ describe('HighlightingRule', () => {
       HighlightingRulesActions.remove = mockAction(jest.fn(() => Promise.resolve([])));
       const wrapper = mount(<HighlightingRule rule={rule} />);
 
-      deleteIcon = wrapper.find('span[title="Remove this Highlighting Rule"]');
+      deleteIcon = wrapper.find('button[title="Remove this Highlighting Rule"]');
     });
 
     afterEach(() => {
