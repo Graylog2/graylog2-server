@@ -103,8 +103,8 @@ class OverlayTrigger extends React.Component<Props, State> {
 
     return (
       <Container ref={() => this.containerRef}>
-        <TriggerWrap ref={this.targetRef}>
-          {React.cloneElement(children, { ...triggerables })}
+        <TriggerWrap ref={this.targetRef} className={children.props.className}>
+          {React.cloneElement(children, { ...triggerables, className: '' })}
         </TriggerWrap>
 
         {show && (
