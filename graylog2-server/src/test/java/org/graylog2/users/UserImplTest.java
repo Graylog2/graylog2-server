@@ -41,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class UserImplTest {
@@ -62,11 +63,12 @@ public class UserImplTest {
     }
 
     @Test
-    public void testSetFullNameDeprecated() {
+    public void testSetFullName() {
         user = new UserImpl(null, null, null);
-        assertThatThrownBy(() -> user.setFullName("Full Name"))
-                .isExactlyInstanceOf(UnsupportedOperationException.class)
-                .hasMessageContaining("Use setFullName");
+        user.setFullName("Full Name");
+        assertEquals("Full Name", user.getFullName());
+        assertNull(user.getFirstName());
+        assertNull(user.getLastName());
     }
 
     @Test
