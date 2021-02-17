@@ -49,12 +49,15 @@ public abstract class UserSummary {
     @JsonProperty
     public abstract String email();
 
+    @Nullable
     @JsonProperty
     public abstract String firstName();
 
+    @Nullable
     @JsonProperty
     public abstract String lastName();
 
+    @Nullable
     @JsonProperty
     public abstract String fullName();
 
