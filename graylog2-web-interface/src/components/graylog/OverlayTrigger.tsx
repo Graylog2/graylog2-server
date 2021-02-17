@@ -18,11 +18,15 @@ import * as React from 'react';
 import { createRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 import styled from 'styled-components';
+import assign from 'lodash/assign';
+
+type Triggers = 'click' | 'focus' | 'hover';
 
 type Props = {
   children: React.ReactElement,
   overlay: React.ReactElement,
   placement: 'top' | 'right' | 'bottom' | 'left',
+  trigger?: Triggers | Array<Triggers>,
   container?: React.ReactElement,
   rootClose?: boolean,
 }
@@ -67,15 +71,40 @@ class OverlayTrigger extends React.Component<Props, State> {
   }
 
   render() {
-    const { children, container, placement, overlay, rootClose, ...overlayProps } = this.props;
+    const { children, container, placement, overlay, rootClose, trigger, ...overlayProps } = this.props;
     const { show } = this.state;
 
-    const toggleShow = () => this.setState({ show: !show });
+    const setShow = (isShown: boolean) => this.setState({ show: isShown });
+    const toggleShow = () => setShow(!show);
+
+    const _onTrigger = {
+      click: {
+        onClick: toggleShow,
+      },
+      hover: {
+        onMouseEnter: () => setShow(true),
+        onMouseLeave: () => setShow(false),
+      },
+      focus: {
+        onFocus: () => setShow(true),
+        onBlur: () => setShow(false),
+      },
+    };
+
+    let triggerables = _onTrigger[trigger];
+
+    if (Array.isArray(trigger)) {
+      const multipleTriggers = {};
+
+      trigger.forEach((triggerType) => {
+        triggerables = assign(multipleTriggers, _onTrigger[triggerType]);
+      });
+    }
 
     return (
       <Container ref={() => this.containerRef}>
         <TriggerWrap ref={this.targetRef}>
-          {React.cloneElement(children, { onClick: toggleShow })}
+          {React.cloneElement(children, { ...triggerables })}
         </TriggerWrap>
 
         {show && (
