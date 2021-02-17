@@ -404,7 +404,7 @@ class Widget extends React.Component<Props, State> {
                       <IfDashboard>
                         <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
                       </IfDashboard>
-                      <ExtraWidgetActions widget={widget} />
+                      <ExtraWidgetActions widget={widget} onSelect={() => {}} />
                       <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>

@@ -22,6 +22,7 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 import { MenuItem } from 'components/graylog';
 
 type Props = {
+  onSelect: (eventKey: string, e: MouseEvent) => void,
   widget: Widget,
 };
 
@@ -32,11 +33,18 @@ type WidgetAction = {
   action: (w: Widget) => unknown,
 };
 
-const ExtraWidgetActions = ({ widget }: Props) => {
+const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
   const pluginWidgetActions = usePluginEntities<WidgetAction>('views.widgets.actions');
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
-    .map(({ title, action, type }) => <MenuItem key={`${type}-${widget.id}`} onSelect={() => action(widget)}>{title(widget)}</MenuItem>), [pluginWidgetActions, widget]);
+    .map(({ title, action, type }) => {
+      const _onSelect = (eventKey: string, e: MouseEvent) => {
+        action(widget);
+        onSelect(eventKey, e);
+      };
+
+      return (<MenuItem key={`${type}-${widget.id}`} onSelect={_onSelect}>{title(widget)}</MenuItem>);
+    }), [onSelect, pluginWidgetActions, widget]);
 
   return extraWidgetActions.length > 0
     ? (
