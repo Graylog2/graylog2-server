@@ -39,6 +39,7 @@ import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.bindings.CustomScopes;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelType;
@@ -339,9 +340,17 @@ public abstract class PluginModule extends Graylog2Module {
             Class<? extends MessageQueueWriter> writerClass,
             Class<? extends MessageQueueAcknowledger> acknowledgerClass) {
 
-        MapBinder.newMapBinder(binder(), String.class, MessageQueueReader.class).addBinding(name).to(readerClass);
-        MapBinder.newMapBinder(binder(), String.class, MessageQueueWriter.class).addBinding(name).to(writerClass);
-        MapBinder.newMapBinder(binder(), String.class, MessageQueueAcknowledger.class).addBinding(name)
-                .to(acknowledgerClass);
+        MapBinder.newMapBinder(binder(), String.class, MessageQueueReader.class)
+                .addBinding(name)
+                .to(readerClass)
+                .in(CustomScopes.LAZY_SINGLETON);
+        MapBinder.newMapBinder(binder(), String.class, MessageQueueWriter.class)
+                .addBinding(name)
+                .to(writerClass)
+                .in(CustomScopes.LAZY_SINGLETON);
+        MapBinder.newMapBinder(binder(), String.class, MessageQueueAcknowledger.class)
+                .addBinding(name)
+                .to(acknowledgerClass)
+                .in(CustomScopes.LAZY_SINGLETON);
     }
 }

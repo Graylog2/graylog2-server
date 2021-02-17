@@ -10,7 +10,7 @@ import java.util.Map;
 @Singleton
 public class MessageQueueImplProvider<T> implements Provider<T> {
 
-    private final T impl;
+    private final Provider<T> provider;
 
     @Inject
     public MessageQueueImplProvider(BaseConfiguration config, Map<String, Provider<T>> providerMap) {
@@ -20,11 +20,11 @@ public class MessageQueueImplProvider<T> implements Provider<T> {
                     "Invalid journal mode [" + journalMode + "]. Valid journal modes are: " + providerMap.keySet() +
                             ". Please adjust the setting for \"message_journal_mode\" in your configuration.");
         }
-        impl = providerMap.get(config.getMessageJournalMode()).get();
+        provider = providerMap.get(config.getMessageJournalMode());
     }
 
     @Override
     public T get() {
-        return impl;
+        return provider.get();
     }
 }

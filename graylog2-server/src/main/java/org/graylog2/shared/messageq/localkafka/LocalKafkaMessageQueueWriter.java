@@ -25,6 +25,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractService;
+import org.graylog2.bindings.LazySingleton;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.KafkaJournal;
@@ -36,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Lists.transform;
 
-@Singleton
+@LazySingleton
 public class LocalKafkaMessageQueueWriter extends AbstractService implements MessageQueueWriter {
     private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaMessageQueueWriter.class);
 
