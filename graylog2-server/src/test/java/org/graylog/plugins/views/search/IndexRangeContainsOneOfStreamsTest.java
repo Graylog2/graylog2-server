@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search;
 
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.streams.Stream;
 import org.junit.Rule;
@@ -102,7 +103,7 @@ public class IndexRangeContainsOneOfStreamsTest {
 
     @Test
     public void closedIndexRangeShouldNotMatchIfNotContainingStreamId() {
-        when(indexRange.streamIds()).thenReturn(Collections.singletonList("stream3"));
+        when(indexRange.streamIds()).thenReturn(ImmutableSet.of("stream3"));
         when(stream1.getId()).thenReturn("stream1");
         when(stream2.getId()).thenReturn("stream2");
 
@@ -117,7 +118,7 @@ public class IndexRangeContainsOneOfStreamsTest {
 
     @Test
     public void closedIndexRangeShouldNotMatchIfNotContainingAnyStreamId() {
-        when(indexRange.streamIds()).thenReturn(Collections.emptyList());
+        when(indexRange.streamIds()).thenReturn(Collections.emptySet());
         when(stream1.getId()).thenReturn("stream1");
         when(stream2.getId()).thenReturn("stream2");
 

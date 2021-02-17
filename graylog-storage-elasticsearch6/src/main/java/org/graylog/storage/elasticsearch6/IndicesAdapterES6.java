@@ -66,10 +66,10 @@ import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
@@ -99,7 +99,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
 
 public class IndicesAdapterES6 implements IndicesAdapter {
@@ -352,9 +352,9 @@ public class IndicesAdapterES6 implements IndicesAdapter {
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
         final TermsAggregation streams = f.getTermsAggregation("streams");
-        final List<String> streamIds = streams.getBuckets().stream()
+        final Set<String> streamIds = streams.getBuckets().stream()
                 .map(TermsAggregation.Entry::getKeyAsString)
-                .collect(toList());
+                .collect(toSet());
 
 
         return IndexRangeStats.create(min, max, streamIds);

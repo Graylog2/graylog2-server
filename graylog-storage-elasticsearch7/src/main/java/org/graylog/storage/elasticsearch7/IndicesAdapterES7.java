@@ -86,7 +86,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
@@ -434,9 +434,9 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
         final Terms streams = f.getAggregations().get("streams");
-        final List<String> streamIds = streams.getBuckets().stream()
+        final Set<String> streamIds = streams.getBuckets().stream()
                 .map(MultiBucketsAggregation.Bucket::getKeyAsString)
-                .collect(toList());
+                .collect(toSet());
 
         return IndexRangeStats.create(min, max, streamIds);
     }
