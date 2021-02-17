@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { fireEvent } from '@testing-library/dom';
+import { fireEvent } from '@testing-library/react';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
