@@ -61,7 +61,7 @@ const GraylogThemeProvider = ({ children }) => {
     setCustomizedThemeColors(merge({}, customizedThemeColors, newColors));
   };
 
-  const theme = useMemo(() => generateTheme({ mode, changeMode, customizedThemeColors }),
+  const theme: DefaultTheme = useMemo(() => generateTheme({ mode, changeMode, customizedThemeColors }),
     [mode, customizedThemeColors, changeMode]);
 
   return (
