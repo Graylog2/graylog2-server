@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 import merge from 'lodash/merge';
@@ -30,35 +30,39 @@ import useCurrentThemeMode from './UseCurrentThemeMode';
 
 const customizedTheme = AppConfig.customTheme();
 
-const GraylogThemeProvider = ({ children }) => {
-  const [mode, changeMode] = useCurrentThemeMode();
+const generateTheme = ({ changeMode, customizedThemeColors, mode }) => {
+  const currentTheme = merge({}, colors[mode], customizedThemeColors[mode]);
 
-  const updatableTheme = (newColors: any) => {
-    console.log(newColors);
+  const formattedUtils = {
+    ...utils,
+    colorLevel: utils.colorLevel(currentTheme),
+    readableColor: utils.readableColor(currentTheme),
   };
 
-  const theme = useCallback((): DefaultTheme => {
-    const currentTheme = merge(colors[mode], customizedTheme[mode]);
+  return {
+    mode,
+    changeMode,
+    breakpoints,
+    colors: currentTheme,
+    fonts,
+    components: {
+      button: buttonStyles({ colors: currentTheme, utils: formattedUtils }),
+      aceEditor: aceEditorStyles({ colors: currentTheme }),
+    },
+    utils: formattedUtils,
+  };
+};
 
-    const formattedUtils = {
-      ...utils,
-      colorLevel: utils.colorLevel(currentTheme),
-      readableColor: utils.readableColor(currentTheme),
-    };
+const GraylogThemeProvider = ({ children }) => {
+  const [mode, changeMode] = useCurrentThemeMode();
+  const [customizedThemeColors, setCustomizedThemeColors] = useState(customizedTheme);
 
-    return {
-      mode,
-      changeMode,
-      breakpoints,
-      colors: currentTheme,
-      fonts,
-      components: {
-        button: buttonStyles({ colors: currentTheme, utils: formattedUtils }),
-        aceEditor: aceEditorStyles({ colors: currentTheme }),
-      },
-      utils: formattedUtils,
-    };
-  }, [mode, changeMode]);
+  const updatableTheme = (newColors: any) => {
+    setCustomizedThemeColors(merge({}, customizedThemeColors, newColors));
+  };
+
+  const theme = useMemo(() => generateTheme({ mode, changeMode, customizedThemeColors }),
+    [mode, customizedThemeColors, changeMode]);
 
   return (
     <UpdatableThemeContext.Provider value={{ updatableTheme }}>
