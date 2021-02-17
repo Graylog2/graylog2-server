@@ -21,6 +21,8 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.util.Duration;
 
 public class DurationCastedToIntegerValidator implements Validator<Duration> {
+    private static final Duration maximumValue = Duration.days(24);
+
     /**
      * Validates if the value {@literal value} of the provided configuration parameter {@literal name} is a positive
      * {@link Duration}, that is not higher than 24 days. This constraint is related to the duration (in milliseconds)
@@ -33,7 +35,7 @@ public class DurationCastedToIntegerValidator implements Validator<Duration> {
      */
     @Override
     public void validate(String name, Duration value) throws ValidationException {
-        if (value != null && (value.getQuantity() < 0L || value.toMilliseconds() > Integer.MAX_VALUE)) {
+        if (value != null && (value.getQuantity() < 0L || value.toMilliseconds() > maximumValue.toMilliseconds())) {
             throw new ValidationException("Parameter " + name + " should be positive and not higher than 24 days (found " + value + ")");
         }
     }
