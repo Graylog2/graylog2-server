@@ -88,7 +88,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.colors.global.link};
   }
 
-  a:hover {
+  a:hover,
+  a:focus {
     color: ${theme.colors.global.linkHover};
   }
 
