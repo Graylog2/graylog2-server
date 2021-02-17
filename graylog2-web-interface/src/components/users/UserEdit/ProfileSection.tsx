@@ -23,13 +23,15 @@ import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-import FullNameFormGroup from '../UserCreate/FullNameFormGroup';
+import FirstNameFormGroup from '../UserCreate/FirstNameFormGroup';
+import LastNameFormGroup from '../UserCreate/LastNameFormGroup';
 import EmailFormGroup from '../UserCreate/EmailFormGroup';
 
 type Props = {
   user: User,
   onSubmit: (payload: {
-    full_name: $PropertyType<User, 'fullName'>,
+    first_name: $PropertyType<User, 'firstName'>,
+    last_name: $PropertyType<User, 'lastName'>,
     email: $PropertyType<User, 'email'>,
   }) => Promise<void>,
 };
@@ -40,18 +42,20 @@ const ProfileSection = ({
 }: Props) => {
   const {
     username,
-    fullName,
+    firstName,
+    lastName,
     email,
   } = user;
 
   return (
     <SectionComponent title="Profile">
       <Formik onSubmit={onSubmit}
-              initialValues={{ email, full_name: fullName }}>
+              initialValues={{ email, first_name: firstName, last_name: lastName }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <ReadOnlyFormGroup label="Username" value={username} />
-            <FullNameFormGroup />
+            <FirstNameFormGroup />
+            <LastNameFormGroup />
             <EmailFormGroup />
             <Row className="no-bm">
               <Col xs={12}>

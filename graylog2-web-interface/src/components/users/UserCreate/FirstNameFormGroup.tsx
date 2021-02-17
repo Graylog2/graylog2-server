@@ -18,12 +18,12 @@ import * as React from 'react';
 
 import { FormikFormGroup } from 'components/common';
 
-const FullNameFormGroup = () => (
-  <FormikFormGroup label="Full Name"
-                   name="full_name"
+const FirstNameFormGroup = () => (
+  <FormikFormGroup label="First Name"
+                   name="first_name"
                    maxLength={200}
                    required
-                   help="The user's full name." />
+                   help="The user's first name." />
 );
 
-export default FullNameFormGroup;
+export default FirstNameFormGroup;
