@@ -189,8 +189,8 @@ public class UserImpl extends PersistedImpl implements User {
      */
     @Override
     public void setFullName(final String firstName, final String lastName) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(firstName), "A firstName value is required.");
-        Preconditions.checkArgument(StringUtils.isNotBlank(lastName), "A lastName value is required.");
+        Preconditions.checkArgument(StringUtils.isNotBlank(firstName), "A first_name value is required.");
+        Preconditions.checkArgument(StringUtils.isNotBlank(lastName), "A last_name value is required.");
         fields.put(FIRST_NAME, firstName);
         fields.put(LAST_NAME, lastName);
         fields.put(FULL_NAME, String.format(Locale.ENGLISH, FULL_NAME_FORMAT, firstName, lastName));
