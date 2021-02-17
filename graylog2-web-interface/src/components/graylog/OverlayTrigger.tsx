@@ -31,12 +31,24 @@ type State = {
   show: boolean,
 }
 
-const TriggerWrap = styled.span`
+const TriggerWrap = styled.button`
+  display: inline-block;
+  background: transparent;
+  padding: 0;
+  border: none;
+
+  &::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+`;
+
+const Container = styled.div`
   display: inline-block;
 `;
 
 class OverlayTrigger extends React.Component<Props, State> {
-  targetRef = createRef<HTMLElement>();
+  targetRef = createRef<HTMLButtonElement>();
 
   containerRef = createRef<HTMLElement>();
 
@@ -61,7 +73,7 @@ class OverlayTrigger extends React.Component<Props, State> {
     const toggleShow = () => this.setState({ show: !show });
 
     return (
-      <div ref={() => this.containerRef}>
+      <Container ref={() => this.containerRef}>
         <TriggerWrap ref={this.targetRef}>
           {React.cloneElement(children, { onClick: toggleShow })}
         </TriggerWrap>
@@ -80,7 +92,7 @@ class OverlayTrigger extends React.Component<Props, State> {
             {overlay}
           </Overlay>
         )}
-      </div>
+      </Container>
     );
   }
 }
