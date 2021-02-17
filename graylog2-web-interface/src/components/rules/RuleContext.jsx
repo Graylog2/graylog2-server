@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useEffect, useRef, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -27,6 +27,9 @@ export const PipelineRulesContext = createContext();
 export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   const descriptionRef = useRef();
   const ruleSourceRef = useRef();
+  const [, setAceLoaded] = useState(false);
+
+  const onAceLoaded = () => setAceLoaded(true);
 
   const createAnnotations = (nextErrors) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
@@ -113,6 +116,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
       handleSavePipelineRule,
       ruleSourceRef,
       usedInPipelines,
+      onAceLoaded,
     }}>
       {children}
     </PipelineRulesContext.Provider>
