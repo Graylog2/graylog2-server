@@ -49,16 +49,16 @@ public abstract class UserSummary {
     @JsonProperty
     public abstract String email();
 
-    @Nullable
     @JsonProperty
+    @Nullable
     public abstract String firstName();
 
-    @Nullable
     @JsonProperty
+    @Nullable
     public abstract String lastName();
 
-    @Nullable
     @JsonProperty
+    @Nullable
     public abstract String fullName();
 
     @JsonProperty
