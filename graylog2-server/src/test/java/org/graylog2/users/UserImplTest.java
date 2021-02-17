@@ -74,11 +74,11 @@ public class UserImplTest {
         user = new UserImpl(null, null, null);
         assertThatThrownBy(() -> user.setFullName(null, "Last"))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("A firstName value is required");
+                .hasMessageContaining("A first_name value is required");
 
         assertThatThrownBy(() -> user.setFullName("First", null))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("A lastName value is required");
+                .hasMessageContaining("A last_name value is required");
     }
 
     @Test
