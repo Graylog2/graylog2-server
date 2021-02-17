@@ -182,7 +182,7 @@ const webpackConfig = {
       theme: path.resolve(APP_PATH, 'theme'),
     },
   },
-  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
+  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')] },
   devtool: 'source-map',
   plugins: [
     new UniqueChunkIdPlugin(),

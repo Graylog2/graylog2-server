@@ -22,7 +22,7 @@ import { Alert } from 'components/graylog';
 import { Icon, SortableList } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import DecoratorStyles from '!style-loader!css-loader!./decoratorStyles.css';
 
 const AlertContainer = styled.div`
   margin-bottom: 20px;

@@ -58,7 +58,7 @@
     "reflux": "0.2.13",
     "styled-components": "5.1.1",
     "typescript": "^4.0.5",
-    "webpack": "4.44.2",
+    "webpack": "5.22.0",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "3.3.12",
     "webpack-merge": "4.2.2"
