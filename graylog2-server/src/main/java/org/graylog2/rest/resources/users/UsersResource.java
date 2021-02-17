@@ -707,6 +707,8 @@ public class UsersResource extends RestResource {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
                 user.getFullName(),
                 wildcardPermissions,
                 grnPermissions,

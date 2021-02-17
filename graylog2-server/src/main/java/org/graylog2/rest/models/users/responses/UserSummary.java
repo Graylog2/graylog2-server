@@ -50,6 +50,12 @@ public abstract class UserSummary {
     public abstract String email();
 
     @JsonProperty
+    public abstract String firstName();
+
+    @JsonProperty
+    public abstract String lastName();
+
+    @JsonProperty
     public abstract String fullName();
 
     @JsonProperty
@@ -103,6 +109,8 @@ public abstract class UserSummary {
     public static UserSummary create(@JsonProperty("id") @Nullable String id,
                                      @JsonProperty("username") String username,
                                      @JsonProperty("email") String email,
+                                     @JsonProperty("first_name") @Nullable String firstName,
+                                     @JsonProperty("last_name") @Nullable String lastName,
                                      @JsonProperty("full_name") @Nullable String fullName,
                                      @JsonProperty("permissions") @Nullable List<WildcardPermission> permissions,
                                      @JsonProperty("grn_permissions") @Nullable List<GRNPermission> grnPermissions,
@@ -120,6 +128,8 @@ public abstract class UserSummary {
         return new AutoValue_UserSummary(id,
                                          username,
                                          email,
+                                         firstName,
+                                         lastName,
                                          fullName,
                                          permissions,
                                          grnPermissions,
