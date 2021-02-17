@@ -82,11 +82,9 @@ public interface User extends Persisted {
     void setFullName(String firstName, String lastName);
 
     /**
-     * Set the user's full name.
-     * Starting in Graylog 4.1, this method is no longer supported. Use the {@link #setFullName(String, String)}
-     * method instead.
+     * Set the user's full name. Starting in Graylog 4.1, use of this method is discouraged.
+     * Prefer use of the {@link #setFullName(String, String)} method instead when possible.
      */
-    @Deprecated
     void setFullName(String fullname);
 
     String getHashedPassword();

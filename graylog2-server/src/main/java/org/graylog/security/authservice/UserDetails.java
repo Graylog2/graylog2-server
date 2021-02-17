@@ -46,6 +46,10 @@ public abstract class UserDetails {
 
     public abstract String lastName();
 
+    /**
+     * Some authentication backends only currently support the fullName attribute (and not firstName and lastName),
+     * so it is still optionally available here. Prefer use of only firstName and lastName when available.
+     */
     public abstract String fullName();
 
     public abstract Set<String> defaultRoles();

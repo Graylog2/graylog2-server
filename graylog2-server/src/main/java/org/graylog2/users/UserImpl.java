@@ -197,15 +197,12 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     /**
-     * Set the user's full name.
-     * Starting in Graylog 4.1, this method is no longer supported. Use the {@link #setFullName(String, String)}
-     * method instead.
+     * Set the user's full name. Starting in Graylog 4.1, use of this method is discouraged.
+     * Prefer use of the {@link #setFullName(String, String)} method instead when possible.
      */
     @Override
-    @Deprecated
     public void setFullName(final String fullname) {
-        throw new UnsupportedOperationException("This method is no longer supported. " +
-                                                "Use setFullName(firstName, lastName) instead.");
+        fields.put(FULL_NAME, fullname);
     }
 
     @Override
