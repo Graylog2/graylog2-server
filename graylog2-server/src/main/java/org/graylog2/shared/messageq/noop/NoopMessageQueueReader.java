@@ -16,19 +16,20 @@
  */
 package org.graylog2.shared.messageq.noop;
 
-import com.google.common.util.concurrent.AbstractService;
+import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.shared.messageq.MessageQueueReader;
 
 import javax.inject.Singleton;
 
 @Singleton
-public class NoopMessageQueueReader extends AbstractService implements MessageQueueReader {
-
+public class NoopMessageQueueReader extends AbstractIdleService implements MessageQueueReader {
     @Override
-    protected void doStart() {
+    protected void startUp() throws Exception {
+
     }
 
     @Override
-    protected void doStop() {
+    protected void shutDown() throws Exception {
+
     }
 }

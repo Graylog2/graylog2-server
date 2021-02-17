@@ -24,7 +24,7 @@ import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.AbstractService;
+import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.bindings.LazySingleton;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.journal.Journal;
@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 import static com.google.common.collect.Lists.transform;
 
 @LazySingleton
-public class LocalKafkaMessageQueueWriter extends AbstractService implements MessageQueueWriter {
+public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
     private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaMessageQueueWriter.class);
 
     private KafkaJournal kafkaJournal;
@@ -70,16 +70,6 @@ public class LocalKafkaMessageQueueWriter extends AbstractService implements Mes
                                         @Named("JournalSignal") Semaphore journalFilled) {
         this.kafkaJournal = kafkaJournal;
         this.journalFilled = journalFilled;
-    }
-
-    @Override
-    protected void doStart() {
-
-    }
-
-    @Override
-    protected void doStop() {
-
     }
 
     @Override
@@ -109,6 +99,16 @@ public class LocalKafkaMessageQueueWriter extends AbstractService implements Mes
         LOG.debug("Processed batch, last journal offset: {}, signalling reader.",
                 lastOffset);
         journalFilled.release();
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+
     }
 
     private static class Converter implements Function<RawMessageEvent, Journal.Entry> {

@@ -56,6 +56,8 @@ public class MessageQueueModule extends PluginModule {
             serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
         }
 
+        serviceBinder().addBinding().to(MessageQueueInitializer.class).in(Scopes.SINGLETON);
+
         bind(MessageQueueReader.class)
                 .toProvider(new TypeLiteral<MessageQueueImplProvider<MessageQueueReader>>() {})
                 .in(Scopes.SINGLETON);

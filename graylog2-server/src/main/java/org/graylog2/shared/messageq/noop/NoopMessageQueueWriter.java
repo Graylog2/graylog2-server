@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.messageq.noop;
 
-import com.google.common.util.concurrent.AbstractService;
+import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
@@ -25,18 +25,20 @@ import javax.inject.Singleton;
 import java.util.List;
 
 @Singleton
-public class NoopMessageQueueWriter extends AbstractService implements MessageQueueWriter {
-
-    @Override
-    protected void doStart() {
-    }
-
-    @Override
-    protected void doStop() {
-    }
+public class NoopMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
 
     @Override
     public void write(List<RawMessageEvent> entries) throws MessageQueueException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+
     }
 }

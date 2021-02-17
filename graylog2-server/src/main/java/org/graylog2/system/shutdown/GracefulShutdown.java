@@ -83,6 +83,8 @@ public class GracefulShutdown implements Runnable {
 
     private void doRun(boolean exit) {
         LOG.info("Graceful shutdown initiated.");
+
+        // Trigger a lifecycle change. Some services are listening for those and will halt operation accordingly.
         serverStatus.shutdown();
 
         // Give possible load balancers time to recognize state change. State is DEAD because of HALTING.
