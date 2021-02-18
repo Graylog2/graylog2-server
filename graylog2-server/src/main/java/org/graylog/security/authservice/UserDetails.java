@@ -27,7 +27,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 @AutoValue
 public abstract class UserDetails {
-
     public abstract Optional<String> databaseId();
 
     public abstract String authServiceType();

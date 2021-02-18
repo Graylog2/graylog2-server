@@ -183,9 +183,9 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     /**
-     * Set the user's fullName, firstName, and lastName all together. The fullName is composed with the {@link #FULL_NAME_FORMAT}
+     * Set the user's fullName, firstName, and lastName. The fullName is composed with the {@link #FULL_NAME_FORMAT}
      * @param firstName The user's first name.
-     * @param lastName The users's last name.
+     * @param lastName The user's last name.
      */
     @Override
     public void setFullName(final String firstName, final String lastName) {
