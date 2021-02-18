@@ -69,7 +69,7 @@ const NumberField = createReactClass({
   },
 
   render() {
-    const { field, title, typeName } = this.state;
+    const { field, title, typeName } = this.props;
     const isRequired = !field.is_optional;
     const validationSpecs = this.validationSpec(field);
     const fieldId = `${typeName}-${title}`;
