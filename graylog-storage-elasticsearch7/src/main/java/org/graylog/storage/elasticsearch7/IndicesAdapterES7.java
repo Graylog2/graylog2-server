@@ -87,6 +87,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.graylog.storage.elasticsearch7.ElasticsearchClient.withTimeout;
 
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
@@ -392,7 +393,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .maxNumSegments(maxNumSegments)
                 .flush(true);
 
-        client.execute((c, requestOptions) -> c.indices().forcemerge(request, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().forcemerge(request, withTimeout(requestOptions, timeout)));
     }
 
     @Override

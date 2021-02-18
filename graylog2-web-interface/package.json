@@ -163,7 +163,6 @@
   },
   "resolutions": {
     "jquery": "3.5.1",
-    "jsdom": "15.2.1",
     "upath": "1.0.5",
     "ace-builds": "1.4.12"
   }

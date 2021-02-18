@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.filter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -42,6 +43,7 @@ public abstract class StreamFilter implements Filter {
     @Override
     @Nullable
     @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract Set<Filter> filters();
 
     @Nullable
@@ -50,6 +52,7 @@ public abstract class StreamFilter implements Filter {
 
     @Nullable
     @JsonProperty("title")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract String streamTitle();
 
     public static Builder builder() {
