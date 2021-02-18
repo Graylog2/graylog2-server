@@ -32,6 +32,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -81,7 +82,7 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
             }
 
             @Override
-            protected void retain(String indexName, IndexSet indexSet) {
+            protected void retain(List<String> indexName, IndexSet indexSet) {
 
             }
 
@@ -104,9 +105,9 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
     public void shouldRetainOldestIndex() throws Exception {
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
         verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).isEqualTo("index1");
+        assertThat(retainedIndexName.getValue()).containsExactly("index1");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
@@ -117,12 +118,12 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
-        verify(retentionStrategy, times(2)).retain(retainedIndexName.capture(), eq(indexSet));
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
         // Ensure that the oldest indices come first
-        assertThat(retainedIndexName.getAllValues()).containsExactly("index1", "index2");
+        assertThat(retainedIndexName.getAllValues().get(0)).containsExactly("index1", "index2");
 
-        verify(activityWriter, times(3)).write(any(Activity.class));
+        verify(activityWriter, times(2)).write(any(Activity.class));
     }
 
     @Test
@@ -131,7 +132,7 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        verify(retentionStrategy, never()).retain(anyString(), eq(indexSet));
+        verify(retentionStrategy, never()).retain(any(List.class), eq(indexSet));
 
         verify(activityWriter, never()).write(any(Activity.class));
     }
@@ -143,9 +144,9 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
         verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).isEqualTo("index2");
+        assertThat(retainedIndexName.getValue()).containsExactly("index2");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
@@ -160,9 +161,9 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
         verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).isEqualTo("index2");
+        assertThat(retainedIndexName.getValue()).containsExactly("index2");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
