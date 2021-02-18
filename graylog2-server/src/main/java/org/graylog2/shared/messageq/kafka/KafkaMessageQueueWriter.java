@@ -16,106 +16,93 @@
  */
 package org.graylog2.shared.messageq.kafka;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.AbstractService;
+import com.google.common.util.concurrent.AbstractIdleService;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.buffers.RawMessageEvent;
-import org.graylog2.shared.journal.Journal;
-import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 
-import static com.google.common.collect.Lists.transform;
+import static org.graylog2.shared.messageq.kafka.KafkaMessageQueueConfiguration.KAFKA_MESSAGE_QUEUE_BOOTSTRAP_SERVERS;
 
 @Singleton
-public class KafkaMessageQueueWriter extends AbstractService implements MessageQueueWriter {
+public class KafkaMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaMessageQueueWriter.class);
+    public static final String MESSAGE_INPUT_TOPIC = "message-input";
+    private KafkaProducer<String, byte[]> producer;
+    private final Properties props;
+    private final String topic;
+    private final NodeId nodeId;
 
-    private KafkaJournal kafkaJournal;
-    private Semaphore journalFilled;
-
-    private static final Retryer<Void> JOURNAL_WRITE_RETRYER = RetryerBuilder.<Void>newBuilder()
-            .retryIfException(new Predicate<Throwable>() {
-                @Override
-                public boolean apply(@Nullable Throwable input) {
-                    LOG.error("Unable to write to journal - retrying with exponential back-off", input);
-                    return true;
-                }
-            })
-            .withWaitStrategy(WaitStrategies.exponentialWait(250, 1, TimeUnit.MINUTES))
-            .withStopStrategy(StopStrategies.neverStop())
-            .build();
-
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     @Inject
-    public KafkaMessageQueueWriter(KafkaJournal kafkaJournal,
-                                   @Named("JournalSignal") Semaphore journalFilled) {
-        this.kafkaJournal = kafkaJournal;
-        this.journalFilled = journalFilled;
+    public KafkaMessageQueueWriter(NodeId nodeId,
+                                   @Named(KAFKA_MESSAGE_QUEUE_BOOTSTRAP_SERVERS) String kafkaMessageQueueBootstrapServers) {
+        this.nodeId = nodeId;
+
+        props = new Properties();
+        props.put("bootstrap.servers", kafkaMessageQueueBootstrapServers);
+        props.put("acks", "all"); //TODO tune maybe set to 1?
+        props.put("batch.size", 1024 * 1024 * 2); // bytes!
+        props.put("retries", 100000); //TODO
+        props.put("linger.ms", 200); // time before we send out batches
+        props.put("compression.type", "gzip");
+        //props.put("buffer.memory", 1024 * 1024 * 32); //default 32MB
+        props.put("max.block.ms", Long.MAX_VALUE); // default 1 minute
+        props.put("client.id", "graylog-node-" + this.nodeId.toString());
+        //max.in.flight.requests.per.connection  // default 5
+        //props.put("enable.idempotence", true); // exactly once delivery
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+
+        this.topic = MESSAGE_INPUT_TOPIC;
     }
 
     @Override
-    protected void doStart() {
+    protected void startUp() throws Exception {
+        LOG.info("Starting Kafka message queue writer service for topic: {}", topic);
+        producer = new KafkaProducer<String, byte[]>(props);
 
+        // Service is ready for writing
+        latch.countDown();
     }
 
     @Override
-    protected void doStop() {
+    protected void shutDown() throws Exception {
+        producer.close();
 
     }
 
     @Override
     public void write(List<RawMessageEvent> entries) throws MessageQueueException {
-        final Converter converter = new Converter();
-        final ArrayList<Journal.Entry> journalEntries = Lists.newArrayList(transform(entries, converter));
-
         try {
-            writeToJournal(journalEntries);
-        } catch (Exception e) {
-            LOG.error("Unable to write to journal - retrying", e);
-
-            // Use retryer with exponential back-off to avoid spamming the logs.
-            try {
-                JOURNAL_WRITE_RETRYER.call(() -> {
-                    writeToJournal(journalEntries);
-                    return null;
-                });
-            } catch (ExecutionException | RetryException ex) {
-                throw new MessageQueueException("Retryer exception", ex);
-            }
+            latch.await();
+        } catch (InterruptedException e) {
+            LOG.info("Got interrupted", e);
+            Thread.currentThread().interrupt();
+            return;
         }
-    }
-
-    private void writeToJournal(List<Journal.Entry> entries) {
-        final long lastOffset = kafkaJournal.write(entries);
-        LOG.debug("Processed batch, last journal offset: {}, signalling reader.",
-                lastOffset);
-        journalFilled.release();
-    }
-
-    private static class Converter implements Function<RawMessageEvent, Journal.Entry> {
-        @Nullable
-        @Override
-        public Journal.Entry apply(@Nullable RawMessageEvent input) {
-            return new Journal.Entry(input.getMessageIdBytes(), input.getEncodedRawMessage());
+        if (!isRunning()) {
+            throw new MessageQueueException("Message queue service is not running");
         }
+        for (final RawMessageEvent entry : entries) {
+
+            final ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, entry.getEncodedRawMessage());
+            final Future<RecordMetadata> future = producer.send(record);
+        }
+
     }
 }

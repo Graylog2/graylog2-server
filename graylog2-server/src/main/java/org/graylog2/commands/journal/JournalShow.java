@@ -18,7 +18,7 @@ package org.graylog2.commands.journal;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import kafka.log.LogSegment;
+import org.graylog.shaded.kafka09.log.LogSegment;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

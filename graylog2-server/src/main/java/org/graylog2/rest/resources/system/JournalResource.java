@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.github.joschi.jadconfig.util.Size;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import kafka.log.LogSegment;
+import org.graylog.shaded.kafka09.log.LogSegment;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;

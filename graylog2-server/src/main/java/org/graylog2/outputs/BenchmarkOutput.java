@@ -21,6 +21,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -47,6 +48,7 @@ public class BenchmarkOutput implements MessageOutput {
     private final Meter messagesWritten;
     private final CsvReporter csvReporter;
     private final MessageQueueAcknowledger messageQueueAcknowledger;
+    private final Timer ackTime;
 
     @AssistedInject
     public BenchmarkOutput(final MetricRegistry metricRegistry,
@@ -60,6 +62,7 @@ public class BenchmarkOutput implements MessageOutput {
     public BenchmarkOutput(final MetricRegistry metricRegistry, MessageQueueAcknowledger messageQueueAcknowledger) {
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
+        this.ackTime = metricRegistry.timer(name(this.getClass(), "ackTime"));
 
         final File directory = new File("benchmark-csv");
         //noinspection ResultOfMethodCallIgnored
@@ -90,7 +93,9 @@ public class BenchmarkOutput implements MessageOutput {
 
     @Override
     public void write(Message message) throws Exception {
-        messageQueueAcknowledger.acknowledge(message.getMessageQueueId());
+        try (final Timer.Context ignored = ackTime.time()) {
+            messageQueueAcknowledger.acknowledge(message.getMessageQueueId());
+        }
         messagesWritten.mark();
     }
 

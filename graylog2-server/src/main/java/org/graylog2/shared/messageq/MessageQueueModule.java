@@ -19,6 +19,7 @@ package org.graylog2.shared.messageq;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.shared.messageq.kafka.KafkaMessageQueueModule;
+import org.graylog2.shared.messageq.localkafka.LocalKafkaMessageQueueModule;
 import org.graylog2.shared.messageq.noop.NoopMessagequeueModule;
 import org.graylog2.shared.messageq.pulsar.PulsarMessageQueueModule;
 
@@ -34,6 +35,9 @@ public class MessageQueueModule extends PluginModule {
         if (configuration.isMessageJournalEnabled()) {
             switch (configuration.getMessageJournalMode()) {
                 case DISK:
+                    install(new LocalKafkaMessageQueueModule());
+                    break;
+                case KAFKA:
                     install(new KafkaMessageQueueModule());
                     break;
                 case PULSAR:
