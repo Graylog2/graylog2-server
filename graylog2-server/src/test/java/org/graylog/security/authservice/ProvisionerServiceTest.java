@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ public class ProvisionerServiceTest {
         detailsBuilder
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
-                .base64AuthServiceUid(new String(Base64.getEncoder().encode("id".getBytes())))
+                .base64AuthServiceUid(new String(Base64.getEncoder().encode("id".getBytes(StandardCharsets.UTF_8))))
                 .username(USERNAME)
                 .accountIsEnabled(true)
                 .email(EMAIL)
@@ -101,7 +102,7 @@ public class ProvisionerServiceTest {
         assertNotNull(detailsBuilder);
         detailsBuilder
                 .fullName(FULL_NAME)
-                .base64AuthServiceUid(new String(Base64.getEncoder().encode("id".getBytes())))
+                .base64AuthServiceUid(new String(Base64.getEncoder().encode("id".getBytes(StandardCharsets.UTF_8))))
                 .username(USERNAME)
                 .accountIsEnabled(true)
                 .email(EMAIL)

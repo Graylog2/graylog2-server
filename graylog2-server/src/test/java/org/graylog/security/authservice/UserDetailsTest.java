@@ -18,6 +18,7 @@ package org.graylog.security.authservice;
 
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashSet;
 
@@ -54,7 +55,8 @@ public class UserDetailsTest {
         return UserDetails.builder()
                           .authServiceType("auth-type")
                           .authServiceId("auth-id")
-                          .base64AuthServiceUid(new String(Base64.getEncoder().encode("uid".getBytes())))
+                          .base64AuthServiceUid(new String(Base64.getEncoder()
+                                                                 .encode("uid".getBytes(StandardCharsets.UTF_8))))
                           .username("username")
                           .accountIsEnabled(true)
                           .email("email@graylog.com")

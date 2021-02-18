@@ -39,6 +39,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -255,7 +256,7 @@ public class MigrationHelpersTest {
     @Test
     public void deprecatedEnsureUserFullName() {
         assertThatThrownBy(() -> migrationHelpers.ensureUser("username", "password", "Full Name", "email",
-                                                             Collections.EMPTY_SET))
+                                                             new HashSet<>()))
                 .isExactlyInstanceOf(UnsupportedOperationException.class);
     }
 
