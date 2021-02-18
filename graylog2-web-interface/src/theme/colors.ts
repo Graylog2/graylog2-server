@@ -28,7 +28,6 @@ export type Colors = {
   global: {
     background: string,
     contentBackground: string,
-    inputBackground: string,
     link: string,
     linkHover: string,
     navigationBackground: string,
@@ -56,6 +55,7 @@ export type Colors = {
     boxShadow: string,
     color: string,
     colorDisabled: string,
+    placeholder: string,
   },
   table: {
     background: string,
