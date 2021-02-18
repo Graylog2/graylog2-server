@@ -70,7 +70,6 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
 
     @Override
     public void retain(List<String> indexNames, IndexSet indexSet) {
-
         indexNames.forEach(indexName -> {
                     final Stopwatch sw = Stopwatch.createStarted();
 

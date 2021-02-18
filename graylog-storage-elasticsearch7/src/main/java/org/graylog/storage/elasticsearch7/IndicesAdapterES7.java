@@ -245,7 +245,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public long numberOfMessages(String index) {
         final JsonNode result = statsApi.indexStats(index);
-        return result.path("primaries").path("docs").path("count").asLong();
+        return result.path("_all").path("primaries").path("docs").path("count").asLong();
     }
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {

@@ -100,8 +100,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
                 .collect(Collectors.toCollection(LinkedList::new)).descendingIterator().
                 forEachRemaining(orderedIndicesDescending::add);
 
-
-        String indexNamesAsString = String.join(",", orderedIndicesDescending);
+        String indexNamesAsString = String.join(", ", orderedIndicesDescending);
 
         final String strategyName = this.getClass().getCanonicalName();
         final String msg = "Running retention strategy [" + strategyName + "] for indices <" + indexNamesAsString + ">";
