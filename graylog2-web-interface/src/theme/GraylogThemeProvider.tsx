@@ -59,28 +59,30 @@ const generateTheme = ({ changeMode, customizedThemeColors, mode }) => {
     };
   }
 
+  const currentThemeColors = {
+    ...currentTheme,
+    gray: grayColors,
+    global: globalColors,
+    input: inputColors,
+    table: tableColors,
+    variant: variantColors,
+  };
+
   const formattedUtils = {
     ...utils,
-    colorLevel: utils.colorLevel(currentTheme),
-    readableColor: utils.readableColor(currentTheme),
+    colorLevel: utils.colorLevel(currentThemeColors),
+    readableColor: utils.readableColor(currentThemeColors),
   };
 
   return {
     mode,
     changeMode,
     breakpoints,
-    colors: {
-      ...currentTheme,
-      gray: grayColors,
-      global: globalColors,
-      input: inputColors,
-      table: tableColors,
-      variant: variantColors,
-    },
+    colors: currentThemeColors,
     fonts,
     components: {
-      button: buttonStyles({ colors: currentTheme, utils: formattedUtils }),
-      aceEditor: aceEditorStyles({ colors: currentTheme }),
+      button: buttonStyles({ colors: currentThemeColors, utils: formattedUtils }),
+      aceEditor: aceEditorStyles({ colors: currentThemeColors }),
     },
     utils: formattedUtils,
   };
