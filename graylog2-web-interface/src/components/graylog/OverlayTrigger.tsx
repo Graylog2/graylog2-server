@@ -34,16 +34,8 @@ type State = {
   show: boolean,
 }
 
-const TriggerWrap = styled.button`
+const TriggerWrap = styled.span`
   display: inline-block;
-  background: transparent;
-  padding: 0;
-  border: none;
-
-  &::-moz-focus-inner {
-    border: 0;
-    padding: 0;
-  }
 `;
 
 const Container = styled.div`
@@ -103,7 +95,7 @@ class OverlayTrigger extends React.Component<Props, State> {
 
     return (
       <Container ref={() => this.containerRef}>
-        <TriggerWrap ref={this.targetRef} className={children.props.className}>
+        <TriggerWrap ref={this.targetRef} className={children.props.className} role="button">
           {React.cloneElement(children, { ...triggerables, className: '' })}
         </TriggerWrap>
 
