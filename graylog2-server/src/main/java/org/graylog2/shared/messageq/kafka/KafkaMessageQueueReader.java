@@ -27,12 +27,14 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.messageq.AbstractMessageQueueReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.time.Duration;
@@ -44,6 +46,7 @@ import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.graylog2.shared.messageq.kafka.KafkaMessageQueueConfiguration.KAFKA_MESSAGE_QUEUE_BOOTSTRAP_SERVERS;
 
 @Singleton
 public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
@@ -57,27 +60,35 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
     private ProcessBuffer processBuffer;
     private final Properties props;
     private volatile ConcurrentHashMap<TopicPartition, Long> commitableOffsets;
+    private final NodeId nodeId;
+    private final String topic;
 
     @Inject
     public KafkaMessageQueueReader(MetricRegistry metricRegistry,
                                    Provider<ProcessBuffer> processBufferProvider,
-                                   EventBus eventBus) {
+                                   EventBus eventBus,
+                                   NodeId nodeId,
+                                   @Named(KAFKA_MESSAGE_QUEUE_BOOTSTRAP_SERVERS) String kafkaMessageQueueBootstrapServers) {
         super(eventBus);
 
         // Using a ProcessBuffer directly will lead to guice error:
         // "Please wait until after injection has completed to use this object."
         this.processBufferProvider = processBufferProvider;
+        this.nodeId = nodeId;
 
         props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
-        props.put("client.id", "node-id"); // TODO what to use?
-        props.put("group.id", "test"); // TODO what to use?
+        props.put("bootstrap.servers", kafkaMessageQueueBootstrapServers);
+        props.put("client.id", "graylog-node-" + nodeId.toString());
+        props.put("group.id", "message-input");
+
         props.put("enable.auto.commit", "false");
         props.put("session.timeout.ms", "30000");
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         props.put("auto.offset.reset", "earliest");
-        // max.poll.records
+        //props.put("max.poll.records", xxx); //The maximum number of records returned in a single call to poll(). Default 500
+
+        this.topic = KafkaMessageQueueWriter.MESSAGE_INPUT_TOPIC;
 
         commitableOffsets = new ConcurrentHashMap<>();
 
@@ -91,7 +102,7 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
         LOG.info("Starting Kafka message queue reader service");
 
         this.consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(ImmutableList.of("message-input"));
+        consumer.subscribe(ImmutableList.of(topic));
 
         processBuffer = processBufferProvider.get();
         // Service is ready for consuming
@@ -148,34 +159,27 @@ public class KafkaMessageQueueReader extends AbstractMessageQueueReader {
         this.commitableOffsets = new ConcurrentHashMap<>();
 
         final Map<TopicPartition, OffsetAndMetadata> commitMap = copy.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> new OffsetAndMetadata(v.getValue() + 1)));
+
         try (Timer.Context ignored = ackTimer.time()){
             consumer.commitSync(commitMap);
         }
     }
 
-    // TODO
-    //    public void commit(List<Object> messageIds) {
-    //        messageIds.stream().filter(KafkaMessageQueueEntry.CommitId.class::isInstance).map(e -> {
-    //            final KafkaMessageQueueEntry.CommitId commitId = (KafkaMessageQueueEntry.CommitId) e;
-    //        })
-    //    }
-
     public void commit(Object object) {
-        if (object instanceof KafkaMessageQueueEntry.CommitId) {
-            final KafkaMessageQueueEntry.CommitId commitId = (KafkaMessageQueueEntry.CommitId) object;
-
-            commitableOffsets.compute(commitId.getTopicPartition(), (partition, offset) -> {
-                if (offset == null) {
-                    return commitId.getOffset();
-                }
-                if (offset >= commitId.getOffset()) {
-                    return offset;
-                }
-                return commitId.getOffset();
-            });
-        } else {
+        if (!(object instanceof KafkaMessageQueueEntry.CommitId)) {
             LOG.error("Couldn't acknowledge message. Expected <" + object + "> to be a KafkaMessageQueueEntry.CommitId");
+            return;
         }
-    }
+        final KafkaMessageQueueEntry.CommitId commitId = (KafkaMessageQueueEntry.CommitId) object;
 
+        commitableOffsets.compute(commitId.getTopicPartition(), (partition, offset) -> {
+            if (offset == null) {
+                return commitId.getOffset();
+            }
+            if (offset >= commitId.getOffset()) {
+                return offset;
+            }
+            return commitId.getOffset();
+        });
+    }
 }

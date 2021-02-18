@@ -16,13 +16,17 @@
  */
 package org.graylog2.shared.messageq.kafka;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Scopes;
+import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
+
+import java.util.Set;
 
 public class KafkaMessageQueueModule extends PluginModule {
     @Override
@@ -34,5 +38,10 @@ public class KafkaMessageQueueModule extends PluginModule {
         bind(MessageQueueAcknowledger.class).to(KafkaMessageQueueAcknowledger.class).in(Scopes.SINGLETON);
 
         binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
+    }
+
+    @Override
+    public Set<? extends PluginConfigBean> getConfigBeans() {
+        return ImmutableSet.of(new KafkaMessageQueueConfiguration());
     }
 }
