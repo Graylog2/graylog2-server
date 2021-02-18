@@ -87,6 +87,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.graylog.storage.elasticsearch7.ElasticsearchClient.withTimeout;
 
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
@@ -245,7 +246,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public long numberOfMessages(String index) {
         final JsonNode result = statsApi.indexStats(index);
-        return result.path("primaries").path("docs").path("count").asLong();
+        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
+        if (count.isMissingNode()) {
+            throw new RuntimeException("Unable to extract count from response.");
+        }
+        return count.asLong();
     }
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {
@@ -392,7 +397,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .maxNumSegments(maxNumSegments)
                 .flush(true);
 
-        client.execute((c, requestOptions) -> c.indices().forcemerge(request, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().forcemerge(request, withTimeout(requestOptions, timeout)));
     }
 
     @Override
