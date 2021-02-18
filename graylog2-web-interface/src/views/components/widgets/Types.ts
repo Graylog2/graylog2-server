@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+
 import { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
 import Widget from 'views/logic/widgets/Widget';
 
@@ -25,7 +27,7 @@ export type WidgetAction = (w: Widget, contexts: Contexts) => unknown;
 
 export type WidgetActionType = {
   type: string,
-  title: (w: Widget) => string,
+  title: (w: Widget) => React.ReactNode,
   isHidden?: (w: Widget) => boolean,
   action: WidgetAction,
 };
