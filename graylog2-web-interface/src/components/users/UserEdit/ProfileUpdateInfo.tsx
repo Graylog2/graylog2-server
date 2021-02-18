@@ -19,11 +19,11 @@ import * as React from 'react';
 import { Alert } from 'components/graylog';
 import { Icon } from 'components/common';
 
-const PermissionsUpdateInfo = () => (
+const ProfileUpdateInfo = () => (
   <Alert bsStyle="info">
     <Icon name="info-circle" />{' '}<b> First and Last Name</b><br />
-    With Graylog 4.1, we&apos;ve added distinct First Name and Last Name fields. These must be provided before the user’s Profile can be saved.
+    With Graylog 4.1, we&apos;ve added distinct first and last name fields. These must be provided before the user’s profile can be saved.
   </Alert>
 );
 
-export default PermissionsUpdateInfo;
+export default ProfileUpdateInfo;

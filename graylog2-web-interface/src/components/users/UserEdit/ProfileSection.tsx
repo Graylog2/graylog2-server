@@ -60,7 +60,7 @@ const ProfileSection = ({
 
   return (
     <SectionComponent title="Profile">
-      {isOldUser && <ProfileUpdateInfo />}
+      {isOldUser() && <ProfileUpdateInfo />}
       <Formik onSubmit={onSubmit}
               initialValues={{ email, first_name: firstName, last_name: lastName }}>
         {({ isSubmitting, isValid }) => (
