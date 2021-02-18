@@ -87,13 +87,13 @@ class CachesOverview extends React.Component {
         <p><strong>Examples</strong></p>
         <p>
           Find caches by parts of their names:<br />
-          <kbd>name:guava</kbd><br />
-          <kbd>name:gua</kbd>
+          <code>name:guava</code><br />
+          <code>name:gua</code>
         </p>
         <p>
           Searching without a field name matches against the <code>title</code> field:<br />
-          <kbd>guava</kbd> <br />is the same as<br />
-          <kbd>title:guava</kbd>
+          <code>guava</code> <br />is the same as<br />
+          <code>title:guava</code>
         </p>
       </Popover>
     );

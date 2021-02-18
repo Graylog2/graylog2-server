@@ -39,7 +39,7 @@ const sharedEntitiesQueryHelperPopover = (
     <p><strong>Examples</strong></p>
     <p>
       Find shared entities with a title containing security:<br />
-      <kbd>title:security</kbd><br />
+      <code>title:security</code><br />
     </p>
   </Popover>
 );

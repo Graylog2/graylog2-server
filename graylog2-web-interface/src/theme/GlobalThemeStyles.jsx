@@ -657,9 +657,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 6px;
   }
 
-  code {
-    color: ${theme.colors.variant.darker.danger};
+  code,
+  kbd {
+    color: ${theme.colors.variant.darker.default};
     background-color: ${theme.colors.variant.lightest.danger};
+    font-size: ${theme.fonts.size.small};
   }
 
   pre {
