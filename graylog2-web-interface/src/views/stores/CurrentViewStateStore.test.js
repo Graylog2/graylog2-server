@@ -81,7 +81,7 @@ describe('CurrentViewStateStore', () => {
 
     const newWidgetPositionDead = WidgetPosition.builder()
       .col(1)
-      .row(6)
+      .row(2)
       .height(5)
       .width(6)
       .build();
@@ -129,7 +129,7 @@ describe('CurrentViewStateStore', () => {
 
     const expectedWidgets = [widgetOne];
     const expectedViewState = viewState.toBuilder()
-      .widgetPositions({ 'widget-one': widgetOnePos })
+      .widgetPositions({ 'widget-one': widgetOnePos.toBuilder().row(widgetOnePos.row + 1).build() })
       .widgets(expectedWidgets)
       .build();
     const updateFn = mockAction(jest.fn(() => Promise.resolve(expectedViewState)));
