@@ -80,7 +80,13 @@ describe('ExtraWidgetActions', () => {
 
     await userEvent.click(menuItem);
 
-    await waitFor(() => expect(dummyActionWhichIsNotHidden.action).toHaveBeenCalledWith(widget));
+    await waitFor(() => expect(dummyActionWhichIsNotHidden.action)
+      .toHaveBeenCalledWith(widget, expect.objectContaining({
+        widgetFocusContext: expect.objectContaining({
+          focusedWidget: undefined,
+          setFocusedWidget: expect.any(Function),
+        }),
+      })));
   });
 
   it('clicking menu item triggers `onSelect` to close menu', async () => {
