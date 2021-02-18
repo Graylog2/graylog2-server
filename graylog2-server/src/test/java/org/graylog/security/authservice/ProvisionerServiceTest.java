@@ -78,7 +78,7 @@ public class ProvisionerServiceTest {
         detailsBuilder
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
-                .base64AuthServiceUid(new String(Base64.getEncoder().encode("id".getBytes(StandardCharsets.UTF_8))))
+                .base64AuthServiceUid("id")
                 .username(USERNAME)
                 .accountIsEnabled(true)
                 .email(EMAIL)
@@ -102,7 +102,7 @@ public class ProvisionerServiceTest {
         assertNotNull(detailsBuilder);
         detailsBuilder
                 .fullName(FULL_NAME)
-                .base64AuthServiceUid(new String(Base64.getEncoder().encode("id".getBytes(StandardCharsets.UTF_8))))
+                .base64AuthServiceUid("id")
                 .username(USERNAME)
                 .accountIsEnabled(true)
                 .email(EMAIL)
