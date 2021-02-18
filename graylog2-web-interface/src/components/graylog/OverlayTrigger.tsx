@@ -18,7 +18,6 @@ import * as React from 'react';
 import { createRef } from 'react';
 import { Overlay, Transition } from 'react-overlays';
 import styled from 'styled-components';
-import assign from 'lodash/assign';
 
 type Triggers = 'click' | 'focus' | 'hover';
 
@@ -71,6 +70,7 @@ class OverlayTrigger extends React.Component<Props, State> {
   }
 
   render() {
+    let triggerables;
     const { children, container, placement, overlay, rootClose, trigger, ...overlayProps } = this.props;
     const { show } = this.state;
 
@@ -91,14 +91,14 @@ class OverlayTrigger extends React.Component<Props, State> {
       },
     };
 
-    let triggerables = _onTrigger[trigger];
-
     if (Array.isArray(trigger)) {
       const multipleTriggers = {};
 
       trigger.forEach((triggerType) => {
-        triggerables = assign(multipleTriggers, _onTrigger[triggerType]);
+        triggerables = Object.assign(multipleTriggers, _onTrigger[triggerType]);
       });
+    } else {
+      triggerables = _onTrigger[trigger];
     }
 
     return (
