@@ -15,31 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
 import Widget from 'views/logic/widgets/Widget';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { MenuItem } from 'components/graylog';
+import WidgetFocusContext, { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
 
 type Props = {
   onSelect: (eventKey: string, e: MouseEvent) => void,
   widget: Widget,
 };
 
+type Contexts = {
+  widgetFocusContext: WidgetFocusContextType,
+};
+
 type WidgetAction = {
   type: string,
   title: (w: Widget) => string,
   isHidden?: (w: Widget) => boolean,
-  action: (w: Widget) => unknown,
+  action: (w: Widget, contexts: Contexts) => unknown,
 };
 
 const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
+  const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = usePluginEntities<WidgetAction>('views.widgets.actions');
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
     .map(({ title, action, type }) => {
       const _onSelect = (eventKey: string, e: MouseEvent) => {
-        action(widget);
+        action(widget, { widgetFocusContext });
         onSelect(eventKey, e);
       };
 
