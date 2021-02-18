@@ -28,6 +28,7 @@ export type SearchBarFormValues = {
 export const TIMESTAMP_FIELD = 'timestamp';
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, 'source'];
 export const MESSAGE_FIELD = 'message';
+export const SOURCE_FIELD = 'source';
 export const RELATIVE_ALL_TIME = 0; // value for time range `range` property, which represents all time
 export const Messages = {
   DEFAULT_LIMIT: 150,
