@@ -176,7 +176,7 @@ public class UserImpl extends PersistedImpl implements User {
         final Object firstName = fields.get(FIRST_NAME);
         final Object lastName = fields.get(LAST_NAME);
         if (firstName != null && lastName != null ) {
-            return String.format(Locale.ENGLISH, "%s %s", firstName, lastName);
+            return String.format(Locale.ENGLISH, FULL_NAME_FORMAT, firstName, lastName);
         }
 
         return String.valueOf(fields.get(FULL_NAME));
