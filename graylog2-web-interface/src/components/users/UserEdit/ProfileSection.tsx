@@ -17,22 +17,30 @@
 import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { $PropertyType } from 'utility-types';
+import styled from 'styled-components';
 
 import { Button, Col, Row } from 'components/graylog';
 import { ReadOnlyFormGroup } from 'components/common';
 import User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-import FullNameFormGroup from '../UserCreate/FullNameFormGroup';
+import ProfileUpdateInfo from './ProfileUpdateInfo';
+
+import FirstNameFormGroup from '../UserCreate/FirstNameFormGroup';
+import LastNameFormGroup from '../UserCreate/LastNameFormGroup';
 import EmailFormGroup from '../UserCreate/EmailFormGroup';
 
 type Props = {
   user: User,
   onSubmit: (payload: {
-    full_name: $PropertyType<User, 'fullName'>,
+    first_name: $PropertyType<User, 'firstName'>,
+    last_name: $PropertyType<User, 'lastName'>,
     email: $PropertyType<User, 'email'>,
   }) => Promise<void>,
 };
+const StyledReadOnlyFormGroup = styled(ReadOnlyFormGroup)`
+  padding-bottom: 15px;
+`;
 
 const ProfileSection = ({
   user,
@@ -41,17 +49,26 @@ const ProfileSection = ({
   const {
     username,
     fullName,
+    firstName,
+    lastName,
     email,
   } = user;
 
+  const isOldUser = () => {
+    return fullName && (!firstName && !lastName);
+  };
+
   return (
     <SectionComponent title="Profile">
+      {isOldUser() && <ProfileUpdateInfo />}
       <Formik onSubmit={onSubmit}
-              initialValues={{ email, full_name: fullName }}>
+              initialValues={{ email, first_name: firstName, last_name: lastName }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <ReadOnlyFormGroup label="Username" value={username} />
-            <FullNameFormGroup />
+            <StyledReadOnlyFormGroup label="Username" value={username} />
+            {isOldUser() && <StyledReadOnlyFormGroup label="Full Name" value={fullName} />}
+            <FirstNameFormGroup />
+            <LastNameFormGroup />
             <EmailFormGroup />
             <Row className="no-bm">
               <Col xs={12}>
