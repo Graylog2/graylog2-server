@@ -95,6 +95,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .fullName(user.getFullName())
                 // No need to set default roles because MongoDB users will not be provisioned by the provisioner
                 .defaultRoles(Collections.emptySet())
                 .base64AuthServiceUid(Base64.encode(user.getId()))
