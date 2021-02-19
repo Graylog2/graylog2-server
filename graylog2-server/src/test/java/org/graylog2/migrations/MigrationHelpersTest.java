@@ -39,8 +39,10 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -249,6 +251,13 @@ public class MigrationHelpersTest {
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
                                                                                    "54e3deadbeefdeadbeef0002")))
                 .isNull();
+    }
+
+    @Test
+    public void deprecatedEnsureUserFullName() {
+        assertThatThrownBy(() -> migrationHelpers.ensureUser("username", "password", "Full Name", "email",
+                                                             new HashSet<>()))
+                .isExactlyInstanceOf(UnsupportedOperationException.class);
     }
 
     private User newUser(Permissions permissions) {
