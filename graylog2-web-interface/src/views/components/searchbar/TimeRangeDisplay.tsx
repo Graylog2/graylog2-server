@@ -42,7 +42,6 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.primary};
   align-items: center;
   border-radius: 4px;
-  cursor: pointer;
 
   > span {
     flex: 1;
