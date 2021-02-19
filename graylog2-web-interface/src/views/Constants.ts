@@ -25,6 +25,7 @@ export type SearchBarFormValues = {
   queryString: string,
 };
 
+export const FULL_MESSAGE_FIELD = 'full_message';
 export const TIMESTAMP_FIELD = 'timestamp';
 export const MESSAGE_FIELD = 'message';
 export const SOURCE_FIELD = 'source';
