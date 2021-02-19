@@ -35,7 +35,6 @@ import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
-import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<any>,
@@ -100,7 +99,6 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                      setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                      currentTimeRange={values?.timerange}
                                      hasErrorOnMount={!isValid} />
-              <TimeRangeDisplay timerange={values?.timerange} />
             </FlexCol>
 
             <Col md={8}>

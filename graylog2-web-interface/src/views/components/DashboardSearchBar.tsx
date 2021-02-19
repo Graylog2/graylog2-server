@@ -38,7 +38,6 @@ import { SearchesConfig } from 'components/search/SearchConfig';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 const FlexCol = styled(Col)`
   display: flex;
@@ -83,7 +82,6 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                            currentTimeRange={values?.timerange}
                                            hasErrorOnMount={!isValid}
                                            noOverride />
-                    <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
                   <Col lg={4} md={3} xs={2}>
                     <RefreshControls />

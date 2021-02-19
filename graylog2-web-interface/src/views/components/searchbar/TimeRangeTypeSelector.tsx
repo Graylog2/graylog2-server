@@ -22,6 +22,7 @@ import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
+import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {
   currentTimeRange: TimeRange | NoTimeRangeOverride,
@@ -37,15 +38,18 @@ const TimeRangeTypeSelector = ({ disabled, hasErrorOnMount, noOverride, currentT
   const toggleShow = () => setShow(!show);
 
   return (
-    <TimeRangeDropdownButton disabled={disabled}
-                             show={show}
-                             toggleShow={toggleShow}
-                             hasErrorOnMount={hasErrorOnMount}>
-      <TimeRangeDropdown currentTimeRange={currentTimeRange}
-                         noOverride={noOverride}
-                         setCurrentTimeRange={setCurrentTimeRange}
-                         toggleDropdownShow={toggleShow} />
-    </TimeRangeDropdownButton>
+    <>
+      <TimeRangeDropdownButton disabled={disabled}
+                               show={show}
+                               toggleShow={toggleShow}
+                               hasErrorOnMount={hasErrorOnMount}>
+        <TimeRangeDropdown currentTimeRange={currentTimeRange}
+                           noOverride={noOverride}
+                           setCurrentTimeRange={setCurrentTimeRange}
+                           toggleDropdownShow={toggleShow} />
+      </TimeRangeDropdownButton>
+      <TimeRangeDisplay timerange={currentTimeRange} toggleDropdownShow={toggleShow} />
+    </>
   );
 };
 
