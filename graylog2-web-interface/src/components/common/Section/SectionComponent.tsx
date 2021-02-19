@@ -25,7 +25,6 @@ type Props = {
   title: string,
   showLoading?: boolean,
   headerActions?: React.ReactElement,
-  className?: string,
 };
 
 const Header = styled.div`
@@ -48,8 +47,8 @@ const LoadingSpinner = styled(Spinner)(({ theme }) => css`
   font-size: ${theme.fonts.size.h3};
 `);
 
-const SectionComponent = ({ children, title, showLoading = false, headerActions, className }: Props) => (
-  <Row className={`content ${className}`}>
+const SectionComponent = ({ children, title, showLoading = false, headerActions }: Props) => (
+  <Row className="content">
     <Col xs={12}>
       <Header>
         <Headline>
@@ -64,7 +63,6 @@ const SectionComponent = ({ children, title, showLoading = false, headerActions,
 );
 
 SectionComponent.defaultProps = {
-  className: '',
   showLoading: false,
   headerActions: undefined,
 };
