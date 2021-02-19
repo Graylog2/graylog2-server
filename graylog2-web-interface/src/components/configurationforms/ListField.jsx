@@ -63,6 +63,8 @@ class ListField extends React.Component {
     const { field } = this.state;
     const { typeName } = this.state;
     const { value } = this.state;
+    const fieldId = `${typeName}-${field.title}`;
+
     const isRequired = !field.is_optional;
     const allowCreate = field.attributes.includes('allow_create');
     const options = (field.additional_info && field.additional_info.values ? field.additional_info.values : {});
@@ -70,13 +72,13 @@ class ListField extends React.Component {
 
     return (
       <div className="form-group">
-        <label htmlFor={`${typeName}-${field.title}`}>
+        <label htmlFor={fieldId}>
           {field.human_name}
 
           {FieldHelpers.optionalMarker(field)}
         </label>
 
-        <MultiSelect id={field.title}
+        <MultiSelect id={fieldId}
                      required={isRequired}
                      autoFocus={this.props.autoFocus}
                      options={formattedOptions}
