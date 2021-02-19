@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
+import styled, { css } from 'styled-components';
 
 import { ListGroupItem } from 'components/graylog';
 
@@ -25,6 +26,14 @@ import Icon from './Icon';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import SortableListItemStyle from '!style!css!components/common/SortableListItem.css';
+
+const ContentContainer = styled.div`
+  display: flex;
+`;
+
+const Handle = styled.div`
+  margin-right: 5px;
+`;
 
 const ItemTypes = {
   ITEM: 'item',
@@ -50,6 +59,7 @@ const itemTarget = {
     }
 
     // Determine rectangle on screen
+    // eslint-disable-next-line react/no-find-dom-node
     const hoverBoundingRect = ReactDOM.findDOMNode(component).getBoundingClientRect();
 
     // Get vertical middle
@@ -82,6 +92,7 @@ const itemTarget = {
     // Generally it's better to avoid mutations,
     // but it's good here for the sake of performance
     // to avoid expensive index searches.
+    // eslint-disable-next-line no-param-reassign
     monitor.getItem().index = hoverIndex;
   },
 };
@@ -111,19 +122,27 @@ class SortableListItem extends React.Component {
     connectDropTarget: PropTypes.func.isRequired,
     content: PropTypes.any.isRequired,
     disableDragging: PropTypes.bool,
+    // Is used via DnD libray
+    // eslint-disable-next-line react/no-unused-prop-types
     index: PropTypes.number.isRequired,
     isDragging: PropTypes.bool.isRequired,
     isOver: PropTypes.bool.isRequired,
+    // Is used via DnD libray
+    // eslint-disable-next-line react/no-unused-prop-types
     id: PropTypes.any.isRequired,
+    // Is used via DnD libray
+    // eslint-disable-next-line react/no-unused-prop-types
     moveItem: PropTypes.func.isRequired,
+    customContentRender: PropTypes.func,
   };
 
   static defaultProps = {
     disableDragging: false,
+    customContentRender: undefined,
   };
 
   render() {
-    const { content, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
+    const { content, isDragging, isOver, connectDragSource, connectDropTarget, disableDragging, customContentRender } = this.props;
     const classes = [SortableListItemStyle.listGroupItem];
 
     if (isDragging) {
@@ -134,22 +153,24 @@ class SortableListItem extends React.Component {
       classes.push('over');
     }
 
-    const handle = <span className={SortableListItemStyle.itemHandle}><Icon name="sort" /></span>;
+    const finalContent = customContentRender ? customContentRender(content) : content;
+
+    const handle = <Handle className={SortableListItemStyle.itemHandle}><Icon name="sort" /></Handle>;
 
     const component = (
       <div>
         <div>
           <ListGroupItem className={classes.join(' ')}>
-            <div>
-              {this.props.disableDragging ? null : handle}
-              {content}
-            </div>
+            <ContentContainer>
+              {disableDragging ? null : handle}
+              {finalContent}
+            </ContentContainer>
           </ListGroupItem>
         </div>
       </div>
     );
 
-    return this.props.disableDragging ? component : connectDragSource(connectDropTarget(component));
+    return disableDragging ? component : connectDragSource(connectDropTarget(component));
   }
 }
 
