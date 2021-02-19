@@ -23,6 +23,8 @@ import ProfileSection from './ProfileSection';
 const exampleUser = alice.toBuilder()
   .username('johndoe')
   .fullName('John Doe')
+  .firstName('John')
+  .lastName('Doe')
   .email('johndoe@example.org')
   .build();
 
@@ -43,7 +45,8 @@ describe('<ProfileSection />', () => {
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
     expect(onSubmitStub).toHaveBeenCalledWith({
-      full_name: exampleUser.fullName,
+      first_name: exampleUser.firstName,
+      last_name: exampleUser.lastName,
       email: exampleUser.email,
     });
   });
@@ -52,18 +55,21 @@ describe('<ProfileSection />', () => {
     const onSubmitStub = jest.fn();
     render(<ProfileSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
 
-    const fullNameInput = screen.getByLabelText('Full Name');
+    const firstNameInput = screen.getByLabelText('First Name');
+    const lastNameInput = screen.getByLabelText('Last Name');
     const emailInput = screen.getByLabelText('E-Mail Address');
     const submitButton = screen.getByText('Update Profile');
 
-    fireEvent.change(fullNameInput, { target: { value: 'New full name' } });
+    fireEvent.change(firstNameInput, { target: { value: 'New first name' } });
+    fireEvent.change(lastNameInput, { target: { value: 'New last name' } });
     fireEvent.change(emailInput, { target: { value: 'newfullname@example.org' } });
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
     expect(onSubmitStub).toHaveBeenCalledWith({
-      full_name: 'New full name',
+      first_name: 'New first name',
+      last_name: 'New last name',
       email: 'newfullname@example.org',
     });
   });
