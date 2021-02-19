@@ -66,7 +66,7 @@ describe('SearchBar', () => {
     render(<SearchBar config={config} />);
 
     const timeRangeButton = screen.getByLabelText('Open Time Range Selector');
-    const timeRangeDisplay = screen.getByLabelText('Search Time Range');
+    const timeRangeDisplay = screen.getByLabelText('Search Time Range, Opens Time Range Selector On Click');
     const streamsFilter = screen.getByTestId('streams-filter');
     const liveUpdate = screen.getByLabelText('Refresh Search Controls');
     const searchButton = screen.getByTitle('Perform search');
