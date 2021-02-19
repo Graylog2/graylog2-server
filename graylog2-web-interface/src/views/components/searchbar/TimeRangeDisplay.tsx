@@ -120,7 +120,7 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
   }, [dateTested, timerange]);
 
   return (
-    <TimeRangeWrapper aria-label="Search Time Range" onClick={toggleDropdownShow}>
+    <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>
       {!(timerange && 'type' in timerange)
         ? <span><code>No Override</code></span>
         : (
