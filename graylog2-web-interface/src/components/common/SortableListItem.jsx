@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { ListGroupItem } from 'components/graylog';
 
