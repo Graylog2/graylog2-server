@@ -147,8 +147,10 @@ const TableHead = styled.thead(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
 
-  th {
+  && > tr > th {
     min-width: 50px;
+    min-height: 28px;
+    padding: 0 5px;
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;
