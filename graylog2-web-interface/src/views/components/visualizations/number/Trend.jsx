@@ -25,8 +25,9 @@ const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivEleme
   return css`
     text-align: right;
     ${trend && css`
-      background-color: ${bgColor};
+      background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${util.contrastingColor(bgColor)};
+      -webkit-print-color-adjust: exact !important; /* Needed for report generation */
     `}
   `;
 });
