@@ -27,9 +27,7 @@ import Icon from './Icon';
 type Option = { [key: string]: any };
 
 const MultiValueRemove = (props) => (
-  <Components.MultiValueRemove {...props}>
-    &times;
-  </Components.MultiValueRemove>
+  <Components.MultiValueRemove {...props} />
 );
 
 const IndicatorSeparator = () => null;
