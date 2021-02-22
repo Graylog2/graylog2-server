@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inject;
+package org.graylog2.web.resources;
 
-import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.inject.Graylog2Module;
 
-@AutoValue
-public abstract class RestControllerPackage {
-    public abstract String name();
-
-    public static RestControllerPackage create(String name) {
-        return new AutoValue_RestControllerPackage(name);
+public class WebResourcesModule extends Graylog2Module {
+    @Override
+    protected void configure() {
+        addSystemRestResource(AppConfigResource.class);
+        addSystemRestResource(WebInterfaceAssetsResource.class);
     }
 }

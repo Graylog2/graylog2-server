@@ -16,26 +16,32 @@
  */
 package org.graylog.testing.graylognode;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.stream.StreamSupport;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.graylog.testing.ResourceUtil.resourceToTmpFile;
 import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
 import static org.graylog.testing.graylognode.NodeContainerConfig.DEBUG_PORT;
-import static org.graylog.testing.ResourceUtil.resourceToTmpFile;
 
 public class NodeContainerFactory {
     private static final Logger LOG = LoggerFactory.getLogger(NodeContainerFactory.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @SuppressWarnings("OctalInteger")
     private static final int EXECUTABLE_MODE = 0100755;
@@ -90,7 +96,24 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
-                .waitingFor(Wait.forLogMessage(".*Graylog server up and running.*", 1))
+                .waitingFor(new WaitAllStrategy()
+                        .withStrategy(Wait.forLogMessage(".*Graylog server up and running.*", 1))
+                        // To be able to search for data we need the index ranges to be computed. Since this is an async
+                        // background job, we need to wait until they have been created.
+                        .withStrategy(new HttpWaitStrategy()
+                                .forPort(API_PORT)
+                                .forPath("/api/system/indices/ranges")
+                                .withMethod("GET")
+                                .withBasicCredentials("admin", "admin")
+                                .forResponsePredicate(body -> {
+                                    try {
+                                        return StreamSupport.stream(OBJECT_MAPPER.readTree(body).path("ranges").spliterator(), false)
+                                                // With the default configuration, there should be a least one "graylog_" prefixed index
+                                                .anyMatch(range -> range.path("index_name").asText().startsWith("graylog_"));
+                                    } catch (IOException e) {
+                                        throw new RuntimeException("Couldn't extract response", e);
+                                    }
+                                })))
                 .withExposedPorts(config.portsToExpose())
                 .withStartupTimeout(Duration.of(120, SECONDS));
 
