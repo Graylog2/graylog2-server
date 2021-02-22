@@ -14,17 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { Suspense } from 'react';
 import PropTypes from 'prop-types';
-import loadable from 'loadable-components';
 
-type Props = {
-  error: {
-    message: string;
-  };
+import Spinner from 'components/common/Spinner';
+
+type Error = {
+  message: string;
 };
 
-const ErrorComponent: React.FC<Props> = ({ error }: Props) => <div>Loading component failed: {error.message}</div>;
+type Props = {
+  error: Error;
+};
+
+const ErrorComponent: React.ComponentType<Props> = ({ error }: Props) => <div>Loading component failed: {error.message}</div>;
 
 ErrorComponent.propTypes = {
   error: PropTypes.exact({
@@ -32,4 +36,38 @@ ErrorComponent.propTypes = {
   }).isRequired,
 };
 
-export default <T, >(f: () => Promise<{ default: loadable.DefaultComponent<T> }>) => loadable<T>(() => f().then((c) => c.default), { ErrorComponent });
+class AsyncLoaderErrorBoundary extends React.Component<{ errorComponent: React.ComponentType<Props> }, { error?: Error }> {
+  constructor(props: Readonly<{ errorComponent: React.ComponentType<Props> }>) {
+    super(props);
+    this.state = {};
+  }
+
+  componentDidCatch(error) {
+    this.setState({ error });
+  }
+
+  render() {
+    const { error } = this.state;
+    const { children } = this.props;
+
+    if (error) {
+      const { errorComponent: CustomErrorComponent } = this.props;
+
+      return <CustomErrorComponent error={error} />;
+    }
+
+    return children;
+  }
+}
+
+export default <T, >(f: () => Promise<{ default: React.ComponentType<T> }>) => (props: T) => {
+  const LazyComponent = React.lazy(f);
+
+  return (
+    <AsyncLoaderErrorBoundary errorComponent={ErrorComponent}>
+      <Suspense fallback={<Spinner />}>
+        <LazyComponent {...props} />
+      </Suspense>
+    </AsyncLoaderErrorBoundary>
+  );
+};
