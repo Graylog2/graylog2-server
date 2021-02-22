@@ -17,10 +17,9 @@
 import React, { useRef, useMemo } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
-import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
+import ReactSelect, { components as Components, Creatable as CreatableSelect, createFilter } from 'react-select';
 import { Overlay } from 'react-overlays';
 import { useTheme } from 'styled-components';
-import { createFilter } from 'react-select/lib/filters';
 
 export type Option = { [key: string]: any };
 
