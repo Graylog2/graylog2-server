@@ -33,11 +33,12 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import CSVExportSettings from 'views/components/searchbar/csvexport/CSVExportSettings';
 import CSVExportWidgetSelection from 'views/components/searchbar/csvexport/CSVExportWidgetSelection';
 import CustomPropTypes from 'views/components/CustomPropTypes';
+import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
-const DEFAULT_FIELDS = ['timestamp', 'source', 'message'];
+const DEFAULT_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD];
 
 const Content = styled.div`
   margin-left: 15px;
@@ -54,7 +55,7 @@ export type Props = {
 
 const _getInitialWidgetFields = (selectedWidget) => {
   if (selectedWidget.config.showMessageRow) {
-    return [...new Set([...selectedWidget.config.fields, 'message'])];
+    return [...new Set([...selectedWidget.config.fields, MESSAGE_FIELD])];
   }
 
   return selectedWidget.config.fields;

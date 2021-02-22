@@ -25,6 +25,7 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import { Store } from 'stores/StoreTypes';
+import { MESSAGE_FIELD } from 'views/Constants';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -146,8 +147,8 @@ const MessageTableEntry = ({
         <tr className="message-row" onClick={_toggleDetail}>
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
-              <CustomHighlighting field="message" value={message.fields.message}>
-                <TypeSpecificValue field="message" value={message.fields.message} type={fieldType('message', message, fields)} render={DecoratedValue} />
+              <CustomHighlighting field="message" value={message.fields[MESSAGE_FIELD]}>
+                <TypeSpecificValue field="message" value={message.fields[MESSAGE_FIELD]} type={fieldType(MESSAGE_FIELD, message, fields)} render={DecoratedValue} />
               </CustomHighlighting>
             </div>
           </td>
