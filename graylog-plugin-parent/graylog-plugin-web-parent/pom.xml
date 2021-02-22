@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-parent</artifactId>
-        <version>4.0.4-SNAPSHOT</version>
+        <version>4.0.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-plugin-web-parent</artifactId>
