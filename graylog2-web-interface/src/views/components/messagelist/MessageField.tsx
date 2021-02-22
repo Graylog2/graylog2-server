@@ -23,6 +23,7 @@ import Field from 'views/components/Field';
 import Value from 'views/components/Value';
 import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { FULL_MESSAGE_FIELD } from 'views/Constants';
 
 import DecoratedValue from './decoration/DecoratedValue';
 import type { Message } from './Types';
@@ -30,7 +31,7 @@ import type { Message } from './Types';
 import CustomPropTypes from '../CustomPropTypes';
 import InteractiveContext from '../contexts/InteractiveContext';
 
-const SPECIAL_FIELDS = ['full_message', 'level'];
+const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
 
 type Props = {
   fieldName: string,
