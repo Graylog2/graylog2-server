@@ -83,19 +83,6 @@ public class MigrationHelpers {
         return previousRole.getId();
     }
 
-    /**
-     * This method was deprecated in Graylog 4.1.
-     * Prefer use of the {@link #ensureUser(String, String, String, String, String, Set)} method instead, which sets
-     * both the firstName and lastName.
-     */
-    @Nullable
-    @Deprecated
-    public String ensureUser(String userName, String password, String fullName, String email,
-                             Set<String> expectedRoles) {
-        throw new UnsupportedOperationException("This method is no longer supported. Please use the alternate method " +
-                                                "providing both a firstName and lastName instead of fullName.");
-    }
-
     @Nullable
     public String ensureUser(String userName, String password, String firstName, String lastName, String email,
                              Set<String> expectedRoles) {

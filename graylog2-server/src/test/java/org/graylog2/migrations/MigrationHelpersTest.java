@@ -253,13 +253,6 @@ public class MigrationHelpersTest {
                 .isNull();
     }
 
-    @Test
-    public void deprecatedEnsureUserFullName() {
-        assertThatThrownBy(() -> migrationHelpers.ensureUser("username", "password", "Full Name", "email",
-                                                             new HashSet<>()))
-                .isExactlyInstanceOf(UnsupportedOperationException.class);
-    }
-
     private User newUser(Permissions permissions) {
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(10);
         final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(), passwordAlgorithm);
