@@ -143,7 +143,6 @@
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
     "less-loader": "^7.0.0",
-    "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^2.1.1",
     "react-styleguidist": "^11.0.8",
     "style-loader": "2.0.0",
