@@ -38,8 +38,9 @@ const Background = styled.div<{ trend: string | undefined | null }>(({ theme, tr
   return css`
     text-align: right;
     ${trend && css`
-      background-color: ${bgColor};
+      background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${theme.utils.contrastingColor(bgColor)};
+      -webkit-print-color-adjust: exact !important; /* Needed for report generation */
     `}
   `;
 });
