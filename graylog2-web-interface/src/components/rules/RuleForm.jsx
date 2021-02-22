@@ -33,6 +33,8 @@ const RuleForm = ({ create }) => {
     handleSavePipelineRule,
     ruleSourceRef,
     onAceLoaded,
+    onChangeSource,
+    ruleSource,
   } = useContext(PipelineRulesContext);
 
   const [isDirty, setIsDirty] = useState(false);
@@ -58,8 +60,9 @@ const RuleForm = ({ create }) => {
     handleDescription(event.target.value);
   };
 
-  const handleSourceChange = () => {
+  const handleSourceChange = (newSource) => {
     setIsDirty(true);
+    onChangeSource(newSource);
   };
 
   const handleCancel = () => {
@@ -94,6 +97,7 @@ const RuleForm = ({ create }) => {
                             mode="pipeline"
                             onLoad={onAceLoaded}
                             onChange={handleSourceChange}
+                            value={ruleSource}
                             innerRef={ruleSourceRef} />
         </Input>
       </fieldset>
