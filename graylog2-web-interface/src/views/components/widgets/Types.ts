@@ -16,15 +16,18 @@
  */
 import * as React from 'react';
 
-import { singleton } from 'views/logic/singleton';
+import { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
+import Widget from 'views/logic/widgets/Widget';
 
-export type WidgetFocusContextType = {
-  focusedWidget: string | undefined | null,
-  setFocusedWidget: (focusedWidget: string | undefined | null) => void,
+export type Contexts = {
+  widgetFocusContext: WidgetFocusContextType,
 };
 
-const defaultContext = { focusedWidget: undefined, setFocusedWidget: () => {} };
+export type WidgetAction = (w: Widget, contexts: Contexts) => unknown;
 
-const WidgetFocus = React.createContext<WidgetFocusContextType>(defaultContext);
-
-export default singleton('contexts.WidgetFocus', () => WidgetFocus);
+export type WidgetActionType = {
+  type: string,
+  title: (w: Widget) => React.ReactNode,
+  isHidden?: (w: Widget) => boolean,
+  action: WidgetAction,
+};

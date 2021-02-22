@@ -62,6 +62,7 @@ import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import ReplaySearchButton from './ReplaySearchButton';
+import ExtraWidgetActions from './ExtraWidgetActions';
 
 import CustomPropTypes from '../CustomPropTypes';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -404,6 +405,7 @@ class Widget extends React.Component<Props, State> {
                       <IfDashboard>
                         <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
                       </IfDashboard>
+                      <ExtraWidgetActions widget={widget} onSelect={() => {}} />
                       <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>
