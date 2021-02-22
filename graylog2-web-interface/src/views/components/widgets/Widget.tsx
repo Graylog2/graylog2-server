@@ -307,7 +307,7 @@ class Widget extends React.Component<Props, State> {
 
     if (data) {
       const { editing } = this.state;
-      const { id, widget, height, width, fields } = this.props;
+      const { id, widget, height, width, fields, view: { activeQuery: queryId } } = this.props;
       const { config, filter } = widget;
       const VisComponent = _visualizationForType(widget.type);
 
@@ -318,6 +318,7 @@ class Widget extends React.Component<Props, State> {
                       fields={fields}
                       filter={filter}
                       height={height}
+                      queryId={queryId}
                       onConfigChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}
                       setLoadingState={this._setLoadingState}
                       title={title}
