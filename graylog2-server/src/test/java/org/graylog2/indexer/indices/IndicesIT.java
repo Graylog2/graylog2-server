@@ -441,4 +441,11 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         assertThat(healthStatus).isEqualTo(HealthStatus.Red);
     }
+
+    @Test
+    public void numberOfMessagesReturnsCorrectSize() {
+        importFixture("org/graylog2/indexer/indices/IndicesIT.json");
+
+        assertThat(indices.numberOfMessages("graylog_0")).isEqualTo(10);
+    }
 }

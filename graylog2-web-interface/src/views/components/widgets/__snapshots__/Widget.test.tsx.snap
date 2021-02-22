@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports['<Widget /> should render with empty props 1'] = `
+exports[`<Widget /> should render with empty props 1`] = `
 .c2 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -19,16 +19,16 @@ exports['<Widget /> should render with empty props 1'] = `
   border: 0;
   background-color: transparent;
   cursor: pointer;
-  color: #b4b4b4;
+  color: #9b9b9b;
   font-size: 1.125rem;
 }
 
 .c2:hover {
-  background-color: #e6e6e6;
+  background-color: #cdcdcd;
 }
 
 .c2:active {
-  background-color: #cdcdcd;
+  background-color: #b4b4b4;
 }
 
 .c0 {

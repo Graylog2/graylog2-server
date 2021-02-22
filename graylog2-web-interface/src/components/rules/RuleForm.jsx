@@ -32,6 +32,7 @@ const RuleForm = ({ create }) => {
     handleDescription,
     handleSavePipelineRule,
     ruleSourceRef,
+    onAceLoaded,
   } = useContext(PipelineRulesContext);
 
   const [isDirty, setIsDirty] = useState(false);
@@ -91,6 +92,7 @@ const RuleForm = ({ create }) => {
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
                             mode="pipeline"
+                            onLoad={onAceLoaded}
                             onChange={handleSourceChange}
                             innerRef={ruleSourceRef} />
         </Input>

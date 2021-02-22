@@ -281,6 +281,10 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
   color: rgb(88,73,5);
 }
 
+.c3 {
+  display: inline-block;
+}
+
 .c2 {
   display: inline-block;
 }
@@ -347,35 +351,49 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
             ]
           }
         >
-          <div>
-            <OverlayTrigger__TriggerWrap>
-              <span
-                className="c2"
+          <OverlayTrigger__Container>
+            <div
+              className="c2"
+            >
+              <OverlayTrigger__TriggerWrap
+                className="c1 "
+                role="button"
               >
-                <Icon
-                  className="c1 "
-                  name="question-circle"
-                  onClick={[Function]}
-                  type="solid"
+                <span
+                  className="c3 c1 "
+                  role="button"
                 >
-                  <FontAwesomeIcon
-                    className="c1 "
-                    icon={
-                      Object {
-                        "iconName": "question-circle",
-                        "prefix": "fas",
-                      }
-                    }
-                    onClick={[Function]}
+                  <Icon
+                    className=""
+                    name="question-circle"
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    type="solid"
                   >
-                    <svg
-                      className="svg-inline--fa fa-question-circle"
-                    />
-                  </FontAwesomeIcon>
-                </Icon>
-              </span>
-            </OverlayTrigger__TriggerWrap>
-          </div>
+                    <FontAwesomeIcon
+                      className=""
+                      icon={
+                        Object {
+                          "iconName": "question-circle",
+                          "prefix": "fas",
+                        }
+                      }
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseEnter={[Function]}
+                      onMouseLeave={[Function]}
+                    >
+                      <svg
+                        className="svg-inline--fa fa-question-circle"
+                      />
+                    </FontAwesomeIcon>
+                  </Icon>
+                </span>
+              </OverlayTrigger__TriggerWrap>
+            </div>
+          </OverlayTrigger__Container>
         </OverlayTrigger>
       </HoverForHelp>
     </SharingDisabledPopover__StyledHoverForHelp>
