@@ -75,7 +75,6 @@ public class JournalShow extends AbstractJournalCommand {
             sb.append("\t\t").append("Segment ").append(i++).append("\n");
             sb.append("\t\t\t").append("Base offset: ").append(segment.baseOffset()).append("\n");
             sb.append("\t\t\t").append("Size in bytes: ").append(segment.size()).append("\n");
-            sb.append("\t\t\t").append("Created at: ").append(new DateTime(segment.created(), DateTimeZone.UTC)).append("\n");
             sb.append("\t\t\t").append("Last modified: ").append(new DateTime(segment.lastModified(), DateTimeZone.UTC)).append("\n");
         }
     }

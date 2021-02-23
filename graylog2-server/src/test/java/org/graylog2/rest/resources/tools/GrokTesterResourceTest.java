@@ -22,6 +22,7 @@ import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.system.stats.mongo.HostInfo;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,6 +71,7 @@ public class GrokTesterResourceTest {
     public void testGrokWithInvalidPattern() {
         final GrokTesterResponse response = resource.grokTest("%{NUMBER", "abc 1234", false);
         assertThat(response.matched()).isFalse();
+        System.out.println(response.pattern());
         assertThat(response.pattern()).isEqualTo("%{NUMBER");
         assertThat(response.string()).isEqualTo("abc 1234");
         assertThat(response.errorMessage()).startsWith("Illegal repetition near index 0");

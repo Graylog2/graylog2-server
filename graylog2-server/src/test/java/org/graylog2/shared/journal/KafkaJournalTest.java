@@ -22,10 +22,8 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
-import kafka.common.KafkaException;
+import org.apache.kafka.common.KafkaException;
 import kafka.log.LogSegment;
-import kafka.message.Message;
-import kafka.message.MessageSet;
 import kafka.utils.FileLock;
 import org.graylog2.Configuration;
 import org.graylog2.audit.NullAuditEventSender;
@@ -238,7 +236,7 @@ public class KafkaJournalTest {
 
         final byte[] idBytes0 = randomAlphanumeric(6).getBytes(UTF_8);
         // Build a message that has exactly the max segment size
-        final String largeMessage2 = randomAlphanumeric(Ints.saturatedCast(segmentSize.toBytes() - MessageSet.LogOverhead() - Message.MessageOverhead() - idBytes0.length));
+        final String largeMessage2 = randomAlphanumeric(Ints.saturatedCast(segmentSize.toBytes() - idBytes0.length));
         list.add(journal.createEntry(idBytes0, largeMessage2.getBytes(UTF_8)));
 
         while (size <= maxSize) {

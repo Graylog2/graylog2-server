@@ -75,7 +75,7 @@ public class JournalResource extends RestResource {
 
             long oldestSegment = Long.MAX_VALUE;
             for (final LogSegment segment : kafkaJournal.getSegments()) {
-                oldestSegment = Math.min(oldestSegment, segment.created());
+                oldestSegment = Math.min(oldestSegment, segment.lastModified());
             }
 
             return JournalSummaryResponse.createEnabled(throttleState.appendEventsPerSec,

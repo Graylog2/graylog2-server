@@ -29,22 +29,14 @@ import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Uninterruptibles;
 import kafka.common.KafkaException;
-import kafka.common.OffsetOutOfRangeException;
-import kafka.common.TopicAndPartition;
-import kafka.log.CleanerConfig;
-import kafka.log.Log;
-import kafka.log.LogAppendInfo;
-import kafka.log.LogConfig;
-import kafka.log.LogManager;
-import kafka.log.LogSegment;
-import kafka.message.ByteBufferMessageSet;
-import kafka.message.Message;
-import kafka.message.MessageAndOffset;
-import kafka.message.MessageSet;
-import kafka.server.BrokerState;
-import kafka.server.RunningAsBroker;
+import kafka.log.*;
+import kafka.server.*;
+import org.apache.kafka.clients.consumer.OffsetOutOfRangeException;
+import org.apache.kafka.common.TopicPartition;
 import kafka.utils.KafkaScheduler;
-import kafka.utils.Time;
+import org.apache.kafka.common.record.*;
+import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.common.utils.SystemTime;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
@@ -56,29 +48,22 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
+import scala.Tuple2;
+import scala.collection.*;
 import scala.collection.Iterator;
-import scala.collection.JavaConversions;
-import scala.collection.Map$;
 import scala.runtime.AbstractFunction1;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.SyncFailedException;
-import java.io.UncheckedIOException;
+import java.io.*;
+import java.lang.Iterable;
+import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -124,7 +109,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     // This exists so we can use JodaTime's millis provider in tests.
     // Kafka really only cares about the milliseconds() method in here.
-    private static final Time JODA_TIME = new Time() {
+    private static final Time JODA_TIME = new SystemTime() {
         @Override
         public long milliseconds() {
             return DateTimeUtils.currentTimeMillis();
@@ -267,7 +252,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 // minInSyncReplicas If number of insync replicas drops below this number, we stop accepting writes with -1 (or all) required acks
                 .put(LogConfig.MinInSyncReplicasProp(), 1)
                 .build();
-        final LogConfig defaultConfig = new LogConfig(config);
+        final LogConfig defaultConfig = new LogConfig(config, new scala.collection.immutable.HashSet<String>());
 
         // these are the default values as per kafka 0.8.1.1, except we don't turn on the cleaner
         // Cleaner really is log compaction with respect to "deletes" in the log.
@@ -315,8 +300,11 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             brokerState.newState(RunningAsBroker.state());
             kafkaScheduler = new KafkaScheduler(2, "kafka-journal-scheduler-", false); // TODO make thread count configurable
             kafkaScheduler.startup();
+            List<File> files = new ArrayList<File>();
+            files.add(journalDirectory.toFile());
             logManager = new LogManager(
-                    new File[]{journalDirectory.toFile()},
+                    JavaConversions.asScalaBuffer(files),
+                    Seq$.MODULE$.<File[]>empty(),
                     Map$.MODULE$.<String, LogConfig>empty(),
                     defaultConfig,
                     cleanerConfig,
@@ -324,14 +312,18 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     SECONDS.toMillis(60L),
                     SECONDS.toMillis(60L),
                     SECONDS.toMillis(60L),
+                    SECONDS.toMillis(60L),
+                    60000, // TODO
                     kafkaScheduler, // Broker state
                     brokerState,
+                    new BrokerTopicStats(),
+                    new LogDirFailureChannel(60),
                     JODA_TIME);
 
-            final TopicAndPartition topicAndPartition = new TopicAndPartition("messagejournal", 0);
-            final Option<Log> messageLog = logManager.getLog(topicAndPartition);
+            final TopicPartition topicPartition = new TopicPartition("messagejournal", 0);
+            final Option<Log> messageLog = logManager.getLog(topicPartition, false);
             if (messageLog.isEmpty()) {
-                kafkaLog = logManager.createLog(topicAndPartition, logManager.defaultConfig());
+                kafkaLog = logManager.getOrCreateLog(topicPartition, defaultConfig, true, false);
             } else {
                 kafkaLog = messageLog.get();
             }
@@ -350,7 +342,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 public Date getValue() {
                     long oldestSegment = Long.MAX_VALUE;
                     for (final LogSegment segment : KafkaJournal.this.getSegments()) {
-                        oldestSegment = Math.min(oldestSegment, segment.created());
+                        oldestSegment = Math.min(oldestSegment, segment.largestTimestamp());
                     }
 
                     return new Date(oldestSegment);
@@ -476,16 +468,18 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             long messageSetSize = 0L;
             long lastWriteOffset = 0L;
 
-            final List<Message> messages = new ArrayList<>(entries.size());
+            int messageCount = 0;
+            List<SimpleRecord> records = new ArrayList<SimpleRecord>();
             for (final Entry entry : entries) {
                 final byte[] messageBytes = entry.getMessageBytes();
                 final byte[] idBytes = entry.getIdBytes();
+                SimpleRecord record = new SimpleRecord(messageBytes, idBytes);
+                int sizeEstimate = AbstractRecords.estimateSizeInBytes(RecordBatch.CURRENT_MAGIC_VALUE, CompressionType.GZIP, Arrays.asList(record));
 
                 payloadSize += messageBytes.length;
 
-                final Message newMessage = new Message(messageBytes, idBytes);
                 // Calculate the size of the new message in the message set by including the overhead for the log entry.
-                final int newMessageSize = MessageSet.entrySize(newMessage);
+                final int newMessageSize = sizeEstimate;
 
                 if (newMessageSize > maxMessageSize) {
                     writeDiscardedMessages.mark();
@@ -500,51 +494,51 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 if ((messageSetSize + newMessageSize) > maxSegmentSize) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Flushing {} bytes message set with {} messages to avoid overflowing segment with max size of {} bytes",
-                                messageSetSize, messages.size(), maxSegmentSize);
+                                messageSetSize, messageCount, maxSegmentSize);
                     }
-                    lastWriteOffset = flushMessages(messages, payloadSize);
+                    lastWriteOffset = flushMessages(MemoryRecords.withRecords(CompressionType.GZIP, records.toArray(new SimpleRecord[0])), payloadSize);
                     // Reset the messages list and size counters to start a new batch.
-                    messages.clear();
-                    messageSetSize = 0;
+                    messageCount = 0;
                     payloadSize = 0;
+                    records = new ArrayList<SimpleRecord>();
                 }
-                messages.add(newMessage);
-                messageSetSize += newMessageSize;
+                messageCount += 1;
+                records.add(record);
 
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("Message {} contains bytes {}", bytesToHex(idBytes), bytesToHex(messageBytes));
                 }
             }
 
-            // Flush the rest of the messages.
-            if (messages.size() > 0) {
-                lastWriteOffset = flushMessages(messages, payloadSize);
+            if (records.size() > 0) {
+                lastWriteOffset = flushMessages(MemoryRecords.withRecords(CompressionType.GZIP, records.toArray(new SimpleRecord[0])), payloadSize);
             }
 
             return lastWriteOffset;
         }
     }
 
-    private long flushMessages(List<Message> messages, long payloadSize) {
-        if (messages.isEmpty()) {
+    private long flushMessages(MemoryRecords records, long payloadSize) {
+        if (records.sizeInBytes() <= 0) {
             LOG.debug("No messages to flush, not trying to write an empty message set.");
             return -1L;
         }
 
-        final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages).toSeq());
+        //final ByteBufferMessageSet messageSet = new ByteBuffer(JavaConversions.asScalaBuffer(messages).toSeq());
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Trying to write ByteBufferMessageSet with size of {} bytes to journal", messageSet.sizeInBytes());
+            LOG.debug("Trying to write ByteBufferMessageSet with size of {} bytes to journal", records.sizeInBytes());
         }
 
-        final LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
+        // MemoryRecords records, AppendOrigin origin, ApiVersion interBrokerProtocolVersion, boolean assignOffsets, int leaderEpoch
+        final LogAppendInfo appendInfo = kafkaLog.appendAsFollower(records);
         long lastWriteOffset = appendInfo.lastOffset();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Wrote {} messages to journal: {} bytes (payload {} bytes), log position {} to {}",
-                    messages.size(), messageSet.sizeInBytes(), payloadSize, appendInfo.firstOffset(), lastWriteOffset);
+                    records.firstBatchSize(), records.sizeInBytes(), payloadSize, appendInfo.firstOffset(), lastWriteOffset);
         }
-        writtenMessages.mark(messages.size());
+        writtenMessages.mark(records.sizeInBytes());
 
         return lastWriteOffset;
     }
@@ -591,30 +585,31 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     maximumCount, readOffset, maxOffset);
 
             // TODO benchmark and make read-ahead strategy configurable for performance tuning
-            final MessageSet messageSet = kafkaLog.read(readOffset,
+            final FetchDataInfo messageSet = kafkaLog.read(readOffset,
                     5 * 1024 * 1024,
-                    Option.<Object>apply(maxOffset)).messageSet();
+                    new FetchIsolation() {
+                    }, true);
 
-            final Iterator<MessageAndOffset> iterator = messageSet.iterator();
+            final java.util.Iterator<Record> iterator = messageSet.records().records().iterator();
             long firstOffset = Long.MIN_VALUE;
             long lastOffset = Long.MIN_VALUE;
             long totalBytes = 0;
             while (iterator.hasNext()) {
-                final MessageAndOffset messageAndOffset = iterator.next();
+                final Record messageAndOffset = iterator.next();
 
                 if (firstOffset == Long.MIN_VALUE) firstOffset = messageAndOffset.offset();
                 // always remember the last seen offset for debug purposes below
                 lastOffset = messageAndOffset.offset();
 
-                final byte[] payloadBytes = ByteBufferUtils.readBytes(messageAndOffset.message().payload());
+                final byte[] payloadBytes = ByteBufferUtils.readBytes(messageAndOffset.value());
                 if (LOG.isTraceEnabled()) {
-                    final byte[] keyBytes = ByteBufferUtils.readBytes(messageAndOffset.message().key());
+                    final byte[] keyBytes = ByteBufferUtils.readBytes(messageAndOffset.key());
                     LOG.trace("Read message {} contains {}", bytesToHex(keyBytes), bytesToHex(payloadBytes));
                 }
                 totalBytes += payloadBytes.length;
                 messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
                 // remember where to read from
-                nextReadOffset = messageAndOffset.nextOffset();
+                nextReadOffset = messageAndOffset.offset() + 1; //TODO: get the correct one
             }
             if (messages.isEmpty()) {
                 LOG.debug("No messages available to read for offset interval [{}, {}).", readOffset, maxOffset);
@@ -678,10 +673,11 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     protected void flushDirtyLogs() {
         LOG.debug("Checking for dirty logs to flush...");
 
-        final Set<Map.Entry<TopicAndPartition, Log>> entries = JavaConversions.mapAsJavaMap(logManager.logsByTopicPartition()).entrySet();
-        for (final Map.Entry<TopicAndPartition, Log> topicAndPartitionLogEntry : entries) {
-            final TopicAndPartition topicAndPartition = topicAndPartitionLogEntry.getKey();
-            final Log kafkaLog = topicAndPartitionLogEntry.getValue();
+        final scala.collection.Iterator<Tuple2<TopicPartition, Log>> entriesIter = logManager.kafka$log$LogManager$$currentLogs().toIterator();
+        while (entriesIter.hasNext()) {
+            final Tuple2<TopicPartition, Log> topicAndPartitionLogEntry = entriesIter.next();
+            final TopicPartition topicAndPartition = topicAndPartitionLogEntry._1;
+            final Log kafkaLog = topicAndPartitionLogEntry._2;
             final long timeSinceLastFlush = JODA_TIME.milliseconds() - kafkaLog.lastFlushTime();
             try {
                 LOG.debug(
@@ -723,7 +719,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         // write recovery checkpoint files
         checkpointFlusherFuture = scheduler.scheduleAtFixedRate(recoveryCheckpointFlusher,
                 SECONDS.toMillis(30),
-                logManager.flushCheckpointMs(),
+                logManager.flushRecoveryOffsetCheckpointMs(),
                 MILLISECONDS);
 
 
@@ -911,20 +907,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 KafkaJournal.this.purgedSegmentsInLastRetention.set(0);
                 return 0;
             }
-            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
-                @Override
-                public Object apply(LogSegment segment) {
-                    final long segmentAge = JODA_TIME.milliseconds() - segment.lastModified();
-                    final boolean shouldDelete = segmentAge > kafkaLog.config().retentionMs();
-                    if (shouldDelete) {
-                        loggerForCleaner.debug(
-                                "[cleanup-time] Removing segment with age {}s, older than then maximum retention age {}s",
-                                MILLISECONDS.toSeconds(segmentAge),
-                                MILLISECONDS.toSeconds(kafkaLog.config().retentionMs()));
-                    }
-                    return shouldDelete;
-                }
-            });
+            int deletedSegments = kafkaLog.deleteOldSegments();
             KafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
             return deletedSegments;
         }
@@ -971,23 +954,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 return 0;
             }
             final long[] diff = {currentSize - retentionSize};
-            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() { // sigh scala
-                @Override
-                public Object apply(LogSegment segment) {
-                    if (diff[0] - segment.size() >= 0) {
-                        diff[0] -= segment.size();
-                        loggerForCleaner.debug(
-                                "[cleanup-size] Removing segment starting at offset {}, size {} bytes, to shrink log to new size {}, target size {}",
-                                segment.baseOffset(),
-                                segment.size(),
-                                diff[0],
-                                retentionSize);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            });
+            int deletedSegments = kafkaLog.deleteOldSegments();
             KafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
             return deletedSegments;
         }
@@ -1007,19 +974,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     JavaConversions.asJavaIterable(kafkaLog.logSegments(committedOffset, Long.MAX_VALUE))
             );
             loggerForCleaner.debug("[cleanup-committed] Keeping segments {}", logSegments);
-            return kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
-                @Override
-                public Object apply(LogSegment segment) {
-                    final boolean shouldDelete = !logSegments.contains(segment);
-                    if (shouldDelete) {
-                        loggerForCleaner.debug(
-                                "[cleanup-committed] Should delete segment {} because it is prior to committed offset {}",
-                                segment,
-                                committedOffset);
-                    }
-                    return shouldDelete;
-                }
-            });
+            return kafkaLog.deleteOldSegments();
         }
     }
 
@@ -1027,7 +982,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         @Override
         public void run() {
             try {
-                logManager.checkpointRecoveryPointOffsets();
+                logManager.checkpointLogRecoveryOffsets();
             } catch (Exception e) {
                 LOG.error("Unable to flush checkpoint recovery point offsets. Will try again.", e);
             }
