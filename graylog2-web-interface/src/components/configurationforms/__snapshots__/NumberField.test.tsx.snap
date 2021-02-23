@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<NumberField> should match the snapshot 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <label
+      for="number-number field title"
+    >
+      number field
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <input
+      class="input-xlarge validatable form-control"
+      id="number field title"
+      max="9007199254740991"
+      min="-9007199254740991"
+      type="number"
+      value=""
+    />
+    <p
+      class="help-block"
+    >
+      my number description
+    </p>
+  </div>
+</div>
+`;
