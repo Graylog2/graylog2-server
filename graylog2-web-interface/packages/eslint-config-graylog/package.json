@@ -13,7 +13,7 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0",
   "dependencies": {
-    "@babel/eslint-parser": "7.12.17",
+    "@babel/eslint-parser": "7.13.4",
     "@typescript-eslint/parser": "4.15.0",
     "@typescript-eslint/eslint-plugin": "4.15.0",
     "eslint": "7.20.0",
