@@ -229,6 +229,21 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void testSaveValidationFullName() throws Exception {
+        final User user = userService.create();
+        user.setName("TEST");
+        user.setEmail("test@example.com");
+        user.setTimeZone(DateTimeZone.UTC);
+        user.setPassword("TEST");
+        user.setPermissions(Collections.<String>emptyList());
+        user.setFullName(null);
+
+        assertThatThrownBy(() -> userService.save(user))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A fullName is required.");
+    }
+
+    @Test
     public void testGetAdminUser() throws Exception {
         assertThat(userService.getAdminUser().getName()).isEqualTo(configuration.getRootUsername());
         assertThat(userService.getAdminUser().getEmail()).isEqualTo(configuration.getRootEmail());

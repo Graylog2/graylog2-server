@@ -79,11 +79,18 @@ public interface User extends Persisted {
 
     void setEmail(String email);
 
-    void setFullName(String firstName, String lastName);
+    /**
+     * Set the first, last, and full user's name. The full user's full name is composed by concatenating the first and
+     * last names together with a space between. For example "First Last".
+     * @param firstName Required. The user's first name.
+     * @param lastName Required. The user's last name.
+     */
+    void setFirstLastFullNames(String firstName, String lastName);
 
     /**
      * Set the user's full name. Starting in Graylog 4.1, use of this method is discouraged.
-     * Prefer use of the {@link #setFullName(String, String)} method instead when possible.
+     * Prefer use of the {@link #setFirstLastFullNames(String, String)} method instead when possible. This way,
+     * both individual first and last names will be available when needed.
      */
     void setFullName(String fullname);
 

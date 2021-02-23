@@ -27,8 +27,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -91,7 +89,7 @@ public class ProvisionerServiceTest {
         when(userService.save(isA(User.class))).thenReturn(USER_ID);
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
-        verify(user, times(1)).setFullName(eq(FIRST_NAME), eq(LAST_NAME));
+        verify(user, times(1)).setFirstLastFullNames(eq(FIRST_NAME), eq(LAST_NAME));
     }
 
     @Test

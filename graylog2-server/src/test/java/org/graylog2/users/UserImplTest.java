@@ -56,10 +56,10 @@ public class UserImplTest {
     @Test
     public void testFirstLastFullNames() {
         user = new UserImpl(null, null, null);
-        user.setFullName("First", "Last");
-        assertEquals("First Last", user.getFullName());
+        user.setFirstLastFullNames("First", "Last");
         assertEquals("First", user.getFirstName());
         assertEquals("Last", user.getLastName());
+        assertEquals("First Last", user.getFullName());
     }
 
     @Test
@@ -74,13 +74,13 @@ public class UserImplTest {
     @Test
     public void testFirstLastRequired() {
         user = new UserImpl(null, null, null);
-        assertThatThrownBy(() -> user.setFullName(null, "Last"))
+        assertThatThrownBy(() -> user.setFirstLastFullNames(null, "Last"))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("A first_name value is required");
+                .hasMessageContaining("A firstName value is required");
 
-        assertThatThrownBy(() -> user.setFullName("First", null))
+        assertThatThrownBy(() -> user.setFirstLastFullNames("First", null))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("A last_name value is required");
+                .hasMessageContaining("A lastName value is required");
     }
 
     @Test

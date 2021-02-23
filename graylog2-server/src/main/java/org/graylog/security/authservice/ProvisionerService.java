@@ -116,7 +116,7 @@ public class ProvisionerService {
         user.setAuthServiceUid(userDetails.base64AuthServiceUid());
         user.setName(userDetails.username());
         if (userDetails.firstName().isPresent() && userDetails.lastName().isPresent()) {
-            user.setFullName(userDetails.firstName().get(), userDetails.lastName().get());
+            user.setFirstLastFullNames(userDetails.firstName().get(), userDetails.lastName().get());
         }
         userDetails.fullName().ifPresent(user::setFullName);
         user.setEmail(userDetails.email());

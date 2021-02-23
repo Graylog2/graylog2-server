@@ -165,32 +165,22 @@ public class UserImpl extends PersistedImpl implements User {
         return lastName != null ? String.valueOf(lastName) : null;
     }
 
-    /**
-     * @return The full user name formatted as "First Last".
-     * first_name and last_name fields were added in Graylog 4.1.
-     * So, they might not be present for users that existed before.
-     * Fall back to full_name when they are not present.
-     */
     @Override
     public String getFullName() {
-        final Object firstName = fields.get(FIRST_NAME);
-        final Object lastName = fields.get(LAST_NAME);
-        if (firstName != null && lastName != null ) {
-            return String.format(Locale.ENGLISH, FULL_NAME_FORMAT, firstName, lastName);
-        }
-
-        return String.valueOf(fields.get(FULL_NAME));
+        final Object fullName = fields.get(FULL_NAME);
+        return fullName != null ? String.valueOf(fullName) : null;
     }
 
     /**
-     * Set the user's fullName, firstName, and lastName. The fullName is composed with the {@link #FULL_NAME_FORMAT}
-     * @param firstName The user's first name.
-     * @param lastName The user's last name.
+     * Set the first, last, and full user's name. The full user's full name is composed by concatenating the first and
+     * last names together with a space between. For example "First Last".
+     * @param firstName Required. The user's first name.
+     * @param lastName Required. The user's last name.
      */
     @Override
-    public void setFullName(final String firstName, final String lastName) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(firstName), "A first_name value is required.");
-        Preconditions.checkArgument(StringUtils.isNotBlank(lastName), "A last_name value is required.");
+    public void setFirstLastFullNames(final String firstName, final String lastName) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(firstName), "A firstName value is required.");
+        Preconditions.checkArgument(StringUtils.isNotBlank(lastName), "A lastName value is required.");
         fields.put(FIRST_NAME, firstName);
         fields.put(LAST_NAME, lastName);
         fields.put(FULL_NAME, String.format(Locale.ENGLISH, FULL_NAME_FORMAT, firstName, lastName));
@@ -198,7 +188,8 @@ public class UserImpl extends PersistedImpl implements User {
 
     /**
      * Set the user's full name. Starting in Graylog 4.1, use of this method is discouraged.
-     * Prefer use of the {@link #setFullName(String, String)} method instead when possible.
+     * Prefer use of the {@link #setFirstLastFullNames(String, String)} method instead when possible. This way,
+     * both individual first and last names will be available when needed.
      */
     @Override
     public void setFullName(final String fullname) {

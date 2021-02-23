@@ -103,7 +103,7 @@ public class MigrationHelpers {
             } else {
                 fixedUser = userService.create();
                 fixedUser.setName(userName);
-                fixedUser.setFullName(firstName, lastName);
+                fixedUser.setFirstLastFullNames(firstName, lastName);
                 fixedUser.setPassword(password);
                 fixedUser.setEmail(email);
                 fixedUser.setPermissions(Collections.emptyList());

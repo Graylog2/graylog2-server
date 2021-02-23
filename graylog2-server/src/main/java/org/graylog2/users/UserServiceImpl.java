@@ -27,6 +27,7 @@ import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
@@ -67,6 +68,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 
 public class UserServiceImpl extends PersistedServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -291,6 +293,27 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     public <T extends Persisted> String save(T model) throws ValidationException {
         if (model instanceof UserImpl.LocalAdminUser) {
             throw new IllegalStateException("Cannot modify local root user, this is a bug.");
+        }
+
+        if (!(model instanceof User)) {
+            throw new IllegalArgumentException("Expected a User instance. This is a bug.");
+        }
+
+        final User user = (User) model;
+        // If specified, both a firstName and lastName are required together. This consistency is required.
+        // However, some paths in Graylog may not provide either. The LDAP auth backend, for example.
+        final boolean hasFirstName = isNoneBlank(user.getFirstName());
+        final boolean hasLastName = isNoneBlank(user.getLastName());
+        if (hasFirstName && !hasLastName ) {
+            throw new IllegalArgumentException("A lastName is required when providing a firstName.");
+        }
+        if (!hasFirstName && hasLastName ) {
+            throw new IllegalArgumentException("A firstName is required when providing a lastName.");
+        }
+
+        // All users must have a fullName.
+        if (StringUtils.isBlank(user.getFullName())) {
+            throw new IllegalArgumentException("A fullName is required.");
         }
 
         final String userId = super.save(model);

@@ -205,7 +205,7 @@ public class MigrationHelpersTest {
         final User existingUser = newUser(permissions);
 
         existingUser.setName("test-user");
-        existingUser.setFullName("Test", "User");
+        existingUser.setFirstLastFullNames("Test", "User");
         existingUser.setPassword("password");
         existingUser.setEmail("test@example.com");
         existingUser.setTimeZone(DateTimeZone.UTC);
