@@ -16,11 +16,34 @@
  */
 package org.graylog2.shared.messageq;
 
-import org.graylog2.shared.buffers.RawMessageEvent;
+import javax.annotation.Nullable;
 
-import java.util.List;
+public interface MessageQueueEntry {
+    Object commitId();
 
-public interface MessageQueueWriter {
+    /**
+     * The journal entry ID.
+     *
+     * @return the ID value
+     */
+    byte[] id();
 
-    void write(List<RawMessageEvent> entries) throws MessageQueueException;
+    /**
+     * The journal entry key. This is supposed to be the shard key for journal implementations that support it.
+     * @return the key value
+     */
+    @Nullable
+    byte[] key();
+
+    /**
+     * The journal entry value.
+     * @return the vale
+     */
+    byte[] value();
+
+    /**
+     * This is the event time in milliseconds of the entry.
+     * @return the event time in milliseconds
+     */
+    long timestamp();
 }

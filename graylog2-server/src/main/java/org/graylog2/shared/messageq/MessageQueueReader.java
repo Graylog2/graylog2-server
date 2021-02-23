@@ -18,4 +18,4 @@ package org.graylog2.shared.messageq;
 
 import com.google.common.util.concurrent.Service;
 
-public interface MessageQueueReader extends Service { }
+public interface MessageQueueReader extends Service {}

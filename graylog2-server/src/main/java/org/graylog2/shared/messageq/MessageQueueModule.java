@@ -17,7 +17,6 @@
 package org.graylog2.shared.messageq;
 
 import com.google.inject.Scopes;
-import com.google.inject.TypeLiteral;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.shared.journal.Journal;
@@ -32,8 +31,8 @@ import org.graylog2.shared.messageq.noop.NoopMessageQueueReader;
 import org.graylog2.shared.messageq.noop.NoopMessageQueueWriter;
 
 public class MessageQueueModule extends PluginModule {
-    public static String NOOP_IMPLEMENTATION = "noop";
-    public static String DISK_IMPLEMENTATION = "disk";
+    public static String DISK_JOURNAL_MODE = "disk";
+    public static String NOOP_JOURNAL_MODE = "noop";
 
     private final Configuration configuration;
 
@@ -43,29 +42,26 @@ public class MessageQueueModule extends PluginModule {
 
     @Override
     protected void configure() {
-        addMessageQueueImplementation(NOOP_IMPLEMENTATION, NoopMessageQueueReader.class, NoopMessageQueueWriter.class,
+        installMessageQueueImplementation(
+                configuration,
+                NOOP_JOURNAL_MODE,
+                NoopMessageQueueReader.class,
+                NoopMessageQueueWriter.class,
                 NoopMessageQueueAcknowledger.class);
-        addMessageQueueImplementation(DISK_IMPLEMENTATION, LocalKafkaMessageQueueReader.class,
-                LocalKafkaMessageQueueWriter.class, LocalKafkaMessageQueueAcknowledger.class);
 
-        if (configuration.getMessageJournalMode().equals(DISK_IMPLEMENTATION)) {
+        installMessageQueueImplementation(
+                configuration,
+                DISK_JOURNAL_MODE,
+                LocalKafkaMessageQueueReader.class,
+                LocalKafkaMessageQueueWriter.class,
+                LocalKafkaMessageQueueAcknowledger.class);
+
+        if (configuration.getEffectiveMessageJournalMode().equals(DISK_JOURNAL_MODE)) {
             install(new KafkaJournalModule());
             serviceBinder().addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
         } else {
             binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
             serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
         }
-
-        serviceBinder().addBinding().to(MessageQueueInitializer.class).in(Scopes.SINGLETON);
-
-        bind(MessageQueueReader.class)
-                .toProvider(new TypeLiteral<MessageQueueImplProvider<MessageQueueReader>>() {})
-                .in(Scopes.SINGLETON);
-        bind(MessageQueueWriter.class)
-                .toProvider(new TypeLiteral<MessageQueueImplProvider<MessageQueueWriter>>() {})
-                .in(Scopes.SINGLETON);
-        bind(MessageQueueAcknowledger.class)
-                .toProvider(new TypeLiteral<MessageQueueImplProvider<MessageQueueAcknowledger>>() {})
-                .in(Scopes.SINGLETON);
     }
 }

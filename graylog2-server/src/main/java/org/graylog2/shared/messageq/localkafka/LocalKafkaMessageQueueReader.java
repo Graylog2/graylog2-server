@@ -22,7 +22,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
-import org.graylog2.bindings.LazySingleton;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.journal.Journal;
@@ -33,13 +32,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-@LazySingleton
+@Singleton
 public class LocalKafkaMessageQueueReader extends AbstractMessageQueueReader {
     private static final Logger log = LoggerFactory.getLogger(LocalKafkaMessageQueueReader.class);
     private final Journal journal;

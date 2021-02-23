@@ -16,17 +16,17 @@
  */
 package org.graylog2.shared.messageq.localkafka;
 
-import org.graylog2.bindings.LazySingleton;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
 
-@LazySingleton
+@Singleton
 public class LocalKafkaMessageQueueAcknowledger implements MessageQueueAcknowledger {
     private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaMessageQueueAcknowledger.class);
     private KafkaJournal kafkaJournal;

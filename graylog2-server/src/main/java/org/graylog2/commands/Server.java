@@ -45,7 +45,6 @@ import org.graylog2.audit.AuditBindings;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
-import org.graylog2.bindings.CustomScopesModule;
 import org.graylog2.bindings.ElasticsearchModule;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
@@ -133,7 +132,6 @@ public class Server extends ServerBootstrap {
     protected List<Module> getCommandBindings() {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
-                new CustomScopesModule(),
                 new VersionAwareStorageModule(),
                 new ConfigurationModule(configuration),
                 new ServerBindings(configuration),

@@ -263,16 +263,17 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     private void dumpDefaultConfigAndExit() {
-        for (Object bean : getCommandConfigurationBeans())
+        for (Object bean : getCommandConfigurationBeans()) {
             jadConfig.addConfigurationBean(bean);
+        }
         dumpCurrentConfigAndExit();
     }
 
     private PluginBindings installPluginConfigAndBindings(Path pluginPath, ChainingClassLoader classLoader) {
         final Set<Plugin> plugins = loadPlugins(pluginPath, classLoader);
-        final PluginBindings pluginBindings = new PluginBindings(plugins);
+        final PluginBindings pluginBindings = new PluginBindings(plugins, configuration);
         for (final Plugin plugin : plugins) {
-            for (final PluginModule pluginModule : plugin.modules()) {
+            for (final PluginModule pluginModule : plugin.modules(configuration)) {
                 for (final PluginConfigBean configBean : pluginModule.getConfigBeans()) {
                     jadConfig.addConfigurationBean(configBean);
                 }
