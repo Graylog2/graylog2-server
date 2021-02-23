@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { union } from 'lodash';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type {
@@ -22,6 +23,7 @@ import type {
   VisualizationComponentProps,
 } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+import PlotLegend from 'views/components/visualizations/PlotLegend';
 
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
@@ -73,16 +75,27 @@ const getChartColor = (fullDataArray, name) => {
 };
 
 const setChartColor = (chart, colorMap) => {
-  const colors = chart.labels.map((label) => colorMap[label]);
+  const colors = chart.labels.map((label) => colorMap.get(label));
 
   return { marker: { colors } };
 };
 
-const PieVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => (
-  <GenericPlot chartData={chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries)}
-               getChartColor={getChartColor}
-               setChartColor={setChartColor} />
-), 'pie');
+const labelMapper = (data: Array<{ labels: Array<string>}>) => data.reduce((acc, { labels }) => {
+  return union(acc, labels);
+}, []);
+
+const PieVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+  const transformedData = chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries);
+
+  return (
+    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper}>
+      <GenericPlot chartData={transformedData}
+                   layout={{ showlegend: false }}
+                   getChartColor={getChartColor}
+                   setChartColor={setChartColor} />
+    </PlotLegend>
+  );
+}, 'pie');
 
 PieVisualization.propTypes = {
   config: AggregationType.isRequired,

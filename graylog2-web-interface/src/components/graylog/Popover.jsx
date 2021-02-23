@@ -14,14 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BootstrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import ThemeAndUserProvider from 'contexts/ThemeAndUserProvider';
-
-const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
+const Popover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
   const backgroundColor = theme.colors.global.contentBackground;
@@ -79,14 +76,6 @@ const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
     }
   `;
 });
-
-const Popover = (props) => {
-  return (
-    <ThemeAndUserProvider>
-      <StyledPopover {...props} />
-    </ThemeAndUserProvider>
-  );
-};
 
 /** @component */
 export default Popover;

@@ -27,10 +27,12 @@ import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import ColorMapper from 'views/components/visualizations/ColorMapper';
+import PlotLegend from 'views/components/visualizations/PlotLegend';
 
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
-import type { ChartColor, ChartConfig, ColorMap } from './GenericPlot';
+import type { ChartColor, ChartConfig } from './GenericPlot';
 
 import CustomPropTypes from '../CustomPropTypes';
 import ViewTypeContext from '../contexts/ViewTypeContext';
@@ -45,7 +47,7 @@ export type Props = {
   },
   getChartColor?: (data: Array<ChartConfig>, name: string) => (string | undefined | null),
   height?: number;
-  setChartColor?: (config: ChartConfig, color: ColorMap) => ChartColor,
+  setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
   plotLayout?: any,
   onZoom?: (query: Query, from: string, to: string, viewType: ViewType | undefined | null) => boolean,
 };
@@ -79,7 +81,8 @@ const XYPlot = ({
   const defaultLayout: {
     yaxis: { fixedrange?: boolean},
     legend?: {y?: number},
-  } = { yaxis };
+    showlegend: boolean,
+  } = { yaxis, showlegend: false };
 
   if (height) {
     defaultLayout.legend = { y: yLegendPosition(height) };
@@ -109,11 +112,13 @@ const XYPlot = ({
   }
 
   return (
-    <GenericPlot chartData={chartData}
-                 layout={layout}
-                 onZoom={_onZoom}
-                 getChartColor={getChartColor}
-                 setChartColor={setChartColor} />
+    <PlotLegend config={config} chartData={chartData}>
+      <GenericPlot chartData={chartData}
+                   layout={layout}
+                   onZoom={_onZoom}
+                   getChartColor={getChartColor}
+                   setChartColor={setChartColor} />
+    </PlotLegend>
   );
 };
 

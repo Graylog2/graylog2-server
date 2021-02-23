@@ -21,7 +21,11 @@ import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTy
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
+import org.graylog.plugins.pipelineprocessor.rest.SimulatorResource;
 import org.graylog2.plugin.PluginModule;
 
 public class PipelineProcessorModule extends PluginModule {
@@ -32,7 +36,10 @@ public class PipelineProcessorModule extends PluginModule {
         addMessageProcessor(PipelineInterpreter.class, PipelineInterpreter.Descriptor.class);
         addPermissions(PipelineRestPermissions.class);
 
-        registerRestControllerPackage(getClass().getPackage().getName());
+        addSystemRestResource(PipelineConnectionsResource.class);
+        addSystemRestResource(PipelineResource.class);
+        addSystemRestResource(RuleResource.class);
+        addSystemRestResource(SimulatorResource.class);
 
         install(new ProcessorFunctionsModule());
 

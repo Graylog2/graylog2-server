@@ -20,7 +20,6 @@ import each from 'jest-each';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 
 import Value from './Value';
 import EmptyValue from './EmptyValue';
@@ -45,9 +44,9 @@ describe('Value', () => {
                                        queryId="someQueryId"
                                        value="2018-10-02T14:45:40Z"
                                        type={new FieldType('date', [], [])} />);
-      const valueActions = wrapper.find('ValueActions');
+      const userTimestamp = wrapper.find('UserTimezoneTimestamp');
 
-      expect(valueActions).toContainReact(<UserTimezoneTimestamp dateTime="2018-10-02T14:45:40Z" />);
+      expect(userTimestamp).toExist();
     });
 
     it('renders numeric timestamps with a custom component', () => {
@@ -55,9 +54,9 @@ describe('Value', () => {
                                        queryId="someQueryId"
                                        value={1571302317}
                                        type={new FieldType('date', [], [])} />);
-      const valueActions = wrapper.find('ValueActions');
+      const userTimeStamp = wrapper.find('UserTimezoneTimestamp');
 
-      expect(valueActions).toContainReact(<UserTimezoneTimestamp dateTime={1571302317} />);
+      expect(userTimeStamp).toExist();
     });
 
     it('renders booleans as strings', () => {

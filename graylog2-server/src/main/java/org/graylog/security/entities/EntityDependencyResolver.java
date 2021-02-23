@@ -22,10 +22,12 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptorService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.DBGrantService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
 import javax.annotation.Nullable;
@@ -42,6 +44,11 @@ public class EntityDependencyResolver {
     private final GRNRegistry grnRegistry;
     private final GRNDescriptorService descriptorService;
     private final DBGrantService grantService;
+    // Some dependencies can be ignored.
+    // E.g. To view a stream with a custom output, a user does not need output permissions
+    private static final Map<GRNType, Set<ModelType>> IGNORED_DEPENDENCIES = ImmutableMap.<GRNType, Set<ModelType>>builder()
+            .put(GRNTypes.STREAM, ImmutableSet.of(ModelTypes.OUTPUT_V1))
+            .build();
 
     @Inject
     public EntityDependencyResolver(ContentPackService contentPackService,
@@ -67,6 +74,12 @@ public class EntityDependencyResolver {
                 .build()));
 
         final ImmutableSet<GRN> dependencies = descriptors.stream()
+                .filter(dep -> {
+                    // Filter dependencies that aren't needed for grants sharing
+                    // TODO This is another reason why we shouldn't be using the content pack resolver ¯\_(ツ)_/¯
+                    final Set<ModelType> ignoredDeps = IGNORED_DEPENDENCIES.getOrDefault(entity.grnType(), ImmutableSet.of());
+                    return !ignoredDeps.contains(dep.type());
+                })
                 .map(descriptor -> grnRegistry.newGRN(descriptor.type().name(), descriptor.id().id()))
                 .filter(dependency -> !entity.equals(dependency)) // Don't include the given entity in dependencies
                 .collect(ImmutableSet.toImmutableSet());

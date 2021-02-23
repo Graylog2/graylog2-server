@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useEffect, useRef, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -27,6 +27,10 @@ export const PipelineRulesContext = createContext();
 export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   const descriptionRef = useRef();
   const ruleSourceRef = useRef();
+  const [, setAceLoaded] = useState(false);
+  const [ruleSource, setRuleSource] = useState(rule.source);
+
+  const onAceLoaded = () => setAceLoaded(true);
 
   const createAnnotations = (nextErrors) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
@@ -78,7 +82,6 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
 
   useEffect(() => {
     if (ruleSourceRef.current) {
-      ruleSourceRef.current.editor.getSession().setValue(rule.source, -1);
       ruleSourceRef.current.editor.session.setOption('useWorker', false);
     }
 
@@ -87,23 +90,21 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     }
   });
 
-  useEffect(() => {
-    if (ruleSourceRef.current) {
-      ruleSourceRef.current.editor.on('change', () => {
-        if (VALIDATE_TIMEOUT) {
-          clearTimeout(VALIDATE_TIMEOUT);
-          VALIDATE_TIMEOUT = null;
-        }
+  const onChangeSource = useCallback((source) => {
+    setRuleSource(source);
 
-        VALIDATE_TIMEOUT = setTimeout(() => {
-          validateNewRule((errors) => {
-            const nextErrors = errors || [];
-
-            createAnnotations(nextErrors);
-          });
-        }, 500);
-      });
+    if (VALIDATE_TIMEOUT) {
+      clearTimeout(VALIDATE_TIMEOUT);
+      VALIDATE_TIMEOUT = null;
     }
+
+    VALIDATE_TIMEOUT = setTimeout(() => {
+      validateNewRule((errors) => {
+        const nextErrors = errors || [];
+
+        createAnnotations(nextErrors);
+      });
+    }, 500);
   }, [validateNewRule]);
 
   return (
@@ -113,6 +114,9 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
       handleSavePipelineRule,
       ruleSourceRef,
       usedInPipelines,
+      onAceLoaded,
+      ruleSource,
+      onChangeSource,
     }}>
       {children}
     </PipelineRulesContext.Provider>

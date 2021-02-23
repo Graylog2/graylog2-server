@@ -62,6 +62,7 @@ import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import ReplaySearchButton from './ReplaySearchButton';
+import ExtraWidgetActions from './ExtraWidgetActions';
 
 import CustomPropTypes from '../CustomPropTypes';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -307,7 +308,7 @@ class Widget extends React.Component<Props, State> {
 
     if (data) {
       const { editing } = this.state;
-      const { id, widget, height, width, fields } = this.props;
+      const { id, widget, height, width, fields, view: { activeQuery: queryId } } = this.props;
       const { config, filter } = widget;
       const VisComponent = _visualizationForType(widget.type);
 
@@ -318,6 +319,7 @@ class Widget extends React.Component<Props, State> {
                       fields={fields}
                       filter={filter}
                       height={height}
+                      queryId={queryId}
                       onConfigChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}
                       setLoadingState={this._setLoadingState}
                       title={title}
@@ -403,6 +405,7 @@ class Widget extends React.Component<Props, State> {
                       <IfDashboard>
                         <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
                       </IfDashboard>
+                      <ExtraWidgetActions widget={widget} onSelect={() => {}} />
                       <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>

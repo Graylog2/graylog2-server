@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -162,6 +161,18 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         final Set<String> searchTypeStreamIds = queries().stream()
                 .flatMap(q -> q.searchTypes().stream())
                 .map(SearchType::effectiveStreams)
+                .reduce(Collections.emptySet(), Sets::union);
+
+        return Sets.union(queryStreamIds, searchTypeStreamIds);
+    }
+
+    public Set<String> streamIdsForPermissionsCheck() {
+        final Set<String> queryStreamIds = queries().stream()
+                .map(Query::usedStreamIds)
+                .reduce(Collections.emptySet(), Sets::union);
+        final Set<String> searchTypeStreamIds = queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .map(SearchType::streams)
                 .reduce(Collections.emptySet(), Sets::union);
 
         return Sets.union(queryStreamIds, searchTypeStreamIds);

@@ -17,6 +17,10 @@
 import * as Immutable from 'immutable';
 
 import highlightConditionFunctions from 'views/logic/views/formatting/highlighting/highlightConditionFunctions';
+import HighlightingColor, {
+  HighlightingColorJson,
+  StaticColor,
+} from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 
 export const StringConditionLabelMap = {
@@ -33,14 +37,14 @@ export const ConditionLabelMap = {
 };
 
 export type Value = string;
-export type Color = string;
+export type Color = HighlightingColor;
 export type Condition = keyof typeof ConditionLabelMap;
 
 export type HighlightingRuleJSON = {
   field: string,
   value: Value,
   condition: Condition,
-  color: Color,
+  color: HighlightingColorJson,
 };
 
 type InternalState = {
@@ -50,9 +54,11 @@ type InternalState = {
   color: Color,
 };
 
-export const randomColor = () => DEFAULT_CUSTOM_HIGHLIGHT_RANGE[
-  Math.floor(Math.random() * DEFAULT_CUSTOM_HIGHLIGHT_RANGE.length)
-];
+export const randomColor = () => StaticColor.create(
+  DEFAULT_CUSTOM_HIGHLIGHT_RANGE[
+    Math.floor(Math.random() * DEFAULT_CUSTOM_HIGHLIGHT_RANGE.length)
+  ],
+);
 
 export default class HighlightingRule {
   _value: InternalState;
@@ -111,7 +117,7 @@ export default class HighlightingRule {
   static fromJSON(json: HighlightingRuleJSON) {
     const { field, value, condition, color } = json;
 
-    return HighlightingRule.create(field, value, condition, color);
+    return HighlightingRule.create(field, value, condition, HighlightingColor.fromJSON(color));
   }
 }
 

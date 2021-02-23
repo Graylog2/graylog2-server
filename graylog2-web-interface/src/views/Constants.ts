@@ -17,6 +17,7 @@
 import chroma from 'chroma-js';
 
 import { TimeRange, RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 export type SearchBarFormValues = {
   timerange: TimeRange,
@@ -24,8 +25,13 @@ export type SearchBarFormValues = {
   queryString: string,
 };
 
+export const FULL_MESSAGE_FIELD = 'full_message';
 export const TIMESTAMP_FIELD = 'timestamp';
-export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, 'source'];
+export const MESSAGE_FIELD = 'message';
+export const SOURCE_FIELD = 'source';
+
+export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD];
+
 export const RELATIVE_ALL_TIME = 0; // value for time range `range` property, which represents all time
 export const Messages = {
   DEFAULT_LIMIT: 150,
@@ -36,7 +42,7 @@ export const DEFAULT_RELATIVE_FROM = 300;
 export const DEFAULT_RELATIVE_TO = DEFAULT_RELATIVE_FROM - 60;
 export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE_TYPE, from: DEFAULT_RELATIVE_FROM };
 
-export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
+export const DEFAULT_HIGHLIGHT_COLOR = StaticColor.create('#ffec3d');
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
   .mode('lch')
   .colors(40);

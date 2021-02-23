@@ -23,6 +23,8 @@ import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
+import { MESSAGE_FIELD, SOURCE_FIELD } from '../../views/Constants';
+
 const UniversalSearchStore = Reflux.createStore({
   DEFAULT_LIMIT: 150,
   listenables: [],
@@ -42,7 +44,7 @@ const UniversalSearchStore = Reflux.createStore({
         return {
           hash: md5(field),
           name: field,
-          standard_selected: (field === 'message' || field === 'source'),
+          standard_selected: (field === MESSAGE_FIELD || field === SOURCE_FIELD),
         };
       });
 

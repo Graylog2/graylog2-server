@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { singleton } from 'views/logic/singleton';
 
-type WidgetFocusContextType = {
+export type WidgetFocusContextType = {
   focusedWidget: string | undefined | null,
   setFocusedWidget: (focusedWidget: string | undefined | null) => void,
 };

@@ -31,6 +31,7 @@ import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
+import { SOURCE_FIELD } from 'views/Constants';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 import InteractiveContext from '../contexts/InteractiveContext';
@@ -147,8 +148,10 @@ const TableHead = styled.thead(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
 
-  th {
+  && > tr > th {
     min-width: 50px;
+    min-height: 28px;
+    padding: 0 5px;
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;
@@ -199,7 +202,7 @@ class MessageTable extends React.Component<Props, State> {
     const { fields } = this.props;
     const selectedFields = Immutable.OrderedSet<string>(fields);
 
-    if (fieldName.toLowerCase() === 'source' && selectedFields.size > 1) {
+    if (fieldName.toLowerCase() === SOURCE_FIELD && selectedFields.size > 1) {
       return { width: 180 };
     }
 
