@@ -16,7 +16,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render an empty field', () => {
-    const { container } = render(
+    render(
       <NumberField field={numberField}
                    onChange={() => {}}
                    title={numberField.title}
@@ -25,8 +25,7 @@ describe('<NumberField>', () => {
 
     const fieldLabel = screen.getByText(numberField.human_name, { exact: false });
     const optionalMarker = screen.getByText(/(optional)/);
-    const formField = container.querySelector('input[type="number"]');
-    // const formField = screen.getByLabelText(/number field/i);
+    const formField = screen.getByLabelText(numberField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).toBeInTheDocument();
@@ -38,7 +37,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render a field with a value', () => {
-    const { container } = render(
+    render(
       <NumberField field={numberField}
                    onChange={() => {}}
                    title={numberField.title}
@@ -46,14 +45,14 @@ describe('<NumberField>', () => {
                    value={numberField.default_value} />,
     );
 
-    const formField = container.querySelector('input[type="number"]');
+    const formField = screen.getByLabelText(numberField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveValue(numberField.default_value);
   });
 
   it('should render a required number field', () => {
-    const { container } = render(
+    render(
       <NumberField field={requiredNumberField}
                    onChange={() => {}}
                    title={requiredNumberField.title}
@@ -62,8 +61,7 @@ describe('<NumberField>', () => {
 
     const fieldLabel = screen.getByText(requiredNumberField.human_name, { exact: false });
     const optionalMarker = screen.queryByText(/(optional)/);
-    const formField = container.querySelector('input[type="number"]');
-    // const formField = screen.getByLabelText(/number field/i);
+    const formField = screen.getByLabelText(requiredNumberField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).not.toBeInTheDocument();
@@ -74,7 +72,7 @@ describe('<NumberField>', () => {
   it('should call onChange when the value changes', async () => {
     const changeFunction = jest.fn();
 
-    const { container } = render(
+    render(
       <NumberField field={numberField}
                    onChange={changeFunction}
                    title={numberField.title}
@@ -82,25 +80,21 @@ describe('<NumberField>', () => {
                    value={numberField.default_value} />,
     );
 
-    const formField = container.querySelector('input[type="number"]');
+    const formField = screen.getByLabelText(numberField.human_name, { exact: false });
     fireEvent.change(formField, { target: { value: '123' } });
-
-    // userEvent.clear(formField);
-    // userEvent.type(formField, '123');
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith(numberField.title, 123));
   });
 
   it('should render negative number field', () => {
-    const { container } = render(
+    render(
       <NumberField field={negativeNumberField}
                    onChange={() => {}}
                    title={negativeNumberField.title}
                    typeName="number" />,
     );
 
-    const formField = container.querySelector('input[type="number"]');
-    // const formField = screen.getByLabelText(/number field/i);
+    const formField = screen.getByLabelText(negativeNumberField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveAttribute('max', '-1');
@@ -108,15 +102,14 @@ describe('<NumberField>', () => {
   });
 
   it('should render positive number field', () => {
-    const { container } = render(
+    render(
       <NumberField field={positiveNumberField}
                    onChange={() => {}}
                    title={positiveNumberField.title}
                    typeName="number" />,
     );
 
-    const formField = container.querySelector('input[type="number"]');
-    // const formField = screen.getByLabelText(/number field/i);
+    const formField = screen.getByLabelText(positiveNumberField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveAttribute('max', String(Number.MAX_SAFE_INTEGER));
@@ -124,15 +117,14 @@ describe('<NumberField>', () => {
   });
 
   it('should render port number field', () => {
-    const { container } = render(
+    render(
       <NumberField field={portNumberField}
                    onChange={() => {}}
                    title={portNumberField.title}
                    typeName="number" />,
     );
 
-    const formField = container.querySelector('input[type="number"]');
-    // const formField = screen.getByLabelText(/number field/i);
+    const formField = screen.getByLabelText(portNumberField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveAttribute('max', '65535');
