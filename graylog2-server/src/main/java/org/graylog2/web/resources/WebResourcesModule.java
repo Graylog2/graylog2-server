@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+package org.graylog2.web.resources;
 
-import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.inject.Graylog2Module;
 
-public class FreeEnterpriseModule extends PluginModule {
+public class WebResourcesModule extends Graylog2Module {
     @Override
     protected void configure() {
-        addSystemRestResource(FreeEnterpriseResource.class);
+        addSystemRestResource(AppConfigResource.class);
+        addSystemRestResource(WebInterfaceAssetsResource.class);
     }
 }

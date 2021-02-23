@@ -14,13 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.freeenterprise;
+import * as React from 'react';
 
-import org.graylog2.plugin.PluginModule;
+import { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
+import Widget from 'views/logic/widgets/Widget';
 
-public class FreeEnterpriseModule extends PluginModule {
-    @Override
-    protected void configure() {
-        addSystemRestResource(FreeEnterpriseResource.class);
-    }
-}
+export type Contexts = {
+  widgetFocusContext: WidgetFocusContextType,
+};
+
+export type WidgetAction = (w: Widget, contexts: Contexts) => unknown;
+
+export type WidgetActionType = {
+  type: string,
+  title: (w: Widget) => React.ReactNode,
+  isHidden?: (w: Widget) => boolean,
+  action: WidgetAction,
+};

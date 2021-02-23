@@ -14,15 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inject;
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import * as React from 'react';
 
-import com.google.auto.value.AutoValue;
+import TimeRangeDisplay from './TimeRangeDisplay';
 
-@AutoValue
-public abstract class RestControllerPackage {
-    public abstract String name();
+describe('TimeRangeDisplay', () => {
+  it('opens the date time range picker on click', () => {
+    const toggleShow = jest.fn();
+    render(<TimeRangeDisplay toggleDropdownShow={toggleShow} timerange={{ type: 'relative', from: 300 }} />);
 
-    public static RestControllerPackage create(String name) {
-        return new AutoValue_RestControllerPackage(name);
-    }
-}
+    const timeRangeDisplay = screen.getByRole('button', { name: 'Search Time Range, Opens Time Range Selector On Click' });
+
+    fireEvent.click(timeRangeDisplay);
+
+    expect(toggleShow).toHaveBeenCalled();
+  });
+});

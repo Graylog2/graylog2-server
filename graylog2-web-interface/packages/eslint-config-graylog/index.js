@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   env: {
     browser: true,
     jest: true,
@@ -42,10 +42,18 @@ module.exports = {
     },
     {
       files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
-      plugins: ['jest'],
-      extends: ['plugin:jest/recommended'],
+      plugins: [
+        'jest',
+        'testing-library',
+      ],
+      extends: [
+        'plugin:jest/recommended',
+        'plugin:testing-library/react',
+        'plugin:testing-library/recommended',
+      ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
+        'testing-library/no-debug': 'warn',
       },
     },
   ],

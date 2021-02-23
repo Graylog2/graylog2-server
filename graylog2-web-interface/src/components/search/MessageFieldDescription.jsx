@@ -20,6 +20,7 @@ import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/graylog';
+import { FULL_MESSAGE_FIELD, MESSAGE_FIELD } from 'views/Constants';
 
 const MessageTerms = styled.span(({ theme }) => css`
   margin-right: 8px;
@@ -66,7 +67,7 @@ class MessageFieldDescription extends React.Component {
 
   render() {
     const { fieldName, renderForDisplay } = this.props;
-    const className = fieldName === 'message' || fieldName === 'full_message' ? 'message-field' : '';
+    const className = fieldName === MESSAGE_FIELD || fieldName === FULL_MESSAGE_FIELD ? 'message-field' : '';
 
     return (
       <dd className={className} key={`${fieldName}dd`}>

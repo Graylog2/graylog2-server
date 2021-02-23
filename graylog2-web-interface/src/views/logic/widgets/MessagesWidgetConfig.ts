@@ -21,6 +21,7 @@ import isEqualForSearch from 'views/stores/isEqualForSearch';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { SortConfigJson } from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
+import { TIMESTAMP_FIELD } from 'views/Constants';
 
 import WidgetConfig from './WidgetConfig';
 
@@ -47,7 +48,7 @@ export type MessagesWidgetConfigJSON = {
 };
 
 export const defaultSortDirection = Direction.Descending;
-export const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', defaultSortDirection)];
+export const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, TIMESTAMP_FIELD, defaultSortDirection)];
 
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;

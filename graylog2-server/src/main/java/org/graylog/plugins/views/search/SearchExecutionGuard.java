@@ -42,7 +42,7 @@ public class SearchExecutionGuard {
     }
 
     public void check(Search search, Predicate<String> hasReadPermissionForStream) {
-        checkUserIsPermittedToSeeStreams(search.usedStreamIds(), hasReadPermissionForStream);
+        checkUserIsPermittedToSeeStreams(search.streamIdsForPermissionsCheck(), hasReadPermissionForStream);
 
         checkMissingRequirements(search);
     }
