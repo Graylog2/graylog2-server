@@ -18,8 +18,6 @@ package org.graylog.security.authservice;
 
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashSet;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
