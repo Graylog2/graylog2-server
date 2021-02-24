@@ -73,6 +73,10 @@ class Widget {
     return this._value.streams;
   }
 
+  get isExportable() {
+    return false;
+  }
+
   duplicate(newId: string): Widget {
     return this.toBuilder().id(newId).build();
   }

@@ -34,6 +34,10 @@ export default class MessagesWidget extends Widget {
 
   static defaultTitle = 'Untitled Message Table';
 
+  get isExportable() {
+    return true;
+  }
+
   static fromJSON(value: WidgetState) {
     const { id, config, filter, timerange, query, streams } = value;
 
