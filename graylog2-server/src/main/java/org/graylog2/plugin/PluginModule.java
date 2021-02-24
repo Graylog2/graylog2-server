@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.util.concurrent.Service;
+import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -37,6 +38,7 @@ import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
+import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
@@ -72,6 +74,13 @@ import java.util.stream.Stream;
 
 public abstract class PluginModule extends Graylog2Module {
     private static final Logger log = LoggerFactory.getLogger(PluginModule.class);
+
+    private Injector configInjector;
+
+    // TODO: limit visibility?
+    public void setConfigInjector(Injector configInjector) {
+        this.configInjector = configInjector;
+    }
 
     public Set<? extends PluginConfigBean> getConfigBeans() {
         return Collections.emptySet();
@@ -352,10 +361,13 @@ public abstract class PluginModule extends Graylog2Module {
      * @param writerClass       Writer implementation
      * @param acknowledgerClass Acknowledger implementation
      */
-    protected void installMessageQueueImplementation(BaseConfiguration config, String mode,
+    // TODO: remove obsolete param
+    protected void installMessageQueueImplementation(BaseConfiguration obsolete, String mode,
                                                      Class<? extends MessageQueueReader> readerClass,
                                                      Class<? extends MessageQueueWriter> writerClass,
                                                      Class<? extends MessageQueueAcknowledger> acknowledgerClass) {
+
+        final Configuration config = configInjector.getInstance(Configuration.class);
 
         if (!config.getEffectiveMessageJournalMode().equals(mode)) {
             return;
