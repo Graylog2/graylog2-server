@@ -107,7 +107,8 @@ public class UserImpl extends PersistedImpl implements User {
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
-    public static final int MAX_NAME_LENGTH = 200;
+    public static final int MAX_FIRST_LAST_NAME_LENGTH = 100;
+    public static final int MAX_FULL_NAME_LENGTH = 200;
 
     public static final long DEFAULT_SESSION_TIMEOUT_MS = TimeUnit.HOURS.toMillis(8);
 
@@ -141,9 +142,9 @@ public class UserImpl extends PersistedImpl implements User {
                 .put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH))
                 .put(PASSWORD, new FilledStringValidator())
                 .put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH))
-                .put(FIRST_NAME, new LimitedOptionalStringValidator(MAX_NAME_LENGTH))
-                .put(LAST_NAME, new LimitedOptionalStringValidator(MAX_NAME_LENGTH))
-                .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_NAME_LENGTH))
+                .put(FIRST_NAME, new LimitedOptionalStringValidator(MAX_FIRST_LAST_NAME_LENGTH))
+                .put(LAST_NAME, new LimitedOptionalStringValidator(MAX_FIRST_LAST_NAME_LENGTH))
+                .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH))
                 .put(PERMISSIONS, new ListValidator())
                 .put(ROLES, new ListValidator(true))
                 .build();

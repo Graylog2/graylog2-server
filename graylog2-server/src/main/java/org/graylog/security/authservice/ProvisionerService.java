@@ -120,9 +120,10 @@ public class ProvisionerService {
         // the following user.setFirstLastFullNames call also sets the full name.
         if (userDetails.firstName().isPresent() && userDetails.lastName().isPresent()) {
             user.setFirstLastFullNames(userDetails.firstName().get(), userDetails.lastName().get());
+        } else {
+            // In other cases, only a full name is present.
+            userDetails.fullName().ifPresent(user::setFullName);
         }
-        // In other cases, only a full name is present.
-        userDetails.fullName().ifPresent(user::setFullName);
 
         user.setEmail(userDetails.email());
 
