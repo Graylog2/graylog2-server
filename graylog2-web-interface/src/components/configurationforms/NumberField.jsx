@@ -69,20 +69,20 @@ const NumberField = createReactClass({
   },
 
   render() {
-    const { typeName } = this.props;
-    const { field } = this.props;
+    const { field, title, typeName } = this.props;
     const isRequired = !field.is_optional;
     const validationSpecs = this.validationSpec(field);
+    const fieldId = `${typeName}-${title}`;
 
     // TODO: replace with bootstrap input component
     return (
       <div className="form-group">
-        <label htmlFor={`${typeName}-${field.title}`}>
+        <label htmlFor={fieldId}>
           {field.human_name}
           {FieldHelpers.optionalMarker(field)}
         </label>
 
-        <input id={field.title}
+        <input id={fieldId}
                type="number"
                required={isRequired}
                onChange={this.handleChange}
