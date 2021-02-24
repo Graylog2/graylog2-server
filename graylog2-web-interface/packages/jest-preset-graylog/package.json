@@ -19,7 +19,7 @@
   "dependencies": {
     "@testing-library/dom": "7.20.2",
     "@testing-library/jest-dom": "5.11.0",
-    "@testing-library/react": "11.2.3",
+    "@testing-library/react": "11.2.5",
     "@types/enzyme": "3.10.8",
     "@types/jest": "26.0.20",
     "babel-jest": "^26.6.3",
