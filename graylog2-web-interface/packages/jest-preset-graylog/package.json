@@ -17,7 +17,7 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0",
   "dependencies": {
-    "@testing-library/dom": "7.20.2",
+    "@testing-library/dom": "7.29.6",
     "@testing-library/jest-dom": "5.11.0",
     "@testing-library/react": "11.2.3",
     "@types/enzyme": "3.10.8",
