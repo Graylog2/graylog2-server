@@ -52,6 +52,7 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.web.PluginUISettingsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
