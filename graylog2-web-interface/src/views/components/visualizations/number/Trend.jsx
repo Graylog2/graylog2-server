@@ -27,7 +27,8 @@ const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivEleme
     ${trend && css`
       background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${util.contrastingColor(bgColor)} !important /* Needed for report generation */;
-      /* eslint-disable-next-line property-no-vendor-prefix */
+
+      /* stylelint-disable-next-line property-no-vendor-prefix */
       -webkit-print-color-adjust: exact !important; /* Needed for report generation */
     `}
   `;
@@ -40,8 +41,9 @@ const TextContainer = styled.div<{ trend: string | undefined | null, ref }>(({ t
   return css`
       margin: 5px;
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
-      /* eslint-disable-next-line property-no-vendor-prefix */
       font-family: ${theme.fonts.family.body};
+
+      /* stylelint-disable-next-line property-no-vendor-prefix */
       -webkit-print-color-adjust: exact !important; /* Needed for report generation */`;
 });
 
@@ -51,7 +53,7 @@ const StyledIcon = styled(Icon)<{ trend: string | undefined | null }>(({ theme, 
 
   return css`
     path {
-        fill: ${theme.utils.contrastingColor(bgColor)};
+      fill: ${theme.utils.contrastingColor(bgColor)};
     }`;
 });
 
