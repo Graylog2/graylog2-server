@@ -250,16 +250,14 @@ public class KafkaTransport extends ThrottleableTransport {
     }
 
     private class ConsumerRunnable implements Runnable {
-        private final Properties props;
         private final MessageInput input;
         private final KafkaConsumer<byte[], byte[]> consumer;
 
         public ConsumerRunnable(Properties props, MessageInput input, int threadId) {
             this.input = input;
             final Properties nprops = (Properties) props.clone();
-            nprops.put("client.id", "gl2-" + nodeId + "-" + input.getId() + "-" + threadId);
-            this.props = nprops;
-            consumer = new KafkaConsumer<>(props);
+            nprops.put("client.id", "gl2-" + nodeId.getShortNodeId() + "-" + input.getId() + "-" + threadId);
+            consumer = new KafkaConsumer<>(nprops);
             //noinspection ConstantConditions
             consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)), new NoOpConsumerRebalanceListener());
         }
@@ -349,7 +347,7 @@ public class KafkaTransport extends ThrottleableTransport {
         final Properties props = new Properties();
 
         props.put("group.id", configuration.getString(CK_GROUP_ID, DEFAULT_GROUP_ID));
-        props.put("client.id", "gl2-" + nodeId + "-" + input.getId());
+        props.put("client.id", "gl2-" + nodeId.getShortNodeId() + "-" + input.getId());
 
         props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
         props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
