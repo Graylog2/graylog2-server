@@ -32,7 +32,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.InvalidOffsetException;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.errors.AuthorizationException;
 import org.apache.kafka.common.errors.WakeupException;
@@ -71,6 +70,7 @@ import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -78,7 +78,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -259,7 +258,7 @@ public class KafkaTransport extends ThrottleableTransport {
             nprops.put("client.id", "gl2-" + nodeId.getShortNodeId() + "-" + input.getId() + "-" + threadId);
             consumer = new KafkaConsumer<>(nprops);
             //noinspection ConstantConditions
-            consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)), new NoOpConsumerRebalanceListener());
+            consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)));
         }
 
         private void consumeRecords(ConsumerRecords<byte[], byte[]> consumerRecords) {
@@ -295,14 +294,11 @@ public class KafkaTransport extends ThrottleableTransport {
 
         private Optional<ConsumerRecords<byte[], byte[]>> tryPoll() {
             try {
-                // Workaround https://issues.apache.org/jira/browse/KAFKA-4189 by calling wakeup()
-                final ScheduledFuture<?> future = scheduler.schedule(consumer::wakeup, 2000, TimeUnit.MILLISECONDS);
-                final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(1000);
-                future.cancel(true);
+                final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(Duration.ofSeconds(1));
 
                 return Optional.of(consumerRecords);
             } catch (WakeupException e) {
-                LOG.error("WakeupException in poll. Kafka server is not responding.");
+                LOG.error("WakeupException in poll.");
             } catch (InvalidOffsetException | AuthorizationException e) {
                 LOG.error("Exception in poll.", e);
             }
@@ -337,9 +333,7 @@ public class KafkaTransport extends ThrottleableTransport {
             // this might trigger a couple of times, but it won't hurt
             consumer.commitAsync();
             stopLatch.countDown();
-            // TODO once we update our kafka client, we should call this with a timeout
-            // Otherwise might hang if kafka is not available: https://issues.apache.org/jira/browse/KAFKA-3822
-            consumer.close();
+            consumer.close(Duration.ofSeconds(5));
         }
     }
 
