@@ -60,7 +60,7 @@ class AsyncLoaderErrorBoundary extends React.Component<{ errorComponent: React.C
   }
 }
 
-export default <T, >(f: () => Promise<{ default: React.ComponentType<T> }>) => (props: T) => {
+export default <T extends React.ComponentType<any>>(f: () => Promise<{ default: T }>) => (props: React.ComponentPropsWithRef<T>) => {
   const LazyComponent = React.lazy(f);
 
   return (
