@@ -74,9 +74,9 @@ describe('CSVExportModal', () => {
   ];
   const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'level', Direction.Descending);
   const config = new MessagesWidgetConfig(['level', 'http_method'], true, [], [currentSort]);
-  const widget1 = Widget.builder().id('widget-id-1').type(MessagesWidget.type).config(config)
+  const widget1 = MessagesWidget.builder().id('widget-id-1').config(config)
     .build();
-  const widget2 = Widget.builder().id('widget-id-2').type(MessagesWidget.type).config(config)
+  const widget2 = MessagesWidget.builder().id('widget-id-2').config(config)
     .build();
   const states: ViewStateMap = Immutable.Map({
     'query-id-1': ViewState.create(),
