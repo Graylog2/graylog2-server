@@ -366,11 +366,11 @@ describe('<Widget />', () => {
   });
 
   it('allows export to CSV for message tables', () => {
-    const messagesWidget = WidgetModel.builder()
+    const messagesWidget = MessagesWidget.builder()
       .id('widgetId')
-      .type(MessagesWidget.type)
       .config({})
       .build();
+
     const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
     const actionToggle = getByTestId('widgetActionDropDown');
