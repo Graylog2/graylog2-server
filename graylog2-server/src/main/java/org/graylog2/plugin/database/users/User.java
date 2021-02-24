@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface User extends Persisted {
@@ -37,9 +38,9 @@ public interface User extends Persisted {
     @Nullable
     String getAuthServiceUid();
 
-    String getFirstName();
+    Optional<String> getFirstName();
 
-    String getLastName();
+    Optional<String> getLastName();
 
     String getFullName();
 

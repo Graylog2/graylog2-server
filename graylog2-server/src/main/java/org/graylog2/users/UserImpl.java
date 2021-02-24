@@ -56,6 +56,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -154,25 +155,30 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public String getFirstName() {
+    public Optional<String> getFirstName() {
         final Object firstName = fields.get(FIRST_NAME);
-        return firstName != null ? String.valueOf(firstName) : null;
+        if (firstName == null) {
+            return Optional.empty();
+        }
+        return Optional.of(firstName.toString());
     }
 
     @Override
-    public String getLastName() {
+    public Optional<String> getLastName() {
         final Object lastName = fields.get(LAST_NAME);
-        return lastName != null ? String.valueOf(lastName) : null;
+        if (lastName == null) {
+            return Optional.empty();
+        }
+        return Optional.of(lastName.toString());
     }
 
     @Override
     public String getFullName() {
-        final Object fullName = fields.get(FULL_NAME);
-        return fullName != null ? String.valueOf(fullName) : null;
+        return nullToEmpty((String) fields.get(FULL_NAME));
     }
 
     /**
-     * Set the first, last, and full user's name. The full user's full name is composed by concatenating the first and
+     * Set the first, last, and full user's name. The user's full name is composed by concatenating the first and
      * last names together with a space between. For example "First Last".
      * @param firstName Required. The user's first name.
      * @param lastName Required. The user's last name.

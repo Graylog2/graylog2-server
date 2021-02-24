@@ -229,7 +229,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testSaveValidationFullName() throws Exception {
+    public void testSaveNoFullNameSuccess() throws Exception {
         final User user = userService.create();
         user.setName("TEST");
         user.setEmail("test@example.com");
@@ -237,10 +237,7 @@ public class UserServiceImplTest {
         user.setPassword("TEST");
         user.setPermissions(Collections.<String>emptyList());
         user.setFullName(null);
-
-        assertThatThrownBy(() -> userService.save(user))
-                .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("A fullName is required.");
+        userService.save(user);
     }
 
     @Test

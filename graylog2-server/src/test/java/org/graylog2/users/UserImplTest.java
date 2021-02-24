@@ -57,8 +57,10 @@ public class UserImplTest {
     public void testFirstLastFullNames() {
         user = new UserImpl(null, null, null);
         user.setFirstLastFullNames("First", "Last");
-        assertEquals("First", user.getFirstName());
-        assertEquals("Last", user.getLastName());
+        assertTrue(user.getFirstName().isPresent());
+        assertTrue(user.getLastName().isPresent());
+        assertEquals("First", user.getFirstName().get());
+        assertEquals("Last", user.getLastName().get());
         assertEquals("First Last", user.getFullName());
     }
 
@@ -67,8 +69,14 @@ public class UserImplTest {
         user = new UserImpl(null, null, null);
         user.setFullName("Full Name");
         assertEquals("Full Name", user.getFullName());
-        assertNull(user.getFirstName());
-        assertNull(user.getLastName());
+        assertFalse(user.getFirstName().isPresent());
+        assertFalse(user.getLastName().isPresent());
+    }
+
+    @Test
+    public void testNoFullNameEmptyString() {
+        user = new UserImpl(null, null, null);
+        assertEquals("", user.getFullName());
     }
 
     @Test
