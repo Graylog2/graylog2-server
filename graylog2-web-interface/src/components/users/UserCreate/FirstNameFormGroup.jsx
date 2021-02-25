@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import * as React from 'react';
 
 import { FormikFormGroup } from 'components/common';
 
-const LastNameFormGroup = () => (
-  <FormikFormGroup label="Last Name"
-                   name="last_name"
+const FirstNameFormGroup = () => (
+  <FormikFormGroup label="First Name"
+                   name="first_name"
                    maxLength={200}
                    required
-                   help="The user's last name." />
+                   help="The user's first name." />
 );
 
-export default LastNameFormGroup;
+export default FirstNameFormGroup;

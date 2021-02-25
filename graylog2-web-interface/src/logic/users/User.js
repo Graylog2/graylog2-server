@@ -31,6 +31,8 @@ export type UserJSON = {
   email: string,
   external: boolean,
   full_name: string,
+  first_name: string,
+  last_name: string,
   id: string,
   last_activity: ?string,
   permissions: string[],
@@ -50,6 +52,8 @@ type InternalState = {
   id: string,
   username: string,
   fullName: string,
+  firstName: string,
+  lastName: string,
   email: string,
   permissions: Immutable.List<string>,
   timezone: ?string,
@@ -72,6 +76,8 @@ export default class User {
     id: $PropertyType<InternalState, 'id'>,
     username: $PropertyType<InternalState, 'username'>,
     fullName: $PropertyType<InternalState, 'fullName'>,
+    firstName: $PropertyType<InternalState, 'firstName'>,
+    lastName: $PropertyType<InternalState, 'lastName'>,
     email: $PropertyType<InternalState, 'email'>,
     permissions: $PropertyType<InternalState, 'permissions'>,
     timezone: $PropertyType<InternalState, 'timezone'>,
@@ -90,6 +96,8 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -116,6 +124,14 @@ export default class User {
 
   get fullName() {
     return this._value.fullName;
+  }
+
+  get firstName() {
+    return this._value.firstName;
+  }
+
+  get lastName() {
+    return this._value.lastName;
   }
 
   get email() {
@@ -215,6 +231,8 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -235,6 +253,8 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -255,6 +275,8 @@ export default class User {
     id: $PropertyType<InternalState, 'id'>,
     username: $PropertyType<InternalState, 'username'>,
     fullName: $PropertyType<InternalState, 'fullName'>,
+    firstName: $PropertyType<InternalState, 'firstName'>,
+    lastName: $PropertyType<InternalState, 'lastName'>,
     email: $PropertyType<InternalState, 'email'>,
     permissions: $PropertyType<InternalState, 'permissions'>,
     timezone: $PropertyType<InternalState, 'timezone'>,
@@ -273,6 +295,8 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -290,7 +314,7 @@ export default class User {
   }
 
   static empty() {
-    return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.Set(), false, false, -1, undefined, false, '', '', 'enabled');
+    return User.create('', '', '', '', '', '', Immutable.List(), '', {}, Immutable.Set(), false, false, -1, undefined, false, '', '', 'enabled');
   }
 
   toJSON(): UserJSON {
@@ -298,6 +322,8 @@ export default class User {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -317,6 +343,8 @@ export default class User {
       id,
       username,
       full_name: fullName,
+      first_name: firstName,
+      last_name: lastName,
       email,
       permissions: permissions ? permissions.toArray() : [],
       timezone,
@@ -339,6 +367,10 @@ export default class User {
       username,
       // eslint-disable-next-line camelcase
       full_name,
+      // eslint-disable-next-line camelcase
+      first_name,
+      // eslint-disable-next-line camelcase
+      last_name,
       email,
       permissions,
       timezone,
@@ -364,6 +396,8 @@ export default class User {
       id,
       username,
       full_name,
+      first_name,
+      last_name,
       email,
       Immutable.List(permissions),
       timezone,
@@ -406,6 +440,14 @@ class Builder {
 
   fullName(value: $PropertyType<InternalState, 'fullName'>) {
     return new Builder(this.value.set('fullName', value));
+  }
+
+  firstName(value: $PropertyType<InternalState, 'firstName'>) {
+    return new Builder(this.value.set('firstName', value));
+  }
+
+  lastName(value: $PropertyType<InternalState, 'lastName'>) {
+    return new Builder(this.value.set('lastName', value));
   }
 
   email(value: $PropertyType<InternalState, 'email'>) {
@@ -465,6 +507,8 @@ class Builder {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
@@ -484,6 +528,8 @@ class Builder {
       id,
       username,
       fullName,
+      firstName,
+      lastName,
       email,
       permissions,
       timezone,
