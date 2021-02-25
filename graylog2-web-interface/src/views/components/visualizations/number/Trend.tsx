@@ -83,7 +83,12 @@ const _trendDirection = (delta: number, trendPreference: TrendPreference): Trend
   }
 };
 
-const _trendIcon = (delta) => (delta === 0 ? 'arrow-circle-right' : delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down');
+// eslint-disable-next-line no-nested-ternary
+const _trendIcon = (delta: number) => (delta === 0
+  ? 'arrow-circle-right'
+  : delta > 0
+    ? 'arrow-circle-up'
+    : 'arrow-circle-down');
 
 const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference }: Props, ref) => {
   const difference = previous ? current - previous : NaN;
