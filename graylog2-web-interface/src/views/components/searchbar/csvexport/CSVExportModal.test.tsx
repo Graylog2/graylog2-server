@@ -20,6 +20,7 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
 import { Optional } from 'utility-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
@@ -37,6 +38,8 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import EditMessageList from 'views/components/widgets/EditMessageList';
+import MessageConfigGenerator from 'views/logic/searchtypes/messages/MessageConfigGenerator';
 
 import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
 
@@ -53,6 +56,18 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
     listen: () => jest.fn(),
   },
 }));
+
+const pluginExports = {
+  exports: {
+    enterpriseWidgets: [
+      {
+        type: 'messages',
+        displayName: 'Message List',
+        titleGenerator: () => MessagesWidget.defaultTitle,
+      },
+    ],
+  },
+};
 
 describe('CSVExportModal', () => {
   const searchType = {
@@ -117,6 +132,14 @@ describe('CSVExportModal', () => {
     limit: undefined,
     execution_state: new SearchExecutionState(),
   };
+
+  beforeAll(() => {
+    PluginStore.register(pluginExports);
+  });
+
+  afterAll(() => {
+    PluginStore.unregister(pluginExports);
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
