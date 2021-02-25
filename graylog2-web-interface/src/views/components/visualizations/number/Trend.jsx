@@ -34,7 +34,7 @@ const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivEleme
   `;
 });
 
-const TextContainer = styled.div<{ trend: string | undefined | null, ref }>(({ theme, trend }) => {
+const TextContainer = styled.div<{trend: ?string}, ThemeInterface, HTMLDivElement>(({ theme, trend }) => {
   const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
@@ -47,7 +47,7 @@ const TextContainer = styled.div<{ trend: string | undefined | null, ref }>(({ t
       -webkit-print-color-adjust: exact !important; /* Needed for report generation */`;
 });
 
-const StyledIcon = styled(Icon)<{ trend: string | undefined | null }>(({ theme, trend }) => {
+const StyledIcon = styled(Icon)<{ trend: ?string}, ThemeInterface, HTMLDivElement>(({ theme, trend }) => {
   const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
