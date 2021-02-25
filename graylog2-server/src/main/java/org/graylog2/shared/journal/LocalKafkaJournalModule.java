@@ -22,6 +22,6 @@ import org.graylog2.plugin.PluginModule;
 public class LocalKafkaJournalModule extends PluginModule {
     @Override
     protected void configure() {
-        bind(Journal.class).to(KafkaJournal.class).in(Scopes.SINGLETON);
+        bind(Journal.class).to(LocalKafkaJournal.class).in(Scopes.SINGLETON);
     }
 }

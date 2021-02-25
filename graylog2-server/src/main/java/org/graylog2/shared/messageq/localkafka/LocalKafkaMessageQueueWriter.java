@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.journal.Journal;
-import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ import static com.google.common.collect.Lists.transform;
 public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
     private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaMessageQueueWriter.class);
 
-    private KafkaJournal kafkaJournal;
+    private LocalKafkaJournal kafkaJournal;
     private Semaphore journalFilled;
 
     private static final Retryer<Void> JOURNAL_WRITE_RETRYER = RetryerBuilder.<Void>newBuilder()
@@ -66,7 +66,7 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
 
 
     @Inject
-    public LocalKafkaMessageQueueWriter(KafkaJournal kafkaJournal,
+    public LocalKafkaMessageQueueWriter(LocalKafkaJournal kafkaJournal,
                                         @Named("JournalSignal") Semaphore journalFilled) {
         this.kafkaJournal = kafkaJournal;
         this.journalFilled = journalFilled;

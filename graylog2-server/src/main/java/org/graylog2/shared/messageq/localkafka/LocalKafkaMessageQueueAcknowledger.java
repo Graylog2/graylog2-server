@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.messageq.localkafka;
 
-import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +29,10 @@ import java.util.Optional;
 @Singleton
 public class LocalKafkaMessageQueueAcknowledger implements MessageQueueAcknowledger {
     private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaMessageQueueAcknowledger.class);
-    private KafkaJournal kafkaJournal;
+    private LocalKafkaJournal kafkaJournal;
 
     @Inject
-    public LocalKafkaMessageQueueAcknowledger(KafkaJournal kafkaJournal) {
+    public LocalKafkaMessageQueueAcknowledger(LocalKafkaJournal kafkaJournal) {
         this.kafkaJournal = kafkaJournal;
     }
 
