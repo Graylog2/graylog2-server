@@ -66,6 +66,8 @@ import java.lang.annotation.Annotation;
 public abstract class Graylog2Module extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
 
+    public static final String SYSTEM_REST_RESOURCES = "systemRestResources";
+
     protected void installTransport(
             MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
             String name,
@@ -272,8 +274,8 @@ public abstract class Graylog2Module extends AbstractModule {
     // This should be used by plugins that have been built for 3.0.1 or later.
     // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     protected <T extends MessageOutput> void installOutput2(MapBinder<String, MessageOutput.Factory2<? extends MessageOutput>> outputMapBinder,
-                                                           Class<T> target,
-                                                           Class<? extends MessageOutput.Factory2<T>> targetFactory) {
+                                                            Class<T> target,
+                                                            Class<? extends MessageOutput.Factory2<T>> targetFactory) {
         install(new FactoryModuleBuilder().implement(MessageOutput.class, target).build(targetFactory));
         outputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }
@@ -422,9 +424,9 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected void installLookupDataAdapter2(String name,
-                                            Class<? extends LookupDataAdapter> adapterClass,
-                                            Class<? extends LookupDataAdapter.Factory2> factoryClass,
-                                            Class<? extends LookupDataAdapterConfiguration> configClass) {
+                                             Class<? extends LookupDataAdapter> adapterClass,
+                                             Class<? extends LookupDataAdapter.Factory2> factoryClass,
+                                             Class<? extends LookupDataAdapterConfiguration> configClass) {
         install(new FactoryModuleBuilder().implement(LookupDataAdapter.class, adapterClass).build(factoryClass));
         lookupDataAdapterBinder2().addBinding(name).to(factoryClass);
         registerJacksonSubtype(configClass, name);
@@ -439,6 +441,7 @@ public abstract class Graylog2Module extends AbstractModule {
 
     /**
      * Use this if the class itself is annotated by {@link com.fasterxml.jackson.annotation.JsonTypeName} instead of explicitly given.
+     *
      * @param klass
      */
     protected void registerJacksonSubtype(Class<?> klass) {
@@ -447,6 +450,7 @@ public abstract class Graylog2Module extends AbstractModule {
 
     /**
      * Use this if the class does not have a {@link com.fasterxml.jackson.annotation.JsonTypeName} annotation.
+     *
      * @param klass
      * @param name
      */
@@ -472,8 +476,22 @@ public abstract class Graylog2Module extends AbstractModule {
 
     private static class ExceptionMapperType extends TypeLiteral<Class<? extends ExceptionMapper>> {}
 
-    protected void registerRestControllerPackage(String packageName) {
-        final Multibinder<RestControllerPackage> restControllerPackages = Multibinder.newSetBinder(binder(), RestControllerPackage.class);
-        restControllerPackages.addBinding().toInstance(RestControllerPackage.create(packageName));
+    /**
+     * Adds given API resource as a system resource. This should not be used from plugins!
+     * Plugins should use {@link org.graylog2.plugin.PluginModule#addRestResource(Class)} instead to ensure the
+     * addition of the path prefix.
+     *
+     * @param restResourceClass the resource to add
+     */
+    protected void addSystemRestResource(Class<?> restResourceClass) {
+        systemRestResourceBinder().addBinding().toInstance(restResourceClass);
+    }
+
+    private Multibinder<Class<?>> systemRestResourceBinder() {
+        return Multibinder.newSetBinder(
+                binder(),
+                new TypeLiteral<Class<?>>() {},
+                Names.named(SYSTEM_REST_RESOURCES)
+        );
     }
 }

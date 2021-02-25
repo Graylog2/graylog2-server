@@ -15,15 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 import numeral from 'numeral';
 
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
-export const TREND_BAD = 'primary';
-export const TREND_GOOD = 'success';
-export const TREND_NEUTRAL = undefined;
+type TrendDirection = 'good' | 'bad' | 'neutral';
 
 type Props = {
   current: number,
@@ -31,54 +29,78 @@ type Props = {
   trendPreference: TrendPreference,
 };
 
-const Background = styled.div<{ trend: string | undefined | null }>(({ theme, trend }) => {
-  const { variant } = theme.colors;
-  const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
+const background = (theme: DefaultTheme, trend: TrendDirection = 'neutral') => ({
+  good: theme.colors.variant.success,
+  bad: theme.colors.variant.danger,
+  neutral: theme.colors.global.contentBackground,
+}[trend]);
+
+const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, trend }) => {
+  const bgColor = background(theme, trend);
 
   return css`
     text-align: right;
     ${trend && css`
-      background-color: ${bgColor};
-      color: ${theme.utils.contrastingColor(bgColor)};
+      background-color: ${bgColor} !important; /* Needed for report generation */
+      color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
+
+      /* stylelint-disable-next-line property-no-vendor-prefix */
+      -webkit-print-color-adjust: exact !important; /* Needed for report generation */
     `}
   `;
 });
 
-const TextContainer = styled.span`
-  margin: 5px;
-`;
+const TextContainer = styled.div<{ trend: TrendDirection | undefined, ref }>(({ theme, trend }) => {
+  const bgColor = background(theme, trend);
 
-const _background = (delta, trendPreference: TrendPreference) => {
+  return css`
+      margin: 5px;
+      color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
+      font-family: ${theme.fonts.family.body};
+
+      /* stylelint-disable-next-line property-no-vendor-prefix */
+      -webkit-print-color-adjust: exact !important; /* Needed for report generation */`;
+});
+
+const StyledIcon = styled(Icon)<{ trend: TrendDirection | undefined }>(({ theme, trend }) => {
+  const bgColor = background(theme, trend);
+
+  return css`
+    path {
+      fill: ${theme.utils.contrastingColor(bgColor)};
+    }`;
+});
+
+const _trendDirection = (delta: number, trendPreference: TrendPreference): TrendDirection => {
   switch (trendPreference) {
     case 'LOWER':
-      return delta > 0 ? TREND_BAD : TREND_GOOD;
+      return delta > 0 ? 'bad' : 'good';
     case 'HIGHER':
-      return delta > 0 ? TREND_GOOD : TREND_BAD;
+      return delta > 0 ? 'good' : 'bad';
     case 'NEUTRAL':
     default:
-      return TREND_NEUTRAL;
+      return 'neutral';
   }
 };
 
-const _trendIcon = (delta) => {
-  if (delta === 0) {
-    return <Icon name="arrow-circle-right" />;
-  }
-
-  return <Icon name={delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down'} />;
-};
+// eslint-disable-next-line no-nested-ternary
+const _trendIcon = (delta: number) => (delta === 0
+  ? 'arrow-circle-right'
+  : delta > 0
+    ? 'arrow-circle-up'
+    : 'arrow-circle-down');
 
 const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference }: Props, ref) => {
   const difference = previous ? current - previous : NaN;
   const differencePercent = previous ? difference / previous : NaN;
 
-  const backgroundTrend = _background(difference, trendPreference);
+  const backgroundTrend = _trendDirection(difference, trendPreference);
   const trendIcon = _trendIcon(difference);
 
   return (
-    <Background trend={backgroundTrend} data-test-id="trend-background">
-      <TextContainer ref={ref}>
-        {trendIcon} {numeral(difference).format('+0,0[.]0[000]')} / {numeral(differencePercent).format('+0[.]0[0]%')}
+    <Background trend={backgroundTrend} data-testid="trend-background">
+      <TextContainer trend={backgroundTrend} ref={ref}>
+        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> {numeral(difference).format('+0,0[.]0[000]')} / {numeral(differencePercent).format('+0[.]0[0]%')}
       </TextContainer>
     </Background>
   );

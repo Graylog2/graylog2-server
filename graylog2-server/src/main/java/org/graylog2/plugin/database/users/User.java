@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface User extends Persisted {
@@ -36,6 +37,10 @@ public interface User extends Persisted {
 
     @Nullable
     String getAuthServiceUid();
+
+    Optional<String> getFirstName();
+
+    Optional<String> getLastName();
 
     String getFullName();
 
@@ -75,6 +80,20 @@ public interface User extends Persisted {
 
     void setEmail(String email);
 
+    /**
+     * Set the first, last, and full user's name. The full user's full name is composed by concatenating the first and
+     * last names together with a space between. For example "First Last".
+     * @param firstName Required. The user's first name.
+     * @param lastName Required. The user's last name.
+     */
+    void setFirstLastFullNames(String firstName, String lastName);
+
+    /**
+     * Set the user's full name. Starting in Graylog 4.1, use of this method is deprecated.
+     * Prefer use of the {@link #setFirstLastFullNames(String, String)} method instead when possible. This way,
+     * both individual first and last names will be available when needed.
+     */
+    @Deprecated
     void setFullName(String fullname);
 
     String getHashedPassword();

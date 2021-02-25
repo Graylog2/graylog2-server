@@ -28,6 +28,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   const descriptionRef = useRef();
   const ruleSourceRef = useRef();
   const [, setAceLoaded] = useState(false);
+  const [ruleSource, setRuleSource] = useState(rule.source);
 
   const onAceLoaded = () => setAceLoaded(true);
 
@@ -81,7 +82,6 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
 
   useEffect(() => {
     if (ruleSourceRef.current) {
-      ruleSourceRef.current.editor.getSession().setValue(rule.source, -1);
       ruleSourceRef.current.editor.session.setOption('useWorker', false);
     }
 
@@ -90,23 +90,21 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     }
   });
 
-  useEffect(() => {
-    if (ruleSourceRef.current) {
-      ruleSourceRef.current.editor.on('change', () => {
-        if (VALIDATE_TIMEOUT) {
-          clearTimeout(VALIDATE_TIMEOUT);
-          VALIDATE_TIMEOUT = null;
-        }
+  const onChangeSource = useCallback((source) => {
+    setRuleSource(source);
 
-        VALIDATE_TIMEOUT = setTimeout(() => {
-          validateNewRule((errors) => {
-            const nextErrors = errors || [];
-
-            createAnnotations(nextErrors);
-          });
-        }, 500);
-      });
+    if (VALIDATE_TIMEOUT) {
+      clearTimeout(VALIDATE_TIMEOUT);
+      VALIDATE_TIMEOUT = null;
     }
+
+    VALIDATE_TIMEOUT = setTimeout(() => {
+      validateNewRule((errors) => {
+        const nextErrors = errors || [];
+
+        createAnnotations(nextErrors);
+      });
+    }, 500);
   }, [validateNewRule]);
 
   return (
@@ -117,6 +115,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
       ruleSourceRef,
       usedInPipelines,
       onAceLoaded,
+      ruleSource,
+      onChangeSource,
     }}>
       {children}
     </PipelineRulesContext.Provider>

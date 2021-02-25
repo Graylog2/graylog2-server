@@ -16,12 +16,14 @@
  */
 package org.graylog2.users;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -54,6 +56,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -63,6 +66,9 @@ import static com.google.common.base.Strings.nullToEmpty;
 
 @CollectionName(UserImpl.COLLECTION_NAME)
 public class UserImpl extends PersistedImpl implements User {
+
+    public static final String FULL_NAME_FORMAT = "%s %s";
+
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
     private final Permissions permissions;
 
@@ -87,6 +93,8 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
+    public static final String FIRST_NAME = "first_name";
+    public static final String LAST_NAME = "last_name";
     public static final String FULL_NAME = "full_name";
     public static final String PERMISSIONS = "permissions";
     public static final String PREFERENCES = "preferences";
@@ -99,6 +107,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
+    public static final int MAX_FIRST_LAST_NAME_LENGTH = 100;
     public static final int MAX_FULL_NAME_LENGTH = 200;
 
     public static final long DEFAULT_SESSION_TIMEOUT_MS = TimeUnit.HOURS.toMillis(8);
@@ -133,6 +142,8 @@ public class UserImpl extends PersistedImpl implements User {
                 .put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH))
                 .put(PASSWORD, new FilledStringValidator())
                 .put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH))
+                .put(FIRST_NAME, new LimitedOptionalStringValidator(MAX_FIRST_LAST_NAME_LENGTH))
+                .put(LAST_NAME, new LimitedOptionalStringValidator(MAX_FIRST_LAST_NAME_LENGTH))
                 .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH))
                 .put(PERMISSIONS, new ListValidator())
                 .put(ROLES, new ListValidator(true))
@@ -145,11 +156,50 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public String getFullName() {
-        return String.valueOf(fields.get(FULL_NAME));
+    public Optional<String> getFirstName() {
+        final Object firstName = fields.get(FIRST_NAME);
+        if (firstName == null) {
+            return Optional.empty();
+        }
+        return Optional.of(firstName.toString());
     }
 
     @Override
+    public Optional<String> getLastName() {
+        final Object lastName = fields.get(LAST_NAME);
+        if (lastName == null) {
+            return Optional.empty();
+        }
+        return Optional.of(lastName.toString());
+    }
+
+    @Override
+    public String getFullName() {
+        return nullToEmpty((String) fields.get(FULL_NAME));
+    }
+
+    /**
+     * Set the first, last, and full user's name. The user's full name is composed by concatenating the first and
+     * last names together with a space between. For example "First Last".
+     * @param firstName Required. The user's first name.
+     * @param lastName Required. The user's last name.
+     */
+    @Override
+    public void setFirstLastFullNames(final String firstName, final String lastName) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(firstName), "A firstName value is required.");
+        Preconditions.checkArgument(StringUtils.isNotBlank(lastName), "A lastName value is required.");
+        fields.put(FIRST_NAME, firstName);
+        fields.put(LAST_NAME, lastName);
+        fields.put(FULL_NAME, String.format(Locale.ENGLISH, FULL_NAME_FORMAT, firstName, lastName));
+    }
+
+    /**
+     * Set the user's full name. Starting in Graylog 4.1, use of this method is deprecated.
+     * Prefer use of the {@link #setFirstLastFullNames(String, String)} method instead when possible. This way,
+     * both individual first and last names will be available when needed.
+     */
+    @Override
+    @Deprecated
     public void setFullName(final String fullname) {
         fields.put(FULL_NAME, fullname);
     }

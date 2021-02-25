@@ -18,9 +18,11 @@ package org.graylog2.users;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
 import org.junit.Rule;
@@ -36,6 +38,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class UserImplTest {
     @Rule
@@ -45,6 +52,66 @@ public class UserImplTest {
     private PasswordAlgorithmFactory passwordAlgorithmFactory;
 
     private UserImpl user;
+
+    @Test
+    public void testFirstLastFullNames() {
+        user = new UserImpl(null, null, null);
+        user.setFirstLastFullNames("First", "Last");
+        assertTrue(user.getFirstName().isPresent());
+        assertTrue(user.getLastName().isPresent());
+        assertEquals("First", user.getFirstName().get());
+        assertEquals("Last", user.getLastName().get());
+        assertEquals("First Last", user.getFullName());
+    }
+
+    @Test
+    public void testSetFullName() {
+        user = new UserImpl(null, null, null);
+        user.setFullName("Full Name");
+        assertEquals("Full Name", user.getFullName());
+        assertFalse(user.getFirstName().isPresent());
+        assertFalse(user.getLastName().isPresent());
+    }
+
+    @Test
+    public void testNoFullNameEmptyString() {
+        user = new UserImpl(null, null, null);
+        assertEquals("", user.getFullName());
+    }
+
+    @Test
+    public void testFirstLastRequired() {
+        user = new UserImpl(null, null, null);
+        assertThatThrownBy(() -> user.setFirstLastFullNames(null, "Last"))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A firstName value is required");
+
+        assertThatThrownBy(() -> user.setFirstLastFullNames("First", null))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A lastName value is required");
+    }
+
+    @Test
+    public void testFirstNameLengthValidation() {
+        user = new UserImpl(null, null, null);
+        ValidationResult result = user.getValidations().get(UserImpl.FIRST_NAME)
+                                            .validate(StringUtils.repeat("*", 10));
+        assertTrue(result.passed());
+        result = user.getValidations().get(UserImpl.FIRST_NAME)
+                     .validate(StringUtils.repeat("*", 210));
+        assertFalse(result.passed());
+    }
+
+    @Test
+    public void testLastNameLengthValidation() {
+        user = new UserImpl(null, null, null);
+        ValidationResult result = user.getValidations().get(UserImpl.LAST_NAME)
+                                      .validate(StringUtils.repeat("*", 10));
+        assertTrue(result.passed());
+        result = user.getValidations().get(UserImpl.LAST_NAME)
+                     .validate(StringUtils.repeat("*", 210));
+        assertFalse(result.passed());
+    }
 
     @Test
     public void getPermissionsWorksWithEmptyPermissions() throws Exception {

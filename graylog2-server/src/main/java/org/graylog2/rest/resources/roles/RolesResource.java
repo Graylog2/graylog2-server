@@ -207,6 +207,8 @@ public class RolesResource extends RestResource {
                     user.getId(),
                     user.getName(),
                     user.getEmail(),
+                    user.getFirstName().orElse(null),
+                    user.getLastName().orElse(null),
                     user.getFullName(),
                     wildcardPermissions,
                     grnPermissions,

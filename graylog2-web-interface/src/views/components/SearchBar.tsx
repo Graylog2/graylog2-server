@@ -45,7 +45,6 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 
 import SearchBarForm from './searchbar/SearchBarForm';
-import TimeRangeDisplay from './searchbar/TimeRangeDisplay';
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
@@ -120,7 +119,6 @@ const SearchBar = ({
                                            setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                            currentTimeRange={values?.timerange}
                                            hasErrorOnMount={!isValid} />
-                    <TimeRangeDisplay timerange={values?.timerange} />
                   </FlexCol>
 
                   <Col mdHidden lgHidden>
