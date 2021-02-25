@@ -32,7 +32,8 @@ import Routes from 'routing/Routes';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
-import FullNameFormGroup from './FullNameFormGroup';
+import FirstNameFormGroup from './FirstNameFormGroup';
+import LastNameFormGroup from './LastNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
@@ -104,7 +105,8 @@ const UserCreate = () => {
               <div>
                 <Headline>Profile</Headline>
                 <UsernameFormGroup users={users} />
-                <FullNameFormGroup />
+                <FirstNameFormGroup />
+                <LastNameFormGroup />
                 <EmailFormGroup />
               </div>
               <div>
