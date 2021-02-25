@@ -18,6 +18,7 @@ package org.graylog2.shared.journal;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
@@ -28,6 +29,7 @@ import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Uninterruptibles;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.shaded.kafka09.common.KafkaException;
 import org.graylog.shaded.kafka09.common.OffsetOutOfRangeException;
 import org.graylog.shaded.kafka09.common.TopicAndPartition;
@@ -43,6 +45,7 @@ import org.graylog.shaded.kafka09.message.MessageAndOffset;
 import org.graylog.shaded.kafka09.message.MessageSet;
 import org.graylog.shaded.kafka09.scala.Option;
 import org.graylog.shaded.kafka09.scala.collection.Iterator;
+import org.graylog.shaded.kafka09.scala.collection.JavaConversions;
 import org.graylog.shaded.kafka09.scala.collection.Map$;
 import org.graylog.shaded.kafka09.scala.runtime.AbstractFunction1;
 import org.graylog.shaded.kafka09.server.BrokerState;
@@ -59,7 +62,6 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog.shaded.kafka09.scala.collection.JavaConversions;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -99,8 +101,9 @@ import static org.graylog2.plugin.Tools.bytesToHex;
 
 @Singleton
 public class LocalKafkaJournal extends AbstractIdleService implements Journal {
-
     private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaJournal.class);
+
+    private static final String LEGACY_CLASS_NAME = "org.graylog2.shared.journal.KafkaJournal";
 
     private static final int NUM_IO_THREADS = 1;
 
@@ -369,6 +372,26 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
             throw new RuntimeException(e);
         }
 
+        if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
+            registerLegacyMetrics();
+        }
+    }
+
+    /**
+     * This class has been renamed. For backwards compatibility, register the metrics under the old name as well.
+     */
+    private void registerLegacyMetrics() {
+        this.metricRegistry.getMetrics().entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(LocalKafkaJournal.class.getName()))
+                .forEach(entry -> {
+                    String legacyName = LEGACY_CLASS_NAME +
+                            StringUtils.removeStart(entry.getKey(), LocalKafkaJournal.class.getName());
+                    try {
+                        this.metricRegistry.register(legacyName, entry.getValue());
+                    } catch (Exception e) {
+                        LOG.warn("Unable to register metric <{}> under legacy name <{}>.", entry.getKey(), legacyName);
+                    }
+                });
     }
 
     /**
@@ -435,6 +458,10 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_RECOVERY_POINT));
         this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME));
         this.metricRegistry.remove(getOldestSegmentMetricName());
+
+        if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
+            this.metricRegistry.removeMatching(MetricFilter.startsWith(LEGACY_CLASS_NAME));
+        }
     }
 
     private String getOldestSegmentMetricName() {
@@ -602,7 +629,9 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
             while (iterator.hasNext()) {
                 final MessageAndOffset messageAndOffset = iterator.next();
 
-                if (firstOffset == Long.MIN_VALUE) firstOffset = messageAndOffset.offset();
+                if (firstOffset == Long.MIN_VALUE) {
+                    firstOffset = messageAndOffset.offset();
+                }
                 // always remember the last seen offset for debug purposes below
                 lastOffset = messageAndOffset.offset();
 
@@ -892,7 +921,9 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
             int total = 0;
             final Timer.Context ctx = new Timer().time();
             for (final Log kafkaLog : JavaConversions.asJavaIterable(logManager.allLogs())) {
-                if (kafkaLog.config().compact()) continue;
+                if (kafkaLog.config().compact()) {
+                    continue;
+                }
                 loggerForCleaner.debug("Garbage collecting {}", kafkaLog.name());
                 total += cleanupExpiredSegments(kafkaLog) +
                         cleanupSegmentsToMaintainSize(kafkaLog) +
