@@ -93,9 +93,9 @@ const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, tre
   const trendIcon = _trendIcon(difference);
 
   return (
-    <Background trend={backgroundTrend} data-test-id="trend-background">
+    <Background trend={backgroundTrend} data-testid="trend-background">
       <TextContainer trend={backgroundTrend} ref={ref}>
-        <StyledIcon name={trendIcon} trend={backgroundTrend} /> {numeral(difference).format('+0,0[.]0[000]')} / {numeral(differencePercent).format('+0[.]0[0]%')}
+        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> {numeral(difference).format('+0,0[.]0[000]')} / {numeral(differencePercent).format('+0[.]0[0]%')}
       </TextContainer>
     </Background>
   );
