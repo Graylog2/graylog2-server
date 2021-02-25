@@ -27,6 +27,8 @@ import { UsersActions } from 'stores/users/UsersStore';
 
 import UsersOverview from './UsersOverview';
 
+jest.mock('components/graylog/OverlayTrigger', () => 'overlay-trigger');
+
 const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 
 jest.mock('stores/users/UsersStore', () => ({
