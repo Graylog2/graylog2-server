@@ -229,6 +229,18 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void testSaveNoFullNameSuccess() throws Exception {
+        final User user = userService.create();
+        user.setName("TEST");
+        user.setEmail("test@example.com");
+        user.setTimeZone(DateTimeZone.UTC);
+        user.setPassword("TEST");
+        user.setPermissions(Collections.<String>emptyList());
+        user.setFullName(null);
+        userService.save(user);
+    }
+
+    @Test
     public void testGetAdminUser() throws Exception {
         assertThat(userService.getAdminUser().getName()).isEqualTo(configuration.getRootUsername());
         assertThat(userService.getAdminUser().getEmail()).isEqualTo(configuration.getRootEmail());
