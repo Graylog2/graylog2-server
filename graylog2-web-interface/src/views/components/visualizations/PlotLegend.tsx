@@ -31,8 +31,8 @@ import { colors as defaultColors } from 'views/components/visualizations/Colors'
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
-  background-color: ${color} !important;
-  -webkit-print-color-adjust: exact !important;
+  background-color: ${color} !important; /* Needed for report generation */
+  -webkit-print-color-adjust: exact !important; /* Needed for report generation */
   width: 12px;
   height: 12px;
 `);
