@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { List } from 'immutable';
+import { Field } from 'formik';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Widget from 'views/logic/widgets/Widget';
@@ -28,11 +29,7 @@ import IfSearch from 'views/components/search/IfSearch';
 
 type CSVExportSettingsType = {
   fields: List<FieldTypeMapping>,
-  limit: number | undefined | null,
-  setLimit: (limit: number) => void,
   selectedWidget: Widget | undefined | null,
-  selectField: (fields: { label: string, value: string }[]) => void,
-  selectedFields: { field: string }[] | undefined | null,
   view: View,
 };
 
@@ -56,10 +53,6 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, v
 const CSVExportSettings = ({
   fields,
   selectedWidget,
-  selectField,
-  selectedFields,
-  setLimit,
-  limit,
   view,
 }: CSVExportSettingsType) => {
   return (
@@ -79,17 +72,38 @@ const CSVExportSettings = ({
         </p>
       </Row>
       <Row>
-        <label htmlFor="export-fields">Fields to export</label>
-        <FieldSelect fields={fields} onChange={selectField} value={selectedFields} allowOptionCreation={!!selectedWidget} inputId="export-fields" />
+        <Field name="selectedFields">
+          {({ field: { name, value, onChange } }) => (
+            <>
+              <label htmlFor={name}>Fields to export</label>
+              <FieldSelect fields={fields}
+                           onChange={(newFields) => {
+                             const newFieldsValue = newFields.map(({ value: field }) => ({ field }));
+
+                             return onChange({ target: { name, value: newFieldsValue } });
+                           }}
+                           value={value}
+                           allowOptionCreation={!!selectedWidget}
+                           inputId={name} />
+            </>
+          )}
+        </Field>
       </Row>
       <Row>
-        <label htmlFor="export-limit">Messages limit</label>
-        <Input type="number"
-               id="export-limit"
-               onChange={({ target: { value } }) => setLimit(Number(value))}
-               min={1}
-               step={1}
-               value={limit} />
+        <Field name="limit">
+          {({ field: { name, value, onChange } }) => (
+            <>
+              <label htmlFor={name}>Messages limit</label>
+              <Input type="number"
+                     id={name}
+                     name={name}
+                     onChange={onChange}
+                     min={1}
+                     step={1}
+                     value={value} />
+            </>
+          )}
+        </Field>
       </Row>
       <Row>
         Messages are loaded in chunks. If a limit is defined, all chunks up to the one where the limit is reached will be retrieved. Which means the total number of delivered messages can be higher than the defined limit.
