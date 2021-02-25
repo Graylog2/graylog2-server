@@ -134,7 +134,7 @@ public class Server extends ServerBootstrap {
         modules.add(
                 new VersionAwareStorageModule(),
                 new ConfigurationModule(configuration),
-                new ServerBindings(configuration),
+                new ServerBindings(configInjector),
                 new ElasticsearchModule(),
                 new PersistenceServicesBindings(),
                 new MessageFilterBindings(),

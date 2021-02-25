@@ -17,6 +17,7 @@
 package org.graylog2.bindings;
 
 import com.floreysoft.jmte.Engine;
+import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -89,17 +90,18 @@ import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
-    private final Configuration configuration;
+    private final Injector configInjector;
 
-    public ServerBindings(Configuration configuration) {
-        this.configuration = configuration;
+    public ServerBindings(Injector configInjector) {
+        this.configInjector = configInjector;
     }
 
     @Override
     protected void configure() {
+        Configuration configuration = configInjector.getInstance(Configuration.class);
         bindInterfaces();
         bindSingletons();
-        install(new MessageQueueModule(configuration));
+        install(new MessageQueueModule(configInjector));
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();

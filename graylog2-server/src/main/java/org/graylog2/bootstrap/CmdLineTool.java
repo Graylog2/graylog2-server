@@ -38,8 +38,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Stage;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -50,10 +52,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginLoaderConfig;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
@@ -113,6 +113,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected String commandName = "command";
 
     protected Injector injector;
+    protected Injector configInjector;
 
     protected CmdLineTool(BaseConfiguration configuration) {
         this(null, configuration);
@@ -171,7 +172,10 @@ public abstract class CmdLineTool implements CliCommand {
     public void run() {
         final Level logLevel = setupLogger();
 
-        final PluginBindings pluginBindings = installPluginConfigAndBindings(getPluginPath(configFile), chainingClassLoader);
+        final Set<Plugin> plugins = loadPlugins(getPluginPath(configFile), chainingClassLoader);
+
+        // adds configuration from plugins to jadConfig
+        installPluginConfig(plugins);
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
@@ -193,10 +197,16 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(configModule, pluginBindings, binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
+        configInjector = setupConfigInjector(configModule);
+        if (configInjector != null) {
+            final PluginBindings pluginBindings = new PluginBindings(plugins, configInjector);
+            injector = setupInjector(configModule, pluginBindings,
+                    binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
+        }
 
         if (injector == null) {
-            LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug reports.)");
+            LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug " +
+                    "reports.)");
             System.exit(1);
         }
 
@@ -210,6 +220,13 @@ public abstract class CmdLineTool implements CliCommand {
         reporter.start();
 
         startCommand();
+    }
+
+    private void installPluginConfig(Set<Plugin> plugins) {
+        plugins.stream()
+                .flatMap(plugin -> plugin.modules().stream())
+                .flatMap(pm -> pm.getConfigBeans().stream())
+                .forEach(jadConfig::addConfigurationBean);
     }
 
     protected abstract void startCommand();
@@ -267,20 +284,6 @@ public abstract class CmdLineTool implements CliCommand {
             jadConfig.addConfigurationBean(bean);
         }
         dumpCurrentConfigAndExit();
-    }
-
-    private PluginBindings installPluginConfigAndBindings(Path pluginPath, ChainingClassLoader classLoader) {
-        final Set<Plugin> plugins = loadPlugins(pluginPath, classLoader);
-        final PluginBindings pluginBindings = new PluginBindings(plugins, configuration);
-        for (final Plugin plugin : plugins) {
-            for (final PluginModule pluginModule : plugin.modules(configuration)) {
-                for (final PluginConfigBean configBean : pluginModule.getConfigBeans()) {
-                    jadConfig.addConfigurationBean(configBean);
-                }
-            }
-
-        }
-        return pluginBindings;
     }
 
     private Path getPluginPath(String configFile) {
@@ -380,6 +383,22 @@ public abstract class CmdLineTool implements CliCommand {
             });
 
             return GuiceInjectorHolder.createInjector(modules.build());
+        } catch (CreationException e) {
+            annotateInjectorCreationException(e);
+            return null;
+        } catch (Exception e) {
+            LOG.error("Injector creation failed!", e);
+            return null;
+        }
+    }
+
+    /**
+     * Set up a separate injector, containing only the configuration bindings. It can be used to look up configuration
+     * values in modules at binding time.
+     */
+    protected Injector setupConfigInjector(NamedConfigParametersModule configModule) {
+        try {
+            return Guice.createInjector(Stage.PRODUCTION, Collections.singletonList(configModule));
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
             return null;

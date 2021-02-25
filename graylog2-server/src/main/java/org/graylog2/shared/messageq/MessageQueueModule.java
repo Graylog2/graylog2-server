@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.messageq;
 
+import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
@@ -34,29 +35,26 @@ public class MessageQueueModule extends PluginModule {
     public static String DISK_JOURNAL_MODE = "disk";
     public static String NOOP_JOURNAL_MODE = "noop";
 
-    private final Configuration configuration;
-
-    public MessageQueueModule(Configuration configuration) {
-        this.configuration = configuration;
+    public MessageQueueModule(Injector configInjector) {
+        super(configInjector);
     }
 
     @Override
     protected void configure() {
+        Configuration config = getConfigInjector().getInstance(Configuration.class);
         installMessageQueueImplementation(
-                configuration,
                 NOOP_JOURNAL_MODE,
                 NoopMessageQueueReader.class,
                 NoopMessageQueueWriter.class,
                 NoopMessageQueueAcknowledger.class);
 
         installMessageQueueImplementation(
-                configuration,
                 DISK_JOURNAL_MODE,
                 LocalKafkaMessageQueueReader.class,
                 LocalKafkaMessageQueueWriter.class,
                 LocalKafkaMessageQueueAcknowledger.class);
 
-        if (configuration.getEffectiveMessageJournalMode().equals(DISK_JOURNAL_MODE)) {
+        if (config.getMessageJournalMode().equals(DISK_JOURNAL_MODE)) {
             install(new KafkaJournalModule());
             serviceBinder().addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
         } else {

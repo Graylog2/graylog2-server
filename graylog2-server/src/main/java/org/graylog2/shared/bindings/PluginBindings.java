@@ -17,10 +17,10 @@
 package org.graylog2.shared.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
@@ -30,11 +30,11 @@ import java.util.Set;
 
 public class PluginBindings extends AbstractModule {
     private final Set<Plugin> plugins;
-    private final BaseConfiguration configuration;
+    private final Injector configInjector;
 
-    public PluginBindings(Set<Plugin> plugins, BaseConfiguration configuration) {
+    public PluginBindings(Set<Plugin> plugins, Injector configInjector) {
         this.plugins = plugins;
-        this.configuration = configuration;
+        this.configInjector = configInjector;
     }
 
     @Override
@@ -50,7 +50,8 @@ public class PluginBindings extends AbstractModule {
 
         for (final Plugin plugin : plugins) {
             pluginbinder.addBinding().toInstance(plugin);
-            for (final PluginModule pluginModule : plugin.modules(configuration)) {
+            for (final PluginModule pluginModule : plugin.modules()) {
+                pluginModule.setConfigInjector(configInjector);
                 binder().install(pluginModule);
             }
 

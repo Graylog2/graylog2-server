@@ -20,13 +20,5 @@ import java.util.Collection;
 
 public interface Plugin {
     PluginMetaData metadata();
-
     Collection<PluginModule> modules();
-
-    /**
-     * If you need access to the base configuration to configure your bindings, override this method.
-     */
-    default Collection<PluginModule> modules(BaseConfiguration configuration) {
-        return modules();
-    }
 }

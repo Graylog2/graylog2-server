@@ -201,9 +201,9 @@ public abstract class BaseConfiguration extends PathConfiguration {
     }
 
     /**
-     * Effective journal mode will be "noop" if the journal is disabled or the configured journal mode otherwise.
+     * Journal mode will be "noop" if the journal is disabled or the configured journal mode otherwise.
      */
-    public String getEffectiveMessageJournalMode() {
+    public String getMessageJournalMode() {
         return messageJournalEnabled ? messageJournalMode : NOOP_JOURNAL_MODE;
     }
 

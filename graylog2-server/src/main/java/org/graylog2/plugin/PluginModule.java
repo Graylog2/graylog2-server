@@ -74,12 +74,35 @@ import java.util.stream.Stream;
 
 public abstract class PluginModule extends Graylog2Module {
     private static final Logger log = LoggerFactory.getLogger(PluginModule.class);
-
     private Injector configInjector;
 
-    // TODO: limit visibility?
+    public PluginModule() {
+    }
+
+    public PluginModule(Injector configInjector) {
+        this.configInjector = configInjector;
+    }
+
     public void setConfigInjector(Injector configInjector) {
         this.configInjector = configInjector;
+    }
+
+    /**
+     * Provides access to an injector to retrieve configuration beans. When a plugin is picked up by the server, the
+     * config injector will be set for you. However, if a PluginModule has been created outside of a "real" plugin, the
+     * injector must have been provided in advance by using either {@link #PluginModule(Injector)} or {@link
+     * #setConfigInjector(Injector)}.
+     *
+     * @throws IllegalStateException if the injector has not been set before
+     */
+    protected Injector getConfigInjector() {
+        if (configInjector == null) {
+            throw new IllegalStateException("Plugin module " + this.getClass().getName() + " is accessing config " +
+                    "injector, but none has been set. The server runtime will set the injector for you upon plugin " +
+                    "initialization, but if you extend this class outside of a plugin, you will have to take care of " +
+                    "setting the injector yourself.");
+        }
+        return configInjector;
     }
 
     public Set<? extends PluginConfigBean> getConfigBeans() {
@@ -334,13 +357,16 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addAuthServiceBackend(String name,
-            Class<? extends AuthServiceBackend> backendClass,
-            Class<? extends AuthServiceBackend.Factory<? extends AuthServiceBackend>> factoryClass,
-            Class<? extends AuthServiceBackendConfig> configClass) {
+                                         Class<? extends AuthServiceBackend> backendClass,
+                                         Class<? extends AuthServiceBackend.Factory<? extends AuthServiceBackend>> factoryClass,
+                                         Class<? extends AuthServiceBackendConfig> configClass) {
         install(new FactoryModuleBuilder().implement(AuthServiceBackend.class, backendClass).build(factoryClass));
         authServiceBackendBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(configClass, name);
     }
+
+    // TODO: check if we can rewrite this to use the configInjector instead of a system property (iow check if the
+    //  system property is used elsewhere)
 
     /**
      * @return A boolean indicating if the plugin is being loaded on Graylog Cloud. The graylog.cloud system property is
@@ -354,22 +380,19 @@ public abstract class PluginModule extends Graylog2Module {
      * Install a message queue implementation. If any of the given classes implement the {@link Service} interface, they
      * will be registered as services.
      *
-     * @param config            Configuration to check if the current journal mode requires binding of the
-     *                          implementation
      * @param mode              Identifier for the journal mode value assigned to this implementation
      * @param readerClass       Reader implementation
      * @param writerClass       Writer implementation
      * @param acknowledgerClass Acknowledger implementation
      */
-    // TODO: remove obsolete param
-    protected void installMessageQueueImplementation(BaseConfiguration obsolete, String mode,
+    protected void installMessageQueueImplementation(String mode,
                                                      Class<? extends MessageQueueReader> readerClass,
                                                      Class<? extends MessageQueueWriter> writerClass,
                                                      Class<? extends MessageQueueAcknowledger> acknowledgerClass) {
 
-        final Configuration config = configInjector.getInstance(Configuration.class);
+        final Configuration config = getConfigInjector().getInstance(Configuration.class);
 
-        if (!config.getEffectiveMessageJournalMode().equals(mode)) {
+        if (!config.getMessageJournalMode().equals(mode)) {
             return;
         }
 
