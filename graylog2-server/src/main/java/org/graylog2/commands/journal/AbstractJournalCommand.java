@@ -27,7 +27,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.journal.KafkaJournal;
-import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.shared.journal.LocalKafkaJournalModule;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 
 import java.nio.file.Path;
@@ -51,10 +51,10 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
     @Override
     protected List<Module> getCommandBindings() {
         return Arrays.asList(new ConfigurationModule(configuration),
-                             new ServerStatusBindings(capabilities()),
-                             new SchedulerBindings(),
-                             new KafkaJournalModule(),
-                             new AuditBindings());
+                new ServerStatusBindings(capabilities()),
+                new SchedulerBindings(),
+                new LocalKafkaJournalModule(),
+                new AuditBindings());
     }
 
     @Override
@@ -88,7 +88,9 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
             System.err.println(
                     "Unable to read the message journal. Please make sure no other Graylog process is using the journal.");
         } finally {
-            if (journal != null) journal.stopAsync().awaitTerminated();
+            if (journal != null) {
+                journal.stopAsync().awaitTerminated();
+            }
         }
     }
 

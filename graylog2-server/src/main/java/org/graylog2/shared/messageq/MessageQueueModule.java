@@ -22,7 +22,7 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.KafkaJournal;
-import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.shared.journal.LocalKafkaJournalModule;
 import org.graylog2.shared.journal.NoopJournal;
 import org.graylog2.shared.messageq.localkafka.LocalKafkaMessageQueueAcknowledger;
 import org.graylog2.shared.messageq.localkafka.LocalKafkaMessageQueueReader;
@@ -55,7 +55,7 @@ public class MessageQueueModule extends PluginModule {
                 LocalKafkaMessageQueueAcknowledger.class);
 
         if (config.getMessageJournalMode().equals(DISK_JOURNAL_MODE)) {
-            install(new KafkaJournalModule());
+            install(new LocalKafkaJournalModule());
             serviceBinder().addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
         } else {
             binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);

@@ -19,7 +19,7 @@ package org.graylog2.shared.journal;
 import com.google.inject.Scopes;
 import org.graylog2.plugin.PluginModule;
 
-public class KafkaJournalModule extends PluginModule {
+public class LocalKafkaJournalModule extends PluginModule {
     @Override
     protected void configure() {
         bind(Journal.class).to(KafkaJournal.class).in(Scopes.SINGLETON);
