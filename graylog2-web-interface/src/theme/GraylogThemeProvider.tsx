@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 import merge from 'lodash/merge';
 import { $PropertyType } from 'utility-types';
 
+import { Spinner } from 'components/common';
 import { breakpoints, colors, fonts, utils } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
@@ -28,9 +29,11 @@ import AppConfig from 'util/AppConfig';
 import UpdatableThemeContext from 'theme/UpdatableThemeContext';
 import { generateGrayScale, generateInputColors, generateTableColors, generateVariantColors, generateGlobalColors } from 'theme/variants/util';
 import { Colors } from 'theme/colors';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
+const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 const customizedTheme = AppConfig.customTheme();
 
 const generateTheme = ({ changeMode, customizedThemeColors, mode }) => {
@@ -89,8 +92,15 @@ const generateTheme = ({ changeMode, customizedThemeColors, mode }) => {
 };
 
 const GraylogThemeProvider = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const canCustomizeTheme = useRef(false);
   const [mode, changeMode] = useCurrentThemeMode();
-  const [customizedThemeColors, setCustomizedThemeColors] = useState(customizedTheme);
+  const [customizedThemeColors, setCustomizedThemeColors] = useState(canCustomizeTheme.current ? customizedTheme : {});
+
+  EnterpriseActions.getLicenseInfo().then(({ free_license_info: { license_status } }) => {
+    canCustomizeTheme.current = license_status === 'installed';
+    setIsLoading(false);
+  });
 
   const updatableTheme = (newColors: any) => {
     setCustomizedThemeColors(merge({}, customizedThemeColors, newColors));
@@ -99,7 +109,7 @@ const GraylogThemeProvider = ({ children }) => {
   const theme: DefaultTheme = useMemo(() => generateTheme({ mode, changeMode, customizedThemeColors }),
     [mode, customizedThemeColors, changeMode]);
 
-  return (
+  return isLoading ? <Spinner /> : (
     <UpdatableThemeContext.Provider value={{ updatableTheme }}>
       <ThemeProvider theme={theme}>
         {children}

@@ -48,7 +48,7 @@ const AppConfig = {
   },
 
   customTheme() {
-    return this.appConfig().customTheme;
+    return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
   },
 
   appConfig() {
