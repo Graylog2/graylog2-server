@@ -260,7 +260,7 @@ describe('<Widget />', () => {
     await findByText('Unknown widget in edit mode');
   });
 
-  it('copies title when duplicating widget', (done) => {
+  it('copies title when duplicating widget', async () => {
     const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" />);
 
     const actionToggle = getByTestId('widgetActionDropDown');
@@ -268,21 +268,14 @@ describe('<Widget />', () => {
     fireEvent.click(actionToggle);
     const duplicateBtn = getByText('Duplicate');
 
-    WidgetActions.duplicate = mockAction(jest.fn(() => Promise.resolve(WidgetModel.builder().id('duplicatedWidgetId').build())));
+    WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
 
-    TitlesActions.set = mockAction(jest.fn(async (type, id, title) => {
-      expect(type).toEqual(TitleTypes.Widget);
-      expect(id).toEqual('duplicatedWidgetId');
-      expect(title).toEqual('Dummy Widget (copy)');
-
-      done();
-
-      return Immutable.Map() as TitlesMap;
-    }));
+    TitlesActions.set = mockAction(jest.fn().mockResolvedValue(Immutable.Map() as TitlesMap));
 
     fireEvent.click(duplicateBtn);
 
-    expect(WidgetActions.duplicate).toHaveBeenCalled();
+    await waitFor(() => expect(WidgetActions.duplicate).toHaveBeenCalled());
+    await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
   });
 
   it('adds cancel action to widget in edit mode', () => {

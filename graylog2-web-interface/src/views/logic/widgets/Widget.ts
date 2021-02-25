@@ -73,6 +73,7 @@ class Widget {
     return this._value.streams;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   get isExportable() {
     return false;
   }

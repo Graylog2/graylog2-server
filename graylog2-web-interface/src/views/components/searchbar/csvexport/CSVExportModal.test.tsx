@@ -32,7 +32,6 @@ import Search from 'views/logic/search/Search';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View, { ViewType } from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
-import Widget from 'views/logic/widgets/Widget';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
