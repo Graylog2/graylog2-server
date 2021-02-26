@@ -22,7 +22,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import { Input } from 'components/bootstrap';
-import { Row } from 'components/graylog';
+import { HelpBlock, Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
@@ -101,12 +101,12 @@ const CSVExportSettings = ({
                      min={1}
                      step={1}
                      value={value} />
+              <HelpBlock>
+                Messages are loaded in chunks. If a limit is defined, all chunks up to the one where the limit is reached will be retrieved. Which means the total number of delivered messages can be higher than the defined limit.
+              </HelpBlock>
             </>
           )}
         </Field>
-      </Row>
-      <Row>
-        Messages are loaded in chunks. If a limit is defined, all chunks up to the one where the limit is reached will be retrieved. Which means the total number of delivered messages can be higher than the defined limit.
       </Row>
     </>
   );
