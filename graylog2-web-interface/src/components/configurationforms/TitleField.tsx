@@ -19,33 +19,38 @@ import React from 'react';
 
 import { TextField } from 'components/configurationforms';
 
-class TitleField extends React.Component {
-  static propTypes = {
-    helpBlock: PropTypes.node,
-    onChange: PropTypes.func,
-    typeName: PropTypes.string.isRequired,
-    value: PropTypes.any,
-  };
+type Props = {
+  helpBlock?: React.ReactNode,
+  onChange: () => void,
+  typeName: string,
+  value: string,
+};
 
-  static defaultProps = {
-    helpBlock: <span />,
-    onChange: () => {},
-  };
+const TitleField = ({ typeName, helpBlock, value, onChange }: Props) => {
+  const titleField = { is_optional: false, attributes: [], human_name: 'Title', description: helpBlock };
 
-  render() {
-    const { typeName } = this.props;
-    const titleField = { is_optional: false, attributes: [], human_name: 'Title', description: this.props.helpBlock };
+  return (
+    <TextField key={`${typeName}-title`}
+               typeName={typeName}
+               title="title"
+               field={titleField}
+               value={value}
+               onChange={onChange}
+               autoFocus />
+  );
+};
 
-    return (
-      <TextField key={`${typeName}-title`}
-                 typeName={typeName}
-                 title="title"
-                 field={titleField}
-                 value={this.props.value}
-                 onChange={this.props.onChange}
-                 autoFocus />
-    );
-  }
-}
+TitleField.propTypes = {
+  helpBlock: PropTypes.node,
+  onChange: PropTypes.func,
+  typeName: PropTypes.string.isRequired,
+  value: PropTypes.string,
+};
+
+TitleField.defaultProps = {
+  helpBlock: <span />,
+  onChange: () => {},
+  value: '',
+};
 
 export default TitleField;
