@@ -19,8 +19,6 @@ import { flatten } from 'lodash';
 import ObjectID from 'bson-objectid';
 
 import Widget from 'views/logic/widgets/Widget';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import defaultTitle from 'views/components/defaultTitle';
 
 import ViewState from './ViewState';

@@ -38,8 +38,6 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import EditMessageList from 'views/components/widgets/EditMessageList';
-import MessageConfigGenerator from 'views/logic/searchtypes/messages/MessageConfigGenerator';
 
 import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
 
