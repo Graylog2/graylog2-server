@@ -67,15 +67,6 @@ const _getInitialFields = (selectedWidget) => {
   return initialFields.map((field) => ({ field })).toArray();
 };
 
-const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields) => {
-  setSelectedWidget(newWidget);
-  setSelectedFields(_getInitialFields(newWidget));
-};
-
-const _onFieldSelect = (newFields, setSelectedFields) => {
-  setSelectedFields(newFields.map((field) => ({ field: field.value })));
-};
-
 const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal) => {
   setLoading(true);
   startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit).then(closeModal);
