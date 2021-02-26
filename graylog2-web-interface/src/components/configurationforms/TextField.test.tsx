@@ -19,8 +19,7 @@ describe('<TextField>', () => {
 
     const fieldLabel = screen.getByText(textField.human_name, { exact: false });
     const optionalMarker = screen.getByText(/(optional)/);
-    const formField = container.querySelector('input[type="text"]');
-    // const formField = screen.getByLabelText(textField.human_name, { exact: false });
+    const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).toBeInTheDocument();
@@ -32,7 +31,7 @@ describe('<TextField>', () => {
   });
 
   it('should render a field with a value', () => {
-    const { container } = render(
+    render(
       <TextField field={textField}
                  onChange={() => {}}
                  title="example_text_field"
@@ -40,14 +39,14 @@ describe('<TextField>', () => {
                  value={textField.default_value} />,
     );
 
-    const formField = container.querySelector('input[type="text"]');
+    const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveValue(textField.default_value);
   });
 
   it('should render a required text field', () => {
-    const { container } = render(
+    render(
       <TextField field={requiredTextField}
                  onChange={() => {}}
                  title="example_text_field"
@@ -56,8 +55,7 @@ describe('<TextField>', () => {
 
     const fieldLabel = screen.getByText(textField.human_name, { exact: false });
     const optionalMarker = screen.queryByText(/(optional)/);
-    const formField = container.querySelector('input[type="text"]');
-    // const formField = screen.getByLabelText(textField.human_name, { exact: false });
+    const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).not.toBeInTheDocument();
@@ -69,7 +67,7 @@ describe('<TextField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    const { container } = render(
+    render(
       <TextField field={textField}
                  onChange={updateFunction}
                  title="example_text_field"
@@ -77,8 +75,7 @@ describe('<TextField>', () => {
                  value={textField.default_value} />,
     );
 
-    const formField = container.querySelector('input[type="text"]');
-    // const formField = screen.getByLabelText(textField.human_name, { exact: false });
+    const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
     fireEvent.change(formField, { target: { value: 'new value' } });
 
@@ -93,8 +90,7 @@ describe('<TextField>', () => {
                  typeName="text" />,
     );
 
-    const formField = container.querySelector('input[type="password"]');
-    // const formField = screen.getByLabelText(textField.human_name, { exact: false });
+    const formField = screen.getByLabelText(passwordTextField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveAttribute('type', 'password');
@@ -109,8 +105,7 @@ describe('<TextField>', () => {
                  typeName="text" />,
     );
 
-    const formField = container.querySelector('textarea');
-    // const formField = screen.getByLabelText(textField.human_name, { exact: false });
+    const formField = screen.getByLabelText(textAreaField.human_name, { exact: false });
 
     expect(formField).toBeInTheDocument();
     expect(container).toMatchSnapshot();

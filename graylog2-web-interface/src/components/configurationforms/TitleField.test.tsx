@@ -9,12 +9,11 @@ describe('<TitleField>', () => {
   });
 
   it('should render an empty field', () => {
-    const { container } = render(
+    render(
       <TitleField typeName="org.graylog.plugins.example" />,
     );
 
-    const titleField = container.querySelector('input[id="title"]');
-    // const titleField = screen.getByLabelText(/title/i);
+    const titleField = screen.getByLabelText(/title/i);
 
     expect(titleField).toBeInTheDocument();
     expect(titleField).toHaveAttribute('required');
@@ -22,12 +21,11 @@ describe('<TitleField>', () => {
   });
 
   it('should render a field with value', () => {
-    const { container } = render(
+    render(
       <TitleField typeName="org.graylog.plugins.example" value="My title" />,
     );
 
-    const titleField = container.querySelector('input[id="title"]');
-    // const titleField = screen.getByLabelText(/title/i);
+    const titleField = screen.getByLabelText(/title/i);
 
     expect(titleField).toHaveValue('My title');
   });
@@ -35,12 +33,11 @@ describe('<TitleField>', () => {
   it('should call onChange function when input value changes', async () => {
     const changeFunction = jest.fn();
 
-    const { container } = render(
+    render(
       <TitleField typeName="org.graylog.plugins.example" onChange={changeFunction} />,
     );
 
-    const titleField = container.querySelector('input[id="title"]');
-    // const titleField = screen.getByLabelText(/title/i);
+    const titleField = screen.getByLabelText(/title/i);
     fireEvent.change(titleField, { target: { value: 'New title' } });
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('title', 'New title'));
