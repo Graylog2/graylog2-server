@@ -99,7 +99,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   const singleWidgetDownload = !!directExportWidgetId;
 
   const _startDownload = (values: FormState) => {
-    return _onStartDownload(downloadFile, view, executionState, values.selectedWidget, values.selectedFields.map(({ field }) => field), values.limit, setLoading, closeModal);
+    return _onStartDownload(downloadFile, view, executionState, values.selectedWidget, values.selectedFields, values.limit, setLoading, closeModal);
   };
 
   const initialValues: FormState = {
