@@ -7,9 +7,7 @@ export const numberField: NumberField = {
   description: 'my number description',
   human_name: 'number field',
   is_optional: true,
-  name: 'number_field',
   position: 100,
-  title: 'number field title',
   type: 'number',
 };
 
@@ -20,9 +18,7 @@ export const requiredNumberField: NumberField = {
   description: 'my number description',
   human_name: 'number field',
   is_optional: false,
-  name: 'number_field',
   position: 100,
-  title: 'number field title',
   type: 'number',
 };
 
@@ -33,9 +29,7 @@ export const negativeNumberField: NumberField = {
   description: 'my number description',
   human_name: 'number field',
   is_optional: true,
-  name: 'number_field',
   position: 100,
-  title: 'number field title',
   type: 'number',
 };
 
@@ -46,9 +40,7 @@ export const positiveNumberField: NumberField = {
   description: 'my number description',
   human_name: 'number field',
   is_optional: true,
-  name: 'number_field',
   position: 100,
-  title: 'number field title',
   type: 'number',
 };
 

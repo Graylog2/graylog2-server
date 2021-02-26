@@ -19,7 +19,7 @@ describe('<NumberField>', () => {
     render(
       <NumberField field={numberField}
                    onChange={() => {}}
-                   title={numberField.title}
+                   title="example_number_field"
                    typeName="number" />,
     );
 
@@ -40,7 +40,7 @@ describe('<NumberField>', () => {
     render(
       <NumberField field={numberField}
                    onChange={() => {}}
-                   title={numberField.title}
+                   title="example_number_field"
                    typeName="number"
                    value={numberField.default_value} />,
     );
@@ -55,7 +55,7 @@ describe('<NumberField>', () => {
     render(
       <NumberField field={requiredNumberField}
                    onChange={() => {}}
-                   title={requiredNumberField.title}
+                   title="example_number_field"
                    typeName="number" />,
     );
 
@@ -75,7 +75,7 @@ describe('<NumberField>', () => {
     render(
       <NumberField field={numberField}
                    onChange={changeFunction}
-                   title={numberField.title}
+                   title="example_number_field"
                    typeName="number"
                    value={numberField.default_value} />,
     );
@@ -83,14 +83,14 @@ describe('<NumberField>', () => {
     const formField = screen.getByLabelText(numberField.human_name, { exact: false });
     fireEvent.change(formField, { target: { value: '123' } });
 
-    await waitFor(() => expect(changeFunction).toHaveBeenCalledWith(numberField.title, 123));
+    await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_number_field', 123));
   });
 
   it('should render negative number field', () => {
     render(
       <NumberField field={negativeNumberField}
                    onChange={() => {}}
-                   title={negativeNumberField.title}
+                   title="example_number_field"
                    typeName="number" />,
     );
 
@@ -105,7 +105,7 @@ describe('<NumberField>', () => {
     render(
       <NumberField field={positiveNumberField}
                    onChange={() => {}}
-                   title={positiveNumberField.title}
+                   title="example_number_field"
                    typeName="number" />,
     );
 
@@ -120,7 +120,7 @@ describe('<NumberField>', () => {
     render(
       <NumberField field={portNumberField}
                    onChange={() => {}}
-                   title={portNumberField.title}
+                   title="example_number_field"
                    typeName="number" />,
     );
 
@@ -134,7 +134,7 @@ describe('<NumberField>', () => {
   it('should match the snapshot', () => {
     const { container } = render(<NumberField field={numberField}
                                               onChange={() => {}}
-                                              title={numberField.title}
+                                              title="example_number_field"
                                               typeName="number" />);
 
     expect(container).toMatchSnapshot();

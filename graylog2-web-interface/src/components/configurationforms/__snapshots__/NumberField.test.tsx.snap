@@ -63,7 +63,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
   >
     <label
       class="c0 control-label"
-      for="number-number field title"
+      for="number-example_number_field"
     >
       <span>
         number field
@@ -78,11 +78,11 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
     <span>
       <input
         class="c1 input-xlarge validatable form-control"
-        id="number-number field title"
+        id="number-example_number_field"
         label="[object Object]"
         max="9007199254740991"
         min="-9007199254740991"
-        name="number field title"
+        name="example_number_field"
         placeholder=""
         type="number"
         value="0"

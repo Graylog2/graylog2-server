@@ -72,10 +72,10 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
   const label = <span>{field.human_name} {FieldHelpers.optionalMarker(field)}</span>;
 
   return (
-    <Input id={`${typeName}-${field.title}`}
+    <Input id={`${typeName}-${title}`}
            label={label}
            type="number"
-           name={field.title}
+           name={title}
            className="input-xlarge validatable"
            required={isRequired}
            onChange={handleChange}
