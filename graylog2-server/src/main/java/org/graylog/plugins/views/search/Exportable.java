@@ -16,7 +16,10 @@
  */
 package org.graylog.plugins.views.search;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public interface Exportable {
+    @JsonIgnore
     default boolean isExportable() {
         return false;
     }
