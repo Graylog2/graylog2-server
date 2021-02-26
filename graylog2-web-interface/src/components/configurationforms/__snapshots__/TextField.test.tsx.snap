@@ -1,0 +1,93 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TextField> should render a password field 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <label
+      for="text-example_password_field)"
+    >
+      password field
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <input
+      class="form-control"
+      id="example_password_field"
+      name="configuration[example_password_field]"
+      type="password"
+      value=""
+    />
+    <p
+      class="help-block"
+    >
+      my password description
+    </p>
+  </div>
+</div>
+`;
+
+exports[`<TextField> should render a textarea field 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <label
+      for="text-example_textarea_field)"
+    >
+      text area field
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <textarea
+      class="form-control"
+      id="example_textarea_field"
+      name="configuration[example_textarea_field]"
+      rows="10"
+    />
+    <p
+      class="help-block"
+    >
+      my long text description
+    </p>
+  </div>
+</div>
+`;
+
+exports[`<TextField> should render an empty field 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <label
+      for="text-example_text_field)"
+    >
+      text field
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <input
+      class="form-control"
+      id="example_text_field"
+      name="configuration[example_text_field]"
+      type="text"
+      value=""
+    />
+    <p
+      class="help-block"
+    >
+      my text description
+    </p>
+  </div>
+</div>
+`;
