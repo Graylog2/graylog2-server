@@ -30,22 +30,32 @@ const ProfileSection = ({
   user: {
     username,
     fullName,
+    firstName,
+    lastName,
     email,
     clientAddress,
     lastActivity,
     sessionActive,
     accountStatus,
   },
-}: Props) => (
-  <SectionComponent title="Profile">
-    <ReadOnlyFormGroup label="Username" value={username} />
-    <ReadOnlyFormGroup label="Full name" value={fullName} />
-    <ReadOnlyFormGroup label="E-Mail Address" value={email} />
-    <ReadOnlyFormGroup label="Client Address" value={clientAddress} />
-    <ReadOnlyFormGroup label="Last Activity" value={lastActivity} />
-    <ReadOnlyFormGroup label="Logged In" value={<LoggedInIcon active={sessionActive} />} />
-    <ReadOnlyFormGroup label="Enabled" value={accountStatus === 'enabled'} />
-  </SectionComponent>
-);
+}: Props) => {
+  const isOldUser = () => {
+    return fullName && (!firstName && !lastName);
+  };
+
+  return (
+    <SectionComponent title="Profile">
+      <ReadOnlyFormGroup label="Username" value={username} />
+      {isOldUser() && <ReadOnlyFormGroup label="Full name" value={fullName} />}
+      <ReadOnlyFormGroup label="First Name" value={firstName} />
+      <ReadOnlyFormGroup label="Last Name" value={lastName} />
+      <ReadOnlyFormGroup label="E-Mail Address" value={email} />
+      <ReadOnlyFormGroup label="Client Address" value={clientAddress} />
+      <ReadOnlyFormGroup label="Last Activity" value={lastActivity} />
+      <ReadOnlyFormGroup label="Logged In" value={<LoggedInIcon active={sessionActive} />} />
+      <ReadOnlyFormGroup label="Enabled" value={accountStatus === 'enabled'} />
+    </SectionComponent>
+  );
+};
 
 export default ProfileSection;
