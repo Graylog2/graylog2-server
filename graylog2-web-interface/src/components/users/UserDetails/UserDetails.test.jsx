@@ -46,6 +46,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 const user = User
   .builder()
   .fullName('The full name')
+  .firstName('The first name')
+  .lastName('The last name')
   .username('The username')
   .email('theemail@example.org')
   .clientAddress('127.0.0.1')
@@ -70,7 +72,8 @@ describe('<UserDetails />', () => {
 
     await screen.findByText(user.username);
 
-    expect(screen.getByText(user.fullName)).toBeInTheDocument();
+    expect(screen.getByText(user.firstName)).toBeInTheDocument();
+    expect(screen.getByText(user.lastName)).toBeInTheDocument();
     expect(screen.getByText(user.email)).toBeInTheDocument();
     expect(screen.getByText(user.clientAddress)).toBeInTheDocument();
 
