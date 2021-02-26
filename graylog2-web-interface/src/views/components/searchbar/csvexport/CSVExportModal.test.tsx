@@ -20,6 +20,7 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
 import { Optional } from 'utility-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
@@ -32,7 +33,6 @@ import Search from 'views/logic/search/Search';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View, { ViewType } from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
-import Widget from 'views/logic/widgets/Widget';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -55,6 +55,18 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
+const pluginExports = {
+  exports: {
+    enterpriseWidgets: [
+      {
+        type: 'messages',
+        displayName: 'Message List',
+        titleGenerator: () => MessagesWidget.defaultTitle,
+      },
+    ],
+  },
+};
+
 describe('CSVExportModal', () => {
   const searchType = {
     id: 'search-type-id-1',
@@ -74,9 +86,9 @@ describe('CSVExportModal', () => {
   ];
   const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'level', Direction.Descending);
   const config = new MessagesWidgetConfig(['level', 'http_method'], true, [], [currentSort]);
-  const widget1 = Widget.builder().id('widget-id-1').type(MessagesWidget.type).config(config)
+  const widget1 = MessagesWidget.builder().id('widget-id-1').config(config)
     .build();
-  const widget2 = Widget.builder().id('widget-id-2').type(MessagesWidget.type).config(config)
+  const widget2 = MessagesWidget.builder().id('widget-id-2').config(config)
     .build();
   const states: ViewStateMap = Immutable.Map({
     'query-id-1': ViewState.create(),
@@ -118,6 +130,14 @@ describe('CSVExportModal', () => {
     limit: undefined,
     execution_state: new SearchExecutionState(),
   };
+
+  beforeAll(() => {
+    PluginStore.register(pluginExports);
+  });
+
+  afterAll(() => {
+    PluginStore.unregister(pluginExports);
+  });
 
   afterEach(() => {
     jest.clearAllMocks();

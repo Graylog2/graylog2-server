@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import { List } from 'immutable';
+import { List, Set } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -24,7 +24,6 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
@@ -38,7 +37,7 @@ import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
-const DEFAULT_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD];
+const DEFAULT_FIELDS = Set([TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD]);
 
 const Content = styled.div`
   margin-left: 15px;
@@ -53,22 +52,18 @@ export type Props = {
   view: View,
 };
 
-const _getInitialWidgetFields = (selectedWidget) => {
+const _getInitialWidgetFields = (selectedWidget: Widget): Set<string> => {
   if (selectedWidget.config.showMessageRow) {
-    return [...new Set([...selectedWidget.config.fields, MESSAGE_FIELD])];
+    return Set<string>(selectedWidget.config.fields).add(MESSAGE_FIELD).toSet();
   }
 
-  return selectedWidget.config.fields;
+  return Set(selectedWidget.config.fields);
 };
 
 const _getInitialFields = (selectedWidget) => {
-  let initialFields = DEFAULT_FIELDS;
+  const initialFields = selectedWidget ? _getInitialWidgetFields(selectedWidget) : DEFAULT_FIELDS;
 
-  if (selectedWidget) {
-    initialFields = _getInitialWidgetFields(selectedWidget);
-  }
-
-  return initialFields.map((field) => ({ field }));
+  return initialFields.map((field) => ({ field })).toArray();
 };
 
 const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields) => {
@@ -88,16 +83,16 @@ const _onStartDownload = (downloadFile, view, executionState, selectedWidget, se
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
-  const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type).toList()).toList().flatten(true) as List<Widget>;
+  const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
 
   const [loading, setLoading] = useState(false);
-  const [selectedWidget, setSelectedWidget] = useState<Widget | undefined>(initialWidget(messagesWidgets, directExportWidgetId));
+  const [selectedWidget, setSelectedWidget] = useState<Widget | undefined>(initialWidget(exportableWidgets, directExportWidgetId));
   const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(_getInitialFields(selectedWidget));
   const [limit, setLimit] = useState<number | undefined>();
 
   const singleWidgetDownload = !!directExportWidgetId;
-  const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, messagesWidgets);
-  const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, messagesWidgets);
+  const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, exportableWidgets);
+  const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, exportableWidgets);
   const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields, loading);
   const _startDownload = () => _onStartDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal);
 
@@ -111,7 +106,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
           {showWidgetSelection && (
             <CSVExportWidgetSelection selectWidget={(selection) => _onSelectWidget(selection, setSelectedWidget, setSelectedFields)}
                                       view={view}
-                                      widgets={messagesWidgets.toList()} />
+                                      widgets={exportableWidgets.toList()} />
           )}
           {!showWidgetSelection && (
             <CSVExportSettings fields={fields}

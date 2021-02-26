@@ -40,7 +40,6 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
@@ -337,7 +336,7 @@ class Widget extends React.Component<Props, State> {
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
     const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
-    const { config, type } = widget;
+    const { config } = widget;
     const { focusedWidget, setFocusedWidget } = this.context;
     const isFocusedWidget = focusedWidget === id;
     const visualization = this.visualize();
@@ -398,7 +397,7 @@ class Widget extends React.Component<Props, State> {
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
-                      {type === MessagesWidget.type && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
+                      {widget.isExportable && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       </IfSearch>
