@@ -34,7 +34,7 @@ const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivEleme
   `;
 });
 
-const TextContainer = styled.div<{trend: ?string}, ThemeInterface, HTMLDivElement>(({ theme, trend }) => {
+const TextContainer: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
   const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
@@ -47,7 +47,7 @@ const TextContainer = styled.div<{trend: ?string}, ThemeInterface, HTMLDivElemen
       -webkit-print-color-adjust: exact !important; /* Needed for report generation */`;
 });
 
-const StyledIcon = styled(Icon)<{ trend: ?string}, ThemeInterface, HTMLDivElement>(({ theme, trend }) => {
+const StyledIcon: StyledComponent<{trend: ?string}, ThemeInterface, typeof Icon> = styled(Icon)(({ theme, trend }) => {
   const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
@@ -69,12 +69,12 @@ const _background = (delta, trendPreference: TrendPreference) => {
   }
 };
 
-const _trendIcon = (delta) => {
+const _trendIcon = (delta, trend) => {
   if (delta === 0) {
-    return <StyledIcon name="arrow-circle-right" />;
+    return <StyledIcon trend={trend} name="arrow-circle-right" />;
   }
 
-  return <StyledIcon name={delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down'} />;
+  return <StyledIcon trend={trend} name={delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down'} />;
 };
 
 const Trend = React.forwardRef<Props, any>(({ current, previous, trendPreference }: Props, ref) => {
@@ -82,7 +82,7 @@ const Trend = React.forwardRef<Props, any>(({ current, previous, trendPreference
   const differencePercent = previous ? difference / previous : NaN;
 
   const backgroundTrend = _background(difference, trendPreference);
-  const trendIcon = _trendIcon(difference);
+  const trendIcon = _trendIcon(difference, backgroundTrend);
 
   return (
     <Background trend={backgroundTrend} data-test-id="trend-background">
