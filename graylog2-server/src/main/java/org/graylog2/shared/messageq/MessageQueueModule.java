@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.messageq;
 
-import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
@@ -32,29 +31,32 @@ import org.graylog2.shared.messageq.noop.NoopMessageQueueReader;
 import org.graylog2.shared.messageq.noop.NoopMessageQueueWriter;
 
 public class MessageQueueModule extends PluginModule {
-    public static String DISK_JOURNAL_MODE = "disk";
-    public static String NOOP_JOURNAL_MODE = "noop";
+    public static final String DISK_JOURNAL_MODE = "disk";
+    public static final String NOOP_JOURNAL_MODE = "noop";
 
-    public MessageQueueModule(Injector configInjector) {
-        super(configInjector);
+    private final Configuration configuration;
+
+    public MessageQueueModule(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
     protected void configure() {
-        Configuration config = getConfigInjector().getInstance(Configuration.class);
-        installMessageQueueImplementation(
-                NOOP_JOURNAL_MODE,
-                NoopMessageQueueReader.class,
-                NoopMessageQueueWriter.class,
-                NoopMessageQueueAcknowledger.class);
+        switch (configuration.getMessageJournalMode()) {
+            case NOOP_JOURNAL_MODE:
+                bindMessageQueueImplementation(NoopMessageQueueReader.class, NoopMessageQueueWriter.class,
+                        NoopMessageQueueAcknowledger.class);
+                break;
+            case DISK_JOURNAL_MODE:
+                bindMessageQueueImplementation(LocalKafkaMessageQueueReader.class, LocalKafkaMessageQueueWriter.class
+                        , LocalKafkaMessageQueueAcknowledger.class);
+                break;
+            default:
+                // OK, none of the journal modes covered by this plugin are activated
+                break;
+        }
 
-        installMessageQueueImplementation(
-                DISK_JOURNAL_MODE,
-                LocalKafkaMessageQueueReader.class,
-                LocalKafkaMessageQueueWriter.class,
-                LocalKafkaMessageQueueAcknowledger.class);
-
-        if (config.getMessageJournalMode().equals(DISK_JOURNAL_MODE)) {
+        if (configuration.getMessageJournalMode().equals(DISK_JOURNAL_MODE)) {
             install(new LocalKafkaJournalModule());
             serviceBinder().addBinding().to(LocalKafkaJournal.class).in(Scopes.SINGLETON);
         } else {

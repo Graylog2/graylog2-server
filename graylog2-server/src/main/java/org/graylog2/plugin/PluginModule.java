@@ -17,7 +17,6 @@
 package org.graylog2.plugin;
 
 import com.google.common.util.concurrent.Service;
-import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -38,7 +37,6 @@ import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
-import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
@@ -64,8 +62,6 @@ import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
@@ -73,38 +69,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public abstract class PluginModule extends Graylog2Module {
-    private static final Logger log = LoggerFactory.getLogger(PluginModule.class);
-    private Injector configInjector;
-
-    public PluginModule() {
-    }
-
-    public PluginModule(Injector configInjector) {
-        this.configInjector = configInjector;
-    }
-
-    public void setConfigInjector(Injector configInjector) {
-        this.configInjector = configInjector;
-    }
-
-    /**
-     * Provides access to an injector to retrieve configuration beans. When a plugin is picked up by the server, the
-     * config injector will be set for you. However, if a PluginModule has been created outside of a "real" plugin, the
-     * injector must have been provided in advance by using either {@link #PluginModule(Injector)} or {@link
-     * #setConfigInjector(Injector)}.
-     *
-     * @throws IllegalStateException if the injector has not been set before
-     */
-    protected Injector getConfigInjector() {
-        if (configInjector == null) {
-            throw new IllegalStateException("Plugin module " + this.getClass().getName() + " is accessing config " +
-                    "injector, but none has been set. The server runtime will set the injector for you upon plugin " +
-                    "initialization, but if you extend this class outside of a plugin, you will have to take care of " +
-                    "setting the injector yourself.");
-        }
-        return configInjector;
-    }
-
     public Set<? extends PluginConfigBean> getConfigBeans() {
         return Collections.emptySet();
     }
@@ -365,38 +329,26 @@ public abstract class PluginModule extends Graylog2Module {
         registerJacksonSubtype(configClass, name);
     }
 
-    // TODO: check if we can rewrite this to use the configInjector instead of a system property (iow check if the
-    //  system property is used elsewhere)
-
     /**
      * @return A boolean indicating if the plugin is being loaded on Graylog Cloud. The graylog.cloud system property is
      * set in the startup sequence of the Graylog Cloud Plugin.
      */
     protected boolean isCloud() {
+        // TODO: check if we can get rid of this method, now that we have the ability to inject core config into plugins
         return Boolean.parseBoolean(System.getProperty("graylog.cloud"));
     }
 
     /**
-     * Install a message queue implementation. If any of the given classes implement the {@link Service} interface, they
-     * will be registered as services.
+     * Bind a message queue implementation. If any of the given classes implements the {@link Service} interface, it
+     * will also be registered with the {@link #serviceBinder()}.
      *
-     * @param mode              Identifier for the journal mode value assigned to this implementation
      * @param readerClass       Reader implementation
      * @param writerClass       Writer implementation
      * @param acknowledgerClass Acknowledger implementation
      */
-    protected void installMessageQueueImplementation(String mode,
-                                                     Class<? extends MessageQueueReader> readerClass,
-                                                     Class<? extends MessageQueueWriter> writerClass,
-                                                     Class<? extends MessageQueueAcknowledger> acknowledgerClass) {
-
-        final Configuration config = getConfigInjector().getInstance(Configuration.class);
-
-        if (!config.getMessageJournalMode().equals(mode)) {
-            return;
-        }
-
-        log.info("Activating <{}> journal mode.", mode);
+    protected void bindMessageQueueImplementation(Class<? extends MessageQueueReader> readerClass,
+                                                  Class<? extends MessageQueueWriter> writerClass,
+                                                  Class<? extends MessageQueueAcknowledger> acknowledgerClass) {
 
         bind(MessageQueueReader.class).to(readerClass).in(Scopes.SINGLETON);
         bind(MessageQueueWriter.class).to(writerClass).in(Scopes.SINGLETON);

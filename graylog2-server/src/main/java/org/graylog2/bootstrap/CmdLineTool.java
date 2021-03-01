@@ -113,7 +113,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected String commandName = "command";
 
     protected Injector injector;
-    protected Injector configInjector;
+    protected Injector coreConfigInjector;
 
     protected CmdLineTool(BaseConfiguration configuration) {
         this(null, configuration);
@@ -172,6 +172,13 @@ public abstract class CmdLineTool implements CliCommand {
     public void run() {
         final Level logLevel = setupLogger();
 
+        coreConfigInjector = setupCoreConfigInjector(readConfiguration(configFile));
+        if (coreConfigInjector == null) {
+            LOG.error("Injector for core configuration could not be created, exiting! (Please include the previous " +
+                    "error messages in bug reports.)");
+            System.exit(1);
+        }
+
         final Set<Plugin> plugins = loadPlugins(getPluginPath(configFile), chainingClassLoader);
 
         // adds configuration from plugins to jadConfig
@@ -197,12 +204,8 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        configInjector = setupConfigInjector(configModule);
-        if (configInjector != null) {
-            final PluginBindings pluginBindings = new PluginBindings(plugins, configInjector);
-            injector = setupInjector(configModule, pluginBindings,
-                    binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
-        }
+        injector = setupInjector(configModule, new PluginBindings(plugins),
+                binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug " +
@@ -296,7 +299,8 @@ public abstract class CmdLineTool implements CliCommand {
     protected Set<Plugin> loadPlugins(Path pluginPath, ChainingClassLoader chainingClassLoader) {
         final Set<Plugin> plugins = new HashSet<>();
 
-        final PluginLoader pluginLoader = new PluginLoader(pluginPath.toFile(), chainingClassLoader);
+        final PluginLoader pluginLoader = new PluginLoader(pluginPath.toFile(), chainingClassLoader,
+                coreConfigInjector);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
             final PluginMetaData metadata = plugin.metadata();
             if (capabilities().containsAll(metadata.getRequiredCapabilities())) {
@@ -393,12 +397,13 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     /**
-     * Set up a separate injector, containing only the configuration bindings. It can be used to look up configuration
-     * values in modules at binding time.
+     * Set up a separate injector, containing only the core configuration bindings. It can be used to look up
+     * configuration values in modules at binding time.
      */
-    protected Injector setupConfigInjector(NamedConfigParametersModule configModule) {
+    protected Injector setupCoreConfigInjector(NamedConfigParametersModule configModule) {
         try {
-            return Guice.createInjector(Stage.PRODUCTION, Collections.singletonList(configModule));
+            return Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(configModule,
+                    (Module) Binder::requireExplicitBindings));
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
             return null;
