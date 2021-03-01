@@ -38,7 +38,7 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
   'availableStreams',
 ));
 
-jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
+jest.mock('views/components/searchbar/AsyncQueryInput', () => 'query-input');
 jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => 'saved-search-controls');
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
