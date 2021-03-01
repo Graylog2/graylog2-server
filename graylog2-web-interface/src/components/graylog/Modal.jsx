@@ -24,6 +24,7 @@ const Dialog = css`
   .modal-content {
     background-color: ${({ theme }) => theme.colors.global.contentBackground};
     border-color: ${({ theme }) => theme.colors.variant.light.default};
+    height: 100%;
   }
 `;
 

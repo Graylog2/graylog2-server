@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
@@ -31,7 +31,6 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import styles from './EditWidgetFrame.css';
-import globalStyles from './EditWidgetFrame.global.lazy.css';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -73,12 +72,6 @@ const onSubmit = (values, widget: Widget) => {
 
 const EditWidgetFrame = ({ children }: Props) => {
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
-
-  useEffect(() => {
-    globalStyles.use();
-
-    return globalStyles.unuse;
-  }, []);
 
   const widget = useContext(WidgetContext);
 
