@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
@@ -32,13 +33,19 @@ type Props = {
   setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
 };
 
+const FlexContainer = styled.span`
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+`;
+
 const TimeRangeTypeSelector = ({ disabled, hasErrorOnMount, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
 
   return (
-    <>
+    <FlexContainer>
       <TimeRangeDropdownButton disabled={disabled}
                                show={show}
                                toggleShow={toggleShow}
@@ -49,7 +56,7 @@ const TimeRangeTypeSelector = ({ disabled, hasErrorOnMount, noOverride, currentT
                            toggleDropdownShow={toggleShow} />
       </TimeRangeDropdownButton>
       <TimeRangeDisplay timerange={currentTimeRange} toggleDropdownShow={toggleShow} />
-    </>
+    </FlexContainer>
   );
 };
 

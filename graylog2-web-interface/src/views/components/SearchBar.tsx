@@ -114,12 +114,12 @@ const SearchBar = ({
             {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
               <>
                 <TopRow>
-                  <FlexCol md={5}>
+                  <Col md={5}>
                     <TimeRangeTypeSelector disabled={disableSearch}
                                            setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                            currentTimeRange={values?.timerange}
                                            hasErrorOnMount={!isValid} />
-                  </FlexCol>
+                  </Col>
 
                   <Col mdHidden lgHidden>
                     <HorizontalSpacer />
