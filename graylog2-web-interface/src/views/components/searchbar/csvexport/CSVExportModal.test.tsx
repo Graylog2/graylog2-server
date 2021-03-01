@@ -162,7 +162,6 @@ describe('CSVExportModal', () => {
   };
 
   it('should provide current execution state on export', async () => {
-    const exportSearchMessagesAction = asMock(exportSearchMessages);
     const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });
     const effectiveTimeRange: AbsoluteTimeRange = { type: 'absolute', from: '2020-01-01T12:18:17.827Z', to: '2020-01-01T12:23:17.827Z' };
     const globalQuery: ElasticsearchQueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
@@ -185,12 +184,11 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
+    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
   });
 
   it('should show loading indicator after starting download', async () => {
-    const exportSearchMessagesAction = asMock(exportSearchMessages);
-    const { getByTestId, getByText, getAllByText } = render(<SimpleCSVExportModal />);
+    const { getByTestId, findByText, getAllByText } = render(<SimpleCSVExportModal />);
 
     expect(getAllByText('Start Download')).toHaveLength(2);
 
@@ -198,9 +196,9 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    expect(getByText('Downloading...')).not.toBeNull();
+    await findByText('Downloading...');
 
-    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
   });
 
   it('should be closed after finishing download', async () => {
@@ -215,7 +213,6 @@ describe('CSVExportModal', () => {
   });
 
   it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
-    const exportSearchTypeMessagesAction = asMock(exportSearchTypeMessages);
     const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
     const widgetWithoutMessageRow = widget1.toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
@@ -233,9 +230,9 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(exportSearchTypeMessagesAction).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-    expect(exportSearchTypeMessagesAction).toHaveBeenCalledWith(
+    expect(exportSearchTypeMessages).toHaveBeenCalledWith(
       {
         ...payload,
         fields_in_order: [
@@ -266,16 +263,15 @@ describe('CSVExportModal', () => {
     });
 
     it('should export all messages with default fields when no widget exists', async () => {
-      const exportSearchMessagesAction = asMock(exportSearchMessages);
       const { getByTestId } = render(<SearchCSVExportModal />);
 
       const submitButton = getByTestId('csv-download-button');
 
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchMessagesAction).toHaveBeenCalledWith(
+      expect(exportSearchMessages).toHaveBeenCalledWith(
         {
           ...payload,
           fields_in_order: [
