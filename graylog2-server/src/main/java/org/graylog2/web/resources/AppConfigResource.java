@@ -88,7 +88,7 @@ public class AppConfigResource {
                 Map.Entry::getKey,
                 entry -> entry.getValue().pluginSettings()));
         try {
-            return objectMapper.writeValueAsString(pluginUISettings);
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pluginUISettings);
         } catch (JsonProcessingException ex) {
             return "{}";
         }
