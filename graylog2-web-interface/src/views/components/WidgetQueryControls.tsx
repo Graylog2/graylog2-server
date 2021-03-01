@@ -41,12 +41,6 @@ type Props = {
   globalOverride: GlobalOverride | undefined | null,
 };
 
-const FlexCol = styled(Col)`
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-`;
-
 const BlurredWrapper = styled.div`
   filter: blur(4px);
 `;

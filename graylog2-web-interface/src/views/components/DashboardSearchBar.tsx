@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
-import styled from 'styled-components';
 import moment from 'moment';
 
 import { Col, Row } from 'components/graylog';
