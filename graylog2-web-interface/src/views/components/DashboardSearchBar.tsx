@@ -39,12 +39,6 @@ import { SearchesConfig } from 'components/search/SearchConfig';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 
-const FlexCol = styled(Col)`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
 type Props = {
   config: SearchesConfig,
   globalOverride: {
@@ -76,13 +70,13 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
             {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
               <>
                 <TopRow>
-                  <FlexCol lg={8} md={9} xs={10}>
+                  <Col lg={8} md={9} xs={10}>
                     <TimeRangeInput disabled={disableSearch}
                                     setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                     currentTimeRange={values?.timerange}
                                     hasErrorOnMount={!isValid}
                                     noOverride />
-                  </FlexCol>
+                  </Col>
                   <Col lg={4} md={3} xs={2}>
                     <RefreshControls />
                   </Col>

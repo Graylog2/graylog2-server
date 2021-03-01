@@ -94,12 +94,12 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
       <Wrapper>
         <>
           <TopRow>
-            <FlexCol md={4}>
+            <Col md={4}>
               <TimeRangeInput disabled={isGloballyOverridden}
                               setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                               currentTimeRange={values?.timerange}
                               hasErrorOnMount={!isValid} />
-            </FlexCol>
+            </Col>
 
             <Col md={8}>
               <Field name="streams">
