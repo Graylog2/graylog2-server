@@ -57,4 +57,10 @@ describe('LogViewExportSettings', () => {
       type: 'relative',
     }));
   });
+
+  it('shows "No Override" if no time range is provided', async () => {
+    render(<TimeRangeInput currentTimeRange={{}} setCurrentTimeRange={() => {}} />);
+
+    await screen.findByText('No Override');
+  });
 });
