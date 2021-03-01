@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 import merge from 'lodash/merge';
@@ -28,7 +28,7 @@ import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import AppConfig from 'util/AppConfig';
 import UpdatableThemeContext from 'theme/UpdatableThemeContext';
 import { generateGrayScale, generateInputColors, generateTableColors, generateVariantColors, generateGlobalColors } from 'theme/variants/util';
-import { Colors } from 'theme/colors';
+import { Colors, ThemeColorModes } from 'theme/colors';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
@@ -36,7 +36,7 @@ import useCurrentThemeMode from './UseCurrentThemeMode';
 const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 const customizedTheme = AppConfig.customTheme();
 
-const generateTheme = ({ changeMode, customizedThemeColors, mode }) => {
+const generateTheme = ({ changeMode, customizedThemeColors, mode }): DefaultTheme => {
   let currentTheme: Colors = colors[mode];
   let tableColors: $PropertyType<Colors, 'table'> = colors[mode].table;
   let inputColors: $PropertyType<Colors, 'input'> = colors[mode].input;
@@ -45,7 +45,6 @@ const generateTheme = ({ changeMode, customizedThemeColors, mode }) => {
   let globalColors: $PropertyType<Colors, 'global'> = colors[mode].global;
 
   if (customizedThemeColors && Object.entries(customizedThemeColors).length > 0) {
-    // Should only be accessible to Enterprise users
     currentTheme = merge({}, colors, customizedThemeColors)[mode];
     tableColors = generateTableColors(mode, currentTheme.variant);
     inputColors = generateInputColors(mode, currentTheme.global, currentTheme.gray, currentTheme.variant);
@@ -92,21 +91,32 @@ const generateTheme = ({ changeMode, customizedThemeColors, mode }) => {
 };
 
 const GraylogThemeProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const canCustomizeTheme = useRef(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [canCustomizeTheme, setCanCustomizeTheme] = useState<boolean>(false);
   const [mode, changeMode] = useCurrentThemeMode();
-  const [customizedThemeColors, setCustomizedThemeColors] = useState(canCustomizeTheme.current ? customizedTheme : {});
+  const [customizedThemeColors, setCustomizedThemeColors] = useState<ThemeColorModes | undefined>(canCustomizeTheme ? customizedTheme : {});
 
-  EnterpriseActions.getLicenseInfo().then(({ free_license_info: { license_status } }) => {
-    canCustomizeTheme.current = license_status === 'installed';
-    setIsLoading(false);
-  });
+  useEffect(() => {
+    if (isLoading) {
+      EnterpriseActions.getLicenseInfo().then(({ free_license_info: { license_status } }) => {
+        setCanCustomizeTheme(license_status === 'installed');
+      });
+
+      setIsLoading(false);
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (canCustomizeTheme) {
+      setCustomizedThemeColors(customizedTheme);
+    }
+  }, [canCustomizeTheme]);
 
   const updatableTheme = (newColors: any) => {
     setCustomizedThemeColors(merge({}, customizedThemeColors, newColors));
   };
 
-  const theme: DefaultTheme = useMemo(() => generateTheme({ mode, changeMode, customizedThemeColors }),
+  const theme = useMemo(() => generateTheme({ mode, changeMode, customizedThemeColors }),
     [mode, customizedThemeColors, changeMode]);
 
   return isLoading ? <Spinner /> : (

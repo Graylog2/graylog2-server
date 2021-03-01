@@ -253,12 +253,12 @@ export const colorsPropTypes = PropTypes.shape({
   }),
 });
 
-type Modes = {
+export type ThemeColorModes = {
   teint: Colors,
   noir: Colors,
 };
 
-const colors: Modes = {
+const colors: ThemeColorModes = {
   teint,
   noir,
 };
