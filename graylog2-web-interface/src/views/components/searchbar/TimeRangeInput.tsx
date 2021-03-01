@@ -39,7 +39,7 @@ const FlexContainer = styled.span`
   justify-content: space-between;
 `;
 
-const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value, onChange }: Props) => {
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
