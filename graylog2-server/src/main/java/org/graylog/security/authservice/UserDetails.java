@@ -41,7 +41,15 @@ public abstract class UserDetails {
 
     public abstract String email();
 
-    public abstract String fullName();
+    public abstract Optional<String> firstName();
+
+    public abstract Optional<String> lastName();
+
+    /**
+     * Some authentication backends only currently support the fullName attribute (and not firstName and lastName),
+     * so it is still optionally available here. Prefer use of only firstName and lastName when available.
+     */
+    public abstract Optional<String> fullName();
 
     public abstract Set<String> defaultRoles();
 
@@ -77,10 +85,27 @@ public abstract class UserDetails {
 
         public abstract Builder email(String email);
 
-        public abstract Builder fullName(String fullName);
+        public abstract Builder firstName(@Nullable String firstName);
+
+        public abstract Builder lastName(@Nullable String lastName);
+
+        public abstract Builder fullName(@Nullable String fullName);
 
         public abstract Builder defaultRoles(Set<String> defaultRoles);
 
-        public abstract UserDetails build();
+        abstract UserDetails autoBuild();
+
+        public UserDetails build() {
+            UserDetails userDetails = autoBuild();
+
+            // Either a fullName, or a firstName/lastName are required.
+            final boolean missingFirstOrLast = !userDetails.firstName().isPresent()
+                                               || !userDetails.lastName().isPresent();
+
+            if (missingFirstOrLast && !userDetails.fullName().isPresent()) {
+                throw new IllegalArgumentException("Either a firstName/lastName or a fullName are required.");
+            }
+            return userDetails;
+        }
     }
 }

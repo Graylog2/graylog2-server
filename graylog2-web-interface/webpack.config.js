@@ -264,19 +264,6 @@ if (TARGET.startsWith('build')) {
   });
 }
 
-if (TARGET === 'test') {
-  // eslint-disable-next-line no-console
-  console.error('Running test/ci mode');
-
-  module.exports = merge(webpackConfig, {
-    module: {
-      rules: [
-        { test: /\.js(x)?$/, enforce: 'pre', loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ },
-      ],
-    },
-  });
-}
-
 if (Object.keys(module.exports).length === 0) {
   module.exports = webpackConfig;
 }

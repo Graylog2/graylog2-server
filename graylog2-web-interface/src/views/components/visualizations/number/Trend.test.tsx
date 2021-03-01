@@ -15,130 +15,132 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-
-import Trend, { TREND_BAD, TREND_GOOD, TREND_NEUTRAL } from './Trend';
+import Trend from './Trend';
 
 const renderTrend = ({
   current = 42,
   previous = 42,
   trendPreference = 'NEUTRAL',
-}: {
-  current?: number,
-  previous?: number,
-  trendPreference?: TrendPreference
- } = {}) => mount(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
+}: Partial<React.ComponentProps<typeof Trend>> = {}) => render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
 
 describe('Trend', () => {
-  it('shows absolute delta', () => {
-    const wrapper = renderTrend({ previous: 23 });
+  it('shows absolute delta', async () => {
+    renderTrend({ previous: 23 });
 
-    expect(wrapper).toIncludeText('+19');
+    await screen.findByText(/\+19/);
   });
 
-  it('shows relative delta as percentage', () => {
-    const wrapper = renderTrend({ previous: 23 });
+  it('shows relative delta as percentage', async () => {
+    renderTrend({ previous: 23 });
 
-    expect(wrapper).toIncludeText('+82.61%');
+    await screen.findByText(/\+82.61%/);
   });
 
-  it('shows absolute delta if values are equal', () => {
-    const wrapper = renderTrend();
+  it('shows absolute delta if values are equal', async () => {
+    renderTrend();
 
-    expect(wrapper).toIncludeText('+0');
+    await screen.findByText(/\+0/);
   });
 
-  it('shows relative delta as percentage if values are equal', () => {
-    const wrapper = renderTrend();
+  it('shows relative delta as percentage if values are equal', async () => {
+    renderTrend();
 
-    expect(wrapper).toIncludeText('+0%');
+    await screen.findByText(/\+0%/);
   });
 
-  it('shows negative absolute delta', () => {
-    const wrapper = renderTrend({ current: 23 });
+  it('shows negative absolute delta', async () => {
+    renderTrend({ current: 23 });
 
-    expect(wrapper).toIncludeText('-19');
+    await screen.findByText(/-19/);
   });
 
-  it('shows negative relative delta as percentage', () => {
-    const wrapper = renderTrend({ current: 23 });
+  it('shows negative relative delta as percentage', async () => {
+    renderTrend({ current: 23 });
 
-    expect(wrapper).toIncludeText('-45.24%');
+    await screen.findByText(/-45.24%/);
   });
 
   describe('renders background according to values and trend preference', () => {
-    it('shows neutral background if values are equal', () => {
-      const wrapper = renderTrend();
+    it('shows neutral background if values are equal', async () => {
+      renderTrend();
 
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_NEUTRAL);
+      const background = await screen.findByTestId('trend-background');
+
+      expect(background).toHaveStyleRule('background-color', '#fff !important');
     });
 
-    it('shows good background if current value and preference are higher', () => {
-      const wrapper = renderTrend({ current: 43, trendPreference: 'HIGHER' });
+    it('shows good background if current value and preference are higher', async () => {
+      renderTrend({ current: 43, trendPreference: 'HIGHER' });
 
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_GOOD);
+      const background = await screen.findByTestId('trend-background');
+
+      expect(background).toHaveStyleRule('background-color', '#00ae42 !important');
     });
 
-    it('shows good background if current value and preference are lower', () => {
-      const wrapper = renderTrend({ current: 41, trendPreference: 'LOWER' });
+    it('shows good background if current value and preference are lower', async () => {
+      renderTrend({ current: 41, trendPreference: 'LOWER' });
 
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_GOOD);
+      const background = await screen.findByTestId('trend-background');
+
+      expect(background).toHaveStyleRule('background-color', '#00ae42 !important');
     });
 
-    it('shows bad background if current value is lower but preference is higher', () => {
-      const wrapper = renderTrend({ current: 41, trendPreference: 'HIGHER' });
+    it('shows bad background if current value is lower but preference is higher', async () => {
+      renderTrend({ current: 41, trendPreference: 'HIGHER' });
 
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_BAD);
+      const background = await screen.findByTestId('trend-background');
+
+      expect(background).toHaveStyleRule('background-color', '#ad0707 !important');
     });
 
-    it('shows bad background if current value is higher but preference is lower', () => {
-      const wrapper = renderTrend({ current: 43, trendPreference: 'LOWER' });
+    it('shows bad background if current value is higher but preference is lower', async () => {
+      renderTrend({ current: 43, trendPreference: 'LOWER' });
 
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_BAD);
+      const background = await screen.findByTestId('trend-background');
+
+      expect(background).toHaveStyleRule('background-color', '#ad0707 !important');
     });
 
-    it('shows neutral background if current value is higher but preference is neutral', () => {
-      const wrapper = renderTrend({ current: 43, trendPreference: 'NEUTRAL' });
+    it('shows neutral background if current value is higher but preference is neutral', async () => {
+      renderTrend({ current: 43, trendPreference: 'NEUTRAL' });
 
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_NEUTRAL);
+      const background = await screen.findByTestId('trend-background');
+
+      expect(background).toHaveStyleRule('background-color', '#fff !important');
     });
 
-    it('shows neutral background if current value is lower but preference is neutral', () => {
-      const wrapper = renderTrend({ current: 41, trendPreference: 'NEUTRAL' });
+    it('shows neutral background if current value is lower but preference is neutral', async () => {
+      renderTrend({ current: 41, trendPreference: 'NEUTRAL' });
 
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
-      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_NEUTRAL);
+      const background = await screen.findByTestId('trend-background');
+
+      expect(background).toHaveStyleRule('background-color', '#fff !important');
     });
   });
 
   describe('renders icon indicating trend direction', () => {
-    it('shows circle right if values are equal', () => {
-      const wrapper = renderTrend();
-      const trendIcon = wrapper.find('svg');
+    it('shows circle right if values are equal', async () => {
+      renderTrend();
 
-      expect(trendIcon).toHaveClassName('fa-arrow-circle-right');
+      const trendIcon = await screen.findByTestId('trend-icon');
+
+      expect(trendIcon).toHaveClass('fa-arrow-circle-right');
     });
 
-    it('shows circle down if current values is lower', () => {
-      const wrapper = renderTrend({ current: 41 });
-      const trendIcon = wrapper.find('svg');
+    it('shows circle down if current values is lower', async () => {
+      renderTrend({ current: 41 });
+      const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClassName('fa-arrow-circle-down');
+      expect(trendIcon).toHaveClass('fa-arrow-circle-down');
     });
 
-    it('shows circle up if current values is higher', () => {
-      const wrapper = renderTrend({ current: 43 });
-      const trendIcon = wrapper.find('svg');
+    it('shows circle up if current values is higher', async () => {
+      renderTrend({ current: 43 });
+      const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClassName('fa-arrow-circle-up');
+      expect(trendIcon).toHaveClass('fa-arrow-circle-up');
     });
   });
 });

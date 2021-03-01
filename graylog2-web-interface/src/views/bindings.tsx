@@ -135,6 +135,7 @@ export default {
       type: 'MESSAGES',
       displayName: 'Message List',
       defaultHeight: 5,
+      reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
@@ -148,6 +149,7 @@ export default {
       displayName: 'Results',
       defaultHeight: 4,
       defaultWidth: 4,
+      reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationControls,
       needsControlledHeight: (widget: Widget) => {

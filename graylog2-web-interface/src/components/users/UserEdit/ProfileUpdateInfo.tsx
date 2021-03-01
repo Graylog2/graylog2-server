@@ -16,14 +16,14 @@
  */
 import * as React from 'react';
 
-import { FormikFormGroup } from 'components/common';
+import { Alert } from 'components/graylog';
+import { Icon } from 'components/common';
 
-const FullNameFormGroup = () => (
-  <FormikFormGroup label="Full Name"
-                   name="full_name"
-                   maxLength={200}
-                   required
-                   help="The user's full name." />
+const ProfileUpdateInfo = () => (
+  <Alert bsStyle="info">
+    <Icon name="info-circle" />{' '}<b> First and Last Name</b><br />
+    With Graylog 4.1, we&apos;ve added distinct first and last name fields. These must be provided before the user’s profile can be saved.
+  </Alert>
 );
 
-export default FullNameFormGroup;
+export default ProfileUpdateInfo;
