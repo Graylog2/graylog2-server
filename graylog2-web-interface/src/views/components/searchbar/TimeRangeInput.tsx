@@ -39,7 +39,7 @@ const FlexContainer = styled.span`
   justify-content: space-between;
 `;
 
-const TimeRangeTypeSelector = ({ disabled, hasErrorOnMount, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
@@ -60,16 +60,16 @@ const TimeRangeTypeSelector = ({ disabled, hasErrorOnMount, noOverride, currentT
   );
 };
 
-TimeRangeTypeSelector.propTypes = {
+TimeRangeInput.propTypes = {
   disabled: PropTypes.bool,
   hasErrorOnMount: PropTypes.bool,
   noOverride: PropTypes.bool,
 };
 
-TimeRangeTypeSelector.defaultProps = {
+TimeRangeInput.defaultProps = {
   disabled: false,
   hasErrorOnMount: false,
   noOverride: false,
 };
 
-export default TimeRangeTypeSelector;
+export default TimeRangeInput;

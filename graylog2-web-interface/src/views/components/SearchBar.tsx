@@ -29,7 +29,7 @@ import { Col, Row } from 'components/graylog';
 import TopRow from 'views/components/searchbar/TopRow';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
-import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
+import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
@@ -115,10 +115,10 @@ const SearchBar = ({
               <>
                 <TopRow>
                   <Col md={5}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange}
-                                           hasErrorOnMount={!isValid} />
+                    <TimeRangeInput disabled={disableSearch}
+                                    setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                    currentTimeRange={values?.timerange}
+                                    hasErrorOnMount={!isValid} />
                   </Col>
 
                   <Col mdHidden lgHidden>

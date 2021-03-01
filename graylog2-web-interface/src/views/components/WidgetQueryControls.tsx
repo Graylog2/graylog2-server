@@ -31,7 +31,7 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
 import type { SearchBarFormValues } from 'views/Constants';
 
-import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
+import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
@@ -95,10 +95,10 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
         <>
           <TopRow>
             <FlexCol md={4}>
-              <TimeRangeTypeSelector disabled={isGloballyOverridden}
-                                     setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                     currentTimeRange={values?.timerange}
-                                     hasErrorOnMount={!isValid} />
+              <TimeRangeInput disabled={isGloballyOverridden}
+                              setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                              currentTimeRange={values?.timerange}
+                              hasErrorOnMount={!isValid} />
             </FlexCol>
 
             <Col md={8}>

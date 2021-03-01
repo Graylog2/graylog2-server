@@ -37,7 +37,7 @@ import TopRow from 'views/components/searchbar/TopRow';
 import { SearchesConfig } from 'components/search/SearchConfig';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
-import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
+import TimeRangeInput from './searchbar/TimeRangeInput';
 
 const FlexCol = styled(Col)`
   display: flex;
@@ -77,11 +77,11 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
               <>
                 <TopRow>
                   <FlexCol lg={8} md={9} xs={10}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange}
-                                           hasErrorOnMount={!isValid}
-                                           noOverride />
+                    <TimeRangeInput disabled={disableSearch}
+                                    setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                    currentTimeRange={values?.timerange}
+                                    hasErrorOnMount={!isValid}
+                                    noOverride />
                   </FlexCol>
                   <Col lg={4} md={3} xs={2}>
                     <RefreshControls />
