@@ -72,8 +72,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                 <TopRow>
                   <Col lg={8} md={9} xs={10}>
                     <TimeRangeInput disabled={disableSearch}
-                                    setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                    currentTimeRange={values?.timerange}
+                                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                    value={values?.timerange}
                                     hasErrorOnMount={!isValid}
                                     noOverride />
                   </Col>

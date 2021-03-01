@@ -26,11 +26,11 @@ import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {
-  currentTimeRange: TimeRange | NoTimeRangeOverride,
+  value: TimeRange | NoTimeRangeOverride,
   disabled?: boolean,
   noOverride?: boolean,
   hasErrorOnMount?: boolean,
-  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
 };
 
 const FlexContainer = styled.span`
@@ -39,7 +39,7 @@ const FlexContainer = styled.span`
   justify-content: space-between;
 `;
 
-const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value, onChange }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
@@ -50,12 +50,12 @@ const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, currentTimeRang
                                show={show}
                                toggleShow={toggleShow}
                                hasErrorOnMount={hasErrorOnMount}>
-        <TimeRangeDropdown currentTimeRange={currentTimeRange}
+        <TimeRangeDropdown currentTimeRange={value}
                            noOverride={noOverride}
-                           setCurrentTimeRange={setCurrentTimeRange}
+                           setCurrentTimeRange={onChange}
                            toggleDropdownShow={toggleShow} />
       </TimeRangeDropdownButton>
-      <TimeRangeDisplay timerange={currentTimeRange} toggleDropdownShow={toggleShow} />
+      <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
     </FlexContainer>
   );
 };

@@ -23,7 +23,7 @@ describe('LogViewExportSettings', () => {
   const defaultTimeRange = { type: 'relative', range: 300 };
 
   it('opens date picker dropdown when clicking button', async () => {
-    render(<TimeRangeInput currentTimeRange={defaultTimeRange} setCurrentTimeRange={() => {}} />);
+    render(<TimeRangeInput value={defaultTimeRange} onChange={() => {}} />);
 
     const button = await screen.findByRole('button', {
       name: /open time range selector/i,
@@ -36,7 +36,7 @@ describe('LogViewExportSettings', () => {
   });
 
   it('displays relative time range of 5 minutes', async () => {
-    render(<TimeRangeInput currentTimeRange={defaultTimeRange} setCurrentTimeRange={() => {}} />);
+    render(<TimeRangeInput value={defaultTimeRange} onChange={() => {}} />);
 
     const from = await screen.findByTestId('from');
     await within(from).findByText(/5 minutes ago/i);
@@ -46,7 +46,7 @@ describe('LogViewExportSettings', () => {
   });
 
   it('opens date picker dropdown when clicking summary', async () => {
-    render(<TimeRangeInput currentTimeRange={defaultTimeRange} setCurrentTimeRange={() => {}} />);
+    render(<TimeRangeInput value={defaultTimeRange} onChange={() => {}} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -55,7 +55,7 @@ describe('LogViewExportSettings', () => {
 
   it('calls callback when changing time range', async () => {
     const onChange = jest.fn();
-    render(<TimeRangeInput currentTimeRange={defaultTimeRange} setCurrentTimeRange={onChange} />);
+    render(<TimeRangeInput value={defaultTimeRange} onChange={onChange} />);
 
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
@@ -75,7 +75,7 @@ describe('LogViewExportSettings', () => {
   });
 
   it('shows "No Override" if no time range is provided', async () => {
-    render(<TimeRangeInput currentTimeRange={{}} setCurrentTimeRange={() => {}} />);
+    render(<TimeRangeInput value={{}} onChange={() => {}} />);
 
     await screen.findByText('No Override');
   });

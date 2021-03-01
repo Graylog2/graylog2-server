@@ -96,8 +96,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
           <TopRow>
             <Col md={4}>
               <TimeRangeInput disabled={isGloballyOverridden}
-                              setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                              currentTimeRange={values?.timerange}
+                              onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                              value={values?.timerange}
                               hasErrorOnMount={!isValid} />
             </Col>
 
