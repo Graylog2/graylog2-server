@@ -21,7 +21,6 @@ import { ThemeProvider, DefaultTheme } from 'styled-components';
 import merge from 'lodash/merge';
 import { $PropertyType } from 'utility-types';
 
-import { Spinner } from 'components/common';
 import { breakpoints, colors, fonts, utils } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
@@ -29,15 +28,14 @@ import AppConfig from 'util/AppConfig';
 import UpdatableThemeContext from 'theme/UpdatableThemeContext';
 import { generateGrayScale, generateInputColors, generateTableColors, generateVariantColors, generateGlobalColors } from 'theme/variants/util';
 import { Colors, ThemeColorModes } from 'theme/colors';
-import CombinedProvider from 'injection/CombinedProvider';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
-const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 const customizedTheme = AppConfig.customTheme();
 
 const generateTheme = ({ changeMode, customizedThemeColors, mode }): DefaultTheme => {
   let currentTheme: Colors = colors[mode];
+
   let tableColors: $PropertyType<Colors, 'table'> = colors[mode].table;
   let inputColors: $PropertyType<Colors, 'input'> = colors[mode].input;
   let variantColors: $PropertyType<Colors, 'variant'> = colors[mode].variant;
@@ -46,6 +44,7 @@ const generateTheme = ({ changeMode, customizedThemeColors, mode }): DefaultThem
 
   if (customizedThemeColors && Object.entries(customizedThemeColors).length > 0) {
     currentTheme = merge({}, colors, customizedThemeColors)[mode];
+
     tableColors = generateTableColors(mode, currentTheme.variant);
     inputColors = generateInputColors(mode, currentTheme.global, currentTheme.gray, currentTheme.variant);
     grayColors = generateGrayScale(currentTheme.global.textDefault, currentTheme.global.textAlt);
@@ -91,35 +90,25 @@ const generateTheme = ({ changeMode, customizedThemeColors, mode }): DefaultThem
 };
 
 const GraylogThemeProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [canCustomizeTheme, setCanCustomizeTheme] = useState<boolean>(false);
   const [mode, changeMode] = useCurrentThemeMode();
+  const hasEnterprisePlugin = true; // TODO: get from source
   const [customizedThemeColors, setCustomizedThemeColors] = useState<ThemeColorModes | undefined>(canCustomizeTheme ? customizedTheme : {});
 
   useEffect(() => {
-    if (isLoading) {
-      EnterpriseActions.getLicenseInfo().then(({ free_license_info: { license_status } }) => {
-        setCanCustomizeTheme(license_status === 'installed');
-      });
-
-      setIsLoading(false);
+    if (hasEnterprisePlugin) {
+      setCanCustomizeTheme(true);
     }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (canCustomizeTheme) {
-      setCustomizedThemeColors(customizedTheme);
-    }
-  }, [canCustomizeTheme]);
+  }, [hasEnterprisePlugin]);
 
   const updatableTheme = (newColors: any) => {
-    setCustomizedThemeColors(merge({}, customizedThemeColors, newColors));
+    setCustomizedThemeColors(newColors);
   };
 
   const theme = useMemo(() => generateTheme({ mode, changeMode, customizedThemeColors }),
     [mode, customizedThemeColors, changeMode]);
 
-  return isLoading ? <Spinner /> : (
+  return (
     <UpdatableThemeContext.Provider value={{ updatableTheme }}>
       <ThemeProvider theme={theme}>
         {children}
