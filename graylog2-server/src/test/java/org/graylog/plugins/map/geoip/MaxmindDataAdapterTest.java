@@ -18,7 +18,6 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
-import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
 import org.graylog.plugins.map.ConditionalRunner;
@@ -41,18 +40,24 @@ import static org.mockito.Mockito.when;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        MaxmindDataAdapterTest.CityDatabaseTest.class,
-        MaxmindDataAdapterTest.CountryDatabaseTest.class
-})
+                            MaxmindDataAdapterTest.CityDatabaseTest.class,
+                            MaxmindDataAdapterTest.CountryDatabaseTest.class,
+                            MaxmindDataAdapterTest.AsnDatabaseTest.class,
+                            MaxmindDataAdapterTest.IPinfoStandardLocationDatabaseTest.class,
+                    })
 public class MaxmindDataAdapterTest {
     private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
     private static final String GEO_LITE2_COUNTRY_MMDB = "/GeoLite2-Country.mmdb";
     private static final String GEO_LITE2_ASN_MMDB = "/GeoLite2-ASN.mmdb";
+    private static final String IPINFO_STANDARD_LOCATION_MMDB = "/ipinfo-standard-location.mmdb";
+    private static final String IPINFO_ASN_MMDB = "/ipinfo-asn.mmdb";
 
     private static final ImmutableMap<DatabaseType, String> DB_PATH = ImmutableMap.of(
             DatabaseType.MAXMIND_CITY, GEO_LITE2_CITY_MMDB,
             DatabaseType.MAXMIND_COUNTRY, GEO_LITE2_COUNTRY_MMDB,
-            DatabaseType.MAXMIND_ASN, GEO_LITE2_ASN_MMDB
+            DatabaseType.MAXMIND_ASN, GEO_LITE2_ASN_MMDB,
+            DatabaseType.IPINFO_STANDARD_LOCATION, IPINFO_STANDARD_LOCATION_MMDB,
+            DatabaseType.IPINFO_ASN, IPINFO_ASN_MMDB
     );
 
     abstract static class Base {
@@ -100,16 +105,16 @@ public class MaxmindDataAdapterTest {
 
         @Test
         public void doGetReturnsEmptyResultIfDatabaseReaderReturnsNull() {
-            final DatabaseReader mockDatabaseReader = mock(DatabaseReader.class);
-            final DatabaseReader oldDatabaseReader = adapter.getDatabaseReader();
+            final IPLocationDatabaseAdapter mockDatabaseReader = mock(IPLocationDatabaseAdapter.class);
+            final IPLocationDatabaseAdapter oldDatabaseReader = adapter.getDatabaseAdapter();
 
             try {
-                adapter.setDatabaseReader(mockDatabaseReader);
+                adapter.setDatabaseAdapter(mockDatabaseReader);
 
                 final LookupResult lookupResult = adapter.doGet("127.0.0.1");
                 assertThat(lookupResult.isEmpty()).isTrue();
             } finally {
-                adapter.setDatabaseReader(oldDatabaseReader);
+                adapter.setDatabaseAdapter(oldDatabaseReader);
             }
         }
 
@@ -155,18 +160,18 @@ public class MaxmindDataAdapterTest {
         @Test
         public void doGetReturnsResultIfCityResponseFieldsAreNull() throws Exception {
             final CityResponse cityResponse = new CityResponse(null, null, null, null, null, null, null, null, null, null);
-            final DatabaseReader mockDatabaseReader = mock(DatabaseReader.class);
-            when(mockDatabaseReader.city(any())).thenReturn(cityResponse);
-            final DatabaseReader oldDatabaseReader = adapter.getDatabaseReader();
+            final IPLocationDatabaseAdapter mockDatabaseReader = mock(IPLocationDatabaseAdapter.class);
+            when(mockDatabaseReader.maxMindCity(any())).thenReturn(cityResponse);
+            final IPLocationDatabaseAdapter oldDatabaseReader = adapter.getDatabaseAdapter();
 
             try {
-                adapter.setDatabaseReader(mockDatabaseReader);
+                adapter.setDatabaseAdapter(mockDatabaseReader);
 
                 final LookupResult lookupResult = adapter.doGet("127.0.0.1");
                 assertThat(lookupResult.isEmpty()).isFalse();
                 assertThat(lookupResult.singleValue()).isNull();
             } finally {
-                adapter.setDatabaseReader(oldDatabaseReader);
+                adapter.setDatabaseAdapter(oldDatabaseReader);
             }
         }
     }
@@ -192,18 +197,18 @@ public class MaxmindDataAdapterTest {
         @Test
         public void doGetReturnsResultIfCountryResponseFieldsAreNull() throws Exception {
             final CountryResponse countryResponse = new CountryResponse(null, null, null, null, null, null);
-            final DatabaseReader mockDatabaseReader = mock(DatabaseReader.class);
-            when(mockDatabaseReader.country(any())).thenReturn(countryResponse);
-            final DatabaseReader oldDatabaseReader = adapter.getDatabaseReader();
+            final IPLocationDatabaseAdapter mockDatabaseReader = mock(IPLocationDatabaseAdapter.class);
+            when(mockDatabaseReader.maxMindCountry(any())).thenReturn(countryResponse);
+            final IPLocationDatabaseAdapter oldDatabaseReader = adapter.getDatabaseAdapter();
 
             try {
-                adapter.setDatabaseReader(mockDatabaseReader);
+                adapter.setDatabaseAdapter(mockDatabaseReader);
 
                 final LookupResult lookupResult = adapter.doGet("127.0.0.1");
                 assertThat(lookupResult.isEmpty()).isFalse();
                 assertThat(lookupResult.singleValue()).isNull();
             } finally {
-                adapter.setDatabaseReader(oldDatabaseReader);
+                adapter.setDatabaseAdapter(oldDatabaseReader);
             }
         }
     }
@@ -226,6 +231,59 @@ public class MaxmindDataAdapterTest {
             assertThat(lookupResult.multiValue())
                     .extracting("as_organization")
                     .containsExactly("Google LLC");
+        }
+
+        @Test
+        public void doGetReturnsEmptyResultOnPrivateIp() {
+            final LookupResult lookupResult = adapter.doGet("192.168.1.1");
+            assertThat(lookupResult).isEqualTo(LookupResult.empty());
+        }
+    }
+
+    @RunWith(ConditionalRunner.class)
+    @ResourceExistsCondition(IPINFO_STANDARD_LOCATION_MMDB)
+    public static class IPinfoStandardLocationDatabaseTest extends Base {
+        public IPinfoStandardLocationDatabaseTest() {
+            super(DatabaseType.IPINFO_STANDARD_LOCATION);
+        }
+
+        @Test
+        public void doGetSuccessfullyResolvesGooglePublicDNSAddress() {
+            // This test will possibly get flaky when the entry for 8.8.8.8 changes!
+            final LookupResult lookupResult = adapter.doGet("8.8.8.8");
+
+            assertThat(lookupResult.singleValue())
+                    .isNotNull()
+                    .isInstanceOf(String.class)
+                    .satisfies(singleValue -> assertThat((String) singleValue).isNotBlank());
+            assertThat(lookupResult.multiValue())
+                    .extracting("city", "region", "country", "timezone", "geoname_id")
+                    .containsExactly("Mountain View", "California", "US", "America/Los_Angeles", 5375480L);
+        }
+
+        @Test
+        public void doGetReturnsEmptyResultOnPrivateIp() {
+            final LookupResult lookupResult = adapter.doGet("192.168.1.1");
+            assertThat(lookupResult).isEqualTo(LookupResult.empty());
+        }
+    }
+
+    @RunWith(ConditionalRunner.class)
+    @ResourceExistsCondition(IPINFO_ASN_MMDB)
+    public static class IPinfoASNDatabaseTest extends Base {
+        public IPinfoASNDatabaseTest() {
+            super(DatabaseType.IPINFO_ASN);
+        }
+
+        @Test
+        public void doGetSuccessfullyResolvesGooglePublicDNSAddress() {
+            // This test will possibly get flaky when the entry for 8.8.8.8 changes!
+            final LookupResult lookupResult = adapter.doGet("8.8.8.8");
+
+            assertThat(lookupResult.singleValue()).isNotNull().isEqualTo(15169L);
+            assertThat(lookupResult.multiValue())
+                    .extracting("asn", "asn_numeric", "name", "domain", "type", "route")
+                    .containsExactly("AS15169", 15169L, "Google LLC", "google.com", "business", "8.8.8.0/24");
         }
 
         @Test

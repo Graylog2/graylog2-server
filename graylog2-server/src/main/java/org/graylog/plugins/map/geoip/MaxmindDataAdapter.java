@@ -28,7 +28,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
-import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.model.AsnResponse;
 import com.maxmind.geoip2.model.CityResponse;
@@ -70,7 +69,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
 
     public static final String NAME = "maxmind_geoip";
     private final Config config;
-    private final AtomicReference<DatabaseReader> databaseReader = new AtomicReference<>();
+    private final AtomicReference<IPLocationDatabaseAdapter> databaseAdapter = new AtomicReference<>();
     private FileInfo fileInfo = FileInfo.empty();
 
     @Inject
@@ -92,7 +91,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
             setError(new IllegalStateException("Cannot read database file " + config.path()));
         } else {
             try {
-                this.databaseReader.set(loadReader(path.toFile()));
+                this.databaseAdapter.set(loadDatabaseAdapter(path.toFile()));
             } catch (Exception e) {
                 LOG.warn("Unable to read data base file {}", config.path());
                 setError(e);
@@ -102,7 +101,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doStop() throws Exception {
-        final DatabaseReader databaseReader = this.databaseReader.get();
+        final IPLocationDatabaseAdapter databaseReader = this.databaseAdapter.get();
         if (databaseReader != null) {
             databaseReader.close();
         }
@@ -127,12 +126,12 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
 
             // file has different attributes, let's reload it
             LOG.debug("MaxMind database file has changed, reloading it from {}", config.path());
-            final DatabaseReader oldReader = this.databaseReader.get();
+            final IPLocationDatabaseAdapter oldAdapter = this.databaseAdapter.get();
             try {
-                this.databaseReader.set(loadReader(Paths.get(config.path()).toFile()));
+                this.databaseAdapter.set(loadDatabaseAdapter(Paths.get(config.path()).toFile()));
                 cachePurge.purgeAll();
-                if (oldReader != null) {
-                    oldReader.close();
+                if (oldAdapter != null) {
+                    oldAdapter.close();
                 }
                 fileInfo = databaseFileCheck.fileInfo();
                 clearError();
@@ -146,8 +145,18 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
         }
     }
 
-    private DatabaseReader loadReader(File file) throws IOException {
-        return new DatabaseReader.Builder(file).build();
+    private IPLocationDatabaseAdapter loadDatabaseAdapter(File file) throws IOException {
+        switch (config.dbType()) {
+            case MAXMIND_ASN:
+            case MAXMIND_CITY:
+            case MAXMIND_COUNTRY:
+                return new MaxMindIPLocationDatabaseAdapter(file);
+            case IPINFO_ASN:
+            case IPINFO_STANDARD_LOCATION:
+                return new IPinfoIPLocationDatabaseAdapter(file);
+            default:
+                throw new IllegalStateException("Unexpected value: " + config.dbType());
+        }
     }
 
     @Override
@@ -164,11 +173,11 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                 return LookupResult.empty();
             }
         }
-        final DatabaseReader reader = this.databaseReader.get();
+        final IPLocationDatabaseAdapter reader = this.databaseAdapter.get();
         switch (config.dbType()) {
             case MAXMIND_CITY:
                 try {
-                    final CityResponse city = reader.city(addr);
+                    final CityResponse city = reader.maxMindCity(addr);
                     if (city == null) {
                         LOG.debug("No city data for IP address {}, returning empty result.", addr);
                         return LookupResult.empty();
@@ -203,7 +212,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                 }
             case MAXMIND_COUNTRY:
                 try {
-                    final CountryResponse countryResponse = reader.country(addr);
+                    final CountryResponse countryResponse = reader.maxMindCountry(addr);
                     if (countryResponse == null) {
                         LOG.debug("No country data for IP address {}, returning empty result.", addr);
                         return LookupResult.empty();
@@ -228,7 +237,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                 }
             case MAXMIND_ASN:
                 try {
-                    final AsnResponse asn = reader.asn(addr);
+                    final AsnResponse asn = reader.maxMindASN(addr);
                     if (asn == null) {
                         LOG.debug("No ASN data for IP address {}, returning empty result.", addr);
                         return LookupResult.empty();
@@ -245,6 +254,55 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                     LOG.warn("Unable to look up ASN data for IP address {}, returning empty result.", addr, e);
                     return LookupResult.empty();
                 }
+            case IPINFO_ASN:
+                try {
+                    final IPinfoASN ipInfo = reader.ipInfoASN(addr);
+                    if (ipInfo == null) {
+                        LOG.debug("No IPinfo location data for IP address {}, returning empty result.", addr);
+                        return LookupResult.empty();
+                    }
+
+                    return LookupResult.multi(ipInfo.asnNumeric(), ImmutableMap.builder()
+                            .put("asn", ipInfo.asn())
+                            .put("asn_numeric", ipInfo.asnNumeric())
+                            .put("name", ipInfo.name())
+                            .put("domain", ipInfo.domain())
+                            .put("type", ipInfo.type())
+                            .put("route", ipInfo.route())
+                            .build());
+
+                } catch (AddressNotFoundException e) {
+                    LOG.debug("Unable to look up IPinfo ASN data for IP address {}, returning empty result.", addr, e);
+                    return LookupResult.empty();
+                } catch (Exception e) {
+                    LOG.warn("Unable to look up IPinfo ASN data for IP address {}, returning empty result.", addr, e);
+                    return LookupResult.empty();
+                }
+            case IPINFO_STANDARD_LOCATION:
+                try {
+                    final IPinfoStandardLocation ipInfo = reader.ipInfoStandardLocation(addr);
+                    if (ipInfo == null) {
+                        LOG.debug("No IPinfo location data for IP address {}, returning empty result.", addr);
+                        return LookupResult.empty();
+                    }
+
+                    return LookupResult.multi(ipInfo.coordinates(), ImmutableMap.builder()
+                            .put("coordinates", ipInfo.coordinates())
+                            .put("latitude", ipInfo.latitude())
+                            .put("longitude", ipInfo.longitude())
+                            .put("city", ipInfo.city())
+                            .put("country", ipInfo.country())
+                            .put("region", ipInfo.region())
+                            .put("timezone", ipInfo.timezone())
+                            .put("geoname_id", ipInfo.geoNameId())
+                            .build());
+                } catch (AddressNotFoundException e) {
+                    LOG.debug("Unable to look up IPinfo location data for IP address {}, returning empty result.", addr, e);
+                    return LookupResult.empty();
+                } catch (Exception e) {
+                    LOG.warn("Unable to look up IPinfo location data for IP address {}, returning empty result.", addr, e);
+                    return LookupResult.empty();
+                }
         }
 
         return LookupResult.empty();
@@ -256,13 +314,13 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     }
 
     @VisibleForTesting
-    void setDatabaseReader(DatabaseReader databaseReader) {
-        this.databaseReader.set(databaseReader);
+    void setDatabaseAdapter(IPLocationDatabaseAdapter databaseAdapter) {
+        this.databaseAdapter.set(databaseAdapter);
     }
 
     @VisibleForTesting
-    DatabaseReader getDatabaseReader() {
-        return databaseReader.get();
+    IPLocationDatabaseAdapter getDatabaseAdapter() {
+        return databaseAdapter.get();
     }
 
     public interface Factory extends LookupDataAdapter.Factory<MaxmindDataAdapter> {
