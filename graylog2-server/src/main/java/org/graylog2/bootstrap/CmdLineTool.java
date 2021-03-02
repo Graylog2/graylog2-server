@@ -172,23 +172,20 @@ public abstract class CmdLineTool implements CliCommand {
     public void run() {
         final Level logLevel = setupLogger();
 
-        coreConfigInjector = setupCoreConfigInjector(readConfiguration(configFile));
-        if (coreConfigInjector == null) {
-            LOG.error("Injector for core configuration could not be created, exiting! (Please include the previous " +
-                    "error messages in bug reports.)");
-            System.exit(1);
-        }
-
-        final Set<Plugin> plugins = loadPlugins(getPluginPath(configFile), chainingClassLoader);
-
-        // adds configuration from plugins to jadConfig
-        installPluginConfig(plugins);
-
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
         }
 
-        final NamedConfigParametersModule configModule = readConfiguration(configFile);
+        installConfigRepositories();
+        installCommandConfig();
+        processConfiguration(jadConfig);
+
+        coreConfigInjector = setupCoreConfigInjector();
+
+        final Set<Plugin> plugins = loadPlugins(getPluginPath(configFile), chainingClassLoader);
+
+        installPluginConfig(plugins);
+        processConfiguration(jadConfig);
 
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
@@ -204,7 +201,8 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(configModule, new PluginBindings(plugins),
+        injector = setupInjector(new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new PluginBindings(plugins),
                 binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         if (injector == null) {
@@ -223,6 +221,10 @@ public abstract class CmdLineTool implements CliCommand {
         reporter.start();
 
         startCommand();
+    }
+
+    private void installCommandConfig() {
+        getCommandConfigurationBeans().forEach(jadConfig::addConfigurationBean);
     }
 
     private void installPluginConfig(Set<Plugin> plugins) {
@@ -283,9 +285,9 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     private void dumpDefaultConfigAndExit() {
-        for (Object bean : getCommandConfigurationBeans()) {
-            jadConfig.addConfigurationBean(bean);
-        }
+        installCommandConfig();
+        coreConfigInjector = setupCoreConfigInjector();
+        installPluginConfig(loadPlugins(getPluginPath(configFile), chainingClassLoader));
         dumpCurrentConfigAndExit();
     }
 
@@ -343,20 +345,11 @@ public abstract class CmdLineTool implements CliCommand {
         return sb.toString();
     }
 
-    protected NamedConfigParametersModule readConfiguration(final String configFile) {
-        final List<Object> beans = getCommandConfigurationBeans();
-        for (Object bean : beans) {
-            jadConfig.addConfigurationBean(bean);
-        }
+    private void installConfigRepositories() {
         jadConfig.setRepositories(getConfigRepositories(configFile));
-
-        LOG.debug("Loading configuration from config file: {}", configFile);
-        processConfiguration(jadConfig);
-
-        return new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
     }
 
-    private void processConfiguration(JadConfig jadConfig) {
+    protected void processConfiguration(JadConfig jadConfig) {
         try {
             jadConfig.process();
         } catch (RepositoryException e) {
@@ -400,17 +393,26 @@ public abstract class CmdLineTool implements CliCommand {
      * Set up a separate injector, containing only the core configuration bindings. It can be used to look up
      * configuration values in modules at binding time.
      */
-    protected Injector setupCoreConfigInjector(NamedConfigParametersModule configModule) {
+    protected Injector setupCoreConfigInjector() {
+        final NamedConfigParametersModule configModule =
+                new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
+
+        Injector coreConfigInjector = null;
         try {
-            return Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(configModule,
+            coreConfigInjector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(configModule,
                     (Module) Binder::requireExplicitBindings));
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
-            return null;
         } catch (Exception e) {
             LOG.error("Injector creation failed!", e);
-            return null;
         }
+
+        if (coreConfigInjector == null) {
+            LOG.error("Injector for core configuration could not be created, exiting! (Please include the previous " +
+                    "error messages in bug reports.)");
+            System.exit(1);
+        }
+        return coreConfigInjector;
     }
 
     protected void annotateInjectorCreationException(CreationException e) {
