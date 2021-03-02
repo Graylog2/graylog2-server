@@ -83,7 +83,7 @@ type Props = {
   id: string,
   view: ViewStoreState,
   widget: WidgetModel,
-  data?: Array<unknown>,
+  data?: { [key: string]: Result },
   editing?: boolean,
   errors?: Array<{ description: string }>,
   fields: Immutable.List<FieldTypeMapping>,
