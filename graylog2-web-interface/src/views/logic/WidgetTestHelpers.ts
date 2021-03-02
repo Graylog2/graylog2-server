@@ -14,9 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
+import { WidgetExport } from 'views/types';
 
-const usePluginEntities = <S extends keyof PluginExports>(entityKey: S) => useMemo(() => PluginStore.exports(entityKey), [entityKey]);
-
-export default usePluginEntities;
+// eslint-disable-next-line import/prefer-default-export
+export const createWidget = (type: string): WidgetExport => ({
+  type,
+  visualizationComponent: () => null,
+  editComponent: () => null,
+  needsControlledHeight: () => false,
+  searchTypes: () => [],
+});

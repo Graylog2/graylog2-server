@@ -22,8 +22,8 @@ import { ViewHook } from 'views/logic/hooks/ViewHook';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 const useViewLoader = (viewId: string, query: { [key: string]: any }, viewLoader: ViewLoaderFn): [boolean, React.ReactElement | undefined] => {
-  const loadingViewHooks: Array<ViewHook> = usePluginEntities('views.hooks.loadingView');
-  const executingViewHooks: Array<ViewHook> = usePluginEntities('views.hooks.executingView');
+  const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
+  const executingViewHooks = usePluginEntities('views.hooks.executingView');
 
   const [loaded, setLoaded] = useState(false);
   const [hookComponent, setHookComponent] = useState(undefined);

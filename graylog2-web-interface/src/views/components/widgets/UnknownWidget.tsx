@@ -22,6 +22,8 @@ import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';
 
 import type { WidgetProps } from './Widget';
+import WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 const Container = styled.div`
   height: 100%;
@@ -51,7 +53,7 @@ const OrderedList = styled.ol`
   list-style: decimal inside none;
 `;
 
-const UnknownWidget = ({ config, type }: WidgetProps) => (
+const UnknownWidget: React.ComponentType<WidgetProps> = ({ config, type }: WidgetProps) => (
   <Container>
     <IconContainer>
       <Icon name="question" size="3x" />
@@ -85,7 +87,7 @@ const UnknownWidget = ({ config, type }: WidgetProps) => (
 );
 
 UnknownWidget.propTypes = {
-  config: PropTypes.object.isRequired,
+  config: PropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   type: PropTypes.string.isRequired,
 };
 

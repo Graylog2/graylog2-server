@@ -23,8 +23,8 @@ import type { ViewHook } from '../hooks/ViewHook';
 import usePluginEntities from '../usePluginEntities';
 
 const useLoadView = (view: Promise<View>, query: { [key: string]: any }) => {
-  const loadingViewHooks: Array<ViewHook> = usePluginEntities('views.hooks.loadingView');
-  const executingViewHooks: Array<ViewHook> = usePluginEntities('views.hooks.executingView');
+  const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
+  const executingViewHooks = usePluginEntities('views.hooks.executingView');
 
   const [loaded, setLoaded] = useState(false);
   const [hookComponent, setHookComponent] = useState(undefined);

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import asMock from 'helpers/mocking/AsMock';
 
 import type { PluginMetadata } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -44,7 +45,7 @@ describe('RequirementsProvided', () => {
   };
 
   it('returns resolved promise for empty requirements', () => {
-    PluginStore.exports.mockReturnValue([]);
+    asMock(PluginStore.exports).mockReturnValue([]);
 
     const view = View.create().toBuilder().requires({}).build();
 
@@ -52,7 +53,7 @@ describe('RequirementsProvided', () => {
   });
 
   it('returns resolved promise if all requirements are provided', () => {
-    PluginStore.exports.mockReturnValue(['parameters', 'timetravel', 'hyperspeed']);
+    asMock(PluginStore.exports).mockReturnValue(['parameters', 'timetravel', 'hyperspeed']);
 
     const view = View.create()
       .toBuilder()
@@ -67,7 +68,7 @@ describe('RequirementsProvided', () => {
   });
 
   it('throws Component if not all requirements are provided', (done) => {
-    PluginStore.exports.mockReturnValue(['parameters']);
+    asMock(PluginStore.exports).mockReturnValue(['parameters']);
 
     const view = View.create()
       .toBuilder()

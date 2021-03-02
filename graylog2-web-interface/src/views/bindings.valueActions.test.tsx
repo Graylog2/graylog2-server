@@ -34,7 +34,7 @@ describe('Views bindings value actions', () => {
   const findAction = (type) => valueActions.find((binding) => binding.type === type);
 
   describe('CreateExtractor', () => {
-    const action: ValueAction = findAction('create-extractor');
+    const action = findAction('create-extractor');
     const { isEnabled } = action;
 
     it('is present', () => {

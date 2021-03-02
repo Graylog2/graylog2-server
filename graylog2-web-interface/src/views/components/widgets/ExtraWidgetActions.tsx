@@ -31,7 +31,7 @@ type Props = {
 
 const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
-  const pluginWidgetActions = usePluginEntities<WidgetActionType>('views.widgets.actions');
+  const pluginWidgetActions = usePluginEntities('views.widgets.actions');
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
     .map(({ title, action, type }) => {
