@@ -122,8 +122,4 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
   );
 };
 
-AggregationBuilder.defaultProps = {
-  editing: false,
-};
-
 export default AggregationBuilder;

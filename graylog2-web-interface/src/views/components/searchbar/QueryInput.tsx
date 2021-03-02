@@ -50,7 +50,7 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
     }
 
     onExecute(value);
-  }, [onExecute]);
+  }, [onExecute, value]);
 
   const editorRef = useCallback((node) => {
     const editor = node && node.editor;

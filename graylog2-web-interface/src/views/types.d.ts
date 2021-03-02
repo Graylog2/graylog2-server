@@ -27,7 +27,7 @@ import { ViewHook } from 'views/logic/hooks/ViewHook';
 import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
-import { OnVisualizationConfigChange, Result } from 'views/components/widgets/Widget';
+import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {

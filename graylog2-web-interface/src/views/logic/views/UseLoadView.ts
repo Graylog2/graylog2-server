@@ -19,7 +19,6 @@ import { useEffect, useState } from 'react';
 import View from './View';
 import { processHooks } from './ViewLoader';
 
-import type { ViewHook } from '../hooks/ViewHook';
 import usePluginEntities from '../usePluginEntities';
 
 const useLoadView = (view: Promise<View>, query: { [key: string]: any }) => {

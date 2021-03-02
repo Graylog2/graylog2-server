@@ -44,15 +44,15 @@ describe('RequirementsProvided', () => {
     url: 'https://www.graylog.org',
   };
 
-  it('returns resolved promise for empty requirements', () => {
+  it('returns resolved promise for empty requirements', async () => {
     asMock(PluginStore.exports).mockReturnValue([]);
 
     const view = View.create().toBuilder().requires({}).build();
 
-    return RequirementsProvided({ view, query: {}, retry });
+    expect(await RequirementsProvided({ view, query: {}, retry })).toBeTruthy();
   });
 
-  it('returns resolved promise if all requirements are provided', () => {
+  it('returns resolved promise if all requirements are provided', async () => {
     asMock(PluginStore.exports).mockReturnValue(['parameters', 'timetravel', 'hyperspeed']);
 
     const view = View.create()
@@ -64,10 +64,10 @@ describe('RequirementsProvided', () => {
       })
       .build();
 
-    return RequirementsProvided({ view, query: {}, retry });
+    expect(await RequirementsProvided({ view, query: {}, retry })).toBeTruthy();
   });
 
-  it('throws Component if not all requirements are provided', (done) => {
+  it('throws Component if not all requirements are provided', async () => {
     asMock(PluginStore.exports).mockReturnValue(['parameters']);
 
     const view = View.create()
@@ -86,13 +86,14 @@ describe('RequirementsProvided', () => {
       })
       .build();
 
-    RequirementsProvided({ view, query: {}, retry })
-      .catch((Component) => {
-        const wrapper = mount(<Component />);
+    let Component;
 
-        expect(wrapper).toExist();
+    try {
+      await RequirementsProvided({ view, query: {}, retry });
+    } catch (component) {
+      Component = component;
+    }
 
-        done();
-      });
+    expect(mount(<Component />)).toExist();
   });
 });

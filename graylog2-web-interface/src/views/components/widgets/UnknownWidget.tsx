@@ -17,14 +17,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 
 import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';
-
-import type { WidgetProps } from './Widget';
-import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 
 const Container = styled.div`
   height: 100%;

@@ -17,13 +17,9 @@
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
-import type { ActionHandlerCondition } from './components/actions/ActionHandler';
 
 describe('Views bindings field actions', () => {
   const { fieldActions } = bindings;
-  type FieldAction = {
-    isEnabled: ActionHandlerCondition,
-  };
   const defaultArguments = {
     queryId: 'query1',
     contexts: {},

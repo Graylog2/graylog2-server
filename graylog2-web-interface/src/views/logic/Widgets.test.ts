@@ -16,11 +16,7 @@
  */
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import asMock from 'helpers/mocking/AsMock';
-import React from 'react';
-import { EditWidgetComponentProps } from 'views/types';
 
-import { WidgetProps } from 'views/components/widgets/Widget';
-import Widget from 'views/logic/widgets/Widget';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 
 import { widgetDefinition } from './Widgets';
