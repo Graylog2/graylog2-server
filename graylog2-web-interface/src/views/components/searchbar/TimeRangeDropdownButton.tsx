@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useRef } from 'react';
 import { Overlay } from 'react-overlays';
+import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -29,6 +30,10 @@ type Props = {
   toggleShow: () => void,
 };
 
+const RelativePosition = styled.div`
+  position: relative;
+`;
+
 const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, toggleShow }: Props) => {
   const containerRef = useRef();
 
@@ -38,7 +43,7 @@ const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, to
   };
 
   return (
-    <div ref={containerRef}>
+    <RelativePosition ref={containerRef}>
       <Button bsStyle={hasErrorOnMount ? 'danger' : 'info'}
               disabled={disabled}
               onClick={_onClick}
@@ -53,7 +58,7 @@ const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, to
                container={containerRef.current}>
         {children}
       </Overlay>
-    </div>
+    </RelativePosition>
   );
 };
 
