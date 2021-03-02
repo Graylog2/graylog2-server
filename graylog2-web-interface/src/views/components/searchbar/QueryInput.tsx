@@ -120,6 +120,4 @@ QueryInput.defaultProps = {
   placeholder: '',
 };
 
-const mapping = { completers: 'views.completers' };
-
-export default withPluginEntities(withTheme(QueryInput), mapping);
+export default withPluginEntities(withTheme(QueryInput), { completers: 'views.completers' });

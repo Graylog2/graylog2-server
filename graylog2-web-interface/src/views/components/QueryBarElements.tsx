@@ -30,8 +30,4 @@ const QueryBarElements = ({ queryBarElements = [] }: Props) => (
   </>
 );
 
-const mapping = {
-  queryBarElements: 'views.elements.queryBar',
-};
-
-export default withPluginEntities(QueryBarElements, mapping);
+export default withPluginEntities(QueryBarElements, { queryBarElements: 'views.elements.queryBar' });
