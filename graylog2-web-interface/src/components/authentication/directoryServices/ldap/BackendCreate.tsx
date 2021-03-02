@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
+import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
 import WizardPageHeader from './WizardPageHeader';
 
@@ -71,7 +72,7 @@ export const HELP = {
   ),
 };
 
-const INITIAL_VALUES = {
+const INITIAL_VALUES: Partial<WizardFormValues> = {
   title: AUTH_BACKEND_META.serviceTitle,
   serverHost: 'localhost',
   serverPort: 636,

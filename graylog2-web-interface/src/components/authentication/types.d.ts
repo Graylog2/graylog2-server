@@ -14,8 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
-import { DirectoryServiceBackendConfig } from 'logic/authentication/directoryServices/types';
+import {
+  DirectoryServiceBackend,
+  DirectoryServiceBackendConfig,
+  WizardSubmitPayload,
+} from 'logic/authentication/directoryServices/types';
+import Role from 'logic/roles/Role';
+import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
 
 interface AuthenticationService {
   name: string;
@@ -27,9 +35,49 @@ interface AuthenticationService {
   configFromJson: (json: {}) => DirectoryServiceBackendConfig;
 }
 
+interface GroupSyncSectionProps {
+  authenticationBackend: DirectoryServiceBackend;
+  excludedFields: { [field: string]: boolean };
+  roles: Immutable.List<Role>;
+}
+
+interface MatchingGroupsProviderProps {
+  prepareSubmitPayload: (overrideFormValues: WizardFormValues) => WizardSubmitPayload;
+}
+
+interface GroupSyncFormProps {
+  formRef: React.Ref<FormikProps<WizardFormValues>>;
+  help: { [inputName: string]: React.ReactElement | string | null | undefined };
+  excludedFields: { [name: string]: boolean };
+  onSubmitAll: (shouldUpdate?: boolean) => Promise<void>;
+  prepareSubmitPayload: (formValues: WizardFormValues) => WizardSubmitPayload;
+  roles: Immutable.List<Role>;
+  submitAllError: React.ReactNode;
+  validateOnMount: boolean;
+}
+type SupportedBackends = 'ldap' | 'activeDirectory';
+
+interface Backend {
+  help: { [inputName: string]: React.ReactElement | string | null | undefined };
+  initialValues: WizardFormValues;
+  excludedFields: { [field: string]: boolean };
+}
+
 interface DirectoryServicesGroupSync {
+  actions: {
+    onDirectoryServiceBackendUpdate: (backendGroupSyncIsActive: boolean, formValues: WizardFormValues, backendId: string, serviceType: string) => Promise<void>;
+  },
+  validation: {
+    GroupSyncValidation: (teamType: string) => {};
+  },
   components: {
-    GroupSyncSection: React.ComponentType<{ authenticationBackend: AuthenticationBackend }>;
+    GroupSyncSection: React.ComponentType<GroupSyncSectionProps>;
+    MatchingGroupsProvider: React.ComponentType<MatchingGroupsProviderProps>;
+    GroupSyncForm: React.ComponentType<GroupSyncFormProps>;
+  },
+  wizardConfig: Record<SupportedBackends, Backend>,
+  hooks: {
+    useInitialGroupSyncValues: (backendId: string, formValues: WizardFormValues) => { formValues: WizardFormValues, finishedLoading: boolean };
   }
 }
 
@@ -42,7 +90,7 @@ interface AuthenticationPlugin {
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'authentication.services'?: Array<AuthenticationService>;
-    'authentication.enterprise.directoryServices.groupSync'?: DirectoryServicesGroupSync;
+    'authentication.enterprise.directoryServices.groupSync'?: Array<DirectoryServicesGroupSync>;
     'authentication.enterprise'?: Array<AuthenticationPlugin>;
   }
 }
