@@ -121,16 +121,6 @@ export type WidgetProps = {
   type: string,
 };
 
-export type EditWidgetProps = {
-  type: string,
-  id: string,
-  config: AggregationWidgetConfig,
-  editing?: boolean,
-  fields: FieldTypeMappingsList,
-  children: React.ReactNode,
-  onChange: (config: WidgetConfig) => void,
-};
-
 const _visualizationForType = (type) => {
   return widgetDefinition(type).visualizationComponent;
 };

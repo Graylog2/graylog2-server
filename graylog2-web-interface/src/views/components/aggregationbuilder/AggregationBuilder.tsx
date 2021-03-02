@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { WidgetComponentProps } from 'views/types';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
@@ -25,8 +26,6 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
-
-import type { OnVisualizationConfigChange, WidgetProps } from '../widgets/Widget';
 
 const defaultVisualizationType = 'table';
 
@@ -86,7 +85,13 @@ const getResult = (value: RowResult | EventResult): Rows | Events => {
   return value.rows;
 };
 
-const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: WidgetProps) => {
+type OnVisualizationConfigChange = (VisualizationConfig) => void;
+
+type AggregationBuilderProps = WidgetComponentProps<AggregationWidgetConfig> & {
+  onVisualizationConfigChange: OnVisualizationConfigChange,
+};
+
+const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: AggregationBuilderProps) => {
   if (!config || config.isEmpty) {
     return <EmptyAggregationContent toggleEdit={toggleEdit} editing={editing} />;
   }

@@ -24,6 +24,7 @@ import ClipboardButton from 'components/common/ClipboardButton';
 import type { WidgetProps } from './Widget';
 import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 
 const Container = styled.div`
   height: 100%;
@@ -53,7 +54,7 @@ const OrderedList = styled.ol`
   list-style: decimal inside none;
 `;
 
-const UnknownWidget: React.ComponentType<WidgetProps> = ({ config, type }: WidgetProps) => (
+const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetComponentProps> = ({ config, type }: WidgetComponentProps & EditWidgetComponentProps) => (
   <Container>
     <IconContainer>
       <Icon name="question" size="3x" />

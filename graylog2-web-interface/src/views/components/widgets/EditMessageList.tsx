@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 import { $PropertyType } from 'utility-types';
+import { EditWidgetComponentProps } from 'views/types';
 
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/graylog';
@@ -28,7 +29,6 @@ import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 
@@ -63,14 +63,7 @@ const _onSortDirectionChange = (direction: SortConfig['direction'], config, onCh
   return onChange(newConfig);
 };
 
-type Props = {
-  children: React.ReactNode,
-  config: MessagesWidgetConfig,
-  fields: Immutable.List<FieldTypeMapping>,
-  onChange: (MessagesWidgetConfig) => void,
-};
-
-const EditMessageList = ({ children, config, fields, onChange }: Props) => {
+const EditMessageList = ({ children, config, fields, onChange }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
   const selectedFieldsForSelect = config.fields.map((fieldName) => ({ field: fieldName }));

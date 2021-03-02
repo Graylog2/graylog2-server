@@ -23,24 +23,46 @@ import { SearchRefreshCondition } from 'views/logic/hooks/SearchRefreshCondition
 import { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { WidgetActionType } from 'views/components/widgets/Types';
 import { Creator } from 'views/components/sidebar/create/AddWidgetButton';
-import { WidgetProps } from 'views/components/widgets/Widget';
 import { ViewHook } from 'views/logic/hooks/ViewHook';
 import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
+import { OnVisualizationConfigChange, Result } from 'views/components/widgets/Widget';
+import { Widgets } from 'views/stores/WidgetStore';
 
-interface EditWidgetComponentProps<Config extends WidgetConfig> {
+interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
   config: Config,
+  editing: boolean;
+  id: string;
+  type: string;
   fields: Immutable.List<FieldTypeMapping>,
   onChange: (newConfig: Config) => void,
 }
+
+interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
+  config: Config;
+  data: { [key: string]: Result };
+  editing: boolean;
+  fields: Immutable.List<FieldTypeMapping>;
+  filter: string;
+  height: number;
+  width: number;
+  queryId: string;
+  onConfigChange: (newConfig: Config) => Promise<Widgets>;
+  setLoadingState: (loading: boolean) => void;
+  title: string;
+  toggleEdit: () => void;
+  type: string;
+  id: string;
+}
+
 export interface WidgetExport {
   type: string;
   displayName?: string;
   defaultHeight?: number;
   defaultWidth?: number;
-  visualizationComponent: React.ComponentType<WidgetProps>;
+  visualizationComponent: React.ComponentType<WidgetComponentProps>;
   editComponent: React.ComponentType<EditWidgetComponentProps>;
   needsControlledHeight: (widget: Widget) => boolean;
   searchResultTransformer?: (data: Array<unknown>, widget: Widget) => unknown;
@@ -65,8 +87,8 @@ interface VisualizationType {
   component: VisualizationComponent;
 }
 
-interface ResultHandler {
-  convert: (result: Result) => Result;
+interface ResultHandler<T, R> {
+  convert: (result: T) => R;
 }
 interface SearchType {
   type: string;
