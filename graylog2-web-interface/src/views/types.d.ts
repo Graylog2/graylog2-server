@@ -83,9 +83,11 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.elements.header'?: Array<React.ComponentType>;
+    'views.elements.queryBar'?: Array<React.ComponentType>;
     'views.hooks.executingView'?: Array<ViewHook>,
     'views.hooks.loadingView'?: Array<ViewHook>,
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
+    'views.overrides.widgetEdit'?: Array<>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
