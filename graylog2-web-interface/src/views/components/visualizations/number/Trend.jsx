@@ -35,25 +35,24 @@ const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivEleme
 });
 
 const TextContainer: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
-  const { variant } = theme.colors;
+  const { variant } = theme.color;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
   return css`
       margin: 5px;
-      color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
-      font-family: ${theme.fonts.family.body};
+      color: ${util.contrastingColor(bgColor)} !important /* Needed for report generation */;
 
       /* stylelint-disable-next-line property-no-vendor-prefix */
       -webkit-print-color-adjust: exact !important; /* Needed for report generation */`;
 });
 
 const StyledIcon: StyledComponent<{trend: ?string}, ThemeInterface, typeof Icon> = styled(Icon)(({ theme, trend }) => {
-  const { variant } = theme.colors;
+  const { variant } = theme.color;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
   return css`
     path {
-      fill: ${theme.utils.contrastingColor(bgColor)};
+      fill: ${util.contrastingColor(bgColor)};
     }`;
 });
 
