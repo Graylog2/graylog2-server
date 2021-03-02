@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { ViewLoaderFn } from 'views/logic/views/ViewLoader';
-import { ViewHook } from 'views/logic/hooks/ViewHook';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
 const useViewLoader = (viewId: string, query: { [key: string]: any }, viewLoader: ViewLoaderFn): [boolean, React.ReactElement | undefined] => {

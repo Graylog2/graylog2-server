@@ -22,8 +22,6 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 import { MenuItem } from 'components/graylog';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
-import { WidgetActionType } from './Types';
-
 type Props = {
   onSelect: (eventKey: string, e: MouseEvent) => void,
   widget: Widget,
