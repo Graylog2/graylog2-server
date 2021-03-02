@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
@@ -25,44 +26,50 @@ import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {
-  currentTimeRange: TimeRange | NoTimeRangeOverride,
+  value: TimeRange | NoTimeRangeOverride,
   disabled?: boolean,
   noOverride?: boolean,
   hasErrorOnMount?: boolean,
-  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
 };
 
-const TimeRangeTypeSelector = ({ disabled, hasErrorOnMount, noOverride, currentTimeRange, setCurrentTimeRange }: Props) => {
+const FlexContainer = styled.span`
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+`;
+
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange }: Props) => {
   const [show, setShow] = useState(false);
 
   const toggleShow = () => setShow(!show);
 
   return (
-    <>
+    <FlexContainer>
       <TimeRangeDropdownButton disabled={disabled}
                                show={show}
                                toggleShow={toggleShow}
                                hasErrorOnMount={hasErrorOnMount}>
-        <TimeRangeDropdown currentTimeRange={currentTimeRange}
+        <TimeRangeDropdown currentTimeRange={value}
                            noOverride={noOverride}
-                           setCurrentTimeRange={setCurrentTimeRange}
+                           setCurrentTimeRange={onChange}
                            toggleDropdownShow={toggleShow} />
       </TimeRangeDropdownButton>
-      <TimeRangeDisplay timerange={currentTimeRange} toggleDropdownShow={toggleShow} />
-    </>
+      <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
+    </FlexContainer>
   );
 };
 
-TimeRangeTypeSelector.propTypes = {
+TimeRangeInput.propTypes = {
   disabled: PropTypes.bool,
   hasErrorOnMount: PropTypes.bool,
   noOverride: PropTypes.bool,
 };
 
-TimeRangeTypeSelector.defaultProps = {
+TimeRangeInput.defaultProps = {
   disabled: false,
   hasErrorOnMount: false,
   noOverride: false,
 };
 
-export default TimeRangeTypeSelector;
+export default TimeRangeInput;
