@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 
 import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 const Container = styled.div`
   height: 100%;
@@ -83,10 +81,5 @@ const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetCompon
     </Description>
   </Container>
 );
-
-UnknownWidget.propTypes = {
-  config: PropTypes.instanceOf(AggregationWidgetConfig).isRequired,
-  type: PropTypes.string.isRequired,
-};
 
 export default UnknownWidget;
