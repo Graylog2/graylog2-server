@@ -15,22 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 
-import { breakpoints, fonts, utils } from 'theme';
-import colors, { Colors } from 'theme/colors';
+import { breakpoints, colors, fonts, utils } from 'theme';
+import RegeneratableThemeContext from 'theme/RegeneratableThemeContext';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import UpdatableThemeContext from 'theme/UpdatableThemeContext';
+import { Colors } from 'theme/colors';
+import { ThemeMode } from 'theme/constants';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
-const _generateTheme = ({ changeMode, mode, generateCustomThemeColors }): DefaultTheme => {
-  const currentThemeColors: Colors = generateCustomThemeColors ? generateCustomThemeColors(colors[mode], mode) : colors[mode];
+interface generateCustomFn {
+  graylogColors: Colors,
+  mode: ThemeMode,
+  initialLoad: boolean,
+}
 
+interface generateFn {
+  changeMode: (ThemeMode) => void,
+  mode: ThemeMode,
+  initialLoad?: boolean,
+  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomFn) => Promise<Colors> | undefined,
+}
+
+function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
   const formattedUtils = {
     ...utils,
     colorLevel: utils.colorLevel(currentThemeColors),
@@ -49,6 +61,22 @@ const _generateTheme = ({ changeMode, mode, generateCustomThemeColors }): Defaul
     },
     utils: formattedUtils,
   };
+}
+
+const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLoad = false }: generateFn) => {
+  if (generateCustomThemeColors) {
+    return generateCustomThemeColors({
+      graylogColors: colors[mode],
+      mode,
+      initialLoad,
+    }).then((currentThemeColors) => {
+      return buildTheme(currentThemeColors, changeMode, mode);
+    });
+  }
+
+  return Promise.resolve(colors[mode]).then((currentThemeColors) => {
+    return buildTheme(currentThemeColors, changeMode, mode);
+  });
 };
 
 const GraylogThemeProvider = ({ children }) => {
@@ -58,19 +86,23 @@ const GraylogThemeProvider = ({ children }) => {
   // @ts-ignore
   const generateCustomThemeColors = themeCustomizer?.[0]?.actions?.generateCustomThemeColors;
 
-  const [theme, setTheme] = useState<DefaultTheme>(_generateTheme({ changeMode, mode, generateCustomThemeColors }));
+  const [theme, setTheme] = useState<DefaultTheme>();
 
-  const updatableTheme = () => {
-    setTheme(_generateTheme({ changeMode, mode, generateCustomThemeColors }));
+  useEffect(() => {
+    _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: true }).then(setTheme);
+  }, [changeMode, generateCustomThemeColors, mode, setTheme]);
+
+  const regenerateTheme = () => {
+    _generateTheme({ changeMode, mode, generateCustomThemeColors }).then(setTheme);
   };
 
-  return (
-    <UpdatableThemeContext.Provider value={{ updatableTheme }}>
+  return theme ? (
+    <RegeneratableThemeContext.Provider value={{ regenerateTheme }}>
       <ThemeProvider theme={theme}>
         {children}
       </ThemeProvider>
-    </UpdatableThemeContext.Provider>
-  );
+    </RegeneratableThemeContext.Provider>
+  ) : null;
 };
 
 GraylogThemeProvider.propTypes = {

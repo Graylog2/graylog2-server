@@ -26,7 +26,7 @@ import {
   generateVariantColors,
 } from './util';
 
-import { THEME_MODE_DARK, THEME_MODE_LIGHT } from '../constants';
+import { THEME_MODE_DARK } from '../constants';
 
 const brand: $PropertyType<Colors, 'brand'> = {
   primary: '#ff3633',
@@ -56,7 +56,7 @@ const variantDefault = {
 
 const variant: $PropertyType<Colors, 'variant'> = {
   ...variantDefault,
-  ...generateVariantColors(THEME_MODE_LIGHT, variantDefault),
+  ...generateVariantColors(THEME_MODE_DARK, variantDefault),
 };
 
 const global = {

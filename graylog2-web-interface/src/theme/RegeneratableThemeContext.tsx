@@ -18,6 +18,6 @@ import * as React from 'react';
 
 import { singleton } from 'views/logic/singleton';
 
-const UpdatableThemeContext = React.createContext<{updatableTheme:() => void} | undefined>(undefined);
+const RegeneratableThemeContext = React.createContext<{regenerateTheme:() => void} | undefined>(undefined);
 
-export default singleton('contexts.UpdatableThemeContext', () => UpdatableThemeContext);
+export default singleton('contexts.RegeneratableThemeContext', () => RegeneratableThemeContext);
