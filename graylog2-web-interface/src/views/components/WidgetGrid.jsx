@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -47,129 +48,149 @@ export const WidgetContainer = styled.div`
   margin-bottom: 0;
 `;
 
-class WidgetGrid extends React.Component {
-  static _defaultDimensions(type) {
-    const widgetDef = widgetDefinition(type);
+const _defaultDimensions = (type) => {
+  const widgetDef = widgetDefinition(type);
 
-    return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
+  return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
+};
+
+const _onWidgetSizeChange = (widgetDimensions, setWidgetDimensions) => (widgetId, dimensions) => {
+  setWidgetDimensions({ ...widgetDimensions, [widgetId]: dimensions });
+};
+
+const _renderWidgets = ({
+  allFields,
+  data,
+  errors,
+  fields,
+  onPositionsChange,
+  positions,
+  setWidgetDimensions,
+  titles,
+  widgetDimensions,
+  widgets,
+}) => {
+  const returnedWidgets = { positions: {}, widgets: [] };
+
+  if (!widgets || _.isEmpty(widgets) || !data) {
+    return returnedWidgets;
   }
 
-  static propTypes = {
-    allFields: CustomPropTypes.FieldListType.isRequired,
-    data: WidgetDataMap.isRequired,
-    errors: WidgetErrorsMap.isRequired,
-    fields: CustomPropTypes.FieldListType.isRequired,
-    locked: PropTypes.bool,
-    onPositionsChange: PropTypes.func.isRequired,
-    positions: PositionsMap,
-    staticWidgets: PropTypes.arrayOf(PropTypes.node),
-    titles: ImmutablePropTypes.map.isRequired,
-    widgets: WidgetsMap.isRequired,
-  };
+  const _onPositionsChange = (newPosition) => {
+    const newPositions = Object.keys(positions).map((id) => {
+      const { col, row, height, width } = positions[id]._value;
 
-  static defaultProps = {
-    locked: true,
-    staticWidgets: [],
-    positions: {},
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      widgetDimensions: {},
-    };
-  }
-
-  _onWidgetSizeChange = (widgetId, dimensions) => {
-    this.setState(({ widgetDimensions }) => ({ widgetDimensions: { ...widgetDimensions, [widgetId]: dimensions } }));
-  };
-
-  _renderWidgets = (widgets, positions, data, errors) => {
-    const returnedWidgets = { positions: {}, widgets: [] };
-
-    if (!widgets || _.isEmpty(widgets) || !data) {
-      return returnedWidgets;
-    }
-
-    const onPositionsChange = (newPosition) => {
-      const newPositions = Object.keys(positions).map((id) => {
-        const { col, row, height, width } = positions[id]._value;
-
-        return { id: id, col: col, row: row, height: height, width: width };
-      });
-
-      newPositions.push(newPosition);
-      // eslint-disable-next-line react/destructuring-assignment
-      this.props.onPositionsChange(newPositions);
-    };
-
-    Object.keys(widgets).forEach((widgetId) => {
-      const widget = widgets[widgetId];
-      returnedWidgets.positions[widgetId] = positions[widgetId] || WidgetGrid._defaultDimensions(widget.type);
-
-      const { widgetDimensions = {} } = this.state;
-      const { fields, allFields, titles = Immutable.Map() } = this.props;
-      const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
-
-      returnedWidgets.widgets.push(
-        <WidgetContainer key={widgetId}>
-          <WidgetComponent widget={widget}
-                           widgetId={widgetId}
-                           data={data}
-                           errors={errors}
-                           widgetDimension={widgetDimensions[widgetId] || {}}
-                           title={widgetTitle}
-                           position={returnedWidgets.positions[widgetId]}
-                           onPositionsChange={onPositionsChange}
-                           fields={fields}
-                           allFields={allFields}
-                           onWidgetSizeChange={this._onWidgetSizeChange} />
-        </WidgetContainer>,
-      );
+      return { id: id, col: col, row: row, height: height, width: width };
     });
 
-    return returnedWidgets;
+    newPositions.push(newPosition);
+    // eslint-disable-next-line react/destructuring-assignment
+    onPositionsChange(newPositions);
   };
 
-  render() {
-    const { staticWidgets, data, errors, locked, onPositionsChange } = this.props;
-    // eslint-disable-next-line react/destructuring-assignment
-    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, data, errors);
-    const grid = widgets && widgets.length > 0 ? (
-      <ReactGridContainer animate
-                          locked={locked}
-                          columns={{
-                            xxl: 12,
-                            xl: 12,
-                            lg: 12,
-                            md: 12,
-                            sm: 12,
-                            xs: 12,
-                          }}
-                          measureBeforeMount
-                          onPositionsChange={onPositionsChange}
-                          positions={positions}
-                          useDragHandle=".widget-drag-handle">
-        {widgets}
-      </ReactGridContainer>
-    ) : <span />;
+  Object.keys(widgets).forEach((widgetId) => {
+    const widget = widgets[widgetId];
+    returnedWidgets.positions[widgetId] = positions[widgetId] || _defaultDimensions(widget.type);
+    const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
 
-    // The SizeMe component is required to update the widget grid
-    // when its content height results in a scrollbar
-    return (
-      <SizeMe monitorWidth refreshRate={100}>
-        {({ size }) => {
-          return (
-            <DashboardWrap>
-              {React.cloneElement(grid, { width: size.width })}
-              {staticWidgets}
-            </DashboardWrap>
-          );
-        }}
-      </SizeMe>
+    returnedWidgets.widgets.push(
+      <WidgetContainer key={widgetId}>
+        <WidgetComponent widget={widget}
+                         widgetId={widgetId}
+                         data={data}
+                         errors={errors}
+                         widgetDimension={widgetDimensions[widgetId] || {}}
+                         title={widgetTitle}
+                         position={returnedWidgets.positions[widgetId]}
+                         onPositionsChange={_onPositionsChange}
+                         fields={fields}
+                         allFields={allFields}
+                         onWidgetSizeChange={_onWidgetSizeChange(widgetDimensions, setWidgetDimensions)} />
+      </WidgetContainer>,
     );
-  }
-}
+  });
+
+  return returnedWidgets;
+};
+
+const WidgetGrid = ({
+  staticWidgets,
+  data,
+  errors,
+  locked,
+  onPositionsChange,
+  widgets: propsWidgets,
+  positions: propsPositions,
+  fields,
+  allFields,
+  titles,
+}) => {
+  const [widgetDimensions, setWidgetDimensions] = useState({});
+  const { widgets, positions } = _renderWidgets({
+    allFields,
+    data,
+    errors,
+    fields,
+    onPositionsChange,
+    positions: propsPositions,
+    widgets: propsWidgets,
+    setWidgetDimensions,
+    titles,
+    widgetDimensions,
+  });
+  const grid = widgets && widgets.length > 0 ? (
+    <ReactGridContainer animate
+                        locked={locked}
+                        columns={{
+                          xxl: 12,
+                          xl: 12,
+                          lg: 12,
+                          md: 12,
+                          sm: 12,
+                          xs: 12,
+                        }}
+                        measureBeforeMount
+                        onPositionsChange={onPositionsChange}
+                        positions={positions}
+                        useDragHandle=".widget-drag-handle">
+      {widgets}
+    </ReactGridContainer>
+  ) : <span />;
+
+  // The SizeMe component is required to update the widget grid
+  // when its content height results in a scrollbar
+  return (
+    <SizeMe monitorWidth refreshRate={100}>
+      {({ size }) => {
+        return (
+          <DashboardWrap>
+            {React.cloneElement(grid, { width: size.width })}
+            {staticWidgets}
+          </DashboardWrap>
+        );
+      }}
+    </SizeMe>
+  );
+};
+
+WidgetGrid.propTypes = {
+  allFields: CustomPropTypes.FieldListType.isRequired,
+  data: WidgetDataMap.isRequired,
+  errors: WidgetErrorsMap.isRequired,
+  fields: CustomPropTypes.FieldListType.isRequired,
+  locked: PropTypes.bool,
+  onPositionsChange: PropTypes.func.isRequired,
+  positions: PositionsMap,
+  staticWidgets: PropTypes.arrayOf(PropTypes.node),
+  titles: ImmutablePropTypes.map,
+  widgets: WidgetsMap.isRequired,
+};
+
+WidgetGrid.defaultProps = {
+  locked: true,
+  staticWidgets: [],
+  positions: {},
+  titles: Immutable.Map(),
+};
 
 export default connect(WidgetGrid, { titles: TitlesStore });
