@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<DropdownField> should render an empty field 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <label
+      for="dropdown-undefined"
+    >
+      dropdown field
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <select
+      class="input-xlarge form-control"
+    >
+      <option
+        id="uno"
+        value="uno"
+      >
+        one
+      </option>
+      <option
+        id="dos"
+        value="dos"
+      >
+        two
+      </option>
+    </select>
+    <p
+      class="help-block"
+    >
+      my dropdown description
+    </p>
+  </div>
+</div>
+`;

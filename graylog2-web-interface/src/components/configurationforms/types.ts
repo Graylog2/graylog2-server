@@ -55,4 +55,19 @@ export type ListField = {
   type: 'list',
 };
 
-export type ConfigurationField = ListField | NumberField | TextField;
+export type DropdownField = {
+  additional_info: {
+    values: {
+      [value: string]: string,
+    }
+  },
+  attributes: [],
+  default_value: string,
+  description: string,
+  human_name: string,
+  is_optional: boolean,
+  position: number,
+  type: 'dropdown',
+};
+
+export type ConfigurationField = DropdownField | ListField | NumberField | TextField;

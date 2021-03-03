@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ListField, NumberField, TextField } from 'components/configurationforms/types';
+import { DropdownField, ListField, NumberField, TextField } from 'components/configurationforms/types';
 
 export const numberField: NumberField = {
   additional_info: {},
@@ -141,5 +141,34 @@ export const creatableListField: ListField = {
   attributes: ['allow_create'],
   position: 100,
   type: 'list',
+  is_optional: false,
+};
+
+export const dropdownField: DropdownField = {
+  human_name: 'dropdown field',
+  additional_info: {
+    values: {
+      uno: 'one',
+      dos: 'two',
+    },
+  },
+  description: 'my dropdown description',
+  default_value: '',
+  attributes: [],
+  position: 100,
+  type: 'dropdown',
+  is_optional: true,
+};
+
+export const requiredDropdownField: DropdownField = {
+  human_name: 'required dropdown field',
+  additional_info: {
+    values: {},
+  },
+  description: 'my required dropdown description',
+  default_value: '',
+  attributes: [],
+  position: 100,
+  type: 'dropdown',
   is_optional: false,
 };

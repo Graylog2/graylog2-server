@@ -77,7 +77,7 @@ class DropdownField extends React.Component {
         </label>
 
         <select id={field.title}
-                value={this.state.value}
+                value={this.state.value || ''}
                 className="input-xlarge form-control"
                 onChange={this.handleChange}
                 autoFocus={this.props.autoFocus}
