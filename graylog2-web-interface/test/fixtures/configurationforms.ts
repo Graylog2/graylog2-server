@@ -1,4 +1,4 @@
-import { NumberField, TextField } from 'components/configurationforms/types';
+import { ListField, NumberField, TextField } from 'components/configurationforms/types';
 
 export const numberField: NumberField = {
   additional_info: {},
@@ -24,7 +24,7 @@ export const requiredNumberField: NumberField = {
 
 export const negativeNumberField: NumberField = {
   additional_info: {},
-  attributes: ['ONLY_NEGATIVE'],
+  attributes: ['only_negative'],
   default_value: -42,
   description: 'my number description',
   human_name: 'number field',
@@ -35,7 +35,7 @@ export const negativeNumberField: NumberField = {
 
 export const positiveNumberField: NumberField = {
   additional_info: {},
-  attributes: ['ONLY_POSITIVE'],
+  attributes: ['only_positive'],
   default_value: 42,
   description: 'my number description',
   human_name: 'number field',
@@ -46,7 +46,7 @@ export const positiveNumberField: NumberField = {
 
 export const portNumberField: NumberField = {
   additional_info: {},
-  attributes: ['IS_PORT_NUMBER'],
+  attributes: ['is_port_number'],
   default_value: 42,
   description: 'my number description',
   human_name: 'number field',
@@ -97,4 +97,33 @@ export const textAreaField: TextField = {
   position: 100,
   type: 'text',
   is_optional: true,
+};
+
+export const listField: ListField = {
+  human_name: 'list field',
+  additional_info: {
+    values: {
+      uno: 'one',
+      dos: 'two',
+    },
+  },
+  description: 'my list description',
+  default_value: [],
+  attributes: [],
+  position: 100,
+  type: 'list',
+  is_optional: true,
+};
+
+export const creatableListField: ListField = {
+  human_name: 'list field',
+  additional_info: {
+    values: {},
+  },
+  description: 'my list description',
+  default_value: [],
+  attributes: ['allow_create'],
+  position: 100,
+  type: 'list',
+  is_optional: false,
 };

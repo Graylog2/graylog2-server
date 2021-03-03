@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ListField> should render an empty field 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <label
+      for="list-undefined"
+    >
+      list field
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <div
+      class="css-1pcexqc-container"
+    >
+      <div
+        class="css-ghr2vn-control"
+      >
+        <div
+          class="css-1hio1c"
+        >
+          <div
+            class="css-1nlt8zk-placeholder"
+          >
+            Select list field
+          </div>
+          <div
+            class="css-dg7tyz"
+          >
+            <div
+              class=""
+              style="display: inline-block;"
+            >
+              <input
+                aria-autocomplete="list"
+                autocapitalize="none"
+                autocomplete="off"
+                autocorrect="off"
+                id="react-select-2-input"
+                spellcheck="false"
+                style="box-sizing: content-box; width: 2px; border: 0px; opacity: 1; outline: 0; padding: 0px;"
+                tabindex="0"
+                type="text"
+                value=""
+              />
+              <div
+                style="position: absolute; top: 0px; left: 0px; visibility: hidden; height: 0px; overflow: scroll; white-space: pre; font-family: -webkit-small-control; letter-spacing: normal; text-transform: none;"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="css-1wy0on6"
+        >
+          <div
+            aria-hidden="true"
+            style="color: rgb(166, 166, 166); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
+          >
+            <svg
+              class="svg-inline--fa fa-caret-down"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <p
+      class="help-block"
+    >
+      my list description
+    </p>
+  </div>
+</div>
+`;
