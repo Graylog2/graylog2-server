@@ -26,6 +26,7 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.AbstractMessageQueueReader;
+import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,16 +48,18 @@ public class LocalKafkaMessageQueueReader extends AbstractMessageQueueReader {
     private final Semaphore journalFilled;
     private final MetricRegistry metricRegistry;
     private final Meter readMessages;
+    private final Metrics readerMetrics;
     private Histogram requestedReadCount;
     private final Counter readBlocked;
     private Thread executionThread;
 
     @Inject
     public LocalKafkaMessageQueueReader(Journal journal,
-                         ProcessBuffer processBuffer,
-                         @Named("JournalSignal") Semaphore journalFilled,
-                         MetricRegistry metricRegistry,
-                         EventBus eventBus) {
+                                        ProcessBuffer processBuffer,
+                                        @Named("JournalSignal") Semaphore journalFilled,
+                                        MetricRegistry metricRegistry,
+                                        EventBus eventBus,
+                                        MessageQueueReader.Metrics readerMetrics) {
 
         super(eventBus);
 
@@ -66,6 +69,7 @@ public class LocalKafkaMessageQueueReader extends AbstractMessageQueueReader {
         this.metricRegistry = metricRegistry;
         readBlocked = metricRegistry.counter(name(this.getClass(), "readBlocked"));
         readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
+        this.readerMetrics = readerMetrics;
     }
 
     @Override
@@ -119,10 +123,12 @@ public class LocalKafkaMessageQueueReader extends AbstractMessageQueueReader {
                 journalFilled.drainPermits();
             } else {
                 readMessages.mark(encodedRawMessages.size());
+                readerMetrics.readMessages().mark(encodedRawMessages.size());
                 log.debug("Processing {} messages from journal.", encodedRawMessages.size());
                 for (final Journal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
                     final RawMessage rawMessage = RawMessage.decode(encodedRawMessage.getPayload(),
                                                                     encodedRawMessage.getOffset());
+                    readerMetrics.readBytes().mark(encodedRawMessage.getPayload().length);
                     if (rawMessage == null) {
                         // never insert null objects into the ringbuffer, as that is useless
                         log.error("Found null raw message!");

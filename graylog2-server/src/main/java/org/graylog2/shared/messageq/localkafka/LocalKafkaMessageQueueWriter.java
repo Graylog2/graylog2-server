@@ -21,9 +21,7 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.journal.Journal;
@@ -37,13 +35,13 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.collect.Lists.transform;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Singleton
 public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
@@ -51,6 +49,7 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
 
     private LocalKafkaJournal kafkaJournal;
     private Semaphore journalFilled;
+    private final Metrics metrics;
 
     private static final Retryer<Void> JOURNAL_WRITE_RETRYER = RetryerBuilder.<Void>newBuilder()
             .retryIfException(new Predicate<Throwable>() {
@@ -67,15 +66,23 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
 
     @Inject
     public LocalKafkaMessageQueueWriter(LocalKafkaJournal kafkaJournal,
-                                        @Named("JournalSignal") Semaphore journalFilled) {
+                                        @Named("JournalSignal") Semaphore journalFilled,
+                                        MessageQueueWriter.Metrics metrics) {
         this.kafkaJournal = kafkaJournal;
         this.journalFilled = journalFilled;
+        this.metrics = metrics;
     }
 
     @Override
     public void write(List<RawMessageEvent> entries) throws MessageQueueException {
-        final Converter converter = new Converter();
-        final ArrayList<Journal.Entry> journalEntries = Lists.newArrayList(transform(entries, converter));
+
+        final AtomicLong msgBytes = new AtomicLong(0);
+
+        final List<Journal.Entry> journalEntries = entries.stream()
+                .filter(Objects::nonNull)
+                .map(e -> new Journal.Entry(e.getMessageIdBytes(), e.getEncodedRawMessage()))
+                .peek(e -> msgBytes.addAndGet(e.getMessageBytes().length))
+                .collect(Collectors.toList());
 
         try {
             writeToJournal(journalEntries);
@@ -92,10 +99,14 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
                 throw new MessageQueueException("Retryer exception", ex);
             }
         }
+
+        metrics.writtenMessages().mark(journalEntries.size());
+        metrics.writtenBytes().mark(msgBytes.get());
     }
 
     private void writeToJournal(List<Journal.Entry> entries) {
         final long lastOffset = kafkaJournal.write(entries);
+
         LOG.debug("Processed batch, last journal offset: {}, signalling reader.",
                 lastOffset);
         journalFilled.release();
@@ -109,13 +120,5 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
     @Override
     protected void shutDown() throws Exception {
 
-    }
-
-    private static class Converter implements Function<RawMessageEvent, Journal.Entry> {
-        @Nullable
-        @Override
-        public Journal.Entry apply(@Nullable RawMessageEvent input) {
-            return new Journal.Entry(input.getMessageIdBytes(), input.getEncodedRawMessage());
-        }
     }
 }

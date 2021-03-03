@@ -48,8 +48,8 @@ public class MessageQueueModule extends PluginModule {
                         NoopMessageQueueAcknowledger.class);
                 break;
             case DISK_JOURNAL_MODE:
-                bindMessageQueueImplementation(LocalKafkaMessageQueueReader.class, LocalKafkaMessageQueueWriter.class
-                        , LocalKafkaMessageQueueAcknowledger.class);
+                bindMessageQueueImplementation(LocalKafkaMessageQueueReader.class, LocalKafkaMessageQueueWriter.class,
+                        LocalKafkaMessageQueueAcknowledger.class);
                 break;
             default:
                 // OK, none of the journal modes covered by this plugin are activated
@@ -63,5 +63,12 @@ public class MessageQueueModule extends PluginModule {
             binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
             serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
         }
+
+        bind(MessageQueueReader.Metrics.class).toProvider(MessageQueueReader.Metrics.Provider.class)
+                .in(Scopes.SINGLETON);
+        bind(MessageQueueWriter.Metrics.class).toProvider(MessageQueueWriter.Metrics.Provider.class)
+                .in(Scopes.SINGLETON);
+        bind(MessageQueueAcknowledger.Metrics.class).toProvider(MessageQueueAcknowledger.Metrics.Provider.class)
+                .in(Scopes.SINGLETON);
     }
 }

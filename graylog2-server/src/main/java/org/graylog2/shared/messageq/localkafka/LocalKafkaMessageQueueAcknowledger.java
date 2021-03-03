@@ -30,16 +30,20 @@ import java.util.Optional;
 public class LocalKafkaMessageQueueAcknowledger implements MessageQueueAcknowledger {
     private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaMessageQueueAcknowledger.class);
     private LocalKafkaJournal kafkaJournal;
+    private final Metrics metrics;
 
     @Inject
-    public LocalKafkaMessageQueueAcknowledger(LocalKafkaJournal kafkaJournal) {
+    public LocalKafkaMessageQueueAcknowledger(LocalKafkaJournal kafkaJournal,
+                                              MessageQueueAcknowledger.Metrics metrics) {
         this.kafkaJournal = kafkaJournal;
+        this.metrics = metrics;
     }
 
     @Override
     public void acknowledge(Object messageId) {
         if (messageId instanceof Long) {
-            kafkaJournal.markJournalOffsetCommitted((Long) messageId);
+            doAcknowledge((Long) messageId);
+            metrics.acknowledgedMessages().mark();
         } else {
             LOG.error("Couldn't acknowledge message. Expected <" + messageId + "> to be a Long");
         }
@@ -47,9 +51,13 @@ public class LocalKafkaMessageQueueAcknowledger implements MessageQueueAcknowled
 
     @Override
     public void acknowledge(List<Object> messageIds) {
-        final Optional<Long> max = messageIds.stream().filter(Long.class::isInstance).map(Long.class::cast).max(Long::compare);
-        if (max.isPresent()) {
-            acknowledge(max.get());
-        }
+        final Optional<Long> max =
+                messageIds.stream().filter(Long.class::isInstance).map(Long.class::cast).max(Long::compare);
+        max.ifPresent(this::doAcknowledge);
+        metrics.acknowledgedMessages().mark(messageIds.size());
+    }
+
+    private void doAcknowledge(long offset) {
+        kafkaJournal.markJournalOffsetCommitted(offset);
     }
 }
