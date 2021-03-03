@@ -84,6 +84,11 @@ public abstract class MessageList implements SearchType {
     @JsonProperty
     public abstract List<Decorator> decorators();
 
+    @Override
+    public boolean isExportable() {
+        return true;
+    }
+
     @JsonCreator
     public static Builder builder() {
         return new AutoValue_MessageList.Builder()

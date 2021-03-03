@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import { List } from 'immutable';
+import { List, Set } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Field, Formik, Form } from 'formik';
 
 import connect from 'stores/connect';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
@@ -38,7 +38,7 @@ import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
-const DEFAULT_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD];
+const DEFAULT_FIELDS = Set([TIMESTAMP_FIELD, SOURCE_FIELD, MESSAGE_FIELD]);
 
 const Content = styled.div`
   margin-left: 15px;
@@ -53,31 +53,18 @@ export type Props = {
   view: View,
 };
 
-const _getInitialWidgetFields = (selectedWidget) => {
+const _getInitialWidgetFields = (selectedWidget: Widget): Set<string> => {
   if (selectedWidget.config.showMessageRow) {
-    return [...new Set([...selectedWidget.config.fields, MESSAGE_FIELD])];
+    return Set<string>(selectedWidget.config.fields).add(MESSAGE_FIELD).toSet();
   }
 
-  return selectedWidget.config.fields;
+  return Set(selectedWidget.config.fields);
 };
 
 const _getInitialFields = (selectedWidget) => {
-  let initialFields = DEFAULT_FIELDS;
+  const initialFields = selectedWidget ? _getInitialWidgetFields(selectedWidget) : DEFAULT_FIELDS;
 
-  if (selectedWidget) {
-    initialFields = _getInitialWidgetFields(selectedWidget);
-  }
-
-  return initialFields.map((field) => ({ field }));
-};
-
-const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields) => {
-  setSelectedWidget(newWidget);
-  setSelectedFields(_getInitialFields(newWidget));
-};
-
-const _onFieldSelect = (newFields, setSelectedFields) => {
-  setSelectedFields(newFields.map((field) => ({ field: field.value })));
+  return initialFields.map((field) => ({ field })).toArray();
 };
 
 const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal) => {
@@ -85,55 +72,90 @@ const _onStartDownload = (downloadFile, view, executionState, selectedWidget, se
   startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit).then(closeModal);
 };
 
+type FormState = {
+  selectedWidget: Widget | undefined,
+  limit: number,
+  selectedFields: Array<{ field: string }>,
+};
+
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
-  const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type).toList()).toList().flatten(true) as List<Widget>;
+  const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
 
   const [loading, setLoading] = useState(false);
-  const [selectedWidget, setSelectedWidget] = useState<Widget | undefined>(initialWidget(messagesWidgets, directExportWidgetId));
-  const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(_getInitialFields(selectedWidget));
-  const [limit, setLimit] = useState<number | undefined>();
+  const initialSelectedWidget = initialWidget(exportableWidgets, directExportWidgetId);
+  const initialSelectedFields = _getInitialFields(initialSelectedWidget);
 
   const singleWidgetDownload = !!directExportWidgetId;
-  const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, messagesWidgets);
-  const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, messagesWidgets);
-  const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields, loading);
-  const _startDownload = () => _onStartDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal);
+
+  const _startDownload = (values: FormState) => {
+    return _onStartDownload(downloadFile, view, executionState, values.selectedWidget, values.selectedFields, values.limit, setLoading, closeModal);
+  };
+
+  const initialValues: FormState = {
+    selectedWidget: initialSelectedWidget,
+    selectedFields: initialSelectedFields,
+    limit: undefined,
+  };
 
   return (
-    <BootstrapModalWrapper showModal onHide={closeModal}>
-      <Modal.Header>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Content>
-          {showWidgetSelection && (
-            <CSVExportWidgetSelection selectWidget={(selection) => _onSelectWidget(selection, setSelectedWidget, setSelectedFields)}
-                                      view={view}
-                                      widgets={messagesWidgets.toList()} />
-          )}
-          {!showWidgetSelection && (
-            <CSVExportSettings fields={fields}
-                               selectedFields={selectedFields}
-                               selectField={(newFields) => _onFieldSelect(newFields, setSelectedFields)}
-                               selectedWidget={selectedWidget}
-                               setLimit={setLimit}
-                               limit={limit}
-                               view={view} />
-          )}
-        </Content>
-      </Modal.Body>
-      <Modal.Footer>
-        {allowWidgetSelection && <Button bsStyle="link" onClick={() => setSelectedWidget(null)} className="pull-left">Select different message table</Button>}
-        <Button type="button" onClick={closeModal}>Close</Button>
-        <Button type="button" onClick={_startDownload} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
-          {loading
-            ? <Spinner text="Downloading..." delay={0} />
-            : <><Icon name="cloud-download-alt" />&nbsp;Start Download</>}
-        </Button>
-      </Modal.Footer>
-    </BootstrapModalWrapper>
+    <Formik<FormState> onSubmit={_startDownload}
+                       initialValues={initialValues}>
+      {({ submitForm, values: { selectedWidget, selectedFields }, setFieldValue }) => {
+        const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, exportableWidgets);
+        const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, exportableWidgets);
+        const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields, loading);
+        const resetSelectedWidget = () => setFieldValue('selectedWidget', undefined);
+        const setSelectedFields = (newFields) => setFieldValue('selectedFields', newFields);
+
+        return (
+          <Form>
+            <BootstrapModalWrapper showModal onHide={closeModal}>
+              <Modal.Header>
+                <Modal.Title>{title}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Content>
+
+                  {showWidgetSelection && (
+                  <Field name="selectedWidget">
+                    {({ field: { name, onChange } }) => {
+                      const onChangeSelectWidget = ({ value }) => {
+                        setSelectedFields(_getInitialFields(value));
+
+                        return onChange({ target: { name, value } });
+                      };
+
+                      return (
+                        <CSVExportWidgetSelection selectWidget={onChangeSelectWidget}
+                                                  view={view}
+                                                  widgets={exportableWidgets.toList()} />
+                      );
+                    }}
+                  </Field>
+                  )}
+                  {!showWidgetSelection && (
+                  <CSVExportSettings fields={fields}
+                                     selectedWidget={initialSelectedWidget}
+                                     view={view} />
+                  )}
+                </Content>
+              </Modal.Body>
+              <Modal.Footer>
+                {allowWidgetSelection && <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">Select different message table</Button>}
+                <Button type="button" onClick={closeModal}>Close</Button>
+                <Button type="submit" onClick={submitForm} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+                  {loading
+                    ? <Spinner text="Downloading..." delay={0} />
+                    : <><Icon name="cloud-download-alt" />&nbsp;Start Download</>}
+                </Button>
+              </Modal.Footer>
+            </BootstrapModalWrapper>
+          </Form>
+        );
+      }}
+    </Formik>
   );
 };
 

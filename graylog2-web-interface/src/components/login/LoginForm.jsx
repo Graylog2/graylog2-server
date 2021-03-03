@@ -73,12 +73,14 @@ const LoginForm = ({ onErrorChange }) => {
              id="username"
              type="text"
              placeholder="Username"
-             autoFocus />
+             autoFocus
+             required />
 
       <Input ref={(password) => { passwordInput = password; }}
              id="password"
              type="password"
-             placeholder="Password" />
+             placeholder="Password"
+             required />
 
       <StyledFormGroup>
         <Button type="submit" bsStyle="info" disabled={isLoading}>

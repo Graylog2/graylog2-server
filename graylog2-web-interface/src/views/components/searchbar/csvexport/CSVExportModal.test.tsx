@@ -20,6 +20,7 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
 import { Optional } from 'utility-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
@@ -32,7 +33,6 @@ import Search from 'views/logic/search/Search';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View, { ViewType } from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
-import Widget from 'views/logic/widgets/Widget';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -55,6 +55,18 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
+const pluginExports = {
+  exports: {
+    enterpriseWidgets: [
+      {
+        type: 'messages',
+        displayName: 'Message List',
+        titleGenerator: () => MessagesWidget.defaultTitle,
+      },
+    ],
+  },
+};
+
 describe('CSVExportModal', () => {
   const searchType = {
     id: 'search-type-id-1',
@@ -74,9 +86,9 @@ describe('CSVExportModal', () => {
   ];
   const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'level', Direction.Descending);
   const config = new MessagesWidgetConfig(['level', 'http_method'], true, [], [currentSort]);
-  const widget1 = Widget.builder().id('widget-id-1').type(MessagesWidget.type).config(config)
+  const widget1 = MessagesWidget.builder().id('widget-id-1').config(config)
     .build();
-  const widget2 = Widget.builder().id('widget-id-2').type(MessagesWidget.type).config(config)
+  const widget2 = MessagesWidget.builder().id('widget-id-2').config(config)
     .build();
   const states: ViewStateMap = Immutable.Map({
     'query-id-1': ViewState.create(),
@@ -119,6 +131,14 @@ describe('CSVExportModal', () => {
     execution_state: new SearchExecutionState(),
   };
 
+  beforeAll(() => {
+    PluginStore.register(pluginExports);
+  });
+
+  afterAll(() => {
+    PluginStore.unregister(pluginExports);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -142,7 +162,6 @@ describe('CSVExportModal', () => {
   };
 
   it('should provide current execution state on export', async () => {
-    const exportSearchMessagesAction = asMock(exportSearchMessages);
     const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });
     const effectiveTimeRange: AbsoluteTimeRange = { type: 'absolute', from: '2020-01-01T12:18:17.827Z', to: '2020-01-01T12:23:17.827Z' };
     const globalQuery: ElasticsearchQueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
@@ -165,12 +184,11 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
+    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
   });
 
   it('should show loading indicator after starting download', async () => {
-    const exportSearchMessagesAction = asMock(exportSearchMessages);
-    const { getByTestId, getByText, getAllByText } = render(<SimpleCSVExportModal />);
+    const { getByTestId, findByText, getAllByText } = render(<SimpleCSVExportModal />);
 
     expect(getAllByText('Start Download')).toHaveLength(2);
 
@@ -178,9 +196,9 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    expect(getByText('Downloading...')).not.toBeNull();
+    await findByText('Downloading...');
 
-    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
   });
 
   it('should be closed after finishing download', async () => {
@@ -195,7 +213,6 @@ describe('CSVExportModal', () => {
   });
 
   it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
-    const exportSearchTypeMessagesAction = asMock(exportSearchTypeMessages);
     const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
     const widgetWithoutMessageRow = widget1.toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
@@ -213,9 +230,9 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(exportSearchTypeMessagesAction).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-    expect(exportSearchTypeMessagesAction).toHaveBeenCalledWith(
+    expect(exportSearchTypeMessages).toHaveBeenCalledWith(
       {
         ...payload,
         fields_in_order: [
@@ -246,16 +263,15 @@ describe('CSVExportModal', () => {
     });
 
     it('should export all messages with default fields when no widget exists', async () => {
-      const exportSearchMessagesAction = asMock(exportSearchMessages);
       const { getByTestId } = render(<SearchCSVExportModal />);
 
       const submitButton = getByTestId('csv-download-button');
 
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchMessagesAction).toHaveBeenCalledWith(
+      expect(exportSearchMessages).toHaveBeenCalledWith(
         {
           ...payload,
           fields_in_order: [

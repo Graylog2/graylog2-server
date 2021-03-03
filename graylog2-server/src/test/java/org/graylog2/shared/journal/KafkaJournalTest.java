@@ -22,11 +22,11 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
-import kafka.common.KafkaException;
-import kafka.log.LogSegment;
-import kafka.message.Message;
-import kafka.message.MessageSet;
-import kafka.utils.FileLock;
+import org.graylog.shaded.kafka09.common.KafkaException;
+import org.graylog.shaded.kafka09.log.LogSegment;
+import org.graylog.shaded.kafka09.message.Message;
+import org.graylog.shaded.kafka09.message.MessageSet;
+import org.graylog.shaded.kafka09.utils.FileLock;
 import org.graylog2.Configuration;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.InstantMillisProvider;
@@ -442,7 +442,7 @@ public class KafkaJournalTest {
         } catch (Exception e) {
             assertThat(e)
                     .isExactlyInstanceOf(RuntimeException.class)
-                    .hasMessageStartingWith("kafka.common.KafkaException: Failed to acquire lock on file .lock in")
+                    .hasMessageStartingWith("org.graylog.shaded.kafka09.common.KafkaException: Failed to acquire lock on file .lock in")
                     .hasCauseExactlyInstanceOf(KafkaException.class);
         }
     }

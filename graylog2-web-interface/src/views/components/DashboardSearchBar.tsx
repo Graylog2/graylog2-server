@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
-import styled from 'styled-components';
 import moment from 'moment';
 
 import { Col, Row } from 'components/graylog';
@@ -37,13 +36,7 @@ import TopRow from 'views/components/searchbar/TopRow';
 import { SearchesConfig } from 'components/search/SearchConfig';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
-import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-
-const FlexCol = styled(Col)`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
+import TimeRangeInput from './searchbar/TimeRangeInput';
 
 type Props = {
   config: SearchesConfig,
@@ -76,13 +69,13 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
             {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
               <>
                 <TopRow>
-                  <FlexCol lg={8} md={9} xs={10}>
-                    <TimeRangeTypeSelector disabled={disableSearch}
-                                           setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                           currentTimeRange={values?.timerange}
-                                           hasErrorOnMount={!isValid}
-                                           noOverride />
-                  </FlexCol>
+                  <Col lg={8} md={9} xs={10}>
+                    <TimeRangeInput disabled={disableSearch}
+                                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                    value={values?.timerange}
+                                    hasErrorOnMount={!isValid}
+                                    noOverride />
+                  </Col>
                   <Col lg={4} md={3} xs={2}>
                     <RefreshControls />
                   </Col>
