@@ -25,6 +25,8 @@ export const viewsManager: UserJSON = {
   email: '',
   external: false,
   full_name: 'Betty Holberton',
+  first_name: 'Betty',
+  last_name: 'Holberton',
   id: 'user-id-1',
   last_activity: '2020-01-01T10:40:05.376+0000',
   permissions: ['dashboards:edit:view-id', 'view:edit:view-id'],
@@ -42,6 +44,8 @@ export const viewsManager: UserJSON = {
 
 export const admin: UserJSON = {
   client_address: '127.0.0.1',
+  first_name: '',
+  last_name: '',
   email: '',
   external: false,
   full_name: 'Alonzo Church',
@@ -62,6 +66,8 @@ export const alice = User.builder()
   .id('alice-id')
   .username('alice')
   .fullName('Alice Schwarzer')
+  .firstName('Alice')
+  .lastName('Schwarzer')
   .email('alice@example.org')
   .permissions(Immutable.List(readerPermissions('alice')))
   .preferences({ updateUnfocussed: false, enableSmartSearch: true })
@@ -78,6 +84,8 @@ export const bob = User.builder()
   .id('bob-id')
   .username('bob')
   .fullName('Bob Bobson')
+  .firstName('Bob')
+  .lastName('Bobson')
   .email('bob@example.org')
   .permissions(Immutable.List(readerPermissions('bob')))
   .preferences({ updateUnfocussed: false, enableSmartSearch: true })
@@ -94,6 +102,8 @@ export const adminUser = User.builder()
   .id('admin-id')
   .username('admin')
   .fullName('Administrator')
+  .firstName('Administrator')
+  .lastName('')
   .email('admin@example.org')
   .permissions(Immutable.List(['*']))
   .roles(Immutable.Set(['Admin', 'Reader']))

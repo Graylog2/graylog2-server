@@ -61,7 +61,8 @@ public class UsersResourceTest {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "test@graylog.com";
-    public static final String FULL_NAME = "Test User";
+    public static final String FIRST_NAME = "First";
+    public static final String LAST_NAME = "Last";
     public static final String TIMEZONE = "Europe/Berlin";
     public static final long SESSION_TIMEOUT = 0L;
 
@@ -120,7 +121,7 @@ public class UsersResourceTest {
 
     private CreateUserRequest buildCreateUserRequest() {
         return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
-                                        FULL_NAME, Collections.singletonList(""),
+                                        FIRST_NAME, LAST_NAME, Collections.singletonList(""),
                                         TIMEZONE, SESSION_TIMEOUT,
                                         startPage, Collections.emptyList());
     }
