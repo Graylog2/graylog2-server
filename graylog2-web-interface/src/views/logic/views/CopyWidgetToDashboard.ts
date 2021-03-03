@@ -21,7 +21,7 @@ import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import TitleTypes, { TitleType } from 'views/stores/TitleTypes';
+import TitleTypes from 'views/stores/TitleTypes';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
