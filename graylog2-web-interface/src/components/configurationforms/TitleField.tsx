@@ -21,7 +21,7 @@ import { TextField } from 'components/configurationforms';
 
 type Props = {
   helpBlock?: React.ReactNode,
-  onChange: () => void,
+  onChange: (title: string, value: string) => void,
   typeName: string,
   value: string,
 };
