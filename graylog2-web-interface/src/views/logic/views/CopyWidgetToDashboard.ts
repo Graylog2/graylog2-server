@@ -21,7 +21,7 @@ import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import TitleTypes from 'views/stores/TitleTypes';
+import TitleTypes, { TitleType } from 'views/stores/TitleTypes';
 
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
@@ -42,7 +42,7 @@ const _newTitlesMap = (titlesMap, widget, title) => {
     return titlesMap;
   }
 
-  const widgetTitles = titlesMap.get(TitleTypes.Widget);
+  const widgetTitles = titlesMap.get(TitleTypes.Widget, Map());
   const newWidgetTitles = widgetTitles.set(widget.id, title);
 
   return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
