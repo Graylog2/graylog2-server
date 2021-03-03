@@ -29,7 +29,7 @@ import UpdatableThemeContext from 'theme/UpdatableThemeContext';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
 const _generateTheme = ({ changeMode, mode, generateCustomThemeColors }): DefaultTheme => {
-  const currentThemeColors: Colors = generateCustomThemeColors(colors[mode], mode) ?? colors[mode];
+  const currentThemeColors: Colors = generateCustomThemeColors ? generateCustomThemeColors(colors[mode], mode) : colors[mode];
 
   const formattedUtils = {
     ...utils,
@@ -55,7 +55,8 @@ const GraylogThemeProvider = ({ children }) => {
   const [mode, changeMode] = useCurrentThemeMode();
 
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
-  const { generateCustomThemeColors } = themeCustomizer?.[0]?.actions;
+  // @ts-ignore
+  const generateCustomThemeColors = themeCustomizer?.[0]?.actions?.generateCustomThemeColors;
 
   const [theme, setTheme] = useState<DefaultTheme>(_generateTheme({ changeMode, mode, generateCustomThemeColors }));
 
