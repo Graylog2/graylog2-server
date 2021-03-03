@@ -94,8 +94,7 @@ export default class ConfigurationFormField extends React.Component {
                      field={configField}
                      value={configValue}
                      onChange={onChange}
-                     autoFocus={autoFocus}
-                     addPlaceholder />
+                     autoFocus={autoFocus} />
         );
       default:
         return null;

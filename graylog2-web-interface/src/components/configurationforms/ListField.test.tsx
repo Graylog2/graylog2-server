@@ -21,7 +21,7 @@ describe('<ListField>', () => {
 
     const fieldLabel = screen.getByText(listField.human_name, { exact: true });
     const optionalMarker = screen.getByText(/(optional)/);
-    const select: HTMLElement = container.querySelector('input[type="text"]');
+    const select = screen.getByLabelText(listField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).toBeInTheDocument();
@@ -31,7 +31,7 @@ describe('<ListField>', () => {
   });
 
   it('should display options from attributes', async () => {
-    const { container } = render(
+    render(
       <ListField field={listField}
                  onChange={() => {}}
                  title="example_list_field"
@@ -39,7 +39,7 @@ describe('<ListField>', () => {
                  autoFocus={false} />,
     );
 
-    const select: HTMLElement = container.querySelector('input[type="text"]');
+    const select = screen.getByLabelText(listField.human_name, { exact: false });
 
     expect(screen.queryByText('uno')).not.toBeInTheDocument();
     expect(screen.queryByText('dos')).not.toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('<ListField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    const { container } = render(
+    render(
       <ListField field={listField}
                  onChange={updateFunction}
                  title="example_list_field"
@@ -75,7 +75,7 @@ describe('<ListField>', () => {
                  autoFocus={false} />,
     );
 
-    const select: HTMLElement = container.querySelector('input[type="text"]');
+    const select = screen.getByLabelText(listField.human_name, { exact: false });
 
     await selectEvent.select(select, ['uno', 'dos']);
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['one', 'two']));
@@ -84,7 +84,7 @@ describe('<ListField>', () => {
   it('should call onChange when clearing values', async () => {
     const updateFunction = jest.fn();
 
-    const { container } = render(
+    render(
       <ListField field={listField}
                  onChange={updateFunction}
                  title="example_list_field"
@@ -93,7 +93,7 @@ describe('<ListField>', () => {
                  value={['one']} />,
     );
 
-    const select: HTMLElement = container.querySelector('input[type="text"]');
+    const select = screen.getByLabelText(listField.human_name, { exact: false });
 
     await selectEvent.clearAll(select);
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', []));
@@ -102,7 +102,7 @@ describe('<ListField>', () => {
   it('should create new values when allow_create is set', async () => {
     const updateFunction = jest.fn();
 
-    const { container } = render(
+    render(
       <ListField field={creatableListField}
                  onChange={updateFunction}
                  title="example_list_field"
@@ -110,7 +110,7 @@ describe('<ListField>', () => {
                  autoFocus={false} />,
     );
 
-    const select: HTMLElement = container.querySelector('input[type="text"]');
+    const select = screen.getByLabelText(listField.human_name, { exact: false });
 
     await selectEvent.create(select, 'three');
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', ['three']));
