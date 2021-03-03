@@ -38,7 +38,7 @@ describe('<DropdownField>', () => {
 
     const fieldLabel = screen.getByText(dropdownField.human_name, { exact: true });
     const optionalMarker = screen.getByText(/(optional)/);
-    const select = container.querySelector('select');
+    const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('<DropdownField>', () => {
   });
 
   it('should render an empty field with placeholder', () => {
-    const { container } = render(
+    render(
       <DropdownField field={dropdownField}
                      onChange={() => {}}
                      title="example_dropdown_field"
@@ -62,14 +62,14 @@ describe('<DropdownField>', () => {
                      addPlaceholder />,
     );
 
-    const select = container.querySelector('select');
+    const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(select).toBeInTheDocument();
     expect(select).not.toHaveValue();
   });
 
   it('should render a required field', () => {
-    const { container } = render(
+    render(
       <DropdownField field={requiredDropdownField}
                      onChange={() => {}}
                      title="example_dropdown_field"
@@ -78,7 +78,7 @@ describe('<DropdownField>', () => {
                      addPlaceholder />,
     );
 
-    const select = container.querySelector('select');
+    const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(select).toBeInTheDocument();
     expect(select).not.toHaveValue();
@@ -99,7 +99,7 @@ describe('<DropdownField>', () => {
   });
 
   it('should render a field with a value', async () => {
-    const { container } = render(
+    render(
       <DropdownField field={dropdownField}
                      onChange={() => {}}
                      title="example_dropdown_field"
@@ -108,7 +108,7 @@ describe('<DropdownField>', () => {
                      value="dos" />,
     );
 
-    const select = container.querySelector('select');
+    const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(select).toHaveValue('dos');
   });
@@ -116,7 +116,7 @@ describe('<DropdownField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    const { container } = render(
+    render(
       <DropdownField field={dropdownField}
                      onChange={updateFunction}
                      title="example_dropdown_field"
@@ -124,7 +124,7 @@ describe('<DropdownField>', () => {
                      autoFocus={false} />,
     );
 
-    const select = container.querySelector('select');
+    const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     userEvent.selectOptions(select, 'two');
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_dropdown_field', 'dos'));
