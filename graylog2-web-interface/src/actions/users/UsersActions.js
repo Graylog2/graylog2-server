@@ -27,6 +27,8 @@ import UserOverview, { type AccountStatus } from 'logic/users/UserOverview';
 export type UserCreate = {
   email: $PropertyType<UserJSON, 'email'>,
   full_name: $PropertyType<UserJSON, 'full_name'>,
+  first_name: $PropertyType<UserJSON, 'first_name'>,
+  last_name: $PropertyType<UserJSON, 'last_name'>,
   password: string,
   permissions: $PropertyType<UserJSON, 'permissions'>,
   roles: $PropertyType<UserJSON, 'roles'>,
