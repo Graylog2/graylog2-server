@@ -95,7 +95,6 @@ const _renderWidgets = ({
     const widget = widgets[widgetId];
     returnedWidgets.positions[widgetId] = positions[widgetId] || _defaultDimensions(widget.type);
     const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
-    console.log('widget grid', { focusedWidget });
     const isFocused = focusedWidget?.id === widgetId;
     const editing = focusedWidget?.editing;
 

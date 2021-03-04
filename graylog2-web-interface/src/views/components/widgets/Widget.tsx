@@ -339,7 +339,6 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, editing } = this.props;
-    console.log('widget', { editing });
     const { loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config } = widget;
     const { focusedWidget, setFocusedWidget } = this.context;
