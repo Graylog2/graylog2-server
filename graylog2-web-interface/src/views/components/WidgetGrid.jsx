@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useContext } from 'react';
+import { useState, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -130,7 +130,7 @@ const WidgetGrid = ({
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
 
-  const { widgets, positions } = _renderWidgets({
+  const { widgets, positions } = useMemo(() => _renderWidgets({
     allFields,
     data,
     errors,
@@ -142,7 +142,19 @@ const WidgetGrid = ({
     titles,
     widgetDimensions,
     focusedWidget,
-  });
+  }), [
+    allFields,
+    data,
+    errors,
+    fields,
+    onPositionsChange,
+    propsPositions,
+    propsWidgets,
+    setWidgetDimensions,
+    titles,
+    widgetDimensions,
+    focusedWidget,
+  ]);
 
   const grid = widgets && widgets.length > 0 ? (
     <StyledReactGridContainer animate
