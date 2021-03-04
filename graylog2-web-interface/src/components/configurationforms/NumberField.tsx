@@ -21,7 +21,7 @@ import Input from 'components/bootstrap/Input';
 import { getValueFromInput } from 'util/FormsUtils';
 
 import type { NumberField as NumberFieldType } from './types';
-import FieldHelpers from './FieldHelpers';
+import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
   autoFocus?: boolean,
@@ -69,7 +69,7 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
   const isRequired = !field.is_optional;
   const validationSpecs = validationSpec();
 
-  const label = <>{field.human_name} {FieldHelpers.optionalMarker(field)}</>;
+  const label = <>{field.human_name} {optionalMarker(field)}</>;
 
   return (
     <Input id={`${typeName}-${title}`}

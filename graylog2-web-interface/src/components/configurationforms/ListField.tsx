@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import { ListField as ListFieldType } from 'components/configurationforms/types';
 import { MultiSelect } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { FieldHelpers } from 'components/configurationforms';
+import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
   autoFocus?: boolean,
@@ -45,7 +45,7 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
   const formattedOptions = Object.entries(options)
     .map(([label, optionValue]) => ({ value: optionValue, label: label }));
 
-  const label = <>{field.human_name} {FieldHelpers.optionalMarker(field)}</>;
+  const label = <>{field.human_name} {optionalMarker(field)}</>;
 
   return (
     <Input id={`${typeName}-${title}`}

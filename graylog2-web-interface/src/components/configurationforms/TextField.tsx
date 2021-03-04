@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
-import FieldHelpers from 'components/configurationforms/FieldHelpers';
+import { hasAttribute, optionalMarker } from 'components/configurationforms/FieldHelpers';
 import { getValueFromInput } from 'util/FormsUtils';
 
 import type { TextField as TextFieldType } from './types';
@@ -34,10 +34,10 @@ type Props = {
 
 const TextField = ({ field, title, typeName, onChange, value, autoFocus }: Props) => {
   const isRequired = !field.is_optional;
-  const fieldType = (!FieldHelpers.hasAttribute(field.attributes, 'textarea') && FieldHelpers.hasAttribute(field.attributes, 'is_password') ? 'password' : 'text');
+  const fieldType = (!hasAttribute(field.attributes, 'textarea') && hasAttribute(field.attributes, 'is_password') ? 'password' : 'text');
   const fieldId = `${typeName}-${title}`;
 
-  const labelContent = <>{field.human_name} {FieldHelpers.optionalMarker(field)}</>;
+  const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
 
   const handleChange = ({ target }) => {
     const inputValue = getValueFromInput(target);
@@ -45,7 +45,7 @@ const TextField = ({ field, title, typeName, onChange, value, autoFocus }: Props
     onChange(title, inputValue);
   };
 
-  if (FieldHelpers.hasAttribute(field.attributes, 'textarea')) {
+  if (hasAttribute(field.attributes, 'textarea')) {
     return (
       <Input id={fieldId}
              type="textarea"

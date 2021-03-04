@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 
 import { DropdownField as DropdownFieldType } from 'components/configurationforms/types';
 import { Input } from 'components/bootstrap';
-import FieldHelpers from 'components/configurationforms/FieldHelpers';
+import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
   autoFocus?: boolean,
@@ -49,7 +49,7 @@ const DropdownField = ({ autoFocus, field, onChange, title, typeName, value, add
     options.unshift(formatOption('', `Select ${field.human_name || title}`, true));
   }
 
-  const label = <>{field.human_name} {FieldHelpers.optionalMarker(field)}</>;
+  const label = <>{field.human_name} {optionalMarker(field)}</>;
 
   return (
     <Input id={`${typeName}-${title}`}
