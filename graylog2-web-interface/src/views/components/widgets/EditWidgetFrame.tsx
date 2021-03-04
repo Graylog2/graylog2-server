@@ -86,36 +86,31 @@ const EditWidgetFrame = ({ children }: Props) => {
   const _onSubmit = (values) => onSubmit(values, widget);
 
   return (
-    <Modal show
-           animation={false}
-           dialogComponentClass={EditWidgetDialog}
-           enforceFocus={false}>
-      <SearchBarForm initialValues={{ timerange, streams, queryString }}
-                     limitDuration={limitDuration}
-                     onSubmit={_onSubmit}
-                     validateOnMount={false}>
-        <div className={styles.gridContainer}>
-          <IfDashboard>
-            <Modal.Header className={styles.QueryControls}>
-              <QueryEditModeContext.Provider value="widget">
-                <HeaderElements />
-                <WidgetQueryControls />
-              </QueryEditModeContext.Provider>
-            </Modal.Header>
-          </IfDashboard>
-          <Modal.Body className={styles.Visualization}>
-            <div role="presentation" style={{ height: '100%' }}>
-              <WidgetOverrideElements>
-                {children[0]}
-              </WidgetOverrideElements>
-            </div>
-          </Modal.Body>
-          <Modal.Footer className={styles.Footer}>
-            {children[1]}
-          </Modal.Footer>
-        </div>
-      </SearchBarForm>
-    </Modal>
+    <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                   limitDuration={limitDuration}
+                   onSubmit={_onSubmit}
+                   validateOnMount={false}>
+      <div className={styles.gridContainer}>
+        <IfDashboard>
+          <Modal.Header className={styles.QueryControls}>
+            <QueryEditModeContext.Provider value="widget">
+              <HeaderElements />
+              <WidgetQueryControls />
+            </QueryEditModeContext.Provider>
+          </Modal.Header>
+        </IfDashboard>
+        <Modal.Body className={styles.Visualization}>
+          <div role="presentation" style={{ height: '100%' }}>
+            <WidgetOverrideElements>
+              {children[0]}
+            </WidgetOverrideElements>
+          </div>
+        </Modal.Body>
+        <Modal.Footer className={styles.Footer}>
+          {children[1]}
+        </Modal.Footer>
+      </div>
+    </SearchBarForm>
   );
 };
 

@@ -50,7 +50,7 @@ import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 import WidgetActionDropdown from './WidgetActionDropdown';
 import WidgetHorizontalStretch from './WidgetHorizontalStretch';
-import MeasureDimensions from './MeasureDimensions';
+// import MeasureDimensions from './MeasureDimensions';
 import EditWidgetFrame from './EditWidgetFrame';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
@@ -93,6 +93,7 @@ type Props = {
   onSizeChange: () => void,
   onPositionsChange: () => void,
 };
+
 type State = {
   editing: boolean,
   loading: boolean;
@@ -130,19 +131,19 @@ const _editComponentForType = (type) => {
 
 class Widget extends React.Component<Props, State> {
   static propTypes = {
-    id: PropTypes.string.isRequired,
-    view: CustomPropTypes.CurrentView.isRequired,
-    widget: PropTypes.instanceOf(WidgetModel).isRequired,
     data: PropTypes.any,
     editing: PropTypes.bool,
     errors: WidgetErrorsList,
-    height: PropTypes.number,
-    width: PropTypes.number,
     fields: PropTypes.any.isRequired,
-    onSizeChange: PropTypes.func.isRequired,
+    height: PropTypes.number,
+    id: PropTypes.string.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
+    onSizeChange: PropTypes.func.isRequired,
     position: PropTypes.instanceOf(WidgetPosition).isRequired,
+    title: PropTypes.string.isRequired,
+    view: CustomPropTypes.CurrentView.isRequired,
+    widget: PropTypes.instanceOf(WidgetModel).isRequired,
+    width: PropTypes.number,
   };
 
   static defaultProps = {
@@ -254,11 +255,13 @@ class Widget extends React.Component<Props, State> {
     this._onToggleCopyToDashboard();
   };
 
-  _onToggleEdit = () => {
+  _onToggleEdit = (setFocusedWidget) => {
     const { widget } = this.props;
 
     this.setState((state) => {
       if (state.editing) {
+        setFocusedWidget(undefined);
+
         return {
           editing: false,
           oldWidget: undefined,
@@ -266,6 +269,7 @@ class Widget extends React.Component<Props, State> {
       }
 
       RefreshActions.disable();
+      setFocusedWidget({ id: widget.id, editing: true });
 
       return {
         editing: true,
@@ -282,7 +286,7 @@ class Widget extends React.Component<Props, State> {
     });
   }
 
-  _onCancelEdit = () => {
+  _onCancelEdit = (setFocusedWidget) => {
     const { oldWidget } = this.state;
 
     if (oldWidget) {
@@ -291,7 +295,7 @@ class Widget extends React.Component<Props, State> {
       WidgetActions.update(id, oldWidget);
     }
 
-    this._onToggleEdit();
+    this._onToggleEdit(setFocusedWidget);
   };
 
   _onWidgetConfigChange = (widgetId, config) => WidgetActions.updateConfig(widgetId, config);
@@ -334,41 +338,43 @@ class Widget extends React.Component<Props, State> {
 
   // TODO: Clean up different code paths for normal/edit modes
   render() {
-    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
-    const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
+    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, editing } = this.props;
+    console.log('widget', { editing });
+    const { loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config } = widget;
     const { focusedWidget, setFocusedWidget } = this.context;
     const isFocusedWidget = focusedWidget === id;
     const visualization = this.visualize();
+    const EditComponent = _editComponentForType(widget.type);
 
-    if (editing) {
-      const EditComponent = _editComponentForType(widget.type);
+    // if (editing) {
+    //   const EditComponent = _editComponentForType(widget.type);
 
-      return (
-        <WidgetColorContext id={id}>
-          <EditWidgetFrame>
-            <MeasureDimensions>
-              <WidgetHeader title={title}
-                            hideDragHandle
-                            loading={loading}
-                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
-                            editing={editing} />
-              <EditComponent config={config}
-                             fields={fields}
-                             editing={editing}
-                             id={id}
-                             type={widget.type}
-                             onChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}>
-                <WidgetErrorBoundary>
-                  {visualization}
-                </WidgetErrorBoundary>
-              </EditComponent>
-            </MeasureDimensions>
-            <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
-          </EditWidgetFrame>
-        </WidgetColorContext>
-      );
-    }
+    //   return (
+    //     <WidgetColorContext id={id}>
+    //       <EditWidgetFrame>
+    //         <MeasureDimensions>
+    //           <WidgetHeader title={title}
+    //                         hideDragHandle
+    //                         loading={loading}
+    //                         onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
+    //                         editing={editing} />
+    //           <EditComponent config={config}
+    //                          fields={fields}
+    //                          editing={editing}
+    //                          id={id}
+    //                          type={widget.type}
+    //                          onChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}>
+    //             <WidgetErrorBoundary>
+    //               {visualization}
+    //             </WidgetErrorBoundary>
+    //           </EditComponent>
+    //         </MeasureDimensions>
+    //         <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
+    //       </EditWidgetFrame>
+    //     </WidgetColorContext>
+    //   );
+    // }
 
     return (
       <WidgetColorContext id={id}>
@@ -387,15 +393,15 @@ class Widget extends React.Component<Props, State> {
                     </IfDashboard>
                     <IconButton name={isFocusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
                                 title={isFocusedWidget ? 'Un-focus widget' : 'Focus this widget'}
-                                onClick={() => setFocusedWidget(id)} />
+                                onClick={() => setFocusedWidget({ id })} />
                     {!isFocusedWidget && (
-                    <WidgetHorizontalStretch widgetId={widget.id}
-                                             widgetType={widget.type}
-                                             onStretch={onPositionsChange}
-                                             position={position} />
+                      <WidgetHorizontalStretch widgetId={widget.id}
+                                               widgetType={widget.type}
+                                               onStretch={onPositionsChange}
+                                               position={position} />
                     )}
                     <WidgetActionDropdown>
-                      <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                      <MenuItem onSelect={() => this._onToggleEdit(setFocusedWidget)}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
                       {widget.isExportable && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
                       <IfSearch>
@@ -426,9 +432,25 @@ class Widget extends React.Component<Props, State> {
             )}
           </InteractiveContext.Consumer>
 
-          <WidgetErrorBoundary>
-            {visualization}
-          </WidgetErrorBoundary>
+          {editing && (
+            <EditWidgetFrame>
+              <EditComponent config={config}
+                             fields={fields}
+                             editing={editing}
+                             id={id}
+                             type={widget.type}
+                             onChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}>
+                {visualization}
+              </EditComponent>
+              <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={() => this._onCancelEdit(setFocusedWidget)} />
+            </EditWidgetFrame>
+          )}
+          {!editing && (
+            <WidgetErrorBoundary>
+              {visualization}
+            </WidgetErrorBoundary>
+          )}
+
         </WidgetFrame>
       </WidgetColorContext>
     );
