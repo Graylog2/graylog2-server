@@ -24,14 +24,15 @@ import Series from '../aggregationbuilder/Series';
 
 describe('InferTypeForSeries', () => {
   each`
-    func              | expectedType
-    ${'card'}         | ${FieldTypes.LONG()}
-    ${'count'}        | ${FieldTypes.LONG()}
-    ${'stddev'}       | ${FieldTypes.FLOAT()}
-    ${'sum'}          | ${FieldTypes.FLOAT()}
-    ${'sumofsquares'} | ${FieldTypes.FLOAT()}
-  `.test('returns expected type for constant type function "$func(field)"', ({ func, expectedType }) => {
-    const functionName = `${func}(foo)`;
+    func              | expectedType          | field
+    ${'card'}         | ${FieldTypes.LONG()}  | ${'foo'}
+    ${'count'}        | ${FieldTypes.LONG()}  | ${'foo'} 
+    ${'stddev'}       | ${FieldTypes.FLOAT()} | ${'foo'} 
+    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo'} 
+    ${'sum'}          | ${FieldTypes.FLOAT()} | ${'foo-bar'} 
+    ${'sumofsquares'} | ${FieldTypes.FLOAT()} | ${'foo'} 
+  `.test('returns expected type for constant type function "$func($field)"', ({ func, expectedType, field }) => {
+    const functionName = `${func}(${field})`;
 
     expect(inferTypeForSeries(Series.forFunction(functionName), []))
       .toEqual(FieldTypeMapping.create(functionName, expectedType));
