@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { DropdownField, ListField, NumberField, TextField } from 'components/configurationforms/types';
+import { BooleanField, DropdownField, ListField, NumberField, TextField } from 'components/configurationforms/types';
 
 export const numberField: NumberField = {
   additional_info: {},
@@ -171,4 +171,15 @@ export const requiredDropdownField: DropdownField = {
   position: 100,
   type: 'dropdown',
   is_optional: false,
+};
+
+export const booleanField: BooleanField = {
+  human_name: 'boolean field',
+  additional_info: {},
+  description: 'my boolean description',
+  default_value: false,
+  attributes: [],
+  position: 100,
+  type: 'boolean',
+  is_optional: true,
 };

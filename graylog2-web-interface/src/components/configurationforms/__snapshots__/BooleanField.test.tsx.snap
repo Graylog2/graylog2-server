@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<BooleanField> should render a checked field 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <div
+      class="checkbox"
+    >
+      <label>
+        <input
+          checked=""
+          id="boolean-example_boolean_field"
+          name="configuration[example_boolean_field]"
+          type="checkbox"
+        />
+        boolean field
+      </label>
+    </div>
+    <p
+      class="help-block"
+    >
+      my boolean description
+    </p>
+  </div>
+</div>
+`;
+
+exports[`<BooleanField> should render an unchecked field by default 1`] = `
+<div>
+  <div
+    class="form-group"
+  >
+    <div
+      class="checkbox"
+    >
+      <label>
+        <input
+          id="boolean-example_boolean_field"
+          name="configuration[example_boolean_field]"
+          type="checkbox"
+        />
+        boolean field
+      </label>
+    </div>
+    <p
+      class="help-block"
+    >
+      my boolean description
+    </p>
+  </div>
+</div>
+`;

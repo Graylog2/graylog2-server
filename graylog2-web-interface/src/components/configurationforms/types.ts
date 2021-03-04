@@ -70,4 +70,15 @@ export type DropdownField = {
   type: 'dropdown',
 };
 
-export type ConfigurationField = DropdownField | ListField | NumberField | TextField;
+export type BooleanField = {
+  additional_info: {},
+  attributes: [],
+  default_value: boolean,
+  description: string,
+  human_name: string,
+  is_optional: true,
+  position: number,
+  type: 'boolean',
+};
+
+export type ConfigurationField = BooleanField | DropdownField | ListField | NumberField | TextField;
