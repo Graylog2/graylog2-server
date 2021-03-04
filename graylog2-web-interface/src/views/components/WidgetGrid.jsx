@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -29,8 +29,9 @@ import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { RowContentStyles } from 'components/graylog/Row';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
+import WidgetContainer from './WidgetContainer';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import WidgetComponent from './WidgetComponent';
 import defaultTitle from './defaultTitle';
@@ -39,14 +40,14 @@ const DashboardWrap = styled.div(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
   margin: 0;
   width: 100%;
+  height: 100%;
 `);
 
-export const WidgetContainer = styled.div`
-  z-index: auto;
-  ${RowContentStyles}
-  height: 100%;
-  margin-bottom: 0;
-`;
+const StyledReactGridContainer = styled(ReactGridContainer)(({ focusedWidget }) => `
+  height: ${focusedWidget ? '100% !important' : '100%'};
+  max-height: ${focusedWidget ? '100%' : 'auto'};
+  transition: none;
+`);
 
 const _defaultDimensions = (type) => {
   const widgetDef = widgetDefinition(type);
@@ -69,6 +70,7 @@ const _renderWidgets = ({
   titles,
   widgetDimensions,
   widgets,
+  focusedWidget,
 }) => {
   const returnedWidgets = { positions: {}, widgets: [] };
 
@@ -94,18 +96,18 @@ const _renderWidgets = ({
     const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
 
     returnedWidgets.widgets.push(
-      <WidgetContainer key={widgetId}>
-        <WidgetComponent widget={widget}
-                         widgetId={widgetId}
+      <WidgetContainer isFocused={focusedWidget === widgetId} key={widget.id}>
+        <WidgetComponent allFields={allFields}
                          data={data}
                          errors={errors}
-                         widgetDimension={widgetDimensions[widgetId] || {}}
-                         title={widgetTitle}
-                         position={returnedWidgets.positions[widgetId]}
-                         onPositionsChange={_onPositionsChange}
                          fields={fields}
-                         allFields={allFields}
-                         onWidgetSizeChange={_onWidgetSizeChange(widgetDimensions, setWidgetDimensions)} />
+                         isFocused={focusedWidget === widgetId}
+                         onPositionsChange={_onPositionsChange}
+                         onWidgetSizeChange={_onWidgetSizeChange(widgetDimensions, setWidgetDimensions)}
+                         position={returnedWidgets.positions[widgetId]}
+                         title={widgetTitle}
+                         widgetDimension={widgetDimensions[widgetId] || {}}
+                         widget={widget} />
       </WidgetContainer>,
     );
   });
@@ -125,7 +127,9 @@ const WidgetGrid = ({
   allFields,
   titles,
 }) => {
+  const { focusedWidget } = useContext(WidgetFocusContext);
   const [widgetDimensions, setWidgetDimensions] = useState({});
+
   const { widgets, positions } = _renderWidgets({
     allFields,
     data,
@@ -137,24 +141,27 @@ const WidgetGrid = ({
     setWidgetDimensions,
     titles,
     widgetDimensions,
+    focusedWidget,
   });
+
   const grid = widgets && widgets.length > 0 ? (
-    <ReactGridContainer animate
-                        locked={locked}
-                        columns={{
-                          xxl: 12,
-                          xl: 12,
-                          lg: 12,
-                          md: 12,
-                          sm: 12,
-                          xs: 12,
-                        }}
-                        measureBeforeMount
-                        onPositionsChange={onPositionsChange}
-                        positions={positions}
-                        useDragHandle=".widget-drag-handle">
+    <StyledReactGridContainer animate
+                              locked={locked}
+                              columns={{
+                                xxl: 12,
+                                xl: 12,
+                                lg: 12,
+                                md: 12,
+                                sm: 12,
+                                xs: 12,
+                              }}
+                              measureBeforeMount
+                              focusedWidget={focusedWidget}
+                              onPositionsChange={onPositionsChange}
+                              positions={positions}
+                              useDragHandle=".widget-drag-handle">
       {widgets}
-    </ReactGridContainer>
+    </StyledReactGridContainer>
   ) : <span />;
 
   // The SizeMe component is required to update the widget grid
