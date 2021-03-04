@@ -32,16 +32,20 @@ type Props = {
   style?: React.CSSProperties,
 }
 
-const WidgetContainer = ({ children, className, isFocused, style }: Props) => {
-  const containerStyle = {
-    ...style,
-    height: isFocused ? '100%' : (style.height ?? 'auto'),
-    width: isFocused ? '100%' : (style.width ?? 'auto'),
-    transition: 'none',
-  };
+const WidgetContainer = ({ children, className, isFocused, style, ...rest }: Props) => {
+  let containerStyle = { ...style };
+
+  if (isFocused) {
+    containerStyle = {
+      ...containerStyle,
+      height: '100%',
+      width: '100%',
+      transition: 'none',
+    };
+  }
 
   return (
-    <Container className={className} style={containerStyle}>
+    <Container className={className} style={containerStyle} {...rest}>
       {children}
     </Container>
   );
