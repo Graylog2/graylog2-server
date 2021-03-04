@@ -39,6 +39,8 @@ class UserSummaryTest {
             "1234",
             "user",
             "email",
+            "Hans",
+            "Dampf",
             "Hans Dampf",
             ImmutableList.of(new WildcardPermission("dashboard:create:123")),
             ImmutableList.of(GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.STREAM, "1234"))),

@@ -35,7 +35,8 @@ import AppConfig from 'util/AppConfig';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
-import FullNameFormGroup from './FullNameFormGroup';
+import FirstNameFormGroup from './FirstNameFormGroup';
+import LastNameFormGroup from './LastNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
@@ -178,7 +179,8 @@ const UserCreate = () => {
             <Form className="form form-horizontal">
               <div>
                 <Headline>Profile</Headline>
-                <FullNameFormGroup />
+                <FirstNameFormGroup />
+                <LastNameFormGroup />
                 {getUserNameGroup()}
                 {getEmailGroup()}
               </div>

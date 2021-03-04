@@ -297,7 +297,7 @@ public class UsersResource extends RestResource {
         User user = userManagementService.create();
         user.setName(cr.username());
         user.setPassword(cr.password());
-        user.setFullName(cr.fullName());
+        user.setFirstLastFullNames(cr.firstName(), cr.lastName());
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
         setUserRoles(cr.roles(), user);
@@ -363,8 +363,8 @@ public class UsersResource extends RestResource {
             if (cr.email() != null) {
                 user.setEmail(cr.email());
             }
-            if (cr.fullName() != null) {
-                user.setFullName(cr.fullName());
+            if (cr.firstName() != null && cr.lastName() != null) {
+                user.setFirstLastFullNames(cr.firstName(), cr.lastName());
             }
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
@@ -691,6 +691,8 @@ public class UsersResource extends RestResource {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
+                user.getFirstName().orElse(null),
+                user.getLastName().orElse(null),
                 user.getFullName(),
                 wildcardPermissions,
                 grnPermissions,

@@ -64,7 +64,8 @@ describe('<UserCreate />', () => {
     const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
 
     const usernameInput = await findByLabelText('Username');
-    const fullNameInput = await findByLabelText('Full Name');
+    const firstNameInput = await findByLabelText('First Name');
+    const lastNameInput = await findByLabelText('Last Name');
     const emailInput = await findByLabelText('E-Mail Address');
     const timeoutAmountInput = await findByPlaceholderText('Timeout amount');
     // const timeoutUnitSelect = getByTestId('Timeout unit');
@@ -74,7 +75,8 @@ describe('<UserCreate />', () => {
     const submitButton = await findByText('Create User');
 
     fireEvent.change(usernameInput, { target: { value: 'The username' } });
-    fireEvent.change(fullNameInput, { target: { value: 'The full name' } });
+    fireEvent.change(firstNameInput, { target: { value: 'The first name' } });
+    fireEvent.change(lastNameInput, { target: { value: 'The last name' } });
     fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
     fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
     // await selectEvent.openMenu(timeoutUnitSelect);
@@ -88,7 +90,8 @@ describe('<UserCreate />', () => {
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
       username: 'The username',
-      full_name: 'The full name',
+      first_name: 'The first name',
+      last_name: 'The last name',
       timezone: 'Europe/Berlin',
       roles: ['Reader'],
       email: 'username@example.org',
@@ -102,14 +105,16 @@ describe('<UserCreate />', () => {
     const { findByLabelText, findByPlaceholderText, findByText } = render(<UserCreate />);
 
     const usernameInput = await findByLabelText('Username');
-    const fullNameInput = await findByLabelText('Full Name');
+    const firstNameInput = await findByLabelText('First Name');
+    const lastNameInput = await findByLabelText('Last Name');
     const emailInput = await findByLabelText('E-Mail Address');
     const passwordInput = await findByPlaceholderText('Password');
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
     const submitButton = await findByText('Create User');
 
     fireEvent.change(usernameInput, { target: { value: '   username   ' } });
-    fireEvent.change(fullNameInput, { target: { value: 'The full name' } });
+    fireEvent.change(firstNameInput, { target: { value: 'The first name' } });
+    fireEvent.change(lastNameInput, { target: { value: 'The last name' } });
     fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
     fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
     fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
@@ -118,7 +123,8 @@ describe('<UserCreate />', () => {
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
       username: 'username',
-      full_name: 'The full name',
+      first_name: 'The first name',
+      last_name: 'The last name',
       roles: ['Reader'],
       email: 'username@example.org',
       permissions: [],
