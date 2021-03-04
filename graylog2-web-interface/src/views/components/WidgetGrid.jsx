@@ -157,7 +157,7 @@ const WidgetGrid = ({
   ]);
 
   const grid = widgets && widgets.length > 0 ? (
-    <StyledReactGridContainer animate
+    <StyledReactGridContainer focusedWidget={focusedWidget}
                               columns={{
                                 xxl: 12,
                                 xl: 12,
@@ -166,7 +166,6 @@ const WidgetGrid = ({
                                 sm: 12,
                                 xs: 12,
                               }}
-                              focusedWidget={focusedWidget}
                               isResizable={!focusedWidget}
                               locked={locked}
                               measureBeforeMount

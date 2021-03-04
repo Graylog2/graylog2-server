@@ -189,7 +189,7 @@ class ReactGridContainer extends React.Component {
   };
 
   static defaultProps = {
-    animate: true,
+    animate: false,
     className: undefined,
     columns: COLUMNS,
     isResizable: true,

@@ -40,7 +40,6 @@ const WidgetContainer = ({ children, className, isFocused, style, ...rest }: Pro
       ...containerStyle,
       height: '100%',
       width: '100%',
-      transition: 'none',
     };
   }
 
