@@ -43,10 +43,10 @@ const DashboardWrap = styled.div(({ theme }) => css`
   height: 100%;
 `);
 
-const StyledReactGridContainer = styled(ReactGridContainer)(({ focusedWidget }) => `
-  height: ${focusedWidget ? '100% !important' : '100%'};
-  max-height: ${focusedWidget ? '100%' : 'auto'};
-  overflow: ${focusedWidget ? 'hidden' : 'visible'};
+const StyledReactGridContainer = styled(ReactGridContainer)(({ hasFocusedWidget }) => css`
+  height: ${hasFocusedWidget ? '100% !important' : '100%'};
+  max-height: ${hasFocusedWidget ? '100%' : 'auto'};
+  overflow: ${hasFocusedWidget ? 'hidden' : 'visible'};
   transition: none;
 `);
 
@@ -95,12 +95,15 @@ const _renderWidgets = ({
     const widget = widgets[widgetId];
     returnedWidgets.positions[widgetId] = positions[widgetId] || _defaultDimensions(widget.type);
     const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
-    const isFocused = focusedWidget === widgetId;
+    console.log('widget grid', { focusedWidget });
+    const isFocused = focusedWidget?.id === widgetId;
+    const editing = focusedWidget?.editing;
 
     returnedWidgets.widgets.push(
       <WidgetContainer isFocused={isFocused} key={widget.id}>
         <WidgetComponent allFields={allFields}
                          data={data}
+                         editing={editing}
                          errors={errors}
                          fields={fields}
                          onPositionsChange={_onPositionsChange}
@@ -158,7 +161,7 @@ const WidgetGrid = ({
   ]);
 
   const grid = widgets && widgets.length > 0 ? (
-    <StyledReactGridContainer focusedWidget={focusedWidget}
+    <StyledReactGridContainer hasFocusedWidget={!!focusedWidget?.id}
                               columns={{
                                 xxl: 12,
                                 xl: 12,
@@ -167,7 +170,7 @@ const WidgetGrid = ({
                                 sm: 12,
                                 xs: 12,
                               }}
-                              isResizable={!focusedWidget}
+                              isResizable={!focusedWidget?.id}
                               locked={locked}
                               measureBeforeMount
                               onPositionsChange={onPositionsChange}

@@ -23,53 +23,57 @@ import URI from 'urijs';
 import { useStore } from 'stores/connect';
 import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext, { FocusedWidget } from 'views/components/contexts/WidgetFocusContext';
 
-const _syncWithQuery = (query: string, focusedWidget: string) => {
+const _syncWithQuery = (query: string, focusedWidget: FocusedWidget) => {
   const baseUri = new URI(query)
-    .removeSearch('focused');
+    .removeSearch('focused')
+    .removeSearch('editing');
 
-  if (focusedWidget) {
-    return baseUri.setSearch('focused', focusedWidget).toString();
+  if (focusedWidget?.id) {
+    return baseUri
+      .setSearch('focused', focusedWidget.id)
+      .setSearch('editing', focusedWidget.editing)
+      .toString();
   }
 
   return baseUri.toString();
 };
 
 const useFocusWidgetIdFromParam = (focusedWidget, setFocusedWidget, widgets) => {
-  const { focused: paramFocusedWidget } = useQuery();
+  const { focused: paramFocusedWidget, editing: paramEditing } = useQuery();
 
   useEffect(() => {
-    if (focusedWidget !== paramFocusedWidget) {
+    if (focusedWidget?.id !== paramFocusedWidget) {
       if (paramFocusedWidget && !widgets.has(paramFocusedWidget)) {
         return;
       }
 
-      setFocusedWidget(paramFocusedWidget);
+      setFocusedWidget({ id: paramFocusedWidget, editing: paramEditing === 'true' });
     }
-  }, [focusedWidget, paramFocusedWidget, setFocusedWidget, widgets]);
+  }, [focusedWidget, paramFocusedWidget, setFocusedWidget, widgets, paramEditing]);
 };
 
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const { search, pathname } = useLocation();
   const query = pathname + search;
   const history = useHistory();
-  const [focusedWidget, setFocusedWidget] = useState<string | undefined>();
+  const [focusedWidget, setFocusedWidget] = useState<FocusedWidget | undefined>();
   const widgets = useStore(WidgetStore);
 
   useFocusWidgetIdFromParam(focusedWidget, setFocusedWidget, widgets);
 
   useEffect(() => {
-    if (focusedWidget && !widgets.has(focusedWidget)) {
+    if (focusedWidget && !widgets.has(focusedWidget.id)) {
       setFocusedWidget(undefined);
     }
   }, [focusedWidget, widgets]);
 
-  const updateFocus = useCallback((widgetId: string | undefined | null) => {
-    const newFocus = widgetId === focusedWidget
+  const updateFocus = useCallback((widget: FocusedWidget | undefined) => {
+    const newFocusWidget = widget?.id === focusedWidget?.id
       ? undefined
-      : widgetId;
-    const newURI = _syncWithQuery(query, newFocus);
+      : widget;
+    const newURI = _syncWithQuery(query, newFocusWidget);
 
     history.replace(newURI);
   }, [focusedWidget, history, query]);

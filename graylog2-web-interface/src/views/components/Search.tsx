@@ -77,7 +77,7 @@ const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return css`
-    ${focusedWidget && css`
+    ${focusedWidget?.id && css`
       .page-content-grid {
         display: flex;
         flex-direction: column;
@@ -85,7 +85,7 @@ const SearchArea = styled(PageContentLayout)(() => {
         width: 100%;
 
         /* overflow auto is required to display the message table widget height correctly */
-        overflow: ${focusedWidget ? 'auto' : 'visible'};
+        overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
     `}
   `;
