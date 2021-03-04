@@ -24,34 +24,39 @@ import WidgetClass from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
+import WidgetContainer from './WidgetContainer';
 import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
 type Props = {
-  widget: WidgetClass & { data: string };
-  widgetId: string,
   data: WidgetDataMap,
   errors: WidgetErrorsMap,
-  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
-  title: string,
-  position: WidgetPosition,
-  onPositionsChange: (position?: WidgetPosition) => void,
   fields: Immutable.List<TFieldTypeMapping>,
+  isFocused: boolean,
+  onPositionsChange: (position?: WidgetPosition) => void,
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
+  position: WidgetPosition,
+  style?: React.CSSProperties,
+  title: string,
+  widget: WidgetClass & { data: string };
+  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
+  widgetId: string,
 };
 
 const WidgetComponent = ({
-  widget,
-  widgetId,
   data,
   errors,
-  widgetDimension: { height, width },
-  position,
-  onPositionsChange = () => undefined,
-  title,
   fields,
+  isFocused,
+  onPositionsChange = () => undefined,
   onWidgetSizeChange = () => {},
+  position,
+  style,
+  title,
+  widget,
+  widgetDimension: { height, width },
+  widgetId,
 }: Props) => {
   const dataKey = widget.data || widget.id;
   const widgetData = data[dataKey];
@@ -61,18 +66,20 @@ const WidgetComponent = ({
     <DrilldownContextProvider widget={widget}>
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
-          <Widget key={widgetId}
-                  id={widgetId}
-                  widget={widget}
-                  data={widgetData}
-                  errors={widgetErrors}
-                  height={height}
-                  position={position}
-                  width={width}
-                  fields={fields}
-                  onPositionsChange={onPositionsChange}
-                  onSizeChange={onWidgetSizeChange}
-                  title={title} />
+          <WidgetContainer key={widgetId} isFocused={isFocused} style={style}>
+            <Widget key={widgetId}
+                    id={widgetId}
+                    widget={widget}
+                    data={widgetData}
+                    errors={widgetErrors}
+                    height={height}
+                    position={position}
+                    width={width}
+                    fields={fields}
+                    onPositionsChange={onPositionsChange}
+                    onSizeChange={onWidgetSizeChange}
+                    title={title} />
+          </WidgetContainer>
         </AdditionalContext.Provider>
       </WidgetContext.Provider>
     </DrilldownContextProvider>
@@ -95,6 +102,7 @@ WidgetComponent.propTypes = {
 WidgetComponent.defaultProps = {
   onPositionsChange: () => {},
   onWidgetSizeChange: () => {},
+  style: {},
 };
 
 export default WidgetComponent;
