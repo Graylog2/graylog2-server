@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
                             MaxmindDataAdapterTest.CountryDatabaseTest.class,
                             MaxmindDataAdapterTest.AsnDatabaseTest.class,
                             MaxmindDataAdapterTest.IPinfoStandardLocationDatabaseTest.class,
+                            MaxmindDataAdapterTest.IPinfoASNDatabaseTest.class,
                     })
 public class MaxmindDataAdapterTest {
     private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
