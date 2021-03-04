@@ -79,7 +79,7 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
            className="input-xlarge validatable"
            required={isRequired}
            onChange={handleChange}
-           value={value}
+           value={value || 0}
            help={field.description}
            {...validationSpecs}
            autoFocus={autoFocus} />

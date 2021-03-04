@@ -54,7 +54,7 @@ const TextField = ({ field, title, typeName, onChange, value, autoFocus }: Props
              name={`configuration[${title}]`}
              required={isRequired}
              help={field.description}
-             value={value}
+             value={value || ''}
              onChange={handleChange}
              autoFocus={autoFocus} />
     );
@@ -67,7 +67,7 @@ const TextField = ({ field, title, typeName, onChange, value, autoFocus }: Props
            label={labelContent}
            required={isRequired}
            help={field.description}
-           value={value}
+           value={value || ''}
            onChange={handleChange}
            autoFocus={autoFocus} />
   );
