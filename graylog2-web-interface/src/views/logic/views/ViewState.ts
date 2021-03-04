@@ -20,7 +20,7 @@ import isDeepEqual from 'stores/isDeepEqual';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
-import type { TitlesMap, TitleType } from 'views/stores/TitleTypes';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
