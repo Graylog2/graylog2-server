@@ -94,14 +94,14 @@ const _renderWidgets = ({
     const widget = widgets[widgetId];
     returnedWidgets.positions[widgetId] = positions[widgetId] || _defaultDimensions(widget.type);
     const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
+    const isFocused = focusedWidget === widgetId;
 
     returnedWidgets.widgets.push(
-      <WidgetContainer isFocused={focusedWidget === widgetId} key={widget.id}>
+      <WidgetContainer isFocused={isFocused} key={widget.id}>
         <WidgetComponent allFields={allFields}
                          data={data}
                          errors={errors}
                          fields={fields}
-                         isFocused={focusedWidget === widgetId}
                          onPositionsChange={_onPositionsChange}
                          onWidgetSizeChange={_onWidgetSizeChange(widgetDimensions, setWidgetDimensions)}
                          position={returnedWidgets.positions[widgetId]}
@@ -158,7 +158,6 @@ const WidgetGrid = ({
 
   const grid = widgets && widgets.length > 0 ? (
     <StyledReactGridContainer animate
-                              locked={locked}
                               columns={{
                                 xxl: 12,
                                 xl: 12,
@@ -167,8 +166,10 @@ const WidgetGrid = ({
                                 sm: 12,
                                 xs: 12,
                               }}
-                              measureBeforeMount
                               focusedWidget={focusedWidget}
+                              isResizable={!focusedWidget}
+                              locked={locked}
+                              measureBeforeMount
                               onPositionsChange={onPositionsChange}
                               positions={positions}
                               useDragHandle=".widget-drag-handle">
