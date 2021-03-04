@@ -41,13 +41,13 @@ describe('FieldTypeFor', () => {
 
     expect(fieldTypeFor('card(foo)', [FieldTypeMapping.create('foo', FieldTypes.STRING())]))
       .toEqual(FieldTypes.LONG());
+  });
+
+  it('returns inferred type (long) for `count() and sum()`', () => {
+    expect(fieldTypeFor('count()', []))
+      .toEqual(FieldTypes.LONG());
 
     expect(fieldTypeFor('sum(foo-bar)', [FieldTypeMapping.create('foo-bar', FieldTypes.LONG())]))
       .toEqual(FieldTypes.FLOAT());
-  });
-
-  it('returns inferred type (long) for `count()`', () => {
-    expect(fieldTypeFor('count()', []))
-      .toEqual(FieldTypes.LONG());
   });
 });
