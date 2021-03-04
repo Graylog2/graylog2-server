@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 
+import javax.annotation.Nullable;
+
 // IPInfo standard location response:
 //
 // {
@@ -40,19 +42,24 @@ import com.google.auto.value.extension.memoized.Memoized;
 @JsonDeserialize(builder = IPinfoStandardLocation.Builder.class)
 public abstract class IPinfoStandardLocation {
     @JsonProperty("city")
+    @Nullable
     public abstract String city();
 
     @JsonProperty("country")
+    @Nullable
     public abstract String country();
 
     @JsonProperty("timezone")
+    @Nullable
     public abstract String timezone();
 
     @JsonProperty("region")
+    @Nullable
     public abstract String region();
 
     @JsonProperty("geoname_id")
-    public abstract long geoNameId();
+    @Nullable
+    public abstract Long geoNameId();
 
     @JsonProperty("lat")
     public abstract double latitude();
@@ -86,7 +93,7 @@ public abstract class IPinfoStandardLocation {
         public abstract Builder region(String region);
 
         @JsonProperty("geoname_id")
-        public abstract Builder geoNameId(long geonameId);
+        public abstract Builder geoNameId(Long geonameId);
 
         @JsonProperty("lat")
         public abstract Builder latitude(double latitude);

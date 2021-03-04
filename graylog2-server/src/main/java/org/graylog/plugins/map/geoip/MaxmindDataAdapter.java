@@ -55,6 +55,7 @@ import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -262,15 +263,16 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                         return LookupResult.empty();
                     }
 
-                    return LookupResult.multi(ipInfo.asnNumeric(), ImmutableMap.builder()
-                            .put("asn", ipInfo.asn())
-                            .put("asn_numeric", ipInfo.asnNumeric())
-                            .put("name", ipInfo.name())
-                            .put("domain", ipInfo.domain())
-                            .put("type", ipInfo.type())
-                            .put("route", ipInfo.route())
-                            .build());
+                    // Values can be null so we cannot use an ImmutableMap here
+                    final Map<Object, Object> multiValue = new HashMap<>();
+                    multiValue.put("asn", ipInfo.asn());
+                    multiValue.put("asn_numeric", ipInfo.asnNumeric());
+                    multiValue.put("name", ipInfo.name());
+                    multiValue.put("domain", ipInfo.domain());
+                    multiValue.put("type", ipInfo.type());
+                    multiValue.put("route", ipInfo.route());
 
+                    return LookupResult.multi(ipInfo.asnNumeric(), Collections.unmodifiableMap(multiValue));
                 } catch (AddressNotFoundException e) {
                     LOG.debug("Unable to look up IPinfo ASN data for IP address {}, returning empty result.", addr, e);
                     return LookupResult.empty();
@@ -286,16 +288,18 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                         return LookupResult.empty();
                     }
 
-                    return LookupResult.multi(ipInfo.coordinates(), ImmutableMap.builder()
-                            .put("coordinates", ipInfo.coordinates())
-                            .put("latitude", ipInfo.latitude())
-                            .put("longitude", ipInfo.longitude())
-                            .put("city", ipInfo.city())
-                            .put("country", ipInfo.country())
-                            .put("region", ipInfo.region())
-                            .put("timezone", ipInfo.timezone())
-                            .put("geoname_id", ipInfo.geoNameId())
-                            .build());
+                    // Values can be null so we cannot use an ImmutableMap here
+                    final Map<Object, Object> multiValue = new HashMap<>();
+                    multiValue.put("coordinates", ipInfo.coordinates());
+                    multiValue.put("latitude", ipInfo.latitude());
+                    multiValue.put("longitude", ipInfo.longitude());
+                    multiValue.put("city", ipInfo.city());
+                    multiValue.put("country", ipInfo.country());
+                    multiValue.put("region", ipInfo.region());
+                    multiValue.put("timezone", ipInfo.timezone());
+                    multiValue.put("geoname_id", ipInfo.geoNameId());
+
+                    return LookupResult.multi(ipInfo.coordinates(), Collections.unmodifiableMap(multiValue));
                 } catch (AddressNotFoundException e) {
                     LOG.debug("Unable to look up IPinfo location data for IP address {}, returning empty result.", addr, e);
                     return LookupResult.empty();

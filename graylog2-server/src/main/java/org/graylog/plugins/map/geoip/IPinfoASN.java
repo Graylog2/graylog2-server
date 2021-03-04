@@ -24,6 +24,8 @@ import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.primitives.Longs;
 
+import javax.annotation.Nullable;
+
 // IPInfo ASN response:
 //
 // {
@@ -38,28 +40,33 @@ import com.google.common.primitives.Longs;
 @JsonDeserialize(builder = IPinfoASN.Builder.class)
 public abstract class IPinfoASN {
     @JsonProperty("name")
+    @Nullable
     public abstract String name();
 
     @JsonProperty("route")
+    @Nullable
     public abstract String route();
 
     @JsonProperty("type")
+    @Nullable
     public abstract String type();
 
     @JsonProperty("asn")
+    @Nullable
     public abstract String asn();
 
     @Memoized
     @JsonProperty("asn_numeric")
-    public long asnNumeric() {
-        final Long num = Longs.tryParse(asn().replace("AS", ""));
-        if (num == null) {
-            throw new IllegalArgumentException("Couldn't parse " + asn() + "into numeric value");
+    @Nullable
+    public Long asnNumeric() {
+        if (asn() == null) {
+            return null;
         }
-        return num;
+        return Longs.tryParse(asn().replace("AS", ""));
     }
 
     @JsonProperty("domain")
+    @Nullable
     public abstract String domain();
 
     @AutoValue.Builder
