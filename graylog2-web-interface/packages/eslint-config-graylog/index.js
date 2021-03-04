@@ -53,7 +53,9 @@ module.exports = {
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
+        'jest/no-standalone-expect': ['error', { additionalTestBlockFunctions: ['each.test'] }],
         'testing-library/no-debug': 'warn',
+	"jest/no-standalone-expect": [ "error", { "additionalTestBlockFunctions": ["each.test"] } ]
       },
     },
   ],
