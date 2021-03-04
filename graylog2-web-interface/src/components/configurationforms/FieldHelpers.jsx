@@ -17,8 +17,8 @@
 import React from 'react';
 
 const FieldHelpers = {
-  hasAttribute: (ary, attribute) => {
-    return ary.indexOf(attribute) > -1;
+  hasAttribute: (array, attribute) => {
+    return array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
   },
   optionalMarker: (field) => {
     return field.is_optional && field.type !== 'boolean' ? <span className="configuration-field-optional">(optional)</span> : null;
