@@ -45,7 +45,7 @@ public interface MessageQueueAcknowledger {
             public MessageQueueAcknowledger.Metrics get() {
                 return MessageQueueAcknowledger.Metrics.builder()
                         .acknowledgedMessages(
-                                metricRegistry.meter(name(MessageQueueWriter.class, "acknowledged-messages")))
+                                metricRegistry.meter(name(MessageQueueAcknowledger.class, "acknowledged-messages")))
                         .build();
             }
         }
