@@ -48,6 +48,7 @@ const _headerFieldForValue = (activeQuery: string, field, value, span = 1, prefi
   </th>
 );
 
+// eslint-disable-next-line jsx-a11y/control-has-associated-label
 const _spacer = (idx, span = 1) => <th colSpan={span} key={`spacer-${idx}`} className={styles.leftAligned} />;
 
 const columnPivotFieldsHeaders = (activeQuery: string, columnPivots: string[], actualColumnPivotValues: any[], series: Series[], offset = 1) => {
