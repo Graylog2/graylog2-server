@@ -65,14 +65,12 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
       class="c0 control-label"
       for="number-example_number_field"
     >
-      <span>
-        number field
-         
-        <span
-          class="configuration-field-optional"
-        >
-          (optional)
-        </span>
+      number field
+       
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
       </span>
     </label>
     <span>

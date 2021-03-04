@@ -69,7 +69,7 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
   const isRequired = !field.is_optional;
   const validationSpecs = validationSpec();
 
-  const label = <span>{field.human_name} {FieldHelpers.optionalMarker(field)}</span>;
+  const label = <>{field.human_name} {FieldHelpers.optionalMarker(field)}</>;
 
   return (
     <Input id={`${typeName}-${title}`}
