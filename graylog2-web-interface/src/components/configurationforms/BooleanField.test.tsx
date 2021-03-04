@@ -67,7 +67,7 @@ describe('<BooleanField>', () => {
   it('should call onChange when input value changes', async () => {
     const changeFunction = jest.fn();
 
-    render(
+    const { rerender } = render(
       <BooleanField field={booleanField}
                     onChange={changeFunction}
                     title="example_boolean_field"
@@ -81,8 +81,20 @@ describe('<BooleanField>', () => {
 
     userEvent.click(input);
 
+    await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', true));
+
+    rerender(
+      <BooleanField field={booleanField}
+                    onChange={changeFunction}
+                    title="example_boolean_field"
+                    typeName="boolean"
+                    value />,
+    );
+
     expect(input).toBeChecked();
 
-    await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', true));
+    userEvent.click(input);
+
+    await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', false));
   });
 });
