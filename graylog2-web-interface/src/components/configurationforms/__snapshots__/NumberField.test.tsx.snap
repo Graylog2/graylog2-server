@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<NumberField> should match the snapshot 1`] = `
+exports[`<NumberField> should render an empty field 1`] = `
 .c0 {
   color: #1f1f1f;
   font-weight: bold;

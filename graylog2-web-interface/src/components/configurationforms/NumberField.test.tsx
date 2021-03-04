@@ -32,7 +32,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render an empty field', () => {
-    render(
+    const { container } = render(
       <NumberField field={numberField}
                    onChange={() => {}}
                    title="example_number_field"
@@ -50,6 +50,8 @@ describe('<NumberField>', () => {
     expect(formField).not.toBeRequired();
     expect(formField).toHaveAttribute('max', String(Number.MAX_SAFE_INTEGER));
     expect(formField).toHaveAttribute('min', String(Number.MIN_SAFE_INTEGER));
+
+    expect(container).toMatchSnapshot();
   });
 
   it('should render a field with a value', () => {
@@ -145,14 +147,5 @@ describe('<NumberField>', () => {
     expect(formField).toBeInTheDocument();
     expect(formField).toHaveAttribute('max', '65535');
     expect(formField).toHaveAttribute('min', '0');
-  });
-
-  it('should match the snapshot', () => {
-    const { container } = render(<NumberField field={numberField}
-                                              onChange={() => {}}
-                                              title="example_number_field"
-                                              typeName="number" />);
-
-    expect(container).toMatchSnapshot();
   });
 });
