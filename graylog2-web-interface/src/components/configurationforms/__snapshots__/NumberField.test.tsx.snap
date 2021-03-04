@@ -77,7 +77,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
     </label>
     <span>
       <input
-        class="c1 input-xlarge validatable form-control"
+        class="c1 form-control"
         id="number-example_number_field"
         label="[object Object]"
         max="9007199254740991"
