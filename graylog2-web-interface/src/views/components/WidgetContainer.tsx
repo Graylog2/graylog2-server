@@ -33,13 +33,19 @@ type Props = {
 }
 
 const WidgetContainer = ({ children, className, isFocused, style, ...rest }: Props) => {
-  let containerStyle = { ...style };
+  let containerStyle = {
+    ...style,
+    transition: 'none',
+  };
 
   if (isFocused) {
     containerStyle = {
       ...containerStyle,
       height: '100%',
       width: '100%',
+      zIndex: 5,
+      top: 0,
+      left: 0,
     };
   }
 

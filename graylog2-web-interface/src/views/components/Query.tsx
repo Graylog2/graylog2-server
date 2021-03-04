@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
@@ -30,7 +29,6 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
@@ -142,16 +140,12 @@ const EmptyDashboardInfo = () => (
 );
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
-  const { focusedWidget } = useContext(WidgetFocusContext);
-
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
-  const visibleWidgets = focusedWidget ? widgets.filter((widget) => widget.id === focusedWidget) : widgets;
-
   if (results) {
-    const widgetGrid = _renderWidgetGrid(visibleWidgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
+    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
 
     return (<>{widgetGrid}</>);
   }
