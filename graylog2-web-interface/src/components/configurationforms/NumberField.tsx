@@ -19,9 +19,9 @@ import React from 'react';
 
 import Input from 'components/bootstrap/Input';
 import { getValueFromInput } from 'util/FormsUtils';
+import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 
 import type { NumberField as NumberFieldType } from './types';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
   autoFocus?: boolean,
