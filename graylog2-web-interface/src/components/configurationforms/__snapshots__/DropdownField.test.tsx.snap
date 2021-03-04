@@ -78,7 +78,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
         class="c1 form-control"
         id="dropdown-example_dropdown_field"
         label="[object Object]"
-        name="dropdown-example_dropdown_field"
+        name="configuration[example_dropdown_field]"
         placeholder=""
         type="select"
       >

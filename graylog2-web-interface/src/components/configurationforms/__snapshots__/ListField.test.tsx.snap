@@ -88,6 +88,11 @@ exports[`<ListField> should render an empty field 1`] = `
             </div>
           </div>
         </div>
+        <input
+          name="configuration[example_list_field]"
+          type="hidden"
+          value=""
+        />
       </div>
       <span
         class="c1 help-block"

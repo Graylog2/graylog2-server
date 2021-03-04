@@ -52,6 +52,7 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
            label={label}
            help={field.description}>
       <MultiSelect inputId={`${typeName}-${title}`}
+                   name={`configuration[${title}]`}
                    required={isRequired}
                    autoFocus={autoFocus}
                    options={formattedOptions}

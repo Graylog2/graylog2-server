@@ -53,7 +53,7 @@ const DropdownField = ({ autoFocus, field, onChange, title, typeName, value, add
 
   return (
     <Input id={`${typeName}-${title}`}
-           name={`${typeName}-${title}`}
+           name={`configuration[${title}]`}
            label={label}
            type="select"
            value={value}
