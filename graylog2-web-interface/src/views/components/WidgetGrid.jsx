@@ -95,11 +95,11 @@ const _renderWidgets = ({
     const widget = widgets[widgetId];
     returnedWidgets.positions[widgetId] = positions[widgetId] || _defaultDimensions(widget.type);
     const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
-    const isFocused = focusedWidget?.id === widgetId;
-    const editing = focusedWidget?.editing;
+    const isFocused = focusedWidget?.id === widgetId && focusedWidget?.focusing;
+    const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
 
     returnedWidgets.widgets.push(
-      <WidgetContainer isFocused={isFocused} key={widget.id}>
+      <WidgetContainer isFocused={isFocused || editing} key={widget.id}>
         <WidgetComponent allFields={allFields}
                          data={data}
                          editing={editing}

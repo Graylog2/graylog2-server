@@ -44,7 +44,7 @@ type Props = {
 
 const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
   const actionContext = useContext(ActionContext);
-  const { setFocusedWidget } = useContext(WidgetFocusContext);
+  const { setWidgetFocusing } = useContext(WidgetFocusContext);
   const [open, setOpen] = useState(false);
   const [overflowingComponents, setOverflowingComponents] = useState({});
 
@@ -68,7 +68,7 @@ const ValueActions = ({ children, element, field, menuContainer, queryId, type, 
         const { resetFocus } = action;
 
         if (resetFocus) {
-          setFocusedWidget(undefined);
+          setWidgetFocusing(undefined);
         }
 
         _onMenuToggle();

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react';
+import { isEqual } from 'lodash';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
@@ -23,45 +24,61 @@ import URI from 'urijs';
 import { useStore } from 'stores/connect';
 import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import WidgetFocusContext, { FocusedWidget } from 'views/components/contexts/WidgetFocusContext';
+import WidgetFocusContext, { FocusRequest } from 'views/components/contexts/WidgetFocusContext';
 
-const _syncWithQuery = (query: string, focusedWidget: FocusedWidget) => {
-  const baseUri = new URI(query)
-    .removeSearch('focused')
-    .removeSearch('editing');
+const _syncWithQuery = ({
+  focusedWidget,
+  query,
+} : {
+  focusedWidget: FocusRequest,
+  query: string,
+}) => {
+  let baseUri = new URI(query)
+    .removeSearch('focusing')
+    .removeSearch('editing')
+    .removeSearch('focusedId');
 
-  if (focusedWidget?.id) {
-    return baseUri
-      .setSearch('focused', focusedWidget.id)
-      .setSearch('editing', focusedWidget.editing)
-      .toString();
+  if (focusedWidget?.id && (focusedWidget.focusing || focusedWidget.editing)) {
+    baseUri = baseUri.setSearch('focusedId', focusedWidget.id ?? focusedWidget.id);
+  }
+
+  if (focusedWidget.focusing) {
+    baseUri = baseUri.setSearch('focusing', true);
+  }
+
+  if (focusedWidget.editing) {
+    baseUri = baseUri.setSearch('editing', true);
   }
 
   return baseUri.toString();
 };
 
-const useFocusWidgetIdFromParam = (focusedWidget, setFocusedWidget, widgets) => {
-  const { focused: paramFocusedWidget, editing: paramEditing } = useQuery();
-
+const useFocusWidgetIdFromParam = ({ focusedWidget, focusUriParams, setFocusedWidget, widgets }) => {
   useEffect(() => {
-    if (focusedWidget?.id !== paramFocusedWidget) {
-      if (paramFocusedWidget && !widgets.has(paramFocusedWidget)) {
+    if ((focusedWidget?.id || focusUriParams?.id) && !isEqual(focusedWidget, focusUriParams)) {
+      if (focusUriParams.id && !widgets.has(focusUriParams.id)) {
         return;
       }
 
-      setFocusedWidget({ id: paramFocusedWidget, editing: paramEditing === 'true' });
+      setFocusedWidget(focusUriParams);
     }
-  }, [focusedWidget, paramFocusedWidget, setFocusedWidget, widgets, paramEditing]);
+  }, [focusedWidget, setFocusedWidget, widgets, focusUriParams]);
 };
 
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const { search, pathname } = useLocation();
   const query = pathname + search;
   const history = useHistory();
-  const [focusedWidget, setFocusedWidget] = useState<FocusedWidget | undefined>();
+  const [focusedWidget, setFocusedWidget] = useState<FocusRequest | undefined>();
   const widgets = useStore(WidgetStore);
+  const params = useQuery();
+  const focusUriParams = useMemo(() => ({
+    editing: params.editing === 'true',
+    focusing: params.focusing === 'true',
+    id: params.focusedId,
+  }), [params.editing, params.focusing, params.focusedId]);
 
-  useFocusWidgetIdFromParam(focusedWidget, setFocusedWidget, widgets);
+  useFocusWidgetIdFromParam({ focusedWidget, setFocusedWidget, widgets, focusUriParams });
 
   useEffect(() => {
     if (focusedWidget && !widgets.has(focusedWidget.id)) {
@@ -69,17 +86,30 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
     }
   }, [focusedWidget, widgets]);
 
-  const updateFocus = useCallback((widget: FocusedWidget | undefined) => {
-    const newFocusWidget = widget?.id === focusedWidget?.id
-      ? undefined
-      : widget;
-    const newURI = _syncWithQuery(query, newFocusWidget);
+  const updateFocus = useCallback((newFocusedWidget: FocusRequest) => {
+    const newURI = _syncWithQuery({
+      focusedWidget: newFocusedWidget,
+      query,
+    });
 
     history.replace(newURI);
-  }, [focusedWidget, history, query]);
+  }, [history, query]);
+
+  const setWidgetFocusing = (widgetId: string | undefined) => {
+    updateFocus({
+      ...focusedWidget,
+      id: focusedWidget?.id ?? widgetId,
+      focusing: !!widgetId,
+      editing: widgetId ? focusedWidget?.editing : false,
+    });
+  };
+
+  const setWidgetEditing = (widgetId: string | undefined) => {
+    updateFocus({ ...focusedWidget, id: focusedWidget?.id ?? widgetId, editing: !!widgetId });
+  };
 
   return (
-    <WidgetFocusContext.Provider value={{ focusedWidget, setFocusedWidget: updateFocus }}>
+    <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing }}>
       {children}
     </WidgetFocusContext.Provider>
   );

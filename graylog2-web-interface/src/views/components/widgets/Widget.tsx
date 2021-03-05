@@ -255,12 +255,26 @@ class Widget extends React.Component<Props, State> {
     this._onToggleCopyToDashboard();
   };
 
-  _onToggleEdit = (setFocusedWidget) => {
+  _onEdit = (setFocusedWidget) => {
+    const { widget } = this.props;
+
+    this.setState(() => {
+      RefreshActions.disable();
+      setFocusedWidget({ id: widget.id, editing: true });
+
+      return {
+        editing: true,
+        oldWidget: widget,
+      };
+    });
+  };
+
+  _onToggleEdit = (setWidgetEditing) => {
     const { widget } = this.props;
 
     this.setState((state) => {
       if (state.editing) {
-        setFocusedWidget(undefined);
+        setWidgetEditing(undefined);
 
         return {
           editing: false,
@@ -269,7 +283,7 @@ class Widget extends React.Component<Props, State> {
       }
 
       RefreshActions.disable();
-      setFocusedWidget({ id: widget.id, editing: true });
+      setWidgetEditing(widget.id);
 
       return {
         editing: true,
@@ -286,7 +300,7 @@ class Widget extends React.Component<Props, State> {
     });
   }
 
-  _onCancelEdit = (setFocusedWidget) => {
+  _onCancelEdit = (setWidgetEditing) => {
     const { oldWidget } = this.state;
 
     if (oldWidget) {
@@ -295,14 +309,14 @@ class Widget extends React.Component<Props, State> {
       WidgetActions.update(id, oldWidget);
     }
 
-    this._onToggleEdit(setFocusedWidget);
+    this._onToggleEdit(setWidgetEditing);
   };
 
   _onWidgetConfigChange = (widgetId, config) => WidgetActions.updateConfig(widgetId, config);
 
   _setLoadingState = (loading: boolean) => this.setState({ loading });
 
-  visualize = (setFocusedWidget) => {
+  visualize = (setWidgetEditing) => {
     const { data, errors, title } = this.props;
 
     if (errors && errors.length > 0) {
@@ -326,7 +340,7 @@ class Widget extends React.Component<Props, State> {
                       onConfigChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}
                       setLoadingState={this._setLoadingState}
                       title={title}
-                      toggleEdit={() => this._onToggleEdit(setFocusedWidget)}
+                      toggleEdit={() => this._onToggleEdit(setWidgetEditing)}
                       type={widget.type}
                       width={width}
                       id={id} />
@@ -341,9 +355,9 @@ class Widget extends React.Component<Props, State> {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, editing } = this.props;
     const { loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config } = widget;
-    const { focusedWidget, setFocusedWidget } = this.context;
-    const isFocusedWidget = focusedWidget === id;
-    const visualization = this.visualize(setFocusedWidget);
+    const { focusedWidget, setWidgetEditing, setWidgetFocusing } = this.context;
+    const isFocusedWidget = focusedWidget?.id === id;
+    const visualization = this.visualize(setWidgetEditing);
     const EditComponent = _editComponentForType(widget.type);
 
     return (
@@ -363,7 +377,7 @@ class Widget extends React.Component<Props, State> {
                     </IfDashboard>
                     <IconButton name={isFocusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
                                 title={isFocusedWidget ? 'Un-focus widget' : 'Focus this widget'}
-                                onClick={() => setFocusedWidget({ id })} />
+                                onClick={() => setWidgetFocusing(isFocusedWidget ? undefined : widget.id)} />
                     {!isFocusedWidget && (
                       <WidgetHorizontalStretch widgetId={widget.id}
                                                widgetType={widget.type}
@@ -371,8 +385,13 @@ class Widget extends React.Component<Props, State> {
                                                position={position} />
                     )}
                     <WidgetActionDropdown>
-                      <MenuItem onSelect={() => this._onToggleEdit(setFocusedWidget)}>Edit</MenuItem>
-                      <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
+                      {editing ? (
+                        <MenuItem onSelect={() => this._onToggleEdit(setWidgetEditing)}>Cancel Edit</MenuItem>
+                      ) : (
+                        <MenuItem onSelect={() => this._onToggleEdit(setWidgetEditing)}>Edit</MenuItem>
+                      )}
+
+                      <MenuItem onSelect={() => this._onDuplicate(id, setWidgetFocusing)}>Duplicate</MenuItem>
                       {widget.isExportable && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
@@ -413,7 +432,7 @@ class Widget extends React.Component<Props, State> {
                   {visualization}
                 </WidgetErrorBoundary>
               </EditComponent>
-              <SaveOrCancelButtons onFinish={() => this._onToggleEdit(setFocusedWidget)} onCancel={() => this._onCancelEdit(setFocusedWidget)} />
+              <SaveOrCancelButtons onFinish={() => this._onToggleEdit(setWidgetEditing)} onCancel={() => this._onCancelEdit(setWidgetEditing)} />
             </EditWidgetFrame>
           )}
           {!editing && (
