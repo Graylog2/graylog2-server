@@ -47,4 +47,12 @@ public abstract class MoreMediaTypes {
      * A {@link MediaType} constant representing {@value #TEXT_CSV} media type.
      */
     public final static MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
+    /**
+     * A {@code String} constant representing {@value #APPLICATION_JSON} media type.
+     */
+    public final static String APPLICATION_JSON = "application/json";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_JSON} media type.
+     */
+    public final static MediaType APPLICATION_JSON_TYPE = new MediaType("application", "json");
 }

@@ -47,12 +47,12 @@ public class LegacyChunkDecorator implements ChunkDecorator {
 
         SimpleMessageChunk decoratedChunk = simpleMessageChunkFrom(decoratedLegacyResponse, undecoratedChunk.fieldsInOrder());
 
-        return decoratedChunk.toBuilder().isFirstChunk(undecoratedChunk.isFirstChunk()).build();
+        return decoratedChunk.toBuilder().chunkOrder(undecoratedChunk.chunkOrder()).build();
     }
 
     private SimpleMessageChunk simpleMessageChunkFrom(SearchResponse searchResponse, LinkedHashSet<String> fieldsInOrder) {
         LinkedHashSet<SimpleMessage> messages = searchResponse.messages().stream()
-                .map(legacyMessage -> SimpleMessage.from(legacyMessage.index(), new LinkedHashMap<String, Object>(legacyMessage.message())))
+                .map(legacyMessage -> SimpleMessage.from(legacyMessage.index(), new LinkedHashMap<>(legacyMessage.message())))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         // use fieldsInOrder from undecoratedChunk, because the order can get mixed up when decorators are applied

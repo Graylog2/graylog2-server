@@ -133,7 +133,6 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Export a message table as CSV")
     @POST
     @Path("{searchId}/{searchTypeId}")
-    @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
