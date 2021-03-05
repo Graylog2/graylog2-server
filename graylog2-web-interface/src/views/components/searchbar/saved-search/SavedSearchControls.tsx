@@ -30,7 +30,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import CSVExportModal from 'views/components/export/CSVExportModal';
+import ExportModal from 'views/components/export/ExportModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -275,7 +275,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                       <MenuItem divider />
                     </DropdownButton>
                     {showCSVExport && (
-                      <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
+                      <ExportModal view={view} closeModal={this.toggleCSVExport} />
                     )}
                     {showMetadataEdit && (
                       <ViewPropertiesModal show

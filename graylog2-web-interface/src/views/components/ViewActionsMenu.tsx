@@ -23,7 +23,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
 import { Icon, ShareButton } from 'components/common';
-import CSVExportModal from 'views/components/export/CSVExportModal';
+import ExportModal from 'views/components/export/ExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
@@ -116,7 +116,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
                           description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
                           onClose={() => setShareViewOpen(false)} />
       )}
-      {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
+      {csvExportOpen && <ExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
     </ButtonGroup>
   );
 };

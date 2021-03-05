@@ -77,7 +77,7 @@ type FormState = {
   format: string,
 };
 
-const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
+const ExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
   const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
@@ -163,19 +163,19 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   );
 };
 
-CSVExportModal.propTypes = {
+ExportModal.propTypes = {
   closeModal: PropTypes.func,
   directExportWidgetId: PropTypes.string,
   fields: CustomPropTypes.FieldListType.isRequired,
 };
 
-CSVExportModal.defaultProps = {
+ExportModal.defaultProps = {
   closeModal: () => {},
   directExportWidgetId: null,
 };
 
 export default connect(
-  CSVExportModal,
+  ExportModal,
   {
     fields: FieldTypesStore,
     executionState: SearchExecutionStateStore,
