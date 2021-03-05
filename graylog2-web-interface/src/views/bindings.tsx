@@ -394,6 +394,8 @@ const exports: PluginExports = {
     {
       type: 'csv',
       displayName: 'Comma-Separated Values (CSV)',
+      mimeType: 'text/csv',
+      fileExtension: 'csv',
     },
   ],
 };

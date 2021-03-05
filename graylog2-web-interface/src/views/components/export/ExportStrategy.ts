@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { Set, List } from 'immutable';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import View, { ViewType } from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
@@ -28,7 +29,7 @@ type ExportStrategy = {
   shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: Widget | undefined | null, selectedFields: { field: string }[], loading: boolean) => boolean,
   shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: Widget | undefined | null, widgets: List<Widget>) => boolean,
   initialWidget: (widgets: List<Widget>, directExportWidgetId: string | undefined | null) => Widget | undefined | null,
-  downloadFile: (payload: ExportPayload, searchQueries: Set<Query>, searchType: SearchType | undefined | null, searchId: string, filename: string) => Promise<void>,
+  downloadFile: (format: string, payload: ExportPayload, searchQueries: Set<Query>, searchType: SearchType | undefined | null, searchId: string, filename: string) => Promise<void>,
 };
 
 const _getWidgetById = (widgets, id) => widgets.find((item) => item.id === id);
@@ -45,24 +46,40 @@ const _initialSearchWidget = (widgets, directExportWidgetId) => {
   return null;
 };
 
-const _exportOnDashboard = (payload: ExportPayload, searchType: SearchType | undefined | null, searchId: string, filename: string) => {
+const formatDefinition = (format: string) => {
+  const formats = PluginStore.exports('views.export.formats');
+
+  if (!formats?.length) {
+    return undefined;
+  }
+
+  return formats.find(({ type }) => (type === format)) ?? {};
+};
+
+const _exportOnDashboard = (format: string, payload: ExportPayload, searchType: SearchType | undefined | null, searchId: string, filename: string) => {
   if (!searchType) {
     throw new Error('Exports on a dashboard require a selected widget!');
   }
 
-  return exportSearchTypeMessages(payload, searchId, searchType.id, filename);
+  const { mimeType, fileExtension } = formatDefinition(format);
+  const filenameWithExtension = `${filename}.${fileExtension}`;
+
+  return exportSearchTypeMessages(payload, searchId, searchType.id, mimeType, filenameWithExtension);
 };
 
-const _exportOnSearchPage = (payload: ExportPayload, searchQueries: Set<Query>, searchType: SearchType | undefined | null, searchId: string, filename: string) => {
+const _exportOnSearchPage = (format: string, payload: ExportPayload, searchQueries: Set<Query>, searchType: SearchType | undefined | null, searchId: string, filename: string) => {
   if (searchQueries.size !== 1) {
     throw new Error('Searches must only have a single query!');
   }
 
+  const { mimeType, fileExtension } = formatDefinition(format);
+  const filenameWithExtension = `${filename}.${fileExtension}`;
+
   if (searchType) {
-    return exportSearchTypeMessages(payload, searchId, searchType.id, filename);
+    return exportSearchTypeMessages(payload, searchId, searchType.id, mimeType, filenameWithExtension);
   }
 
-  return exportSearchMessages(payload, searchId, filename);
+  return exportSearchMessages(payload, searchId, mimeType, filenameWithExtension);
 };
 
 const SearchExportStrategy: ExportStrategy = {
@@ -71,7 +88,7 @@ const SearchExportStrategy: ExportStrategy = {
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection, widgets) => !singleWidgetDownload && !showWidgetSelection && widgets.size > 1,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget, widgets) => !singleWidgetDownload && !selectedWidget && widgets.size > 1,
   initialWidget: _initialSearchWidget,
-  downloadFile: (payload, searchQueries, searchType, searchId, filename) => _exportOnSearchPage(payload, searchQueries, searchType, searchId, filename),
+  downloadFile: (format: string, payload, searchQueries, searchType, searchId, filename) => _exportOnSearchPage(format, payload, searchQueries, searchType, searchId, filename),
 };
 
 const DashboardExportStrategy: ExportStrategy = {
@@ -80,7 +97,7 @@ const DashboardExportStrategy: ExportStrategy = {
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection) => !singleWidgetDownload && !showWidgetSelection,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget) => !singleWidgetDownload && !selectedWidget,
   initialWidget: (widget, directExportWidgetId) => (directExportWidgetId ? _getWidgetById(widget, directExportWidgetId) : null),
-  downloadFile: (payload, searchQueries, searchType, searchId, filename) => _exportOnDashboard(payload, searchType, searchId, filename),
+  downloadFile: (format: string, payload, searchQueries, searchType, searchId, filename) => _exportOnDashboard(format, payload, searchType, searchId, filename),
 };
 
 const createExportStrategy = (viewType: ViewType) => {

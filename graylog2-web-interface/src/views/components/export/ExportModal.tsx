@@ -88,10 +88,10 @@ const ExportModal = ({ closeModal, fields, view, directExportWidgetId, execution
 
   const singleWidgetDownload = !!directExportWidgetId;
 
-  const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings }: FormState) => {
+  const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings, format }: FormState) => {
     setLoading(true);
 
-    return startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings)
+    return startDownload(format, downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings)
       .then(closeModal)
       .finally(() => setLoading(false));
   };

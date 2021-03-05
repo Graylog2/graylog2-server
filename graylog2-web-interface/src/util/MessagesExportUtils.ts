@@ -32,26 +32,24 @@ export type ExportPayload = {
   limit?: number,
 };
 
-const downloadCSV = (fileContent: string, filename: string = 'search-result') => {
-  download(fileContent, `${filename}.csv`, 'text/csv');
-};
+const downloadFile = (fileContent: string, filename: string = 'search-result', mimeType: string) => download(fileContent, filename, mimeType);
 
-export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, filename?: string) => {
+export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, mimeType: string, filename?: string) => {
   const { url } = ApiRoutes.MessagesController.exportSearch(searchId);
 
-  return fetchFile('POST', qualifyUrl(url), exportPayload)
-    .then((result: string) => downloadCSV(result, filename))
+  return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
+    .then((result: string) => downloadFile(result, filename, mimeType))
     .catch(() => {
-      UserNotification.error('CSV Export failed');
+      UserNotification.error('Export failed');
     });
 };
 
-export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, filename?: string) => {
+export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, mimeType: string, filename?: string) => {
   const { url } = ApiRoutes.MessagesController.exportSearchType(searchId, searchTypeId, filename);
 
-  return fetchFile('POST', qualifyUrl(url), exportPayload)
-    .then((result: string) => downloadCSV(result, filename))
+  return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
+    .then((result: string) => downloadFile(result, filename, mimeType))
     .catch(() => {
-      UserNotification.error('CSV Export for widget failed');
+      UserNotification.error('Export for widget failed');
     });
 };
