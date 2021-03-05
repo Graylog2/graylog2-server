@@ -44,6 +44,7 @@ const port = argv.port || DEFAULT_PORT;
 const apiUrl = argv.apiUrl || process.env.GRAYLOG_API_URL || DEFAULT_API_URL;
 
 // Proxy all "/api" requests to the server backend API.
+// eslint-disable-next-line no-console
 console.log(`Graylog web interface forwarding /api requests to ${apiUrl}`);
 app.use('/api', proxy(apiUrl, {
   proxyReqPathResolver(req) {
