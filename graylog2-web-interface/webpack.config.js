@@ -228,7 +228,8 @@ if (TARGET === 'start') {
     plugins: [
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
-        GRAYLOG_HTTP_PUBLISH_URI: JSON.stringify(process.env.GRAYLOG_HTTP_PUBLISH_URI),
+        // Keep old env to avoid breaking developer setups
+        GRAYLOG_API_URL: JSON.stringify(process.env.GRAYLOG_API_URL || process.env.GRAYLOG_HTTP_PUBLISH_URI),
       }),
       new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
       new webpack.HotModuleReplacementPlugin(),
