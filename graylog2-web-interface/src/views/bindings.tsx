@@ -390,6 +390,12 @@ const exports: PluginExports = {
   'views.elements.header': [
     () => <IfSearch><MigrateFieldCharts /></IfSearch>,
   ],
+  'views.export.formats': [
+    {
+      type: 'csv',
+      displayName: 'Comma-Separated Values (CSV)',
+    },
+  ],
 };
 
 export default exports;

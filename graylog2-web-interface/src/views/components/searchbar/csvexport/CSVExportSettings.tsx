@@ -26,6 +26,7 @@ import { HelpBlock, Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
+import ExportFormatSelection from 'views/components/searchbar/csvexport/ExportFormatSelection';
 
 import CustomExportSettings from './CustomExportSettings';
 
@@ -59,6 +60,10 @@ const CSVExportSettings = ({
 }: CSVExportSettingsType) => {
   return (
     <>
+      <Row>
+        <ExportFormatSelection />
+      </Row>
+
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
         <p>

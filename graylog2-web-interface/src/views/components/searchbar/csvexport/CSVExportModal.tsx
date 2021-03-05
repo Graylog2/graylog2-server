@@ -74,6 +74,7 @@ type FormState = {
   limit: number,
   selectedFields: Array<{ field: string }>,
   customSettings: ExportSettings,
+  format: string,
 };
 
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
@@ -100,6 +101,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
     selectedFields: initialSelectedFields,
     limit: undefined,
     customSettings: {},
+    format: 'csv',
   };
 
   return (
@@ -120,7 +122,6 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
               </Modal.Header>
               <Modal.Body>
                 <Content>
-
                   {showWidgetSelection && (
                   <Field name="selectedWidget">
                     {({ field: { name, onChange } }) => {
