@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { List, Set } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -65,11 +66,6 @@ const _getInitialFields = (selectedWidget) => {
   const initialFields = selectedWidget ? _getInitialWidgetFields(selectedWidget) : DEFAULT_FIELDS;
 
   return initialFields.map((field) => ({ field })).toArray();
-};
-
-const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal) => {
-  setLoading(true);
-  startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit).then(closeModal);
 };
 
 type FormState = {
