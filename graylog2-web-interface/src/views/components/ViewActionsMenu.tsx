@@ -52,7 +52,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
   const [editViewOpen, setEditViewOpen] = useState(false);
-  const [csvExportOpen, setCsvExportOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const viewTypeLabel = ViewTypeLabel({ type: view.type });
@@ -86,7 +86,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit metadata
         </MenuItem>
-        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
+        <MenuItem onSelect={() => setExportOpen(true)}><Icon name="cloud-download-alt" /> Export</MenuItem>
         {debugOverlay}
         <IfDashboard>
           <MenuItem divider />
@@ -116,7 +116,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata }) => {
                           description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
                           onClose={() => setShareViewOpen(false)} />
       )}
-      {csvExportOpen && <ExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
+      {exportOpen && <ExportModal view={view} closeModal={() => setExportOpen(false)} />}
     </ButtonGroup>
   );
 };

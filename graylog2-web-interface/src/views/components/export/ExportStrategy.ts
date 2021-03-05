@@ -47,7 +47,7 @@ const _initialSearchWidget = (widgets, directExportWidgetId) => {
 
 const _exportOnDashboard = (payload: ExportPayload, searchType: SearchType | undefined | null, searchId: string, filename: string) => {
   if (!searchType) {
-    throw new Error('CSV exports on a dashboard require a selected widget!');
+    throw new Error('Exports on a dashboard require a selected widget!');
   }
 
   return exportSearchTypeMessages(payload, searchId, searchType.id, filename);

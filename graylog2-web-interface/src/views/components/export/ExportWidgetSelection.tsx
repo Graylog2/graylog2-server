@@ -43,7 +43,7 @@ const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
     <>
       <Row>
         <IfSearch>
-          The CSV file will contain all messages for your current search.<br />
+          The export will contain all messages for your current search.<br />
           Please select a message table to adopt its fields. You can adjust all settings in the next step.
         </IfSearch>
         <IfDashboard>

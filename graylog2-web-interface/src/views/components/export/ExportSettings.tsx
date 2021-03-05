@@ -67,7 +67,7 @@ const ExportSettings = ({
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
         <p>
-          Define the fields for your CSV file. You can change the field order with drag and drop.<br />
+          Define the fields for your file. You can change the field order with drag and drop.<br />
         </p>
         {selectedWidget && (
           <p>

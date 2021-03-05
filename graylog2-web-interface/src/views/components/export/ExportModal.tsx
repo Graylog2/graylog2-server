@@ -149,7 +149,7 @@ const ExportModal = ({ closeModal, fields, view, directExportWidgetId, execution
               <Modal.Footer>
                 {allowWidgetSelection && <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">Select different message table</Button>}
                 <Button type="button" onClick={closeModal}>Close</Button>
-                <Button type="submit" onClick={submitForm} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+                <Button type="submit" onClick={submitForm} disabled={!enableDownload} bsStyle="primary" data-testid="download-button">
                   {loading
                     ? <Spinner text="Downloading..." delay={0} />
                     : <><Icon name="cloud-download-alt" />&nbsp;Start Download</>}

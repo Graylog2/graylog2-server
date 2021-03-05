@@ -50,7 +50,7 @@ type Props = {
 type State = {
   showForm: boolean,
   showList: boolean,
-  showCSVExport: boolean,
+  showExport: boolean,
   showShareSearch: boolean,
   showMetadataEdit: boolean,
   newTitle: string,
@@ -83,7 +83,7 @@ class SavedSearchControls extends React.Component<Props, State> {
 
     this.state = {
       showMetadataEdit: false,
-      showCSVExport: false,
+      showExport: false,
       showShareSearch: false,
       showForm: false,
       showList: false,
@@ -103,10 +103,10 @@ class SavedSearchControls extends React.Component<Props, State> {
     this.setState({ showList: !showList });
   };
 
-  toggleCSVExport = () => {
-    const { showCSVExport } = this.state;
+  toggleExport = () => {
+    const { showExport } = this.state;
 
-    this.setState({ showCSVExport: !showCSVExport });
+    this.setState({ showExport: !showExport });
   };
 
   toggleMetadataEdit = () => {
@@ -205,7 +205,7 @@ class SavedSearchControls extends React.Component<Props, State> {
   };
 
   render() {
-    const { showForm, showList, newTitle, showCSVExport, showShareSearch, showMetadataEdit } = this.state;
+    const { showForm, showList, newTitle, showExport, showShareSearch, showMetadataEdit } = this.state;
     const { viewStoreState: { view, dirty }, theme } = this.props;
 
     const loaded = (view && view.id);
@@ -268,14 +268,14 @@ class SavedSearchControls extends React.Component<Props, State> {
                         <Icon name="edit" /> Edit metadata
                       </MenuItem>
                       <MenuItem onSelect={this._loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
-                      <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
+                      <MenuItem onSelect={this.toggleExport}><Icon name="cloud-download-alt" /> Export</MenuItem>
                       <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                         <Icon name="eraser" /> Reset search
                       </MenuItem>
                       <MenuItem divider />
                     </DropdownButton>
-                    {showCSVExport && (
-                      <ExportModal view={view} closeModal={this.toggleCSVExport} />
+                    {showExport && (
+                      <ExportModal view={view} closeModal={this.toggleExport} />
                     )}
                     {showMetadataEdit && (
                       <ViewPropertiesModal show

@@ -99,7 +99,7 @@ type State = {
   loading: boolean;
   oldWidget?: WidgetModel,
   showCopyToDashboard: boolean,
-  showCsvExport: boolean,
+  showExport: boolean,
   showMoveWidgetToTab: boolean,
 };
 
@@ -162,7 +162,7 @@ class Widget extends React.Component<Props, State> {
       editing,
       loading: false,
       showCopyToDashboard: false,
-      showCsvExport: false,
+      showExport: false,
       showMoveWidgetToTab: false,
     };
 
@@ -275,11 +275,11 @@ class Widget extends React.Component<Props, State> {
     });
   };
 
-  _onToggleCSVExport = () => {
-    const { showCsvExport } = this.state;
+  _onToggleExport = () => {
+    const { showExport } = this.state;
 
     this.setState({
-      showCsvExport: !showCsvExport,
+      showExport: !showExport,
     });
   }
 
@@ -336,7 +336,7 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
-    const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
+    const { editing, loading, showCopyToDashboard, showExport, showMoveWidgetToTab } = this.state;
     const { config } = widget;
     const { focusedWidget, setFocusedWidget } = this.context;
     const isFocusedWidget = focusedWidget === id;
@@ -398,7 +398,7 @@ class Widget extends React.Component<Props, State> {
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
-                      {widget.isExportable && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
+                      {widget.isExportable && <MenuItem onSelect={() => this._onToggleExport()}>Export to CSV</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       </IfSearch>
@@ -414,7 +414,7 @@ class Widget extends React.Component<Props, State> {
                                        onSubmit={this._onCopyToDashboard}
                                        onCancel={this._onToggleCopyToDashboard} />
                     )}
-                    {showCsvExport && <ExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
+                    {showExport && <ExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleExport} />}
                     {showMoveWidgetToTab && (
                       <MoveWidgetToTabModal view={view.view}
                                             widgetId={widget.id}

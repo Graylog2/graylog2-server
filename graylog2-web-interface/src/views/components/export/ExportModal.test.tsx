@@ -122,7 +122,7 @@ describe('ExportModal', () => {
     };
     const { getByTestId } = render(<SimpleExportModal />);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
@@ -134,7 +134,7 @@ describe('ExportModal', () => {
 
     expect(getAllByText('Start Download')).toHaveLength(2);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
@@ -147,7 +147,7 @@ describe('ExportModal', () => {
     const closeModalStub = jest.fn();
     const { getByTestId } = render(<SimpleExportModal closeModal={closeModalStub} />);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
@@ -168,7 +168,7 @@ describe('ExportModal', () => {
       .build();
     const { getByTestId } = render(<SimpleExportModal view={view} />);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
@@ -197,7 +197,7 @@ describe('ExportModal', () => {
       const { queryByText } = render(<SearchExportModal />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should not show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).toBeNull();
       // should not allow widget selection
@@ -207,7 +207,7 @@ describe('ExportModal', () => {
     it('should export all messages with default fields when no widget exists', async () => {
       const { getByTestId } = render(<SearchExportModal />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
 
@@ -231,7 +231,7 @@ describe('ExportModal', () => {
       const { queryByText } = render(<SearchExportModal view={viewWithOneWidget(View.Type.Search)} />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -241,7 +241,7 @@ describe('ExportModal', () => {
     it('should export messages related to preselected widget', async () => {
       const { getByTestId } = render(<SearchExportModal view={viewWithOneWidget(View.Type.Search)} />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
@@ -266,7 +266,7 @@ describe('ExportModal', () => {
       const { queryByText } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -276,7 +276,7 @@ describe('ExportModal', () => {
     it('should export widget messages on direct export', async () => {
       const { getByTestId } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
@@ -339,7 +339,7 @@ describe('ExportModal', () => {
       const { queryByText } = render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} directExportWidgetId="widget-id-1" />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/You are currently exporting the search results for the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -349,7 +349,7 @@ describe('ExportModal', () => {
     it('should export widget messages on direct export', async () => {
       const { getByTestId } = render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
