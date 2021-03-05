@@ -31,7 +31,7 @@ import Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CSVExportWidgetSelection from 'views/components/export/CSVExportWidgetSelection';
+import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 import { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
@@ -132,9 +132,9 @@ const ExportModal = ({ closeModal, fields, view, directExportWidgetId, execution
                       };
 
                       return (
-                        <CSVExportWidgetSelection selectWidget={onChangeSelectWidget}
-                                                  view={view}
-                                                  widgets={exportableWidgets.toList()} />
+                        <ExportWidgetSelection selectWidget={onChangeSelectWidget}
+                                               view={view}
+                                               widgets={exportableWidgets.toList()} />
                       );
                     }}
                   </Field>
