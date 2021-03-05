@@ -30,13 +30,13 @@ import ExportFormatSelection from 'views/components/export/ExportFormatSelection
 
 import CustomExportSettings from './CustomExportSettings';
 
-type CSVExportSettingsType = {
+type ExportSettingsType = {
   fields: List<FieldTypeMapping>,
   selectedWidget: Widget | undefined | null,
   view: View,
 };
 
-const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, view: View}) => {
+const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget, view: View }) => {
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
 
   return (
@@ -53,11 +53,11 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, v
   );
 };
 
-const CSVExportSettings = ({
+const ExportSettings = ({
   fields,
   selectedWidget,
   view,
-}: CSVExportSettingsType) => {
+}: ExportSettingsType) => {
   return (
     <>
       <Row>
@@ -121,4 +121,4 @@ const CSVExportSettings = ({
   );
 };
 
-export default CSVExportSettings;
+export default ExportSettings;

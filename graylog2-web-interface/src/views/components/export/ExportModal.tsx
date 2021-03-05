@@ -31,12 +31,12 @@ import Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CSVExportSettings from 'views/components/export/CSVExportSettings';
 import CSVExportWidgetSelection from 'views/components/export/CSVExportWidgetSelection';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
-import { ExportSettings } from 'views/components/ExportSettingsContext';
+import { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
 
+import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
@@ -73,7 +73,7 @@ type FormState = {
   selectedWidget: Widget | undefined,
   limit: number,
   selectedFields: Array<{ field: string }>,
-  customSettings: ExportSettings,
+  customSettings: ExportSettingsType,
   format: string,
 };
 
@@ -140,9 +140,9 @@ const ExportModal = ({ closeModal, fields, view, directExportWidgetId, execution
                   </Field>
                   )}
                   {!showWidgetSelection && (
-                  <CSVExportSettings fields={fields}
-                                     selectedWidget={initialSelectedWidget}
-                                     view={view} />
+                  <ExportSettings fields={fields}
+                                  selectedWidget={initialSelectedWidget}
+                                  view={view} />
                   )}
                 </Content>
               </Modal.Body>
