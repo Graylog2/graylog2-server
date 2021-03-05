@@ -40,7 +40,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
+import CSVExportModal from 'views/components/export/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';

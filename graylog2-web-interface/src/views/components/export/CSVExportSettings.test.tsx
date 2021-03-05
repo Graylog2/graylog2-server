@@ -22,7 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import CSVExportSettings from 'views/components/searchbar/csvexport/CSVExportSettings';
+import CSVExportSettings from 'views/components/export/CSVExportSettings';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';

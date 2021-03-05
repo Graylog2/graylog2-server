@@ -26,7 +26,7 @@ import { HelpBlock, Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
-import ExportFormatSelection from 'views/components/searchbar/csvexport/ExportFormatSelection';
+import ExportFormatSelection from 'views/components/export/ExportFormatSelection';
 
 import CustomExportSettings from './CustomExportSettings';
 

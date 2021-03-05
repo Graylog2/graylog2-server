@@ -40,7 +40,7 @@ import {
   stateWithOneWidget, viewWithMultipleWidgets,
   viewWithOneWidget,
   viewWithoutWidget,
-} from 'views/components/searchbar/csvexport/Fixtures';
+} from 'views/components/export/Fixtures';
 
 import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
 import { createWidget } from 'views/logic/WidgetTestHelpers';

@@ -23,7 +23,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
 import { Icon, ShareButton } from 'components/common';
-import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
+import CSVExportModal from 'views/components/export/CSVExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';

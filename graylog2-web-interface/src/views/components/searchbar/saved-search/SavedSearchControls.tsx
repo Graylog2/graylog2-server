@@ -30,7 +30,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
+import CSVExportModal from 'views/components/export/CSVExportModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
