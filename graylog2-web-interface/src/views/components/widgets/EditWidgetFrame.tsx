@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { useStore } from 'stores/connect';
-import { Modal } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext';
@@ -37,23 +36,6 @@ import IfDashboard from '../dashboard/IfDashboard';
 import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 import SearchBarForm from '../searchbar/SearchBarForm';
-
-type DialogProps = {
-  bsClass: string,
-  className: string,
-  children: React.ReactNode,
-};
-
-const EditWidgetDialog = ({ children, ...rest }: DialogProps) => (
-  <Modal.Dialog {...rest} dialogClassName={styles.editWidgetDialog}>
-    {children}
-  </Modal.Dialog>
-);
-
-EditWidgetDialog.propTypes = {
-  className: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-};
 
 type Props = {
   children: Array<React.ReactNode>,
@@ -92,23 +74,23 @@ const EditWidgetFrame = ({ children }: Props) => {
                    validateOnMount={false}>
       <div className={styles.gridContainer}>
         <IfDashboard>
-          <Modal.Header className={styles.QueryControls}>
+          <div className={styles.QueryControls}>
             <QueryEditModeContext.Provider value="widget">
               <HeaderElements />
               <WidgetQueryControls />
             </QueryEditModeContext.Provider>
-          </Modal.Header>
+          </div>
         </IfDashboard>
-        <Modal.Body className={styles.Visualization}>
+        <div className={styles.Visualization}>
           <div role="presentation" style={{ height: '100%' }}>
             <WidgetOverrideElements>
               {children[0]}
             </WidgetOverrideElements>
           </div>
-        </Modal.Body>
-        <Modal.Footer className={styles.Footer}>
+        </div>
+        <div className={styles.Footer}>
           {children[1]}
-        </Modal.Footer>
+        </div>
       </div>
     </SearchBarForm>
   );

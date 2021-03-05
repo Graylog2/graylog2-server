@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useFormikContext } from 'formik';
 
-import { Button } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/graylog';
 
 type Props = {
   onCancel: () => void,
@@ -36,10 +36,10 @@ const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => {
   }, [onFinish, handleSubmit, dirty]);
 
   return (
-    <>
+    <ButtonToolbar className="pull-right">
       <Button onClick={_onFinish} bsStyle="primary">Save</Button>
       <Button onClick={onCancel}>Cancel</Button>
-    </>
+    </ButtonToolbar>
   );
 };
 
