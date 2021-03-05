@@ -41,9 +41,7 @@ const appCompiler = webpack(appConfig);
 const { argv } = yargs;
 const host = argv.host || DEFAULT_HOST;
 const port = argv.port || DEFAULT_PORT;
-// Adhere to the URI environment variable that some folks use as well
-// (see https://github.com/Graylog2/graylog2-server/pull/5276)
-const apiUrl = argv.apiUrl || process.env.GRAYLOG_HTTP_PUBLISH_URI || DEFAULT_API_URL;
+const apiUrl = argv.apiUrl || process.env.GRAYLOG_API_URL || DEFAULT_API_URL;
 
 // Proxy all "/api" requests to the server backend API.
 console.log(`Graylog web interface forwarding /api requests to ${apiUrl}`);
