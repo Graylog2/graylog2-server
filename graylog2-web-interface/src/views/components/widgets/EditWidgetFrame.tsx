@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import moment from 'moment';
 
 import { useStore } from 'stores/connect';
@@ -36,6 +37,42 @@ import IfDashboard from '../dashboard/IfDashboard';
 import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 import SearchBarForm from '../searchbar/SearchBarForm';
+
+const Container = styled.div`
+  display: grid;
+  display: -ms-grid;
+  height: 100%;
+  grid-template-columns: 1fr;
+  -ms-grid-columns: 1fr;
+  grid-template-rows: auto minmax(200px, 1fr) auto;
+  -ms-grid-rows: auto minmax(200px, 1fr) auto;
+  grid-template-areas: "Query-Controls" "Visualization" "Footer";
+`;
+
+const QueryControls = styled.div`
+  grid-area: Query-Controls;
+  grid-column: 1;
+  -ms-grid-column: 1;
+  grid-row: 1;
+  -ms-grid-row: 1;
+`;
+
+const Visualization = styled.div`
+  grid-area: Visualization;
+  overflow: hidden;
+  grid-column: 1;
+  -ms-grid-column: 1;
+  grid-row: 2;
+  -ms-grid-row: 2;
+`;
+
+const Footer = styled.div`
+  grid-area: Footer;
+  grid-column: 1;
+  -ms-grid-column: 1;
+  grid-row: 3;
+  -ms-grid-row: 3;
+`;
 
 type Props = {
   children: Array<React.ReactNode>,
@@ -72,26 +109,26 @@ const EditWidgetFrame = ({ children }: Props) => {
                    limitDuration={limitDuration}
                    onSubmit={_onSubmit}
                    validateOnMount={false}>
-      <div className={styles.gridContainer}>
+      <Container>
         <IfDashboard>
-          <div className={styles.QueryControls}>
+          <QueryControls>
             <QueryEditModeContext.Provider value="widget">
               <HeaderElements />
               <WidgetQueryControls />
             </QueryEditModeContext.Provider>
-          </div>
+          </QueryControls>
         </IfDashboard>
-        <div className={styles.Visualization}>
+        <Visualization>
           <div role="presentation" style={{ height: '100%' }}>
             <WidgetOverrideElements>
               {children[0]}
             </WidgetOverrideElements>
           </div>
-        </div>
-        <div className={styles.Footer}>
+        </Visualization>
+        <Footer>
           {children[1]}
-        </div>
-      </div>
+        </Footer>
+      </Container>
     </SearchBarForm>
   );
 };
