@@ -302,7 +302,7 @@ class Widget extends React.Component<Props, State> {
 
   _setLoadingState = (loading: boolean) => this.setState({ loading });
 
-  visualize = () => {
+  visualize = (setFocusedWidget) => {
     const { data, errors, title } = this.props;
 
     if (errors && errors.length > 0) {
@@ -326,7 +326,7 @@ class Widget extends React.Component<Props, State> {
                       onConfigChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}
                       setLoadingState={this._setLoadingState}
                       title={title}
-                      toggleEdit={this._onToggleEdit}
+                      toggleEdit={() => this._onToggleEdit(setFocusedWidget)}
                       type={widget.type}
                       width={width}
                       id={id} />
@@ -343,7 +343,7 @@ class Widget extends React.Component<Props, State> {
     const { config } = widget;
     const { focusedWidget, setFocusedWidget } = this.context;
     const isFocusedWidget = focusedWidget === id;
-    const visualization = this.visualize();
+    const visualization = this.visualize(setFocusedWidget);
     const EditComponent = _editComponentForType(widget.type);
 
     // if (editing) {
@@ -441,7 +441,7 @@ class Widget extends React.Component<Props, State> {
                              onChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}>
                 {visualization}
               </EditComponent>
-              <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={() => this._onCancelEdit(setFocusedWidget)} />
+              <SaveOrCancelButtons onFinish={() => this._onToggleEdit(setFocusedWidget)} onCancel={() => this._onCancelEdit(setFocusedWidget)} />
             </EditWidgetFrame>
           )}
           {!editing && (
