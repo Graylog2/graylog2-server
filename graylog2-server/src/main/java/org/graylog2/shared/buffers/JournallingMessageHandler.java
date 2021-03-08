@@ -63,15 +63,15 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             final Filter metricsFilter = new Filter();
             final List<RawMessageEvent> entries = batch.stream().map(metricsFilter).filter(Objects::nonNull).collect(Collectors.toList());
 
+            // The filter computed the latest receive timestamp of all messages in the batch so we don't have to
+            // call the update on the recorder service for every message. (less contention)
+            processingStatusRecorder.updateIngestReceiveTime(metricsFilter.getLatestReceiveTime());
+
             // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
             // objects in there have been set to null and cannot be used anymore.
             batch.clear();
 
             messageQueueWriter.write(entries);
-
-            // The filter computed the latest receive timestamp of all messages in the batch so we don't have to
-            // call the update on the recorder service for every message. (less contention)
-            processingStatusRecorder.updateIngestReceiveTime(metricsFilter.getLatestReceiveTime());
         }
     }
 
