@@ -19,7 +19,7 @@ import * as React from 'react';
 import { singleton } from 'views/logic/singleton';
 
 export type FocusRequest = {
-  id: string | undefined,
+  id: string,
   editing?: boolean,
   focusing?: boolean,
 }

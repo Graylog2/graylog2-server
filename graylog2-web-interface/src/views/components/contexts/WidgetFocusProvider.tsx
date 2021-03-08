@@ -69,6 +69,19 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
   }, [focusedWidget, setFocusedWidget, widgets, focusUriParams]);
 };
 
+const useCleanupQueryParams = ({ focusUriParams, widgets, query, history }) => {
+  useEffect(() => {
+    if ((focusUriParams?.id || focusUriParams?.editing || focusUriParams?.focusing) && !widgets.has(focusUriParams.id)) {
+      const newURI = new URI(query)
+        .removeSearch('focusing')
+        .removeSearch('editing')
+        .removeSearch('focusedId');
+
+      history.replace(newURI.toString());
+    }
+  }, [focusUriParams, widgets, query, history]);
+};
+
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const { search, pathname } = useLocation();
   const query = pathname + search;
@@ -83,6 +96,8 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   }), [params.editing, params.focusing, params.focusedId]);
 
   useSyncStateWithQueryParams({ focusedWidget, setFocusedWidget, widgets, focusUriParams });
+
+  useCleanupQueryParams({ focusUriParams, widgets, query, history });
 
   useEffect(() => {
     if (focusedWidget && !widgets.has(focusedWidget.id)) {
