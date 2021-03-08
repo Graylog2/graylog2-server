@@ -128,7 +128,8 @@
         <joda-time.version>2.10.6</joda-time.version>
         <jool.version>0.9.14</jool.version>
         <json-path.version>2.4.0</json-path.version>
-        <kafka.version>0.9.0.1</kafka.version>
+        <kafka.version>2.7.0</kafka.version>
+        <kafka09.version>0.9.0.1-6</kafka09.version>
         <log4j.version>2.13.3</log4j.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
@@ -143,7 +144,7 @@
         <protobuf.version>3.11.4</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.2</shiro.version>
         <sigar.version>1.6.4</sigar.version>

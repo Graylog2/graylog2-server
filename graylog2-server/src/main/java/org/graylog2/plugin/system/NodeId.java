@@ -102,4 +102,8 @@ public class NodeId {
     public String anonymize() {
         return Hashing.sha256().hashString(id, StandardCharsets.UTF_8).toString();
     }
+
+    public String getShortNodeId() {
+        return id.split("-")[0];
+    }
 }
