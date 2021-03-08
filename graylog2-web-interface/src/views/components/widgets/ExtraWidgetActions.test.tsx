@@ -84,7 +84,8 @@ describe('ExtraWidgetActions', () => {
       .toHaveBeenCalledWith(widget, expect.objectContaining({
         widgetFocusContext: expect.objectContaining({
           focusedWidget: undefined,
-          setFocusedWidget: expect.any(Function),
+          setWidgetFocusing: expect.any(Function),
+          setWidgetEditing: expect.any(Function),
         }),
       })));
   });
