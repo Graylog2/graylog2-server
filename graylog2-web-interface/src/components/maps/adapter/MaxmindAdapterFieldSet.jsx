@@ -55,6 +55,8 @@ class MaxmindAdapterFieldSet extends React.Component {
       { label: 'ASN database', value: 'MAXMIND_ASN' },
       { label: 'City database', value: 'MAXMIND_CITY' },
       { label: 'Country database', value: 'MAXMIND_COUNTRY' },
+      { label: 'IPinfo location database)', value: 'IPINFO_STANDARD_LOCATION' },
+      { label: 'IPinfo ASN database)', value: 'IPINFO_ASN' },
     ];
 
     return (
