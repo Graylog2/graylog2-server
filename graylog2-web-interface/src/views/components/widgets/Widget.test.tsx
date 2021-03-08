@@ -16,39 +16,27 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
-import asMock from 'helpers/mocking/AsMock';
 
-import Routes from 'routing/Routes';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import { DashboardsStore } from 'views/stores/DashboardsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
-import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import { loadDashboard } from 'views/logic/views/Actions';
 import { TitlesMap } from 'views/stores/TitleTypes';
 
 import Widget from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
-
-jest.mock('views/actions/SearchActions', () => ({
-  create: mockAction(jest.fn()),
-  get: mockAction(jest.fn()),
-}));
+import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
 
@@ -58,8 +46,6 @@ jest.mock('views/stores/ViewManagementStore', () => ({
     get: mockAction(jest.fn()),
   },
 }));
-
-jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
@@ -74,7 +60,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
         // eslint-disable-next-line react/prop-types
         editComponent: ({ onChange }) => {
           // eslint-disable-next-line react/button-has-type
-          return <button onClick={() => onChange({ foo: 23 })}>Click me</button>;
+          return <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>;
         },
       },
       {
@@ -86,24 +72,9 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
-jest.mock('views/stores/ChartColorRulesStore', () => ({
-  ChartColorRulesStore: {},
-}));
-
 jest.mock('views/stores/WidgetStore');
 jest.mock('views/stores/TitlesStore');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
-jest.mock('views/logic/views/Actions');
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({
-      searchesClusterConfig: {},
-    }),
-  },
-  SearchConfigActions: {},
-}));
 
 describe('<Widget />', () => {
   const widget = WidgetModel.builder().newId()
@@ -128,23 +99,6 @@ describe('<Widget />', () => {
     dirty: false,
   };
 
-  const searchDB1 = Search.builder().id('search-1').build();
-  const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
-    .search(searchDB1)
-    .build();
-  const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
-    .build();
-  const dashboardList = [dashboard1, dashboard2];
-  const dashboardState = {
-    list: dashboardList,
-    pagination: {
-      total: 2,
-      page: 1,
-      per_page: 10,
-      count: 2,
-    },
-  };
-
   beforeEach(() => {
     ViewStore.getInitialState = jest.fn(() => viewStoreState);
   });
@@ -155,22 +109,24 @@ describe('<Widget />', () => {
   });
 
   const DummyWidget = (props) => (
-    <WidgetContext.Provider value={widget}>
-      <Widget widget={widget}
-              id="widgetId"
-              fields={[]}
-              onPositionsChange={() => {}}
-              onSizeChange={() => {}}
-              title="Widget Title"
-              position={new WidgetPosition(1, 1, 1, 1)}
-              {...props} />
-    </WidgetContext.Provider>
+    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setWidgetFocusing: () => {}, setWidgetEditing: () => {} }}>
+      <WidgetContext.Provider value={widget}>
+        <Widget widget={widget}
+                id="widgetId"
+                fields={[]}
+                onPositionsChange={() => {}}
+                onSizeChange={() => {}}
+                title="Widget Title"
+                position={new WidgetPosition(1, 1, 1, 1)}
+                {...props} />
+      </WidgetContext.Provider>
+    </WidgetFocusContext.Provider>
   );
 
   it('should render with empty props', () => {
-    const { baseElement } = render(<DummyWidget />);
+    const { getByTitle } = render(<DummyWidget />);
 
-    expect(baseElement).toMatchSnapshot();
+    expect(getByTitle('Widget Title')).toBeInTheDocument();
   });
 
   it('should render loading widget for widget without data', () => {
@@ -217,14 +173,14 @@ describe('<Widget />', () => {
       .config({})
       .build();
     const UnknownWidget = (props) => (
-      <Widget widget={unknownWidget}
-              id="widgetId"
-              fields={[]}
-              onPositionsChange={() => {}}
-              onSizeChange={() => {}}
-              title="Widget Title"
-              position={new WidgetPosition(1, 1, 1, 1)}
-              {...props} />
+      <DummyWidget widget={unknownWidget}
+                   id="widgetId"
+                   fields={[]}
+                   onPositionsChange={() => {}}
+                   onSizeChange={() => {}}
+                   title="Widget Title"
+                   position={new WidgetPosition(1, 1, 1, 1)}
+                   {...props} />
 
     );
     const { findByText } = render(
@@ -341,113 +297,5 @@ describe('<Widget />', () => {
     fireEvent.click(saveButton);
 
     expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
-  });
-
-  it('does not display export to CSV action if widget is not a message table', () => {
-    const dummyWidget = WidgetModel.builder()
-      .id('widgetId')
-      .type('dummy')
-      .config({})
-      .build();
-    const { getByTestId, queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
-
-    const actionToggle = getByTestId('widgetActionDropDown');
-
-    fireEvent.click(actionToggle);
-
-    expect(queryByText('Export to CSV')).toBeNull();
-  });
-
-  it('allows export to CSV for message tables', () => {
-    const messagesWidget = MessagesWidget.builder()
-      .id('widgetId')
-      .config({})
-      .build();
-
-    const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
-
-    const actionToggle = getByTestId('widgetActionDropDown');
-
-    fireEvent.click(actionToggle);
-
-    const exportButton = getByText('Export to CSV');
-
-    fireEvent.click(exportButton);
-
-    expect(getByText('Export message table search results to CSV')).not.toBeNull();
-  });
-
-  describe('copy widget to dashboard', () => {
-    beforeEach(() => {
-      // @ts-ignore
-      DashboardsStore.getInitialState = jest.fn(() => dashboardState);
-      ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
-      SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
-      ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
-      SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
-      Routes.pluginRoute = jest.fn((route) => (id) => `${route}-${id}`);
-
-      asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
-        .search(Search.builder().id('search-id').build())
-        .id('new-id').type(View.Type.Dashboard)
-        .build());
-    });
-
-    const renderAndClick = () => {
-      const { getByText, getByTestId } = render(<DummyWidget />);
-      const actionToggle = getByTestId('widgetActionDropDown');
-
-      fireEvent.click(actionToggle);
-      const copyToDashboard = getByText('Copy to Dashboard');
-
-      fireEvent.click(copyToDashboard);
-      const view1ListItem = getByText('view 1');
-
-      fireEvent.click(view1ListItem);
-      const selectBtn = getByText('Select');
-
-      fireEvent.click(selectBtn);
-    };
-
-    it('should get dashboard from backend', async () => {
-      renderAndClick();
-      await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
-
-      expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
-    });
-
-    it('should get corresponding search to dashboard', async () => {
-      renderAndClick();
-      await waitFor(() => expect(SearchActions.get).toHaveBeenCalledTimes(1));
-
-      expect(SearchActions.get).toHaveBeenCalledWith('search-1');
-    });
-
-    it('should create new search for dashboard', async () => {
-      renderAndClick();
-      await waitFor(() => expect(SearchActions.create).toHaveBeenCalledTimes(1));
-
-      expect(SearchActions.create).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
-        .build());
-    });
-
-    it('should update dashboard with new search and widget', async () => {
-      renderAndClick();
-      await waitFor(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
-
-      expect(ViewManagementActions.update).toHaveBeenCalledWith(
-        View.builder()
-          .search(Search.builder().id('search-1').build())
-          .id('new-id').type(View.Type.Dashboard)
-          .build(),
-      );
-    });
-
-    it('should redirect to updated dashboard', async () => {
-      renderAndClick();
-      await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
-
-      expect(loadDashboard).toHaveBeenCalledWith('view-1');
-    });
   });
 });
