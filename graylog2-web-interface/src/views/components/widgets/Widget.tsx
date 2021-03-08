@@ -135,12 +135,12 @@ class Widget extends React.Component<Props, State> {
     }
   }
 
-  _onEdit = (setFocusedWidget) => {
+  _onEdit = (setWidgetFocusing) => {
     const { widget } = this.props;
 
     this.setState(() => {
       RefreshActions.disable();
-      setFocusedWidget({ id: widget.id, editing: true });
+      setWidgetFocusing({ id: widget.id, editing: true });
 
       return {
         editing: true,
