@@ -166,6 +166,12 @@
             <artifactId>jackson-module-jsonSchema</artifactId>
         </dependency>
         <dependency>
+	    <!-- Workaround for https://github.com/FasterXML/jackson-bom/pull/38 -->
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_2.13</artifactId>
+            <version>2.9.10</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
@@ -504,8 +510,12 @@
             <artifactId>amqp-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>kafka09_2.11</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.11</artifactId>
+            <artifactId>kafka_2.13</artifactId>
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>

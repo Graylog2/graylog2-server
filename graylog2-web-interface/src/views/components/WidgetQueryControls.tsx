@@ -31,7 +31,7 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
 import type { SearchBarFormValues } from 'views/Constants';
 
-import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
+import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
@@ -40,12 +40,6 @@ type Props = {
   availableStreams: Array<any>,
   globalOverride: GlobalOverride | undefined | null,
 };
-
-const FlexCol = styled(Col)`
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-`;
 
 const BlurredWrapper = styled.div`
   filter: blur(4px);
@@ -93,12 +87,12 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
       {isGloballyOverridden && <ResetOverrideHint />}
       <Wrapper>
         <TopRow>
-          <FlexCol md={4}>
-            <TimeRangeTypeSelector disabled={isGloballyOverridden}
-                                   setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                   currentTimeRange={values?.timerange}
-                                   hasErrorOnMount={!isValid} />
-          </FlexCol>
+          <Col md={4}>
+            <TimeRangeInput disabled={isGloballyOverridden}
+                            onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                            value={values?.timerange}
+                            hasErrorOnMount={!isValid} />
+          </Col>
 
           <Col md={8}>
             <Field name="streams">
