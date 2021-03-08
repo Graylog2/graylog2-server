@@ -17,66 +17,36 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
-import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
-import IfSearch from 'views/components/search/IfSearch';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import { TitlesActions } from 'views/stores/TitlesStore';
+import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import SearchActions from 'views/actions/SearchActions';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
-import View from 'views/logic/views/View';
-import Search from 'views/logic/search/Search';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
-import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
-import { loadDashboard } from 'views/logic/views/Actions';
-import { IconButton } from 'components/common';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
-import WidgetActionDropdown from './WidgetActionDropdown';
-import WidgetHorizontalStretch from './WidgetHorizontalStretch';
-// import MeasureDimensions from './MeasureDimensions';
 import EditWidgetFrame from './EditWidgetFrame';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
 import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
-import CopyToDashboard from './CopyToDashboardForm';
-import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
-import ReplaySearchButton from './ReplaySearchButton';
-import ExtraWidgetActions from './ExtraWidgetActions';
+import WidgetActionsMenu from './WidgetActionsMenu';
 
 import CustomPropTypes from '../CustomPropTypes';
-import IfDashboard from '../dashboard/IfDashboard';
 import InteractiveContext from '../contexts/InteractiveContext';
-import IfInteractive from '../dashboard/IfInteractive';
-
-const WidgetActionsWBar = styled.div`
-  > * {
-    margin-right: 5px;
-
-    :last-child {
-      margin-right: 0;
-    }
-  }
-`;
 
 type Props = {
   id: string,
@@ -98,9 +68,6 @@ type State = {
   editing: boolean,
   loading: boolean;
   oldWidget?: WidgetModel,
-  showCopyToDashboard: boolean,
-  showCsvExport: boolean,
-  showMoveWidgetToTab: boolean,
 };
 
 export type Result = {
@@ -161,99 +128,12 @@ class Widget extends React.Component<Props, State> {
     this.state = {
       editing,
       loading: false,
-      showCopyToDashboard: false,
-      showCsvExport: false,
-      showMoveWidgetToTab: false,
     };
 
     if (editing) {
       this.state = { ...this.state, oldWidget: props.widget };
     }
   }
-
-  _onDelete = (widget) => {
-    const { title } = this.props;
-
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to remove the widget "${title}"?`)) {
-      WidgetActions.remove(widget.id);
-    }
-  };
-
-  _onDuplicate = (widgetId, setFocusWidget) => {
-    const { title } = this.props;
-
-    WidgetActions.duplicate(widgetId).then((newWidget) => {
-      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
-        setFocusWidget(undefined);
-      });
-    });
-  };
-
-  _onToggleCopyToDashboard = () => {
-    this.setState(({ showCopyToDashboard }) => ({ showCopyToDashboard: !showCopyToDashboard }));
-  };
-
-  _onToggleMoveWidgetToTab = () => {
-    this.setState(({ showMoveWidgetToTab }) => ({ showMoveWidgetToTab: !showMoveWidgetToTab }));
-  };
-
-  _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string) => ({ search: newSearch }) => {
-    const newDashboard = dashboard.toBuilder().search(newSearch).build();
-
-    ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
-  };
-
-  _onMoveWidgetToTab = (widgetId, queryId, keepCopy) => {
-    const { view } = this.props;
-    const { view: activeView } = view;
-
-    if (!queryId) {
-      return;
-    }
-
-    const newDashboard = MoveWidgetToTab(widgetId, queryId, activeView, keepCopy);
-
-    if (newDashboard) {
-      SearchActions.create(newDashboard.search).then((searchResponse) => {
-        const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
-
-        ViewActions.update(updatedDashboard).then(() => {
-          this._onToggleMoveWidgetToTab();
-
-          ViewActions.selectQuery(queryId).then(() => {
-            SearchActions.executeWithCurrentState();
-          });
-        });
-      });
-    }
-  };
-
-  _onCopyToDashboard = (widgetId: string, dashboardId: string | undefined | null): void => {
-    const { view } = this.props;
-    const { view: activeView } = view;
-
-    if (!dashboardId) {
-      return;
-    }
-
-    const addWidgetToDashboard = (dashboard: View) => (searchJson) => {
-      const search = Search.fromJSON(searchJson);
-      const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
-
-      if (newDashboard && newDashboard.search) {
-        SearchActions.create(newDashboard.search).then(this._updateDashboardWithNewSearch(newDashboard, dashboardId));
-      }
-    };
-
-    ViewManagementActions.get(dashboardId).then((dashboardJson) => {
-      const dashboard = View.fromJSON(dashboardJson);
-
-      SearchActions.get(dashboardJson.search_id).then(addWidgetToDashboard(dashboard));
-    });
-
-    this._onToggleCopyToDashboard();
-  };
 
   _onEdit = (setFocusedWidget) => {
     const { widget } = this.props;
@@ -291,14 +171,6 @@ class Widget extends React.Component<Props, State> {
       };
     });
   };
-
-  _onToggleCSVExport = () => {
-    const { showCsvExport } = this.state;
-
-    this.setState({
-      showCsvExport: !showCsvExport,
-    });
-  }
 
   _onCancelEdit = (setWidgetEditing) => {
     const { oldWidget } = this.state;
@@ -353,10 +225,10 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, editing } = this.props;
-    const { loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
+    const { loading } = this.state;
     const { config } = widget;
-    const { focusedWidget, setWidgetEditing, setWidgetFocusing } = this.context;
-    const isFocusedWidget = focusedWidget?.id === id;
+    const { focusedWidget, setWidgetEditing } = this.context;
+    const isFocused = focusedWidget?.id === id;
     const visualization = this.visualize(setWidgetEditing);
     const EditComponent = _editComponentForType(widget.type);
 
@@ -366,57 +238,18 @@ class Widget extends React.Component<Props, State> {
           <InteractiveContext.Consumer>
             {(interactive) => (
               <WidgetHeader title={title}
-                            hideDragHandle={!interactive || isFocusedWidget}
+                            hideDragHandle={!interactive || isFocused}
                             loading={loading}
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
-                <WidgetActionsWBar>
-                  <IfInteractive>
-                    <IfDashboard>
-                      <ReplaySearchButton />
-                    </IfDashboard>
-                    <IconButton name={isFocusedWidget ? 'compress-arrows-alt' : 'expand-arrows-alt'}
-                                title={isFocusedWidget ? 'Un-focus widget' : 'Focus this widget'}
-                                onClick={() => setWidgetFocusing(isFocusedWidget ? undefined : widget.id)} />
-                    {!isFocusedWidget && (
-                      <WidgetHorizontalStretch widgetId={widget.id}
-                                               widgetType={widget.type}
-                                               onStretch={onPositionsChange}
-                                               position={position} />
-                    )}
-                    <WidgetActionDropdown>
-                      {editing ? (
-                        <MenuItem onSelect={() => this._onToggleEdit(setWidgetEditing)}>Cancel Edit</MenuItem>
-                      ) : (
-                        <MenuItem onSelect={() => this._onToggleEdit(setWidgetEditing)}>Edit</MenuItem>
-                      )}
-
-                      <MenuItem onSelect={() => this._onDuplicate(id, setWidgetFocusing)}>Duplicate</MenuItem>
-                      {widget.isExportable && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
-                      <IfSearch>
-                        <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
-                      </IfSearch>
-                      <IfDashboard>
-                        <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
-                      </IfDashboard>
-                      <ExtraWidgetActions widget={widget} onSelect={() => {}} />
-                      <MenuItem divider />
-                      <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-                    </WidgetActionDropdown>
-                    {showCopyToDashboard && (
-                      <CopyToDashboard widgetId={id}
-                                       onSubmit={this._onCopyToDashboard}
-                                       onCancel={this._onToggleCopyToDashboard} />
-                    )}
-                    {showCsvExport && <CSVExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
-                    {showMoveWidgetToTab && (
-                      <MoveWidgetToTabModal view={view.view}
-                                            widgetId={widget.id}
-                                            onCancel={this._onToggleMoveWidgetToTab}
-                                            onSubmit={this._onMoveWidgetToTab} />
-                    )}
-                  </IfInteractive>
-                </WidgetActionsWBar>
+                <WidgetActionsMenu isFocused={isFocused}
+                                   widget={widget}
+                                   toggleEdit={() => this._onToggleEdit(setWidgetEditing)}
+                                   title={title}
+                                   view={view}
+                                   editing={editing}
+                                   position={position}
+                                   onPositionsChange={onPositionsChange} />
               </WidgetHeader>
             )}
           </InteractiveContext.Consumer>
