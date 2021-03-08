@@ -99,7 +99,7 @@ const _renderWidgets = ({
     const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
 
     returnedWidgets.widgets.push(
-      <WidgetContainer isFocused={isFocused || editing} key={widget.id}>
+      <WidgetContainer isFocused={isFocused} key={widget.id}>
         <WidgetComponent allFields={allFields}
                          data={data}
                          editing={editing}
