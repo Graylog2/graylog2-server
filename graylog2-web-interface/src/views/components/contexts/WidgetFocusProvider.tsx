@@ -26,11 +26,13 @@ import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusContext, { FocusRequest } from 'views/components/contexts/WidgetFocusContext';
 
+type QueryParamsUpdate = FocusRequest & { id: FocusRequest['id'] | undefined };
+
 const _updateQueryParams = ({
-  focusedWidget,
+  newQueryParams,
   query,
 } : {
-  focusedWidget: FocusRequest,
+  newQueryParams: QueryParamsUpdate,
   query: string,
 }) => {
   let baseUri = new URI(query)
@@ -38,15 +40,15 @@ const _updateQueryParams = ({
     .removeSearch('editing')
     .removeSearch('focusedId');
 
-  if (focusedWidget?.id && (focusedWidget.focusing || focusedWidget.editing)) {
-    baseUri = baseUri.setSearch('focusedId', focusedWidget.id);
+  if (newQueryParams?.id && (newQueryParams.focusing || newQueryParams.editing)) {
+    baseUri = baseUri.setSearch('focusedId', newQueryParams.id);
   }
 
-  if (focusedWidget.focusing) {
+  if (newQueryParams.focusing) {
     baseUri = baseUri.setSearch('focusing', true);
   }
 
-  if (focusedWidget.editing) {
+  if (newQueryParams.editing) {
     baseUri = baseUri.setSearch('editing', true);
   }
 
@@ -61,7 +63,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       focusing: focusUriParams.focusing || focusUriParams.editing,
     };
 
-    if (focusUriParams?.id && !isEqual(focusedWidget, nextFocusedWidget)) {
+    if (!isEqual(focusedWidget, nextFocusedWidget)) {
       if (focusUriParams.id && !widgets.has(focusUriParams.id)) {
         return;
       }
@@ -101,26 +103,30 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
 
   useCleanupQueryParams({ focusUriParams, widgets, query, history });
 
-  const updateFocusQueryParams = useCallback((newFocusedWidget: FocusRequest) => {
+  const updateFocusQueryParams = useCallback((newQueryParams: QueryParamsUpdate) => {
     const newURI = _updateQueryParams({
-      focusedWidget: newFocusedWidget,
+      newQueryParams: {
+        ...newQueryParams,
+        id: newQueryParams.id ?? focusedWidget?.id,
+      },
       query,
     });
 
     history.replace(newURI);
-  }, [history, query]);
+  }, [history, query, focusedWidget]);
 
   const setWidgetFocusing = (widgetId: string | undefined) => {
     updateFocusQueryParams({
-      id: focusedWidget?.id ?? widgetId,
+      id: widgetId,
       focusing: !!widgetId,
     });
   };
 
   const setWidgetEditing = (widgetId: string | undefined) => {
     updateFocusQueryParams({
-      id: focusedWidget?.id ?? widgetId,
+      id: widgetId,
       editing: !!widgetId,
+      focusing: focusUriParams.focusing,
     });
   };
 
