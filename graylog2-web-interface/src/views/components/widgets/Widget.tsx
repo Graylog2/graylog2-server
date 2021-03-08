@@ -243,7 +243,6 @@ class Widget extends React.Component<Props, State> {
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
                 <WidgetActionsMenu isFocused={isFocused}
-                                   widget={widget}
                                    toggleEdit={() => this._onToggleEdit(setWidgetEditing)}
                                    title={title}
                                    view={view}

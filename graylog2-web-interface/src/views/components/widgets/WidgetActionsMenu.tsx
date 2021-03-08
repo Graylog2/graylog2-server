@@ -46,6 +46,7 @@ import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 import IfInteractive from '../dashboard/IfInteractive';
 import IfDashboard from '../dashboard/IfDashboard';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
+import WidgetContext from '../contexts/WidgetContext';
 
 const Container = styled.div`
   > * {
@@ -140,7 +141,6 @@ type Props = {
   title: string,
   toggleEdit: () => void
   view: ViewStoreState,
-  widget: WidgetModel,
 };
 
 const WidgetActionsMenu = ({
@@ -151,8 +151,8 @@ const WidgetActionsMenu = ({
   title,
   toggleEdit,
   view,
-  widget,
 }: Props) => {
+  const widget = useContext(WidgetContext);
   const { setWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showCsvExport, setShowCsvExport] = useState(false);
