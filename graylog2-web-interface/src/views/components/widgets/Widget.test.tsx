@@ -21,10 +21,10 @@ import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 
+import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
@@ -36,7 +36,7 @@ import { TitlesMap } from 'views/stores/TitleTypes';
 import Widget from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
-import WidgetFocusContext from '../contexts/WidgetFocusContext';
+import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
 
@@ -108,12 +108,23 @@ describe('<Widget />', () => {
     jest.resetModules();
   });
 
-  const DummyWidget = (props) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setWidgetFocusing: () => {}, setWidgetEditing: () => {} }}>
-      <WidgetContext.Provider value={widget}>
-        <Widget widget={widget}
+  type DummyWidgetProps = {
+    widget?: WidgetModel,
+    errors?: Array<{ description: string }>,
+    data?: Array<unknown>,
+    focusedWidget?: WidgetFocusContextType['focusedWidget'],
+    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
+    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
+    title?: string,
+    editing?: boolean,
+  }
+
+  const DummyWidget = ({ widget: propsWidget = widget, focusedWidget = undefined, setWidgetFocusing = () => {}, setWidgetEditing = () => {}, ...props }: DummyWidgetProps) => (
+    <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing }}>
+      <WidgetContext.Provider value={propsWidget}>
+        <Widget widget={propsWidget}
                 id="widgetId"
-                fields={[]}
+                fields={Immutable.List([])}
                 onPositionsChange={() => {}}
                 onSizeChange={() => {}}
                 title="Widget Title"
@@ -241,6 +252,24 @@ describe('<Widget />', () => {
     const cancel = screen.queryAllByText('Cancel');
 
     expect(cancel).toHaveLength(1);
+  });
+
+  it('updates focus mode, on widget edit cancel', () => {
+    const mockSetWidgetEditing = jest.fn();
+    render(<DummyWidget editing setWidgetEditing={mockSetWidgetEditing} />);
+    const cancel = screen.getByText('Cancel');
+    fireEvent.click(cancel);
+
+    expect(mockSetWidgetEditing).toHaveBeenCalledWith(undefined);
+  });
+
+  it('updates focus mode, on widget edit save', () => {
+    const mockSetWidgetEditing = jest.fn();
+    render(<DummyWidget editing setWidgetEditing={mockSetWidgetEditing} />);
+    const saveButton = screen.getByText('Save');
+    fireEvent.click(saveButton);
+
+    expect(mockSetWidgetEditing).toHaveBeenCalledWith(undefined);
   });
 
   it('does not trigger action when clicking cancel after no changes were made', () => {
