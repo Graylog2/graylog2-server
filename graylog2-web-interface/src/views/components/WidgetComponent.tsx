@@ -29,29 +29,27 @@ import Widget from './widgets/Widget';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
 type Props = {
-  widget: WidgetClass & { data: string };
-  widgetId: string,
   data: WidgetDataMap,
   errors: WidgetErrorsMap,
-  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
-  title: string,
-  position: WidgetPosition,
-  onPositionsChange: (position?: WidgetPosition) => void,
   fields: Immutable.List<TFieldTypeMapping>,
+  onPositionsChange: (position?: WidgetPosition) => void,
   onWidgetSizeChange: (widgetId?: string, dimensions?: { height: number, width: number }) => void,
+  position: WidgetPosition,
+  title: string,
+  widget: WidgetClass & { data: string };
+  widgetDimension: { height: number | null | undefined, width: number | null | undefined },
 };
 
 const WidgetComponent = ({
-  widget,
-  widgetId,
   data,
   errors,
-  widgetDimension: { height, width },
-  position,
-  onPositionsChange = () => undefined,
-  title,
   fields,
+  onPositionsChange = () => undefined,
   onWidgetSizeChange = () => {},
+  position,
+  title,
+  widget,
+  widgetDimension: { height, width },
 }: Props) => {
   const dataKey = widget.data || widget.id;
   const widgetData = data[dataKey];
@@ -61,8 +59,7 @@ const WidgetComponent = ({
     <DrilldownContextProvider widget={widget}>
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
-          <Widget key={widgetId}
-                  id={widgetId}
+          <Widget id={widget.id}
                   widget={widget}
                   data={widgetData}
                   errors={widgetErrors}
@@ -81,7 +78,6 @@ const WidgetComponent = ({
 
 WidgetComponent.propTypes = {
   widget: PropTypes.object.isRequired,
-  widgetId: PropTypes.string.isRequired,
   data: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
   widgetDimension: PropTypes.object.isRequired,

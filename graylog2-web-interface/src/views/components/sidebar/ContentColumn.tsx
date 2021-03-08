@@ -44,7 +44,7 @@ export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, side
   border-right: ${sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
   box-shadow: ${sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
 
-  z-index: ${sidebarIsPinned ? 1030 : 4};
+  z-index: ${sidebarIsPinned ? 1030 : 6};
 
   ${sidebarIsPinned && css`
     ::before {
