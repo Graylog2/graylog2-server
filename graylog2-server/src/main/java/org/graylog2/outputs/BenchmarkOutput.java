@@ -21,7 +21,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -91,13 +89,13 @@ public class BenchmarkOutput implements MessageOutput {
 
     @Override
     public void write(Message message) throws Exception {
-        messageQueueAcknowledger.acknowledge(message.getMessageQueueId());
+        messageQueueAcknowledger.acknowledge(message);
         messagesWritten.mark();
     }
 
     @Override
     public void write(List<Message> messages) throws Exception {
-        messageQueueAcknowledger.acknowledge(messages.stream().map(Message::getMessageQueueId).collect(Collectors.toList()));
+        messageQueueAcknowledger.acknowledge(messages);
 
         messagesWritten.mark(messages.size());
     }

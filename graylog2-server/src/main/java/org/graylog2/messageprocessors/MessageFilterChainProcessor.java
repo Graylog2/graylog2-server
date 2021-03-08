@@ -103,7 +103,7 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                                 msg.getId());
                         msg.setFilterOut(true);
                         filteredOutMessages.mark();
-                        messageQueueAcknowledger.acknowledge(msg.getMessageQueueId());
+                        messageQueueAcknowledger.acknowledge(msg);
                     }
                 } catch (Exception e) {
                     LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ",

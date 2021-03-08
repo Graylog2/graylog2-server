@@ -175,7 +175,7 @@ public class PipelineInterpreter implements MessageProcessor {
         if (message.getFilterOut()) {
             log.debug("[{}] marked message to be discarded. Dropping message.", message.getId());
             filteredOutMessages.mark();
-            messageQueueAcknowledger.acknowledge(message.getMessageQueueId());
+            messageQueueAcknowledger.acknowledge(message);
         }
     }
 

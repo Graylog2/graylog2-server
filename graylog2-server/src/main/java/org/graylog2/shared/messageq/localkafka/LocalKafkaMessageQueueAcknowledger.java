@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.messageq.localkafka;
 
+import org.graylog2.plugin.Message;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
@@ -40,24 +41,31 @@ public class LocalKafkaMessageQueueAcknowledger implements MessageQueueAcknowled
     }
 
     @Override
-    public void acknowledge(Object messageId) {
-        if (messageId instanceof Long) {
-            doAcknowledge((Long) messageId);
-            metrics.acknowledgedMessages().mark();
-        } else {
-            LOG.error("Couldn't acknowledge message. Expected <" + messageId + "> to be a Long");
-        }
+    public void acknowledge(Object offset) {
+        doAcknowledge(offset);
+        metrics.acknowledgedMessages().mark();
     }
 
     @Override
-    public void acknowledge(List<Object> messageIds) {
-        final Optional<Long> max =
-                messageIds.stream().filter(Long.class::isInstance).map(Long.class::cast).max(Long::compare);
-        max.ifPresent(this::doAcknowledge);
-        metrics.acknowledgedMessages().mark(messageIds.size());
+    public void acknowledge(Message message) {
+        doAcknowledge(message.getMessageQueueId());
+        metrics.acknowledgedMessages().mark();
     }
 
-    private void doAcknowledge(long offset) {
+    @Override
+    public void acknowledge(List<Message> messages) {
+        final Optional<Long> max =
+                messages.stream().map(Message::getMessageQueueId).filter(Long.class::isInstance).map(Long.class::cast).max(Long::compare);
+        max.ifPresent(this::doAcknowledge);
+        metrics.acknowledgedMessages().mark(messages.size());
+    }
+
+    private void doAcknowledge(Object object) {
+        if (!(object instanceof Long)) {
+            LOG.error("Couldn't acknowledge message. Expected <" + object + "> to be of type Long");
+            return;
+        }
+        final long offset = (Long) object;
         kafkaJournal.markJournalOffsetCommitted(offset);
     }
 }

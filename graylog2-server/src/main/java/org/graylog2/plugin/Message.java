@@ -809,6 +809,7 @@ public class Message implements Messages, Indexable {
         this.messageQueueId = journalOffset;
     }
 
+    @Deprecated
     public long getJournalOffset() {
         if (messageQueueId == null) {
             return Long.MIN_VALUE;
@@ -819,6 +820,7 @@ public class Message implements Messages, Indexable {
     public void setMessageQueueId(Object messageQueueId) {
         this.messageQueueId = messageQueueId;
     }
+
     @Nullable
     public Object getMessageQueueId() {
         return messageQueueId;

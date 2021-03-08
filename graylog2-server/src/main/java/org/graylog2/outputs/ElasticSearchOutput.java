@@ -105,12 +105,7 @@ public class ElasticSearchOutput implements MessageOutput {
         failures.mark(failedMessageIds.size());
 
         // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
-        final List<Object> messageIds = messageList.stream()
-            .map(Map.Entry::getValue)
-            .map(message -> message.getMessageQueueId() != null ? message.getMessageQueueId() : message.getJournalOffset())
-            .collect(Collectors.toList());
-
-        acknowledger.acknowledge(messageIds);
+        acknowledger.acknowledge(messageList.stream().map(Map.Entry::getValue).collect(Collectors.toList()));
     }
 
     @Override

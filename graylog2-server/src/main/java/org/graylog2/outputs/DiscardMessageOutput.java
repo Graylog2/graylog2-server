@@ -29,7 +29,6 @@ import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -65,15 +64,13 @@ public class DiscardMessageOutput implements MessageOutput {
 
     @Override
     public void write(Message message) throws Exception {
-        messageQueueAcknowledger.acknowledge(message.getMessageQueueId());
+        messageQueueAcknowledger.acknowledge(message);
         messagesDiscarded.mark();
     }
 
     @Override
     public void write(List<Message> messages) throws Exception {
-        long maxOffset = Long.MIN_VALUE;
-
-        messageQueueAcknowledger.acknowledge(messages.stream().map(Message::getMessageQueueId).collect(Collectors.toList()));
+        messageQueueAcknowledger.acknowledge(messages);
         messagesDiscarded.mark(messages.size());
     }
 

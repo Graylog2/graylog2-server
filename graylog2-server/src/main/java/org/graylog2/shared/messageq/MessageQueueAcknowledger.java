@@ -19,6 +19,7 @@ package org.graylog2.shared.messageq;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.Message;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -27,9 +28,11 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public interface MessageQueueAcknowledger {
 
-    void acknowledge(Object messageId);
+    void acknowledge(Object messageQueueId);
 
-    void acknowledge(List<Object> messageIds);
+    void acknowledge(Message message);
+
+    void acknowledge(List<Message> messages);
 
     @AutoValue
     abstract class Metrics {
