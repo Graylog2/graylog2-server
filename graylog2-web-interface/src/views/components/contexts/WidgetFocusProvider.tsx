@@ -55,16 +55,18 @@ const _updateQueryParams = ({
 
 const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgets }) => {
   useEffect(() => {
-    if ((focusedWidget?.id || focusUriParams?.id) && !isEqual(focusedWidget, focusUriParams)) {
+    const nextFocusedWidget = {
+      id: focusUriParams.id,
+      editing: focusUriParams.editing,
+      focusing: focusUriParams.focusing || focusUriParams.editing,
+    };
+
+    if (focusUriParams?.id && !isEqual(focusedWidget, nextFocusedWidget)) {
       if (focusUriParams.id && !widgets.has(focusUriParams.id)) {
         return;
       }
 
-      setFocusedWidget({
-        id: focusUriParams.id,
-        editing: focusUriParams.editing,
-        focusing: focusUriParams.focusing ?? focusUriParams.editing,
-      });
+      setFocusedWidget(nextFocusedWidget);
     }
   }, [focusedWidget, setFocusedWidget, widgets, focusUriParams]);
 };
@@ -99,12 +101,6 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
 
   useCleanupQueryParams({ focusUriParams, widgets, query, history });
 
-  useEffect(() => {
-    if (focusedWidget && !widgets.has(focusedWidget.id)) {
-      setFocusedWidget(undefined);
-    }
-  }, [focusedWidget, widgets]);
-
   const updateFocusQueryParams = useCallback((newFocusedWidget: FocusRequest) => {
     const newURI = _updateQueryParams({
       focusedWidget: newFocusedWidget,
@@ -123,7 +119,6 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
 
   const setWidgetEditing = (widgetId: string | undefined) => {
     updateFocusQueryParams({
-      ...focusedWidget,
       id: focusedWidget?.id ?? widgetId,
       editing: !!widgetId,
     });
