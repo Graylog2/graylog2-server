@@ -92,53 +92,51 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
     <>
       {isGloballyOverridden && <ResetOverrideHint />}
       <Wrapper>
-        <>
-          <TopRow>
-            <FlexCol md={4}>
-              <TimeRangeTypeSelector disabled={isGloballyOverridden}
-                                     setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                     currentTimeRange={values?.timerange}
-                                     hasErrorOnMount={!isValid} />
-            </FlexCol>
+        <TopRow>
+          <FlexCol md={4}>
+            <TimeRangeTypeSelector disabled={isGloballyOverridden}
+                                   setCurrentTimeRange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                   currentTimeRange={values?.timerange}
+                                   hasErrorOnMount={!isValid} />
+          </FlexCol>
 
-            <Col md={8}>
-              <Field name="streams">
-                {({ field: { name, value, onChange } }) => (
-                  <StreamsFilter value={value}
-                                 disabled={isGloballyOverridden}
-                                 streams={availableStreams}
-                                 onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
-                )}
-              </Field>
-            </Col>
-          </TopRow>
+          <Col md={8}>
+            <Field name="streams">
+              {({ field: { name, value, onChange } }) => (
+                <StreamsFilter value={value}
+                               disabled={isGloballyOverridden}
+                               streams={availableStreams}
+                               onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+              )}
+            </Field>
+          </Col>
+        </TopRow>
 
-          <Row className="no-bm">
-            <Col md={12}>
-              <div className="pull-right search-help">
-                <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                   title="Search query syntax documentation"
-                                   text={<Icon name="lightbulb" type="regular" />} />
-              </div>
-              <SearchButton disabled={isGloballyOverridden || isSubmitting || !isValid}
-                            dirty={dirty} />
+        <Row className="no-bm">
+          <Col md={12}>
+            <div className="pull-right search-help">
+              <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                 title="Search query syntax documentation"
+                                 text={<Icon name="lightbulb" type="regular" />} />
+            </div>
+            <SearchButton disabled={isGloballyOverridden || isSubmitting || !isValid}
+                          dirty={dirty} />
 
-              <Field name="queryString">
-                {({ field: { name, value, onChange } }) => (
-                  <QueryInput value={value}
-                              disabled={isGloballyOverridden}
-                              placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                              onChange={(newQuery) => {
-                                onChange({ target: { value: newQuery, name } });
+            <Field name="queryString">
+              {({ field: { name, value, onChange } }) => (
+                <QueryInput value={value}
+                            disabled={isGloballyOverridden}
+                            placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                            onChange={(newQuery) => {
+                              onChange({ target: { value: newQuery, name } });
 
-                                return Promise.resolve(newQuery);
-                              }}
-                              onExecute={handleSubmit as () => void} />
-                )}
-              </Field>
-            </Col>
-          </Row>
-        </>
+                              return Promise.resolve(newQuery);
+                            }}
+                            onExecute={handleSubmit as () => void} />
+              )}
+            </Field>
+          </Col>
+        </Row>
       </Wrapper>
     </>
   );

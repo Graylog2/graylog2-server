@@ -30,8 +30,6 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
-import styles from './EditWidgetFrame.css';
-
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 import HeaderElements from '../HeaderElements';
@@ -50,6 +48,7 @@ const Container = styled.div`
 `;
 
 const QueryControls = styled.div`
+  margin-bottom: 10px;
   grid-area: Query-Controls;
   grid-column: 1;
   -ms-grid-column: 1;
