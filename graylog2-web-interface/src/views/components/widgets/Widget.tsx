@@ -65,7 +65,6 @@ type Props = {
 };
 
 type State = {
-  editing: boolean,
   loading: boolean;
   oldWidget?: WidgetModel,
 };
@@ -126,7 +125,6 @@ class Widget extends React.Component<Props, State> {
     const { editing } = props;
 
     this.state = {
-      editing,
       loading: false,
     };
 
@@ -143,21 +141,19 @@ class Widget extends React.Component<Props, State> {
       setWidgetFocusing({ id: widget.id, editing: true });
 
       return {
-        editing: true,
         oldWidget: widget,
       };
     });
   };
 
   _onToggleEdit = (setWidgetEditing) => {
-    const { widget } = this.props;
+    const { widget, editing } = this.props;
 
-    this.setState((state) => {
-      if (state.editing) {
+    this.setState(() => {
+      if (editing) {
         setWidgetEditing(undefined);
 
         return {
-          editing: false,
           oldWidget: undefined,
         };
       }
@@ -166,7 +162,6 @@ class Widget extends React.Component<Props, State> {
       setWidgetEditing(widget.id);
 
       return {
-        editing: true,
         oldWidget: widget,
       };
     });
@@ -196,8 +191,7 @@ class Widget extends React.Component<Props, State> {
     }
 
     if (data) {
-      const { editing } = this.state;
-      const { id, widget, height, width, fields, view: { activeQuery: queryId } } = this.props;
+      const { id, widget, height, width, fields, view: { activeQuery: queryId }, editing } = this.props;
       const { config, filter } = widget;
       const VisComponent = _visualizationForType(widget.type);
 
