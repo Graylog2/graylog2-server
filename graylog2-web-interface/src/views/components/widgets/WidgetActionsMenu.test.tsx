@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
@@ -112,12 +112,12 @@ describe('<Widget />', () => {
   );
 
   it('copies title when duplicating widget', async () => {
-    const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" />);
+    render(<DummyWidget title="Dummy Widget" />);
 
-    const actionToggle = getByTestId('widgetActionDropDown');
+    const actionToggle = screen.getByTestId('widgetActionDropDown');
 
     fireEvent.click(actionToggle);
-    const duplicateBtn = getByText('Duplicate');
+    const duplicateBtn = screen.getByText('Duplicate');
 
     WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
 
@@ -150,17 +150,17 @@ describe('<Widget />', () => {
       .config({})
       .build();
 
-    const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
+    render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
-    const actionToggle = getByTestId('widgetActionDropDown');
+    const actionToggle = screen.getByTestId('widgetActionDropDown');
 
     fireEvent.click(actionToggle);
 
-    const exportButton = getByText('Export to CSV');
+    const exportButton = screen.getByText('Export to CSV');
 
     fireEvent.click(exportButton);
 
-    expect(getByText('Export message table search results to CSV')).not.toBeNull();
+    expect(screen.getByText('Export message table search results to CSV')).not.toBeNull();
   });
 
   describe('copy widget to dashboard', () => {
@@ -179,17 +179,17 @@ describe('<Widget />', () => {
     });
 
     const renderAndClick = () => {
-      const { getByText, getByTestId } = render(<DummyWidget />);
-      const actionToggle = getByTestId('widgetActionDropDown');
+      render(<DummyWidget />);
+      const actionToggle = screen.getByTestId('widgetActionDropDown');
 
       fireEvent.click(actionToggle);
-      const copyToDashboard = getByText('Copy to Dashboard');
+      const copyToDashboard = screen.getByText('Copy to Dashboard');
 
       fireEvent.click(copyToDashboard);
-      const view1ListItem = getByText('view 1');
+      const view1ListItem = screen.getByText('view 1');
 
       fireEvent.click(view1ListItem);
-      const selectBtn = getByText('Select');
+      const selectBtn = screen.getByText('Select');
 
       fireEvent.click(selectBtn);
     };
