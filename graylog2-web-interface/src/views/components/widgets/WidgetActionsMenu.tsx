@@ -33,7 +33,6 @@ import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal'
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/graylog';
 import { IconButton } from 'components/common';
-import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 
 import ReplaySearchButton from './ReplaySearchButton';

@@ -41,6 +41,7 @@ import { TitlesMap } from 'views/stores/TitleTypes';
 import WidgetActionsMenu from './WidgetActionsMenu';
 
 import WidgetContext from '../contexts/WidgetContext';
+import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
 
@@ -55,6 +56,7 @@ jest.mock('views/logic/views/Actions');
 describe('<Widget />', () => {
   const widget = WidgetModel.builder().newId()
     .type('dummy')
+    .id('widget-id')
     .config({})
     .build();
 
@@ -97,19 +99,51 @@ describe('<Widget />', () => {
     jest.resetModules();
   });
 
-  const DummyWidget = (props) => (
-    // eslint-disable-next-line
-    <WidgetContext.Provider value={props.widget ?? widget}>
-      <WidgetActionsMenu isFocused={false}
-                         toggleEdit={() => {}}
-                         title="Widget Title"
-                         view={viewStoreState}
-                         editing={false}
-                         position={new WidgetPosition(1, 1, 1, 1)}
-                         onPositionsChange={() => {}}
-                         {...props} />
-    </WidgetContext.Provider>
+  type DummyWidgetProps = {
+    widget?: WidgetModel,
+    focusedWidget?: WidgetFocusContextType['focusedWidget'],
+    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
+    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
+    title?: string
+    isFocused?: boolean,
+  }
+
+  const DummyWidget = ({ widget: propsWidget = widget, setWidgetFocusing = () => {}, setWidgetEditing = () => {}, focusedWidget, ...props }: DummyWidgetProps) => (
+    <WidgetFocusContext.Provider value={{ setWidgetFocusing, setWidgetEditing, focusedWidget }}>
+      <WidgetContext.Provider value={propsWidget}>
+        <WidgetActionsMenu isFocused={false}
+                           toggleEdit={() => {}}
+                           title="Widget Title"
+                           view={viewStoreState}
+                           editing={false}
+                           position={new WidgetPosition(1, 1, 1, 1)}
+                           onPositionsChange={() => {}}
+                           {...props} />
+      </WidgetContext.Provider>
+    </WidgetFocusContext.Provider>
   );
+
+  it('is updating widget focus context on focus', () => {
+    const mockSetWidgetFocusing = jest.fn();
+    render(<DummyWidget title="Dummy Widget" setWidgetFocusing={mockSetWidgetFocusing} />);
+
+    const focusButton = screen.getByTitle('Focus this widget');
+
+    fireEvent.click(focusButton);
+
+    expect(mockSetWidgetFocusing).toHaveBeenCalledWith('widget-id');
+  });
+
+  it('is updating widget focus context on un-focus', () => {
+    const mockSetWidgetFocusing = jest.fn();
+    render(<DummyWidget title="Dummy Widget" isFocused setWidgetFocusing={mockSetWidgetFocusing} />);
+
+    const unfocusButton = screen.getByTitle('Un-focus widget');
+
+    fireEvent.click(unfocusButton);
+
+    expect(mockSetWidgetFocusing).toHaveBeenCalledWith(undefined);
+  });
 
   it('copies title when duplicating widget', async () => {
     render(<DummyWidget title="Dummy Widget" />);
