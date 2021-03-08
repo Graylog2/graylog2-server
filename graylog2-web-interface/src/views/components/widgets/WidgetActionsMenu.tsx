@@ -66,7 +66,6 @@ const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string) => 
 const _onCopyToDashboard = (
   view: ViewStoreState,
   setShowCopyToDashboard: (show: boolean) => void,
-) => (
   widgetId: string,
   dashboardId: string | undefined | null,
 ): void => {
@@ -94,7 +93,7 @@ const _onCopyToDashboard = (
   setShowCopyToDashboard(false);
 };
 
-const _onMoveWidgetToTab = (view, setShowMoveWidgetToTab) => (widgetId, queryId, keepCopy) => {
+const _onMoveWidgetToTab = (view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy) => {
   const { view: activeView } = view;
 
   if (!queryId) {
@@ -160,8 +159,8 @@ const WidgetActionsMenu = ({
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
 
   const onDuplicate = () => _onDuplicate(widget.id, setWidgetFocusing, title);
-  const onCopyToDashboard = useCallback(() => _onCopyToDashboard(view, setShowCopyToDashboard), [view]);
-  const onMoveWidgetToTab = useCallback(() => _onMoveWidgetToTab(view, setShowMoveWidgetToTab), [view]);
+  const onCopyToDashboard = useCallback((widgetId, dashboardId) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
+  const onMoveWidgetToTab = useCallback((widgetId, queryId, keepCopy) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
 
   return (
     <Container>
