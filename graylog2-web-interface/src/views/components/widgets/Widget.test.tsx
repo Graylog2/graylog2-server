@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, act } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
@@ -124,46 +124,46 @@ describe('<Widget />', () => {
   );
 
   it('should render with empty props', () => {
-    const { getByTitle } = render(<DummyWidget />);
+    render(<DummyWidget />);
 
-    expect(getByTitle('Widget Title')).toBeInTheDocument();
+    expect(screen.getByTitle('Widget Title')).toBeInTheDocument();
   });
 
   it('should render loading widget for widget without data', () => {
-    const { queryAllByTestId } = render(<DummyWidget />);
+    render(<DummyWidget />);
 
-    expect(queryAllByTestId('loading-widget')).toHaveLength(1);
+    expect(screen.queryAllByTestId('loading-widget')).toHaveLength(1);
   });
 
   it('should render error widget for widget with one error', () => {
-    const { queryAllByText } = render(<DummyWidget errors={[{ description: 'The widget has failed: the dungeon collapsed, you die!' }]} />);
-    const errorWidgets = queryAllByText('The widget has failed: the dungeon collapsed, you die!');
+    render(<DummyWidget errors={[{ description: 'The widget has failed: the dungeon collapsed, you die!' }]} />);
+    const errorWidgets = screen.queryAllByText('The widget has failed: the dungeon collapsed, you die!');
 
     expect(errorWidgets).toHaveLength(1);
   });
 
   it('should render error widget including all error messages for widget with multiple errors', () => {
-    const { queryAllByText } = render((
+    render((
       <DummyWidget errors={[
         { description: 'Something is wrong' },
         { description: 'Very wrong' },
       ]} />
     ));
 
-    const errorWidgets1 = queryAllByText('Something is wrong');
+    const errorWidgets1 = screen.queryAllByText('Something is wrong');
 
     expect(errorWidgets1).toHaveLength(1);
 
-    const errorWidgets2 = queryAllByText('Very wrong');
+    const errorWidgets2 = screen.queryAllByText('Very wrong');
 
     expect(errorWidgets2).toHaveLength(1);
   });
 
   it('should render correct widget visualization for widget with data', () => {
-    const { queryAllByTestId, queryAllByTitle } = render(<DummyWidget data={[]} />);
+    render(<DummyWidget data={[]} />);
 
-    expect(queryAllByTestId('loading-widget')).toHaveLength(0);
-    expect(queryAllByTitle('Widget Title')).toHaveLength(2);
+    expect(screen.queryAllByTestId('loading-widget')).toHaveLength(0);
+    expect(screen.queryAllByTitle('Widget Title')).toHaveLength(2);
   });
 
   it('renders placeholder if widget type is unknown', async () => {
@@ -183,11 +183,12 @@ describe('<Widget />', () => {
                    {...props} />
 
     );
-    const { findByText } = render(
+
+    render(
       <UnknownWidget data={[]} />,
     );
 
-    await findByText('Unknown widget');
+    await screen.findByText('Unknown widget');
   });
 
   it('renders placeholder in edit mode if widget type is unknown', async () => {
@@ -209,20 +210,21 @@ describe('<Widget />', () => {
                 {...props} />
       </WidgetContext.Provider>
     );
-    const { findByText } = render(
+
+    render(
       <UnknownWidget data={[]} />,
     );
 
-    await findByText('Unknown widget in edit mode');
+    await screen.findByText('Unknown widget in edit mode');
   });
 
   it('copies title when duplicating widget', async () => {
-    const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" />);
+    render(<DummyWidget title="Dummy Widget" />);
 
-    const actionToggle = getByTestId('widgetActionDropDown');
+    const actionToggle = screen.getByTestId('widgetActionDropDown');
 
     fireEvent.click(actionToggle);
-    const duplicateBtn = getByText('Duplicate');
+    const duplicateBtn = screen.getByText('Duplicate');
 
     WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
 
@@ -235,18 +237,18 @@ describe('<Widget />', () => {
   });
 
   it('adds cancel action to widget in edit mode', () => {
-    const { queryAllByText } = render(<DummyWidget editing />);
-    const cancel = queryAllByText('Cancel');
+    render(<DummyWidget editing />);
+    const cancel = screen.queryAllByText('Cancel');
 
     expect(cancel).toHaveLength(1);
   });
 
   it('does not trigger action when clicking cancel after no changes were made', () => {
-    const { getByText } = render(<DummyWidget editing />);
+    render(<DummyWidget editing />);
 
     WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
 
-    const cancelBtn = getByText('Cancel');
+    const cancelBtn = screen.getByText('Cancel');
 
     fireEvent.click(cancelBtn);
 
@@ -259,17 +261,17 @@ describe('<Widget />', () => {
       .type('dummy')
       .config({ foo: 42 })
       .build();
-    const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
+    render(<DummyWidget editing widget={widgetWithConfig} />);
 
     WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
     WidgetActions.update = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
-    const onChangeBtn = getByText('Click me');
+    const onChangeBtn = screen.getByText('Click me');
 
     fireEvent.click(onChangeBtn);
 
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const cancelButton = getByText('Cancel');
+    const cancelButton = screen.getByText('Cancel');
 
     fireEvent.click(cancelButton);
 
@@ -282,17 +284,17 @@ describe('<Widget />', () => {
       .type('dummy')
       .config({ foo: 42 })
       .build();
-    const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
+    render(<DummyWidget editing widget={widgetWithConfig} />);
 
     WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
     WidgetActions.update = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
-    const onChangeBtn = getByText('Click me');
+    const onChangeBtn = screen.getByText('Click me');
 
     fireEvent.click(onChangeBtn);
 
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const saveButton = getByText('Save');
+    const saveButton = screen.getByText('Save');
 
     fireEvent.click(saveButton);
 
