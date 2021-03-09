@@ -23,10 +23,10 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
-import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 const defaultVisualizationType = 'table';
 

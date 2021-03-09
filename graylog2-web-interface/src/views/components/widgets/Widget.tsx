@@ -45,6 +45,7 @@ import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -67,7 +68,6 @@ import CustomPropTypes from '../CustomPropTypes';
 import IfDashboard from '../dashboard/IfDashboard';
 import InteractiveContext from '../contexts/InteractiveContext';
 import IfInteractive from '../dashboard/IfInteractive';
-import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 const WidgetActionsWBar = styled.div`
   > * {

@@ -19,6 +19,7 @@ import { Formik } from 'formik';
 import * as Immutable from 'immutable';
 import { render } from 'wrappedTestingLibrary';
 import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
+import { WidgetExport } from 'views/types';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
@@ -28,7 +29,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import { viewWithoutWidget, stateWithOneWidget } from './Fixtures';
-import { WidgetExport } from 'views/types';
 
 const CustomExportComponent = () => <>This is a custom export component</>;
 
