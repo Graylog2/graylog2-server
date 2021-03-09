@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { StoreMock as MockStore } from 'helpers/mocking';
 
 import { SearchActions } from 'views/stores/SearchStore';
 
@@ -28,13 +27,6 @@ jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     refresh: jest.fn(),
   },
-}));
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideActions: {
-    set: jest.fn(() => Promise.resolve()),
-  },
-  GlobalOverrideStore: MockStore(),
 }));
 
 const config = {
