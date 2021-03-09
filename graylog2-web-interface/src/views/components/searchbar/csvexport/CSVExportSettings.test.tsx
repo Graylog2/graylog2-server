@@ -18,8 +18,7 @@ import * as React from 'react';
 import { Formik } from 'formik';
 import * as Immutable from 'immutable';
 import { render } from 'wrappedTestingLibrary';
-import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
-import { WidgetExport } from 'views/types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';

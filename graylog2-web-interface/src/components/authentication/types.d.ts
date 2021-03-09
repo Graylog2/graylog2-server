@@ -24,7 +24,6 @@ import {
 } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
 import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
-import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
 interface AuthenticationService {
   name: string;
