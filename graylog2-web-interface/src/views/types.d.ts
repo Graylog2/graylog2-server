@@ -29,6 +29,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
+import { OverrideProps } from 'views/components/WidgetOverrideElements';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -109,7 +110,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.executingView'?: Array<ViewHook>,
     'views.hooks.loadingView'?: Array<ViewHook>,
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
-    'views.overrides.widgetEdit'?: Array<>;
+    'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
     visualizationConfigTypes?: Array<VisualizationConfigType>;
