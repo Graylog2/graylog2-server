@@ -136,7 +136,7 @@
         <mongojack.version>2.10.1</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.59.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.34.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.36.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
         <okta-sdk.version>3.0.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
