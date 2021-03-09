@@ -49,11 +49,13 @@ const _initialSearchWidget = (widgets, directExportWidgetId) => {
 const formatDefinition = (format: string) => {
   const formats = PluginStore.exports('views.export.formats');
 
-  if (!formats?.length) {
-    return undefined;
+  const definition = formats.find(({ type }) => (type === format));
+
+  if (!definition) {
+    throw new Error(`Unknown export format "${definition}"`);
   }
 
-  return formats.find(({ type }) => (type === format)) ?? {};
+  return definition;
 };
 
 const _exportOnDashboard = (format: string, payload: ExportPayload, searchType: SearchType | undefined | null, searchId: string, filename: string) => {
