@@ -14,20 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { WidgetExport } from 'views/types';
 
-import withPluginEntities from 'views/logic/withPluginEntities';
-
-type Props = {
-  queryBarElements: Array<React.ComponentType<{}>>,
-};
-
-const QueryBarElements = ({ queryBarElements = [] }: Props) => (
-  <>
-    {queryBarElements
-      // eslint-disable-next-line react/no-array-index-key
-      .map((Component, idx) => <Component key={idx} />)}
-  </>
-);
-
-export default withPluginEntities(QueryBarElements, { queryBarElements: 'views.elements.queryBar' });
+// eslint-disable-next-line import/prefer-default-export
+export const createWidget = (type: string): WidgetExport => ({
+  type,
+  visualizationComponent: () => null,
+  editComponent: () => null,
+  needsControlledHeight: () => false,
+  searchTypes: () => [],
+});

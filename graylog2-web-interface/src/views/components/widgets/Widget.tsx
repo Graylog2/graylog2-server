@@ -45,6 +45,7 @@ import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -82,7 +83,7 @@ type Props = {
   id: string,
   view: ViewStoreState,
   widget: WidgetModel,
-  data?: Array<unknown>,
+  data?: { [key: string]: Result },
   editing?: boolean,
   errors?: Array<{ description: string }>,
   fields: Immutable.List<FieldTypeMapping>,
@@ -108,7 +109,7 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-export type OnVisualizationConfigChange = (VisualizationConfig) => void;
+export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 export type WidgetProps = {
   config: AggregationWidgetConfig,

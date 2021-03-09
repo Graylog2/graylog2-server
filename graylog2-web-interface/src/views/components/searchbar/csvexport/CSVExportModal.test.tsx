@@ -20,7 +20,7 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
 import { Optional } from 'utility-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
@@ -43,6 +43,7 @@ import {
 } from 'views/components/searchbar/csvexport/Fixtures';
 
 import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
+import { createWidget } from 'views/logic/WidgetTestHelpers';
 
 jest.mock('util/MessagesExportUtils', () => ({
   exportSearchMessages: jest.fn(() => Promise.resolve()),
@@ -58,15 +59,9 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
-const pluginExports = {
+const pluginExports: PluginRegistration = {
   exports: {
-    enterpriseWidgets: [
-      {
-        type: 'messages',
-        displayName: 'Message List',
-        titleGenerator: () => MessagesWidget.defaultTitle,
-      },
-    ],
+    enterpriseWidgets: [createWidget('messages')],
   },
 };
 
