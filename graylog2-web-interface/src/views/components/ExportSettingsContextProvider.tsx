@@ -14,8 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.map.config;
+import * as React from 'react';
+import { useState } from 'react';
 
-public enum DatabaseType {
-    MAXMIND_ASN, MAXMIND_CITY, MAXMIND_COUNTRY, IPINFO_STANDARD_LOCATION, IPINFO_ASN
-}
+import ExportSettingsContext, { ExportSettings } from 'views/components/ExportSettingsContext';
+
+type Props = {
+  children: React.ReactNode,
+};
+
+const ExportSettingsContextProvider = ({ children }: Props) => {
+  const [exportSettings, setExportSettings] = useState<ExportSettings>();
+
+  return (
+    <ExportSettingsContext.Provider value={{ settings: exportSettings, setSettings: setExportSettings }}>
+      {children}
+    </ExportSettingsContext.Provider>
+  );
+};
+
+export default ExportSettingsContextProvider;

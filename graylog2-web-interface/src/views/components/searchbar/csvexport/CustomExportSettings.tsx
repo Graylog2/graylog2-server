@@ -14,8 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.map.config;
+import * as React from 'react';
+import { useMemo } from 'react';
 
-public enum DatabaseType {
-    MAXMIND_ASN, MAXMIND_CITY, MAXMIND_COUNTRY, IPINFO_STANDARD_LOCATION, IPINFO_ASN
+import Widget from 'views/logic/widgets/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
+
+type Props = {
+  widget: Widget,
 }
+
+const CustomExportSettings = ({ widget }: Props) => {
+  const { exportComponent: ExportComponent = () => null } = useMemo(() => (widget?.type && widgetDefinition(widget.type)) ?? {}, [widget]);
+
+  return <ExportComponent widget={widget} />;
+};
+
+export default CustomExportSettings;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import styled, { css } from 'styled-components';
@@ -23,18 +22,13 @@ import styled, { css } from 'styled-components';
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
-import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { widgetDefinition } from 'views/logic/Widgets';
 import DocumentationLink from 'components/support/DocumentationLink';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
-import WidgetGrid, { WidgetContainer } from 'views/components/WidgetGrid';
+import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import WidgetComponent from 'views/components/WidgetComponent';
-import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
-import defaultTitle from 'views/components/defaultTitle';
-import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
@@ -82,32 +76,6 @@ const _getDataAndErrors = (widget, widgetMapping, results) => {
   }
 
   return { widgetData: data, error };
-};
-
-const _renderFocusedWidget = (focusedWidget, widgetDefs, titles, widgetMapping, fields, results) => {
-  const widget = widgetDefs.find((w) => w.id === focusedWidget);
-
-  if (widget) {
-    const title = titles.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget));
-    const { widgetData, error } = _getDataAndErrors(widget, widgetMapping, results);
-    const data = { [widget.id]: widgetData };
-    const errors = { [widget.id]: error };
-
-    return (
-      <WidgetContainer>
-        <WidgetComponent widget={widget}
-                         widgetId={widget.id}
-                         data={data}
-                         errors={errors}
-                         widgetDimension={{ height: 100, width: 200 }}
-                         title={title}
-                         position={WidgetPosition.builder().build()}
-                         fields={fields} />
-      </WidgetContainer>
-    );
-  }
-
-  return undefined;
 };
 
 const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields) => {
@@ -172,19 +140,14 @@ const EmptyDashboardInfo = () => (
 );
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
-  const { focusedWidget } = useContext(WidgetFocusContext);
-  const titles = useStore(TitlesStore);
-
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
   if (results) {
-    const content = focusedWidget
-      ? _renderFocusedWidget(focusedWidget, widgets, titles, widgetMapping.toJS(), fields, results)
-      : _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
+    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
 
-    return (<>{content}</>);
+    return (<>{widgetGrid}</>);
   }
 
   return <Spinner />;

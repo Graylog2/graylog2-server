@@ -16,10 +16,10 @@
  */
 const AppConfig = {
   gl2ServerUrl() {
-    if (typeof (GRAYLOG_HTTP_PUBLISH_URI) !== 'undefined') {
-      // The GRAYLOG_HTTP_PUBLISH_URI variable will be set by webpack via the DefinePlugin.
+    if (typeof (GRAYLOG_API_URL) !== 'undefined') {
+      // The GRAYLOG_API_URL variable will be set by webpack via the DefinePlugin.
       // eslint-disable-next-line no-undef
-      return GRAYLOG_HTTP_PUBLISH_URI;
+      return GRAYLOG_API_URL;
     }
 
     return this.appConfig().gl2ServerUrl;

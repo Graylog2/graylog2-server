@@ -14,8 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.map.config;
+import * as React from 'react';
 
-public enum DatabaseType {
-    MAXMIND_ASN, MAXMIND_CITY, MAXMIND_COUNTRY, IPINFO_STANDARD_LOCATION, IPINFO_ASN
+import { singleton } from 'views/logic/singleton';
+
+type ExportSettingsContextType = {
+  settings: ExportSettings;
+  setSettings: (settings: ExportSettings) => void;
 }
+
+export interface ExportSettings {}
+
+const ExportSettingsContext = React.createContext<ExportSettingsContextType>({ settings: {}, setSettings: () => {} });
+
+export default singleton('contexts.ExportSettingsContext', () => ExportSettingsContext);

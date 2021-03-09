@@ -27,6 +27,8 @@ import FieldSelect from 'views/components/widgets/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 
+import CustomExportSettings from './CustomExportSettings';
+
 type CSVExportSettingsType = {
   fields: List<FieldTypeMapping>,
   selectedWidget: Widget | undefined | null,
@@ -108,6 +110,8 @@ const CSVExportSettings = ({
           )}
         </Field>
       </Row>
+
+      <CustomExportSettings widget={selectedWidget} />
     </>
   );
 };

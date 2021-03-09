@@ -17,6 +17,7 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { flatten, get } from 'lodash';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import Value from 'views/components/Value';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -29,6 +30,11 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
+
+const StyledTd = styled.td(({ isNumeric, theme }: { isNumeric: boolean, theme: DefaultTheme }) => css`
+  ${isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
+  ${isNumeric ? 'text-align: right' : ''}
+`);
 
 type Field = {
   field: string,
@@ -48,13 +54,13 @@ type Props = {
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
 const _column = (field: string, value: any, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, source: string | undefined | null) => (
-  <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
+  <StyledTd isNumeric={type.isNumeric()} key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
       <CustomHighlighting field={source ?? field} value={value}>
         {value !== null && value !== undefined ? <Value field={source ?? field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : null}
       </CustomHighlighting>
     </AdditionalContext.Provider>
-  </td>
+  </StyledTd>
 );
 
 const fullValuePathForField = (fieldName, valuePath) => {

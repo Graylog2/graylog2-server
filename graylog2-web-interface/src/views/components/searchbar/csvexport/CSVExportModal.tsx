@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { List, Set } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -34,6 +35,7 @@ import CSVExportSettings from 'views/components/searchbar/csvexport/CSVExportSet
 import CSVExportWidgetSelection from 'views/components/searchbar/csvexport/CSVExportWidgetSelection';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
+import { ExportSettings } from 'views/components/ExportSettingsContext';
 
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
@@ -67,15 +69,11 @@ const _getInitialFields = (selectedWidget) => {
   return initialFields.map((field) => ({ field })).toArray();
 };
 
-const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal) => {
-  setLoading(true);
-  startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit).then(closeModal);
-};
-
 type FormState = {
   selectedWidget: Widget | undefined,
   limit: number,
   selectedFields: Array<{ field: string }>,
+  customSettings: ExportSettings,
 };
 
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
@@ -89,14 +87,19 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
 
   const singleWidgetDownload = !!directExportWidgetId;
 
-  const _startDownload = (values: FormState) => {
-    return _onStartDownload(downloadFile, view, executionState, values.selectedWidget, values.selectedFields, values.limit, setLoading, closeModal);
+  const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings }: FormState) => {
+    setLoading(true);
+
+    return startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings)
+      .then(closeModal)
+      .finally(() => setLoading(false));
   };
 
   const initialValues: FormState = {
     selectedWidget: initialSelectedWidget,
     selectedFields: initialSelectedFields,
     limit: undefined,
+    customSettings: {},
   };
 
   return (

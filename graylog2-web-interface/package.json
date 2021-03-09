@@ -148,7 +148,6 @@
     "stylelint": "^13.6.0",
     "stylelint-config-standard": "20.0.0",
     "url-loader": "^4.0.0",
-    "webpack": "^4.39.3",
     "webpack-bundle-analyzer": "^3.5.2",
     "webpack-cli": "3.3.12",
     "webpack-dev-middleware": "^3.7.1",
