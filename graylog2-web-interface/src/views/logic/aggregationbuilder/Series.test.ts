@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import each from 'jest-each';
-
 import { parseSeries, isFunction } from './Series';
 
 describe('Series.ts', () => {
@@ -54,7 +52,7 @@ describe('Series.ts', () => {
   });
 
   describe('isFunction', () => {
-    each`
+    it.each`
     func                    | result
     ${'count()'}            | ${true}
     ${'count(foo)'}         | ${true}
@@ -66,8 +64,8 @@ describe('Series.ts', () => {
     ${'foob('}              | ${false}
     ${'foob)'}              | ${false}
     ${'(foob)'}             | ${false}
-  `.test('returns type of field for "$func(field)"', ({ func, result }) => {
-    expect(isFunction(func)).toBe(result);
-  });
+  `('returns type of field for "$func(field)"', ({ func, result }) => {
+      expect(isFunction(func)).toBe(result);
+    });
   });
 });
