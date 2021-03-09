@@ -66,7 +66,10 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginExports = PluginStore.exports('navigation');
 
-  if (!pluginExports.find((value) => value.description.toLowerCase() === 'enterprise')) {
+  const enterpriseMenuIsMissing = !pluginExports.find((value) => value.description.toLowerCase() === 'enterprise');
+  const isPermittedToEnterprise = isPermitted(permissions, ['licenseinfos:read']);
+
+  if (enterpriseMenuIsMissing && isPermittedToEnterprise) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
       path: Routes.SYSTEM.ENTERPRISE,
