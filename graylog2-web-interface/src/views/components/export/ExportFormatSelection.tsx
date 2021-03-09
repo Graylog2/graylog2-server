@@ -7,14 +7,20 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 
 type ExportFormat = {
   type: string,
-  displayName: string,
+  displayName: () => string,
+  disabled?: () => boolean,
 }
 
 const ExportFormatSelection = () => {
   const exportFormats = usePluginEntities<ExportFormat>('views.export.formats');
 
   const exportFormatOptions = exportFormats.sort((type1, type2) => defaultCompare(type1?.displayName, type2?.displayName))
-    .map(({ type, displayName }) => ({ label: displayName, value: type }));
+    .map(({ type, displayName, disabled = () => false }) => {
+      const isDisabled = disabled();
+      const title = displayName();
+
+      return { label: title, value: type, disabled: isDisabled };
+    });
 
   return (exportFormats.length > 1)
     ? (

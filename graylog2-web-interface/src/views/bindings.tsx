@@ -393,7 +393,7 @@ const exports: PluginExports = {
   'views.export.formats': [
     {
       type: 'csv',
-      displayName: 'Comma-Separated Values (CSV)',
+      displayName: () => 'Comma-Separated Values (CSV)',
       mimeType: 'text/csv',
       fileExtension: 'csv',
     },
