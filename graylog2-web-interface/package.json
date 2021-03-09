@@ -61,6 +61,7 @@
     "javascript-natural-sort": "^0.7.1",
     "jquery-ui": "1.12.x",
     "leaflet": "^1.5.1",
+    "loadable-components": "^2.2.3",
     "lodash": "^4.17.4",
     "marked": "^2.0.0",
     "md5": "^2.2.1",
