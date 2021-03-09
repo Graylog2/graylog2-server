@@ -25,12 +25,9 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap } from 'views/logic/views/View';
-import Direction from 'views/logic/aggregationbuilder/Direction';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import Query, { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
-import Search from 'views/logic/search/Search';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import View, { ViewType } from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
@@ -38,6 +35,12 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import {
+  messagesWidget,
+  stateWithOneWidget, viewWithMultipleWidgets,
+  viewWithOneWidget,
+  viewWithoutWidget,
+} from 'views/components/searchbar/csvexport/Fixtures';
 
 import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
 
@@ -68,62 +71,6 @@ const pluginExports = {
 };
 
 describe('CSVExportModal', () => {
-  const searchType = {
-    id: 'search-type-id-1',
-    type: 'messages',
-    streams: [],
-    sort: [],
-    filter: '',
-    name: null,
-    query: null,
-    timerange: null,
-    limit: 150,
-    decorators: [],
-    offset: 0,
-  };
-  const queries = [
-    Query.builder().id('query-id-1').searchTypes([searchType]).build(),
-  ];
-  const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'level', Direction.Descending);
-  const config = new MessagesWidgetConfig(['level', 'http_method'], true, [], [currentSort]);
-  const widget1 = MessagesWidget.builder().id('widget-id-1').config(config)
-    .build();
-  const widget2 = MessagesWidget.builder().id('widget-id-2').config(config)
-    .build();
-  const states: ViewStateMap = Immutable.Map({
-    'query-id-1': ViewState.create(),
-  });
-  const searchWithQueries = Search.builder()
-    .id('search-id')
-    .queries(queries)
-    .build();
-  const viewWithoutWidget = (viewType: ViewType) => View.create()
-    .toBuilder()
-    .id('deadbeef')
-    .type(viewType)
-    .search(searchWithQueries)
-    .state(states)
-    .build();
-  // Prepare view with one widget
-  const stateWithOneWidget: ViewState = ViewState.builder()
-    .widgets(Immutable.List([widget1]))
-    .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-    .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map<string, string>({ 'widget-id-1': 'Widget 1' }) }))
-    .build();
-  const viewWithOneWidget = (viewType) => viewWithoutWidget(viewType)
-    .toBuilder()
-    .state(Immutable.Map({ 'query-id-1': stateWithOneWidget }))
-    .build();
-  // Prepare view with mulitple widgets
-  const stateWithMultipleWidgets: ViewState = ViewState.builder()
-    .widgets(Immutable.List([widget1, widget2]))
-    .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-    .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map({ 'widget-id-1': 'Widget 1', 'widget-id-2': 'Widget 2' }) }))
-    .build();
-  const viewWithMultipleWidgets = (viewType) => viewWithoutWidget(viewType)
-    .toBuilder()
-    .state(Immutable.Map({ 'query-id-1': stateWithMultipleWidgets }))
-    .build();
   // Prepare expected payload
   const payload = {
     fields_in_order: ['level', 'http_method', 'message'],
@@ -214,9 +161,9 @@ describe('CSVExportModal', () => {
 
   it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
     const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
-    const widgetWithoutMessageRow = widget1.toBuilder().config(widgetConfig).build();
+    const widgetWithoutMessageRow = messagesWidget().toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
-      'query-id-1': stateWithOneWidget.toBuilder()
+      'query-id-1': stateWithOneWidget(messagesWidget()).toBuilder()
         .widgets(Immutable.List([widgetWithoutMessageRow]))
         .build(),
     });
@@ -374,14 +321,14 @@ describe('CSVExportModal', () => {
 
     it('show widget selection with widgets from all dashboard pages', async () => {
       const secondViewState: ViewState = ViewState.builder()
-        .widgets(Immutable.List([widget2]))
+        .widgets(Immutable.List([messagesWidget('widget-id-2')]))
         .widgetMapping(Immutable.Map({ 'widget-id-2': Immutable.Set(['search-type-id-2']) }))
         .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map({ 'widget-id-2': 'Widget 2' }) }))
         .build();
 
       const complexView = viewWithoutWidget(View.Type.Dashboard)
         .toBuilder()
-        .state(Immutable.Map({ 'query-id-1': stateWithOneWidget, 'query-id-2': secondViewState }))
+        .state(Immutable.Map({ 'query-id-1': stateWithOneWidget(messagesWidget()), 'query-id-2': secondViewState }))
         .build();
 
       const { queryByText, getByLabelText } = render(<DashboardCSVExportModal view={complexView} />);

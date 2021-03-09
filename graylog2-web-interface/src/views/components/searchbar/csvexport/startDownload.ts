@@ -24,6 +24,7 @@ import Widget from 'views/logic/widgets/Widget';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { SearchType } from 'views/logic/queries/SearchType';
+import { ExportSettings } from 'views/components/ExportSettingsContext';
 
 const getFilename = (view, selectedWidget) => {
   let filename = 'search-result';
@@ -48,11 +49,13 @@ const startDownload = (
   selectedWidget: Widget | undefined | null,
   selectedFields: { field: string }[],
   limit: number | undefined | null,
+  customSettings: ExportSettings,
 ) => {
   const payload: ExportPayload = {
     execution_state: executionState,
     fields_in_order: selectedFields.map((field) => field.field),
     limit,
+    ...customSettings,
   };
   const searchType: SearchType | undefined | null = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;
   const filename = getFilename(view, selectedWidget);
