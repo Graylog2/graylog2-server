@@ -43,6 +43,7 @@ import {
 } from 'views/components/searchbar/csvexport/Fixtures';
 
 import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
+import { createWidget } from 'views/logic/WidgetTestHelpers';
 
 jest.mock('util/MessagesExportUtils', () => ({
   exportSearchMessages: jest.fn(() => Promise.resolve()),
@@ -60,17 +61,7 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
 
 const pluginExports: PluginRegistration = {
   exports: {
-    enterpriseWidgets: [
-      {
-        type: 'messages',
-        displayName: 'Message List',
-        titleGenerator: () => MessagesWidget.defaultTitle,
-        visualizationComponent: () => null,
-        editComponent: () => null,
-        needsControlledHeight: () => false,
-        searchTypes: () => [],
-      },
-    ],
+    enterpriseWidgets: [createWidget('messages')],
   },
 };
 
