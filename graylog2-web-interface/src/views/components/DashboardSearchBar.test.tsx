@@ -18,11 +18,17 @@ import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
-import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+import { SearchActions } from 'views/stores/SearchStore';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
+
+jest.mock('views/stores/SearchStore', () => ({
+  SearchActions: {
+    refresh: jest.fn(),
+  },
+}));
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideActions: {
@@ -73,8 +79,6 @@ describe('DashboardSearchBar', () => {
 
     fireEvent.click(searchButton);
 
-    await waitFor(() => expect(onExecute).toHaveBeenCalledTimes(1));
-
-    expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, '');
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
 });
