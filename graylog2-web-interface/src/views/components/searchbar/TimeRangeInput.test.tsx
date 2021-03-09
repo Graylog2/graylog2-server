@@ -19,7 +19,7 @@ import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrar
 
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 
-describe('LogViewExportSettings', () => {
+describe('TimeRangeInput', () => {
   const defaultTimeRange = { type: 'relative', range: 300 };
 
   it('opens date picker dropdown when clicking button', async () => {
