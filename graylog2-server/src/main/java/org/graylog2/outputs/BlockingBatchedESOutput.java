@@ -21,14 +21,11 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,22 +55,13 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private final AtomicLong lastFlushTime = new AtomicLong();
     private final int outputFlushInterval;
 
-    @AssistedInject
-    public BlockingBatchedESOutput(MetricRegistry metricRegistry,
-                                   Messages messages,
-                                   org.graylog2.Configuration serverConfiguration,
-                                   Journal journal,
-                                   @Assisted Stream stream,
-                                   @Assisted Configuration configuration) {
-        this(metricRegistry, messages, serverConfiguration, journal);
-    }
-
     @Inject
     public BlockingBatchedESOutput(MetricRegistry metricRegistry,
                                    Messages messages,
                                    org.graylog2.Configuration serverConfiguration,
-                                   Journal journal) {
-        super(metricRegistry, messages, journal);
+                                   Journal journal,
+                                   MessageQueueAcknowledger acknowledger) {
+        super(metricRegistry, messages, journal, acknowledger);
         this.maxBufferSize = serverConfiguration.getOutputBatchSize();
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
