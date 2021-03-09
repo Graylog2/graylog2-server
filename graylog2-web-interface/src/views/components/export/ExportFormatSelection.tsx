@@ -21,14 +21,8 @@ import usePluginEntities from 'views/logic/usePluginEntities';
 import Select from 'components/common/Select';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 
-type ExportFormat = {
-  type: string,
-  displayName: () => string,
-  disabled?: () => boolean,
-}
-
 const ExportFormatSelection = () => {
-  const exportFormats = usePluginEntities<ExportFormat>('views.export.formats');
+  const exportFormats = usePluginEntities('views.export.formats');
 
   const exportFormatOptions = exportFormats.sort((type1, type2) => defaultCompare(type1?.displayName, type2?.displayName))
     .map(({ type, displayName, disabled = () => false }) => {
