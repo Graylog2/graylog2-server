@@ -19,15 +19,16 @@ package org.graylog.storage.elasticsearch6.views.export;
 import com.google.inject.name.Named;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.TermsQueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import io.searchbox.core.search.sort.Sort;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.TermsQueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
@@ -110,7 +111,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .addType(IndexMapping.TYPE_MESSAGE)
                 .allowNoIndices(false)
                 .ignoreUnavailable(false)
-                .addIndex(indices);
+                .addIndex(indices)
+                .addSort(new Sort(Message.FIELD_TIMESTAMP, Sort.Sorting.ASC));
     }
 
     private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand command) {

@@ -29,6 +29,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.TermsQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
@@ -117,7 +118,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
-                .size(command.chunkSize());
+                .size(command.chunkSize())
+                .sort(Message.FIELD_TIMESTAMP, SortOrder.ASC);
 
         return requestStrategy.configure(ssb);
     }
