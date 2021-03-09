@@ -62,6 +62,12 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
 const pluginExports: PluginRegistration = {
   exports: {
     enterpriseWidgets: [createWidget('messages')],
+    'views.export.formats': [{
+      type: 'csv',
+      displayName: () => 'CSV',
+      mimeType: 'text/csv',
+      fileExtension: 'csv',
+    }],
   },
 };
 
@@ -126,7 +132,12 @@ describe('ExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
+    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledWith(
+      expectedPayload,
+      'search-id',
+      'text/csv',
+      'Untitled-Search-search-result.csv',
+    ));
   });
 
   it('should show loading indicator after starting download', async () => {
@@ -184,7 +195,8 @@ describe('ExportModal', () => {
       },
       'search-id',
       'search-type-id-1',
-      'Widget-1-search-result',
+      'text/csv',
+      'Widget-1-search-result.csv',
     );
   });
 
@@ -223,7 +235,8 @@ describe('ExportModal', () => {
           ],
         },
         'search-id',
-        'Untitled-Search-search-result',
+        'text/csv',
+        'Untitled-Search-search-result.csv',
       );
     });
 
@@ -246,7 +259,13 @@ describe('ExportModal', () => {
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(
+        payload,
+        'search-id',
+        'search-type-id-1',
+        'text/csv',
+        'Widget-1-search-result.csv',
+      );
     });
 
     it('show widget selection if more than one exists', async () => {
@@ -281,7 +300,13 @@ describe('ExportModal', () => {
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(
+        payload,
+        'search-id',
+        'search-type-id-1',
+        'text/csv',
+        'Widget-1-search-result.csv',
+      );
     });
   });
 
@@ -354,7 +379,13 @@ describe('ExportModal', () => {
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(
+        payload,
+        'search-id',
+        'search-type-id-1',
+        'text/csv',
+        'Widget-1-search-result.csv',
+      );
     });
   });
 });
