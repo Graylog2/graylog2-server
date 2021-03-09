@@ -61,8 +61,7 @@ const WidgetComponent = ({
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
           <ExportSettingsContextProvider>
-            <Widget
-                    id={widget.id}
+            <Widget id={widget.id}
                     widget={widget}
                     data={widgetData}
                     errors={widgetErrors}
