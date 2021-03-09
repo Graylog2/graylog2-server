@@ -58,6 +58,7 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.web.PluginUISettingsProvider;
 
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
@@ -322,5 +323,14 @@ public abstract class PluginModule extends Graylog2Module {
         install(new FactoryModuleBuilder().implement(AuthServiceBackend.class, backendClass).build(factoryClass));
         authServiceBackendBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(configClass, name);
+    }
+
+    protected MapBinder<String, PluginUISettingsProvider> pluginUISettingsProviderBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, PluginUISettingsProvider.class);
+    }
+
+    protected void addPluginUISettingsProvider(String providerKey,
+                                               Class<? extends PluginUISettingsProvider> uiSettingsProviderClass) {
+        pluginUISettingsProviderBinder().addBinding(providerKey).to(uiSettingsProviderClass);
     }
 }
