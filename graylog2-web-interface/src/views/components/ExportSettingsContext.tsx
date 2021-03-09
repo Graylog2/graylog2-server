@@ -14,22 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import loadable from 'loadable-components';
+import * as React from 'react';
 
-type Props = {
-  error: {
-    message: string;
-  };
-};
+import { singleton } from 'views/logic/singleton';
 
-const ErrorComponent: React.FC<Props> = ({ error }: Props) => <div>Loading component failed: {error.message}</div>;
+type ExportSettingsContextType = {
+  settings: ExportSettings;
+  setSettings: (settings: ExportSettings) => void;
+}
 
-ErrorComponent.propTypes = {
-  error: PropTypes.exact({
-    message: PropTypes.string,
-  }).isRequired,
-};
+export interface ExportSettings {}
 
-export default <T, >(f: () => Promise<{ default: loadable.DefaultComponent<T> }>) => loadable<T>(() => f().then((c) => c.default), { ErrorComponent });
+const ExportSettingsContext = React.createContext<ExportSettingsContextType>({ settings: {}, setSettings: () => {} });
+
+export default singleton('contexts.ExportSettingsContext', () => ExportSettingsContext);

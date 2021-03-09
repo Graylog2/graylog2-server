@@ -23,6 +23,7 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import WidgetClass from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
 
 import { WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
@@ -61,18 +62,20 @@ const WidgetComponent = ({
     <DrilldownContextProvider widget={widget}>
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
-          <Widget data={widgetData}
-                  editing={editing}
-                  errors={widgetErrors}
-                  fields={fields}
-                  height={height}
-                  id={widget.id}
-                  onPositionsChange={onPositionsChange}
-                  onSizeChange={onWidgetSizeChange}
-                  position={position}
-                  title={title}
-                  widget={widget}
-                  width={width} />
+          <ExportSettingsContextProvider>
+            <Widget data={widgetData}
+                    editing={editing}
+                    errors={widgetErrors}
+                    fields={fields}
+                    height={height}
+                    id={widget.id}
+                    onPositionsChange={onPositionsChange}
+                    onSizeChange={onWidgetSizeChange}
+                    position={position}
+                    title={title}
+                    widget={widget}
+                    width={width} />
+          </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
       </WidgetContext.Provider>
     </DrilldownContextProvider>

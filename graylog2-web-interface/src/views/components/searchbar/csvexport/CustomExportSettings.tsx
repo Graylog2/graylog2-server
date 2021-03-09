@@ -14,22 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import loadable from 'loadable-components';
+import * as React from 'react';
+import { useMemo } from 'react';
+
+import Widget from 'views/logic/widgets/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
 
 type Props = {
-  error: {
-    message: string;
-  };
+  widget: Widget,
+}
+
+const CustomExportSettings = ({ widget }: Props) => {
+  const { exportComponent: ExportComponent = () => null } = useMemo(() => (widget?.type && widgetDefinition(widget.type)) ?? {}, [widget]);
+
+  return <ExportComponent widget={widget} />;
 };
 
-const ErrorComponent: React.FC<Props> = ({ error }: Props) => <div>Loading component failed: {error.message}</div>;
-
-ErrorComponent.propTypes = {
-  error: PropTypes.exact({
-    message: PropTypes.string,
-  }).isRequired,
-};
-
-export default <T, >(f: () => Promise<{ default: loadable.DefaultComponent<T> }>) => loadable<T>(() => f().then((c) => c.default), { ErrorComponent });
+export default CustomExportSettings;
