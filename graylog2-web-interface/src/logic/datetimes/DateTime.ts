@@ -164,7 +164,7 @@ class DateTime {
     return this.dateTime.toISOString();
   }
 
-  toString(format) {
+  toString(format?: string) {
     let effectiveFormat = format;
 
     if (format === undefined || format === null) {
