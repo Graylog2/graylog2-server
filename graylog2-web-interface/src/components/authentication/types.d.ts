@@ -19,19 +19,26 @@ import * as React from 'react';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import {
   DirectoryServiceBackend,
-  DirectoryServiceBackendConfig,
+  DirectoryServiceBackendConfig, DirectoryServiceBackendConfigJson,
   WizardSubmitPayload,
 } from 'logic/authentication/directoryServices/types';
 import Role from 'logic/roles/Role';
 import { WizardFormValues } from 'components/authentication/directoryServices/BackendWizard/BackendWizardContext';
+import { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 
 interface AuthenticationService {
   name: string;
   displayName: string;
   createComponent: React.ComponentType<{}>;
-  editComponent: React.ComponentType<any>;
-  configDetailsComponent: React.ComponentType<any>;
-  configToJson: (config: {}) => {};
+  editComponent: React.ComponentType<{
+    authenticationBackend: DirectoryServiceBackend,
+    initialStepKey: string | null | undefined
+  }>;
+  configDetailsComponent: React.ComponentType<{
+    authenticationBackend: AuthenticationBackend,
+    roles: Immutable.List<Role>,
+  }>;
+  configToJson: (config: {}) => DirectoryServiceBackendConfigJson;
   configFromJson: (json: {}) => DirectoryServiceBackendConfig;
 }
 
