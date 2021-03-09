@@ -26,6 +26,7 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 const defaultVisualizationType = 'table';
 
@@ -85,7 +86,7 @@ const getResult = (value: RowResult | EventResult): Rows | Events => {
   return value.rows;
 };
 
-type OnVisualizationConfigChange = (VisualizationConfig) => void;
+type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 type AggregationBuilderProps = WidgetComponentProps<AggregationWidgetConfig> & {
   onVisualizationConfigChange: OnVisualizationConfigChange,

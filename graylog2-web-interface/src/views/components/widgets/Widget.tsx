@@ -67,6 +67,7 @@ import CustomPropTypes from '../CustomPropTypes';
 import IfDashboard from '../dashboard/IfDashboard';
 import InteractiveContext from '../contexts/InteractiveContext';
 import IfInteractive from '../dashboard/IfInteractive';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 const WidgetActionsWBar = styled.div`
   > * {
@@ -108,7 +109,7 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-export type OnVisualizationConfigChange = (VisualizationConfig) => void;
+export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 export type WidgetProps = {
   config: AggregationWidgetConfig,
