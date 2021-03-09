@@ -19,7 +19,7 @@ import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 
-import { QueriesActions } from 'views/stores/QueriesStore';
+import { SearchActions } from 'views/stores/SearchStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';
 
@@ -59,7 +59,7 @@ describe('SearchBar', () => {
   };
 
   beforeEach(() => {
-    QueriesActions.update = mockAction(jest.fn());
+    SearchActions.refresh = mockAction(jest.fn());
   });
 
   it('should render the SearchBar', () => {
@@ -87,9 +87,7 @@ describe('SearchBar', () => {
 
     fireEvent.click(searchButton);
 
-    const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
-
-    await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
+    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
