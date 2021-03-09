@@ -68,7 +68,7 @@ export interface WidgetExport {
   searchResultTransformer?: (data: Array<unknown>, widget: Widget) => unknown;
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: Widget) => string;
-  reportStyle?: () => Record<string, any>;
+  reportStyle?: () => { width: React.CSSProperties['width'] };
 }
 
 interface VisualizationConfigProps {
