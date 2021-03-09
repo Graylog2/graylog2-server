@@ -43,7 +43,7 @@ const FlexContainer = styled.span`
 const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes }: Props) => {
   const [show, setShow] = useState(false);
 
-  if (validTypes && value?.type && !validTypes.includes(value?.type)) {
+  if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
     throw new Error(`Value is of type ${value.type}, but only these types are valid: ${validTypes}`);
   }
 
