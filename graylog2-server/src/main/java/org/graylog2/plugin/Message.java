@@ -357,10 +357,12 @@ public class Message implements Messages, Indexable {
         return sb.toString();
     }
 
+    @Override
     public String getId() {
         return getFieldAs(String.class, FIELD_ID);
     }
 
+    @Override
     public DateTime getTimestamp() {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
@@ -598,6 +600,7 @@ public class Message implements Messages, Indexable {
         return valueSize;
     }
 
+    @Override
     public long getSize() {
         return sizeCounter.getCount();
     }
@@ -809,6 +812,9 @@ public class Message implements Messages, Indexable {
         this.messageQueueId = journalOffset;
     }
 
+    /**
+     * @deprecated Use {@link #getMessageQueueId()} instead.
+     */
     @Deprecated
     public long getJournalOffset() {
         if (messageQueueId == null) {
@@ -826,6 +832,7 @@ public class Message implements Messages, Indexable {
         return messageQueueId;
     }
 
+    @Override
     @Nullable
     public DateTime getReceiveTime() {
         return receiveTime;
@@ -853,13 +860,17 @@ public class Message implements Messages, Indexable {
     // helper methods to optionally record timing information per message, useful for debugging or benchmarking
     // not thread safe!
     public void recordTiming(ServerStatus serverStatus, String name, long elapsedNanos) {
-        if (shouldNotRecord(serverStatus)) return;
+        if (shouldNotRecord(serverStatus)) {
+            return;
+        }
         lazyInitRecordings();
         recordings.add(Recording.timing(name, elapsedNanos));
     }
 
     public void recordCounter(ServerStatus serverStatus, String name, int counter) {
-        if (shouldNotRecord(serverStatus)) return;
+        if (shouldNotRecord(serverStatus)) {
+            return;
+        }
         lazyInitRecordings();
         recordings.add(Recording.counter(name, counter));
     }
