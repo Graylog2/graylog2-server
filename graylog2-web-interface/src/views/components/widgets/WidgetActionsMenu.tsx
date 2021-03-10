@@ -133,7 +133,6 @@ const _onDuplicate = (widgetId, setFocusWidget, title) => {
 };
 
 type Props = {
-  editing: boolean,
   isFocused: boolean,
   onPositionsChange: () => void,
   position: WidgetPosition,
@@ -143,7 +142,6 @@ type Props = {
 };
 
 const WidgetActionsMenu = ({
-  editing,
   isFocused,
   onPositionsChange,
   position,
@@ -167,35 +165,27 @@ const WidgetActionsMenu = ({
         <IfDashboard>
           <ReplaySearchButton />
         </IfDashboard>
-        {isFocused
-          ? (
-            <IconButton name="compress-arrows-alt"
-                        title="Un-focus widget"
-                        onClick={() => setWidgetFocusing(undefined)} />
-          )
-          : (
+        {isFocused && (
+          <IconButton name="compress-arrows-alt"
+                      title="Un-focus widget"
+                      onClick={() => setWidgetFocusing(undefined)} />
+        )}
+        {!isFocused && (
+          <>
             <IconButton name="expand-arrows-alt"
                         title="Focus this widget"
                         onClick={() => setWidgetFocusing(widget.id)} />
-          )}
-
-        {!isFocused && (
-          <WidgetHorizontalStretch widgetId={widget.id}
-                                   widgetType={widget.type}
-                                   onStretch={onPositionsChange}
-                                   position={position} />
+            <WidgetHorizontalStretch widgetId={widget.id}
+                                     widgetType={widget.type}
+                                     onStretch={onPositionsChange}
+                                     position={position} />
+          </>
         )}
 
         <WidgetActionDropdown>
-          {editing ? (
-            <MenuItem onSelect={toggleEdit}>
-              Cancel Edit
-            </MenuItem>
-          ) : (
-            <MenuItem onSelect={toggleEdit}>
-              Edit
-            </MenuItem>
-          )}
+          <MenuItem onSelect={toggleEdit}>
+            Edit
+          </MenuItem>
           <MenuItem onSelect={onDuplicate}>
             Duplicate
           </MenuItem>

@@ -115,7 +115,6 @@ describe('<Widget />', () => {
                            toggleEdit={() => {}}
                            title="Widget Title"
                            view={viewStoreState}
-                           editing={false}
                            position={new WidgetPosition(1, 1, 1, 1)}
                            onPositionsChange={() => {}}
                            {...props} />

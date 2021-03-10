@@ -236,13 +236,14 @@ class Widget extends React.Component<Props, State> {
                             loading={loading}
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
-                <WidgetActionsMenu isFocused={isFocused}
-                                   toggleEdit={() => this._onToggleEdit(setWidgetEditing)}
-                                   title={title}
-                                   view={view}
-                                   editing={editing}
-                                   position={position}
-                                   onPositionsChange={onPositionsChange} />
+                {!editing && (
+                  <WidgetActionsMenu isFocused={isFocused}
+                                     toggleEdit={() => this._onToggleEdit(setWidgetEditing)}
+                                     title={title}
+                                     view={view}
+                                     position={position}
+                                     onPositionsChange={onPositionsChange} />
+                )}
               </WidgetHeader>
             )}
           </InteractiveContext.Consumer>
