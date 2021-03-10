@@ -118,6 +118,10 @@ export default class Series {
       .build();
   }
 
+  static createDefault() {
+    return Series.forFunction('count()');
+  }
+
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));

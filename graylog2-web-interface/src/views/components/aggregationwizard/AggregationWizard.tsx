@@ -17,9 +17,26 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { isEmpty } from 'lodash';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+
+import AggregationAttributeSelect from './AggregationAttributeSelect';
+import VisualizationConfiguration from './attributeConfiguration/VisualizationConfiguration';
+import GroupByConfiguration from './attributeConfiguration/GroupByConfiguration';
+import MetricConfiguration from './attributeConfiguration/MetricConfiguration';
+import SortConfiguration from './attributeConfiguration/SortConfiguration';
+
+export type CreateAggregationAttribute = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationAttribute;
+
+export type AggregationAttribute = {
+  label: string,
+  value: string,
+  isAvailable: boolean,
+  onCreate: () => void,
+  onDeleteAll: () => void,
+}
 
 const Wrapper = styled.div`
   height: 100%;
@@ -42,14 +59,29 @@ export type Props = {
   children: React.ReactNode,
   config: AggregationWidgetConfig,
   fields: Immutable.List<FieldTypeMapping>,
-  onChange: (AggregationWidgetConfig) => void,
+  onChange: (newConfig: AggregationWidgetConfig) => void,
 };
 
-const AggregationWizard = ({ children }: Props) => {
+const AggregationWizard = ({ onChange, config, children }: Props) => {
   return (
     <Wrapper>
       <Controls>
-        The controls
+        <AggregationAttributeSelect onConfigChange={onChange}
+                                    config={config} />
+        <div>
+          {!isEmpty(config.visualization) && (
+            <VisualizationConfiguration config={config} onConfigChange={onChange} />
+          )}
+          {(!isEmpty(config.rowPivots) || !isEmpty(config.columnPivots)) && (
+            <GroupByConfiguration config={config} onConfigChange={onChange} />
+          )}
+          {!isEmpty(config.series) && (
+            <MetricConfiguration config={config} onConfigChange={onChange} />
+          )}
+          {!isEmpty(config.sort) && (
+            <SortConfiguration config={config} onConfigChange={onChange} />
+          )}
+        </div>
       </Controls>
       <Visualization>
         {children}
