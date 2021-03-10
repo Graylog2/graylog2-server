@@ -17,11 +17,8 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.github.joschi.jadconfig.util.Duration;
-import org.graylog.shaded.elasticsearch7.org.apache.http.Header;
 import org.graylog.shaded.elasticsearch7.org.apache.http.HttpHost;
-import org.graylog.shaded.elasticsearch7.org.apache.http.HttpResponse;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.elasticsearch7.org.apache.http.protocol.HttpContext;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClientBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
@@ -38,11 +35,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
@@ -140,16 +135,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 );
 
         if(muteElasticsearchDeprecationWarnings) {
-            restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.addInterceptorFirst(this::filterElasticsearchDeprecationWarningsFromHeaders));
+            restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor()));
         }
 
         return new RestHighLevelClient(restClientBuilder);
-    }
-
-    private void filterElasticsearchDeprecationWarningsFromHeaders(final HttpResponse response, final HttpContext context) {
-        List<Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !header.getValue().contains("setting was deprecated in Elasticsearch")).collect(Collectors.toList());
-        response.removeHeaders("Warning");
-        warnings.stream().forEach(header -> response.addHeader(header));
     }
 
     private void registerSnifferShutdownHook(GracefulShutdownService shutdownService) {
