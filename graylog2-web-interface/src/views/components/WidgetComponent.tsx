@@ -54,6 +54,7 @@ const WidgetComponent = ({
   widget,
   widgetDimension: { height, width },
 }: Props) => {
+  console.log('render widget component', widget.config);
   const dataKey = widget.data || widget.id;
   const widgetData = data[dataKey];
   const widgetErrors = errors[widget.id] || [];
