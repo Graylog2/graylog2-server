@@ -28,7 +28,7 @@ import Series from './aggregationbuilder/Series';
 import FieldType from './fieldtypes/FieldType';
 import type { Decorator } from './widgets/MessagesWidgetConfig';
 
-const widgetsKey = 'enterpriseWidgets';
+const widgetsKey = 'enterpriseWidgets' as const;
 
 const _findWidgetDefinition = (type) => PluginStore.exports(widgetsKey)
   .find((widget) => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());

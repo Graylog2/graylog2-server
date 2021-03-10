@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import asMock from 'helpers/mocking/AsMock';
 
 import type { PluginMetadata } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -43,16 +44,16 @@ describe('RequirementsProvided', () => {
     url: 'https://www.graylog.org',
   };
 
-  it('returns resolved promise for empty requirements', () => {
-    PluginStore.exports.mockReturnValue([]);
+  it('returns resolved promise for empty requirements', async () => {
+    asMock(PluginStore.exports).mockReturnValue([]);
 
     const view = View.create().toBuilder().requires({}).build();
 
-    return RequirementsProvided({ view, query: {}, retry });
+    expect(await RequirementsProvided({ view, query: {}, retry })).toBeTruthy();
   });
 
-  it('returns resolved promise if all requirements are provided', () => {
-    PluginStore.exports.mockReturnValue(['parameters', 'timetravel', 'hyperspeed']);
+  it('returns resolved promise if all requirements are provided', async () => {
+    asMock(PluginStore.exports).mockReturnValue(['parameters', 'timetravel', 'hyperspeed']);
 
     const view = View.create()
       .toBuilder()
@@ -63,11 +64,11 @@ describe('RequirementsProvided', () => {
       })
       .build();
 
-    return RequirementsProvided({ view, query: {}, retry });
+    expect(await RequirementsProvided({ view, query: {}, retry })).toBeTruthy();
   });
 
-  it('throws Component if not all requirements are provided', (done) => {
-    PluginStore.exports.mockReturnValue(['parameters']);
+  it('throws Component if not all requirements are provided', async () => {
+    asMock(PluginStore.exports).mockReturnValue(['parameters']);
 
     const view = View.create()
       .toBuilder()
@@ -85,13 +86,14 @@ describe('RequirementsProvided', () => {
       })
       .build();
 
-    RequirementsProvided({ view, query: {}, retry })
-      .catch((Component) => {
-        const wrapper = mount(<Component />);
+    let Component;
 
-        expect(wrapper).toExist();
+    try {
+      await RequirementsProvided({ view, query: {}, retry });
+    } catch (component) {
+      Component = component;
+    }
 
-        done();
-      });
+    expect(mount(<Component />)).toExist();
   });
 });

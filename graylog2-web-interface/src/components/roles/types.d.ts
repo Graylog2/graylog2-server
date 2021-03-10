@@ -16,18 +16,25 @@
  */
 import * as React from 'react';
 
-import withPluginEntities from 'views/logic/withPluginEntities';
+import Role from 'logic/roles/Role';
+import User from 'logic/users/User';
 
-type Props = {
-  queryBarElements: Array<React.ComponentType<{}>>,
-};
+interface RoleTeamsAssignmentProps {
+  role: Role;
+  readOnly?: boolean;
+}
 
-const QueryBarElements = ({ queryBarElements = [] }: Props) => (
-  <>
-    {queryBarElements
-      // eslint-disable-next-line react/no-array-index-key
-      .map((Component, idx) => <Component key={idx} />)}
-  </>
-);
+interface UserTeamsAssignmentProps {
+  user: User;
+  readOnly?: boolean;
+}
 
-export default withPluginEntities(QueryBarElements, { queryBarElements: 'views.elements.queryBar' });
+interface TeamsPlugin {
+  RoleTeamsAssignment?: React.ComponentType<RoleTeamsAssignmentProps>;
+  UserTeamsAssignment?: React.ComponentType<UserTeamsAssignmentProps>;
+}
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    teams?: TeamsPlugin;
+  }
+}

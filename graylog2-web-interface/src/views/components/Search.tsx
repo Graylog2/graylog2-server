@@ -142,7 +142,7 @@ ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 const Search = ({ location }: Props) => {
   const { pathname, search } = location;
   const query = `${pathname}${search}`;
-  const searchRefreshHooks: Array<SearchRefreshCondition> = usePluginEntities('views.hooks.searchRefresh');
+  const searchRefreshHooks = usePluginEntities('views.hooks.searchRefresh');
   const refreshIfNotUndeclared = useCallback(
     () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState()),
     [searchRefreshHooks],

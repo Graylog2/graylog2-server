@@ -25,7 +25,7 @@ type Props = {
 }
 
 const CustomExportSettings = ({ widget }: Props) => {
-  const { exportComponent: ExportComponent = () => null } = useMemo(() => (widget?.type && widgetDefinition(widget.type)) ?? {}, [widget]);
+  const { exportComponent: ExportComponent = () => null } = useMemo(() => (widget?.type && widgetDefinition(widget.type)), [widget]) ?? {};
 
   return <ExportComponent widget={widget} />;
 };

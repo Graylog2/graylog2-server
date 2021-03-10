@@ -17,13 +17,9 @@
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
-import type { ActionHandlerCondition } from './components/actions/ActionHandler';
 
 describe('Views bindings value actions', () => {
   const { valueActions } = bindings;
-  type ValueAction = {
-    isEnabled: ActionHandlerCondition,
-  };
   const defaultArguments = {
     queryId: 'query1',
     contexts: {
@@ -34,7 +30,7 @@ describe('Views bindings value actions', () => {
   const findAction = (type) => valueActions.find((binding) => binding.type === type);
 
   describe('CreateExtractor', () => {
-    const action: ValueAction = findAction('create-extractor');
+    const action = findAction('create-extractor');
     const { isEnabled } = action;
 
     it('is present', () => {

@@ -33,6 +33,7 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -52,7 +53,7 @@ type Props = {
   id: string,
   view: ViewStoreState,
   widget: WidgetModel,
-  data?: Array<unknown>,
+  data?: { [key: string]: Result },
   editing?: boolean,
   errors?: Array<{ description: string }>,
   fields: Immutable.List<FieldTypeMapping>,
@@ -75,7 +76,7 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-export type OnVisualizationConfigChange = (VisualizationConfig) => void;
+export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 export type WidgetProps = {
   config: AggregationWidgetConfig,
