@@ -57,7 +57,7 @@ public class CommandFactory {
         Query query = queryFrom(search);
 
         return builderFrom(resultFormat)
-                .timeRange(toAbsolute(query.timerange()))
+                .timeRange(resultFormat.timerange().orElse(toAbsolute(query.timerange())))
                 .queryString(queryStringFrom(search, query))
                 .streams(query.usedStreamIds())
                 .build();
@@ -79,7 +79,7 @@ public class CommandFactory {
         final List<Decorator> decorators = searchType instanceof MessageList ? ((MessageList) searchType).decorators() : Collections.emptyList();
 
         ExportMessagesCommand.Builder commandBuilder = builderFrom(resultFormat)
-                .timeRange(toAbsolute(timeRangeFrom(query, searchType)))
+                .timeRange(resultFormat.timerange().orElse(toAbsolute(timeRangeFrom(query, searchType))))
                 .queryString(queryStringFrom(search, query, searchType))
                 .streams(streamsFrom(query, searchType))
                 .decorators(decorators);
