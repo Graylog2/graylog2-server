@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 
-import withPluginEntities from 'views/logic/withPluginEntities';
+import GraylogThemeProvider from '../src/theme/GraylogThemeProvider';
 
 type Props = {
-  queryBarElements: Array<React.ComponentType<{}>>,
-};
+  children: React.Component,
+}
 
-const QueryBarElements = ({ queryBarElements = [] }: Props) => (
-  <>
-    {queryBarElements
-      // eslint-disable-next-line react/no-array-index-key
-      .map((Component, idx) => <Component key={idx} />)}
-  </>
+const StyleGuideWrapper = ({ children }: Props) => (
+  <GraylogThemeProvider initialThemeModeOverride="teint">
+    {children}
+  </GraylogThemeProvider>
 );
 
-export default withPluginEntities(QueryBarElements, { queryBarElements: 'views.elements.queryBar' });
+export default StyleGuideWrapper;

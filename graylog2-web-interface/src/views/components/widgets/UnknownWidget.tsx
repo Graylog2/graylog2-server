@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 
 import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';
-
-import type { WidgetProps } from './Widget';
 
 const Container = styled.div`
   height: 100%;
@@ -51,7 +49,7 @@ const OrderedList = styled.ol`
   list-style: decimal inside none;
 `;
 
-const UnknownWidget = ({ config, type }: WidgetProps) => (
+const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetComponentProps> = ({ config, type }: WidgetComponentProps & EditWidgetComponentProps) => (
   <Container>
     <IconContainer>
       <Icon name="question" size="3x" />
@@ -83,10 +81,5 @@ const UnknownWidget = ({ config, type }: WidgetProps) => (
     </Description>
   </Container>
 );
-
-UnknownWidget.propTypes = {
-  config: PropTypes.object.isRequired,
-  type: PropTypes.string.isRequired,
-};
 
 export default UnknownWidget;

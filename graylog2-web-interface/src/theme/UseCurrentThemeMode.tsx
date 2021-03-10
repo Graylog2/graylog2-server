@@ -35,7 +35,17 @@ type CurrentUser = {
   };
 };
 
-const useCurrentThemeMode = () => {
+const _getInitialThemeMode = (userPreferences, browserThemePreference, initialThemeModeOverride) => {
+  if (initialThemeModeOverride) {
+    return initialThemeModeOverride;
+  }
+
+  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
+
+  return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
+};
+
+const useCurrentThemeMode = (initialThemeModeOverride: ThemeMode): [string, (newThemeMode: string) => void] => {
   const browserThemePreference = usePrefersColorScheme();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
@@ -44,9 +54,8 @@ const useCurrentThemeMode = () => {
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
-  const initialThemeMode = userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
-  const [currentThemeMode, setCurrentThemeMode] = useState<ThemeMode>(initialThemeMode);
+  const initialThemeMode = _getInitialThemeMode(userPreferences, browserThemePreference, initialThemeModeOverride);
+  const [currentThemeMode, setCurrentThemeMode] = useState<string>(initialThemeMode);
 
   const changeCurrentThemeMode = useCallback((newThemeMode: ThemeMode) => {
     setCurrentThemeMode(newThemeMode);

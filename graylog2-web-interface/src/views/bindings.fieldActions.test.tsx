@@ -17,22 +17,18 @@
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 
 import bindings from './bindings';
-import type { ActionHandlerCondition } from './components/actions/ActionHandler';
 
 describe('Views bindings field actions', () => {
   const { fieldActions } = bindings;
-  type FieldAction = {
-    isEnabled: ActionHandlerCondition,
-  };
   const defaultArguments = {
     queryId: 'query1',
     contexts: {},
     type: FieldType.Unknown,
   };
-  const findAction = (type) => fieldActions.find((binding) => binding.type === type);
+  const findAction = (type: string) => fieldActions.find((binding) => binding.type === type);
 
   describe('Aggregate', () => {
-    const action: FieldAction = findAction('aggregate');
+    const action = findAction('aggregate');
     const { isEnabled } = action;
 
     it('is present', () => {
@@ -83,7 +79,7 @@ describe('Views bindings field actions', () => {
   });
 
   describe('Statistics', () => {
-    const action: FieldAction = findAction('statistics');
+    const action = findAction('statistics');
     const { isEnabled } = action;
 
     it('is present', () => {
@@ -125,7 +121,7 @@ describe('Views bindings field actions', () => {
   });
 
   describe('AddToAllTables', () => {
-    const action: FieldAction = findAction('add-to-all-tables');
+    const action = findAction('add-to-all-tables');
     const { isEnabled } = action;
 
     it('is present', () => {
@@ -176,7 +172,7 @@ describe('Views bindings field actions', () => {
   });
 
   describe('RemoveFromAllTables', () => {
-    const action: FieldAction = findAction('remove-from-all-tables');
+    const action = findAction('remove-from-all-tables');
     const { isEnabled } = action;
 
     it('is present', () => {

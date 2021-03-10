@@ -38,7 +38,7 @@ export type Definition = {
 
 const parametersRegex = /\((.+)\)/;
 const funcNameRegex = /(\w+)\(/;
-const testSeriesRegex = /^(\w+)\((\w*)(,(\w+))*\)$/;
+const testSeriesRegex = /^(\w+)\((.*)(,(\w+))*\)$/;
 
 const definitionFor = (type: string, parameters: Array<string>): Definition => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

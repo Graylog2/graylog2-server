@@ -28,6 +28,7 @@ import { Colors } from 'theme/colors';
 import { ThemeMode } from 'theme/constants';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
+import { THEME_MODES } from './constants';
 
 interface generateCustomFn {
   graylogColors: Colors,
@@ -79,8 +80,8 @@ const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLo
   });
 };
 
-const GraylogThemeProvider = ({ children }) => {
-  const [mode, changeMode] = useCurrentThemeMode();
+const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
+  const [mode, changeMode] = useCurrentThemeMode(initialThemeModeOverride);
 
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
   // @ts-ignore
@@ -107,6 +108,11 @@ const GraylogThemeProvider = ({ children }) => {
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
+  initialThemeModeOverride: PropTypes.oneOf(THEME_MODES),
+};
+
+GraylogThemeProvider.defaultProps = {
+  initialThemeModeOverride: undefined,
 };
 
 export default GraylogThemeProvider;
