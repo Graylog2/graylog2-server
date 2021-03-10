@@ -28,7 +28,6 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -79,7 +78,7 @@ export type Result = {
 export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 export type WidgetProps = {
-  config: AggregationWidgetConfig,
+  config: any,
   data: { [key: string]: Result },
   editing?: boolean,
   toggleEdit: () => void,
