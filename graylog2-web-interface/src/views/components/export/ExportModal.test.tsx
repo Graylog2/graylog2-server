@@ -25,7 +25,6 @@ import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap } from 'views/logic/views/View';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import View, { ViewType } from 'views/logic/views/View';
@@ -41,9 +40,9 @@ import {
   viewWithOneWidget,
   viewWithoutWidget,
 } from 'views/components/export/Fixtures';
+import { createWidget } from 'views/logic/WidgetTestHelpers';
 
 import ExportModal, { Props as ExportModalProps } from './ExportModal';
-import { createWidget } from 'views/logic/WidgetTestHelpers';
 
 jest.mock('util/MessagesExportUtils', () => ({
   exportSearchMessages: jest.fn(() => Promise.resolve()),
