@@ -33,7 +33,7 @@ import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { TitlesMap } from 'views/stores/TitleTypes';
 
-import Widget from './Widget';
+import Widget, { Result } from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
@@ -111,7 +111,7 @@ describe('<Widget />', () => {
   type DummyWidgetProps = {
     widget?: WidgetModel,
     errors?: Array<{ description: string }>,
-    data?: Array<unknown>,
+    data?: { [key: string]: Result },
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
     setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
     setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
@@ -171,7 +171,7 @@ describe('<Widget />', () => {
   });
 
   it('should render correct widget visualization for widget with data', () => {
-    render(<DummyWidget data={[]} />);
+    render(<DummyWidget data={{}} />);
 
     expect(screen.queryAllByTestId('loading-widget')).toHaveLength(0);
     expect(screen.queryAllByTitle('Widget Title')).toHaveLength(2);
