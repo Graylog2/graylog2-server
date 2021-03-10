@@ -19,16 +19,15 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, DefaultTheme } from 'styled-components';
 
-import { breakpoints, colors, fonts, utils } from 'theme';
-import RegeneratableThemeContext from 'theme/RegeneratableThemeContext';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import usePluginEntities from 'views/logic/usePluginEntities';
-import { Colors } from 'theme/colors';
-import { ThemeMode } from 'theme/constants';
 
+import { breakpoints, colors, fonts, utils } from './index';
+import RegeneratableThemeContext from './RegeneratableThemeContext';
+import { Colors } from './colors';
+import { THEME_MODES, ThemeMode } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
-import { THEME_MODES } from './constants';
 
 interface generateCustomFn {
   graylogColors: Colors,
