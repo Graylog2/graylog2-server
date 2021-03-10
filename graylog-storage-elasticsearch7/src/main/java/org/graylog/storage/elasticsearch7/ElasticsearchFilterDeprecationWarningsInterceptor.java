@@ -28,10 +28,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ElasticsearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor {
+    private String[] messagesToFilter = {
+            "setting was deprecated in Elasticsearch",
+            "but in a future major version, directaccess to system indices and their aliases will not be allowed"
+    };
+
+    private boolean isDeprecationMessage(final String message) {
+        for(String msg: messagesToFilter) {
+            if(message.contains(msg)) return true;
+        }
+        return false;
+    }
+
     @Override
     public void process(HttpResponse response, HttpContext context) throws
             HttpException, IOException {
-        List<Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !header.getValue().contains("setting was deprecated in Elasticsearch")).collect(Collectors.toList());
+        List<Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).collect(Collectors.toList());
         response.removeHeaders("Warning");
         warnings.stream().forEach(header -> response.addHeader(header));
     }

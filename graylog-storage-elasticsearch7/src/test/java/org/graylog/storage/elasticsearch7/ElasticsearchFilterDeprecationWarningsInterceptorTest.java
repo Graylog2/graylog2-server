@@ -21,10 +21,11 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.HttpResponse;
 import org.graylog.shaded.elasticsearch7.org.apache.http.ProtocolVersion;
 import org.graylog.shaded.elasticsearch7.org.apache.http.message.BasicHttpResponse;
 import org.graylog.shaded.elasticsearch7.org.apache.http.message.BasicStatusLine;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
     @Test
@@ -34,7 +35,9 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
         interceptor.process(response, null);
 
-        Assert.assertEquals( "Number of Headers should be 0 and the interceptor should not fail in itself.", 0, response.getAllHeaders().length);
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be 0 and the interceptor should not fail in itself.")
+                .hasSize(0);
     }
 
     @Test
@@ -45,8 +48,13 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
         response.addHeader("Test", "This header should not trigger the interceptor.");
         interceptor.process(response, null);
 
-        Assert.assertEquals( "Number of Headers should be unchanged.", 1, response.getAllHeaders().length);
-        Assert.assertEquals( "Remaining Header should be same as the given.", "Test", response.getAllHeaders()[0].getName());
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be unchanged.")
+                .hasSize(1);
+
+        assertThat(response.getAllHeaders()[0].getName())
+                .as("Remaining Header should be same as the given.")
+                .isEqualTo("Test");
     }
 
     @Test
@@ -58,7 +66,9 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
         interceptor.process(response, null);
 
-        Assert.assertEquals( "Number of Headers should be unchanged.", 2, response.getAllHeaders().length);
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be unchanged.")
+                .hasSize(2);
     }
 
     @Test
@@ -70,10 +80,55 @@ public class ElasticsearchFilterDeprecationWarningsInterceptorTest {
         response.addHeader("Warning", "This warning should not trigger the interceptor.");
         response.addHeader("Warning", "This text contains the trigger: setting was deprecated in Elasticsearch - and should be filtered out");
 
-        Assert.assertEquals( "Number of Headers should be 3 before start.", 3, response.getAllHeaders().length);
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be 3 before start.")
+                .hasSize(3);
 
         interceptor.process(response, null);
 
-        Assert.assertEquals( "Number of Headers should be 1 less after running the interceptor.", 2, response.getAllHeaders().length);
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be 1 less after running the interceptor.")
+                .hasSize(2);
+    }
+
+    @Test
+    public void testInterceptorMultipleHeaderFilteredWarning2() throws IOException, HttpException {
+        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        response.addHeader("Test", "This header should not trigger the interceptor.");
+        response.addHeader("Warning", "This warning should not trigger the interceptor.");
+        response.addHeader("Warning", "This text contains the trigger: but in a future major version, directaccess to system indices and their aliases will not be allowed - and should be filtered out");
+
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be 3 before start.")
+                .hasSize(3);
+
+        interceptor.process(response, null);
+
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be 1 less after running the interceptor.")
+                .hasSize(2);
+    }
+
+    @Test
+    public void testInterceptorMultipleHeaderFilteredWarningAndMultipleTriggers() throws IOException, HttpException {
+        ElasticsearchFilterDeprecationWarningsInterceptor interceptor = new ElasticsearchFilterDeprecationWarningsInterceptor();
+
+        HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));
+        response.addHeader("Test", "This header should not trigger the interceptor.");
+        response.addHeader("Warning", "This warning should not trigger the interceptor.");
+        response.addHeader("Warning", "This text contains the trigger: but in a future major version, directaccess to system indices and their aliases will not be allowed - and should be filtered out");
+        response.addHeader("Warning", "This text contains the trigger: setting was deprecated in Elasticsearch - and should be filtered out");
+
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be 4 before start.")
+                .hasSize(4);
+
+        interceptor.process(response, null);
+
+        assertThat(response.getAllHeaders())
+                .as("Number of Headers should be 2 less after running the interceptor.")
+                .hasSize(2);
     }
 }
