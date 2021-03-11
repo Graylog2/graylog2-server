@@ -33,8 +33,8 @@ import SortConfiguration from './actionConfiguration/SortConfiguration';
 export type CreateAggregationAction = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationAction;
 
 export type AggregationAction = {
-  label: string,
-  value: string,
+  title: string,
+  key: string,
   isConfigured: boolean,
   onCreate: () => void,
   onDeleteAll?: () => void,
@@ -45,16 +45,16 @@ export type AggregationAction = {
 }
 
 const createVisualizationAction: CreateAggregationAction = (config, onConfigChange) => ({
-  label: 'Visualization',
-  value: 'visualization',
+  title: 'Visualization',
+  key: 'visualization',
   isConfigured: !isEmpty(config.visualization),
   onCreate: () => onConfigChange(config),
   component: VisualizationConfiguration,
 });
 
 const createMetricAction: CreateAggregationAction = (config, onConfigChange) => ({
-  label: 'Metric',
-  value: 'metric',
+  title: 'Metric',
+  key: 'metric',
   isConfigured: !isEmpty(config.series),
   onCreate: () => onConfigChange(config.toBuilder().series([Series.createDefault()]).build()),
   onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
@@ -62,8 +62,8 @@ const createMetricAction: CreateAggregationAction = (config, onConfigChange) => 
 });
 
 const createGroupByAction: CreateAggregationAction = (config, onConfigChange) => ({
-  label: 'Group By',
-  value: 'groupBy',
+  title: 'Group By',
+  key: 'groupBy',
   isConfigured: !isEmpty(config.rowPivots) || !isEmpty(config.columnPivots),
   onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().rowPivots([]).columnPivots([]).build()),
@@ -71,8 +71,8 @@ const createGroupByAction: CreateAggregationAction = (config, onConfigChange) =>
 });
 
 const createSortAction: CreateAggregationAction = (config, onConfigChange) => ({
-  label: 'Sort',
-  value: 'sort',
+  title: 'Sort',
+  key: 'sort',
   isConfigured: !isEmpty(config.sort),
   onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().sort([]).build()),
@@ -92,7 +92,7 @@ const _createAggregationActions: (
 const _initialConfiguredAggregationActions = (config: AggregationWidgetConfig, aggregationActions: Array<AggregationAction>) => {
   return aggregationActions.reduce((configuredActions, action) => {
     if (action.isConfigured) {
-      configuredActions.push(action.value);
+      configuredActions.push(action.key);
     }
 
     return configuredActions;
@@ -151,7 +151,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
           <SectionHeadline>Configured Actions</SectionHeadline>
           <div>
             {configuredAggregationActions.map((actionKey) => {
-              const aggregationAction = aggregationActions.find((action) => action.value === actionKey);
+              const aggregationAction = aggregationActions.find((action) => action.key === actionKey);
               const AggregationActionComponent = aggregationAction.component;
 
               const onDeleteAll = () => {
@@ -159,7 +159,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
                   return;
                 }
 
-                const newConfiguredActions = configuredAggregationActions.filter((action) => action !== aggregationAction.value);
+                const newConfiguredActions = configuredAggregationActions.filter((action) => action !== aggregationAction.key);
 
                 setConfiguredAggregationActions(newConfiguredActions);
 
@@ -169,7 +169,10 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
               };
 
               return (
-                <ActionConfigurationContainer title={aggregationAction.label} onDeleteAll={onDeleteAll} isPermanentAction={aggregationAction.onDeleteAll === undefined} key={aggregationAction.value}>
+                <ActionConfigurationContainer title={aggregationAction.title}
+                                              onDeleteAll={onDeleteAll}
+                                              isPermanentAction={aggregationAction.onDeleteAll === undefined}
+                                              key={aggregationAction.key}>
                   <AggregationActionComponent config={config} onConfigChange={onChange} />
                 </ActionConfigurationContainer>
               );
