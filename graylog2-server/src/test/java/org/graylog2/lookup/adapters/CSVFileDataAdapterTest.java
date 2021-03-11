@@ -19,38 +19,44 @@ package org.graylog2.lookup.adapters;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.io.Resources;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class CSVFileDataAdapterTest {
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
     private final Path csvFile;
+    private final Path permittedPath;
     private CSVFileDataAdapter csvFileDataAdapter;
 
     public CSVFileDataAdapterTest() throws Exception {
         final URL resource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterTest.csv");
-        this.csvFile = Paths.get(resource.toURI());
+        final Path csvFilePath = Paths.get(resource.toURI());
+        this.csvFile = csvFilePath;
+        this.permittedPath = csvFilePath.getParent();
     }
 
     @Test
     public void doGet_successfully_returns_values() throws Exception {
-        final CSVFileDataAdapter.Config config = CSVFileDataAdapter.Config.builder()
-                .type(org.graylog2.lookup.adapters.CSVFileDataAdapter.NAME)
-                .path(csvFile.toString())
-                .separator(",")
-                .quotechar("\"")
-                .keyColumn("key")
-                .valueColumn("value")
-                .checkInterval(60)
-                .caseInsensitiveLookup(false)
-                .build();
-        csvFileDataAdapter = new CSVFileDataAdapter("id", "name", config, new MetricRegistry());
+        final CSVFileDataAdapter.Config config = baseConfig();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, null, new MetricRegistry()));
         csvFileDataAdapter.doStart();
 
+        verify(csvFileDataAdapter, times(1)).pathIsValid(eq(csvFile.toString()));
         assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("23"));
         assertThat(csvFileDataAdapter.doGet("bar")).isEqualTo(LookupResult.single("42"));
         assertThat(csvFileDataAdapter.doGet("quux")).isEqualTo(LookupResult.empty());
@@ -59,20 +65,59 @@ public class CSVFileDataAdapterTest {
     @Test
     public void doGet_successfully_returns_values_with_key_and_value_column_identical() throws Exception {
         final CSVFileDataAdapter.Config config = CSVFileDataAdapter.Config.builder()
-                .type(org.graylog2.lookup.adapters.CSVFileDataAdapter.NAME)
-                .path(csvFile.toString())
-                .separator(",")
-                .quotechar("\"")
-                .keyColumn("key")
-                .valueColumn("key")
-                .checkInterval(60)
-                .caseInsensitiveLookup(false)
-                .build();
-        csvFileDataAdapter = new CSVFileDataAdapter("id", "name", config, new MetricRegistry());
+                                                                          .type(org.graylog2.lookup.adapters.CSVFileDataAdapter.NAME)
+                                                                          .path(csvFile.toString())
+                                                                          .separator(",")
+                                                                          .quotechar("\"")
+                                                                          .keyColumn("key")
+                                                                          .valueColumn("key")
+                                                                          .checkInterval(60)
+                                                                          .caseInsensitiveLookup(false)
+                                                                          .build();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, null, new MetricRegistry()));
         csvFileDataAdapter.doStart();
 
+        verify(csvFileDataAdapter, times(1)).pathIsValid(eq(csvFile.toString()));
         assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("foo"));
         assertThat(csvFileDataAdapter.doGet("bar")).isEqualTo(LookupResult.single("bar"));
         assertThat(csvFileDataAdapter.doGet("quux")).isEqualTo(LookupResult.empty());
+    }
+
+    @Test
+    public void doGet_successfully_withPermittedPath() throws Exception {
+        final CSVFileDataAdapter.Config config = baseConfig();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, permittedPath, new MetricRegistry()));
+        csvFileDataAdapter.doStart();
+
+        verify(csvFileDataAdapter, times(1)).pathIsValid(eq(csvFile.toString()));
+        assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("foo"));
+        assertThat(csvFileDataAdapter.doGet("bar")).isEqualTo(LookupResult.single("bar"));
+        assertThat(csvFileDataAdapter.doGet("quux")).isEqualTo(LookupResult.empty());
+    }
+
+    @Test
+    public void doGet_failure_filePathInvalid() throws Exception {
+        final CSVFileDataAdapter.Config config = baseConfig();
+
+        // Build an invalid CSV file path.
+        final Path invalidPath = permittedPath.resolve("invalid-path");
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, invalidPath, new MetricRegistry()));
+
+        assertThatThrownBy(() -> csvFileDataAdapter.doStart())
+                .isExactlyInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("The specified CSV file is outside of the permitted location");
+    }
+
+    private CSVFileDataAdapter.Config baseConfig() {
+        return CSVFileDataAdapter.Config.builder()
+                                        .type(CSVFileDataAdapter.NAME)
+                                        .path(csvFile.toString())
+                                        .separator(",")
+                                        .quotechar("\"")
+                                        .keyColumn("key")
+                                        .valueColumn("value")
+                                        .checkInterval(60)
+                                        .caseInsensitiveLookup(false)
+                                        .build();
     }
 }

@@ -24,12 +24,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -40,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -63,6 +66,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     public static final String NAME = "csvfile";
 
     private final Config config;
+    private final Path permittedDirectory;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -71,9 +75,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     public CSVFileDataAdapter(@Assisted("id") String id,
                               @Assisted("name") String name,
                               @Assisted LookupDataAdapterConfiguration config,
+                              @Named("csv_file_lookup_dir") Path permittedDirectory,
                               MetricRegistry metricRegistry) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
+        this.permittedDirectory = permittedDirectory;
     }
 
     @Override
@@ -82,6 +88,13 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (isNullOrEmpty(config.path())) {
             throw new IllegalStateException("File path needs to be set");
         }
+        if (!pathIsValid(config.path())) {
+            // Purposefully do not expose the permitted location in the error message.
+            // For security reasons, this may not be appropriate for  certain users to see.
+            throw new IllegalStateException("The specified CSV file is outside of the permitted location " +
+                                            "as indicated by the [" + PathConfiguration.CSV_FILE_LOOKUP_DIR + "] " +
+                                            "server configuration parameter.");
+        }
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
@@ -89,6 +102,19 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         // Set file info before parsing the data for the first time
         fileInfo = FileInfo.forPath(Paths.get(config.path()));
         lookupRef.set(parseCSVFile());
+    }
+
+    boolean pathIsValid(String csvFilePath) throws IOException {
+        Preconditions.checkNotNull(csvFilePath);
+
+        // permittedDirectory is optional. If not provided, then true is a correct response.
+        if (permittedDirectory == null) {
+            return true;
+        }
+
+        final Path filePath = Paths.get(csvFilePath).toFile().getCanonicalFile().toPath();
+
+        return filePath.startsWith(permittedDirectory);
     }
 
     @Override

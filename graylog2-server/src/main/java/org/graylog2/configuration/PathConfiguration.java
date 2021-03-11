@@ -17,11 +17,16 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.validators.PathExecutableValidator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public abstract class PathConfiguration {
+    public static final String CSV_FILE_LOOKUP_DIR = "csv_file_lookup_dir";
+
     protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");
     protected static final Path DEFAULT_DATA_DIR = Paths.get("data");
     protected static final Path DEFAULT_PLUGIN_DIR = Paths.get("plugin");
@@ -34,6 +39,19 @@ public abstract class PathConfiguration {
 
     @Parameter(value = "plugin_dir", required = true)
     private Path pluginDir = DEFAULT_PLUGIN_DIR;
+
+    /**
+     * Optional absolute path where CSV lookup files can be placed.
+     *
+     * If provided, then the CSV File lookup adapter will only start if the CSV file is in the specified location.
+     * This helps with security, and allows administrators to control where in the file system users can select
+     * CSV files from.
+     *
+     * An absolute path is required here (not relative to the server working directory, or the data directory),
+     * since an administrator might want to specify CSV files in another location all-together.
+     */
+    @Parameter(value = CSV_FILE_LOOKUP_DIR, validator = PathExecutableValidator.class)
+    private Path csvFileLookupDir;
 
     public Path getBinDir() {
         return binDir;
@@ -50,4 +68,13 @@ public abstract class PathConfiguration {
         return pluginDir;
     }
 
+    @ValidatorMethod
+    public void validateCsvFileLookupDir() throws ValidationException {
+        if (csvFileLookupDir != null) {
+            if (csvFileLookupDir.toString().contains("../")) {
+                throw new ValidationException("Relative paths are not permitted in the " +
+                                              CSV_FILE_LOOKUP_DIR + " parameter");
+            }
+        }
+    }
 }
