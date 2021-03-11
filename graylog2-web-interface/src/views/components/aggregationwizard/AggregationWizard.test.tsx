@@ -60,12 +60,13 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config });
     const addActionSection = screen.getByTestId('add-action-section');
-
+    const aggregationActionSelect = screen.getByLabelText('Add an Action');
     const notConfiguredActions = [
       'Metric',
       'Group By',
       'Sort',
     ];
+    await selectEvent.openMenu(aggregationActionSelect);
 
     notConfiguredActions.forEach((actionTitle) => {
       expect(within(addActionSection).getByText(actionTitle)).toBeInTheDocument();

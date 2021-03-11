@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useRef } from 'react';
 
 import { Select } from 'components/common';
 
@@ -37,11 +38,18 @@ type Props = {
 }
 
 const AggregationActionSelect = ({ aggregationActions, configuredActions, onActionCreate }: Props) => {
+  const selectRef = useRef(null);
   const options = _getOptions(aggregationActions, configuredActions);
+
+  const _onSelect = (actionKey: string) => {
+    selectRef.current.clearValue();
+    onActionCreate(actionKey);
+  };
 
   return (
     <Select options={options}
-            onChange={onActionCreate}
+            onChange={_onSelect}
+            ref={selectRef}
             placeholder="Select action..."
             aria-label="Add an Action" />
   );
