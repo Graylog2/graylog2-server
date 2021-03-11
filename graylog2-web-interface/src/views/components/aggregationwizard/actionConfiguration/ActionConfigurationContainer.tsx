@@ -19,8 +19,6 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 
-import type { AggregationAction } from '../AggregationWizard';
-
 const Wrapper = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
   border: 1px solid ${theme.colors.variant.lighter.default};
@@ -31,7 +29,6 @@ const Wrapper = styled.div(({ theme }) => css`
   :last-child {
     margin-bottom: 0;
   }
-
 `);
 
 const Header = styled.div`
@@ -40,27 +37,33 @@ const Header = styled.div`
   margin-bottom: 5px;
 `;
 
-const Headline = styled.div`
-  font-weight: bold;
+const Headline = styled.h4`
+  /* font-weight: bold; */
 `;
 
 const Actions = styled.div``;
 
 type Props = {
   children: React.ReactNode,
-  aggregationAction: AggregationAction,
+  isPermanentAction: boolean,
+  onDeleteAll: () => void
+  title: string,
 }
 
-const AttributeConfigurationContainer = ({
+const ActionConfigurationContainer = ({
   children,
-  aggregationAction: { label, onDeleteAll },
+  isPermanentAction,
+  onDeleteAll,
+  title,
 }: Props) => {
   return (
     <Wrapper>
       <Header>
-        <Headline>{label}</Headline>
+        <Headline>{title}</Headline>
         <Actions>
-          <IconButton title={`Remove ${label}`} name="trash" onClick={onDeleteAll} />
+          {!isPermanentAction && (
+            <IconButton title={`Remove ${title}`} name="trash" onClick={onDeleteAll} />
+          )}
         </Actions>
       </Header>
       <div>
@@ -70,4 +73,4 @@ const AttributeConfigurationContainer = ({
   );
 };
 
-export default AttributeConfigurationContainer;
+export default ActionConfigurationContainer;

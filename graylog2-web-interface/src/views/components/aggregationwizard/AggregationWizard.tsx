@@ -15,28 +15,89 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import Series from 'views/logic/aggregationbuilder/Series';
 
-import AggregationAttributeSelect from './AggregationAttributeSelect';
-import VisualizationConfiguration from './attributeConfiguration/VisualizationConfiguration';
-import GroupByConfiguration from './attributeConfiguration/GroupByConfiguration';
-import MetricConfiguration from './attributeConfiguration/MetricConfiguration';
-import SortConfiguration from './attributeConfiguration/SortConfiguration';
+import AggregationActionSelect from './AggregationActionSelect';
+import ActionConfigurationContainer from './actionConfiguration/ActionConfigurationContainer';
+import VisualizationConfiguration from './actionConfiguration/VisualizationConfiguration';
+import GroupByConfiguration from './actionConfiguration/GroupByConfiguration';
+import MetricConfiguration from './actionConfiguration/MetricConfiguration';
+import SortConfiguration from './actionConfiguration/SortConfiguration';
 
 export type CreateAggregationAction = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationAction;
 
 export type AggregationAction = {
   label: string,
   value: string,
-  isAvailable: boolean,
+  isConfigured: boolean,
   onCreate: () => void,
-  onDeleteAll: () => void,
+  onDeleteAll?: () => void,
+  isPermanent?: boolean,
+  component: React.ComponentType<{
+    config: AggregationWidgetConfig,
+    onConfigChange: (newConfig: AggregationWidgetConfig) => void
+  }>,
 }
+
+const createVisualizationAction: CreateAggregationAction = (config, onConfigChange) => ({
+  label: 'Visualization',
+  value: 'visualization',
+  isConfigured: !isEmpty(config.visualization),
+  onCreate: () => onConfigChange(config),
+  component: VisualizationConfiguration,
+});
+
+const createMetricAction: CreateAggregationAction = (config, onConfigChange) => ({
+  label: 'Metric',
+  value: 'metric',
+  isConfigured: !isEmpty(config.series),
+  onCreate: () => onConfigChange(config.toBuilder().series([Series.createDefault()]).build()),
+  onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
+  component: MetricConfiguration,
+});
+
+const createGroupByAction: CreateAggregationAction = (config, onConfigChange) => ({
+  label: 'Group By',
+  value: 'groupBy',
+  isConfigured: !isEmpty(config.rowPivots) || !isEmpty(config.columnPivots),
+  onCreate: () => onConfigChange(config),
+  onDeleteAll: () => onConfigChange(config.toBuilder().rowPivots([]).columnPivots([]).build()),
+  component: GroupByConfiguration,
+});
+
+const createSortAction: CreateAggregationAction = (config, onConfigChange) => ({
+  label: 'Sort',
+  value: 'sort',
+  isConfigured: !isEmpty(config.sort),
+  onCreate: () => onConfigChange(config),
+  onDeleteAll: () => onConfigChange(config.toBuilder().sort([]).build()),
+  component: SortConfiguration,
+});
+
+const _createAggregationActions: (
+  config: AggregationWidgetConfig,
+  onConfigChange: (newConfig: AggregationWidgetConfig) => void
+) => Array<AggregationAction> = (config, onConfigChange) => ([
+  createVisualizationAction(config, onConfigChange),
+  createGroupByAction(config, onConfigChange),
+  createMetricAction(config, onConfigChange),
+  createSortAction(config, onConfigChange),
+]);
+
+const _initialConfiguredAggregationActions = (config: AggregationWidgetConfig, aggregationActions: Array<AggregationAction>) => {
+  return aggregationActions.reduce((configuredActions, action) => {
+    if (action.isConfigured) {
+      configuredActions.push(action.value);
+    }
+
+    return configuredActions;
+  }, []);
+};
 
 const Wrapper = styled.div`
   height: 100%;
@@ -55,33 +116,73 @@ const Visualization = styled.div`
   flex: 3;
 `;
 
-export type Props = {
+const Section = styled.div`
+  margin-bottom: 10px;
+
+  :last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const SectionHeadline = styled.h3`
+  margin-bottom: 5px;
+`;
+
+type Props = {
   children: React.ReactNode,
   config: AggregationWidgetConfig,
-  fields: Immutable.List<FieldTypeMapping>,
+  // fields: Immutable.List<FieldTypeMapping>,
   onChange: (newConfig: AggregationWidgetConfig) => void,
 };
 
 const AggregationWizard = ({ onChange, config, children }: Props) => {
+  const aggregationActions = _createAggregationActions(config, onChange);
+  const [configuredAggregationActions, setConfiguredAggregationActions] = useState(_initialConfiguredAggregationActions(config, aggregationActions));
+
+  const _onActionCreate = (actionKey: string) => {
+    if (actionKey) {
+      setConfiguredAggregationActions([...configuredAggregationActions, actionKey]);
+    }
+  };
+
   return (
     <Wrapper>
       <Controls>
-        <AggregationAttributeSelect onConfigChange={onChange}
-                                    config={config} />
-        <div>
-          {!isEmpty(config.visualization) && (
-            <VisualizationConfiguration config={config} onConfigChange={onChange} />
-          )}
-          {(!isEmpty(config.rowPivots) || !isEmpty(config.columnPivots)) && (
-            <GroupByConfiguration config={config} onConfigChange={onChange} />
-          )}
-          {!isEmpty(config.series) && (
-            <MetricConfiguration config={config} onConfigChange={onChange} />
-          )}
-          {!isEmpty(config.sort) && (
-            <SortConfiguration config={config} onConfigChange={onChange} />
-          )}
-        </div>
+        <Section>
+          <SectionHeadline>Add an Action</SectionHeadline>
+          <AggregationActionSelect onActionCreate={_onActionCreate}
+                                   configuredActions={configuredAggregationActions}
+                                   aggregationActions={aggregationActions} />
+        </Section>
+        <Section>
+          <SectionHeadline>Configured Actions</SectionHeadline>
+          <div>
+            {configuredAggregationActions.map((actionKey) => {
+              const aggregationAction = aggregationActions.find((action) => action.value === actionKey);
+              const AggregationActionComponent = aggregationAction.component;
+
+              const onDeleteAll = () => {
+                if (typeof aggregationAction.onDeleteAll !== 'function') {
+                  return;
+                }
+
+                const newConfiguredActions = configuredAggregationActions.filter((action) => action !== aggregationAction.value);
+
+                setConfiguredAggregationActions(newConfiguredActions);
+
+                if (aggregationAction.isConfigured) {
+                  aggregationAction.onDeleteAll();
+                }
+              };
+
+              return (
+                <ActionConfigurationContainer title={aggregationAction.label} onDeleteAll={onDeleteAll} isPermanentAction={aggregationAction.onDeleteAll === undefined} key={aggregationAction.value}>
+                  <AggregationActionComponent config={config} onConfigChange={onChange} />
+                </ActionConfigurationContainer>
+              );
+            })}
+          </div>
+        </Section>
       </Controls>
       <Visualization>
         {children}
