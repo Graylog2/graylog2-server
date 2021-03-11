@@ -90,6 +90,7 @@ describe('NewSearchPage', () => {
   it('should show spinner while loading view', async () => {
     const { findByText, getByText } = render(<SimpleNewSearchPage />);
 
+    // @ts-ignore
     act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();

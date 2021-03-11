@@ -44,9 +44,12 @@ describe('<RolesSection />', () => {
   });
 
   it('should assigning a role', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
+    // @ts-ignore
     await act(() => mockRolesForUserPromise);
+    // @ts-ignore
     await act(() => mockLoadRolesPromise);
 
     const assignRoleButton = screen.getByRole('button', { name: 'Assign Role' });
@@ -61,9 +64,12 @@ describe('<RolesSection />', () => {
   });
 
   it('should filter assigned roles', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
+    // @ts-ignore
     await act(() => mockRolesForUserPromise);
+    // @ts-ignore
     await act(() => mockLoadRolesPromise);
 
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
@@ -81,9 +87,12 @@ describe('<RolesSection />', () => {
     const newExampleUser = alice.toBuilder()
       .roles(Immutable.Set([assignedRole1.name, assignedRole2.name]))
       .build();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
     render(<RolesSection user={newExampleUser} onSubmit={(data) => onSubmitStub(data)} />);
+    // @ts-ignore
     await act(() => mockRolesForUserPromise);
+    // @ts-ignore
     await act(() => mockLoadRolesPromise);
 
     const unassignRoleButton = screen.getByRole('button', { name: `Remove ${assignedRole1.name}` });

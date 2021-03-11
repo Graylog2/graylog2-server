@@ -69,7 +69,9 @@ describe('UsersSection', () => {
 
   it('should assigning a user', async () => {
     render(<UsersSection role={exampleRole} />);
+    // @ts-ignore
     await act(() => mockLoadUsersPromise);
+    // @ts-ignore
     await act(() => mockLoadUsersForRolePromise);
 
     const assignUserButton = screen.getByRole('button', { name: 'Assign User' });
@@ -85,7 +87,9 @@ describe('UsersSection', () => {
 
   it('should filter assigned users', async () => {
     render(<UsersSection role={exampleRole} />);
+    // @ts-ignore
     await act(() => mockLoadUsersForRolePromise);
+    // @ts-ignore
     await act(() => mockLoadUsersPromise);
 
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
@@ -101,7 +105,9 @@ describe('UsersSection', () => {
 
   it('should unassign a user', async () => {
     render(<UsersSection role={exampleRole} />);
+    // @ts-ignore
     await act(() => mockLoadUsersForRolePromise);
+    // @ts-ignore
     await act(() => mockLoadUsersPromise);
 
     const assignUserButton = await screen.findByRole('button', { name: `Remove ${alice.username}` });
