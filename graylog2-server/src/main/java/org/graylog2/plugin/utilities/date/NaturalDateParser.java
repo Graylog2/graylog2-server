@@ -23,6 +23,7 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -30,47 +31,76 @@ import java.util.Map;
 import java.util.TimeZone;
 
 public class NaturalDateParser {
-    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    private final TimeZone timeZone;
+    private final ZoneId zoneId;
+    private final DateTimeZone dateTimeZone;
+
+    public NaturalDateParser() {
+        this("Etc/UTC");
+    }
+
+    public NaturalDateParser(final String timeZone) {
+        this.timeZone = TimeZone.getTimeZone(timeZone);
+        this.zoneId = ZoneId.of(timeZone);
+        this.dateTimeZone = DateTimeZone.forTimeZone(this.timeZone);
+    }
+
+    public Date alignToStartOfDay(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).toLocalDate().atStartOfDay().atZone(zoneId).toInstant());
+    }
+
+    public Date alignToEndOfDay(Date dateToConvert) {
+        return java.util.Date.from(dateToConvert.toInstant().atZone(zoneId).plusDays(1).toLocalDate().atStartOfDay().atZone(zoneId).toInstant());
+    }
 
     public Result parse(final String string) throws DateNotParsableException {
         Date from = null;
         Date to = null;
 
-        final Parser parser = new Parser(UTC);
+        final Parser parser = new Parser(timeZone);
         final List<DateGroup> groups = parser.parse(string);
         if (!groups.isEmpty()) {
-            final List<Date> dates = groups.get(0).getDates();
+            // only working on with the first DateGroup
+            final DateGroup group = groups.get(0);
+            final boolean timeIsInferred = group.isTimeInferred();
+
+            final List<Date> dates = group.getDates();
             Collections.sort(dates);
 
             if (dates.size() >= 1) {
-                from = dates.get(0);
+                from = timeIsInferred ? alignToStartOfDay(dates.get(0)) : dates.get(0);
             }
 
             if (dates.size() >= 2) {
-                to = dates.get(1);
+                to = timeIsInferred ? alignToEndOfDay(dates.get(1)) : dates.get(1);
+            } else {
+                to = timeIsInferred ? alignToEndOfDay(dates.get(0)) : null;
             }
         } else {
             throw new DateNotParsableException("Unparsable date: " + string);
         }
 
-        return new Result(from, to);
+        return new Result(from, to, this.dateTimeZone);
     }
 
     public static class Result {
         private final DateTime from;
         private final DateTime to;
+        private final DateTimeZone dateTimeZone;
 
-        public Result(final Date from, final Date to) {
+        public Result(final Date from, final Date to, final DateTimeZone dateTimeZone) {
+            this.dateTimeZone = dateTimeZone;
+
             if (from != null) {
-                this.from = new DateTime(from, DateTimeZone.UTC);
+                this.from = new DateTime(from, this.dateTimeZone);
             } else {
-                this.from = Tools.nowUTC();
+                this.from = Tools.now(this.dateTimeZone);
             }
 
             if (to != null) {
-                this.to = new DateTime(to, DateTimeZone.UTC);
+                this.to = new DateTime(to, this.dateTimeZone);
             } else {
-                this.to = Tools.nowUTC();
+                this.to = Tools.now(this.dateTimeZone);
             }
         }
 
@@ -92,7 +122,7 @@ public class NaturalDateParser {
         }
 
         private String dateFormat(final DateTime x) {
-            return x.toString(Tools.ES_DATE_FORMAT_NO_MS_FORMATTER.withZoneUTC());
+            return x.toString(Tools.ES_DATE_FORMAT_NO_MS_FORMATTER.withZone(dateTimeZone));
         }
     }
 

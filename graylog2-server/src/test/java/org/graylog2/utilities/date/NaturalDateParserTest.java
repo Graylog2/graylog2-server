@@ -17,11 +17,13 @@
 package org.graylog2.utilities.date;
 
 import org.graylog2.plugin.utilities.date.NaturalDateParser;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.assertj.jodatime.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,6 +44,22 @@ public class NaturalDateParserTest {
         // It's enough if this does not throw exceptions because we are not testing the underlying library.
         naturalDateParser.parse("today");
         naturalDateParser.parse("last week to today");
+    }
+
+    @Test
+    public void testParseAlignToStartOfDay() throws Exception {
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+        final String[] testsThatAlignToStartOfDay = { "yesterday", "the day before yesterday", "today",
+                "monday", "monday to friday", "last week" };
+
+        for(String test: testsThatAlignToStartOfDay) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+        }
     }
 
     @Test(expected = NaturalDateParser.DateNotParsableException.class)
@@ -67,15 +85,16 @@ public class NaturalDateParserTest {
     }
 
     // https://github.com/Graylog2/graylog2-server/issues/1226
+    // proposed change of how it works, is that the to-part is actually the first moment of the next day so that comparisons work
     @Test
     public void issue1226() throws Exception {
         NaturalDateParser.Result result99days = naturalDateParser.parse("last 99 days");
-        assertThat(result99days.getFrom()).isEqualToIgnoringMillis(result99days.getTo().minusDays(99));
+        org.assertj.jodatime.api.Assertions.assertThat(result99days.getFrom()).isEqualToIgnoringMillis(result99days.getTo().minusDays(100));
 
         NaturalDateParser.Result result100days = naturalDateParser.parse("last 100 days");
-        assertThat(result100days.getFrom()).isEqualToIgnoringMillis(result100days.getTo().minusDays(100));
+        org.assertj.jodatime.api.Assertions.assertThat(result100days.getFrom()).isEqualToIgnoringMillis(result100days.getTo().minusDays(101));
 
         NaturalDateParser.Result result101days = naturalDateParser.parse("last 101 days");
-        assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
+        org.assertj.jodatime.api.Assertions.assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(102));
     }
 }
