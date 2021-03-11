@@ -15,13 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import MockStore from 'helpers/mocking/StoreMock';
 
+import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
+
+jest.mock('views/stores/GlobalOverrideStore', () => ({
+  GlobalOverrideStore: MockStore(),
+  GlobalOverrideActions: {
+    set: jest.fn().mockResolvedValue({}),
+  },
+}));
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
@@ -38,10 +48,6 @@ const config = {
 };
 
 describe('DashboardSearchBar', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   const onExecute = jest.fn();
 
   it('should render the DashboardSearchBar', () => {
@@ -64,7 +70,7 @@ describe('DashboardSearchBar', () => {
     expect(screen.getByText('No Override')).toBeVisible();
   });
 
-  it('should call onExecute and set global override when search is performed', async () => {
+  it('should refresh search when button is clicked', async () => {
     render(<DashboardSearchBar onExecute={onExecute} config={config} />);
 
     const searchButton = screen.getByTitle('Perform search');
@@ -72,5 +78,24 @@ describe('DashboardSearchBar', () => {
     fireEvent.click(searchButton);
 
     await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+  });
+
+  it('should call onExecute and set global override when search is performed', async () => {
+    render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
+    const timeRangeInput = await screen.findByText(/no override/i);
+
+    act(() => {
+      userEvent.click(timeRangeInput);
+    });
+
+    userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
+    userEvent.click(await screen.findByRole('button', { name: 'Apply' }));
+
+    const searchButton = await screen.findByTitle('Perform search (changes were made after last search execution)');
+
+    fireEvent.click(searchButton);
+
+    await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
   });
 });
