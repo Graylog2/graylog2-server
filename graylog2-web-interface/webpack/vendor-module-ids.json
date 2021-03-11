@@ -2133,6 +2133,8 @@
     "usedIds": [
       0
     ],
-    "bySource": {}
+    "bySource": {
+      "0 vendor": 0
+    }
   }
 }
