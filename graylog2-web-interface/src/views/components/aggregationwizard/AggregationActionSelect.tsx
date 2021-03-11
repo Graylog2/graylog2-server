@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { Select } from 'components/common';
 
@@ -41,7 +40,10 @@ const AggregationActionSelect = ({ aggregationActions, configuredActions, onActi
   const options = _getOptions(aggregationActions, configuredActions);
 
   return (
-    <Select options={options} onChange={onActionCreate} placeholder="Select action..." />
+    <Select options={options}
+            onChange={onActionCreate}
+            placeholder="Select action..."
+            aria-label="Add an Action" />
   );
 };
 
