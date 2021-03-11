@@ -23,8 +23,8 @@ import type { AggregationAction } from './AggregationWizard';
 
 const _getOptions = (aggregationActions: Array<AggregationAction>, configuredActions: Array<string>) => {
   return aggregationActions.reduce((availableActions, aggregationAction) => {
-    if (!configuredActions.find((actionKey) => aggregationAction.value === actionKey)) {
-      availableActions.push({ value: aggregationAction.value, label: aggregationAction.label });
+    if (!configuredActions.find((actionKey) => aggregationAction.key === actionKey)) {
+      availableActions.push({ value: aggregationAction.key, label: aggregationAction.title });
     }
 
     return availableActions;

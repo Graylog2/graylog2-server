@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import AggregationActionSelect from './AggregationActionSelect';
@@ -23,15 +23,15 @@ import { AggregationAction } from './AggregationWizard';
 
 const aggregationActions: Array<AggregationAction> = [
   {
-    label: 'Metric',
-    value: 'metric',
+    title: 'Metric',
+    key: 'metric',
     isConfigured: false,
     onCreate: () => {},
     component: () => <div />,
   },
   {
-    label: 'Sort',
-    value: 'sort',
+    title: 'Sort',
+    key: 'sort',
     isConfigured: false,
     onCreate: () => {},
     component: () => <div />,
