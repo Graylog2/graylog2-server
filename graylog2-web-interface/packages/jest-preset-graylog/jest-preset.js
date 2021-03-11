@@ -27,6 +27,7 @@ module.exports = {
     require.resolve('./lib/setup-files/mock-FetchProvider.js'),
     require.resolve('./lib/setup-files/mock-Version.js'),
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
+    'jest-canvas-mock',
   ],
   setupFilesAfterEnv: [
     'jest-enzyme',
