@@ -22,12 +22,12 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 
 import AttributeConfigurationContainer from './AttributeConfigurationContainer';
 
-import type { CreateAggregationAttribute } from '../AggregationWizard';
+import type { CreateAggregationAction } from '../AggregationWizard';
 
-export const createAggregationAttribute: CreateAggregationAttribute = (config, onConfigChange) => ({
-  label: 'Group By',
-  value: 'groupBy',
-  isAvailable: isEmpty(config.rowPivots) && isEmpty(config.columnPivots),
+export const createAggregationAction: CreateAggregationAction = (config, onConfigChange) => ({
+  label: 'Visualization',
+  value: 'visualization',
+  isAvailable: isEmpty(config.visualization) || config.visualization === 'datatable',
   onCreate: (config) => {},
   onDeleteAll: (config) => {},
 });
@@ -37,14 +37,14 @@ type Props = {
   onConfigChange: (newConfig: AggregationWidgetConfig) => void
 }
 
-const GroupByConfiguration = ({ config, onConfigChange }: Props) => {
-  const aggregationAttribute = createAggregationAttribute(config, onConfigChange);
+const VisualizationConfiguration = ({ config, onConfigChange }: Props) => {
+  const aggregationAction = createAggregationAction(config, onConfigChange);
 
   return (
-    <AttributeConfigurationContainer aggregationAttribute={aggregationAttribute}>
+    <AttributeConfigurationContainer aggregationAction={aggregationAction}>
       Configuration Elements
     </AttributeConfigurationContainer>
   );
 };
 
-export default GroupByConfiguration;
+export default VisualizationConfiguration;

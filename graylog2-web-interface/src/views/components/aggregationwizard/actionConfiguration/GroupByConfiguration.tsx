@@ -19,18 +19,17 @@ import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Series from 'views/logic/aggregationbuilder/Series';
 
 import AttributeConfigurationContainer from './AttributeConfigurationContainer';
 
-import type { CreateAggregationAttribute } from '../AggregationWizard';
+import type { CreateAggregationAction } from '../AggregationWizard';
 
-export const createAggregationAttribute: CreateAggregationAttribute = (config, onConfigChange) => ({
-  label: 'Metric',
-  value: 'metric',
-  isAvailable: isEmpty(config.series),
-  onCreate: () => onConfigChange(config.toBuilder().series([Series.createDefault()]).build()),
-  onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
+export const createAggregationAction: CreateAggregationAction = (config, onConfigChange) => ({
+  label: 'Group By',
+  value: 'groupBy',
+  isAvailable: isEmpty(config.rowPivots) && isEmpty(config.columnPivots),
+  onCreate: (config) => {},
+  onDeleteAll: (config) => {},
 });
 
 type Props = {
@@ -38,15 +37,14 @@ type Props = {
   onConfigChange: (newConfig: AggregationWidgetConfig) => void
 }
 
-const MetricConfiguration = ({ config, onConfigChange }: Props) => {
-  console.log(config);
-  const aggregationAttribute = createAggregationAttribute(config, onConfigChange);
+const GroupByConfiguration = ({ config, onConfigChange }: Props) => {
+  const aggregationAction = createAggregationAction(config, onConfigChange);
 
   return (
-    <AttributeConfigurationContainer aggregationAttribute={aggregationAttribute}>
+    <AttributeConfigurationContainer aggregationAction={aggregationAction}>
       Configuration Elements
     </AttributeConfigurationContainer>
   );
 };
 
-export default MetricConfiguration;
+export default GroupByConfiguration;

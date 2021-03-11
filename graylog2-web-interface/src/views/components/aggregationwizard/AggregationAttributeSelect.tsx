@@ -21,16 +21,16 @@ import { isEmpty } from 'lodash';
 import { Select } from 'components/common';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import { createAggregationAttribute as createVisualizationAttribute } from './attributeConfiguration/VisualizationConfiguration';
-import { createAggregationAttribute as createGroupByAttribute } from './attributeConfiguration/GroupByConfiguration';
-import { createAggregationAttribute as createMetricAttribute } from './attributeConfiguration/MetricConfiguration';
-import { createAggregationAttribute as createSortAttribute } from './attributeConfiguration/SortConfiguration';
-import type { AggregationAttribute } from './AggregationWizard';
+import { createAggregationAction as createVisualizationAttribute } from './attributeConfiguration/VisualizationConfiguration';
+import { createAggregationAction as createGroupByAttribute } from './attributeConfiguration/GroupByConfiguration';
+import { createAggregationAction as createMetricAttribute } from './attributeConfiguration/MetricConfiguration';
+import { createAggregationAction as createSortAttribute } from './attributeConfiguration/SortConfiguration';
+import type { AggregationAction } from './AggregationWizard';
 
 const _createAggregationAttributes: (
   config: AggregationWidgetConfig,
   onConfigChange: (newConfig: AggregationWidgetConfig) => void
-) => Array<AggregationAttribute> = (config, onConfigChange) => ([
+) => Array<AggregationAction> = (config, onConfigChange) => ([
   createVisualizationAttribute(config, onConfigChange),
   createGroupByAttribute(config, onConfigChange),
   createMetricAttribute(config, onConfigChange),

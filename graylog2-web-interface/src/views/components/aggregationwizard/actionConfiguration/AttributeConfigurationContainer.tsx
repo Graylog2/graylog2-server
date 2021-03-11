@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 
-import type { AggregationAttribute } from '../AggregationWizard';
+import type { AggregationAction } from '../AggregationWizard';
 
 const Wrapper = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
@@ -48,12 +48,12 @@ const Actions = styled.div``;
 
 type Props = {
   children: React.ReactNode,
-  aggregationAttribute: AggregationAttribute,
+  aggregationAction: AggregationAction,
 }
 
 const AttributeConfigurationContainer = ({
   children,
-  aggregationAttribute: { label, onDeleteAll },
+  aggregationAction: { label, onDeleteAll },
 }: Props) => {
   return (
     <Wrapper>
