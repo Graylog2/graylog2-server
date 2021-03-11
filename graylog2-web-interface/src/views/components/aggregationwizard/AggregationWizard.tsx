@@ -141,13 +141,13 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   return (
     <Wrapper>
       <Controls>
-        <Section>
+        <Section data-testid="add-action-section">
           <SectionHeadline>Add an Action</SectionHeadline>
           <AggregationActionSelect onActionCreate={_onActionCreate}
                                    configuredActions={configuredAggregationActions}
                                    aggregationActions={aggregationActions} />
         </Section>
-        <Section>
+        <Section data-testid="configure-actions-section">
           <SectionHeadline>Configured Actions</SectionHeadline>
           <div>
             {configuredAggregationActions.map((actionKey) => {
