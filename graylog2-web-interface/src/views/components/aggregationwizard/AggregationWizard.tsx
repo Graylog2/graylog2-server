@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
+import { EditWidgetComponentProps } from 'views/types';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -124,18 +125,11 @@ const Section = styled.div`
   }
 `;
 
-const SectionHeadline = styled.h3`
+const SectionHeadline = styled.div`
   margin-bottom: 5px;
 `;
 
-type Props = {
-  children: React.ReactNode,
-  config: AggregationWidgetConfig,
-  // fields: Immutable.List<FieldTypeMapping>,
-  onChange: (newConfig: AggregationWidgetConfig) => void,
-};
-
-const AggregationWizard = ({ onChange, config, children }: Props) => {
+const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
   const aggregationActions = _createAggregationActions(config, onChange);
   const [configuredAggregationActions, setConfiguredAggregationActions] = useState(_initialConfiguredAggregationActions(config, aggregationActions));
 
