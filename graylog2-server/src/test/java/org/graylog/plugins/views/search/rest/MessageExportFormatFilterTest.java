@@ -1,5 +1,7 @@
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.apache.http.HttpHeaders;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.graylog.plugins.views.search.export.ExportFormat;
@@ -29,6 +31,17 @@ import static org.mockito.Mockito.when;
 
 class MessageExportFormatFilterTest {
     private static final String VALID_PATH = "/views/search/messages";
+    private static final ExportFormat disabledJsonExportFormat = new ExportFormat() {
+        @Override
+        public MediaType mimeType() {
+            return MoreMediaTypes.APPLICATION_JSON_TYPE;
+        }
+
+        @Override
+        public Optional<String> hasError() {
+            return Optional.of("Kaboom!");
+        }
+    };
 
     private ArgumentCaptor<Response> responseCaptor;
 
@@ -69,19 +82,7 @@ class MessageExportFormatFilterTest {
 
     @Test
     void returns415IfAcceptedFormatIsNotEnabled() throws Exception {
-        final ExportFormat jsonExportFormat = new ExportFormat() {
-            @Override
-            public MediaType mimeType() {
-                return MoreMediaTypes.APPLICATION_JSON_TYPE;
-            }
-
-            @Override
-            public Optional<String> hasError() {
-                return Optional.of("Kaboom!");
-            }
-        };
-
-        final ContainerRequestFilter filter = new MessageExportFormatFilter(Collections.singleton(jsonExportFormat));
+        final ContainerRequestFilter filter = new MessageExportFormatFilter(Collections.singleton(disabledJsonExportFormat));
         final ContainerRequestContext requestContext = mockRequestContext(Collections.emptyList());
 
         filter.filter(requestContext);
@@ -96,6 +97,45 @@ class MessageExportFormatFilterTest {
 
         filter.filter(requestContext);
 
+        verifyRequestNotAborted(requestContext);
+    }
+
+    @Test
+    void filtersAcceptedMediaTypesToExistingOnes() throws Exception {
+        final ExportFormat jsonExportFormat = () -> MoreMediaTypes.APPLICATION_JSON_TYPE;
+        final ExportFormat plainTextExportFormat = () -> MoreMediaTypes.TEXT_PLAIN_TYPE;
+
+        final ContainerRequestFilter filter = new MessageExportFormatFilter(ImmutableSet.of(jsonExportFormat, plainTextExportFormat));
+        final ContainerRequestContext requestContext = mockRequestContext(ImmutableList.of(
+                MoreMediaTypes.TEXT_CSV_TYPE,
+                MoreMediaTypes.TEXT_PLAIN_TYPE,
+                MoreMediaTypes.APPLICATION_JSON_TYPE
+        ));
+
+        filter.filter(requestContext);
+
+        verifyRequestNotAborted(requestContext);
+        assertThat(requestContext.getHeaders().get(HttpHeaders.ACCEPT)).containsExactly(MoreMediaTypes.APPLICATION_JSON, MoreMediaTypes.TEXT_PLAIN);
+    }
+
+    @Test
+    void filtersAcceptedMediaTypesToEnabledOnes() throws Exception {
+        final ExportFormat plainTextExportFormat = () -> MoreMediaTypes.TEXT_PLAIN_TYPE;
+
+        final ContainerRequestFilter filter = new MessageExportFormatFilter(ImmutableSet.of(disabledJsonExportFormat, plainTextExportFormat));
+        final ContainerRequestContext requestContext = mockRequestContext(ImmutableList.of(
+                MoreMediaTypes.TEXT_CSV_TYPE,
+                MoreMediaTypes.TEXT_PLAIN_TYPE,
+                MoreMediaTypes.APPLICATION_JSON_TYPE
+        ));
+
+        filter.filter(requestContext);
+
+        verifyRequestNotAborted(requestContext);
+        assertThat(requestContext.getHeaders().get(HttpHeaders.ACCEPT)).containsExactly(MoreMediaTypes.TEXT_PLAIN);
+    }
+
+    private void verifyRequestNotAborted(ContainerRequestContext requestContext) {
         verify(requestContext, never()).abortWith(any());
     }
 
