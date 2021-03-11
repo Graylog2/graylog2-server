@@ -28,9 +28,9 @@ import GroupByConfiguration from './attributeConfiguration/GroupByConfiguration'
 import MetricConfiguration from './attributeConfiguration/MetricConfiguration';
 import SortConfiguration from './attributeConfiguration/SortConfiguration';
 
-export type CreateAggregationAttribute = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationAttribute;
+export type CreateAggregationAction = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationAction;
 
-export type AggregationAttribute = {
+export type AggregationAction = {
   label: string,
   value: string,
   isAvailable: boolean,
