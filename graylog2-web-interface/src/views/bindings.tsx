@@ -29,7 +29,6 @@ import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
 import AggregateActionHandler from 'views/logic/fieldactions/AggregateActionHandler';
 import ChartActionHandler from 'views/logic/fieldactions/ChartActionHandler';
 import AggregationBuilder from 'views/components/aggregationbuilder/AggregationBuilder';
-import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
@@ -153,7 +152,7 @@ const exports: PluginExports = {
       defaultWidth: 4,
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
-      editComponent: AggregationWizard,
+      editComponent: AggregationControls,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [
