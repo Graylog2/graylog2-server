@@ -46,11 +46,14 @@ const timeRangeTypes = {
   keyword: TabKeywordTimeRange,
 };
 
+const allTimeRangeTypes = Object.keys(timeRangeTypes) as Array<TimeRangeType>;
+
 type Props = {
   noOverride?: boolean,
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
   setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
+  validTypes?: Array<TimeRangeType>,
 };
 
 const StyledPopover = styled(Popover)(({ theme }) => css`
@@ -112,21 +115,32 @@ const DEFAULT_RANGES = {
   disabled: undefined,
 };
 
-const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword }) => availableTimeRangeTypes.map(({ type, name }) => {
-  const TimeRangeTypeTabs = timeRangeTypes[type];
+export type TimeRangeType = keyof typeof timeRangeTypes;
 
-  return (
-    <Tab title={name}
-         key={`time-range-type-selector-${type}`}
-         eventKey={type}>
-      {type === activeTab && (
-        <TimeRangeTypeTabs disabled={false}
-                           limitDuration={limitDuration}
-                           setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
-      )}
-    </Tab>
-  );
-});
+type TimeRangeTabsArguments = {
+  activeTab: TimeRangeType,
+  limitDuration: number,
+  setValidatingKeyword: (status: boolean) => void,
+  tabs: Array<TimeRangeType>,
+}
+
+const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
+  .filter(({ type }) => tabs.includes(type))
+  .map(({ type, name }) => {
+    const TimeRangeTypeTab = timeRangeTypes[type];
+
+    return (
+      <Tab title={name}
+           key={`time-range-type-selector-${type}`}
+           eventKey={type}>
+        {type === activeTab && (
+        <TimeRangeTypeTab disabled={false}
+                          limitDuration={limitDuration}
+                          setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
+        )}
+      </Tab>
+    );
+  });
 
 const exceedsDuration = (timerange, limitDuration) => {
   if (limitDuration === 0) {
@@ -225,7 +239,7 @@ const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['n
   return (nextTimeRange as SearchBarFormValues['timerange']);
 };
 
-const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange }: Props) => {
+const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange, validTypes = allTimeRangeTypes }: Props) => {
   const { limitDuration } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
@@ -294,6 +308,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
                         activeTab,
                         limitDuration,
                         setValidatingKeyword,
+                        tabs: validTypes,
                       })}
 
                       {!activeTab && (<TabDisabledTimeRange />)}
@@ -327,6 +342,7 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
 
 TimeRangeDropdown.defaultProps = {
   noOverride: false,
+  validTypes: allTimeRangeTypes,
 };
 
 export default TimeRangeDropdown;
