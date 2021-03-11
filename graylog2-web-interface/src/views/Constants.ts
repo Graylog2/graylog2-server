@@ -92,7 +92,7 @@ export const showDashboardsPath = `${dashboardsPath}/:viewId`;
 export const extendedSearchPath = '/extendedsearch';
 
 export const availableTimeRangeTypes = [
-  { type: 'relative', name: 'Relative' },
-  { type: 'absolute', name: 'Absolute' },
-  { type: 'keyword', name: 'Keyword' },
+  { type: 'relative' as const, name: 'Relative' },
+  { type: 'absolute' as const, name: 'Absolute' },
+  { type: 'keyword' as const, name: 'Keyword' },
 ];
