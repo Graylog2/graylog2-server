@@ -4,6 +4,7 @@ import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog2.rest.MoreMediaTypes;
 
 import javax.inject.Inject;
+import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -22,15 +23,20 @@ import java.util.stream.Collectors;
 @PreMatching
 public class MessageExportFormatFilter implements ContainerRequestFilter {
     private final Map<MediaType, ExportFormat> supportedFormats;
+    private final String targetPath;
 
     @Inject
     public MessageExportFormatFilter(Set<ExportFormat> supportedFormats) {
         this.supportedFormats = supportedFormats.stream()
             .collect(Collectors.toMap(ExportFormat::mimeType, Function.identity()));
+        targetPath = MessagesResource.class.getAnnotation(Path.class).value();
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        if (!requestContext.getUriInfo().getPath().contains(targetPath)) {
+            return;
+        }
         final List<MediaType> acceptedFormats = requestContext.getAcceptableMediaTypes();
 
         final Map<MediaType, ExportFormat> exportFormatCandidates = supportedFormats.entrySet()
@@ -40,6 +46,7 @@ public class MessageExportFormatFilter implements ContainerRequestFilter {
 
         if (exportFormatCandidates.isEmpty()) {
             requestContext.abortWith(Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).build());
+            return;
         }
 
         final Map<MediaType, Optional<String>> candidateErrors = exportFormatCandidates.entrySet()
@@ -54,6 +61,7 @@ public class MessageExportFormatFilter implements ContainerRequestFilter {
                     .entity(errorMessage)
                     .type(MoreMediaTypes.TEXT_PLAIN_TYPE)
                     .build());
+            return;
         }
 
         final List<String> allowedMediaTypes = candidateErrors.entrySet().stream()
