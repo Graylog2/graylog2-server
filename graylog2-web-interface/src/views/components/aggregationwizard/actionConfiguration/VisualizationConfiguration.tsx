@@ -23,6 +23,7 @@ type Props = {
   onConfigChange: (newConfig: AggregationWidgetConfig) => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const VisualizationConfiguration = ({ config, onConfigChange }: Props) => {
   return (
     <>
