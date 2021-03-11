@@ -15,23 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { isEmpty } from 'lodash';
-import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Series from 'views/logic/aggregationbuilder/Series';
-
-import AttributeConfigurationContainer from './AttributeConfigurationContainer';
-
-import type { CreateAggregationAction } from '../AggregationWizard';
-
-export const createAggregationAction: CreateAggregationAction = (config, onConfigChange) => ({
-  label: 'Metric',
-  value: 'metric',
-  isAvailable: isEmpty(config.series),
-  onCreate: () => onConfigChange(config.toBuilder().series([Series.createDefault()]).build()),
-  onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
-});
 
 type Props = {
   config: AggregationWidgetConfig,
@@ -39,13 +24,10 @@ type Props = {
 }
 
 const MetricConfiguration = ({ config, onConfigChange }: Props) => {
-  console.log(config);
-  const aggregationAction = createAggregationAction(config, onConfigChange);
-
   return (
-    <AttributeConfigurationContainer aggregationAction={aggregationAction}>
+    <>
       Configuration Elements
-    </AttributeConfigurationContainer>
+    </>
   );
 };
 

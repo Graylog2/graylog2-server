@@ -15,22 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { isEmpty } from 'lodash';
-import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-
-import AttributeConfigurationContainer from './AttributeConfigurationContainer';
-
-import type { CreateAggregationAction } from '../AggregationWizard';
-
-export const createAggregationAction: CreateAggregationAction = (config, onConfigChange) => ({
-  label: 'Visualization',
-  value: 'visualization',
-  isAvailable: isEmpty(config.visualization) || config.visualization === 'datatable',
-  onCreate: (config) => {},
-  onDeleteAll: (config) => {},
-});
 
 type Props = {
   config: AggregationWidgetConfig,
@@ -38,12 +24,10 @@ type Props = {
 }
 
 const VisualizationConfiguration = ({ config, onConfigChange }: Props) => {
-  const aggregationAction = createAggregationAction(config, onConfigChange);
-
   return (
-    <AttributeConfigurationContainer aggregationAction={aggregationAction}>
+    <>
       Configuration Elements
-    </AttributeConfigurationContainer>
+    </>
   );
 };
 
