@@ -37,10 +37,6 @@ const Header = styled.div`
   margin-bottom: 5px;
 `;
 
-const Headline = styled.h4`
-  /* font-weight: bold; */
-`;
-
 const Actions = styled.div``;
 
 type Props = {
@@ -59,7 +55,7 @@ const ActionConfigurationContainer = ({
   return (
     <Wrapper>
       <Header>
-        <Headline>{title}</Headline>
+        <div>{title}</div>
         <Actions>
           {!isPermanentAction && (
             <IconButton title={`Remove ${title}`} name="trash" onClick={onDeleteAll} />

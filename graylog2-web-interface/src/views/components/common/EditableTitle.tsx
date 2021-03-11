@@ -22,7 +22,6 @@ import styles from './EditableTitle.css';
 
 const StyledStaticSpan = styled.span(({ theme }) => css`
   border: 1px solid ${theme.colors.global.contentBackground};
-  padding: 2px 3px;
   font-size: ${theme.fonts.size.large};
   display: inline-block;
 `);
