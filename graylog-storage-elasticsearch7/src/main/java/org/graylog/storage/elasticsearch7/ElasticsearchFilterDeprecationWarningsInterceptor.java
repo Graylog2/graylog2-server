@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
 public class ElasticsearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor {
     private String[] messagesToFilter = {
             "setting was deprecated in Elasticsearch",
-            "but in a future major version, directaccess to system indices and their aliases will not be allowed"
+            "but in a future major version, directaccess to system indices and their aliases will not be allowed",
+            "in epoch time formats is deprecated and will not be supported in the next major version of Elasticsearch",
+            org.graylog.shaded.elasticsearch7.org.elasticsearch.common.joda.JodaDeprecationPatterns.USE_NEW_FORMAT_SPECIFIERS
     };
 
     private boolean isDeprecationMessage(final String message) {
