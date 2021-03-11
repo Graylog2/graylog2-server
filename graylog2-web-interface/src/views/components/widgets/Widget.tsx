@@ -398,7 +398,7 @@ class Widget extends React.Component<Props, State> {
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
-                      {widget.isExportable && <MenuItem onSelect={() => this._onToggleExport()}>Export to CSV</MenuItem>}
+                      {widget.isExportable && <MenuItem onSelect={() => this._onToggleExport()}>Export</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       </IfSearch>
