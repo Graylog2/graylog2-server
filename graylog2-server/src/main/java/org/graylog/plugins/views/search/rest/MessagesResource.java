@@ -58,6 +58,7 @@ import java.util.function.Function;
 @Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
 @Path("/views/search/messages")
 @RequiresAuthentication
+@SupportOnlyValidExportFormats
 public class MessagesResource extends RestResource implements PluginRestResource {
 
     private final CommandFactory commandFactory;
