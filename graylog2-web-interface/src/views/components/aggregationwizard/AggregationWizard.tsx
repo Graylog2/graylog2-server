@@ -38,7 +38,6 @@ export type AggregationAction = {
   isConfigured: boolean,
   onCreate: () => void,
   onDeleteAll?: () => void,
-  isPermanent?: boolean,
   component: React.ComponentType<{
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
