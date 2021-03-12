@@ -17,15 +17,15 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.ValidatorMethod;
-import com.github.joschi.jadconfig.validators.PathExecutableValidator;
+import org.graylog2.configuration.converters.PathSetConverter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Set;
 
-public abstract class PathConfiguration {
-    public static final String CSV_FILE_LOOKUP_DIR = "csv_file_lookup_dir";
+public class PathConfiguration {
+    public static final String TRUSTED_DATA_FILE_PATHS = "trusted_data_file_paths";
 
     protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");
     protected static final Path DEFAULT_DATA_DIR = Paths.get("data");
@@ -41,17 +41,17 @@ public abstract class PathConfiguration {
     private Path pluginDir = DEFAULT_PLUGIN_DIR;
 
     /**
-     * Optional absolute path where CSV lookup files can be placed.
+     * Optional trusted paths for Graylog data files.
      *
-     * If provided, then the CSV File lookup adapter will only start if the CSV file is in the specified location.
-     * This helps with security, and allows administrators to control where in the file system users can select
-     * CSV files from.
+     * If provided, certain operations in Graylog will only be permitted if the data file(s) are located in the
+     * specified paths. All subdirectories of indicated paths are trusted by default.
      *
-     * An absolute path is required here (not relative to the server working directory, or the data directory),
-     * since an administrator might want to specify CSV files in another location all-together.
+     * This provides an additional layer of security, and allows administrators to control where in the file system
+     * Graylog users can select files from. It protects against the potential inspection of arbitrary files in the
+     * file system from the Graylog user interface.
      */
-    @Parameter(value = CSV_FILE_LOOKUP_DIR, validator = PathExecutableValidator.class)
-    private Path csvFileLookupDir;
+    @Parameter(value = TRUSTED_DATA_FILE_PATHS, converter = PathSetConverter.class)
+    private Set<Path> trustedFilePaths = Collections.emptySet();
 
     public Path getBinDir() {
         return binDir;
@@ -68,13 +68,7 @@ public abstract class PathConfiguration {
         return pluginDir;
     }
 
-    @ValidatorMethod
-    public void validateCsvFileLookupDir() throws ValidationException {
-        if (csvFileLookupDir != null) {
-            if (csvFileLookupDir.toString().contains("../")) {
-                throw new ValidationException("Relative paths are not permitted in the " +
-                                              CSV_FILE_LOOKUP_DIR + " parameter");
-            }
-        }
+    public Set<Path> getTrustedFilePaths() {
+        return trustedFilePaths;
     }
 }
