@@ -38,7 +38,7 @@ public class PathSetConverterTest {
     public void testConvertFrom() {
         Assert.assertEquals(0, converter.convertFrom("").size());
         Assert.assertEquals(0, converter.convertFrom(",").size());
-        Assert.assertEquals(0, converter.convertFrom(",,,,,").size());
+        Assert.assertEquals(0, converter.convertFrom(",,,,,,,").size());
         Assert.assertEquals(1, converter.convertFrom("/another-dir").size());
         Assert.assertEquals(1, converter.convertFrom("/another-dir;/some-dir;/finally-dir").size());
         Assert.assertEquals(3, converter.convertFrom("/another-dir, /some-dir, /finally-dir").size());

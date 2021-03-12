@@ -40,6 +40,7 @@ public class TrustedPathChecker {
         }
 
         // Get the absolute file path (resolve all relative paths and symbolic links).
+        // The path.toFile().getCanonicalFile() calls accomplishes this.
         final Path csvFilePath = Paths.get(filePath).toFile().getCanonicalFile().toPath();
         for (Path trustedPath : trustedPaths) {
             final Path absoluteTrustedPath = trustedPath.toFile().getCanonicalFile().toPath();

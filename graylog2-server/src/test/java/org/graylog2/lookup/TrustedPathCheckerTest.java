@@ -40,6 +40,13 @@ public class TrustedPathCheckerTest {
     }
 
     @Test
+    public void successRelativePaths() throws IOException {
+        final Set<Path> paths = Collections.singleton(Paths.get(TRUSTED_PATH + "/sub-dir/../"));
+        pathChecker = new TrustedPathChecker(paths);
+        assertTrue(pathChecker.fileIsInTrustedPath(TRUSTED_PATH + "/file.csv"));
+    }
+
+    @Test
     public void failureOutsideOfTrustedPath() throws IOException {
         final Set<Path> paths = Collections.singleton(Paths.get(TRUSTED_PATH));
         pathChecker = new TrustedPathChecker(paths);
