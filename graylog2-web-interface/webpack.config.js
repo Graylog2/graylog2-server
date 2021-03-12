@@ -97,7 +97,6 @@ const webpackConfig = {
   entry: {
     app: APP_PATH,
     builtins: [path.resolve(APP_PATH, 'injection', 'builtins.js')],
-    polyfill: ['@babel/polyfill'],
   },
   output: {
     path: BUILD_PATH,
