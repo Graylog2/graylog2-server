@@ -18,8 +18,11 @@ import * as React from 'react';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import ExportModal from 'views/components/export/ExportModal';
+import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
+import { IconButton } from 'components/common';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -27,12 +30,9 @@ import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import Search from 'views/logic/search/Search';
-import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/graylog';
-import { IconButton } from 'components/common';
 import { WidgetActions } from 'views/stores/WidgetStore';
 
 import ReplaySearchButton from './ReplaySearchButton';
@@ -152,7 +152,7 @@ const WidgetActionsMenu = ({
   const widget = useContext(WidgetContext);
   const { setWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
-  const [showCsvExport, setShowCsvExport] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
 
   const onDuplicate = () => _onDuplicate(widget.id, setWidgetFocusing, title);
@@ -189,16 +189,12 @@ const WidgetActionsMenu = ({
           <MenuItem onSelect={onDuplicate}>
             Duplicate
           </MenuItem>
-          {widget.isExportable && (
-            <MenuItem onSelect={() => setShowCsvExport(true)}>
-              Export to CSV
-            </MenuItem>
-          )}
           <IfSearch>
             <MenuItem onSelect={() => setShowCopyToDashboard(true)}>
               Copy to Dashboard
             </MenuItem>
           </IfSearch>
+          {widget.isExportable && <MenuItem onSelect={() => setShowExport(true)}>Export</MenuItem>}
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>
               Move to Page
@@ -216,11 +212,13 @@ const WidgetActionsMenu = ({
                            onSubmit={onCopyToDashboard}
                            onCancel={() => setShowCopyToDashboard(false)} />
         )}
-        {showCsvExport && (
-          <CSVExportModal view={view.view}
-                          directExportWidgetId={widget.id}
-                          closeModal={() => setShowCsvExport(false)} />
+
+        {showExport && (
+          <ExportModal view={view.view}
+                       directExportWidgetId={widget.id}
+                       closeModal={() => setShowExport(false)} />
         )}
+
         {showMoveWidgetToTab && (
           <MoveWidgetToTabModal view={view.view}
                                 widgetId={widget.id}

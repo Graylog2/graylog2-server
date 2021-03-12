@@ -30,6 +30,7 @@ import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
+import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
@@ -332,5 +333,17 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addPluginUISettingsProvider(String providerKey,
                                                Class<? extends PluginUISettingsProvider> uiSettingsProviderClass) {
         pluginUISettingsProviderBinder().addBinding(providerKey).to(uiSettingsProviderClass);
+    }
+
+    private Multibinder<ExportFormat> exportFormatBinder() {
+        return Multibinder.newSetBinder(binder(), ExportFormat.class);
+    }
+
+    protected void addExportFormat(Class<? extends ExportFormat> exportFormat) {
+        exportFormatBinder().addBinding().to(exportFormat);
+    }
+
+    protected void addExportFormat(ExportFormat exportFormat) {
+        exportFormatBinder().addBinding().toInstance(exportFormat);
     }
 }

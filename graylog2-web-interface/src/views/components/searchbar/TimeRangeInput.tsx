@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
-import TimeRangeDropdown from './date-time-picker/TimeRangeDropdown';
+import TimeRangeDropdown, { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 type Props = {
@@ -31,6 +31,7 @@ type Props = {
   noOverride?: boolean,
   hasErrorOnMount?: boolean,
   onChange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  validTypes?: Array<TimeRangeType>,
 };
 
 const FlexContainer = styled.span`
@@ -39,8 +40,12 @@ const FlexContainer = styled.span`
   justify-content: space-between;
 `;
 
-const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange }: Props) => {
+const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onChange, validTypes }: Props) => {
   const [show, setShow] = useState(false);
+
+  if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
+    throw new Error(`Value is of type ${value.type}, but only these types are valid: ${validTypes}`);
+  }
 
   const toggleShow = () => setShow(!show);
 
@@ -53,7 +58,8 @@ const TimeRangeInput = ({ disabled, hasErrorOnMount, noOverride, value = {}, onC
         <TimeRangeDropdown currentTimeRange={value}
                            noOverride={noOverride}
                            setCurrentTimeRange={onChange}
-                           toggleDropdownShow={toggleShow} />
+                           toggleDropdownShow={toggleShow}
+                           validTypes={validTypes} />
       </TimeRangeDropdownButton>
       <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
     </FlexContainer>
@@ -64,12 +70,14 @@ TimeRangeInput.propTypes = {
   disabled: PropTypes.bool,
   hasErrorOnMount: PropTypes.bool,
   noOverride: PropTypes.bool,
+  validTypes: PropTypes.arrayOf(PropTypes.string),
 };
 
 TimeRangeInput.defaultProps = {
   disabled: false,
   hasErrorOnMount: false,
   noOverride: false,
+  validTypes: undefined,
 };
 
 export default TimeRangeInput;
