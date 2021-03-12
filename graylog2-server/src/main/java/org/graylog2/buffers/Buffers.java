@@ -122,7 +122,7 @@ public class Buffers {
     // e.g. 123i/432p/545o
     private String getUsageStats(Map<Type, EventBuffer> buffersByTypes) {
         return buffersByTypes.entrySet().stream()
-                .map(e -> e.getValue().getUsage() + e.getKey().name().substring(0, 1).toLowerCase())
+                .map(e -> e.getValue().getUsage() + e.getKey().name().substring(0, 1).toLowerCase(Locale.ENGLISH))
                 .collect(Collectors.joining("/"));
     }
 
