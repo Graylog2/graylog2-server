@@ -26,16 +26,17 @@ import { HelpBlock, Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
+import ExportFormatSelection from 'views/components/export/ExportFormatSelection';
 
 import CustomExportSettings from './CustomExportSettings';
 
-type CSVExportSettingsType = {
+type ExportSettingsType = {
   fields: List<FieldTypeMapping>,
   selectedWidget: Widget | undefined | null,
   view: View,
 };
 
-const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, view: View}) => {
+const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget, view: View }) => {
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
 
   return (
@@ -52,17 +53,21 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, v
   );
 };
 
-const CSVExportSettings = ({
+const ExportSettings = ({
   fields,
   selectedWidget,
   view,
-}: CSVExportSettingsType) => {
+}: ExportSettingsType) => {
   return (
     <>
+      <Row>
+        <ExportFormatSelection />
+      </Row>
+
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
         <p>
-          Define the fields for your CSV file. You can change the field order with drag and drop.<br />
+          Define the fields for your file. You can change the field order with drag and drop.<br />
         </p>
         {selectedWidget && (
           <p>
@@ -116,4 +121,4 @@ const CSVExportSettings = ({
   );
 };
 
-export default CSVExportSettings;
+export default ExportSettings;

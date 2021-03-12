@@ -98,6 +98,14 @@ interface SearchType {
   defaults: {};
 }
 
+interface ExportFormat {
+  type: string;
+  displayName: () => string;
+  disabled?: () => boolean;
+  mimeType: string;
+  fileExtension: string;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -108,6 +116,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.completers'?: Array<Completer>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
+    'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.executingView'?: Array<ViewHook>,
     'views.hooks.loadingView'?: Array<ViewHook>,
     'views.hooks.searchRefresh'?: Array<SearchRefreshCondition>;
