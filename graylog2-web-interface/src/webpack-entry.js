@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import 'core-js';
-import 'regenerator-runtime/runtime';
 import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
