@@ -220,6 +220,7 @@ class Widget extends React.Component<Props, State> {
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, editing } = this.props;
     const { loading } = this.state;
+
     const { config } = widget;
     const { focusedWidget, setWidgetEditing } = this.context;
     const isFocused = focusedWidget?.id === id;

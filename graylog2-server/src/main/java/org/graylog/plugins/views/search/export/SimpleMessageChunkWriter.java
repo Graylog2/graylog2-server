@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+package org.graylog.plugins.views.search.export;
 
-export type ThemeMode = 'teint' | 'noir';
-export type PreferencesThemeMode = 'themeMode';
+import javax.ws.rs.ext.MessageBodyWriter;
+import java.lang.reflect.Type;
 
-const PREFERENCES_THEME_MODE: PreferencesThemeMode = 'themeMode';
-const THEME_MODE_LIGHT = 'teint';
-const THEME_MODE_DARK = 'noir';
-const DEFAULT_THEME_MODE: ThemeMode = prefersDarkMode ? THEME_MODE_DARK : THEME_MODE_LIGHT;
-const THEME_MODES: Array<ThemeMode> = [THEME_MODE_LIGHT, THEME_MODE_DARK];
+public abstract class SimpleMessageChunkWriter implements MessageBodyWriter<SimpleMessageChunk> {
+    protected boolean typesMatch(Class<?> type, Type genericType) {
+        return SimpleMessageChunk.class.equals(type) || isAutoValueType(type, genericType);
+    }
 
-export {
-  DEFAULT_THEME_MODE,
-  PREFERENCES_THEME_MODE,
-  THEME_MODE_LIGHT,
-  THEME_MODE_DARK,
-  THEME_MODES,
-};
+    private boolean isAutoValueType(Class<?> type, Type genericType) {
+        return AutoValue_SimpleMessageChunk.class.equals(type) && SimpleMessageChunk.class.equals(genericType);
+    }
+}

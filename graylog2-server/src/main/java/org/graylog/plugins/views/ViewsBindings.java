@@ -50,6 +50,7 @@ import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
+import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
@@ -95,6 +96,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.plugin.PluginConfigBean;
+import org.graylog2.rest.MoreMediaTypes;
 
 import java.util.Set;
 
@@ -193,7 +195,10 @@ public class ViewsBindings extends ViewsModule {
 
         registerExceptionMappers();
 
+        addExportFormat(() -> MoreMediaTypes.TEXT_CSV_TYPE);
+
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SimpleMessageChunkCsvWriter.class);
+        jerseyAdditionalComponentsBinder().addBinding().toInstance(MessageExportFormatFilter.class);
     }
 
     private void registerExportBackendProvider() {

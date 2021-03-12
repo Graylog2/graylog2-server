@@ -162,7 +162,7 @@ describe('<Widget />', () => {
     await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
   });
 
-  it('does not display export to CSV action if widget is not a message table', () => {
+  it('does not display export action if widget is not a message table', () => {
     const dummyWidget = WidgetModel.builder()
       .id('widgetId')
       .type('dummy')
@@ -174,10 +174,10 @@ describe('<Widget />', () => {
 
     fireEvent.click(actionToggle);
 
-    expect(queryByText('Export to CSV')).toBeNull();
+    expect(queryByText('Export')).toBeNull();
   });
 
-  it('allows export to CSV for message tables', () => {
+  it('allows export for message tables', () => {
     const messagesWidget = MessagesWidget.builder()
       .id('widgetId')
       .config({})
@@ -189,11 +189,11 @@ describe('<Widget />', () => {
 
     fireEvent.click(actionToggle);
 
-    const exportButton = screen.getByText('Export to CSV');
+    const exportButton = screen.getByText('Export');
 
     fireEvent.click(exportButton);
 
-    expect(screen.getByText('Export message table search results to CSV')).not.toBeNull();
+    expect(screen.getByText('Export message table search results')).not.toBeNull();
   });
 
   describe('copy widget to dashboard', () => {

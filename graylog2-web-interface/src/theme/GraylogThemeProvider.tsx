@@ -24,9 +24,10 @@ import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 
 import useCurrentThemeMode from './UseCurrentThemeMode';
+import { THEME_MODES } from './constants';
 
-const GraylogThemeProvider = ({ children }) => {
-  const [mode, changeMode] = useCurrentThemeMode();
+const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
+  const [mode, changeMode] = useCurrentThemeMode(initialThemeModeOverride);
   const themeColors = colors[mode];
 
   const theme = useCallback((): DefaultTheme => {
@@ -59,6 +60,11 @@ const GraylogThemeProvider = ({ children }) => {
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.any.isRequired,
+  initialThemeModeOverride: PropTypes.oneOf(THEME_MODES),
+};
+
+GraylogThemeProvider.defaultProps = {
+  initialThemeModeOverride: undefined,
 };
 
 export default GraylogThemeProvider;
