@@ -28,6 +28,11 @@ import WidgetFocusContext, { FocusRequest } from 'views/components/contexts/Widg
 
 type QueryParamsUpdate = FocusRequest & { id: FocusRequest['id'] | undefined };
 
+const _clearURI = (query) => new URI(query)
+  .removeSearch('focusing')
+  .removeSearch('editing')
+  .removeSearch('focusedId');
+
 const _updateQueryParams = ({
   newQueryParams,
   query,
@@ -35,10 +40,7 @@ const _updateQueryParams = ({
   newQueryParams: QueryParamsUpdate,
   query: string,
 }) => {
-  let baseUri = new URI(query)
-    .removeSearch('focusing')
-    .removeSearch('editing')
-    .removeSearch('focusedId');
+  let baseUri = _clearURI(query);
 
   if (newQueryParams?.id && (newQueryParams.focusing || newQueryParams.editing)) {
     baseUri = baseUri.setSearch('focusedId', newQueryParams.id);
@@ -76,12 +78,9 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
 const useCleanupQueryParams = ({ focusUriParams, widgets, query, history }) => {
   useEffect(() => {
     if ((focusUriParams?.id || focusUriParams?.editing || focusUriParams?.focusing) && !widgets.has(focusUriParams.id)) {
-      const newURI = new URI(query)
-        .removeSearch('focusing')
-        .removeSearch('editing')
-        .removeSearch('focusedId');
+      const baseURI = _clearURI(query);
 
-      history.replace(newURI.toString());
+      history.replace(baseURI.toString());
     }
   }, [focusUriParams, widgets, query, history]);
 };
