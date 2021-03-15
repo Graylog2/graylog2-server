@@ -28,8 +28,8 @@ import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
-import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import Search from 'views/logic/search/Search';
+import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/graylog';
@@ -57,7 +57,7 @@ const Container = styled.div`
   }
 `;
 
-const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string) => ({ search: newSearch }) => {
+const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search) => {
   const newDashboard = dashboard.toBuilder().search(newSearch).build();
 
   ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
@@ -80,7 +80,7 @@ const _onCopyToDashboard = (
     const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
 
     if (newDashboard && newDashboard.search) {
-      SearchActions.create(newDashboard.search).then(_updateDashboardWithNewSearch(newDashboard, dashboardId));
+      SearchActions.create(newDashboard.search).then(({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, dashboardId, newSearch));
     }
   };
 
