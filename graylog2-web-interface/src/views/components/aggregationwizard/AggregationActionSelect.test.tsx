@@ -26,13 +26,15 @@ const aggregationActions: Array<AggregationAction> = [
     title: 'Metric',
     key: 'metric',
     isConfigured: false,
+    multipleUse: true,
     onCreate: () => {},
     component: () => <div />,
   },
   {
     title: 'Sort',
     key: 'sort',
-    isConfigured: false,
+    multipleUse: false,
+    isConfigured: true,
     onCreate: () => {},
     component: () => <div />,
   },
@@ -43,7 +45,6 @@ describe('AggregationActionSelect', () => {
     const onActionCreateMock = jest.fn();
 
     render(<AggregationActionSelect onActionCreate={onActionCreateMock}
-                                    configuredActions={[]}
                                     aggregationActions={aggregationActions} />);
 
     const aggregationActionSelect = screen.getByLabelText('Add an Action');
@@ -55,16 +56,15 @@ describe('AggregationActionSelect', () => {
     expect(onActionCreateMock).toHaveBeenCalledWith('metric');
   });
 
-  it('should not list already configured aggregation actions', async () => {
+  it('should not list already configured aggregation actions which can not be configured multiple times', async () => {
     render(<AggregationActionSelect onActionCreate={() => {}}
-                                    configuredActions={['metric']}
                                     aggregationActions={aggregationActions} />);
 
     const aggregationActionSelect = screen.getByLabelText('Add an Action');
 
     await selectEvent.openMenu(aggregationActionSelect);
 
-    expect(screen.getByText('Sort')).toBeInTheDocument();
-    expect(screen.queryByText('Metric')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sort')).not.toBeInTheDocument();
+    expect(screen.getByText('Metric')).toBeInTheDocument();
   });
 });

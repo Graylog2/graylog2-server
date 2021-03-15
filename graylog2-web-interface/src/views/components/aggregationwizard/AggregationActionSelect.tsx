@@ -21,11 +21,13 @@ import { Select } from 'components/common';
 
 import type { AggregationAction } from './AggregationWizard';
 
-const _getOptions = (aggregationActions: Array<AggregationAction>, configuredActions: Array<string>) => {
+const _getOptions = (aggregationActions: Array<AggregationAction>) => {
   return aggregationActions.reduce((availableActions, aggregationAction) => {
-    if (!configuredActions.find((actionKey) => aggregationAction.key === actionKey)) {
-      availableActions.push({ value: aggregationAction.key, label: aggregationAction.title });
+    if (aggregationAction.isConfigured && !aggregationAction.multipleUse) {
+      return availableActions;
     }
+
+    availableActions.push({ value: aggregationAction.key, label: aggregationAction.title });
 
     return availableActions;
   }, []);
@@ -33,13 +35,12 @@ const _getOptions = (aggregationActions: Array<AggregationAction>, configuredAct
 
 type Props = {
   aggregationActions: Array<AggregationAction>,
-  configuredActions: Array<string>,
   onActionCreate: (actionKey: string) => void,
 }
 
-const AggregationActionSelect = ({ aggregationActions, configuredActions, onActionCreate }: Props) => {
+const AggregationActionSelect = ({ aggregationActions, onActionCreate }: Props) => {
   const selectRef = useRef(null);
-  const options = _getOptions(aggregationActions, configuredActions);
+  const options = _getOptions(aggregationActions);
 
   const _onSelect = (actionKey: string) => {
     selectRef.current.clearValue();
