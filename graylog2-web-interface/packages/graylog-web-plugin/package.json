@@ -37,8 +37,8 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@babel/preset-env": "7.12.17",
-    "@babel/preset-typescript": "7.12.17",
+    "@babel/preset-env": "7.13.10",
+    "@babel/preset-typescript": "7.13.0",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
     "formik": "2.2.6",
@@ -64,8 +64,8 @@
     "webpack-merge": "4.2.2"
   },
   "devDependencies": {
-    "@babel/cli": "7.12.17",
-    "@babel/core": "7.12.17",
+    "@babel/cli": "7.13.10",
+    "@babel/core": "7.13.10",
     "babel-plugin-add-module-exports": "^1.0.2"
   }
 }
