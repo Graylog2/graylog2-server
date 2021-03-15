@@ -23,16 +23,16 @@ import { EditWidgetComponentProps } from 'views/types';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 
-import AggregationActionSelect from './AggregationActionSelect';
-import ActionConfigurationContainer from './actionConfiguration/ActionConfigurationContainer';
-import VisualizationConfiguration from './actionConfiguration/VisualizationConfiguration';
-import GroupByConfiguration from './actionConfiguration/GroupByConfiguration';
-import MetricConfiguration from './actionConfiguration/MetricConfiguration';
-import SortConfiguration from './actionConfiguration/SortConfiguration';
+import AggregationElementSelect from './AggregationElementSelect';
+import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
+import VisualizationConfiguration from './elementConfiguration/VisualizationConfiguration';
+import GroupByConfiguration from './elementConfiguration/GroupByConfiguration';
+import MetricConfiguration from './elementConfiguration/MetricConfiguration';
+import SortConfiguration from './elementConfiguration/SortConfiguration';
 
-export type CreateAggregationAction = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationAction;
+export type CreateAggregationElement = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationElement;
 
-export type AggregationAction = {
+export type AggregationElement = {
   title: string,
   key: string,
   isConfigured: boolean,
@@ -45,7 +45,7 @@ export type AggregationAction = {
   }>,
 }
 
-const createVisualizationAction: CreateAggregationAction = (config, onConfigChange) => ({
+const createVisualizationElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Visualization',
   key: 'visualization',
   multipleUse: false,
@@ -54,7 +54,7 @@ const createVisualizationAction: CreateAggregationAction = (config, onConfigChan
   component: VisualizationConfiguration,
 });
 
-const createMetricAction: CreateAggregationAction = (config, onConfigChange) => ({
+const createMetricElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Metric',
   key: 'metric',
   multipleUse: true,
@@ -64,7 +64,7 @@ const createMetricAction: CreateAggregationAction = (config, onConfigChange) => 
   component: MetricConfiguration,
 });
 
-const createGroupByAction: CreateAggregationAction = (config, onConfigChange) => ({
+const createGroupByElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Group By',
   key: 'groupBy',
   multipleUse: true,
@@ -74,7 +74,7 @@ const createGroupByAction: CreateAggregationAction = (config, onConfigChange) =>
   component: GroupByConfiguration,
 });
 
-const createSortAction: CreateAggregationAction = (config, onConfigChange) => ({
+const createSortElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Sort',
   key: 'sort',
   multipleUse: false,
@@ -84,23 +84,23 @@ const createSortAction: CreateAggregationAction = (config, onConfigChange) => ({
   component: SortConfiguration,
 });
 
-const _createAggregationActions: (
+const _createAggregationElements: (
   config: AggregationWidgetConfig,
   onConfigChange: (newConfig: AggregationWidgetConfig) => void
-) => Array<AggregationAction> = (config, onConfigChange) => ([
-  createVisualizationAction(config, onConfigChange),
-  createGroupByAction(config, onConfigChange),
-  createMetricAction(config, onConfigChange),
-  createSortAction(config, onConfigChange),
+) => Array<AggregationElement> = (config, onConfigChange) => ([
+  createVisualizationElement(config, onConfigChange),
+  createGroupByElement(config, onConfigChange),
+  createMetricElement(config, onConfigChange),
+  createSortElement(config, onConfigChange),
 ]);
 
-const _initialConfiguredAggregationActions = (config: AggregationWidgetConfig, aggregationActions: Array<AggregationAction>) => {
-  return aggregationActions.reduce((configuredActions, action) => {
-    if (action.isConfigured) {
-      configuredActions.push(action.key);
+const _initialConfiguredAggregationElements = (aggregationElements: Array<AggregationElement>) => {
+  return aggregationElements.reduce((configuredElements, element) => {
+    if (element.isConfigured) {
+      configuredElements.push(element.key);
     }
 
-    return configuredActions;
+    return configuredElements;
   }, []);
 };
 
@@ -134,51 +134,51 @@ const SectionHeadline = styled.div`
 `;
 
 const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
-  const aggregationActions = _createAggregationActions(config, onChange);
-  const [configuredAggregationActions, setConfiguredAggregationActions] = useState(_initialConfiguredAggregationActions(config, aggregationActions));
+  const aggregationElements = _createAggregationElements(config, onChange);
+  const [configuredAggregationElements, setConfiguredAggregationElements] = useState(_initialConfiguredAggregationElements(aggregationElements));
 
-  const _onActionCreate = (actionKey: string) => {
-    if (actionKey) {
-      setConfiguredAggregationActions([...configuredAggregationActions, actionKey]);
+  const _onElementCreate = (elementKey: string) => {
+    if (elementKey) {
+      setConfiguredAggregationElements([...configuredAggregationElements, elementKey]);
     }
   };
 
   return (
     <Wrapper>
       <Controls>
-        <Section data-testid="add-action-section">
-          <SectionHeadline>Add an Action</SectionHeadline>
-          <AggregationActionSelect onActionCreate={_onActionCreate}
-                                   aggregationActions={aggregationActions} />
+        <Section data-testid="add-element-section">
+          <SectionHeadline>Add an Element</SectionHeadline>
+          <AggregationElementSelect onElementCreate={_onElementCreate}
+                                    aggregationElements={aggregationElements} />
         </Section>
-        <Section data-testid="configure-actions-section">
-          <SectionHeadline>Configured Actions</SectionHeadline>
+        <Section data-testid="configure-elements-section">
+          <SectionHeadline>Configured Elements</SectionHeadline>
           <div>
-            {configuredAggregationActions.map((actionKey) => {
-              const aggregationAction = aggregationActions.find((action) => action.key === actionKey);
-              const AggregationActionComponent = aggregationAction.component;
+            {configuredAggregationElements.map((elementKey) => {
+              const aggregationElement = aggregationElements.find((element) => element.key === elementKey);
+              const AggregationElementComponent = aggregationElement.component;
 
               const onDeleteAll = () => {
-                if (typeof aggregationAction.onDeleteAll !== 'function') {
+                if (typeof aggregationElement.onDeleteAll !== 'function') {
                   return;
                 }
 
-                const newConfiguredActions = configuredAggregationActions.filter((action) => action !== aggregationAction.key);
+                const newConfiguredElements = configuredAggregationElements.filter((element) => element !== aggregationElement.key);
 
-                setConfiguredAggregationActions(newConfiguredActions);
+                setConfiguredAggregationElements(newConfiguredElements);
 
-                if (aggregationAction.isConfigured) {
-                  aggregationAction.onDeleteAll();
+                if (aggregationElement.isConfigured) {
+                  aggregationElement.onDeleteAll();
                 }
               };
 
               return (
-                <ActionConfigurationContainer title={aggregationAction.title}
-                                              onDeleteAll={onDeleteAll}
-                                              isPermanentAction={aggregationAction.onDeleteAll === undefined}
-                                              key={aggregationAction.key}>
-                  <AggregationActionComponent config={config} onConfigChange={onChange} />
-                </ActionConfigurationContainer>
+                <ElementConfigurationContainer title={aggregationElement.title}
+                                               onDeleteAll={onDeleteAll}
+                                               isPermanentElement={aggregationElement.onDeleteAll === undefined}
+                                               key={aggregationElement.key}>
+                  <AggregationElementComponent config={config} onConfigChange={onChange} />
+                </ElementConfigurationContainer>
               );
             })}
           </div>

@@ -18,10 +18,10 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
-import AggregationActionSelect from './AggregationActionSelect';
-import { AggregationAction } from './AggregationWizard';
+import AggregationElementSelect from './AggregationElementSelect';
+import { AggregationElement } from './AggregationWizard';
 
-const aggregationActions: Array<AggregationAction> = [
+const aggregationElements: Array<AggregationElement> = [
   {
     title: 'Metric',
     key: 'metric',
@@ -40,29 +40,29 @@ const aggregationActions: Array<AggregationAction> = [
   },
 ];
 
-describe('AggregationActionSelect', () => {
-  it('should select an aggregation action', async () => {
-    const onActionCreateMock = jest.fn();
+describe('AggregationElementSelect', () => {
+  it('should select an aggregation element', async () => {
+    const onElementCreateMock = jest.fn();
 
-    render(<AggregationActionSelect onActionCreate={onActionCreateMock}
-                                    aggregationActions={aggregationActions} />);
+    render(<AggregationElementSelect onElementCreate={onElementCreateMock}
+                                     aggregationElements={aggregationElements} />);
 
-    const aggregationActionSelect = screen.getByLabelText('Add an Action');
+    const aggregationElementSelect = screen.getByLabelText('Add an Element');
 
-    await selectEvent.openMenu(aggregationActionSelect);
-    await selectEvent.select(aggregationActionSelect, 'Metric');
+    await selectEvent.openMenu(aggregationElementSelect);
+    await selectEvent.select(aggregationElementSelect, 'Metric');
 
-    expect(onActionCreateMock).toHaveBeenCalledTimes(1);
-    expect(onActionCreateMock).toHaveBeenCalledWith('metric');
+    expect(onElementCreateMock).toHaveBeenCalledTimes(1);
+    expect(onElementCreateMock).toHaveBeenCalledWith('metric');
   });
 
-  it('should not list already configured aggregation actions which can not be configured multiple times', async () => {
-    render(<AggregationActionSelect onActionCreate={() => {}}
-                                    aggregationActions={aggregationActions} />);
+  it('should not list already configured aggregation elements which can not be configured multiple times', async () => {
+    render(<AggregationElementSelect onElementCreate={() => {}}
+                                     aggregationElements={aggregationElements} />);
 
-    const aggregationActionSelect = screen.getByLabelText('Add an Action');
+    const aggregationElementSelect = screen.getByLabelText('Add an Element');
 
-    await selectEvent.openMenu(aggregationActionSelect);
+    await selectEvent.openMenu(aggregationElementSelect);
 
     expect(screen.queryByText('Sort')).not.toBeInTheDocument();
     expect(screen.getByText('Metric')).toBeInTheDocument();
