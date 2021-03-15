@@ -18,23 +18,15 @@ import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import moment from 'moment';
 
-import { useStore } from 'stores/connect';
 import Spinner from 'components/common/Spinner';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext';
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import Widget from 'views/logic/widgets/Widget';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
-import SearchBarForm from '../searchbar/SearchBarForm';
 
 const Container = styled.div`
   display: grid;
@@ -77,58 +69,34 @@ type Props = {
   children: Array<React.ReactNode>,
 };
 
-const onSubmit = (values, widget: Widget) => {
-  const { timerange, streams, queryString } = values;
-  const newWidget = widget.toBuilder()
-    .timerange(timerange)
-    .query(createElasticsearchQueryString(queryString))
-    .streams(streams)
-    .build();
-
-  return WidgetActions.update(widget.id, newWidget);
-};
-
 const EditWidgetFrame = ({ children }: Props) => {
-  const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
-
   const widget = useContext(WidgetContext);
 
   if (!widget) {
     return <Spinner text="Loading widget ..." />;
   }
 
-  const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
-  const { streams } = widget;
-  const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
-  const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
-  const _onSubmit = (values) => onSubmit(values, widget);
-
   return (
-    <SearchBarForm initialValues={{ timerange, streams, queryString }}
-                   limitDuration={limitDuration}
-                   onSubmit={_onSubmit}
-                   validateOnMount={false}>
-      <Container>
-        <IfDashboard>
-          <QueryControls>
-            <QueryEditModeContext.Provider value="widget">
-              <HeaderElements />
-              <WidgetQueryControls />
-            </QueryEditModeContext.Provider>
-          </QueryControls>
-        </IfDashboard>
-        <Visualization>
-          <div role="presentation" style={{ height: '100%' }}>
-            <WidgetOverrideElements>
-              {children[0]}
-            </WidgetOverrideElements>
-          </div>
-        </Visualization>
-        <Footer>
-          {children[1]}
-        </Footer>
-      </Container>
-    </SearchBarForm>
+    <Container>
+      <IfDashboard>
+        <QueryControls>
+          <QueryEditModeContext.Provider value="widget">
+            <HeaderElements />
+            <WidgetQueryControls />
+          </QueryEditModeContext.Provider>
+        </QueryControls>
+      </IfDashboard>
+      <Visualization>
+        <div role="presentation" style={{ height: '100%' }}>
+          <WidgetOverrideElements>
+            {children[0]}
+          </WidgetOverrideElements>
+        </div>
+      </Visualization>
+      <Footer>
+        {children[1]}
+      </Footer>
+    </Container>
   );
 };
 
