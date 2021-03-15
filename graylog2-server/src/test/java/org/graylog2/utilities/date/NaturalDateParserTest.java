@@ -32,7 +32,7 @@ public class NaturalDateParserTest {
 
     @Before
     public void setUp() {
-        naturalDateParser = new NaturalDateParser();
+        naturalDateParser = new NaturalDateParser("Etc/UTC");
     }
 
     @Test
@@ -62,6 +62,23 @@ public class NaturalDateParserTest {
         }
     }
 
+    @Test
+    public void testParseAlignToStartOfDayEuropeBerlin() throws Exception {
+        final NaturalDateParser naturalDateParser = new NaturalDateParser("Europe/Berlin");
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+        final String[] testsThatAlignToStartOfDay = { "yesterday", "the day before yesterday", "today",
+                "monday", "monday to friday", "last week" };
+
+        for(String test: testsThatAlignToStartOfDay) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+        }
+    }
+
     @Test(expected = NaturalDateParser.DateNotParsableException.class)
     public void testParseFailsOnUnparsableDate() throws Exception {
         naturalDateParser.parse("LOLWUT");
@@ -75,7 +92,7 @@ public class NaturalDateParserTest {
     @Test
     @Ignore
     public void testTemporalOrder() throws Exception {
-        NaturalDateParser p = new NaturalDateParser();
+        NaturalDateParser p = new NaturalDateParser("Etc/UTC");
 
         NaturalDateParser.Result result1 = p.parse("last hour");
         assertTrue(result1.getFrom().compareTo(result1.getTo()) < 0);
