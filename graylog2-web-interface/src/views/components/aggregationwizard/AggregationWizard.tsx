@@ -23,6 +23,7 @@ import { EditWidgetComponentProps } from 'views/types';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
+import WidgetConfigForm from './WidgetConfigForm';
 import AggregationElementSelect from './AggregationElementSelect';
 import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
 import VisualizationConfiguration from './elementConfiguration/VisualizationConfiguration';
@@ -169,38 +170,40 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
           <AggregationElementSelect onElementCreate={_onElementCreate}
                                     aggregationElements={aggregationElements} />
         </Section>
-        <Section data-testid="configure-elements-section">
-          <SectionHeadline>Configured Elements</SectionHeadline>
-          <div>
-            {sortedConfiguredElements.map((elementKey) => {
-              const aggregationElement = aggregationElements.find((element) => element.key === elementKey);
-              const AggregationElementComponent = aggregationElement.component;
+        <WidgetConfigForm>
+          <Section data-testid="configure-elements-section">
+            <SectionHeadline>Configured Elements</SectionHeadline>
+            <div>
+              {sortedConfiguredElements.map((elementKey) => {
+                const aggregationElement = aggregationElements.find((element) => element.key === elementKey);
+                const AggregationElementComponent = aggregationElement.component;
 
-              const onDeleteAll = () => {
-                if (typeof aggregationElement.onDeleteAll !== 'function') {
-                  return;
-                }
+                const onDeleteAll = () => {
+                  if (typeof aggregationElement.onDeleteAll !== 'function') {
+                    return;
+                  }
 
-                const newConfiguredElements = configuredAggregationElements.filter((element) => element !== aggregationElement.key);
+                  const newConfiguredElements = configuredAggregationElements.filter((element) => element !== aggregationElement.key);
 
-                setConfiguredAggregationElements(newConfiguredElements);
+                  setConfiguredAggregationElements(newConfiguredElements);
 
-                if (aggregationElement.isConfigured) {
-                  aggregationElement.onDeleteAll();
-                }
-              };
+                  if (aggregationElement.isConfigured) {
+                    aggregationElement.onDeleteAll();
+                  }
+                };
 
-              return (
-                <ElementConfigurationContainer title={aggregationElement.title}
-                                               onDeleteAll={onDeleteAll}
-                                               isPermanentElement={aggregationElement.onDeleteAll === undefined}
-                                               key={aggregationElement.key}>
-                  <AggregationElementComponent config={config} onConfigChange={onChange} />
-                </ElementConfigurationContainer>
-              );
-            })}
-          </div>
-        </Section>
+                return (
+                  <ElementConfigurationContainer title={aggregationElement.title}
+                                                 onDeleteAll={onDeleteAll}
+                                                 isPermanentElement={aggregationElement.onDeleteAll === undefined}
+                                                 key={aggregationElement.key}>
+                    <AggregationElementComponent config={config} onConfigChange={onChange} />
+                  </ElementConfigurationContainer>
+                );
+              })}
+            </div>
+          </Section>
+        </WidgetConfigForm>
       </Controls>
       <Visualization>
         {children}
