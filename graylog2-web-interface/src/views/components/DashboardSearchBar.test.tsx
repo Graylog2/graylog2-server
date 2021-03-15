@@ -39,6 +39,8 @@ jest.mock('views/stores/SearchStore', () => ({
   },
 }));
 
+jest.mock('views/components/searchbar/AsyncQueryInput', () => () => null);
+
 const config = {
   analysis_disabled_fields: ['full_message', 'message'],
   query_time_range_limit: 'PT0S',
