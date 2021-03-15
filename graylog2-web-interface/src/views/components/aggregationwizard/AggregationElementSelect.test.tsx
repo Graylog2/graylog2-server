@@ -25,6 +25,7 @@ const aggregationElements: Array<AggregationElement> = [
   {
     title: 'Metric',
     key: 'metric',
+    order: 1,
     isConfigured: false,
     multipleUse: true,
     onCreate: () => {},
@@ -33,6 +34,7 @@ const aggregationElements: Array<AggregationElement> = [
   {
     title: 'Sort',
     key: 'sort',
+    order: 1,
     multipleUse: false,
     isConfigured: true,
     onCreate: () => {},
