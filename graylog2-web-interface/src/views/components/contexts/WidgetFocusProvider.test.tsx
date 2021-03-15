@@ -46,8 +46,6 @@ jest.mock('views/stores/WidgetStore', () => ({
 
 describe('WidgetFocusProvider', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     useLocation.mockReturnValue({
       pathname: '',
       search: '',
