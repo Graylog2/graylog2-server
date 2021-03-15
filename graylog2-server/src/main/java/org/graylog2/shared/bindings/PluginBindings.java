@@ -24,6 +24,7 @@ import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.web.PluginUISettingsProvider;
 
 import java.util.Set;
 
@@ -43,6 +44,11 @@ public class PluginBindings extends AbstractModule {
         // without plugins.
         MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {},
                 new TypeLiteral<Class<? extends PluginRestResource>>() {})
+                .permitDuplicates();
+
+        // Make sure there is a binding for the PluginUISettingsProvider classes to avoid binding errors when running
+        // without plugins
+        MapBinder.newMapBinder(binder(), String.class, PluginUISettingsProvider.class)
                 .permitDuplicates();
 
         for (final Plugin plugin : plugins) {

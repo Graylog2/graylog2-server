@@ -25,6 +25,7 @@ import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } fro
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
+  toggleDropdownShow: () => void,
 };
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
@@ -93,7 +94,7 @@ const dateOutput = (timerange: TimeRange) => {
   }
 };
 
-const TimeRangeDisplay = ({ timerange }: Props) => {
+const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
   const [{ from, until }, setTimeOutput] = useState(EMPTY_OUTPUT);
   const dateTested = useRef(false);
 
@@ -118,13 +119,13 @@ const TimeRangeDisplay = ({ timerange }: Props) => {
   }, [dateTested, timerange]);
 
   return (
-    <TimeRangeWrapper aria-label="Search Time Range">
+    <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>
       {!(timerange && 'type' in timerange)
         ? <span><code>No Override</code></span>
         : (
           <>
-            <span><strong>From</strong>: <code>{from}</code></span>
-            <span><strong>Until</strong>: <code>{until}</code></span>
+            <span data-testid="from"><strong>From</strong>: <code>{from}</code></span>
+            <span data-testid="to"><strong>Until</strong>: <code>{until}</code></span>
           </>
         )}
     </TimeRangeWrapper>

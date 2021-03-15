@@ -40,12 +40,12 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
+import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -62,6 +62,7 @@ import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import ReplaySearchButton from './ReplaySearchButton';
+import ExtraWidgetActions from './ExtraWidgetActions';
 
 import CustomPropTypes from '../CustomPropTypes';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -82,7 +83,7 @@ type Props = {
   id: string,
   view: ViewStoreState,
   widget: WidgetModel,
-  data?: Array<unknown>,
+  data?: { [key: string]: Result },
   editing?: boolean,
   errors?: Array<{ description: string }>,
   fields: Immutable.List<FieldTypeMapping>,
@@ -98,7 +99,7 @@ type State = {
   loading: boolean;
   oldWidget?: WidgetModel,
   showCopyToDashboard: boolean,
-  showCsvExport: boolean,
+  showExport: boolean,
   showMoveWidgetToTab: boolean,
 };
 
@@ -108,7 +109,7 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-export type OnVisualizationConfigChange = (VisualizationConfig) => void;
+export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 export type WidgetProps = {
   config: AggregationWidgetConfig,
@@ -161,7 +162,7 @@ class Widget extends React.Component<Props, State> {
       editing,
       loading: false,
       showCopyToDashboard: false,
-      showCsvExport: false,
+      showExport: false,
       showMoveWidgetToTab: false,
     };
 
@@ -274,11 +275,11 @@ class Widget extends React.Component<Props, State> {
     });
   };
 
-  _onToggleCSVExport = () => {
-    const { showCsvExport } = this.state;
+  _onToggleExport = () => {
+    const { showExport } = this.state;
 
     this.setState({
-      showCsvExport: !showCsvExport,
+      showExport: !showExport,
     });
   }
 
@@ -307,7 +308,7 @@ class Widget extends React.Component<Props, State> {
 
     if (data) {
       const { editing } = this.state;
-      const { id, widget, height, width, fields } = this.props;
+      const { id, widget, height, width, fields, view: { activeQuery: queryId } } = this.props;
       const { config, filter } = widget;
       const VisComponent = _visualizationForType(widget.type);
 
@@ -318,6 +319,7 @@ class Widget extends React.Component<Props, State> {
                       fields={fields}
                       filter={filter}
                       height={height}
+                      queryId={queryId}
                       onConfigChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}
                       setLoadingState={this._setLoadingState}
                       title={title}
@@ -334,8 +336,8 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
-    const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
-    const { config, type } = widget;
+    const { editing, loading, showCopyToDashboard, showExport, showMoveWidgetToTab } = this.state;
+    const { config } = widget;
     const { focusedWidget, setFocusedWidget } = this.context;
     const isFocusedWidget = focusedWidget === id;
     const visualization = this.visualize();
@@ -396,13 +398,14 @@ class Widget extends React.Component<Props, State> {
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id, setFocusedWidget)}>Duplicate</MenuItem>
-                      {type === MessagesWidget.type && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
+                      {widget.isExportable && <MenuItem onSelect={() => this._onToggleExport()}>Export</MenuItem>}
                       <IfSearch>
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       </IfSearch>
                       <IfDashboard>
                         <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
                       </IfDashboard>
+                      <ExtraWidgetActions widget={widget} onSelect={() => {}} />
                       <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>
@@ -411,7 +414,7 @@ class Widget extends React.Component<Props, State> {
                                        onSubmit={this._onCopyToDashboard}
                                        onCancel={this._onToggleCopyToDashboard} />
                     )}
-                    {showCsvExport && <CSVExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
+                    {showExport && <ExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleExport} />}
                     {showMoveWidgetToTab && (
                       <MoveWidgetToTabModal view={view.view}
                                             widgetId={widget.id}

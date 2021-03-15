@@ -9,7 +9,7 @@
     "preparebuild": "yarn install --ignore-scripts",
     "compile": "yarn run preparebuild && yarn run build",
     "prepublish": "yarn run compile",
-    "preinstall": "test -d src/ && yarn run compile || echo \"src\" folder missing, skipping preinstall"
+    "preinstall": "test -d src/ && yarn run compile"
   },
   "repository": {
     "type": "git",
@@ -37,8 +37,8 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@babel/preset-env": "7.12.11",
-    "@babel/preset-typescript": "^7.12.1",
+    "@babel/preset-env": "7.12.17",
+    "@babel/preset-typescript": "7.12.17",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
     "formik": "2.2.6",
@@ -57,15 +57,15 @@
     "react-router-dom": "5.2.0",
     "reflux": "0.2.13",
     "styled-components": "5.1.1",
-    "typescript": "^4.0.5",
+    "typescript": "4.2.3",
     "webpack": "4.44.2",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "3.3.12",
     "webpack-merge": "4.2.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.0",
-    "@babel/core": "^7.8.7",
+    "@babel/cli": "7.12.17",
+    "@babel/core": "7.12.17",
     "babel-plugin-add-module-exports": "^1.0.2"
   }
 }

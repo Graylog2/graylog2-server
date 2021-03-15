@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { ldapBackend as exampleAuthBackend } from 'fixtures/authenticationBackends';
+import { DirectoryServicesGroupSync } from 'components/authentication/types';
 
 import { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 
@@ -34,11 +35,11 @@ describe('<GroupSyncSection />', () => {
 
   it('should display enterprise group sync section', () => {
     PluginStore.register(new PluginManifest({}, {
-      'authentication.enterprise.directoryServices.groupSync': {
+      'authentication.enterprise.directoryServices.groupSync': [{
         components: {
           GroupSyncSection: () => <>GroupSyncSection</>,
         },
-      },
+      } as unknown as DirectoryServicesGroupSync],
     }));
 
     render(<GroupSyncSection authenticationBackend={exampleAuthBackend as DirectoryServiceBackend} roles={Immutable.List()} />);

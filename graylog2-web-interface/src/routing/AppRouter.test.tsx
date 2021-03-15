@@ -60,7 +60,7 @@ describe('AppRouter', () => {
   });
 
   it('renders null-parent component plugin routes without application chrome', async () => {
-    asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span> }]);
+    asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/' }]);
 
     const { findByText, queryByTitle } = render(<AppRouterWithContext />);
 

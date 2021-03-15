@@ -68,8 +68,4 @@ class WidgetOverrideElements extends React.Component<Props, State> {
   }
 }
 
-const mapping = {
-  widgetOverrideElements: 'views.overrides.widgetEdit',
-};
-
-export default withPluginEntities<Props, typeof mapping>(WidgetOverrideElements, mapping);
+export default withPluginEntities(WidgetOverrideElements, { widgetOverrideElements: 'views.overrides.widgetEdit' });

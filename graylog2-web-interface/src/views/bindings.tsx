@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { get } from 'lodash';
+import { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import App from 'routing/App';
@@ -111,7 +112,7 @@ Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
 const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
 
-export default {
+const exports: PluginExports = {
   pages: {
     search: { component: NewSearchPage },
   },
@@ -135,6 +136,7 @@ export default {
       type: 'MESSAGES',
       displayName: 'Message List',
       defaultHeight: 5,
+      reportStyle: () => ({ width: 800 }),
       defaultWidth: 6,
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
@@ -148,6 +150,7 @@ export default {
       displayName: 'Results',
       defaultHeight: 4,
       defaultWidth: 4,
+      reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationControls,
       needsControlledHeight: (widget: Widget) => {
@@ -387,4 +390,14 @@ export default {
   'views.elements.header': [
     () => <IfSearch><MigrateFieldCharts /></IfSearch>,
   ],
+  'views.export.formats': [
+    {
+      type: 'csv',
+      displayName: () => 'Comma-Separated Values (CSV)',
+      mimeType: 'text/csv',
+      fileExtension: 'csv',
+    },
+  ],
 };
+
+export default exports;

@@ -23,13 +23,13 @@ import bindings from './bindings';
 
 describe('Views bindings enterprise widgets', () => {
   const { enterpriseWidgets } = bindings;
-  type WidgetCondig = {
+  type WidgetConfig = {
     needsControlledHeight: (widget?: Widget) => boolean,
   };
   const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 
   describe('Aggregations', () => {
-    const aggregationConfig: WidgetCondig = findWidgetConfig('AGGREGATION');
+    const aggregationConfig: WidgetConfig = findWidgetConfig('AGGREGATION');
 
     it('is present', () => {
       expect(aggregationConfig).toBeDefined();

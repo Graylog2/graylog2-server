@@ -51,7 +51,7 @@ const AuthenticationBackendEditPage = ({ params: { backendId }, location: { quer
 
   const { editComponent: BackendEdit } = authService;
 
-  return <BackendEdit authenticationBackend={authBackend} initialStepKey={initialStepKey} />;
+  return <BackendEdit authenticationBackend={authBackend} initialStepKey={initialStepKey as string} />;
 };
 
 export default withParams(withLocation(AuthenticationBackendEditPage));

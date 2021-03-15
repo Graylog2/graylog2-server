@@ -27,9 +27,7 @@ import Icon from './Icon';
 type Option = { [key: string]: any };
 
 const MultiValueRemove = (props) => (
-  <Components.MultiValueRemove {...props}>
-    &times;
-  </Components.MultiValueRemove>
+  <Components.MultiValueRemove {...props} />
 );
 
 const IndicatorSeparator = () => null;
@@ -310,6 +308,10 @@ class Select extends React.Component<Props, State> {
     onReactSelectChange: PropTypes.func,
     /** Select placeholder text */
     placeholder: PropTypes.string,
+    /** Placement of the menu: "top", "bottom", "auto" */
+    menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
+    /** Max height of the menu */
+    maxMenuHeight: PropTypes.number,
   }
 
   static defaultProps = {
@@ -336,6 +338,8 @@ class Select extends React.Component<Props, State> {
     value: undefined,
     valueKey: 'value',
     valueRenderer: undefined,
+    menuPlacement: 'bottom',
+    maxMenuHeight: 300,
   };
 
   constructor(props: Props) {

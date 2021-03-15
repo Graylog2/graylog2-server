@@ -19,15 +19,16 @@ package org.graylog.storage.elasticsearch6.views.export;
 import com.google.inject.name.Named;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.TermsQueryBuilder;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import io.searchbox.core.search.sort.Sort;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.TermsQueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -75,10 +77,11 @@ public class ElasticsearchExportBackend implements ExportBackend {
             List<SearchResult.Hit<Map, Void>> hits = search(command);
 
             if (hits.isEmpty()) {
+                publishChunk(chunkCollector, hits, command.fieldsInOrder(), SimpleMessageChunk.ChunkOrder.LAST);
                 return;
             }
 
-            boolean success = publishChunk(chunkCollector, hits, command.fieldsInOrder(), isFirstChunk);
+            boolean success = publishChunk(chunkCollector, hits, command.fieldsInOrder(), isFirstChunk ? SimpleMessageChunk.ChunkOrder.FIRST : SimpleMessageChunk.ChunkOrder.INTERMEDIATE);
             if (!success) {
                 return;
             }
@@ -86,6 +89,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
             totalCount += hits.size();
             if (command.limit().isPresent() && totalCount >= command.limit().getAsInt()) {
                 LOG.info("Limit of {} reached. Stopping message retrieval.", command.limit().getAsInt());
+                publishChunk(chunkCollector, Collections.emptyList(), command.fieldsInOrder(), SimpleMessageChunk.ChunkOrder.LAST);
                 return;
             }
 
@@ -107,7 +111,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .addType(IndexMapping.TYPE_MESSAGE)
                 .allowNoIndices(false)
                 .ignoreUnavailable(false)
-                .addIndex(indices);
+                .addIndex(indices)
+                .addSort(new Sort(Message.FIELD_TIMESTAMP, Sort.Sorting.ASC));
     }
 
     private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand command) {
@@ -147,8 +152,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange());
     }
 
-    private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, boolean isFirstChunk) {
-        SimpleMessageChunk chunk = chunkFrom(hits, desiredFieldsInOrder, isFirstChunk);
+    private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, SimpleMessageChunk.ChunkOrder chunkOrder) {
+        SimpleMessageChunk chunk = chunkFrom(hits, desiredFieldsInOrder, chunkOrder);
 
         try {
             chunkCollector.accept(chunk);
@@ -159,13 +164,13 @@ public class ElasticsearchExportBackend implements ExportBackend {
         }
     }
 
-    private SimpleMessageChunk chunkFrom(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, boolean isFirstChunk) {
+    private SimpleMessageChunk chunkFrom(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, SimpleMessageChunk.ChunkOrder chunkOrder) {
         LinkedHashSet<SimpleMessage> messages = messagesFrom(hits);
 
         return SimpleMessageChunk.builder()
                 .fieldsInOrder(desiredFieldsInOrder)
                 .messages(messages)
-                .isFirstChunk(isFirstChunk)
+                .chunkOrder(chunkOrder)
                 .build();
     }
 

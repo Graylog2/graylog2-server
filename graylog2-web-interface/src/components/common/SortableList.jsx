@@ -24,8 +24,8 @@ import { ListGroup } from 'components/graylog';
 
 import SortableListItem from './SortableListItem';
 
-const SortableListGroup = styled(ListGroup)(({ disableDragging, theme }) => css`
-  cursor: ${disableDragging ? 'default' : 'move'};
+const SortableListGroup = styled(ListGroup)(({ $disableDragging, theme }) => css`
+  cursor: ${$disableDragging ? 'default' : 'move'};
   margin: 0 0 15px;
 
   .dragging {
@@ -76,11 +76,16 @@ class SortableList extends React.Component {
      * The function will receive the newly sorted list as an argument.
      */
     onMoveItem: PropTypes.func,
+    /**
+     * Custom content renderer for the SortableListItem
+     */
+    customContentRender: PropTypes.func,
   };
 
   static defaultProps = {
     disableDragging: false,
     onMoveItem: () => {},
+    customContentRender: undefined,
   };
 
   constructor(props) {
@@ -111,12 +116,13 @@ class SortableList extends React.Component {
 
   render() {
     const { items } = this.state;
-    const { disableDragging } = this.props;
+    const { disableDragging, customContentRender } = this.props;
 
     const formattedItems = items.map((item, idx) => {
       return (
         <SortableListItem key={`sortable-list-item-${item.id}`}
                           disableDragging={disableDragging}
+                          customContentRender={customContentRender}
                           index={idx}
                           id={item.id}
                           content={item.title}
@@ -126,7 +132,7 @@ class SortableList extends React.Component {
 
     return (
       <DndProvider backend={HTML5Backend}>
-        <SortableListGroup disableDragging={disableDragging}>
+        <SortableListGroup $disableDragging={disableDragging}>
           {formattedItems}
         </SortableListGroup>
       </DndProvider>

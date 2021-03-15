@@ -21,10 +21,13 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public class CommandFactory {
@@ -54,7 +57,7 @@ public class CommandFactory {
         Query query = queryFrom(search);
 
         return builderFrom(resultFormat)
-                .timeRange(toAbsolute(query.timerange()))
+                .timeRange(resultFormat.timerange().orElse(toAbsolute(query.timerange())))
                 .queryString(queryStringFrom(search, query))
                 .streams(query.usedStreamIds())
                 .build();
@@ -71,26 +74,28 @@ public class CommandFactory {
 
     public ExportMessagesCommand buildWithMessageList(Search search, String messageListId, ResultFormat resultFormat) {
         Query query = search.queryForSearchType(messageListId);
-        MessageList messageList = messageListFrom(query, messageListId);
+        SearchType searchType = searchTypeFrom(query, messageListId);
+
+        final List<Decorator> decorators = searchType instanceof MessageList ? ((MessageList) searchType).decorators() : Collections.emptyList();
 
         ExportMessagesCommand.Builder commandBuilder = builderFrom(resultFormat)
-                .timeRange(toAbsolute(timeRangeFrom(query, messageList)))
-                .queryString(queryStringFrom(search, query, messageList))
-                .streams(streamsFrom(query, messageList))
-                .decorators(messageList.decorators());
+                .timeRange(resultFormat.timerange().orElse(toAbsolute(timeRangeFrom(query, searchType))))
+                .queryString(queryStringFrom(search, query, searchType))
+                .streams(streamsFrom(query, searchType))
+                .decorators(decorators);
 
         return commandBuilder.build();
     }
 
-    private MessageList messageListFrom(Query query, String searchTypeId) {
+    private SearchType searchTypeFrom(Query query, String searchTypeId) {
         SearchType searchType = query.searchTypes().stream()
                 .filter(st -> st.id().equals(searchTypeId))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("Error getting search type"));
 
-        if (!(searchType instanceof MessageList)) {
+        if (!searchType.isExportable()) {
             throw new ExportException("export is not supported for search type " + searchType.getClass());
         }
-        return (MessageList) searchType;
+        return searchType;
     }
 
     private AbsoluteRange toAbsolute(TimeRange timeRange) {
@@ -109,9 +114,9 @@ public class CommandFactory {
         return requestBuilder;
     }
 
-    private TimeRange timeRangeFrom(Query query, MessageList ml) {
-        if (ml.timerange().isPresent()) {
-            return query.effectiveTimeRange(ml);
+    private TimeRange timeRangeFrom(Query query, SearchType searchType) {
+        if (searchType.timerange().isPresent()) {
+            return query.effectiveTimeRange(searchType);
         } else {
             return query.timerange();
         }
@@ -122,16 +127,16 @@ public class CommandFactory {
         return decorateQueryString(search, query, undecorated);
     }
 
-    private ElasticsearchQueryString queryStringFrom(Search search, Query query, MessageList messageList) {
-        ElasticsearchQueryString undecorated = pickQueryString(messageList, query);
+    private ElasticsearchQueryString queryStringFrom(Search search, Query query, SearchType searchType) {
+        ElasticsearchQueryString undecorated = pickQueryString(searchType, query);
         return decorateQueryString(search, query, undecorated);
     }
 
-    private ElasticsearchQueryString pickQueryString(MessageList messageList, Query query) {
-        if (messageList.query().isPresent() && hasQueryString(query)) {
-            return esQueryStringFrom(query).concatenate(esQueryStringFrom(messageList));
-        } else if (messageList.query().isPresent()) {
-            return esQueryStringFrom(messageList);
+    private ElasticsearchQueryString pickQueryString(SearchType searchType, Query query) {
+        if (searchType.query().isPresent() && hasQueryString(query)) {
+            return esQueryStringFrom(query).concatenate(esQueryStringFrom(searchType));
+        } else if (searchType.query().isPresent()) {
+            return esQueryStringFrom(searchType);
         } else {
             return queryStringFrom(query);
         }
@@ -145,9 +150,9 @@ public class CommandFactory {
         return hasQueryString(query) ? esQueryStringFrom(query) : ElasticsearchQueryString.empty();
     }
 
-    private ElasticsearchQueryString esQueryStringFrom(MessageList ml) {
+    private ElasticsearchQueryString esQueryStringFrom(SearchType searchType) {
         //noinspection OptionalGetWithoutIsPresent
-        return (ElasticsearchQueryString) ml.query().get();
+        return (ElasticsearchQueryString) searchType.query().get();
     }
 
     private ElasticsearchQueryString esQueryStringFrom(Query query) {
@@ -160,9 +165,9 @@ public class CommandFactory {
         return ElasticsearchQueryString.builder().queryString(decorated).build();
     }
 
-    private Set<String> streamsFrom(Query query, MessageList messageList) {
-        return messageList.effectiveStreams().isEmpty() ?
+    private Set<String> streamsFrom(Query query, SearchType searchType) {
+        return searchType.effectiveStreams().isEmpty() ?
                 query.usedStreamIds() :
-                messageList.effectiveStreams();
+                searchType.effectiveStreams();
     }
 }

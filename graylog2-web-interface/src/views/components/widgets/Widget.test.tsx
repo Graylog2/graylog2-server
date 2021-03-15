@@ -260,7 +260,7 @@ describe('<Widget />', () => {
     await findByText('Unknown widget in edit mode');
   });
 
-  it('copies title when duplicating widget', (done) => {
+  it('copies title when duplicating widget', async () => {
     const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" />);
 
     const actionToggle = getByTestId('widgetActionDropDown');
@@ -268,21 +268,14 @@ describe('<Widget />', () => {
     fireEvent.click(actionToggle);
     const duplicateBtn = getByText('Duplicate');
 
-    WidgetActions.duplicate = mockAction(jest.fn(() => Promise.resolve(WidgetModel.builder().id('duplicatedWidgetId').build())));
+    WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
 
-    TitlesActions.set = mockAction(jest.fn(async (type, id, title) => {
-      expect(type).toEqual(TitleTypes.Widget);
-      expect(id).toEqual('duplicatedWidgetId');
-      expect(title).toEqual('Dummy Widget (copy)');
-
-      done();
-
-      return Immutable.Map() as TitlesMap;
-    }));
+    TitlesActions.set = mockAction(jest.fn().mockResolvedValue(Immutable.Map() as TitlesMap));
 
     fireEvent.click(duplicateBtn);
 
-    expect(WidgetActions.duplicate).toHaveBeenCalled();
+    await waitFor(() => expect(WidgetActions.duplicate).toHaveBeenCalled());
+    await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
   });
 
   it('adds cancel action to widget in edit mode', () => {
@@ -350,7 +343,7 @@ describe('<Widget />', () => {
     expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });
 
-  it('does not display export to CSV action if widget is not a message table', () => {
+  it('does not display export action if widget is not a message table', () => {
     const dummyWidget = WidgetModel.builder()
       .id('widgetId')
       .type('dummy')
@@ -362,26 +355,26 @@ describe('<Widget />', () => {
 
     fireEvent.click(actionToggle);
 
-    expect(queryByText('Export to CSV')).toBeNull();
+    expect(queryByText('Export')).toBeNull();
   });
 
-  it('allows export to CSV for message tables', () => {
-    const messagesWidget = WidgetModel.builder()
+  it('allows export for message tables', () => {
+    const messagesWidget = MessagesWidget.builder()
       .id('widgetId')
-      .type(MessagesWidget.type)
       .config({})
       .build();
+
     const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
     const actionToggle = getByTestId('widgetActionDropDown');
 
     fireEvent.click(actionToggle);
 
-    const exportButton = getByText('Export to CSV');
+    const exportButton = getByText('Export');
 
     fireEvent.click(exportButton);
 
-    expect(getByText('Export message table search results to CSV')).not.toBeNull();
+    expect(getByText('Export message table search results')).not.toBeNull();
   });
 
   describe('copy widget to dashboard', () => {

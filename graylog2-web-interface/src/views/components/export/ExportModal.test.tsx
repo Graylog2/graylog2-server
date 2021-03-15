@@ -20,26 +20,29 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
 import { Optional } from 'utility-types';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap } from 'views/logic/views/View';
-import Direction from 'views/logic/aggregationbuilder/Direction';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import Query, { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
-import Search from 'views/logic/search/Search';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import View, { ViewType } from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
-import Widget from 'views/logic/widgets/Widget';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import {
+  messagesWidget,
+  stateWithOneWidget, viewWithMultipleWidgets,
+  viewWithOneWidget,
+  viewWithoutWidget,
+} from 'views/components/export/Fixtures';
+import { createWidget } from 'views/logic/WidgetTestHelpers';
 
-import CSVExportModal, { Props as CSVExportModalProps } from './CSVExportModal';
+import ExportModal, { Props as ExportModalProps } from './ExportModal';
 
 jest.mock('util/MessagesExportUtils', () => ({
   exportSearchMessages: jest.fn(() => Promise.resolve()),
@@ -55,63 +58,19 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
-describe('CSVExportModal', () => {
-  const searchType = {
-    id: 'search-type-id-1',
-    type: 'messages',
-    streams: [],
-    sort: [],
-    filter: '',
-    name: null,
-    query: null,
-    timerange: null,
-    limit: 150,
-    decorators: [],
-    offset: 0,
-  };
-  const queries = [
-    Query.builder().id('query-id-1').searchTypes([searchType]).build(),
-  ];
-  const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'level', Direction.Descending);
-  const config = new MessagesWidgetConfig(['level', 'http_method'], true, [], [currentSort]);
-  const widget1 = Widget.builder().id('widget-id-1').type(MessagesWidget.type).config(config)
-    .build();
-  const widget2 = Widget.builder().id('widget-id-2').type(MessagesWidget.type).config(config)
-    .build();
-  const states: ViewStateMap = Immutable.Map({
-    'query-id-1': ViewState.create(),
-  });
-  const searchWithQueries = Search.builder()
-    .id('search-id')
-    .queries(queries)
-    .build();
-  const viewWithoutWidget = (viewType: ViewType) => View.create()
-    .toBuilder()
-    .id('deadbeef')
-    .type(viewType)
-    .search(searchWithQueries)
-    .state(states)
-    .build();
-  // Prepare view with one widget
-  const stateWithOneWidget: ViewState = ViewState.builder()
-    .widgets(Immutable.List([widget1]))
-    .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-    .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map<string, string>({ 'widget-id-1': 'Widget 1' }) }))
-    .build();
-  const viewWithOneWidget = (viewType) => viewWithoutWidget(viewType)
-    .toBuilder()
-    .state(Immutable.Map({ 'query-id-1': stateWithOneWidget }))
-    .build();
-  // Prepare view with mulitple widgets
-  const stateWithMultipleWidgets: ViewState = ViewState.builder()
-    .widgets(Immutable.List([widget1, widget2]))
-    .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-    .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map({ 'widget-id-1': 'Widget 1', 'widget-id-2': 'Widget 2' }) }))
-    .build();
-  const viewWithMultipleWidgets = (viewType) => viewWithoutWidget(viewType)
-    .toBuilder()
-    .state(Immutable.Map({ 'query-id-1': stateWithMultipleWidgets }))
-    .build();
+const pluginExports: PluginRegistration = {
+  exports: {
+    enterpriseWidgets: [createWidget('messages')],
+    'views.export.formats': [{
+      type: 'csv',
+      displayName: () => 'CSV',
+      mimeType: 'text/csv',
+      fileExtension: 'csv',
+    }],
+  },
+};
+
+describe('ExportModal', () => {
   // Prepare expected payload
   const payload = {
     fields_in_order: ['level', 'http_method', 'message'],
@@ -119,21 +78,29 @@ describe('CSVExportModal', () => {
     execution_state: new SearchExecutionState(),
   };
 
+  beforeAll(() => {
+    PluginStore.register(pluginExports);
+  });
+
+  afterAll(() => {
+    PluginStore.unregister(pluginExports);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  type SimpleCSVExportModalProps = {
+  type SimpleExportModalProps = {
     viewType?: ViewType,
-  } & Optional<CSVExportModalProps>;
+  } & Optional<ExportModalProps>;
 
-  const SimpleCSVExportModal = ({ viewType = View.Type.Search, ...props }: SimpleCSVExportModalProps) => (
+  const SimpleExportModal = ({ viewType = View.Type.Search, ...props }: SimpleExportModalProps) => (
     <ViewTypeContext.Provider value={viewType}>
-      <CSVExportModal view={viewWithoutWidget(viewType)} {...props as CSVExportModalProps} />
+      <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
     </ViewTypeContext.Provider>
   );
 
-  SimpleCSVExportModal.defaultProps = {
+  SimpleExportModal.defaultProps = {
     viewType: View.Type.Search,
     closeModal: () => {},
     directExportWidgetId: undefined,
@@ -142,7 +109,6 @@ describe('CSVExportModal', () => {
   };
 
   it('should provide current execution state on export', async () => {
-    const exportSearchMessagesAction = asMock(exportSearchMessages);
     const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });
     const effectiveTimeRange: AbsoluteTimeRange = { type: 'absolute', from: '2020-01-01T12:18:17.827Z', to: '2020-01-01T12:23:17.827Z' };
     const globalQuery: ElasticsearchQueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
@@ -159,35 +125,39 @@ describe('CSVExportModal', () => {
       ],
       execution_state: executionState,
     };
-    const { getByTestId } = render(<SimpleCSVExportModal />);
+    const { getByTestId } = render(<SimpleExportModal />);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
+    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledWith(
+      expectedPayload,
+      'search-id',
+      'text/csv',
+      'Untitled-Search-search-result.csv',
+    ));
   });
 
   it('should show loading indicator after starting download', async () => {
-    const exportSearchMessagesAction = asMock(exportSearchMessages);
-    const { getByTestId, getByText, getAllByText } = render(<SimpleCSVExportModal />);
+    const { getByTestId, findByText, getAllByText } = render(<SimpleExportModal />);
 
     expect(getAllByText('Start Download')).toHaveLength(2);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
-    expect(getByText('Downloading...')).not.toBeNull();
+    await findByText('Downloading...');
 
-    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
   });
 
   it('should be closed after finishing download', async () => {
     const closeModalStub = jest.fn();
-    const { getByTestId } = render(<SimpleCSVExportModal closeModal={closeModalStub} />);
+    const { getByTestId } = render(<SimpleExportModal closeModal={closeModalStub} />);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
@@ -195,11 +165,10 @@ describe('CSVExportModal', () => {
   });
 
   it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
-    const exportSearchTypeMessagesAction = asMock(exportSearchTypeMessages);
     const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
-    const widgetWithoutMessageRow = widget1.toBuilder().config(widgetConfig).build();
+    const widgetWithoutMessageRow = messagesWidget().toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
-      'query-id-1': stateWithOneWidget.toBuilder()
+      'query-id-1': stateWithOneWidget(messagesWidget()).toBuilder()
         .widgets(Immutable.List([widgetWithoutMessageRow]))
         .build(),
     });
@@ -207,15 +176,15 @@ describe('CSVExportModal', () => {
       .toBuilder()
       .state(viewStateMap)
       .build();
-    const { getByTestId } = render(<SimpleCSVExportModal view={view} />);
+    const { getByTestId } = render(<SimpleExportModal view={view} />);
 
-    const submitButton = getByTestId('csv-download-button');
+    const submitButton = getByTestId('download-button');
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(exportSearchTypeMessagesAction).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-    expect(exportSearchTypeMessagesAction).toHaveBeenCalledWith(
+    expect(exportSearchTypeMessages).toHaveBeenCalledWith(
       {
         ...payload,
         fields_in_order: [
@@ -225,20 +194,21 @@ describe('CSVExportModal', () => {
       },
       'search-id',
       'search-type-id-1',
-      'Widget-1-search-result',
+      'text/csv',
+      'Widget-1-search-result.csv',
     );
   });
 
   describe('on search page', () => {
-    const SearchCSVExportModal = (props) => (
-      <SimpleCSVExportModal viewType={View.Type.Search} {...props} />
+    const SearchExportModal = (props) => (
+      <SimpleExportModal viewType={View.Type.Search} {...props} />
     );
 
     it('should not show widget selection when no widget exists', () => {
-      const { queryByText } = render(<SearchCSVExportModal />);
+      const { queryByText } = render(<SearchExportModal />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should not show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).toBeNull();
       // should not allow widget selection
@@ -246,16 +216,15 @@ describe('CSVExportModal', () => {
     });
 
     it('should export all messages with default fields when no widget exists', async () => {
-      const exportSearchMessagesAction = asMock(exportSearchMessages);
-      const { getByTestId } = render(<SearchCSVExportModal />);
+      const { getByTestId } = render(<SearchExportModal />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchMessagesAction).toHaveBeenCalledWith(
+      expect(exportSearchMessages).toHaveBeenCalledWith(
         {
           ...payload,
           fields_in_order: [
@@ -265,15 +234,16 @@ describe('CSVExportModal', () => {
           ],
         },
         'search-id',
-        'Untitled-Search-search-result',
+        'text/csv',
+        'Untitled-Search-search-result.csv',
       );
     });
 
     it('preselect messages widget when only one exists', () => {
-      const { queryByText } = render(<SearchCSVExportModal view={viewWithOneWidget(View.Type.Search)} />);
+      const { queryByText } = render(<SearchExportModal view={viewWithOneWidget(View.Type.Search)} />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -281,18 +251,24 @@ describe('CSVExportModal', () => {
     });
 
     it('should export messages related to preselected widget', async () => {
-      const { getByTestId } = render(<SearchCSVExportModal view={viewWithOneWidget(View.Type.Search)} />);
+      const { getByTestId } = render(<SearchExportModal view={viewWithOneWidget(View.Type.Search)} />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(
+        payload,
+        'search-id',
+        'search-type-id-1',
+        'text/csv',
+        'Widget-1-search-result.csv',
+      );
     });
 
     it('show widget selection if more than one exists', async () => {
-      const { getByLabelText, queryByText } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
+      const { getByLabelText, queryByText } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
 
       const select = getByLabelText('Select message table');
 
@@ -305,10 +281,10 @@ describe('CSVExportModal', () => {
     });
 
     it('preselect widget on direct export', () => {
-      const { queryByText } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
+      const { queryByText } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -316,36 +292,42 @@ describe('CSVExportModal', () => {
     });
 
     it('should export widget messages on direct export', async () => {
-      const { getByTestId } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
+      const { getByTestId } = render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(
+        payload,
+        'search-id',
+        'search-type-id-1',
+        'text/csv',
+        'Widget-1-search-result.csv',
+      );
     });
   });
 
   describe('on dashboard', () => {
-    const DashboardCSVExportModal = (props) => (
-      <SimpleCSVExportModal viewType={View.Type.Dashboard} view={viewWithoutWidget(View.Type.Dashboard)} {...props} />
+    const DashboardExportModal = (props) => (
+      <SimpleExportModal viewType={View.Type.Dashboard} view={viewWithoutWidget(View.Type.Dashboard)} {...props} />
     );
 
     it('show warning when no messages widget exists', () => {
-      const { queryByText } = render(<DashboardCSVExportModal view={viewWithoutWidget(View.Type.Dashboard)} />);
+      const { queryByText } = render(<DashboardExportModal view={viewWithoutWidget(View.Type.Dashboard)} />);
 
       expect(queryByText('You need to create a message table widget to export its result.')).not.toBeNull();
     });
 
     it('does not preselect widget when only one exists', () => {
-      const { queryByText } = render(<DashboardCSVExportModal view={viewWithOneWidget(View.Type.Dashboard)} />);
+      const { queryByText } = render(<DashboardExportModal view={viewWithOneWidget(View.Type.Dashboard)} />);
 
       expect(queryByText(/Please select the message table you want to export the search results for./)).not.toBeNull();
     });
 
     it('show widget selection if more than one exists', async () => {
-      const { queryByText, getByLabelText } = render(<DashboardCSVExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />);
+      const { queryByText, getByLabelText } = render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />);
       const select = getByLabelText('Select message table');
 
       expect(queryByText(/Please select the message table you want to export the search results for./)).not.toBeNull();
@@ -358,17 +340,17 @@ describe('CSVExportModal', () => {
 
     it('show widget selection with widgets from all dashboard pages', async () => {
       const secondViewState: ViewState = ViewState.builder()
-        .widgets(Immutable.List([widget2]))
+        .widgets(Immutable.List([messagesWidget('widget-id-2')]))
         .widgetMapping(Immutable.Map({ 'widget-id-2': Immutable.Set(['search-type-id-2']) }))
         .titles(Immutable.Map<TitleType, Immutable.Map<string, string>>({ widget: Immutable.Map({ 'widget-id-2': 'Widget 2' }) }))
         .build();
 
       const complexView = viewWithoutWidget(View.Type.Dashboard)
         .toBuilder()
-        .state(Immutable.Map({ 'query-id-1': stateWithOneWidget, 'query-id-2': secondViewState }))
+        .state(Immutable.Map({ 'query-id-1': stateWithOneWidget(messagesWidget()), 'query-id-2': secondViewState }))
         .build();
 
-      const { queryByText, getByLabelText } = render(<DashboardCSVExportModal view={complexView} />);
+      const { queryByText, getByLabelText } = render(<DashboardExportModal view={complexView} />);
       const select = getByLabelText('Select message table');
 
       await selectEvent.openMenu(select);
@@ -378,10 +360,10 @@ describe('CSVExportModal', () => {
     });
 
     it('preselect widget on direct widget export', () => {
-      const { queryByText } = render(<DashboardCSVExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} directExportWidgetId="widget-id-1" />);
+      const { queryByText } = render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} directExportWidgetId="widget-id-1" />);
 
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/You are currently exporting the search results for the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -389,14 +371,20 @@ describe('CSVExportModal', () => {
     });
 
     it('should export widget messages on direct export', async () => {
-      const { getByTestId } = render(<DashboardCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
+      const { getByTestId } = render(<DashboardExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      const submitButton = getByTestId('csv-download-button');
+      const submitButton = getByTestId('download-button');
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(
+        payload,
+        'search-id',
+        'search-type-id-1',
+        'text/csv',
+        'Widget-1-search-result.csv',
+      );
     });
   });
 });

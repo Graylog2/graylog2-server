@@ -107,7 +107,7 @@
         <grpc.version>1.29.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>28.2-jre</guava.version>
-        <guice.version>4.2.2</guice.version>
+        <guice.version>5.0.1</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
         <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
         <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
@@ -128,14 +128,15 @@
         <joda-time.version>2.10.6</joda-time.version>
         <jool.version>0.9.14</jool.version>
         <json-path.version>2.4.0</json-path.version>
-        <kafka.version>0.9.0.1</kafka.version>
+        <kafka.version>2.7.0</kafka.version>
+        <kafka09.version>0.9.0.1-6</kafka09.version>
         <log4j.version>2.13.3</log4j.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
         <mongojack.version>2.10.1</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.52.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.34.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.60.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.36.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
         <okta-sdk.version>3.0.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
@@ -144,7 +145,7 @@
         <protobuf.version>3.11.4</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.2</shiro.version>
         <oshi.version>5.3.7</oshi.version>

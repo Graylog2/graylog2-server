@@ -7,7 +7,7 @@ updates:
     time: "11:00"
   open-pull-requests-limit: 10
   labels:
-  - ready-for-review
+  - dependencies
 - package-ecosystem: npm
   directory: "/graylog2-web-interface/packages/graylog-web-plugin"
   schedule:
@@ -15,7 +15,7 @@ updates:
     time: "11:00"
   open-pull-requests-limit: 10
   labels:
-  - ready-for-review
+  - dependencies
   ignore:
   - dependency-name: react-bootstrap
     versions:
@@ -28,7 +28,7 @@ updates:
     time: "11:00"
   open-pull-requests-limit: 10
   labels:
-  - ready-for-review
+  - dependencies
   ignore:
   - dependency-name: bootstrap
     versions:
@@ -41,4 +41,12 @@ updates:
     time: "11:00"
   open-pull-requests-limit: 10
   labels:
-  - ready-for-review
+  - dependencies
+- package-ecosystem: npm
+  directory: "/graylog2-web-interface/packages/jest-preset-graylog"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  labels:
+  - dependencies

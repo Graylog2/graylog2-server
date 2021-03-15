@@ -84,7 +84,8 @@ public class MigrationHelpers {
     }
 
     @Nullable
-    public String ensureUser(String userName, String password, String fullName, String email, Set<String> expectedRoles) {
+    public String ensureUser(String userName, String password, String firstName, String lastName, String email,
+                             Set<String> expectedRoles) {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);
@@ -102,7 +103,7 @@ public class MigrationHelpers {
             } else {
                 fixedUser = userService.create();
                 fixedUser.setName(userName);
-                fixedUser.setFullName(fullName);
+                fixedUser.setFirstLastFullNames(firstName, lastName);
                 fixedUser.setPassword(password);
                 fixedUser.setEmail(email);
                 fixedUser.setPermissions(Collections.emptyList());

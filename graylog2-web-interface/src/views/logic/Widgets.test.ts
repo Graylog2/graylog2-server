@@ -17,6 +17,8 @@
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import asMock from 'helpers/mocking/AsMock';
 
+import { createWidget } from 'views/logic/WidgetTestHelpers';
+
 import { widgetDefinition } from './Widgets';
 
 jest.mock('graylog-web-plugin/plugin', () => ({
@@ -25,37 +27,26 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
+const someTypeWidget = createWidget('some-type');
+const someOtherTypeWidget = createWidget('some-other-type');
+const defaultWidget = createWidget('default');
+
 describe('Widgets', () => {
   describe('widgetDefinition', () => {
     it('returns widget definition if present', () => {
-      asMock(PluginStore.exports).mockReturnValue([{
-        type: 'some-other-type',
-        value: 23,
-      }, {
-        type: 'some-type',
-        value: 42,
-      }]);
+      asMock(PluginStore.exports).mockReturnValue([someOtherTypeWidget, someTypeWidget]);
 
-      expect(widgetDefinition('some-type')).toEqual({ type: 'some-type', value: 42 });
+      expect(widgetDefinition('some-type')).toEqual(someTypeWidget);
     });
 
     it('returns default definition if widget type is not present', () => {
-      asMock(PluginStore.exports).mockReturnValue([{
-        type: 'some-other-type',
-        value: 23,
-      }, {
-        type: 'default',
-        value: 42,
-      }]);
+      asMock(PluginStore.exports).mockReturnValue([someOtherTypeWidget, defaultWidget]);
 
-      expect(widgetDefinition('some-type')).toEqual({ type: 'default', value: 42 });
+      expect(widgetDefinition('some-type')).toEqual(defaultWidget);
     });
 
     it('throws error if widget type and default type are not present', () => {
-      asMock(PluginStore.exports).mockReturnValue([{
-        type: 'some-other-type',
-        value: 23,
-      }]);
+      asMock(PluginStore.exports).mockReturnValue([someOtherTypeWidget]);
 
       expect(() => widgetDefinition('some-type'))
         .toThrowError('Neither a widget of type "some-type" nor a default widget are registered!');

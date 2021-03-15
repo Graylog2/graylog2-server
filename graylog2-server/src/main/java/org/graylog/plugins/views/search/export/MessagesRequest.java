@@ -100,11 +100,7 @@ public abstract class MessagesRequest {
         @JsonProperty
         public abstract Builder limit(Integer limit);
 
-        abstract MessagesRequest autoBuild();
-
-        public MessagesRequest build() {
-            return autoBuild();
-        }
+        public abstract MessagesRequest build();
 
         @JsonCreator
         public static Builder create() {
