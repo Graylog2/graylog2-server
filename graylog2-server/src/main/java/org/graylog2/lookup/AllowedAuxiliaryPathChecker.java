@@ -25,26 +25,26 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 @Singleton
-public class TrustedPathChecker {
+public class AllowedAuxiliaryPathChecker {
 
-    private final Set<Path> trustedPaths;
+    private final Set<Path> allowedPaths;
 
     @Inject
-    public TrustedPathChecker(@Named("trusted_data_file_paths") Set<Path> trustedPaths) {
-        this.trustedPaths = trustedPaths;
+    public AllowedAuxiliaryPathChecker(@Named("allowed_auxiliary_paths") Set<Path> allowedPaths) {
+        this.allowedPaths = allowedPaths;
     }
 
-    public boolean fileIsInTrustedPath(String filePath) throws IOException {
-        if (trustedPaths.isEmpty()) {
+    public boolean isInAllowedPath(String filePath) {
+        if (allowedPaths.isEmpty()) {
             return true;
         }
 
         // Get the absolute file path (resolve all relative paths and symbolic links).
         // The path.toFile().getCanonicalFile() calls accomplishes this.
         final Path absoluteCsvFilePath = Paths.get(filePath).toAbsolutePath().normalize();
-        for (Path trustedPath : trustedPaths) {
-            final Path absoluteTrustedPath = trustedPath.toAbsolutePath().normalize();
-            if (absoluteCsvFilePath.startsWith(absoluteTrustedPath)) {
+        for (Path allowedPath : allowedPaths) {
+            final Path absoluteAllowedPath = allowedPath.toAbsolutePath().normalize();
+            if (absoluteCsvFilePath.startsWith(absoluteAllowedPath)) {
                 return true;
             }
         }

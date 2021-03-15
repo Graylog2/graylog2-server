@@ -30,7 +30,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.lookup.TrustedPathChecker;
+import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -64,7 +64,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     public static final String NAME = "csvfile";
 
     private final Config config;
-    private final TrustedPathChecker pathChecker;
+    private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -74,7 +74,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                               @Assisted("name") String name,
                               @Assisted LookupDataAdapterConfiguration config,
                               MetricRegistry metricRegistry,
-                              TrustedPathChecker pathChecker) {
+                              AllowedAuxiliaryPathChecker pathChecker) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
         this.pathChecker = pathChecker;
@@ -86,7 +86,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (isNullOrEmpty(config.path())) {
             throw new IllegalStateException("File path needs to be set");
         }
-        if (!pathChecker.fileIsInTrustedPath(config.path())) {
+        if (!pathChecker.isInAllowedPath(config.path())) {
             throw new IllegalStateException("The specified CSV file is not in a trusted path.");
         }
         if (config.checkInterval() < 1) {

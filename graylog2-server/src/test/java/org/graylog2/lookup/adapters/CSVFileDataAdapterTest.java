@@ -18,7 +18,7 @@ package org.graylog2.lookup.adapters;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.io.Resources;
-import org.graylog2.lookup.TrustedPathChecker;
+import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class CSVFileDataAdapterTest {
     private CSVFileDataAdapter csvFileDataAdapter;
 
     @Mock
-    TrustedPathChecker pathChecker;
+    AllowedAuxiliaryPathChecker pathChecker;
 
     public CSVFileDataAdapterTest() throws Exception {
         final URL resource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterTest.csv");
@@ -58,7 +58,7 @@ public class CSVFileDataAdapterTest {
     public void doGet_successfully_returns_values() throws Exception {
         final Config config = baseConfig();
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
-        when(pathChecker.fileIsInTrustedPath(anyString())).thenReturn(true);
+        when(pathChecker.isInAllowedPath(anyString())).thenReturn(true);
         csvFileDataAdapter.doStart();
 
         assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("23"));
@@ -79,7 +79,7 @@ public class CSVFileDataAdapterTest {
                                     .caseInsensitiveLookup(false)
                                     .build();
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
-        when(pathChecker.fileIsInTrustedPath(anyString())).thenReturn(true);
+        when(pathChecker.isInAllowedPath(anyString())).thenReturn(true);
         csvFileDataAdapter.doStart();
 
         assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("foo"));
@@ -90,7 +90,7 @@ public class CSVFileDataAdapterTest {
     @Test
     public void doGet_failure_filePathInvalid() throws Exception {
         final Config config = baseConfig();
-        when(pathChecker.fileIsInTrustedPath(anyString())).thenReturn(false);
+        when(pathChecker.isInAllowedPath(anyString())).thenReturn(false);
         csvFileDataAdapter = new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker);
         assertThatThrownBy(() -> csvFileDataAdapter.doStart())
                 .isExactlyInstanceOf(IllegalStateException.class)

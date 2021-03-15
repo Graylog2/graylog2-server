@@ -62,15 +62,15 @@ public class PathConfigurationTest {
         assertEquals(BIN_PATH, configuration.getBinDir().toString());
         assertEquals(DATA_PATH, configuration.getDataDir().toString());
         assertEquals(PLUGINS_PATH, configuration.getPluginDir().toString());
-        assertTrue(configuration.getTrustedFilePaths().isEmpty());
+        assertTrue(configuration.getAllowedAuxiliaryPaths().isEmpty());
     }
 
     @Test
-    public void testTrustedPaths() throws ValidationException, RepositoryException {
-        validProperties.put("trusted_data_file_paths", "/permitted-dir,/another-valid-dir");
+    public void testAllowedAuxiliaryPaths() throws ValidationException, RepositoryException {
+        validProperties.put("allowed_auxiliary_paths", "/permitted-dir,/another-valid-dir");
         PathConfiguration configuration = new PathConfiguration();
         final JadConfig jadConfig = new JadConfig(new InMemoryRepository(validProperties), configuration);
         jadConfig.process();
-        assertEquals(2,configuration.getTrustedFilePaths().size());
+        assertEquals(2,configuration.getAllowedAuxiliaryPaths().size());
     }
 }

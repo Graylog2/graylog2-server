@@ -27,29 +27,29 @@ import java.util.Set;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class TrustedPathCheckerTest {
+public class AllowedAuxiliaryPathCheckerTest {
 
-    public static final String TRUSTED_PATH = "/trusted-path";
-    TrustedPathChecker pathChecker;
+    public static final String ALLOWED_PATH = "/allowed-path";
+    AllowedAuxiliaryPathChecker pathChecker;
 
     @Test
     public void success() throws IOException {
-        final Set<Path> paths = Collections.singleton(Paths.get(TRUSTED_PATH));
-        pathChecker = new TrustedPathChecker(paths);
-        assertTrue(pathChecker.fileIsInTrustedPath(TRUSTED_PATH + "/file.csv"));
+        final Set<Path> paths = Collections.singleton(Paths.get(ALLOWED_PATH));
+        pathChecker = new AllowedAuxiliaryPathChecker(paths);
+        assertTrue(pathChecker.isInAllowedPath(ALLOWED_PATH + "/file.csv"));
     }
 
     @Test
     public void successRelativePaths() throws IOException {
-        final Set<Path> paths = Collections.singleton(Paths.get(TRUSTED_PATH + "/sub-dir/../"));
-        pathChecker = new TrustedPathChecker(paths);
-        assertTrue(pathChecker.fileIsInTrustedPath(TRUSTED_PATH + "/file.csv"));
+        final Set<Path> paths = Collections.singleton(Paths.get(ALLOWED_PATH + "/sub-dir/../"));
+        pathChecker = new AllowedAuxiliaryPathChecker(paths);
+        assertTrue(pathChecker.isInAllowedPath(ALLOWED_PATH + "/file.csv"));
     }
 
     @Test
-    public void failureOutsideOfTrustedPath() throws IOException {
-        final Set<Path> paths = Collections.singleton(Paths.get(TRUSTED_PATH));
-        pathChecker = new TrustedPathChecker(paths);
-        assertFalse(pathChecker.fileIsInTrustedPath("/untrusted-path/file.csv"));
+    public void failureOutsideOfAllowedPath() throws IOException {
+        final Set<Path> paths = Collections.singleton(Paths.get(ALLOWED_PATH));
+        pathChecker = new AllowedAuxiliaryPathChecker(paths);
+        assertFalse(pathChecker.isInAllowedPath("/disallowed-path/file.csv"));
     }
 }

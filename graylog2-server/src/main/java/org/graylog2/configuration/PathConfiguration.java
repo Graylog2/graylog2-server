@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 
 public class PathConfiguration {
-    public static final String TRUSTED_DATA_FILE_PATHS = "trusted_data_file_paths";
+    public static final String ALLOWED_AUXILIARY_PATHS = "allowed_auxiliary_paths";
 
     protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");
     protected static final Path DEFAULT_DATA_DIR = Paths.get("data");
@@ -41,17 +41,17 @@ public class PathConfiguration {
     private Path pluginDir = DEFAULT_PLUGIN_DIR;
 
     /**
-     * Optional trusted paths for Graylog data files.
+     * Optional allowed paths for Graylog data files.
      *
      * If provided, certain operations in Graylog will only be permitted if the data file(s) are located in the
-     * specified paths. All subdirectories of indicated paths are trusted by default.
+     * specified paths. All subdirectories of indicated paths are allowed by default.
      *
      * This provides an additional layer of security, and allows administrators to control where in the file system
      * Graylog users can select files from. It protects against the potential inspection of arbitrary files in the
      * file system from the Graylog user interface.
      */
-    @Parameter(value = TRUSTED_DATA_FILE_PATHS, converter = PathSetConverter.class)
-    private Set<Path> trustedFilePaths = Collections.emptySet();
+    @Parameter(value = ALLOWED_AUXILIARY_PATHS, converter = PathSetConverter.class)
+    private Set<Path> allowedAuxiliaryPaths = Collections.emptySet();
 
     public Path getBinDir() {
         return binDir;
@@ -68,7 +68,7 @@ public class PathConfiguration {
         return pluginDir;
     }
 
-    public Set<Path> getTrustedFilePaths() {
-        return trustedFilePaths;
+    public Set<Path> getAllowedAuxiliaryPaths() {
+        return allowedAuxiliaryPaths;
     }
 }
