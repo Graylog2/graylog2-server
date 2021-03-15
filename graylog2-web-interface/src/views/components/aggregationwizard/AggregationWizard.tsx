@@ -36,6 +36,7 @@ export type AggregationAction = {
   title: string,
   key: string,
   isConfigured: boolean,
+  multipleUse: boolean
   onCreate: () => void,
   onDeleteAll?: () => void,
   component: React.ComponentType<{
@@ -47,6 +48,7 @@ export type AggregationAction = {
 const createVisualizationAction: CreateAggregationAction = (config, onConfigChange) => ({
   title: 'Visualization',
   key: 'visualization',
+  multipleUse: false,
   isConfigured: !isEmpty(config.visualization),
   onCreate: () => onConfigChange(config),
   component: VisualizationConfiguration,
@@ -55,6 +57,7 @@ const createVisualizationAction: CreateAggregationAction = (config, onConfigChan
 const createMetricAction: CreateAggregationAction = (config, onConfigChange) => ({
   title: 'Metric',
   key: 'metric',
+  multipleUse: true,
   isConfigured: !isEmpty(config.series),
   onCreate: () => onConfigChange(config.toBuilder().series([Series.createDefault()]).build()),
   onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
@@ -64,6 +67,7 @@ const createMetricAction: CreateAggregationAction = (config, onConfigChange) => 
 const createGroupByAction: CreateAggregationAction = (config, onConfigChange) => ({
   title: 'Group By',
   key: 'groupBy',
+  multipleUse: true,
   isConfigured: !isEmpty(config.rowPivots) || !isEmpty(config.columnPivots),
   onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().rowPivots([]).columnPivots([]).build()),
@@ -73,6 +77,7 @@ const createGroupByAction: CreateAggregationAction = (config, onConfigChange) =>
 const createSortAction: CreateAggregationAction = (config, onConfigChange) => ({
   title: 'Sort',
   key: 'sort',
+  multipleUse: false,
   isConfigured: !isEmpty(config.sort),
   onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().sort([]).build()),
@@ -144,7 +149,6 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
         <Section data-testid="add-action-section">
           <SectionHeadline>Add an Action</SectionHeadline>
           <AggregationActionSelect onActionCreate={_onActionCreate}
-                                   configuredActions={configuredAggregationActions}
                                    aggregationActions={aggregationActions} />
         </Section>
         <Section data-testid="configure-actions-section">

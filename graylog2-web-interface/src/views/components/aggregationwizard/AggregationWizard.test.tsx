@@ -52,7 +52,7 @@ describe('AggregationWizard', () => {
     expect(screen.getByText('The Visualization')).toBeInTheDocument();
   });
 
-  it('should list not configured aggregation actions in action select', async () => {
+  it('should list available aggregation actions in action select', async () => {
     const config = AggregationWidgetConfig
       .builder()
       .visualization(DataTable.type)
