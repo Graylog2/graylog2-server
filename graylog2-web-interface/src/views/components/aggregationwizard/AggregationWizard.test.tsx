@@ -52,44 +52,44 @@ describe('AggregationWizard', () => {
     expect(screen.getByText('The Visualization')).toBeInTheDocument();
   });
 
-  it('should list available aggregation actions in action select', async () => {
+  it('should list available aggregation elements in element select', async () => {
     const config = AggregationWidgetConfig
       .builder()
       .visualization(DataTable.type)
       .build();
 
     renderSUT({ config });
-    const addActionSection = screen.getByTestId('add-action-section');
-    const aggregationActionSelect = screen.getByLabelText('Add an Action');
-    const notConfiguredActions = [
+    const addElementSection = screen.getByTestId('add-element-section');
+    const aggregationElementSelect = screen.getByLabelText('Add an Element');
+    const notConfiguredElements = [
       'Metric',
       'Group By',
       'Sort',
     ];
-    await selectEvent.openMenu(aggregationActionSelect);
+    await selectEvent.openMenu(aggregationElementSelect);
 
-    notConfiguredActions.forEach((actionTitle) => {
-      expect(within(addActionSection).getByText(actionTitle)).toBeInTheDocument();
+    notConfiguredElements.forEach((elementTitle) => {
+      expect(within(addElementSection).getByText(elementTitle)).toBeInTheDocument();
     });
 
-    expect(within(addActionSection).queryByText('Visualization')).not.toBeInTheDocument();
+    expect(within(addElementSection).queryByText('Visualization')).not.toBeInTheDocument();
   });
 
-  it('should display newly selected aggregation action', async () => {
+  it('should display newly selected aggregation element', async () => {
     renderSUT();
 
-    const aggregationActionSelect = screen.getByLabelText('Add an Action');
-    const configureActionsSection = screen.getByTestId('configure-actions-section');
+    const aggregationElementSelect = screen.getByLabelText('Add an Element');
+    const configureElementsSection = screen.getByTestId('configure-elements-section');
 
-    expect(within(configureActionsSection).queryByText('Metric')).not.toBeInTheDocument();
+    expect(within(configureElementsSection).queryByText('Metric')).not.toBeInTheDocument();
 
-    await selectEvent.openMenu(aggregationActionSelect);
-    await selectEvent.select(aggregationActionSelect, 'Metric');
+    await selectEvent.openMenu(aggregationElementSelect);
+    await selectEvent.select(aggregationElementSelect, 'Metric');
 
-    expect(within(configureActionsSection).getByText('Metric')).toBeInTheDocument();
+    expect(within(configureElementsSection).getByText('Metric')).toBeInTheDocument();
   });
 
-  it('should delete aggregation action', async () => {
+  it('should delete aggregation element', async () => {
     const onChangeMock = jest.fn();
     const config = AggregationWidgetConfig
       .builder()
@@ -103,7 +103,7 @@ describe('AggregationWizard', () => {
       .build();
 
     renderSUT({ config, onChange: onChangeMock });
-    const configureActionsSection = screen.getByTestId('configure-actions-section');
+    const configureElementsSection = screen.getByTestId('configure-elements-section');
     const deleteAllMetricsButton = screen.getByTitle('Remove Metric');
 
     fireEvent.click(deleteAllMetricsButton);
@@ -111,10 +111,10 @@ describe('AggregationWizard', () => {
     expect(onChangeMock).toHaveBeenCalledTimes(1);
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
 
-    await waitFor(() => expect(within(configureActionsSection).queryByText('Metric')).not.toBeInTheDocument());
+    await waitFor(() => expect(within(configureElementsSection).queryByText('Metric')).not.toBeInTheDocument());
   });
 
-  it('should display aggregation action as coming from config', async () => {
+  it('should display aggregation element as coming from config', async () => {
     const sort = new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending);
     const rowPivot = Pivot.create('timestamp', 'time', { interval: { type: 'timeunit', unit: 'minutes' } });
 
@@ -127,17 +127,17 @@ describe('AggregationWizard', () => {
       .build();
 
     renderSUT({ config });
-    const configureActionsSection = screen.getByTestId('configure-actions-section');
+    const configureElementsSection = screen.getByTestId('configure-elements-section');
 
-    const configuredActions = [
+    const configuredElements = [
       'Metric',
       'Group By',
       'Sort',
       'Visualization',
     ];
 
-    configuredActions.forEach((actionTitle) => {
-      expect(within(configureActionsSection).getByText(actionTitle)).toBeInTheDocument();
+    configuredElements.forEach((elementTitle) => {
+      expect(within(configureElementsSection).getByText(elementTitle)).toBeInTheDocument();
     });
   });
 });

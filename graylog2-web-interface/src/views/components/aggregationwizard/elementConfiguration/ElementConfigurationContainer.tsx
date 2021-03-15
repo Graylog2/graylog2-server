@@ -37,18 +37,16 @@ const Header = styled.div`
   margin-bottom: 5px;
 `;
 
-const Actions = styled.div``;
-
 type Props = {
   children: React.ReactNode,
-  isPermanentAction: boolean,
+  isPermanentElement: boolean,
   onDeleteAll: () => void
   title: string,
 }
 
-const ActionConfigurationContainer = ({
+const ElementConfigurationContainer = ({
   children,
-  isPermanentAction,
+  isPermanentElement,
   onDeleteAll,
   title,
 }: Props) => {
@@ -56,11 +54,11 @@ const ActionConfigurationContainer = ({
     <Wrapper>
       <Header>
         <div>{title}</div>
-        <Actions>
-          {!isPermanentAction && (
+        <div>
+          {!isPermanentElement && (
             <IconButton title={`Remove ${title}`} name="trash" onClick={onDeleteAll} />
           )}
-        </Actions>
+        </div>
       </Header>
       <div>
         {children}
@@ -69,4 +67,4 @@ const ActionConfigurationContainer = ({
   );
 };
 
-export default ActionConfigurationContainer;
+export default ElementConfigurationContainer;

@@ -19,41 +19,41 @@ import { useRef } from 'react';
 
 import { Select } from 'components/common';
 
-import type { AggregationAction } from './AggregationWizard';
+import type { AggregationElement } from './AggregationWizard';
 
-const _getOptions = (aggregationActions: Array<AggregationAction>) => {
-  return aggregationActions.reduce((availableActions, aggregationAction) => {
-    if (aggregationAction.isConfigured && !aggregationAction.multipleUse) {
-      return availableActions;
+const _getOptions = (aggregationElements: Array<AggregationElement>) => {
+  return aggregationElements.reduce((availableElements, aggregationElement) => {
+    if (aggregationElement.isConfigured && !aggregationElement.multipleUse) {
+      return availableElements;
     }
 
-    availableActions.push({ value: aggregationAction.key, label: aggregationAction.title });
+    availableElements.push({ value: aggregationElement.key, label: aggregationElement.title });
 
-    return availableActions;
+    return availableElements;
   }, []);
 };
 
 type Props = {
-  aggregationActions: Array<AggregationAction>,
-  onActionCreate: (actionKey: string) => void,
+  aggregationElements: Array<AggregationElement>,
+  onElementCreate: (elementKey: string) => void,
 }
 
-const AggregationActionSelect = ({ aggregationActions, onActionCreate }: Props) => {
+const AggregationElementSelect = ({ aggregationElements, onElementCreate }: Props) => {
   const selectRef = useRef(null);
-  const options = _getOptions(aggregationActions);
+  const options = _getOptions(aggregationElements);
 
-  const _onSelect = (actionKey: string) => {
+  const _onSelect = (elementKey: string) => {
     selectRef.current.clearValue();
-    onActionCreate(actionKey);
+    onElementCreate(elementKey);
   };
 
   return (
     <Select options={options}
             onChange={_onSelect}
             ref={selectRef}
-            placeholder="Select action..."
-            aria-label="Add an Action" />
+            placeholder="Select an element..."
+            aria-label="Add an Element" />
   );
 };
 
-export default AggregationActionSelect;
+export default AggregationElementSelect;
