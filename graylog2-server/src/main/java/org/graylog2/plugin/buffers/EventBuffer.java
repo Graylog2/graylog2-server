@@ -16,8 +16,10 @@
  */
 package org.graylog2.plugin.buffers;
 
-import org.graylog2.plugin.journal.RawMessage;
+public interface EventBuffer {
+    long getUsage();
 
-public interface InputBuffer extends EventBuffer {
-    void insert(RawMessage message);
+    default boolean isEmpty() {
+        return getUsage() == 0;
+    }
 }
