@@ -94,11 +94,6 @@ describe('<Widget />', () => {
     },
   };
 
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.resetModules();
-  });
-
   type DummyWidgetProps = {
     widget?: WidgetModel,
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
