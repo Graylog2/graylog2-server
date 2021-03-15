@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { EditWidgetComponentProps } from 'views/types';
 
+import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import AggregationElementSelect from './AggregationElementSelect';
@@ -35,7 +36,8 @@ export type AggregationElement = {
   title: string,
   key: string,
   isConfigured: boolean,
-  multipleUse: boolean
+  multipleUse: boolean,
+  order: number,
   onCreate: () => void,
   onDeleteAll?: () => void,
   component: React.ComponentType<{
@@ -47,6 +49,7 @@ export type AggregationElement = {
 const createVisualizationElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Visualization',
   key: 'visualization',
+  order: 4,
   multipleUse: false,
   isConfigured: !isEmpty(config.visualization),
   onCreate: () => onConfigChange(config),
@@ -56,6 +59,7 @@ const createVisualizationElement: CreateAggregationElement = (config, onConfigCh
 const createMetricElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Metric',
   key: 'metric',
+  order: 2,
   multipleUse: true,
   isConfigured: !isEmpty(config.series),
   onCreate: () => onConfigChange(config),
@@ -66,6 +70,7 @@ const createMetricElement: CreateAggregationElement = (config, onConfigChange) =
 const createGroupByElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Group By',
   key: 'groupBy',
+  order: 1,
   multipleUse: true,
   isConfigured: !isEmpty(config.rowPivots) || !isEmpty(config.columnPivots),
   onCreate: () => onConfigChange(config),
@@ -76,6 +81,7 @@ const createGroupByElement: CreateAggregationElement = (config, onConfigChange) 
 const createSortElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Sort',
   key: 'sort',
+  order: 3,
   multipleUse: false,
   isConfigured: !isEmpty(config.sort),
   onCreate: () => onConfigChange(config),
@@ -100,6 +106,18 @@ const _initialConfiguredAggregationElements = (aggregationElements: Array<Aggreg
     }
 
     return configuredElements;
+  }, []);
+};
+
+const _sortElements = (configuredAggregationElements: Array<string>, aggregationElements: Array<AggregationElement>) => {
+  const sortedAggregationElements = aggregationElements.sort((element1, element2) => defaultCompare(element1.order, element2.order));
+
+  return sortedAggregationElements.reduce((collection, element) => {
+    if (configuredAggregationElements.find((elementKey) => elementKey === element.key)) {
+      collection.push(element.key);
+    }
+
+    return collection;
   }, []);
 };
 
@@ -134,7 +152,8 @@ const SectionHeadline = styled.div`
 
 const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
   const aggregationElements = _createAggregationElements(config, onChange);
-  const [configuredAggregationElements, setConfiguredAggregationElements] = useState(_initialConfiguredAggregationElements(aggregationElements));
+  const [configuredAggregationElements, setConfiguredAggregationElements] = useState<Array<string>>(_initialConfiguredAggregationElements(aggregationElements));
+  const sortedConfiguredElements = useMemo(() => _sortElements(configuredAggregationElements, aggregationElements), [configuredAggregationElements, aggregationElements]);
 
   const _onElementCreate = (elementKey: string) => {
     if (elementKey && !configuredAggregationElements.find((configuredElementKey) => configuredElementKey === elementKey)) {
@@ -153,7 +172,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
         <Section data-testid="configure-elements-section">
           <SectionHeadline>Configured Elements</SectionHeadline>
           <div>
-            {configuredAggregationElements.map((elementKey) => {
+            {sortedConfiguredElements.map((elementKey) => {
               const aggregationElement = aggregationElements.find((element) => element.key === elementKey);
               const AggregationElementComponent = aggregationElement.component;
 
