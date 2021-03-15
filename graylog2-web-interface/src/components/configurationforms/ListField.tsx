@@ -47,6 +47,8 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
 
   const label = <>{field.human_name} {optionalMarker(field)}</>;
 
+  const selectValue = Array.isArray(value) ? value.join(',') : value;
+
   return (
     <Input id={`${typeName}-${title}`}
            label={label}
@@ -56,7 +58,7 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
                    required={isRequired}
                    autoFocus={autoFocus}
                    options={formattedOptions}
-                   value={value ? (Array.isArray(value) ? value.join(',') : value) : undefined}
+                   value={selectValue}
                    placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
                    onChange={handleChange}
                    allowCreate={allowCreate} />
