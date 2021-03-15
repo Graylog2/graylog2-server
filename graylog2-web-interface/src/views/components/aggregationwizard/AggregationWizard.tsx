@@ -138,7 +138,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   const [configuredAggregationElements, setConfiguredAggregationElements] = useState(_initialConfiguredAggregationElements(aggregationElements));
 
   const _onElementCreate = (elementKey: string) => {
-    if (elementKey) {
+    if (elementKey && !configuredAggregationElements.find((configuredElementKey) => configuredElementKey === elementKey)) {
       setConfiguredAggregationElements([...configuredAggregationElements, elementKey]);
     }
   };
