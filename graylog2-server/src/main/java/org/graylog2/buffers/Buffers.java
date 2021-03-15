@@ -67,15 +67,18 @@ public class Buffers {
      */
     @Deprecated
     public void waitForEmptyBuffers() {
-        waitForEmptyBuffers(DEFAULT_MAX_WAIT, TimeUnit.SECONDS);
-    }
-
-    public void waitForEmptyBuffers(EnumSet<Type> bufferTypes) {
-        waitForEmptyBuffers(EnumSet.of(PROCESS, OUTPUT), DEFAULT_MAX_WAIT, TimeUnit.SECONDS);
+        waitForEmptyBuffers(EnumSet.of(PROCESS, OUTPUT));
     }
 
     /**
-     * @deprecated Usse {@link #waitForEmptyBuffers(EnumSet, long, TimeUnit)} instead
+     * Wait until the buffers of the given types have been drained or abort after 30 seconds
+     */
+    public void waitForEmptyBuffers(EnumSet<Type> bufferTypes) {
+        waitForEmptyBuffers(bufferTypes, DEFAULT_MAX_WAIT, TimeUnit.SECONDS);
+    }
+
+    /**
+     * @deprecated Use {@link #waitForEmptyBuffers(EnumSet, long, TimeUnit)} instead
      */
     @Deprecated
     public void waitForEmptyBuffers(final long maxWait, final TimeUnit timeUnit) {

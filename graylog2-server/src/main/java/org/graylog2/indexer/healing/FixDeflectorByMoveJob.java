@@ -30,6 +30,11 @@ import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.EnumSet;
+
+import static org.graylog2.buffers.Buffers.Type.OUTPUT;
+import static org.graylog2.buffers.Buffers.Type.PROCESS;
+
 public class FixDeflectorByMoveJob extends SystemJob {
     public interface Factory {
         FixDeflectorByMoveJob create();
@@ -88,7 +93,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
             serverStatus.pauseMessageProcessing();
             progress = 5;
 
-            bufferSynchronizer.waitForEmptyBuffers();
+            bufferSynchronizer.waitForEmptyBuffers(EnumSet.of(PROCESS, OUTPUT));
             progress = 10;
 
             // Copy messages to new index.
