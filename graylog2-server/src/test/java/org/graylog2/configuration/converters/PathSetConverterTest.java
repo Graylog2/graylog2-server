@@ -54,13 +54,13 @@ public class PathSetConverterTest {
 
     @Test
     public void testConvertTo() {
-        Set<Path> sortedSet = new HashSet<>();
-        sortedSet.add(Paths.get("/some-dir"));
-        sortedSet.add(Paths.get("/another-dir"));
-        sortedSet.add(Paths.get("/finally-dir"));
+        Set<Path> set = new HashSet<>();
+        set.add(Paths.get("/some-dir"));
+        set.add(Paths.get("/another-dir"));
+        set.add(Paths.get("/finally-dir"));
 
         Assert.assertEquals("", converter.convertTo(new HashSet<Path>()));
-        Assert.assertEquals("/another-dir,/some-dir,/finally-dir", converter.convertTo(sortedSet));
+        Assert.assertEquals("/another-dir,/some-dir,/finally-dir", converter.convertTo(set));
     }
 
     @Test(expected = ParameterException.class)
