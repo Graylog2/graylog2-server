@@ -94,7 +94,7 @@ public class CSVFileDataAdapterTest {
         csvFileDataAdapter = new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker);
         assertThatThrownBy(() -> csvFileDataAdapter.doStart())
                 .isExactlyInstanceOf(IllegalStateException.class)
-                .hasMessageStartingWith("The specified CSV file is not in a trusted path.");
+                .hasMessageStartingWith("The specified CSV file is not in a allowed path.");
     }
 
     private Config baseConfig() {
