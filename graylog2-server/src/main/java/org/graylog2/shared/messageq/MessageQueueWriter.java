@@ -47,6 +47,8 @@ public interface MessageQueueWriter {
                                 metricRegistry.meter(name(MessageQueueWriter.class, "written-messages")))
                         .writtenBytes(
                                 metricRegistry.meter(name(MessageQueueWriter.class, "written-bytes")))
+                        .failedWriteAttempts(
+                                metricRegistry.meter(name(MessageQueueWriter.class, "failed-write-attempts")))
                         .build();
             }
         }
@@ -54,6 +56,8 @@ public interface MessageQueueWriter {
         public abstract Meter writtenMessages();
 
         public abstract Meter writtenBytes();
+
+        public abstract Meter failedWriteAttempts();
 
         public static Builder builder() {
             return new AutoValue_MessageQueueWriter_Metrics.Builder();
@@ -65,6 +69,8 @@ public interface MessageQueueWriter {
             public abstract Builder writtenMessages(Meter writtenMessages);
 
             public abstract Builder writtenBytes(Meter writtenBytes);
+
+            public abstract Builder failedWriteAttempts(Meter failedWriteAttempts);
 
             public abstract Metrics build();
         }

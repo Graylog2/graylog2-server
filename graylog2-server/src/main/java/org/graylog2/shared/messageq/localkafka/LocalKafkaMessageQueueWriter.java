@@ -21,7 +21,6 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Predicate;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.journal.Journal;
@@ -31,7 +30,6 @@ import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -50,19 +48,7 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
     private LocalKafkaJournal kafkaJournal;
     private Semaphore journalFilled;
     private final Metrics metrics;
-
-    private static final Retryer<Void> JOURNAL_WRITE_RETRYER = RetryerBuilder.<Void>newBuilder()
-            .retryIfException(new Predicate<Throwable>() {
-                @Override
-                public boolean apply(@Nullable Throwable input) {
-                    LOG.error("Unable to write to journal - retrying with exponential back-off", input);
-                    return true;
-                }
-            })
-            .withWaitStrategy(WaitStrategies.exponentialWait(250, 1, TimeUnit.MINUTES))
-            .withStopStrategy(StopStrategies.neverStop())
-            .build();
-
+    private final Retryer<Void> writeRetryer;
 
     @Inject
     public LocalKafkaMessageQueueWriter(LocalKafkaJournal kafkaJournal,
@@ -71,6 +57,16 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
         this.kafkaJournal = kafkaJournal;
         this.journalFilled = journalFilled;
         this.metrics = metrics;
+
+        writeRetryer = RetryerBuilder.<Void>newBuilder()
+                .retryIfException(input -> {
+                    LOG.error("Unable to write to journal - retrying with exponential back-off", input);
+                    metrics.failedWriteAttempts().mark();
+                    return true;
+                })
+                .withWaitStrategy(WaitStrategies.exponentialWait(250, 1, TimeUnit.MINUTES))
+                .withStopStrategy(StopStrategies.neverStop())
+                .build();
     }
 
     @Override
@@ -91,7 +87,7 @@ public class LocalKafkaMessageQueueWriter extends AbstractIdleService implements
 
             // Use retryer with exponential back-off to avoid spamming the logs.
             try {
-                JOURNAL_WRITE_RETRYER.call(() -> {
+                writeRetryer.call(() -> {
                     writeToJournal(journalEntries);
                     return null;
                 });
