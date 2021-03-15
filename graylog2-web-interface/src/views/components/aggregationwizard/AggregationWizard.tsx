@@ -21,7 +21,6 @@ import { isEmpty } from 'lodash';
 import { EditWidgetComponentProps } from 'views/types';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Series from 'views/logic/aggregationbuilder/Series';
 
 import AggregationElementSelect from './AggregationElementSelect';
 import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
@@ -59,7 +58,7 @@ const createMetricElement: CreateAggregationElement = (config, onConfigChange) =
   key: 'metric',
   multipleUse: true,
   isConfigured: !isEmpty(config.series),
-  onCreate: () => onConfigChange(config.toBuilder().series([Series.createDefault()]).build()),
+  onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
   component: MetricConfiguration,
 });
