@@ -87,10 +87,10 @@ const _createAggregationElements: (
   config: AggregationWidgetConfig,
   onConfigChange: (newConfig: AggregationWidgetConfig) => void
 ) => Array<AggregationElement> = (config, onConfigChange) => ([
-  createVisualizationElement(config, onConfigChange),
   createGroupByElement(config, onConfigChange),
   createMetricElement(config, onConfigChange),
   createSortElement(config, onConfigChange),
+  createVisualizationElement(config, onConfigChange),
 ]);
 
 const _initialConfiguredAggregationElements = (aggregationElements: Array<AggregationElement>) => {
