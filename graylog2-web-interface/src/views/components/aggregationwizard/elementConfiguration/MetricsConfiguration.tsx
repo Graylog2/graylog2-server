@@ -24,7 +24,7 @@ type Props = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const MetricConfiguration = ({ config, onConfigChange }: Props) => {
+const MetricsConfiguration = ({ config, onConfigChange }: Props) => {
   return (
     <>
       Configuration Elements
@@ -32,4 +32,4 @@ const MetricConfiguration = ({ config, onConfigChange }: Props) => {
   );
 };
 
-export default MetricConfiguration;
+export default MetricsConfiguration;

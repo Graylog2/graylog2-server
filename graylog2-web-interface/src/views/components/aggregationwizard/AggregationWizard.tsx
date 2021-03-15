@@ -28,7 +28,7 @@ import AggregationElementSelect from './AggregationElementSelect';
 import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
 import VisualizationConfiguration from './elementConfiguration/VisualizationConfiguration';
 import GroupByConfiguration from './elementConfiguration/GroupByConfiguration';
-import MetricConfiguration from './elementConfiguration/MetricConfiguration';
+import MetricsConfiguration from './elementConfiguration/MetricsConfiguration';
 import SortConfiguration from './elementConfiguration/SortConfiguration';
 
 export type CreateAggregationElement = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationElement;
@@ -65,7 +65,7 @@ const createMetricElement: CreateAggregationElement = (config, onConfigChange) =
   isConfigured: !isEmpty(config.series),
   onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
-  component: MetricConfiguration,
+  component: MetricsConfiguration,
 });
 
 const createGroupByElement: CreateAggregationElement = (config, onConfigChange) => ({
