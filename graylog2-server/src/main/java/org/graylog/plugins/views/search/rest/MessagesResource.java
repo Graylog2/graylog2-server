@@ -58,6 +58,7 @@ import java.util.function.Function;
 @Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
 @Path("/views/search/messages")
 @RequiresAuthentication
+@SupportOnlyValidExportFormats
 public class MessagesResource extends RestResource implements PluginRestResource {
 
     private final CommandFactory commandFactory;
@@ -133,7 +134,6 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Export a message table as CSV")
     @POST
     @Path("{searchId}/{searchTypeId}")
-    @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,

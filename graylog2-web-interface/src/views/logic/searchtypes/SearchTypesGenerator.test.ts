@@ -17,6 +17,8 @@
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 
+import { createWidget } from 'views/logic/WidgetTestHelpers';
+
 import SearchTypesGenerator from './SearchTypesGenerator';
 
 import { widgetDefinition } from '../Widgets';
@@ -32,6 +34,7 @@ const dummyWidget = new Widget('dummyWidget', 'dummy', {});
 
 const mockSearchType = (fn) => asMock(widgetDefinition).mockImplementation((type) => ({
   dummy: {
+    ...createWidget(type),
     searchTypes: fn,
   },
 }[type]));
