@@ -21,10 +21,18 @@ export type MetricFormValues = {
   function: string,
   field: string | undefined,
   name?: string,
-}
+};
 
+export type GroupByFormValues = {};
+
+export type VisualizationFormValues = {};
+
+export type SortFormValues = {}
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
+  groupBy?: Array<GroupByFormValues>,
+  visualization?: VisualizationFormValues,
+  sort?: SortFormValues,
 }
 
 type Props = {

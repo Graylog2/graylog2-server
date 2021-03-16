@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { EditWidgetComponentProps } from 'views/types';
@@ -23,7 +22,6 @@ import { EditWidgetComponentProps } from 'views/types';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import { ButtonToolbar } from 'components/graylog';
-import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Button from 'components/graylog/Button';
 
@@ -35,18 +33,16 @@ import GroupByConfiguration from './elementConfiguration/GroupByConfiguration';
 import MetricsConfiguration from './elementConfiguration/MetricsConfiguration';
 import SortConfiguration from './elementConfiguration/SortConfiguration';
 
-export type CreateAggregationElement = (config: AggregationWidgetConfig, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => AggregationElement;
-
 export type AggregationElement = {
   title: string,
   key: string,
-  isConfigured: boolean,
+  isConfigured: (formValues: WidgetConfigFormValues) => boolean,
   multipleUse: boolean,
   order: number,
   toConfig?: (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => AggregationWidgetConfig,
   fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,
-  onCreate: () => void,
-  onDeleteAll?: () => void,
+  onCreate?: () => void,
+  onDeleteAll?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   component: React.ComponentType<{
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
@@ -69,23 +65,21 @@ const _seriesToMetrics = (series: Array<Series>) => series.map((s) => {
   };
 });
 
-const createVisualizationElement: CreateAggregationElement = (config, onConfigChange) => ({
+const visualizationElement: AggregationElement = {
   title: 'Visualization',
   key: 'visualization',
   order: 4,
   multipleUse: false,
-  isConfigured: !isEmpty(config.visualization),
-  onCreate: () => onConfigChange(config),
+  isConfigured: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.visualization),
   component: VisualizationConfiguration,
-});
+};
 
-const createMetricElement: CreateAggregationElement = (config, onConfigChange) => ({
+const metricElement: AggregationElement = {
   title: 'Metric',
   key: 'metrics',
   order: 2,
   multipleUse: true,
-  isConfigured: !isEmpty(config.series),
-  onCreate: () => onConfigChange(config),
+  isConfigured: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.metrics),
   fromConfig: (providedConfig: AggregationWidgetConfig) => ({
     metrics: _seriesToMetrics(providedConfig.series),
   }),
@@ -93,66 +87,41 @@ const createMetricElement: CreateAggregationElement = (config, onConfigChange) =
     .toBuilder()
     .series(_metricsToSeries(formValues.metrics))
     .build(),
-  onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
   component: MetricsConfiguration,
-});
+};
 
-const createGroupByElement: CreateAggregationElement = (config, onConfigChange) => ({
+const groupByElement: AggregationElement = {
   title: 'Group By',
   key: 'groupBy',
   order: 1,
   multipleUse: true,
-  isConfigured: !isEmpty(config.rowPivots) || !isEmpty(config.columnPivots),
-  onCreate: () => onConfigChange(config),
-  onDeleteAll: () => onConfigChange(config.toBuilder().rowPivots([]).columnPivots([]).build()),
+  isConfigured: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.groupBy),
   component: GroupByConfiguration,
-});
+};
 
-const createSortElement: CreateAggregationElement = (config, onConfigChange) => ({
+const sortElement: AggregationElement = {
   title: 'Sort',
   key: 'sort',
   order: 3,
   multipleUse: false,
-  isConfigured: !isEmpty(config.sort),
-  onCreate: () => onConfigChange(config),
-  onDeleteAll: () => onConfigChange(config.toBuilder().sort([]).build()),
+  isConfigured: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.sort),
   component: SortConfiguration,
-});
-
-const _createAggregationElements: (
-  config: AggregationWidgetConfig,
-  onConfigChange: (newConfig: AggregationWidgetConfig) => void
-) => Array<AggregationElement> = (config, onConfigChange) => ([
-  createGroupByElement(config, onConfigChange),
-  createMetricElement(config, onConfigChange),
-  createSortElement(config, onConfigChange),
-  createVisualizationElement(config, onConfigChange),
-]);
-
-const _initialConfiguredAggregationElements = (aggregationElements: Array<AggregationElement>) => {
-  return aggregationElements.reduce((configuredElements, element) => {
-    if (element.isConfigured) {
-      configuredElements.push(element.key);
-    }
-
-    return configuredElements;
-  }, []);
 };
 
-const _initialFormValues = (config: AggregationWidgetConfig, aggregationElements: Array<AggregationElement>) => {
-  return aggregationElements.reduce((formValues, element) => ({ ...formValues, ...(element.fromConfig ? element.fromConfig(config) : {}) }), {});
-};
+const aggregationElements = [
+  visualizationElement,
+  metricElement,
+  sortElement,
+  groupByElement,
+];
 
-const _sortElements = (configuredAggregationElements: Array<string>, aggregationElements: Array<AggregationElement>) => {
-  const sortedAggregationElements = aggregationElements.sort((element1, element2) => defaultCompare(element1.order, element2.order));
+const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 
-  return sortedAggregationElements.reduce((collection, element) => {
-    if (configuredAggregationElements.find((elementKey) => elementKey === element.key)) {
-      collection.push(element.key);
-    }
-
-    return collection;
-  }, []);
+const _initialFormValues = (config: AggregationWidgetConfig) => {
+  return aggregationElements.reduce((formValues, element) => ({
+    ...formValues,
+    ...(element.fromConfig ? element.fromConfig(config) : {}),
+  }), {});
 };
 
 const Wrapper = styled.div`
@@ -185,22 +154,13 @@ const SectionHeadline = styled.div`
 `;
 
 const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
-  const aggregationElements = _createAggregationElements(config, onChange);
-  const [configuredAggregationElements, setConfiguredAggregationElements] = useState<Array<string>>(_initialConfiguredAggregationElements(aggregationElements));
-  const sortedConfiguredElements = useMemo(() => _sortElements(configuredAggregationElements, aggregationElements), [configuredAggregationElements, aggregationElements]);
-  const initialFormValues = _initialFormValues(config, aggregationElements);
-
-  const _onElementCreate = (elementKey: string) => {
-    if (elementKey && !configuredAggregationElements.find((configuredElementKey) => configuredElementKey === elementKey)) {
-      setConfiguredAggregationElements([...configuredAggregationElements, elementKey]);
-    }
-  };
+  const initialFormValues = _initialFormValues(config);
 
   const _onSubmit = (formValues: WidgetConfigFormValues) => {
     const toConfigByKey = Object.fromEntries(aggregationElements.map(({ key, toConfig }) => [key, toConfig]));
 
     const newConfig = Object.keys(formValues).map((key) => {
-      const toConfig = toConfigByKey[key] ?? ((formValues, prevConfig) => prevConfig);
+      const toConfig = toConfigByKey[key] ?? ((_values, prevConfig) => prevConfig);
 
       if (!toConfig) {
         throw new Error(`Aggregation element with key ${key} is missing toConfig.`);
@@ -215,51 +175,63 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   return (
     <Wrapper>
       <Controls>
-        <Section data-testid="add-element-section">
-          <SectionHeadline>Add an Element</SectionHeadline>
-          <AggregationElementSelect onElementCreate={_onElementCreate}
-                                    aggregationElements={aggregationElements} />
-        </Section>
+
         <WidgetConfigForm onSubmit={_onSubmit} initialValues={initialFormValues}>
-          {({ isValid, dirty }) => {
+          {({ isValid, dirty, values, setValues }) => {
+            const _onElementCreate = (elementKey: string) => {
+              setValues({
+                ...values,
+                [elementKey]: [
+                  ...(values[elementKey] ?? []),
+                  {},
+                ],
+              });
+            };
+
             return (
-              <Section data-testid="configure-elements-section">
-                <SectionHeadline>Configured Elements</SectionHeadline>
-                <div>
-                  {sortedConfiguredElements.map((elementKey) => {
-                    const aggregationElement = aggregationElements.find((element) => element.key === elementKey);
-                    const AggregationElementComponent = aggregationElement.component;
+              <>
+                <Section data-testid="add-element-section">
+                  <SectionHeadline>Add an Element</SectionHeadline>
+                  <AggregationElementSelect onElementCreate={_onElementCreate}
+                                            aggregationElements={aggregationElements} />
+                </Section>
+                <Section data-testid="configure-elements-section">
+                  <SectionHeadline>Configured Elements</SectionHeadline>
+                  <div>
+                    {Object.keys(values).sort((elementKey1, elementKey2) => aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order).map((elementKey) => {
+                      const aggregationElement = aggregationElementsByKey[elementKey];
 
-                    const onDeleteAll = () => {
-                      if (typeof aggregationElement.onDeleteAll !== 'function') {
-                        return;
+                      if (!aggregationElement) {
+                        throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
                       }
 
-                      const newConfiguredElements = configuredAggregationElements.filter((element) => element !== aggregationElement.key);
+                      const AggregationElementComponent = aggregationElement.component;
 
-                      setConfiguredAggregationElements(newConfiguredElements);
+                      const onDeleteAll = () => {
+                        if (typeof aggregationElement.onDeleteAll !== 'function') {
+                          return;
+                        }
 
-                      if (aggregationElement.isConfigured) {
-                        aggregationElement.onDeleteAll();
-                      }
-                    };
+                        setValues(aggregationElement.onDeleteAll(values));
+                      };
 
-                    return (
-                      <ElementConfigurationContainer title={aggregationElement.title}
-                                                     onDeleteAll={onDeleteAll}
-                                                     isPermanentElement={aggregationElement.onDeleteAll === undefined}
-                                                     key={aggregationElement.key}>
-                        <AggregationElementComponent config={config} onConfigChange={onChange} />
-                      </ElementConfigurationContainer>
-                    );
-                  })}
-                </div>
-                {dirty && (
-                  <ButtonToolbar className="pull-right">
-                    <Button type="submit" disabled={!isValid}>Apply</Button>
-                  </ButtonToolbar>
-                )}
-              </Section>
+                      return (
+                        <ElementConfigurationContainer title={aggregationElement.title}
+                                                       onDeleteAll={onDeleteAll}
+                                                       isPermanentElement={aggregationElement.onDeleteAll === undefined}
+                                                       key={aggregationElement.key}>
+                          <AggregationElementComponent config={config} onConfigChange={onChange} />
+                        </ElementConfigurationContainer>
+                      );
+                    })}
+                  </div>
+                  {dirty && (
+                    <ButtonToolbar className="pull-right">
+                      <Button type="submit" disabled={!isValid}>Apply</Button>
+                    </ButtonToolbar>
+                  )}
+                </Section>
+              </>
             );
           }}
         </WidgetConfigForm>
