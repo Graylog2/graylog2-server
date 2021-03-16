@@ -15,19 +15,45 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useFormikContext, FieldArray } from 'formik';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+
+import Metric from './Metric';
+
+import type { WidgetConfigFormValues } from '../WidgetConfigForm';
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+interface WidgetConfigFormValues {
+
+}
 
 type Props = {
   config: AggregationWidgetConfig,
   onConfigChange: (newConfig: AggregationWidgetConfig) => void
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MetricsConfiguration = ({ config, onConfigChange }: Props) => {
+  const { values } = useFormikContext<WidgetConfigFormValues>();
+  const metrics = values.metrics ?? [{}];
+
   return (
     <>
-      Configuration Elements
+      <FieldArray name="metrics"
+                  render={(arrayHelpers) => (
+                    <>
+                      {metrics.map((metric, index) => {
+                        return (
+                          <div>
+                            <Metric index={index} />
+                          </div>
+                        );
+                      })}
+                      <button type="button" onClick={() => arrayHelpers.push({})}>
+                        Add a Metric
+                      </button>
+                    </>
+                  )} />
     </>
   );
 };

@@ -14,25 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { Form, Formik } from 'formik';
 
-type Props = {
-  children: React.ReactNode,
-}
+export const parameterOptionsForType = (type: string): Array<unknown> => {
+  if (type === 'percentile') {
+    return [25.0, 50.0, 75.0, 90.0, 95.0, 99.0];
+  }
 
-export interface WidgetConfigFormValues {}
-
-const WidgetConfigForm = ({ children }: Props) => {
-  return (
-    <Formik<WidgetConfigFormValues> initialValues={{}}
-                                    enableReinitialize
-                                    onSubmit={() => {}}>
-      <Form className="form form-horizontal">
-        {children}
-      </Form>
-    </Formik>
-  );
+  return [];
 };
 
-export default WidgetConfigForm;
+export const parameterNeededForType = (type: string): boolean => parameterOptionsForType(type).length > 0;
+
+export default { parameterOptionsForType, parameterNeededForType };

@@ -37,6 +37,21 @@ const Header = styled.div`
   margin-bottom: 5px;
 `;
 
+const ConfigurationWrapper = styled.div`
+  > div {
+    border-bottom: 1px solid grey;
+    margin-bottom: 5px;
+
+    :last-child {
+      border-bottom: 0;
+      margin-bottom: 0;
+    }
+  }
+  .form-group {
+    margin-bottom: 5px;
+  }
+`;
+
 type Props = {
   children: React.ReactNode,
   isPermanentElement: boolean,
@@ -60,9 +75,9 @@ const ElementConfigurationContainer = ({
           )}
         </div>
       </Header>
-      <div>
+      <ConfigurationWrapper>
         {children}
-      </div>
+      </ConfigurationWrapper>
     </Wrapper>
   );
 };
