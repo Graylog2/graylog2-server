@@ -76,7 +76,7 @@ public class NaturalDateParserTest {
             assertNotNull(result.getTo());
 
             assertThat(df.print(result.getFrom())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
-            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+            assertThat(df.print(result.getTo())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
         }
     }
 
