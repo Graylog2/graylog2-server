@@ -35,7 +35,6 @@ const StreamsStore = StoreProvider.getStore('Streams');
 const InputsActions = ActionsProvider.getActions('Inputs');
 
 const isCloud = AppConfig.isCloud();
-
 const CloudRecentMessageLoader = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.CloudRecentMessageLoader : null;
 
 class LoaderTabs extends React.Component {
