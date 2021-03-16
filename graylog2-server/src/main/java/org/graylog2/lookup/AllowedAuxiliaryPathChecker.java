@@ -19,7 +19,6 @@ package org.graylog2.lookup;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -41,10 +40,10 @@ public class AllowedAuxiliaryPathChecker {
 
         // Get the absolute file path (resolve all relative paths and symbolic links).
         // The path.toFile().getCanonicalFile() calls accomplishes this.
-        final Path absoluteCsvFilePath = Paths.get(filePath).toAbsolutePath().normalize();
+        final Path absoluteFilePath = Paths.get(filePath).toAbsolutePath().normalize();
         for (Path allowedPath : allowedPaths) {
             final Path absoluteAllowedPath = allowedPath.toAbsolutePath().normalize();
-            if (absoluteCsvFilePath.startsWith(absoluteAllowedPath)) {
+            if (absoluteFilePath.startsWith(absoluteAllowedPath)) {
                 return true;
             }
         }
