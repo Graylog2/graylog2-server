@@ -23,15 +23,18 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class PathSetConverter implements Converter<Set<Path>> {
+public class SortedPathSetConverter implements Converter<SortedSet<Path>> {
     protected static final String SEPARATOR = ",";
 
     @Override
-    public Set<Path> convertFrom(String value) {
+    public SortedSet<Path> convertFrom(String value) {
         if (value == null) {
             throw new ParameterException("Path list must not be null.");
         }
@@ -40,15 +43,24 @@ public class PathSetConverter implements Converter<Set<Path>> {
                      .map(StringUtils::trimToNull)
                      .filter(Objects::nonNull)
                      .map(Paths::get)
-                     .collect(Collectors.toSet());
+                     .collect(Collectors.toCollection(sortedPathSupplier()));
     }
 
     @Override
-    public String convertTo(Set<Path> value) {
+    public String convertTo(SortedSet<Path> value) {
         if (value == null) {
             throw new ParameterException("String list of Paths must not be null.");
         }
 
         return value.stream().map(Path::toString).collect(Collectors.joining(","));
+    }
+
+    /**
+     * @return {@link Supplier<TreeSet>} which sorts based on {@literal path.toString()}.
+     *         Sorting is intentionally performed on a case-sensitive basis, since paths
+     *         are also case-sensitive.
+     */
+    private Supplier<TreeSet<Path>> sortedPathSupplier() {
+        return () -> new TreeSet<>(Comparator.comparing(Path::toString));
     }
 }

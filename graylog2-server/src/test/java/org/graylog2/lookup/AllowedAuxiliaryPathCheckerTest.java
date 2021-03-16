@@ -23,6 +23,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -33,22 +35,22 @@ public class AllowedAuxiliaryPathCheckerTest {
     AllowedAuxiliaryPathChecker pathChecker;
 
     @Test
-    public void success() throws IOException {
-        final Set<Path> paths = Collections.singleton(Paths.get(ALLOWED_PATH));
+    public void success() {
+        final SortedSet<Path> paths = new TreeSet<>(Collections.singleton(Paths.get(ALLOWED_PATH)));
         pathChecker = new AllowedAuxiliaryPathChecker(paths);
         assertTrue(pathChecker.isInAllowedPath(ALLOWED_PATH + "/file.csv"));
     }
 
     @Test
-    public void successRelativePaths() throws IOException {
-        final Set<Path> paths = Collections.singleton(Paths.get(ALLOWED_PATH + "/sub-dir/../"));
+    public void successRelativePaths() {
+        final SortedSet<Path> paths = new TreeSet<>(Collections.singleton(Paths.get(ALLOWED_PATH + "/sub-dir/../")));
         pathChecker = new AllowedAuxiliaryPathChecker(paths);
         assertTrue(pathChecker.isInAllowedPath(ALLOWED_PATH + "/file.csv"));
     }
 
     @Test
-    public void failureOutsideOfAllowedPath() throws IOException {
-        final Set<Path> paths = Collections.singleton(Paths.get(ALLOWED_PATH));
+    public void failureOutsideOfAllowedPath() {
+        final SortedSet<Path> paths = new TreeSet<>(Collections.singleton(Paths.get(ALLOWED_PATH)));
         pathChecker = new AllowedAuxiliaryPathChecker(paths);
         assertFalse(pathChecker.isInAllowedPath("/disallowed-path/file.csv"));
     }

@@ -21,15 +21,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
+import java.util.SortedSet;
 
 @Singleton
 public class AllowedAuxiliaryPathChecker {
 
-    private final Set<Path> allowedPaths;
+    private final SortedSet<Path> allowedPaths;
 
     @Inject
-    public AllowedAuxiliaryPathChecker(@Named("allowed_auxiliary_paths") Set<Path> allowedPaths) {
+    public AllowedAuxiliaryPathChecker(@Named("allowed_auxiliary_paths") SortedSet<Path> allowedPaths) {
         this.allowedPaths = allowedPaths;
     }
 
