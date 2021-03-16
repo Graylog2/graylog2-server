@@ -25,6 +25,7 @@ import org.graylog.events.contentpack.entities.LegacyAlarmCallbackEventNotificat
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.contentpack.facade.NotificationFacade;
 import org.graylog.events.fields.EventFieldSpecEngine;
+import org.graylog.events.fields.providers.FixedValueFieldValueProvider;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
 import org.graylog.events.indices.EventIndexer;
@@ -126,6 +127,10 @@ public class EventsModule extends PluginModule {
                 LookupTableFieldValueProvider.class,
                 LookupTableFieldValueProvider.Factory.class,
                 LookupTableFieldValueProvider.Config.class);
+        addEventFieldValueProvider(FixedValueFieldValueProvider.Config.TYPE_NAME,
+                FixedValueFieldValueProvider.class,
+                FixedValueFieldValueProvider.Factory.class,
+                FixedValueFieldValueProvider.Config.class);
 
         addSchedulerJob(EventProcessorExecutionJob.TYPE_NAME,
                 EventProcessorExecutionJob.class,
