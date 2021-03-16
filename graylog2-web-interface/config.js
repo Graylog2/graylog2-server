@@ -19,5 +19,7 @@ window.appConfig = {
   gl2ServerUrl: '/api',
   gl2AppPathPrefix: '',
   rootTimeZone: 'UTC',
-  pluginUISettings: {},
+  pluginUISettings: {
+    'org.graylog.plugins.customization.theme': {},
+  },
 };
