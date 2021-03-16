@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { EditWidgetComponentProps } from 'views/types';
 
-import Series from 'views/logic/aggregationbuilder/Series';
+import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import { ButtonToolbar } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -43,7 +43,8 @@ export type AggregationElement = {
   isConfigured: boolean,
   multipleUse: boolean,
   order: number,
-  toConfig: (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => AggregationWidgetConfig,
+  toConfig?: (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => AggregationWidgetConfig,
+  fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,
   onCreate: () => void,
   onDeleteAll?: () => void,
   component: React.ComponentType<{
@@ -52,20 +53,27 @@ export type AggregationElement = {
   }>,
 }
 
-const _convertMetricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
+const _metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
   .map((metric) => Series.create(metric.function, metric.field)
     .toBuilder()
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
     .build());
+
+const _seriesToMetrics = (series: Array<Series>) => series.map((s) => {
+  const { type: func, field } = parseSeries(s.function);
+
+  return {
+    function: func,
+    field,
+    name: s.config?.name,
+  };
+});
 
 const createVisualizationElement: CreateAggregationElement = (config, onConfigChange) => ({
   title: 'Visualization',
   key: 'visualization',
   order: 4,
   multipleUse: false,
-  toConfig: () => {
-    throw new Error('Not implemented');
-  },
   isConfigured: !isEmpty(config.visualization),
   onCreate: () => onConfigChange(config),
   component: VisualizationConfiguration,
@@ -78,9 +86,12 @@ const createMetricElement: CreateAggregationElement = (config, onConfigChange) =
   multipleUse: true,
   isConfigured: !isEmpty(config.series),
   onCreate: () => onConfigChange(config),
+  fromConfig: (providedConfig: AggregationWidgetConfig) => ({
+    metrics: _seriesToMetrics(providedConfig.series),
+  }),
   toConfig: (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => currentConfig
     .toBuilder()
-    .series(_convertMetricsToSeries(formValues.metrics))
+    .series(_metricsToSeries(formValues.metrics))
     .build(),
   onDeleteAll: () => onConfigChange(config.toBuilder().series([]).build()),
   component: MetricsConfiguration,
@@ -91,9 +102,6 @@ const createGroupByElement: CreateAggregationElement = (config, onConfigChange) 
   key: 'groupBy',
   order: 1,
   multipleUse: true,
-  toConfig: () => {
-    throw new Error('Not implemented');
-  },
   isConfigured: !isEmpty(config.rowPivots) || !isEmpty(config.columnPivots),
   onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().rowPivots([]).columnPivots([]).build()),
@@ -105,9 +113,6 @@ const createSortElement: CreateAggregationElement = (config, onConfigChange) => 
   key: 'sort',
   order: 3,
   multipleUse: false,
-  toConfig: () => {
-    throw new Error('Not implemented');
-  },
   isConfigured: !isEmpty(config.sort),
   onCreate: () => onConfigChange(config),
   onDeleteAll: () => onConfigChange(config.toBuilder().sort([]).build()),
@@ -132,6 +137,10 @@ const _initialConfiguredAggregationElements = (aggregationElements: Array<Aggreg
 
     return configuredElements;
   }, []);
+};
+
+const _initialFormValues = (config: AggregationWidgetConfig, aggregationElements: Array<AggregationElement>) => {
+  return aggregationElements.reduce((formValues, element) => ({ ...formValues, ...(element.fromConfig ? element.fromConfig(config) : {}) }), {});
 };
 
 const _sortElements = (configuredAggregationElements: Array<string>, aggregationElements: Array<AggregationElement>) => {
@@ -179,6 +188,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   const aggregationElements = _createAggregationElements(config, onChange);
   const [configuredAggregationElements, setConfiguredAggregationElements] = useState<Array<string>>(_initialConfiguredAggregationElements(aggregationElements));
   const sortedConfiguredElements = useMemo(() => _sortElements(configuredAggregationElements, aggregationElements), [configuredAggregationElements, aggregationElements]);
+  const initialFormValues = _initialFormValues(config, aggregationElements);
 
   const _onElementCreate = (elementKey: string) => {
     if (elementKey && !configuredAggregationElements.find((configuredElementKey) => configuredElementKey === elementKey)) {
@@ -190,7 +200,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
     const toConfigByKey = Object.fromEntries(aggregationElements.map(({ key, toConfig }) => [key, toConfig]));
 
     const newConfig = Object.keys(formValues).map((key) => {
-      const toConfig = toConfigByKey[key];
+      const toConfig = toConfigByKey[key] ?? ((formValues, prevConfig) => prevConfig);
 
       if (!toConfig) {
         throw new Error(`Aggregation element with key ${key} is missing toConfig.`);
@@ -210,7 +220,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
           <AggregationElementSelect onElementCreate={_onElementCreate}
                                     aggregationElements={aggregationElements} />
         </Section>
-        <WidgetConfigForm onSubmit={_onSubmit}>
+        <WidgetConfigForm onSubmit={_onSubmit} initialValues={initialFormValues}>
           {({ isValid, dirty }) => {
             return (
               <Section data-testid="configure-elements-section">

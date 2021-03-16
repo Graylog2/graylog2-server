@@ -29,12 +29,13 @@ export interface WidgetConfigFormValues {
 
 type Props = {
   children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode,
+  initialValues: WidgetConfigFormValues,
   onSubmit: (formValues: WidgetConfigFormValues) => void,
 }
 
-const WidgetConfigForm = ({ children, onSubmit }: Props) => {
+const WidgetConfigForm = ({ children, onSubmit, initialValues }: Props) => {
   return (
-    <Formik<WidgetConfigFormValues> initialValues={{}}
+    <Formik<WidgetConfigFormValues> initialValues={initialValues}
                                     enableReinitialize
                                     onSubmit={onSubmit}>
       {(...args) => (
