@@ -93,7 +93,7 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
   }, [changeMode, generateCustomThemeColors, mode, setTheme]);
 
   const regenerateTheme = () => {
-    _generateTheme({ changeMode, mode, generateCustomThemeColors }).then(setTheme);
+    _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: false }).then(setTheme);
   };
 
   return theme ? (
