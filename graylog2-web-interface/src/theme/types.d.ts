@@ -22,15 +22,11 @@ interface CustomizationHooks {
     currentColors: ThemeColorModes,
     customThemeColors: {},
     isDefaultColors: boolean,
+    isSaved: boolean,
     onChangeTheme: ({ mode, key, type, hex }: {mode:ThemeMode, key:string, type:string, hex:string}) => void,
     onResetTheme: () => Promise,
     onRevertTheme: () => Promise,
-    onSaveTheme: (nextCustomColors: Partial<ThemeColorModes>) => Promise,
-    editedCustomColors: {},
-    setEditedCustomColors: (editedCustomColors: Partial<ThemeColorModes>) => void,
-    editedCurrentColors: ThemeColorModes,
-    setEditedCurrentColors: (editedCurrentColors: ThemeColorModes) => void,
-    isNotSavable: boolean,
+    onSaveTheme: () => Promise,
   })
 }
 
