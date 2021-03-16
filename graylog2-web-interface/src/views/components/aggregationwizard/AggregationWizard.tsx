@@ -46,6 +46,7 @@ const Controls = styled.div`
   min-width: 300px;
   max-width: 500px;
   flex: 1;
+  overflow-y: auto;
 `;
 
 const Visualization = styled.div`
