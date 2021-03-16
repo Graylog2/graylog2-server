@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -25,6 +26,7 @@ import { Select } from 'components/common';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
+import AppConfig from 'util/AppConfig';
 
 const MessagesActions = ActionsProvider.getActions('Messages');
 const CodecTypesActions = ActionsProvider.getActions('CodecTypes');
@@ -33,6 +35,8 @@ const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesStore = StoreProvider.getStore('Messages');
 const CodecTypesStore = StoreProvider.getStore('CodecTypes');
 const InputsStore = StoreProvider.getStore('Inputs');
+const isCloud = AppConfig.isCloud();
+const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
 
 const RawMessageLoader = createReactClass({
   displayName: 'RawMessageLoader',
@@ -213,6 +217,37 @@ const RawMessageLoader = createReactClass({
     return !this.state.message || !this.state.codec || this.state.loading;
   },
 
+  _getInputIdSelector() {
+    if (this.props.inputIdSelector) {
+      const inputIdSelector = (isCloud && ForwarderInputDropdown)
+        ? (
+
+          <fieldset>
+            <legend>Input selection (optional)</legend>
+            <ForwarderInputDropdown onLoadMessage={this._onInputSelect}
+                                    rawMessageLoader />
+          </fieldset>
+        )
+        : (
+          <Input id="input"
+                 name="input"
+                 label={<span>Message input <small>(optional)</small></span>}
+                 help="Select the message input ID that should be assigned to the parsed message.">
+            <Select id="input"
+                    placeholder="Select input"
+                    options={this._formatInputSelectOptions()}
+                    matchProp="label"
+                    onChange={this._onInputSelect}
+                    value={this.state.inputId} />
+          </Input>
+        );
+
+      return inputIdSelector;
+    }
+
+    return null;
+  },
+
   render() {
     let codecConfigurationOptions;
 
@@ -224,23 +259,7 @@ const RawMessageLoader = createReactClass({
         .map((key) => this._formatConfigField(key, codecConfiguration[key]));
     }
 
-    let inputIdSelector;
-
-    if (this.props.inputIdSelector) {
-      inputIdSelector = (
-        <Input id="input"
-               name="input"
-               label={<span>Message input <small>(optional)</small></span>}
-               help="Select the message input ID that should be assigned to the parsed message.">
-          <Select id="input"
-                  placeholder="Select input"
-                  options={this._formatInputSelectOptions()}
-                  matchProp="label"
-                  onChange={this._onInputSelect}
-                  value={this.state.inputId} />
-        </Input>
-      );
-    }
+    // let inputIdSelector;
 
     return (
       <Row>
@@ -263,7 +282,7 @@ const RawMessageLoader = createReactClass({
                      value={this.state.remoteAddress}
                      onChange={this._bindValue} />
             </fieldset>
-            {inputIdSelector}
+            {this._getInputIdSelector()}
             <fieldset>
               <legend>Codec configuration</legend>
               <Input id="codec"
