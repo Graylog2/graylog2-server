@@ -21,12 +21,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 
 import Metric from './Metric';
 
-import type { WidgetConfigFormValues } from '../WidgetConfigForm';
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-interface WidgetConfigFormValues {
-
-}
+import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type Props = {
   config: AggregationWidgetConfig,

@@ -75,9 +75,9 @@ export const parseSeries = (s: string) => {
 };
 
 export default class Series {
-  _value: InternalState;
+  private readonly _value: InternalState;
 
-  constructor(func: string, config: SeriesConfig = SeriesConfig.empty()) {
+  private constructor(func: string, config: SeriesConfig = SeriesConfig.empty()) {
     this._value = { function: func, config };
   }
 
@@ -118,6 +118,13 @@ export default class Series {
       .build();
   }
 
+  static create(func: string, field?: string) {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    const functionWithField = `${func}(${field ?? ''})`;
+
+    return Series.forFunction(functionWithField);
+  }
+
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
@@ -127,7 +134,7 @@ export default class Series {
 type BuilderState = Immutable.Map<string, any>;
 
 class Builder {
-  value: BuilderState;
+  private readonly value: BuilderState;
 
   constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;

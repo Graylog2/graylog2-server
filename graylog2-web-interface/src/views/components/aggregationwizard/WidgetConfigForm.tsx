@@ -15,22 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikProps } from 'formik';
 
-type Props = {
-  children: React.ReactNode,
+export type MetricFormValues = {
+  function: string,
+  field: string | undefined,
+  name?: string,
 }
 
-export interface WidgetConfigFormValues {}
+export interface WidgetConfigFormValues {
+  metrics?: Array<MetricFormValues>,
+}
 
-const WidgetConfigForm = ({ children }: Props) => {
+type Props = {
+  children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode,
+  onSubmit: (formValues: WidgetConfigFormValues) => void,
+}
+
+const WidgetConfigForm = ({ children, onSubmit }: Props) => {
   return (
     <Formik<WidgetConfigFormValues> initialValues={{}}
                                     enableReinitialize
-                                    onSubmit={() => {}}>
-      <Form className="form form-horizontal">
-        {children}
-      </Form>
+                                    onSubmit={onSubmit}>
+      {(...args) => (
+        <Form className="form form-horizontal">
+          {typeof children === 'function' ? children(...args) : children}
+        </Form>
+      )}
     </Formik>
   );
 };
