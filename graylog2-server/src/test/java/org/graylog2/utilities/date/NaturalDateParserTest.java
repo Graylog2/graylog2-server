@@ -20,15 +20,21 @@ import org.graylog2.plugin.utilities.date.NaturalDateParser;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
+
+    final String[] testsThatAlignToStartOfDay = { "yesterday", "the day before yesterday", "today",
+            "monday", "monday to friday", "last week" };
+
+    final String[][] singleDaytestsThatAlignToAGivenTime = { {"yesterday at noon", "12:00:00"}, {"the day before yesterday at 10", "10:00:00"}, {"today at 5", "05:00:00"},
+            {"monday at 7", "07:00:00"}};
+
+    final String[][] multipleDaytestsThatAlignToAGivenTime =  { {"monday to friday at 7", "07:00:00"} }; //, "last week" };
 
     @Before
     public void setUp() {
@@ -49,8 +55,6 @@ public class NaturalDateParserTest {
     @Test
     public void testParseAlignToStartOfDay() throws Exception {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-        final String[] testsThatAlignToStartOfDay = { "yesterday", "the day before yesterday", "today",
-                "monday", "monday to friday", "last week" };
 
         for(String test: testsThatAlignToStartOfDay) {
             NaturalDateParser.Result result = naturalDateParser.parse(test);
@@ -63,11 +67,36 @@ public class NaturalDateParserTest {
     }
 
     @Test
+    public void multipleDaytestParseAlignToAGivenTime() throws Exception {
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+
+        for(String[] test: multipleDaytestsThatAlignToAGivenTime) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
+            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+        }
+    }
+
+    @Test
+    public void singleDaytestParseAlignToAGivenTime() throws Exception {
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+
+        for(String[] test: singleDaytestsThatAlignToAGivenTime) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal "+ test[1] + " in").isEqualTo(test[1]);
+        }
+    }
+
+    @Test
     public void testParseAlignToStartOfDayEuropeBerlin() throws Exception {
         final NaturalDateParser naturalDateParser = new NaturalDateParser("Europe/Berlin");
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-        final String[] testsThatAlignToStartOfDay = { "yesterday", "the day before yesterday", "today",
-                "monday", "monday to friday", "last week" };
 
         for(String test: testsThatAlignToStartOfDay) {
             NaturalDateParser.Result result = naturalDateParser.parse(test);
@@ -90,15 +119,14 @@ public class NaturalDateParserTest {
     }
 
     @Test
-    @Ignore
     public void testTemporalOrder() throws Exception {
         NaturalDateParser p = new NaturalDateParser("Etc/UTC");
 
         NaturalDateParser.Result result1 = p.parse("last hour");
-        assertTrue(result1.getFrom().compareTo(result1.getTo()) < 0);
+        org.assertj.jodatime.api.Assertions.assertThat(result1.getFrom()).as("from should be before to in").isBefore(result1.getTo());
 
         NaturalDateParser.Result result2 = p.parse("last one hour");
-        assertTrue(result2.getFrom().compareTo(result2.getTo()) < 0);
+        org.assertj.jodatime.api.Assertions.assertThat(result2.getFrom()).as("from should be before to in").isBefore(result2.getTo());
     }
 
     // https://github.com/Graylog2/graylog2-server/issues/1226
