@@ -19,7 +19,7 @@ import { useRef } from 'react';
 
 import { Select } from 'components/common';
 
-import type { AggregationElement } from './AggregationElements';
+import type { AggregationElement } from './aggregationElements/AggregationElementType';
 
 const _getOptions = (aggregationElements: Array<AggregationElement>) => {
   return aggregationElements.reduce((availableElements, aggregationElement) => {

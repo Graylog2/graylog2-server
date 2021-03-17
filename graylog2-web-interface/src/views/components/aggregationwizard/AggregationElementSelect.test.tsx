@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import AggregationElementSelect from './AggregationElementSelect';
-import type { AggregationElement } from './AggregationElements';
+import type { AggregationElement } from './aggregationElements/AggregationElementType';
 
 const aggregationElements: Array<AggregationElement> = [
   {

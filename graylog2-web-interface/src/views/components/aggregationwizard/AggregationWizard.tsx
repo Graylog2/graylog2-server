@@ -25,7 +25,7 @@ import Button from 'components/graylog/Button';
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
 import AggregationElementSelect from './AggregationElementSelect';
 import ElementsConfiguration from './ElementsConfiguration';
-import aggregationElements from './AggregationElements';
+import aggregationElements from './aggregationElements';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 

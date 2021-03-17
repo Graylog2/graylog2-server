@@ -20,7 +20,7 @@ import AggregationWidgetConfig from 'src/views/logic/aggregationbuilder/Aggregat
 import { isEmpty } from 'lodash';
 
 import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
-import type { AggregationElement } from './AggregationElements';
+import type { AggregationElement } from './aggregationElements/AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const _sortConfiguredElements = (
