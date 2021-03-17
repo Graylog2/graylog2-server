@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
 
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -24,7 +24,7 @@ import { createWidget } from 'views/logic/WidgetTestHelpers';
 import GenerateNextPosition from './GenerateNextPosition';
 
 describe('GenerateNextPosition', () => {
-  PluginStore.exports = (key: string) => ({
+  PluginStore.exports = (key: keyof PluginExports) => ({
     enterpriseWidgets: [{ ...createWidget('MESSAGES'), defaultHeight: 5, defaultWidth: 6 }],
   }[key]);
 

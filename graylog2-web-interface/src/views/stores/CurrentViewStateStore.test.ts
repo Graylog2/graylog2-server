@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
 import mockAction from 'helpers/mocking/MockAction';
 import { WidgetExport } from 'views/types';
 
@@ -47,7 +47,7 @@ describe('CurrentViewStateStore', () => {
 
   const widgets: Array<WidgetExport> = [{ ...createWidget('MESSAGES'), defaultHeight: 5, defaultWidth: 6 }];
 
-  PluginStore.exports = (key: string) => ({ enterpriseWidgets: widgets }[key]);
+  PluginStore.exports = (key: keyof PluginExports) => ({ enterpriseWidgets: widgets }[key]);
 
   it('should set empty widgets', async () => {
     const updateFn = mockAction(jest.fn(() => Promise.resolve(viewState)));
