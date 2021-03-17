@@ -41,7 +41,7 @@ describe('QueryTitle', () => {
     wrapper.update();
     const { onSelect } = wrapper.find(`MenuItem[children="${name}"]`).props();
 
-    return () => new Promise((resolve) => {
+    return () => new Promise<void>((resolve) => {
       onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
 
       setImmediate(() => {

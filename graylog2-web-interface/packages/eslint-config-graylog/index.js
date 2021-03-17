@@ -94,6 +94,9 @@ module.exports = {
       }, {
         name: 'create-react-class',
         message: 'Please use an ES6 or functional component instead.',
+      }, {
+        name: 'jest-each',
+        message: 'Please use `it.each` instead.',
       }],
     }],
     'no-underscore-dangle': 'off',

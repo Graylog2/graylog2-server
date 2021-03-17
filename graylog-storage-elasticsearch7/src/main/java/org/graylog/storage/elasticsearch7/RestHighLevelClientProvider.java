@@ -63,6 +63,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
+            @Named("elasticsearch_mute_deprecation_warnings") boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
         client = buildClient(
                 hosts,
@@ -71,6 +72,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 maxTotalConnections,
                 maxTotalConnectionsPerRoute,
                 useExpectContinue,
+                muteElasticsearchDeprecationWarnings,
                 credentialsProvider);
 
         sniffer = discoveryEnabled
@@ -115,6 +117,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             int maxTotalConnections,
             int maxTotalConnectionsPerRoute,
             boolean useExpectContinue,
+            boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
 
@@ -130,6 +133,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
                         .setDefaultCredentialsProvider(credentialsProvider)
                 );
+
+        if(muteElasticsearchDeprecationWarnings) {
+            restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.addInterceptorFirst(new ElasticsearchFilterDeprecationWarningsInterceptor()));
+        }
 
         return new RestHighLevelClient(restClientBuilder);
     }

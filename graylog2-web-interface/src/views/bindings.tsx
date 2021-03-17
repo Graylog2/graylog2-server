@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { get } from 'lodash';
+import { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import App from 'routing/App';
@@ -111,7 +112,7 @@ Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
 const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
 
-export default {
+const exports: PluginExports = {
   pages: {
     search: { component: NewSearchPage },
   },
@@ -389,4 +390,14 @@ export default {
   'views.elements.header': [
     () => <IfSearch><MigrateFieldCharts /></IfSearch>,
   ],
+  'views.export.formats': [
+    {
+      type: 'csv',
+      displayName: () => 'Comma-Separated Values (CSV)',
+      mimeType: 'text/csv',
+      fileExtension: 'csv',
+    },
+  ],
 };
+
+export default exports;

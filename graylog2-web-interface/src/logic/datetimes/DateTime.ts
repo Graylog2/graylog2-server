@@ -19,13 +19,9 @@ import moment from 'moment-timezone';
 import AppConfig from 'util/AppConfig';
 import StoreProvider from 'injection/StoreProvider';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-
-let currentUser = CurrentUserStore.get();
-
-CurrentUserStore.listen((state) => { currentUser = state.currentUser; });
-
 class DateTime {
+  private dateTime: moment.Moment | undefined;
+
   static get Formats() {
     return {
       DATE: 'YYYY-MM-DD',
@@ -88,7 +84,25 @@ class DateTime {
     return parsedDateTime.isValid();
   }
 
+  private static currentUserStoreUnsub: (() => void) | undefined;
+
+  private static _currentUser: any;
+
+  static getCurrentUser() {
+    if (!this.currentUserStoreUnsub) {
+      const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
+      this._currentUser = CurrentUserStore.get();
+
+      this.currentUserStoreUnsub = CurrentUserStore.listen((state) => { this._currentUser = state.currentUser; });
+    }
+
+    return this._currentUser;
+  }
+
   static getUserTimezone() {
+    const currentUser = this.getCurrentUser();
+
     if (currentUser?.timezone) {
       return currentUser.timezone;
     }
@@ -150,7 +164,7 @@ class DateTime {
     return this.dateTime.toISOString();
   }
 
-  toString(format) {
+  toString(format?: string) {
     let effectiveFormat = format;
 
     if (format === undefined || format === null) {

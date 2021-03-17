@@ -33,7 +33,7 @@ import InputsStore from 'stores/inputs/InputsStore';
 import { SearchExecutionResult } from 'views/actions/SearchActions';
 
 import MessageList from './MessageList';
-import RenderCompletionCallback from './RenderCompletionCallback';
+import RenderCompletionCallback, { TRenderCompletionCallback } from './RenderCompletionCallback';
 
 import InputsActions from '../../../actions/inputs/InputsActions';
 
@@ -251,8 +251,8 @@ describe('MessageList', () => {
                    setLoadingState={() => {}} />
     );
 
-    return new Promise((resolve) => {
-      const onRenderComplete = jest.fn(resolve);
+    return new Promise<void>((resolve) => {
+      const onRenderComplete: TRenderCompletionCallback = jest.fn(() => resolve());
 
       mount((
         <RenderCompletionCallback.Provider value={onRenderComplete}>

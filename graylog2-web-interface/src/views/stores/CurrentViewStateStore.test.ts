@@ -15,14 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginExports, PluginStore } from 'graylog-web-plugin/plugin';
 import mockAction from 'helpers/mocking/MockAction';
+import { WidgetExport } from 'views/types';
 
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import ViewState from 'views/logic/views/ViewState';
 import { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
+import { createWidget } from 'views/logic/WidgetTestHelpers';
 
 import { CurrentViewStateActions, CurrentViewStateStore, CurrentViewStateStoreType } from './CurrentViewStateStore';
 import { ViewStatesActions, ViewStatesStoreState } from './ViewStatesStore';
@@ -43,9 +45,9 @@ describe('CurrentViewStateStore', () => {
   viewStateMap[viewId] = viewState;
   const statesMap = Immutable.Map<string, ViewState>(viewStateMap);
 
-  PluginStore.exports = () => {
-    return [{ type: 'MESSAGES', defaultHeight: 5, defaultWidth: 6 }];
-  };
+  const widgets: Array<WidgetExport> = [{ ...createWidget('MESSAGES'), defaultHeight: 5, defaultWidth: 6 }];
+
+  PluginStore.exports = (key: keyof PluginExports) => ({ enterpriseWidgets: widgets }[key]);
 
   it('should set empty widgets', async () => {
     const updateFn = mockAction(jest.fn(() => Promise.resolve(viewState)));

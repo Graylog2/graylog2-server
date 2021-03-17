@@ -19,7 +19,7 @@ import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrar
 
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 
-describe('LogViewExportSettings', () => {
+describe('TimeRangeInput', () => {
   const defaultTimeRange = { type: 'relative', range: 300 };
 
   it('opens date picker dropdown when clicking button', async () => {
@@ -78,5 +78,26 @@ describe('LogViewExportSettings', () => {
     render(<TimeRangeInput value={{}} onChange={() => {}} />);
 
     await screen.findByText('No Override');
+  });
+
+  it('shows all tabs if no `validTypes` prop is passed', async () => {
+    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} />);
+
+    fireEvent.click(await screen.findByText(/5 minutes ago/));
+
+    await screen.findByRole('tab', { name: 'Absolute' });
+    await screen.findByRole('tab', { name: 'Keyword' });
+    await screen.findByRole('tab', { name: 'Relative' });
+  });
+
+  it('shows only valid tabs if `validTypes` prop is passed', async () => {
+    render(<TimeRangeInput onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
+
+    fireEvent.click(await screen.findByText(/5 minutes ago/));
+
+    await screen.findByRole('tab', { name: 'Relative' });
+
+    expect(screen.queryByRole('tab', { name: 'Keyword' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Absolute' })).not.toBeInTheDocument();
   });
 });

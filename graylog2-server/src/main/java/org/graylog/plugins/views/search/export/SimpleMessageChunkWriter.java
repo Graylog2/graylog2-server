@@ -14,20 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
+package org.graylog.plugins.views.search.export;
 
-import Widget from 'views/logic/widgets/Widget';
-import { widgetDefinition } from 'views/logic/Widgets';
+import javax.ws.rs.ext.MessageBodyWriter;
+import java.lang.reflect.Type;
 
-type Props = {
-  widget: Widget,
+public abstract class SimpleMessageChunkWriter implements MessageBodyWriter<SimpleMessageChunk> {
+    protected boolean typesMatch(Class<?> type, Type genericType) {
+        return SimpleMessageChunk.class.equals(type) || isAutoValueType(type, genericType);
+    }
+
+    private boolean isAutoValueType(Class<?> type, Type genericType) {
+        return AutoValue_SimpleMessageChunk.class.equals(type) && SimpleMessageChunk.class.equals(genericType);
+    }
 }
-
-const CustomExportSettings = ({ widget }: Props) => {
-  const { exportComponent: ExportComponent = () => null } = useMemo(() => (widget?.type && widgetDefinition(widget.type)) ?? {}, [widget]);
-
-  return <ExportComponent widget={widget} />;
-};
-
-export default CustomExportSettings;

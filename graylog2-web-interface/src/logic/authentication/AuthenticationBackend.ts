@@ -37,7 +37,7 @@ export type AuthenticationBackendJSON = {
   title: string,
   description: string,
   default_roles: Array<string>,
-  config: unknown,
+  config: DirectoryServiceBackendConfig,
 };
 
 const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
