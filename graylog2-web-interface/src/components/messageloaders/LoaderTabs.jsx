@@ -17,7 +17,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Tab, Tabs } from 'components/graylog';
 import connect from 'stores/connect';
@@ -25,7 +24,6 @@ import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
-import AppConfig from 'util/AppConfig';
 
 import RawMessageLoader from './RawMessageLoader';
 import RecentMessageLoader from './RecentMessageLoader';
@@ -33,9 +31,6 @@ import RecentMessageLoader from './RecentMessageLoader';
 const InputsStore = StoreProvider.getStore('Inputs');
 const StreamsStore = StoreProvider.getStore('Streams');
 const InputsActions = ActionsProvider.getActions('Inputs');
-
-const isCloud = AppConfig.isCloud();
-const CloudRecentMessageLoader = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.CloudRecentMessageLoader : null;
 
 class LoaderTabs extends React.Component {
   TAB_KEYS = {
@@ -128,16 +123,11 @@ class LoaderTabs extends React.Component {
 
     if (this._isTabVisible('recent')) {
       const { inputs, selectedInputId } = this.props;
-      const recentLoader = (isCloud && CloudRecentMessageLoader)
-        ? (
-          <CloudRecentMessageLoader onMessageLoaded={this.onMessageLoaded}
-                                    selectedInputId={selectedInputId} />
-        )
-        : (
-          <RecentMessageLoader inputs={inputs}
-                               selectedInputId={selectedInputId}
-                               onMessageLoaded={this.onMessageLoaded} />
-        );
+      const recentLoader = (
+        <RecentMessageLoader inputs={inputs}
+                             selectedInputId={selectedInputId}
+                             onMessageLoaded={this.onMessageLoaded} />
+      );
 
       messageLoaders.push(
         <Tab key="recent" eventKey={this.TAB_KEYS.recent} title="Recent Message" style={{ marginBottom: 10 }}>

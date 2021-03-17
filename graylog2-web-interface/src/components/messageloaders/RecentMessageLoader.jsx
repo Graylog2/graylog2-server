@@ -16,12 +16,16 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppConfig from 'util/AppConfig';
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
+const isCloud = AppConfig.isCloud();
+const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
 
 class RecentMessageLoader extends React.Component {
   static propTypes = {
@@ -69,13 +73,30 @@ class RecentMessageLoader extends React.Component {
 
     return (
       <div style={{ marginTop: 5 }}>
-        {helpMessage}
-        <InputDropdown inputs={this.props.inputs}
-                       preselectedInputId={this.props.selectedInputId}
-                       onLoadMessage={this.onClick}
-                       title={this.state.loading ? 'Loading message...' : 'Load Message'}
-                       disabled={this.state.loading} />
+        {(isCloud && ForwarderInputDropdown)
+          ? (
+            <fieldset>
+              <p className="description">Select a Forwarder from the list below then select an then select an Input and click
+                on &quot;Load message&quot; to load most recent message received by this input within the last hour.
+              </p>
+              <ForwarderInputDropdown onLoadMessage={this.onClick}
+                                      title={this.state.loading ? 'Loading message...' : 'Load Message'}
+                                      preselectedInputId={this.props.selectedInputId}
+                                      disabled={this.state.loading} />
+            </fieldset>
+          )
+          : (
+            <fieldset>
+              {helpMessage}
+              <InputDropdown inputs={this.props.inputs}
+                             preselectedInputId={this.props.selectedInputId}
+                             onLoadMessage={this.onClick}
+                             title={this.state.loading ? 'Loading message...' : 'Load Message'}
+                             disabled={this.state.loading} />
+            </fieldset>
+          )}
       </div>
+
     );
   }
 }
