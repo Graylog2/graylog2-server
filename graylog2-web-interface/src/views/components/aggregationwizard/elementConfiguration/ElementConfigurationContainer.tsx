@@ -29,6 +29,22 @@ const Wrapper = styled.div(({ theme }) => css`
   :last-child {
     margin-bottom: 0;
   }
+
+  div[class^="col-"] {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .form-group {
+    margin: 0;
+  }
+
+  .control-label {
+    padding-left: 0;
+    padding-right: 5px;
+    font-weight: normal;
+    text-align: left;
+  }
 `);
 
 const Header = styled.div`
