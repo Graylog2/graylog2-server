@@ -25,6 +25,7 @@ import Select from 'components/common/Select';
 import { useStore } from 'stores/connect';
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import FormikInput from 'components/common/FormikInput';
 
 type Props = {
   index: number,
@@ -49,6 +50,12 @@ const Metric = ({ index }: Props) => {
 
   return (
     <>
+      <FormikInput id="name"
+                   label="Name"
+                   name={`metrics.${index}.name`}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9" />
+
       <Field name={`metrics.${index}.function`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="function-select"
