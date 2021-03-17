@@ -27,15 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public abstract class Buffer {
+public abstract class Buffer implements EventBuffer {
     private static final Logger log = LoggerFactory.getLogger(Buffer.class);
 
     protected RingBuffer<MessageEvent> ringBuffer;
     protected int ringBufferSize;
 
+    @Override
     public boolean isEmpty() {
         return getUsage() == 0;
     }
@@ -48,6 +48,7 @@ public abstract class Buffer {
         return ringBufferSize;
     }
 
+    @Override
     public long getUsage() {
         if (ringBuffer == null) {
             return 0;
