@@ -27,7 +27,7 @@ type InternalState = {
 export default class SeriesConfig {
   private readonly _value: InternalState;
 
-  private constructor(name: string | undefined | null) {
+  constructor(name: string | undefined | null) {
     this._value = { name };
   }
 

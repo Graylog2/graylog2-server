@@ -77,7 +77,7 @@ export const parseSeries = (s: string) => {
 export default class Series {
   private readonly _value: InternalState;
 
-  private constructor(func: string, config: SeriesConfig = SeriesConfig.empty()) {
+  constructor(func: string, config: SeriesConfig = SeriesConfig.empty()) {
     this._value = { function: func, config };
   }
 
