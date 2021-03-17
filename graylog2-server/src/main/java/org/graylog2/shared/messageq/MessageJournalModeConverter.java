@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.journal;
+package org.graylog2.shared.messageq;
 
-import com.google.inject.Scopes;
-import org.graylog2.plugin.PluginModule;
+import com.github.joschi.jadconfig.Converter;
+import org.apache.directory.api.util.Strings;
 
-public class KafkaJournalModule extends PluginModule {
+public class MessageJournalModeConverter implements Converter<MessageJournalMode> {
     @Override
-    protected void configure() {
-        bind(Journal.class).to(KafkaJournal.class).in(Scopes.SINGLETON);
+    public MessageJournalMode convertFrom(String value) {
+        return MessageJournalMode.valueOf(Strings.upperCase(value));
+    }
+
+    @Override
+    public String convertTo(MessageJournalMode value) {
+        return value.name();
     }
 }

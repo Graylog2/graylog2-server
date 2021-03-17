@@ -52,7 +52,7 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -271,7 +271,7 @@ public class PipelineInterpreterTest {
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
                 false);
         return new PipelineInterpreter(
-                mock(Journal.class),
+                mock(MessageQueueAcknowledger.class),
                 new MetricRegistry(),
                 stateUpdater
         );
@@ -328,7 +328,7 @@ public class PipelineInterpreterTest {
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
                 false);
         final PipelineInterpreter interpreter = new PipelineInterpreter(
-                mock(Journal.class),
+                mock(MessageQueueAcknowledger.class),
                 metricRegistry,
                 stateUpdater
         );

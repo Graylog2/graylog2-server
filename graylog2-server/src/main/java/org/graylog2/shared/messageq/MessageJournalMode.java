@@ -14,14 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.journal;
+package org.graylog2.shared.messageq;
 
-import com.google.inject.Scopes;
-import org.graylog2.plugin.PluginModule;
-
-public class KafkaJournalModule extends PluginModule {
-    @Override
-    protected void configure() {
-        bind(Journal.class).to(KafkaJournal.class).in(Scopes.SINGLETON);
-    }
+public enum MessageJournalMode {
+    DISK,
+    PULSAR
 }

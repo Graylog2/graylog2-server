@@ -25,6 +25,7 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.journal.NoopJournal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,6 +52,9 @@ public class BlockingBatchedESOutputTest {
     @Mock
     private Messages messages;
 
+    @Mock
+    private MessageQueueAcknowledger acknowledger;
+
     @Before
     public void setUp() throws Exception {
         this.metricRegistry = new MetricRegistry();
@@ -65,7 +69,7 @@ public class BlockingBatchedESOutputTest {
 
     @Test
     public void write() throws Exception {
-        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal);
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger);
 
         final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize());
 
@@ -78,7 +82,7 @@ public class BlockingBatchedESOutputTest {
 
     @Test
     public void forceFlushIfTimedOut() throws Exception {
-        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal);
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal, acknowledger);
 
         final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize() - 1);
 

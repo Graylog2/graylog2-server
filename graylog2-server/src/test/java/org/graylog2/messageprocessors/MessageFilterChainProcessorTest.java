@@ -24,7 +24,7 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -49,7 +49,7 @@ public class MessageFilterChainProcessorTest {
     @Mock
     private ServerStatus serverStatus;
     @Mock
-    private Journal journal;
+    private MessageQueueAcknowledger acknowledger;
 
     @Before
     public void setUp() throws Exception {
@@ -64,7 +64,7 @@ public class MessageFilterChainProcessorTest {
         final Set<MessageFilter> filters = ImmutableSet.of(third, first, second);
         final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
                                                                                       filters,
-                                                                                      journal,
+                                                                                      acknowledger,
                                                                                       serverStatus);
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
@@ -78,7 +78,7 @@ public class MessageFilterChainProcessorTest {
         try {
             new MessageFilterChainProcessor(new MetricRegistry(),
                                             Collections.emptySet(),
-                                            journal,
+                                            acknowledger,
                                             serverStatus);
             Assert.fail("A processor without message filters should fail on creation");
         } catch (RuntimeException ignored) {}
@@ -113,7 +113,7 @@ public class MessageFilterChainProcessorTest {
 
         final MessageFilterChainProcessor filterTest = new MessageFilterChainProcessor(new MetricRegistry(),
                                                                                        Collections.singleton(filterOnlyFirst),
-                                                                                       journal,
+                                                                                       acknowledger,
                                                                                        serverStatus);
         Message filteredoutMessage = new Message("filtered out", "source", Tools.nowUTC());
         filteredoutMessage.setJournalOffset(1);
@@ -136,7 +136,7 @@ public class MessageFilterChainProcessorTest {
         final Set<MessageFilter> filters = ImmutableSet.of(first, second, third);
         final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
                 filters,
-                journal,
+                acknowledger,
                 serverStatus);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
@@ -153,7 +153,7 @@ public class MessageFilterChainProcessorTest {
         final Set<MessageFilter> filters = ImmutableSet.of(first, second);
         final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
                 filters,
-                journal,
+                acknowledger,
                 serverStatus);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));

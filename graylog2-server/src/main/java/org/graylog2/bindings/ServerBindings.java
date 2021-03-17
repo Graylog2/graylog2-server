@@ -66,9 +66,7 @@ import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
-import org.graylog2.shared.journal.JournalReaderModule;
-import org.graylog2.shared.journal.KafkaJournalModule;
-import org.graylog2.shared.journal.NoopJournalModule;
+import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.security.RestrictToMasterFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -101,6 +99,7 @@ public class ServerBindings extends Graylog2Module {
     protected void configure() {
         bindInterfaces();
         bindSingletons();
+        install(new MessageQueueModule(configuration));
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
@@ -145,13 +144,6 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindSingletons() {
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
-
-        if (configuration.isMessageJournalEnabled()) {
-            install(new KafkaJournalModule());
-            install(new JournalReaderModule());
-        } else {
-            install(new NoopJournalModule());
-        }
 
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
