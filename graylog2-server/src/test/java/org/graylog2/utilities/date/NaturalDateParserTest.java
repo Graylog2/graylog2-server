@@ -28,11 +28,17 @@ import static org.junit.Assert.assertNotNull;
 public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
 
-    final String[] testsThatAlignToStartOfDay = { "yesterday", "the day before yesterday", "today",
-            "monday", "monday to friday", "last week" };
+    final String[] testsThatAlignToStartOfDay = {
+            "yesterday", "the day before yesterday", "today",
+            "monday", "monday to friday", "last week"
+    };
 
-    final String[][] singleDaytestsThatAlignToAGivenTime = { {"yesterday at noon", "12:00:00"}, {"the day before yesterday at 10", "10:00:00"}, {"today at 5", "05:00:00"},
-            {"monday at 7", "07:00:00"}};
+    final String[][] singleDaytestsThatAlignToAGivenTime = {
+            {"yesterday at noon", "12:00:00"},
+            {"the day before yesterday at 10", "10:00:00"},
+            {"today at 5", "05:00:00"},
+            {"monday at 7", "07:00:00"}
+    };
 
     final String[][] multipleDaytestsThatAlignToAGivenTime =  { {"monday to friday at 7", "07:00:00"} }; //, "last week" };
 
