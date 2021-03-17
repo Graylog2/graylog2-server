@@ -21,7 +21,7 @@ export type MetricFormValues = {
   function: string,
   field: string | undefined,
   name?: string | undefined,
-  percentile?: string | undefined,
+  percentile?: number | undefined,
 };
 
 export type GroupByFormValues = {};
