@@ -265,12 +265,12 @@ describe('<Widget />', () => {
   });
 
   it('updates focus mode, on widget edit cancel', () => {
-    const mockSetWidgetEditing = jest.fn();
-    render(<DummyWidget editing setWidgetEditing={mockSetWidgetEditing} />);
+    const mockUnsetWidgetEditing = jest.fn();
+    render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const cancel = screen.getByText('Cancel');
     fireEvent.click(cancel);
 
-    expect(mockSetWidgetEditing).toHaveBeenCalledWith(undefined);
+    expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
 
   it('updates focus mode, on widget edit save', () => {
