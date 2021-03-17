@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
+import { Button, ButtonToolbar } from 'components/graylog';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import Metric from './Metric';
@@ -44,9 +45,11 @@ const MetricsConfiguration = ({ config, onConfigChange }: Props) => {
                           </div>
                         );
                       })}
-                      <button type="button" onClick={() => arrayHelpers.push({})}>
-                        Add a Metric
-                      </button>
+                      <ButtonToolbar>
+                        <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push({})}>
+                          Add a Metric
+                        </Button>
+                      </ButtonToolbar>
                     </>
                   )} />
     </>

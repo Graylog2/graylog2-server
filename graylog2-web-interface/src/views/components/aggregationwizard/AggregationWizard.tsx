@@ -104,6 +104,10 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
   return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  margin-top: 5px;
+`;
+
 const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
   const initialFormValues = _initialFormValues(config);
 
@@ -126,9 +130,9 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
                                        config={config}
                                        onConfigChange={onChange} />
                 {dirty && (
-                  <ButtonToolbar className="pull-right">
-                    <Button type="submit" disabled={!isValid}>Apply</Button>
-                  </ButtonToolbar>
+                  <StyledButtonToolbar>
+                    <Button bsStyle="primary" className="pull-right" type="submit" disabled={!isValid}>Apply Changes</Button>
+                  </StyledButtonToolbar>
                 )}
               </Section>
             </>
