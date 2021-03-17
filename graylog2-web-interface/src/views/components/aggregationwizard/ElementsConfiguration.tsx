@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useFormikContext } from 'formik';
 import AggregationWidgetConfig from 'src/views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { isEmpty } from 'lodash';
 
 import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
 import type { AggregationElement } from './AggregationElements';
@@ -25,8 +26,8 @@ import type { WidgetConfigFormValues } from './WidgetConfigForm';
 const _sortConfiguredElements = (
   values: WidgetConfigFormValues,
   aggregationElementsByKey: { [elementKey: string]: AggregationElement },
-) => Object.keys(values).sort(
-  (elementKey1, elementKey2) => (
+) => Object.entries(values).sort(
+  ([elementKey1], [elementKey2]) => (
     aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
   ),
 );
@@ -49,7 +50,11 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
 
   return (
     <div>
-      {_sortConfiguredElements(values, aggregationElementsByKey).map((elementKey) => {
+      {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
+        if (isEmpty(elementFormValues)) {
+          return null;
+        }
+
         const aggregationElement = aggregationElementsByKey[elementKey];
 
         if (!aggregationElement) {
