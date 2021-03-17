@@ -71,7 +71,7 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
     .build());
 
-const seriesToMetrics = (series: Array<Series>) => series.map((s) => {
+const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
   const { type: func, field, percentile } = parseSeries(s.function);
 
   const metric = {

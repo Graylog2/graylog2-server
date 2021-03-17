@@ -118,7 +118,7 @@ export default class Series {
       .build();
   }
 
-  static create(func: string, field?: string, parameter?: string) {
+  static create(func: string, field?: string, parameter?: string | number) {
     const optionalParameter = parameter ? `,${parameter}` : '';
     const functionWithField = `${func}(${field ?? ''}${optionalParameter})`;
 
