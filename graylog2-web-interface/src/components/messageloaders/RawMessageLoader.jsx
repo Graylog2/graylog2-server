@@ -26,21 +26,16 @@ import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
-import ActionsProvider from 'injection/ActionsProvider';
-import StoreProvider from 'injection/StoreProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 import AppConfig from 'util/AppConfig';
 import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
 
 import type { Input as InputType, CodecTypes } from './Types';
 
-const MessagesActions = ActionsProvider.getActions('Messages');
-const CodecTypesActions = ActionsProvider.getActions('CodecTypes');
-const InputsActions = ActionsProvider.getActions('Inputs');
-// eslint-disable-next-line no-unused-vars
-const MessagesStore = StoreProvider.getStore('Messages');
-const CodecTypesStore = StoreProvider.getStore('CodecTypes');
-const InputsStore = StoreProvider.getStore('Inputs');
+const { MessagesActions } = CombinedProvider.get('Messages');
+const { CodecTypesActions, CodecTypesStore } = CombinedProvider.get('CodecTypes');
+const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
 const isCloud = AppConfig.isCloud();
 const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
@@ -84,7 +79,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     event.preventDefault();
 
     setLoading(true);
-    const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress,
+    const promise = MessagesActions.loadRawMessage(message, remoteAddress,
       codec, codecConfiguration);
 
     promise.then((loadedMessage) => {
@@ -214,15 +209,12 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     }
   };
 
-  const _isSubmitDisabled = () => {
-    return !message || !codec || loading;
-  };
+  const _isSubmitDisabled = !message || !codec || loading;
 
   const _getInputIdSelector = () => {
     if (inputIdSelector) {
-      const inputSelector = (isCloud && ForwarderInputDropdown)
+      return (isCloud && ForwarderInputDropdown)
         ? (
-
           <fieldset>
             <legend>Input selection (optional)</legend>
 
@@ -244,8 +236,6 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
                     value={inputId} />
           </Input>
         );
-
-      return inputSelector;
     }
 
     return null;
@@ -299,7 +289,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
             </Input>
             {codecConfigurationOptions}
           </fieldset>
-          <Button type="submit" bsStyle="info" disabled={_isSubmitDisabled()}>
+          <Button type="submit" bsStyle="info" disabled={_isSubmitDisabled}>
             {loading ? 'Loading message...' : 'Load message'}
           </Button>
         </form>
