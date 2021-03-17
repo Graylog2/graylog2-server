@@ -52,6 +52,7 @@ const Metric = ({ index }: Props) => {
     <>
       <FormikInput id="name"
                    label="Name"
+                   placeholder="Specify optional name"
                    name={`metrics.${index}.name`}
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9" />
