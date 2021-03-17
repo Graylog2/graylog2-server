@@ -15,19 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Field } from 'formik';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { Input } from 'components/bootstrap';
+import Select from 'components/common/Select';
+import usePluginEntities from 'views/logic/usePluginEntities';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
-type Props = {
-  config: AggregationWidgetConfig,
-  onConfigChange: (newConfig: AggregationWidgetConfig) => void
-}
+const VisualizationConfiguration = () => {
+  const visualizationTypes = usePluginEntities('visualizationTypes');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const VisualizationConfiguration = ({ config, onConfigChange }: Props) => {
+  const visualizationTypeOptions = visualizationTypes.sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
+    .map(({ displayName, type }) => ({ label: displayName, value: type }));
+
   return (
     <>
-      Configuration Elements
+      <Field name="visualization.type">
+        {({ field: { name, value, onChange }, meta: { error } }) => (
+          <Input id="visualization-type-select"
+                 label="Type"
+                 error={error}
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9">
+            <Select options={visualizationTypeOptions}
+                    clearable={false}
+                    name={name}
+                    value={value}
+                    onChange={(newValue) => {
+                      onChange({ target: { name, value: newValue } });
+                    }} />
+          </Input>
+        )}
+      </Field>
     </>
   );
 };

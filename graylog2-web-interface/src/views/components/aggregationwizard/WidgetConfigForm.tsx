@@ -46,7 +46,11 @@ export type ValuesGrouping = {
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
 
-export type VisualizationFormValues = {};
+export type VisualizationConfigFormValues = {};
+export type VisualizationFormValues = {
+  type: string,
+  config?: VisualizationConfigFormValues,
+};
 
 export type SortFormValues = {}
 export interface WidgetConfigFormValues {
