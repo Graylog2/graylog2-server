@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { Field, useFormikContext } from 'formik';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -24,6 +24,7 @@ import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import { useStore } from 'stores/connect';
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 type Props = {
   index: number,
@@ -31,28 +32,20 @@ type Props = {
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
-// eslint-disable-next-line consistent-return
-const isFunctionDefined = (func: string): void | string => {
-  if (!func) {
-    return 'A function is required.';
-  }
-};
-
 const Metric = ({ index }: Props) => {
   const functions = useStore(AggregationFunctionsStore);
   const fieldTypes = useContext(FieldTypesContext);
   const fieldTypeOptions = fieldTypes.all.map((fieldType) => ({ label: fieldType.name, value: fieldType.name })).toArray().sort(sortByLabel);
   const functionOptions = Object.values(functions).map(({ type }) => ({ label: type, value: type })).sort(sortByLabel);
 
-  const { validateField } = useFormikContext();
+  const { values } = useFormikContext<WidgetConfigFormValues>();
+  const currentFunction = values.metrics[index].function;
 
-  useEffect(() => {
-    validateField(`metrics.${index}.function`);
-  }, [index, validateField]);
+  const isFieldRequired = currentFunction !== 'count';
 
   return (
     <>
-      <Field name={`metrics.${index}.function`} validate={isFunctionDefined}>
+      <Field name={`metrics.${index}.function`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="function-select"
                  label="Function"
@@ -71,12 +64,14 @@ const Metric = ({ index }: Props) => {
       </Field>
 
       <Field name={`metrics.${index}.field`}>
-        {({ field: { name, value, onChange } }) => (
+        {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="field-select"
                  label="Field"
+                 error={error}
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9">
             <Select options={fieldTypeOptions}
+                    clearable={!isFieldRequired}
                     name="field"
                     value={value}
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })} />

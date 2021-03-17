@@ -39,11 +39,13 @@ type Props = {
   children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: WidgetConfigFormValues,
   onSubmit: (formValues: WidgetConfigFormValues) => void,
+  validate: (formValues: WidgetConfigFormValues) => { [key: string]: string },
 }
 
-const WidgetConfigForm = ({ children, onSubmit, initialValues }: Props) => {
+const WidgetConfigForm = ({ children, onSubmit, initialValues, validate }: Props) => {
   return (
     <Formik<WidgetConfigFormValues> initialValues={initialValues}
+                                    validate={validate}
                                     enableReinitialize
                                     validateOnChange
                                     validateOnMount

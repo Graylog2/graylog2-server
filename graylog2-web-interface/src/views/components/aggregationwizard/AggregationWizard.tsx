@@ -95,13 +95,23 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
   onConfigChange(newConfig);
 };
 
+const validateForm = (formValues: WidgetConfigFormValues) => {
+  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => ({})));
+
+  const elementValidationResults = elementValidations.map((validate) => validate(formValues));
+
+  return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
+};
+
 const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
   const initialFormValues = _initialFormValues(config);
 
   return (
     <Wrapper>
       <Controls>
-        <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)} initialValues={initialFormValues}>
+        <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
+                          initialValues={initialFormValues}
+                          validate={validateForm}>
           {({ isValid, dirty, values, setValues }) => (
             <>
               <Section data-testid="add-element-section">

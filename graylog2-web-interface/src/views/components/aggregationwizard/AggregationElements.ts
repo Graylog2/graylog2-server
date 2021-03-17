@@ -40,6 +40,7 @@ export type AggregationElement = {
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
   }>,
+  validate: (formValues: WidgetConfigFormValues) => { [key: string]: string },
 }
 
 const _metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
@@ -67,6 +68,37 @@ const visualizationElement: AggregationElement = {
   component: VisualizationConfiguration,
 };
 
+type MetricError = {
+  function?: string,
+  field?: string,
+};
+
+const validateMetrics = (values: WidgetConfigFormValues) => {
+  const errors = {};
+
+  if (!values.metrics) {
+    return errors;
+  }
+
+  const metricsErrors = values.metrics.map((metric) => {
+    const metricError: MetricError = {};
+
+    if (!metric.function) {
+      metricError.function = 'A function is required.';
+    }
+
+    const isFieldRequired = metric.function && metric.function !== 'count';
+
+    if (isFieldRequired && !metric.field) {
+      metricError.field = `A field is required for function ${metric.function}`;
+    }
+
+    return metricError;
+  });
+
+  return { metrics: metricsErrors };
+};
+
 const metricElement: AggregationElement = {
   title: 'Metric',
   key: 'metrics',
@@ -81,6 +113,7 @@ const metricElement: AggregationElement = {
     .series(_metricsToSeries(formValues.metrics))
     .build(),
   component: MetricsConfiguration,
+  validate: validateMetrics,
 };
 
 const groupByElement: AggregationElement = {
