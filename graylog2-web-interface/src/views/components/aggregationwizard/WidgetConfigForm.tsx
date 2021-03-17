@@ -45,6 +45,8 @@ const WidgetConfigForm = ({ children, onSubmit, initialValues }: Props) => {
   return (
     <Formik<WidgetConfigFormValues> initialValues={initialValues}
                                     enableReinitialize
+                                    validateOnChange
+                                    validateOnMount
                                     onSubmit={onSubmit}>
       {(...args) => (
         <Form className="form form-horizontal">
