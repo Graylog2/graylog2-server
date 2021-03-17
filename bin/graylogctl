@@ -51,7 +51,7 @@ GRAYLOG_CONF=${GRAYLOG_CONF:=/etc/graylog/server/server.conf}
 GRAYLOG_PID=${GRAYLOG_PID:=/tmp/graylog.pid}
 LOG_FILE=${LOG_FILE:=log/graylog-server.log}
 LOG4J=${LOG4J:=}
-DEFAULT_JAVA_OPTS="-Djdk.tls.acknowledgeCloseNotify=true -Xms1g -Xmx1g -XX:NewRatio=1 -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:-OmitStackTraceInFastThrow"
+DEFAULT_JAVA_OPTS="-Djdk.tls.acknowledgeCloseNotify=true -Xms1g -Xmx1g -XX:NewRatio=1 -server -XX:+ResizeTLAB -XX:-OmitStackTraceInFastThrow"
 if $JAVA_CMD -XX:+PrintFlagsFinal 2>&1 |grep -q UseParNewGC; then
 	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+UseParNewGC"
 fi
