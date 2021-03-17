@@ -83,7 +83,7 @@ describe('WidgetFocusProvider', () => {
     const consume = (value) => { contextValue = value; };
     renderSUT(consume);
 
-    contextValue.setWidgetFocusing(undefined);
+    contextValue.unsetWidgetFocusing();
 
     expect(mockHistoryReplace).toBeCalledWith('');
   });
@@ -122,7 +122,7 @@ describe('WidgetFocusProvider', () => {
 
     renderSUT(consume);
 
-    contextValue.setWidgetEditing(undefined);
+    contextValue.unsetWidgetEditing();
 
     expect(mockHistoryReplace).toBeCalledWith('');
   });
@@ -154,7 +154,7 @@ describe('WidgetFocusProvider', () => {
 
     expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true&editing=true');
 
-    contextValue.setWidgetEditing(undefined);
+    contextValue.unsetWidgetEditing();
 
     expect(mockHistoryReplace).toBeCalledWith('?focusedId=widget-id&focusing=true');
   });

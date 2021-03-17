@@ -113,8 +113,8 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
   );
 };
 
-const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery, setWidgetFocusing): void => {
-  setWidgetFocusing(undefined);
+const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery, unsetWidgetFocusing): void => {
+  unsetWidgetFocusing();
 
   history.push(
     new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id))
@@ -146,8 +146,8 @@ type Props = {
 
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
-  const { setWidgetFocusing } = useContext(WidgetFocusContext);
-  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view), setWidgetFocusing);
+  const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
+  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view), unsetWidgetFocusing);
 
   return (
     <>

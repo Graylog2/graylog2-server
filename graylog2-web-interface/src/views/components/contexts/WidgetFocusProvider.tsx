@@ -121,36 +121,36 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
     history.replace(newURI);
   }, [history, query]);
 
-  const setWidgetFocusing = (widgetId: string | undefined) => {
-    if (widgetId) {
-      updateFocusQueryParams({
-        id: widgetId,
-        editing: false,
-        focusing: true,
-      });
-    } else {
-      updateFocusQueryParams(undefined);
-    }
+  const setWidgetFocusing = (widgetId: string) => updateFocusQueryParams({
+    id: widgetId,
+    editing: false,
+    focusing: true,
+  });
+
+  const unsetWidgetFocusing = () => updateFocusQueryParams(undefined);
+
+  const setWidgetEditing = (widgetId: string) => {
+    updateFocusQueryParams({
+      id: widgetId,
+      editing: true,
+      focusing: focusUriParams.focusing,
+    });
   };
 
-  const setWidgetEditing = (widgetId: string | undefined) => {
-    if (widgetId) {
-      updateFocusQueryParams({
-        id: widgetId,
-        editing: true,
-        focusing: focusUriParams.focusing,
-      });
-    } else {
-      updateFocusQueryParams({
-        id: focusUriParams.focusing && focusUriParams.id ? focusUriParams.id : undefined,
-        editing: false,
-        focusing: focusUriParams.focusing,
-      });
-    }
-  };
+  const unsetWidgetEditing = () => updateFocusQueryParams({
+    id: focusUriParams.focusing && focusUriParams.id ? focusUriParams.id : undefined,
+    editing: false,
+    focusing: focusUriParams.focusing,
+  });
 
   return (
-    <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing }}>
+    <WidgetFocusContext.Provider value={{
+      focusedWidget,
+      setWidgetFocusing,
+      setWidgetEditing,
+      unsetWidgetEditing,
+      unsetWidgetFocusing,
+    }}>
       {children}
     </WidgetFocusContext.Provider>
   );

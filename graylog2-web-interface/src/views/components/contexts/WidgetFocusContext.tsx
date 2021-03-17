@@ -34,14 +34,18 @@ export type FocusContextState = WidgetFocusingState | WidgetEditingState;
 
 export type WidgetFocusContextType = {
   focusedWidget: FocusContextState | undefined,
-  setWidgetFocusing: (widgetId: string | undefined) => void,
-  setWidgetEditing: (widgetId: string | undefined) => void,
+  setWidgetFocusing: (widgetId: string) => void,
+  setWidgetEditing: (widgetId: string) => void,
+  unsetWidgetFocusing: () => void,
+  unsetWidgetEditing: () => void,
 };
 
 const defaultContext = {
   focusedWidget: undefined,
   setWidgetFocusing: () => {},
   setWidgetEditing: () => {},
+  unsetWidgetFocusing: () => {},
+  unsetWidgetEditing: () => {},
 };
 
 const WidgetFocus = React.createContext<WidgetFocusContextType>(defaultContext);

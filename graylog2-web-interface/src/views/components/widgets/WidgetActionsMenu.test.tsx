@@ -99,12 +99,28 @@ describe('<Widget />', () => {
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
     setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
     setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
+    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
+    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
     title?: string
     isFocused?: boolean,
   }
 
-  const DummyWidget = ({ widget: propsWidget = widget, setWidgetFocusing = () => {}, setWidgetEditing = () => {}, focusedWidget, ...props }: DummyWidgetProps) => (
-    <WidgetFocusContext.Provider value={{ setWidgetFocusing, setWidgetEditing, focusedWidget }}>
+  const DummyWidget = ({
+    widget: propsWidget = widget,
+    setWidgetFocusing = () => {},
+    setWidgetEditing = () => {},
+    unsetWidgetFocusing = () => {},
+    unsetWidgetEditing = () => {},
+    focusedWidget,
+    ...props
+  }: DummyWidgetProps) => (
+    <WidgetFocusContext.Provider value={{
+      setWidgetFocusing,
+      setWidgetEditing,
+      unsetWidgetFocusing,
+      unsetWidgetEditing,
+      focusedWidget,
+    }}>
       <WidgetContext.Provider value={propsWidget}>
         <WidgetActionsMenu isFocused={false}
                            toggleEdit={() => {}}
@@ -129,14 +145,14 @@ describe('<Widget />', () => {
   });
 
   it('is updating widget focus context on un-focus', () => {
-    const mockSetWidgetFocusing = jest.fn();
-    render(<DummyWidget title="Dummy Widget" isFocused setWidgetFocusing={mockSetWidgetFocusing} />);
+    const mockUnsetWidgetFocusing = jest.fn();
+    render(<DummyWidget title="Dummy Widget" isFocused unsetWidgetFocusing={mockUnsetWidgetFocusing} />);
 
     const unfocusButton = screen.getByTitle('Un-focus widget');
 
     fireEvent.click(unfocusButton);
 
-    expect(mockSetWidgetFocusing).toHaveBeenCalledWith(undefined);
+    expect(mockUnsetWidgetFocusing).toHaveBeenCalledTimes(1);
   });
 
   it('copies title when duplicating widget', async () => {

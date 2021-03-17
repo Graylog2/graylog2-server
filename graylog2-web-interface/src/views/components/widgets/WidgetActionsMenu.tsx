@@ -150,7 +150,7 @@ const WidgetActionsMenu = ({
   view,
 }: Props) => {
   const widget = useContext(WidgetContext);
-  const { setWidgetFocusing } = useContext(WidgetFocusContext);
+  const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
@@ -168,7 +168,7 @@ const WidgetActionsMenu = ({
         {isFocused && (
           <IconButton name="compress-arrows-alt"
                       title="Un-focus widget"
-                      onClick={() => setWidgetFocusing(undefined)} />
+                      onClick={() => unsetWidgetFocusing()} />
         )}
         {!isFocused && (
           <>

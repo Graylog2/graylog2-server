@@ -115,12 +115,22 @@ describe('<Widget />', () => {
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
     setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
     setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
+    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
+    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
     title?: string,
     editing?: boolean,
   }
 
-  const DummyWidget = ({ widget: propsWidget = widget, focusedWidget = undefined, setWidgetFocusing = () => {}, setWidgetEditing = () => {}, ...props }: DummyWidgetProps) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing }}>
+  const DummyWidget = ({
+    widget: propsWidget = widget,
+    focusedWidget = undefined,
+    setWidgetFocusing = () => {},
+    setWidgetEditing = () => {},
+    unsetWidgetFocusing = () => {},
+    unsetWidgetEditing = () => {},
+    ...props
+  }: DummyWidgetProps) => (
+    <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
       <WidgetContext.Provider value={propsWidget}>
         <Widget widget={propsWidget}
                 id="widgetId"
@@ -264,12 +274,12 @@ describe('<Widget />', () => {
   });
 
   it('updates focus mode, on widget edit save', () => {
-    const mockSetWidgetEditing = jest.fn();
-    render(<DummyWidget editing setWidgetEditing={mockSetWidgetEditing} />);
+    const mockUnsetWidgetEditing = jest.fn();
+    render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const saveButton = screen.getByText('Save');
     fireEvent.click(saveButton);
 
-    expect(mockSetWidgetEditing).toHaveBeenCalledWith(undefined);
+    expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
 
   it('does not trigger action when clicking cancel after no changes were made', () => {
