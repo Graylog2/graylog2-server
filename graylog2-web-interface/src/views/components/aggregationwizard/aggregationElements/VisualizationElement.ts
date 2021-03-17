@@ -19,7 +19,9 @@ import { isEmpty } from 'lodash';
 import type { AggregationElement } from './AggregationElementType';
 
 import VisualizationConfiguration from '../elementConfiguration/VisualizationConfiguration';
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
+import { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
+
+const formValuesToVisualizationConfig = (config: VisualizationConfigFormValues) => undefined;
 
 const VisualizationElement: AggregationElement = {
   title: 'Visualization',
@@ -27,6 +29,12 @@ const VisualizationElement: AggregationElement = {
   order: 4,
   allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.visualization),
   component: VisualizationConfiguration,
+  fromConfig: (config) => ({ visualization: { type: config.visualization } }),
+  toConfig: (formValues, currentConfig) => currentConfig
+    .toBuilder()
+    .visualization(formValues.visualization.type)
+    .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization?.config))
+    .build(),
 };
 
 export default VisualizationElement;
