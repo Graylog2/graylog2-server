@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
-    private final Supplier<RestHighLevelClient> clientProvider;
+    private final Supplier<RestHighLevelClient> clientSupplier;
 
     @SuppressWarnings("unused")
     @Inject
@@ -61,7 +61,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
-        clientProvider = Suppliers.memoize(() -> {
+        clientSupplier = Suppliers.memoize(() -> {
             final RestHighLevelClient client = buildClient(hosts,
                     connectTimeout,
                     socketTimeout,
@@ -103,7 +103,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
     @Override
     public RestHighLevelClient get() {
-        return this.clientProvider.get();
+        return this.clientSupplier.get();
     }
 
     private RestHighLevelClient buildClient(
