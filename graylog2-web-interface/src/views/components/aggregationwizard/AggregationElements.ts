@@ -44,19 +44,30 @@ export type AggregationElement = {
 }
 
 const _metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
-  .map((metric) => Series.create(metric.function, metric.field)
+  .map((metric) => Series.create(metric.function, metric.field, metric.percentile)
     .toBuilder()
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
     .build());
 
 const _seriesToMetrics = (series: Array<Series>) => series.map((s) => {
-  const { type: func, field } = parseSeries(s.function);
+  const { type: func, field, percentile } = parseSeries(s.function);
 
-  return {
+  const metric = {
     function: func,
     field,
     name: s.config?.name,
   };
+
+  if (percentile) {
+    const parsedPercentile = Number.parseFloat(percentile);
+
+    return {
+      ...metric,
+      percentile: parsedPercentile,
+    };
+  }
+
+  return metric;
 });
 
 const visualizationElement: AggregationElement = {
@@ -71,6 +82,7 @@ const visualizationElement: AggregationElement = {
 type MetricError = {
   function?: string,
   field?: string,
+  percentile?: string,
 };
 
 const validateMetrics = (values: WidgetConfigFormValues) => {

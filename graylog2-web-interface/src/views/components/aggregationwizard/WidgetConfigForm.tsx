@@ -20,7 +20,8 @@ import { Form, Formik, FormikProps } from 'formik';
 export type MetricFormValues = {
   function: string,
   field: string | undefined,
-  name?: string,
+  name?: string | undefined,
+  percentile?: string | undefined,
 };
 
 export type GroupByFormValues = {};

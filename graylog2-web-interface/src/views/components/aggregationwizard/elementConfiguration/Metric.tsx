@@ -32,6 +32,8 @@ type Props = {
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
+const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
+
 const Metric = ({ index }: Props) => {
   const functions = useStore(AggregationFunctionsStore);
   const fieldTypes = useContext(FieldTypesContext);
@@ -42,6 +44,8 @@ const Metric = ({ index }: Props) => {
   const currentFunction = values.metrics[index].function;
 
   const isFieldRequired = currentFunction !== 'count';
+
+  const isPercentile = currentFunction === 'percentile';
 
   return (
     <>
@@ -54,7 +58,7 @@ const Metric = ({ index }: Props) => {
                  wrapperClassName="col-sm-9">
             <Select options={functionOptions}
                     clearable={false}
-                    name="function"
+                    name={name}
                     value={value}
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
@@ -72,12 +76,29 @@ const Metric = ({ index }: Props) => {
                  wrapperClassName="col-sm-9">
             <Select options={fieldTypeOptions}
                     clearable={!isFieldRequired}
-                    name="field"
+                    name={name}
                     value={value}
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
           </Input>
         )}
       </Field>
+      {isPercentile && (
+        <Field name={`metrics.${index}.percentile`}>
+          {({ field: { name, value, onChange }, meta: { error } }) => (
+            <Input id="percentile-select"
+                   label="Percentile"
+                   error={error}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9">
+              <Select options={percentileOptions}
+                      clearable={false}
+                      name={name}
+                      value={value}
+                      onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+            </Input>
+          )}
+        </Field>
+      )}
     </>
   );
 };

@@ -118,9 +118,9 @@ export default class Series {
       .build();
   }
 
-  static create(func: string, field?: string) {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    const functionWithField = `${func}(${field ?? ''})`;
+  static create(func: string, field?: string, parameter?: string) {
+    const optionalParameter = parameter ? `,${parameter}` : '';
+    const functionWithField = `${func}(${field ?? ''}${optionalParameter})`;
 
     return Series.forFunction(functionWithField);
   }
