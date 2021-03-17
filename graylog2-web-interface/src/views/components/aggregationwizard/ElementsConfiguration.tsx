@@ -19,8 +19,8 @@ import { useFormikContext } from 'formik';
 import AggregationWidgetConfig from 'src/views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
-import type { AggregationElement } from './AggregationWizard';
-import { WidgetConfigFormValues } from './elementConfiguration/WidgetConfigForm';
+import type { AggregationElement } from './AggregationElements';
+import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const _sortConfiguredElements = (
   values: WidgetConfigFormValues,

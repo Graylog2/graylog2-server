@@ -30,7 +30,7 @@ type Props = {
 
 const MetricsConfiguration = ({ config, onConfigChange }: Props) => {
   const { values } = useFormikContext<WidgetConfigFormValues>();
-  const metrics = values.metrics ?? [{}];
+  const { metrics } = values;
 
   return (
     <>
