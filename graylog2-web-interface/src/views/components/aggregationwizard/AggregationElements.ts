@@ -85,6 +85,10 @@ type MetricError = {
   percentile?: string,
 };
 
+const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+  return errors.filter((error) => Object.keys(error).length > 0).length > 0;
+};
+
 const validateMetrics = (values: WidgetConfigFormValues) => {
   const errors = {};
 
@@ -96,19 +100,23 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
     const metricError: MetricError = {};
 
     if (!metric.function) {
-      metricError.function = 'A function is required.';
+      metricError.function = 'Function is required.';
     }
 
     const isFieldRequired = metric.function && metric.function !== 'count';
 
     if (isFieldRequired && !metric.field) {
-      metricError.field = `A field is required for function ${metric.function}`;
+      metricError.field = `Field is required for function ${metric.function}.`;
+    }
+
+    if (metric.function === 'percentile' && !metric.percentile) {
+      metricError.percentile = 'Percentile is required.';
     }
 
     return metricError;
   });
 
-  return { metrics: metricsErrors };
+  return hasErrors(metricsErrors) ? { metrics: metricsErrors } : {};
 };
 
 const metricElement: AggregationElement = {
