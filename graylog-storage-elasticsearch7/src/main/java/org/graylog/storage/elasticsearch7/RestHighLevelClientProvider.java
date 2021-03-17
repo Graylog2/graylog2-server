@@ -42,7 +42,6 @@ import java.util.function.Supplier;
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
     private final Supplier<RestHighLevelClient> clientProvider;
-    private Sniffer sniffer = null;
 
     @SuppressWarnings("unused")
     @Inject
@@ -72,11 +71,9 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     muteElasticsearchDeprecationWarnings,
                 credentialsProvider);
 
-            synchronized (this) {
-                if (sniffer != null && discoveryEnabled) {
-                    sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
-                    shutdownService.register(sniffer::close);
-                }
+            if (discoveryEnabled) {
+                final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
+                shutdownService.register(sniffer::close);
             }
 
             return client;
