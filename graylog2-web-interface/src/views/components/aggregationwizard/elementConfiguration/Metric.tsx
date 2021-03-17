@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
-import { Field } from 'formik';
+import { useContext, useEffect } from 'react';
+import { Field, useFormikContext } from 'formik';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
-
 import { useStore } from 'stores/connect';
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 
@@ -32,28 +31,43 @@ type Props = {
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
+// eslint-disable-next-line consistent-return
+const isFunctionDefined = (func: string): void | string => {
+  if (!func) {
+    return 'A function is required.';
+  }
+};
+
 const Metric = ({ index }: Props) => {
   const functions = useStore(AggregationFunctionsStore);
   const fieldTypes = useContext(FieldTypesContext);
   const fieldTypeOptions = fieldTypes.all.map((fieldType) => ({ label: fieldType.name, value: fieldType.name })).toArray().sort(sortByLabel);
   const functionOptions = Object.values(functions).map(({ type }) => ({ label: type, value: type })).sort(sortByLabel);
 
+  const { validateField } = useFormikContext();
+
+  useEffect(() => {
+    validateField(`metrics.${index}.function`);
+  }, [index, validateField]);
+
   return (
     <>
-      <Field name={`metrics.${index}.function`}>
-        {({ field: { name, value, onChange } }) => (
+      <Field name={`metrics.${index}.function`} validate={isFunctionDefined}>
+        {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="function-select"
                  label="Function"
+                 error={error}
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9">
             <Select options={functionOptions}
+                    clearable={false}
                     name="function"
                     value={value}
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
                     }} />
-        </Input>
-      )}
+          </Input>
+        )}
       </Field>
 
       <Field name={`metrics.${index}.field`}>
