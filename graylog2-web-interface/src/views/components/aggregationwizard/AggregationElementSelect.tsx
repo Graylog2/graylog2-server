@@ -51,7 +51,7 @@ const AggregationElementSelect = ({ aggregationElements, onElementCreate }: Prop
     <Select options={options}
             onChange={_onSelect}
             ref={selectRef}
-            placeholder="Select an element..."
+            placeholder="Select an element to add ..."
             aria-label="Add an Element" />
   );
 };

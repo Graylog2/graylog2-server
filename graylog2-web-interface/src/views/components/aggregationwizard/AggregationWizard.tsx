@@ -62,10 +62,6 @@ const Section = styled.div`
   }
 `;
 
-const SectionHeadline = styled.div`
-  margin-bottom: 5px;
-`;
-
 const _onElementCreate = (
   elementKey: string,
   values: WidgetConfigFormValues,
@@ -120,12 +116,10 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
           {({ isValid, dirty, values, setValues }) => (
             <>
               <Section data-testid="add-element-section">
-                <SectionHeadline>Add an Element</SectionHeadline>
                 <AggregationElementSelect onElementCreate={(elementKey) => _onElementCreate(elementKey, values, setValues)}
                                           aggregationElements={aggregationElements} />
               </Section>
               <Section data-testid="configure-elements-section">
-                <SectionHeadline>Configured Elements</SectionHeadline>
                 <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
                                        config={config}
                                        onConfigChange={onChange} />
