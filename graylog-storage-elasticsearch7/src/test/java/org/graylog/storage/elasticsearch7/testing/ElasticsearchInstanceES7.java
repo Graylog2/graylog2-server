@@ -65,6 +65,7 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
                 Duration.seconds(60),
                 "http",
                 false,
+                false,
                 new BasicCredentialsProvider())
                 .get();
     }
