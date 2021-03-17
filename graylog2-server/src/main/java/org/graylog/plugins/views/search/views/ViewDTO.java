@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
 @WithBeanGetter
-public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder> {
+public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, SummaryViewDTO {
     public enum Type {
         SEARCH,
         DASHBOARD
