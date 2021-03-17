@@ -1,3 +1,4 @@
+// @flow strict
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -14,91 +15,102 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import * as Immutable from 'immutable';
 
 import AppConfig from 'util/AppConfig';
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
+import type { Message } from 'views/components/messagelist/Types';
+
+import type { Input } from './Types';
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 const isCloud = AppConfig.isCloud();
 const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
 
-class RecentMessageLoader extends React.Component {
-  static propTypes = {
-    inputs: PropTypes.object,
-    onMessageLoaded: PropTypes.func.isRequired,
-    selectedInputId: PropTypes.string,
-  };
+type Props = {
+  inputs: Immutable.Map<string, Input>,
+  onMessageLoaded: (message: ?Message) => void,
+  selectedInputId?: string,
+};
 
-  state = {
-    loading: false,
-  };
+const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
+  const [loading, setLoading] = useState<boolean>(false);
 
-  onClick = (inputId) => {
-    const input = this.props.inputs.get(inputId);
+  const onClick = (inputId: string) => {
+    const input = inputs && inputs.get(inputId);
 
-    if (!input) {
+    if (!isCloud && !input) {
       UserNotification.error(`Invalid input selected: ${inputId}`,
         `Could not load message from invalid Input ${inputId}`);
     }
 
-    this.setState({ loading: true });
+    setLoading(true);
     const promise = UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
       { range: 3600 }, undefined, 1, undefined, undefined, undefined, false);
 
     promise.then((response) => {
       if (response.total_results > 0) {
-        this.props.onMessageLoaded(response.messages[0]);
+        onMessageLoaded(response.messages[0]);
       } else {
         UserNotification.error('Input did not return a recent message.');
-        this.props.onMessageLoaded(undefined);
+        onMessageLoaded(undefined);
       }
     });
 
-    promise.finally(() => this.setState({ loading: false }));
+    promise.finally(() => setLoading(false));
   };
 
-  render() {
-    let helpMessage;
+  let helpMessage;
 
-    if (this.props.selectedInputId) {
-      helpMessage = 'Click on "Load Message" to load the most recent message received by this input within the last hour.';
-    } else {
-      helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.';
-    }
-
-    return (
-      <div style={{ marginTop: 5 }}>
-        {(isCloud && ForwarderInputDropdown)
-          ? (
-            <fieldset>
-              <p className="description">Select a Forwarder from the list below then select an then select an Input and click
-                on &quot;Load message&quot; to load most recent message received by this input within the last hour.
-              </p>
-              <ForwarderInputDropdown onLoadMessage={this.onClick}
-                                      title={this.state.loading ? 'Loading message...' : 'Load Message'}
-                                      preselectedInputId={this.props.selectedInputId}
-                                      disabled={this.state.loading} />
-            </fieldset>
-          )
-          : (
-            <fieldset>
-              {helpMessage}
-              <InputDropdown inputs={this.props.inputs}
-                             preselectedInputId={this.props.selectedInputId}
-                             onLoadMessage={this.onClick}
-                             title={this.state.loading ? 'Loading message...' : 'Load Message'}
-                             disabled={this.state.loading} />
-            </fieldset>
-          )}
-      </div>
-
-    );
+  if (selectedInputId) {
+    helpMessage = 'Click on "Load Message" to load the most recent message received by this input within the last hour.';
+  } else {
+    helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.';
   }
-}
+
+  return (
+    <div style={{ marginTop: 5 }}>
+      {(isCloud && ForwarderInputDropdown)
+        ? (
+          <fieldset>
+            <p className="description">Select a Forwarder from the list below then select an then select an Input and click
+              on &quot;Load message&quot; to load most recent message received by this input within the last hour.
+            </p>
+            <ForwarderInputDropdown onLoadMessage={onClick}
+                                    title={loading ? 'Loading message...' : 'Load Message'}
+                                    preselectedInputId={selectedInputId}
+                                    disabled={loading} />
+          </fieldset>
+        )
+        : (
+          <fieldset>
+            {helpMessage}
+            <InputDropdown inputs={inputs}
+                           preselectedInputId={selectedInputId}
+                           onLoadMessage={onClick}
+                           title={loading ? 'Loading message...' : 'Load Message'}
+                           disabled={loading} />
+          </fieldset>
+        )}
+    </div>
+
+  );
+};
+
+RecentMessageLoader.propTypes = {
+  inputs: PropTypes.object,
+  onMessageLoaded: PropTypes.func.isRequired,
+  selectedInputId: PropTypes.string,
+};
+
+RecentMessageLoader.defaultProps = {
+  inputs: {},
+  selectedInputId: undefined,
+};
 
 export default RecentMessageLoader;

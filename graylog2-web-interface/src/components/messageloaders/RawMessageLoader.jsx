@@ -19,6 +19,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import * as Immutable from 'immutable';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Col, Row, Button } from 'components/graylog';
@@ -29,6 +30,9 @@ import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 import AppConfig from 'util/AppConfig';
 import connect from 'stores/connect';
+import type { Message } from 'views/components/messagelist/Types';
+
+import type { Input as InputType, CodecTypes } from './Types';
 
 const MessagesActions = ActionsProvider.getActions('Messages');
 const CodecTypesActions = ActionsProvider.getActions('CodecTypes');
@@ -41,13 +45,30 @@ const isCloud = AppConfig.isCloud();
 const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].messageLoaders.ForwarderInputDropdown : null;
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
 
-const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs }) => {
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [remoteAddress, setRemoteAddress] = useState(DEFAULT_REMOTE_ADDRESS);
-  const [codec, setCodec] = useState('');
+type OptionsType = {
+  message: string,
+  remoteAddress: string,
+  codec: string,
+  codecConfiguration: {
+    [key: string]: string,
+  },
+  inputId?: string,
+};
+
+type Props = {
+  inputs: Immutable.Map<string, InputType>,
+  codecTypes: CodecTypes,
+  onMessageLoaded: (message: ?Message, option: OptionsType) => Promise<void>,
+  inputIdSelector?: boolean,
+};
+
+const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs }: Props) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
+  const [remoteAddress, setRemoteAddress] = useState<string>(DEFAULT_REMOTE_ADDRESS);
+  const [codec, setCodec] = useState<string>('');
   const [codecConfiguration, setCodecConfiguration] = useState({});
-  const [inputId, setInputId] = useState();
+  const [inputId, setInputId] = useState<string | typeof undefined>();
 
   useEffect(() => {
     CodecTypesActions.list();
@@ -59,7 +80,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     }
   }, [inputIdSelector]);
 
-  const _loadMessage = (event) => {
+  const _loadMessage = (event: SyntheticEvent<*>) => {
     event.preventDefault();
 
     setLoading(true);
@@ -117,37 +138,36 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
 
     return inputIds
       .map((id) => {
-        const inputId = inputs[id].id;
-        const label = `${inputId} / ${inputs[id].title} / ${inputs[id].name}`;
+        const label = `${id} / ${inputs.get(id).title} / ${inputs.get(id).name}`;
 
         return { value: inputId, label: label };
       })
       .sort((inputA, inputB) => inputA.label.toLowerCase().localeCompare(inputB.label.toLowerCase()));
   };
 
-  const _onCodecSelect = (selectedCodec) => {
+  const _onCodecSelect = (selectedCodec: string) => {
     setCodec(selectedCodec);
     setCodecConfiguration({});
   };
 
-  const _onInputSelect = (selectedInput) => {
+  const _onInputSelect = (selectedInput: string) => {
     setInputId(selectedInput);
   };
 
-  const _onMessageChange = (event) => {
+  const _onMessageChange = (event: SyntheticInputEvent<HTMLTextAreaElement>) => {
     setMessage(getValueFromInput(event.target));
   };
 
-  const _onRemoteAddressChange = (event) => {
+  const _onRemoteAddressChange = (event: SyntheticInputEvent<HTMLSelectElement>) => {
     setRemoteAddress(getValueFromInput(event.target));
   };
 
-  const _onCodecConfigurationChange = (field, value) => {
+  const _onCodecConfigurationChange = (field: string, value: string) => {
     const newConfiguration = { ...codecConfiguration, [field]: value };
     setCodecConfiguration(newConfiguration);
   };
 
-  const _formatConfigField = (key, configField) => {
+  const _formatConfigField = (key: string, configField) => {
     const value = codecConfiguration[key];
     const typeName = 'RawMessageLoader';
     const elementKey = `${typeName}-${key}`;
