@@ -23,25 +23,20 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 
-import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
+import { useStore } from 'stores/connect';
+import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 
 type Props = {
   index: number,
 }
 
+const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
+
 const Metric = ({ index }: Props) => {
+  const functions = useStore(AggregationFunctionsStore);
   const fieldTypes = useContext(FieldTypesContext);
-  const fieldTypeOptions = fieldTypes.all.map((fieldType) => ({ label: fieldType.name, value: fieldType.name })).toArray();
-  const formattedFields = fieldTypes.all
-    ? fieldTypes.all
-      .map((fieldType) => fieldType.name)
-      .valueSeq()
-      .toJS()
-      .sort(defaultCompare)
-    : [];
-  const functions = new SeriesFunctionsSuggester(formattedFields);
-  const functionOptions = functions.defaults;
-  console.log({ functionOptions });
+  const fieldTypeOptions = fieldTypes.all.map((fieldType) => ({ label: fieldType.name, value: fieldType.name })).toArray().sort(sortByLabel);
+  const functionOptions = Object.values(functions).map(({ type }) => ({ label: type, value: type })).sort(sortByLabel);
 
   return (
     <>
@@ -57,8 +52,8 @@ const Metric = ({ index }: Props) => {
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
                     }} />
-          </Input>
-        )}
+        </Input>
+      )}
       </Field>
 
       <Field name={`metrics.${index}.field`}>
