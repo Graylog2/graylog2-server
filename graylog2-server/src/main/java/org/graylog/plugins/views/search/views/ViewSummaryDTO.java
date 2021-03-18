@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -44,8 +43,6 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
 public abstract class ViewSummaryDTO implements ContentPackable<ViewEntity.Builder> {
-    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(ViewDTO.FIELD_ID, ViewDTO.FIELD_TITLE, ViewDTO.FIELD_CREATED_AT);
-
     @ObjectId
     @Id
     @Nullable

@@ -22,8 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
-import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
@@ -52,11 +52,11 @@ public class SavedSearchesResource extends RestResource {
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
             .build();
 
-    private final ViewSummaryService dbService;
+    private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
-    public SavedSearchesResource(ViewSummaryService dbService) {
+    public SavedSearchesResource(ViewService dbService) {
         this.dbService = dbService;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -78,7 +78,7 @@ public class SavedSearchesResource extends RestResource {
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
-            final PaginatedList<ViewSummaryDTO> result = dbService.searchPaginatedByType(
+            final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
                     ViewDTO.Type.SEARCH,
                     searchQuery,
                     view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id()),
