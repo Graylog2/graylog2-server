@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import * as Immutable from 'immutable';
 
+import { Row, Col } from 'components/graylog';
 import AppConfig from 'util/AppConfig';
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
@@ -81,10 +82,14 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
             <p className="description">Select an Input profile from the list below then select an then select an Input and click
               on &quot;Load message&quot; to load most recent message received by this input within the last hour.
             </p>
-            <ForwarderInputDropdown onLoadMessage={onClick}
-                                    title={loading ? 'Loading message...' : 'Load Message'}
-                                    preselectedInputId={selectedInputId}
-                                    loadButtonDisabled={loading} />
+            <Row>
+              <Col md={8}>
+                <ForwarderInputDropdown onLoadMessage={onClick}
+                                        title={loading ? 'Loading message...' : 'Load Message'}
+                                        preselectedInputId={selectedInputId}
+                                        loadButtonDisabled={loading} />
+              </Col>
+            </Row>
           </fieldset>
         ) : (
           <fieldset>
