@@ -21,8 +21,7 @@ import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 export type AggregationElement = {
   title: string,
   key: string,
-  isConfigured: (formValues: WidgetConfigFormValues) => boolean,
-  multipleUse: boolean,
+  allowCreate: (formValues: WidgetConfigFormValues) => boolean,
   order: number,
   toConfig?: (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => AggregationWidgetConfig,
   fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,

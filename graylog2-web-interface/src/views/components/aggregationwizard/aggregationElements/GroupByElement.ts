@@ -25,8 +25,7 @@ const GroupByElement: AggregationElement = {
   title: 'Group By',
   key: 'groupBy',
   order: 1,
-  multipleUse: true,
-  isConfigured: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.groupBy),
+  allowCreate: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.groupBy),
   component: GroupByConfiguration,
 };
 

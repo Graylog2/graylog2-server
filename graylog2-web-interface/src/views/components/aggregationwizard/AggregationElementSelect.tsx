@@ -16,14 +16,16 @@
  */
 import * as React from 'react';
 import { useRef } from 'react';
+import { useFormikContext } from 'formik';
 
 import { Select } from 'components/common';
 
 import type { AggregationElement } from './aggregationElements/AggregationElementType';
+import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
-const _getOptions = (aggregationElements: Array<AggregationElement>) => {
+const _getOptions = (aggregationElements: Array<AggregationElement>, formValues: WidgetConfigFormValues) => {
   return aggregationElements.reduce((availableElements, aggregationElement) => {
-    if (aggregationElement.isConfigured && !aggregationElement.multipleUse) {
+    if (aggregationElement.allowCreate(formValues)) {
       return availableElements;
     }
 
@@ -39,8 +41,9 @@ type Props = {
 }
 
 const AggregationElementSelect = ({ aggregationElements, onElementCreate }: Props) => {
+  const { values: formValues } = useFormikContext<WidgetConfigFormValues>();
   const selectRef = useRef(null);
-  const options = _getOptions(aggregationElements);
+  const options = _getOptions(aggregationElements, formValues);
 
   const _onSelect = (elementKey: string) => {
     selectRef.current.clearValue();

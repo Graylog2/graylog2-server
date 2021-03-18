@@ -25,8 +25,7 @@ const VisualizationElement: AggregationElement = {
   title: 'Visualization',
   key: 'visualization',
   order: 4,
-  multipleUse: false,
-  isConfigured: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.visualization),
+  allowCreate: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.visualization),
   component: VisualizationConfiguration,
 };
 
