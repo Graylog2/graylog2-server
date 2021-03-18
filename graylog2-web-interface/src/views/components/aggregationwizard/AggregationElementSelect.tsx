@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useRef } from 'react';
-import { useFormikContext } from 'formik';
 
 import { Select } from 'components/common';
 
@@ -37,11 +36,11 @@ const _getOptions = (aggregationElements: Array<AggregationElement>, formValues:
 
 type Props = {
   aggregationElements: Array<AggregationElement>,
+  formValues: WidgetConfigFormValues,
   onElementCreate: (elementKey: string) => void,
 }
 
-const AggregationElementSelect = ({ aggregationElements, onElementCreate }: Props) => {
-  const { values: formValues } = useFormikContext<WidgetConfigFormValues>();
+const AggregationElementSelect = ({ aggregationElements, onElementCreate, formValues }: Props) => {
   const selectRef = useRef(null);
   const options = _getOptions(aggregationElements, formValues);
 
@@ -55,7 +54,7 @@ const AggregationElementSelect = ({ aggregationElements, onElementCreate }: Prop
             onChange={_onSelect}
             ref={selectRef}
             placeholder="Select an element to add ..."
-            aria-label="Add an Element" />
+            aria-label="Select an element to add ..." />
   );
 };
 
