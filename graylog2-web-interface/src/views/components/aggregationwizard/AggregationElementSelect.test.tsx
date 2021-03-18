@@ -26,8 +26,7 @@ const aggregationElements: Array<AggregationElement> = [
     title: 'Metric',
     key: 'metric',
     order: 1,
-    isConfigured: false,
-    multipleUse: true,
+    allowCreate: () => true,
     onCreate: () => {},
     component: () => <div />,
   },
@@ -35,8 +34,7 @@ const aggregationElements: Array<AggregationElement> = [
     title: 'Sort',
     key: 'sort',
     order: 1,
-    multipleUse: false,
-    isConfigured: true,
+    allowCreate: () => false,
     onCreate: () => {},
     component: () => <div />,
   },
@@ -47,9 +45,10 @@ describe('AggregationElementSelect', () => {
     const onElementCreateMock = jest.fn();
 
     render(<AggregationElementSelect onElementCreate={onElementCreateMock}
+                                     formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
-    const aggregationElementSelect = screen.getByLabelText('Add an Element');
+    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
 
     await selectEvent.openMenu(aggregationElementSelect);
     await selectEvent.select(aggregationElementSelect, 'Metric');
@@ -60,9 +59,10 @@ describe('AggregationElementSelect', () => {
 
   it('should not list already configured aggregation elements which can not be configured multiple times', async () => {
     render(<AggregationElementSelect onElementCreate={() => {}}
+                                     formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
-    const aggregationElementSelect = screen.getByLabelText('Add an Element');
+    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
 
     await selectEvent.openMenu(aggregationElementSelect);
 
