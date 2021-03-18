@@ -30,7 +30,7 @@ const VisualizationConfiguration = () => {
   const visualizationTypeOptions = visualizationTypes.sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
     .map(({ displayName, type }) => ({ label: displayName, value: type }));
 
-  const { values } = useFormikContext<WidgetConfigFormValues>();
+  const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentVisualizationType = visualizationTypes.find((visualizationType) => visualizationType.type === values.visualization.type);
 
   return (
@@ -47,7 +47,10 @@ const VisualizationConfiguration = () => {
                     name={name}
                     value={value}
                     onChange={(newValue) => {
-                      onChange({ target: { name, value: newValue } });
+                      if (newValue !== value) {
+                        setFieldValue('visualization.config', {});
+                        onChange({ target: { name, value: newValue } });
+                      }
                     }} />
           </Input>
         )}
