@@ -16,6 +16,8 @@ const makeOptions = (options: ReadonlyArray<string | [string, any]>) => {
   });
 };
 
+const createEvent = (name: string, value: any) => ({ target: { name, value } }) as React.ChangeEvent<any>;
+
 const SelectField = ({ name, field, title, error, value, onChange }: FieldComponentProps) => {
   if (field.type !== 'select') {
     throw new Error('Invalid field type passed!');
@@ -31,7 +33,7 @@ const SelectField = ({ name, field, title, error, value, onChange }: FieldCompon
               clearable={!field.required}
               name={name}
               value={value}
-              onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+              onChange={(newValue) => onChange(createEvent(name, newValue))} />
     </Input>
   );
 };
