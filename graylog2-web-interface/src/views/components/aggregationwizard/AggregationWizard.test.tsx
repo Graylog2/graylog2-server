@@ -130,6 +130,16 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(screen.getByText('Field is required for function min.')).toBeInTheDocument());
   });
 
+  it('should not require metric field when metric function count', async () => {
+    const config = AggregationWidgetConfig
+      .builder()
+      .series([Series.create('count')])
+      .build();
+    renderSUT({ config });
+
+    await waitFor(() => expect(screen.queryByText('Field is required for function min.')).not.toBeInTheDocument());
+  });
+
   it('should display metric form with values from config', async () => {
     const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('Metric name').build();
     const config = AggregationWidgetConfig
@@ -146,7 +156,7 @@ describe('AggregationWizard', () => {
     expect(screen.getByDisplayValue('max')).toBeInTheDocument();
   });
 
-  it('should update config when changing metric', async () => {
+  it('should update config with updated metric', async () => {
     const onChangeMock = jest.fn();
     const config = AggregationWidgetConfig
       .builder()

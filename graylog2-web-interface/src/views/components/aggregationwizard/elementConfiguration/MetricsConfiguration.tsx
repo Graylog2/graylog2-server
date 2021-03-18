@@ -18,18 +18,12 @@ import * as React from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
 import { Button, ButtonToolbar } from 'components/graylog';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import Metric from './Metric';
 
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
-type Props = {
-  config: AggregationWidgetConfig,
-  onConfigChange: (newConfig: AggregationWidgetConfig) => void
-}
-
-const MetricsConfiguration = ({ config, onConfigChange }: Props) => {
+const MetricsConfiguration = () => {
   const { values } = useFormikContext<WidgetConfigFormValues>();
   const { metrics } = values;
 
