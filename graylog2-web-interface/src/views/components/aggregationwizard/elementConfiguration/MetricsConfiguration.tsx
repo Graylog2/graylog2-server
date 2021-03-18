@@ -40,7 +40,8 @@ const MetricsConfiguration = ({ config, onConfigChange }: Props) => {
                     <>
                       {metrics.map((metric, index) => {
                         return (
-                          <div>
+                          // eslint-disable-next-line react/no-array-index-key
+                          <div key={`metrics-${index}`}>
                             <Metric index={index} />
                           </div>
                         );
