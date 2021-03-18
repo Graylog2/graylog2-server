@@ -264,7 +264,7 @@ public class RawMessage implements Serializable {
     public String toString() {
         final MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this);
         helper.add("id", getId())
-                .add("journalOffset", getJournalOffset())
+                .add("messageQueueId", getMessageQueueId())
                 .add("codec", getCodecName())
                 .add("payloadSize", getPayload().length)
                 .add("timestamp", getTimestamp());
@@ -277,6 +277,11 @@ public class RawMessage implements Serializable {
     public Object getMessageQueueId() {
         return messageQueueId;
     }
+
+    /**
+     * @deprecated use {@link #getMessageQueueId()} instead
+     */
+    @Deprecated
     public long getJournalOffset() {
         if (messageQueueId == null) {
             return Long.MIN_VALUE;
