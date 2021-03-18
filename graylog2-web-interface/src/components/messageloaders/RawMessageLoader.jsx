@@ -51,7 +51,7 @@ type OptionsType = {
 };
 
 type Props = {
-  inputs: Immutable.Map<string, InputType>,
+  inputs?: Immutable.Map<string, InputType>,
   codecTypes: CodecTypes,
   onMessageLoaded: (message: ?Message, option: OptionsType) => void,
   inputIdSelector?: boolean,
