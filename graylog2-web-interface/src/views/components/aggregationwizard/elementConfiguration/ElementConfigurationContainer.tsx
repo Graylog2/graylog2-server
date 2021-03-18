@@ -53,9 +53,9 @@ const Header = styled.div`
   margin-bottom: 5px;
 `;
 
-const ConfigurationWrapper = styled.div`
+const ConfigurationWrapper = styled.div(({ theme }) => css`
   > div {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid ${theme.colors.variant.lighter.default};
     margin-bottom: 5px;
 
     :last-child {
@@ -66,7 +66,7 @@ const ConfigurationWrapper = styled.div`
   .form-group {
     margin-bottom: 5px;
   }
-`;
+`);
 
 type Props = {
   children: React.ReactNode,
