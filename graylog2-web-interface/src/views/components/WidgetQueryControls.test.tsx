@@ -21,12 +21,10 @@ import MockStore from 'helpers/mocking/StoreMock';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
 
 import WidgetQueryControls from './WidgetQueryControls';
-import SearchBarForm from './searchbar/SearchBarForm';
 import WidgetContext from './contexts/WidgetContext';
 
 jest.mock('views/stores/WidgetStore', () => ({
