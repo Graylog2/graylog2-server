@@ -21,8 +21,7 @@ import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import VisualizationConfigurationOptions
-  from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
+import VisualizationConfigurationOptions from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 const VisualizationConfiguration = () => {

@@ -49,8 +49,21 @@ export type ValuesGrouping = {
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
 
+export type AreaVisualizationConfigFormValues = {
+  interpolation: 'linear' | 'step-after' | 'spline';
+};
+
+export type LineVisualizationConfigFormValues = {
+  interpolation: 'linear' | 'step-after' | 'spline';
+};
+
 export type BarVisualizationConfigFormValues = {
   barmode: 'group' | 'stack' | 'relative' | 'overlay',
+};
+
+export type NumberVisualizationConfigFormValues = {
+  trend: boolean,
+  trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER',
 };
 
 export type VisualizationConfigFormValues = {};

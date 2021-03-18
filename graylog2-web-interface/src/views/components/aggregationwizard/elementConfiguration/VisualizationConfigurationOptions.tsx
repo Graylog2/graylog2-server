@@ -1,5 +1,10 @@
 import * as React from 'react';
+import { Field, getIn, useFormikContext } from 'formik';
 import { ConfigurationField } from 'views/types';
+
+import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import BooleanField from 'views/components/aggregationwizard/elementConfiguration/configurationFields/BooleanField';
+import { HoverForHelp } from 'components/common';
 
 import SelectField from './configurationFields/SelectField';
 
@@ -8,13 +13,49 @@ type Props = {
   fields: Array<ConfigurationField>,
 };
 
-const VisualizationConfigurationOptions = ({ name, fields = [] }: Props) => {
-  const configurationFields = fields.map((field) => {
-    switch (field.type) {
-      case 'select': return <SelectField name={name} field={field} />;
-      default: throw new Error(`Invalid configuration field type: ${field.type}`);
-    }
-  });
+const componentForType = (type: string) => {
+  switch (type) {
+    case 'select': return SelectField;
+    case 'boolean': return BooleanField;
+    default: throw new Error(`Invalid configuration field type: ${type}`);
+  }
+};
+
+const titleForField = (field: ConfigurationField) => {
+  const { helpComponent: HelpComponent } = field;
+
+  return HelpComponent
+    ? <>{field.title}<HoverForHelp title={`Help for ${field.title}`}><HelpComponent /></HoverForHelp></>
+    : field.title;
+};
+
+export type FieldComponentProps = {
+  field: ConfigurationField,
+  name: string,
+  title: React.ReactNode,
+  value: any,
+  onChange: (e: React.ChangeEvent<any>) => void,
+  error: string | undefined,
+}
+
+const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Props) => {
+  const { values } = useFormikContext();
+  const visualizationConfig: VisualizationConfigFormValues = getIn(values, namePrefix);
+  const configurationFields = fields
+    .filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
+    .map((field) => {
+      const Component = componentForType(field.type);
+
+      const title = titleForField(field);
+
+      return (
+        <Field name={`${namePrefix}.${field.name}`}>
+          {({ field: { name, value, onChange }, meta: { error } }) => (
+            <Component name={name} value={value} onChange={onChange} error={error} field={field} title={title} />
+          )}
+        </Field>
+      );
+    });
 
   return <>{configurationFields}</>;
 };

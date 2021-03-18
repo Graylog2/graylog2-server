@@ -84,7 +84,12 @@ import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
-import { BarVisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import {
+  AreaVisualizationConfigFormValues,
+  BarVisualizationConfigFormValues,
+  LineVisualizationConfigFormValues, NumberVisualizationConfigFormValues,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
+import { HoverForHelp } from 'components/common';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -304,6 +309,8 @@ const exports: PluginExports = {
       displayName: 'Area Chart',
       component: AreaVisualization,
       config: {
+        fromConfig: (config: AreaVisualizationConfig): AreaVisualizationConfigFormValues => ({ interpolation: config.interpolation }),
+        toConfig: (formValues: AreaVisualizationConfigFormValues): AreaVisualizationConfig => AreaVisualizationConfig.create(formValues.interpolation),
         fields: [
           {
             name: 'interpolation',
@@ -321,7 +328,7 @@ const exports: PluginExports = {
       component: BarVisualization,
       config: {
         fromConfig: (config: BarVisualizationConfig): BarVisualizationConfigFormValues => ({ barmode: config.barmode }),
-        toConfig: (formValues): BarVisualizationConfig => BarVisualizationConfig.create(formValues.barmode),
+        toConfig: (formValues: BarVisualizationConfigFormValues): BarVisualizationConfig => BarVisualizationConfig.create(formValues.barmode),
         fields: [{
           name: 'barmode',
           title: 'Mode',
@@ -367,6 +374,8 @@ const exports: PluginExports = {
       displayName: 'Line Chart',
       component: LineVisualization,
       config: {
+        fromConfig: (config: LineVisualizationConfig): LineVisualizationConfigFormValues => ({ interpolation: config.interpolation }),
+        toConfig: (formValues: LineVisualizationConfigFormValues): LineVisualizationConfig => LineVisualizationConfig.create(formValues.interpolation),
         fields: [
           {
             name: 'interpolation',
@@ -397,6 +406,38 @@ const exports: PluginExports = {
       type: NumberVisualization.type,
       displayName: 'Single Number',
       component: NumberVisualization,
+      config: {
+        fromConfig: (config: NumberVisualizationConfig): NumberVisualizationConfigFormValues => ({ trend: config?.trend, trend_preference: config?.trendPreference }),
+        toConfig: (formValues: NumberVisualizationConfigFormValues) => NumberVisualizationConfig.create(formValues.trend, formValues.trend_preference),
+        fields: [{
+          name: 'trend',
+          title: 'Trend',
+          type: 'boolean',
+          required: true,
+          description: 'Show trend information for this number.',
+          helpComponent: () => (
+            <>
+              <p>
+                If the user enables trending, a separate box is shown below the current value, indicating the direction of the change
+                by an icon as well as the absolute and the relative differences between the current value and the previous one.
+              </p>
+
+              <p>
+                The previous value is calculated by performing two searches in the background, which are completely identical besides
+                the timerange. The timerange of the first search is identical to the one configured for this query/this widget,
+                the second one is the same timerange, but with an offset of the timerange length shifted to the past.
+              </p>
+            </>
+          ),
+        }, {
+          name: 'trend_preference',
+          title: 'Trend Preference',
+          type: 'select',
+          options: [['Lower', 'LOWER'], ['Neutral', 'NEUTRAL'], ['Higher', 'HIGHER']],
+          required: true,
+          isShown: (formValues: NumberVisualizationConfigFormValues) => (formValues?.trend === true),
+        }],
+      },
     },
     {
       type: ScatterVisualization.type,

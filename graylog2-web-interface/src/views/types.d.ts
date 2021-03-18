@@ -30,8 +30,11 @@ import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
 import { OverrideProps } from 'views/components/WidgetOverrideElements';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import { VisualizationConfigDefinition } from 'views/components/aggregationwizard/WidgetConfigForm';
+import {
+  VisualizationConfigDefinition,
+  VisualizationConfigFormValues,
+  WidgetConfigFormValues,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -90,6 +93,8 @@ type BaseField = {
   required: boolean,
   name: string,
   helpComponent?: React.ComponentType,
+  description?: string,
+  isShown?: (formValues: VisualizationConfigFormValues) => boolean,
 };
 
 type SelectField = BaseField & {
@@ -97,7 +102,11 @@ type SelectField = BaseField & {
   options: Array<string | [string, any]>,
 };
 
-type ConfigurationField = SelectField;
+type BooleanField = BaseField & {
+  type: 'boolean',
+};
+
+type ConfigurationField = SelectField | BooleanField;
 
 interface VisualizationType {
   type: string;
