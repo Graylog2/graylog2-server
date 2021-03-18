@@ -59,6 +59,10 @@ const toConfig = (formValues: WidgetConfigFormValues, currentConfig: Aggregation
   .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
   .build();
 
+const hasErrors = (errors: { [key: string]: string }) => Object.values(errors)
+  .filter((value) => value !== undefined)
+  .length > 0;
+
 const validate = (formValues: WidgetConfigFormValues) => {
   const { visualization: { type, config } } = formValues;
 
@@ -71,10 +75,14 @@ const validate = (formValues: WidgetConfigFormValues) => {
   if (visualizationType.config) {
     const { fields } = visualizationType.config;
 
-    return fields.filter(({ required }) => required)
+    const configErrors = fields
+      .filter((field) => 'required' in field && field.required)
+      .filter((field) => !field.isShown || field.isShown(config))
       .filter(({ name }) => config[name] === undefined || config[name] === '')
-      .map(({ name, title }) => ({ [`visualization.config.${name}`]: `${title} is required.` }))
+      .map(({ name, title }) => ({ [name]: `${title} is required.` }))
       .reduce((prev, cur) => ({ ...prev, ...cur }), {});
+
+    return hasErrors(configErrors) ? { visualization: { config: configErrors } } : {};
   }
 
   return {};

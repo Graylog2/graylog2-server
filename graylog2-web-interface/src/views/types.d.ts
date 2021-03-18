@@ -90,14 +90,17 @@ interface VisualizationConfigType {
 
 type BaseField = {
   title: string,
-  required: boolean,
   name: string,
   helpComponent?: React.ComponentType,
   description?: string,
   isShown?: (formValues: VisualizationConfigFormValues) => boolean,
 };
 
-type SelectField = BaseField & {
+type BaseRequiredField = BaseField & {
+  required: boolean,
+};
+
+type SelectField = BaseRequiredField & {
   type: 'select',
   options: ReadonlyArray<string | [string, any]>,
 };
@@ -106,7 +109,7 @@ type BooleanField = BaseField & {
   type: 'boolean',
 };
 
-type NumericField = BaseField & {
+type NumericField = BaseRequiredField & {
   type: 'numeric',
 };
 

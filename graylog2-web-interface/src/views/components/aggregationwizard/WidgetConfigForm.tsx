@@ -101,6 +101,13 @@ export interface WidgetConfigFormValues {
   sort?: SortFormValues,
 }
 
+export interface WidgetConfigValidationErrors {
+  metrics?: Array<{ [key: string]: string }>,
+  groupBy?: Array<{ [key: string]: string }>,
+  visualization?: { [key: string]: string | any },
+  sort?: { [key: string]: string },
+}
+
 type Props = {
   children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode,
   initialValues: WidgetConfigFormValues,

@@ -412,7 +412,6 @@ const exports: PluginExports = {
           name: 'trend',
           title: 'Trend',
           type: 'boolean',
-          required: true,
           description: 'Show trend information for this number.',
           helpComponent: () => (
             <>
@@ -448,11 +447,9 @@ const exports: PluginExports = {
       displayName: 'Heatmap',
       component: HeatmapVisualization,
       config: {
-        fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig): HeatMapVisualizationConfigFormValues => {
-          console.log({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin });
-
-          return ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin });
-        },
+        fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig): HeatMapVisualizationConfigFormValues => ({
+          autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin,
+        }),
         toConfig: ({ autoScale, colorScale, reverseScale, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
           .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
         fields: [{
@@ -465,12 +462,10 @@ const exports: PluginExports = {
           name: 'reverseScale',
           type: 'boolean',
           title: 'Reverse Scale',
-          required: true,
         }, {
           name: 'autoScale',
           type: 'boolean',
           title: 'Auto Scale',
-          required: true,
         }, {
           name: 'zMin',
           type: 'numeric',
@@ -485,7 +480,6 @@ const exports: PluginExports = {
           name: 'useSmallestAsDefault',
           type: 'boolean',
           title: 'Use smallest as default',
-          required: true,
         }, {
           name: 'defaultValue',
           type: 'numeric',
