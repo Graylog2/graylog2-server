@@ -22,7 +22,7 @@ import IconButton from 'components/common/IconButton';
 const Wrapper = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
   border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: 10px;
+  padding: 6px;
   border-radius: 6px;
   margin-bottom: 10px;
 
