@@ -68,6 +68,7 @@ const Metric = ({ index }: Props) => {
                     clearable={false}
                     name={name}
                     value={value}
+                    aria-label="Select a function"
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
                     }} />
@@ -86,6 +87,7 @@ const Metric = ({ index }: Props) => {
                     clearable={!isFieldRequired}
                     name={name}
                     value={value}
+                    aria-label="Select a field"
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
           </Input>
         )}
@@ -102,6 +104,7 @@ const Metric = ({ index }: Props) => {
                       clearable={false}
                       name={name}
                       value={value}
+                      aria-label="Select percentile"
                       onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
             </Input>
           )}

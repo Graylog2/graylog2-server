@@ -72,7 +72,7 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
     .build());
 
 const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
-  const { type: func, field, percentile } = parseSeries(s.function);
+  const { type: func, field, percentile } = parseSeries(s.function) ?? {};
 
   const metric = {
     function: func,
