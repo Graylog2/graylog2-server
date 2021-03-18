@@ -294,6 +294,7 @@ class Select extends React.Component<Props, State> {
      */
     value: PropTypes.oneOfType([
       PropTypes.string,
+      PropTypes.number,
       PropTypes.object,
       PropTypes.arrayOf(PropTypes.object),
     ]),
