@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.map.config;
+package org.graylog2.plugin.buffers;
 
-public enum DatabaseType {
-    MAXMIND_ASN, MAXMIND_CITY, MAXMIND_COUNTRY, IPINFO_STANDARD_LOCATION, IPINFO_ASN
+public interface EventBuffer {
+    long getUsage();
+
+    default boolean isEmpty() {
+        return getUsage() == 0;
+    }
 }

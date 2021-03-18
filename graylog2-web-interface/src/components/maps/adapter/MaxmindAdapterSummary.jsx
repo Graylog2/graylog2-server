@@ -30,6 +30,8 @@ class MaxmindAdapterSummary extends React.Component {
       MAXMIND_ASN: 'ASN database',
       MAXMIND_CITY: 'City database',
       MAXMIND_COUNTRY: 'Country database',
+      IPINFO_STANDARD_LOCATION: 'IPinfo location database',
+      IPINFO_ASN: 'IPinfo ASN database',
     };
 
     return (
