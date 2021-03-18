@@ -53,7 +53,7 @@ type OptionsType = {
 type Props = {
   inputs: Immutable.Map<string, InputType>,
   codecTypes: CodecTypes,
-  onMessageLoaded: (message: ?Message, option: OptionsType) => Promise<void>,
+  onMessageLoaded: (message: ?Message, option: OptionsType) => void,
   inputIdSelector?: boolean,
 };
 
@@ -213,17 +213,15 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
 
   const _getInputIdSelector = () => {
     if (inputIdSelector) {
-      return (isCloud && ForwarderInputDropdown)
+      return (ForwarderInputDropdown)
         ? (
           <fieldset>
             <legend>Input selection (optional)</legend>
-
             <ForwarderInputDropdown onLoadMessage={_onInputSelect}
-                                    rawMessageLoader />
-            <p className="description">Select a Forwarder from the list below then select an then select an Input.</p>
+                                    autoLoadMessage />
+            <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
           </fieldset>
-        )
-        : (
+        ) : (
           <Input id="input"
                  name="input"
                  label={<span>Message input <small>(optional)</small></span>}
@@ -314,5 +312,5 @@ RawMessageLoader.defaultProps = {
 export default connect(
   RawMessageLoader,
   { inputs: InputsStore, codecTypes: CodecTypesStore },
-  ({ inputs: { inputs }, codecTypes: { codecTypes } }) => ({ inputs, codecTypes }),
+  ({ inputs: { inputs }, codecTypes: { codecTypes } }) => ({ inputs: (inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined), codecTypes }),
 );

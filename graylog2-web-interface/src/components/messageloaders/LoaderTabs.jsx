@@ -123,15 +123,12 @@ class LoaderTabs extends React.Component {
 
     if (this._isTabVisible('recent')) {
       const { inputs, selectedInputId } = this.props;
-      const recentLoader = (
-        <RecentMessageLoader inputs={inputs}
-                             selectedInputId={selectedInputId}
-                             onMessageLoaded={this.onMessageLoaded} />
-      );
 
       messageLoaders.push(
         <Tab key="recent" eventKey={this.TAB_KEYS.recent} title="Recent Message" style={{ marginBottom: 10 }}>
-          {recentLoader}
+          <RecentMessageLoader inputs={inputs}
+                               selectedInputId={selectedInputId}
+                               onMessageLoaded={this.onMessageLoaded} />
         </Tab>,
       );
     }
@@ -142,8 +139,10 @@ class LoaderTabs extends React.Component {
           <div style={{ marginTop: 5, marginBottom: 15 }}>
             Please provide the id and index of the message that you want to load in this form:
           </div>
-
-          <MessageLoader ref={(messageLoader) => { this.messageLoader = messageLoader; }} onMessageLoaded={this.onMessageLoaded} hidden={false} hideText />
+          <MessageLoader ref={(messageLoader) => { this.messageLoader = messageLoader; }}
+                         onMessageLoaded={this.onMessageLoaded}
+                         hidden={false}
+                         hideText />
         </Tab>,
       );
     }
