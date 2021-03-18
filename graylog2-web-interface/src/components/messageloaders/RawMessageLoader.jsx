@@ -300,7 +300,7 @@ RawMessageLoader.propTypes = {
   onMessageLoaded: PropTypes.func.isRequired,
   inputIdSelector: PropTypes.bool,
   codecTypes: PropTypes.object,
-  inputs: PropTypes.arrayOf(PropTypes.object),
+  inputs: PropTypes.object,
 };
 
 RawMessageLoader.defaultProps = {
