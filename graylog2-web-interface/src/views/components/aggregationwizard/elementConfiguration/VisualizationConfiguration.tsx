@@ -15,12 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { defaultCompare } from 'views/logic/DefaultCompare';
+import VisualizationConfigurationOptions
+  from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 const VisualizationConfiguration = () => {
   const visualizationTypes = usePluginEntities('visualizationTypes');
@@ -28,8 +31,11 @@ const VisualizationConfiguration = () => {
   const visualizationTypeOptions = visualizationTypes.sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
     .map(({ displayName, type }) => ({ label: displayName, value: type }));
 
+  const { values } = useFormikContext<WidgetConfigFormValues>();
+  const currentVisualizationType = visualizationTypes.find((visualizationType) => visualizationType.type === values.visualization.type);
+
   return (
-    <>
+    <div>
       <Field name="visualization.type">
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="visualization-type-select"
@@ -47,7 +53,8 @@ const VisualizationConfiguration = () => {
           </Input>
         )}
       </Field>
-    </>
+      <VisualizationConfigurationOptions name="visualization.config" fields={currentVisualizationType.config?.fields ?? []} />
+    </div>
   );
 };
 

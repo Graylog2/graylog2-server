@@ -84,6 +84,7 @@ import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
+import { BarVisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -302,16 +303,80 @@ const exports: PluginExports = {
       type: AreaVisualization.type,
       displayName: 'Area Chart',
       component: AreaVisualization,
+      config: {
+        fields: [
+          {
+            name: 'interpolation',
+            title: 'Interpolation',
+            type: 'select',
+            options: ['linear', 'step-after', 'spline'],
+            required: true,
+          },
+        ],
+      },
     },
     {
       type: BarVisualization.type,
       displayName: 'Bar Chart',
       component: BarVisualization,
+      config: {
+        fromConfig: (config: BarVisualizationConfig): BarVisualizationConfigFormValues => ({ barmode: config.barmode }),
+        toConfig: (formValues): BarVisualizationConfig => BarVisualizationConfig.create(formValues.barmode),
+        fields: [{
+          name: 'barmode',
+          title: 'Mode',
+          type: 'select',
+          options: [['Group', 'group'], ['Stack', 'stack'], ['Relative', 'relative'], ['Overlay', 'overlay']],
+          required: true,
+          helpComponent: () => {
+            const options = {
+              group: {
+                label: 'Group',
+                help: 'Every series is represented by its own bar in the chart.',
+              },
+              stack: {
+                label: 'Stack',
+                help: 'All series are stacked upon each other resulting in one bar.',
+              },
+              relative: {
+                label: 'Relative',
+                help: 'All series are stacked upon each other resulting in one chart. But negative series are placed below zero.',
+              },
+              overlay: {
+                label: 'Overlay',
+                help: 'All series are placed as bars upon each other. To be able to see the bars the opacity is reduced to 75%.'
+                  + ' It is recommended to use this option with not more than 3 series.',
+              },
+            };
+
+            return (
+              <ul>
+                {Object.values(options).map(({ label, help }) => (
+                  <li key={label}><h4>{label}</h4>
+                    {help}
+                  </li>
+                ))}
+              </ul>
+            );
+          },
+        }],
+      },
     },
     {
       type: LineVisualization.type,
       displayName: 'Line Chart',
       component: LineVisualization,
+      config: {
+        fields: [
+          {
+            name: 'interpolation',
+            title: 'Interpolation',
+            type: 'select',
+            options: ['linear', 'step-after', 'spline'],
+            required: true,
+          },
+        ],
+      },
     },
     {
       type: WorldMapVisualization.type,

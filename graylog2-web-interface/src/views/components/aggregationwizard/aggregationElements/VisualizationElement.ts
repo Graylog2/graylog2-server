@@ -15,13 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty } from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import type { AggregationElement } from './AggregationElementType';
 
 import VisualizationConfiguration from '../elementConfiguration/VisualizationConfiguration';
 import { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
-const formValuesToVisualizationConfig = (config: VisualizationConfigFormValues) => undefined;
+const formValuesToVisualizationConfig = (visualizationType: string, formValues: VisualizationConfigFormValues) => {
+  const visualizationTypeDefinition = PluginStore.exports('visualizationTypes').find(({ type }) => (type === visualizationType));
+
+  if (!visualizationTypeDefinition) {
+    throw new Error(`Invalid visualization type: ${visualizationType}`);
+  }
+
+  const { config: { toConfig } } = visualizationTypeDefinition;
+
+  return toConfig(formValues);
+};
+
+const fromConfig = (config: AggregationWidgetConfig) => ({ visualization: { type: config.visualization } });
+const toConfig = (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => currentConfig
+  .toBuilder()
+  .visualization(formValues.visualization.type)
+  .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
+  .build();
 
 const VisualizationElement: AggregationElement = {
   title: 'Visualization',
@@ -29,12 +49,8 @@ const VisualizationElement: AggregationElement = {
   order: 4,
   allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.visualization),
   component: VisualizationConfiguration,
-  fromConfig: (config) => ({ visualization: { type: config.visualization } }),
-  toConfig: (formValues, currentConfig) => currentConfig
-    .toBuilder()
-    .visualization(formValues.visualization.type)
-    .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization?.config))
-    .build(),
+  fromConfig,
+  toConfig,
 };
 
 export default VisualizationElement;

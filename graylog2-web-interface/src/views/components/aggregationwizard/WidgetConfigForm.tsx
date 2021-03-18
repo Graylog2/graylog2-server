@@ -16,6 +16,9 @@
  */
 import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
+import { ConfigurationField } from 'views/types';
+
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 
@@ -46,10 +49,21 @@ export type ValuesGrouping = {
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
 
+export type BarVisualizationConfigFormValues = {
+  barmode: 'group' | 'stack' | 'relative' | 'overlay',
+};
+
 export type VisualizationConfigFormValues = {};
+
 export type VisualizationFormValues = {
   type: string,
   config?: VisualizationConfigFormValues,
+};
+
+export type VisualizationConfigDefinition = {
+  fromConfig: (config: VisualizationConfig) => VisualizationConfigFormValues,
+  toConfig: (formValues: VisualizationConfigFormValues) => VisualizationConfig,
+  fields: Array<ConfigurationField>,
 };
 
 export type SortFormValues = {}

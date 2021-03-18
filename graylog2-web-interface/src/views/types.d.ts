@@ -30,6 +30,8 @@ import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
 import { OverrideProps } from 'views/components/WidgetOverrideElements';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import { VisualizationConfigDefinition } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -83,10 +85,25 @@ interface VisualizationConfigType {
   component: React.ComponentType<VisualizationConfigProps>;
 }
 
+type BaseField = {
+  title: string,
+  required: boolean,
+  name: string,
+  helpComponent?: React.ComponentType,
+};
+
+type SelectField = BaseField & {
+  type: 'select',
+  options: Array<string | [string, any]>,
+};
+
+type ConfigurationField = SelectField;
+
 interface VisualizationType {
   type: string;
   displayName: string;
   component: VisualizationComponent;
+  config?: VisualizationConfigDefinition;
 }
 
 interface ResultHandler<T, R> {
