@@ -4,7 +4,7 @@ updates:
   directory: "/"
   schedule:
     interval: daily
-    time: "01:00"
+    time: "02:00"
     timezone: "Europe/Berlin"
   open-pull-requests-limit: 10
   labels:
@@ -12,7 +12,7 @@ updates:
 - package-ecosystem: npm
   directory: "/graylog2-web-interface/packages/graylog-web-plugin"
   schedule:
-    time: "01:00"
+    time: "02:00"
     timezone: "Europe/Berlin"
   open-pull-requests-limit: 10
   labels:
@@ -25,7 +25,7 @@ updates:
 - package-ecosystem: npm
   directory: "/graylog2-web-interface"
   schedule:
-    time: "01:00"
+    time: "02:00"
     timezone: "Europe/Berlin"
   open-pull-requests-limit: 10
   labels:
@@ -38,7 +38,7 @@ updates:
 - package-ecosystem: npm
   directory: "/graylog2-web-interface/packages/eslint-config-graylog"
   schedule:
-    time: "01:00"
+    time: "02:00"
     timezone: "Europe/Berlin"
   open-pull-requests-limit: 10
   labels:
@@ -46,7 +46,7 @@ updates:
 - package-ecosystem: npm
   directory: "/graylog2-web-interface/packages/jest-preset-graylog"
   schedule:
-    time: "01:00"
+    time: "02:00"
     timezone: "Europe/Berlin"
   open-pull-requests-limit: 10
   labels:
