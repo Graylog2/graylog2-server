@@ -18,11 +18,17 @@ import * as React from 'react';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
+import { Checkbox } from 'components/graylog';
 import Select from 'components/common/Select';
 import usePluginEntities from 'views/logic/usePluginEntities';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import VisualizationConfigurationOptions from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import { TIMESTAMP_FIELD } from 'views/Constants';
+
+const isTimeline = (values: WidgetConfigFormValues) => {
+  return values.groupBy?.length > 0 && values.groupBy?.find((pivot) => pivot.type === 'row')?.field === TIMESTAMP_FIELD;
+};
 
 const VisualizationConfiguration = () => {
   const visualizationTypes = usePluginEntities('visualizationTypes');
@@ -32,6 +38,8 @@ const VisualizationConfiguration = () => {
 
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentVisualizationType = visualizationTypes.find((visualizationType) => visualizationType.type === values.visualization.type);
+
+  const isTimelineChart = isTimeline(values);
 
   return (
     <div>
@@ -55,6 +63,20 @@ const VisualizationConfiguration = () => {
           </Input>
         )}
       </Field>
+      {isTimelineChart && (
+        <Field name="visualization.eventAnnotation">
+          {({ field: { name, value, onChange }, meta: { error } }) => (
+            <Input id={`${name}-input`}
+                   label="Show Event annotations"
+                   error={error}
+                   labelClassName="col-sm-11"
+                   wrapperClassName="col-sm-1">
+              <Checkbox id={`${name}-input`} name={name} onChange={onChange} checked={value} />
+            </Input>
+          )}
+        </Field>
+
+      )}
       <VisualizationConfigurationOptions name="visualization.config" fields={currentVisualizationType.config?.fields ?? []} />
     </div>
   );

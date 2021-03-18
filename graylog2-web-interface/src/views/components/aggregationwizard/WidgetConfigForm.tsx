@@ -82,6 +82,7 @@ export type VisualizationConfigFormValues = {};
 export type VisualizationFormValues = {
   type: string,
   config?: VisualizationConfigFormValues,
+  eventAnnotation?: boolean,
 };
 
 export type VisualizationConfigDefinition = {

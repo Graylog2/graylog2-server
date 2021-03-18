@@ -51,12 +51,14 @@ const fromConfig = (config: AggregationWidgetConfig) => ({
   visualization: {
     type: config.visualization,
     config: visualizationConfigToFormValues(config.visualization, config.visualizationConfig),
+    eventAnnotation: config.eventAnnotation,
   },
 });
 const toConfig = (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => currentConfig
   .toBuilder()
   .visualization(formValues.visualization.type)
   .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
+  .eventAnnotation(formValues.visualization.eventAnnotation)
   .build();
 
 const hasErrors = (errors: { [key: string]: string }) => Object.values(errors)
