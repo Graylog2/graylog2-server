@@ -75,7 +75,7 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
 
   return (
     <div style={{ marginTop: 5 }}>
-      {(isCloud && ForwarderInputDropdown)
+      {(ForwarderInputDropdown)
         ? (
           <fieldset>
             <p className="description">Select a Forwarder from the list below then select an then select an Input and click
@@ -84,10 +84,9 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
             <ForwarderInputDropdown onLoadMessage={onClick}
                                     title={loading ? 'Loading message...' : 'Load Message'}
                                     preselectedInputId={selectedInputId}
-                                    disabled={loading} />
+                                    loadButtonDisabled={loading} />
           </fieldset>
-        )
-        : (
+        ) : (
           <fieldset>
             {helpMessage}
             <InputDropdown inputs={inputs}
