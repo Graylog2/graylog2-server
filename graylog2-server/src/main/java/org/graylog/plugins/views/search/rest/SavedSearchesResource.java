@@ -22,7 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
@@ -51,25 +52,25 @@ public class SavedSearchesResource extends RestResource {
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
             .build();
 
-    private final ViewService dbService;
+    private final ViewSummaryService dbService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
-    public SavedSearchesResource(ViewService dbService) {
+    public SavedSearchesResource(ViewSummaryService dbService) {
         this.dbService = dbService;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
     @GET
     @ApiOperation("Get a list of all searches")
-    public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                            @ApiParam(name = "sort",
+    public PaginatedResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                   @ApiParam(name = "sort",
                                                       value = "The field to sort the result on",
                                                       required = true,
                                                       allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
-                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                            @ApiParam(name = "query") @QueryParam("query") String query) {
+                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
+                                                   @ApiParam(name = "query") @QueryParam("query") String query) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -77,7 +78,7 @@ public class SavedSearchesResource extends RestResource {
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
-            final PaginatedList<ViewDTO> result = dbService.searchPaginatedByType(
+            final PaginatedList<ViewSummaryDTO> result = dbService.searchPaginatedByType(
                     ViewDTO.Type.SEARCH,
                     searchQuery,
                     view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id()),

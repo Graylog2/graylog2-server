@@ -22,9 +22,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.search.views.SummaryViewDTO;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
@@ -42,9 +42,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import static java.util.Locale.ENGLISH;
 
 @RequiresAuthentication
@@ -57,11 +54,11 @@ public class DashboardsResource extends RestResource {
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
             .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
             .build();
-    private final ViewService dbService;
+    private final ViewSummaryService dbService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
-    public DashboardsResource(ViewService dbService) {
+    public DashboardsResource(ViewSummaryService dbService) {
         this.dbService = dbService;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -69,7 +66,7 @@ public class DashboardsResource extends RestResource {
     @GET
     @ApiOperation("Get a list of all dashboards")
     @Timed
-    public PaginatedResponse<SummaryViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PaginatedResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                    @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                    @ApiParam(name = "sort",
                                                       value = "The field to sort the result on",
@@ -84,7 +81,7 @@ public class DashboardsResource extends RestResource {
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
-            final PaginatedList<ViewDTO> viewsList = dbService.searchPaginatedByType(
+            final PaginatedList<ViewSummaryDTO> result = dbService.searchPaginatedByType(
                     ViewDTO.Type.DASHBOARD,
                     searchQuery,
                     view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
@@ -93,11 +90,6 @@ public class DashboardsResource extends RestResource {
                     sortField,
                     page,
                     perPage);
-
-            final PaginatedList<SummaryViewDTO> result = viewsList.stream()
-                    .collect(Collectors.toCollection(() -> viewsList.grandTotal()
-                            .map(grandTotal -> new PaginatedList<SummaryViewDTO>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage, grandTotal))
-                            .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
 
             return PaginatedResponse.create("views", result, query);
         } catch (IllegalArgumentException e) {
