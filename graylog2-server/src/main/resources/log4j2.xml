@@ -22,6 +22,7 @@
         <Logger name="org.graylog.shaded.kafka09.log.Log" level="warn"/>
         <Logger name="org.graylog.shaded.kafka09.log.OffsetIndex" level="warn"/>
         <Logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="warn"/>
+        <Logger name="org.apache.kafka.clients.producer.ProducerConfig" level="warn"/>
         <!-- Silence useless session validation messages -->
         <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
         <Root level="warn">

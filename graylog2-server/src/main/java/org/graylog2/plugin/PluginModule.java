@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.util.concurrent.Service;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
@@ -59,11 +60,15 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.shared.messageq.MessageQueueReader;
+import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.graylog2.web.PluginUISettingsProvider;
 
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public abstract class PluginModule extends Graylog2Module {
     public Set<? extends PluginConfigBean> getConfigBeans() {
@@ -318,9 +323,9 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addAuthServiceBackend(String name,
-            Class<? extends AuthServiceBackend> backendClass,
-            Class<? extends AuthServiceBackend.Factory<? extends AuthServiceBackend>> factoryClass,
-            Class<? extends AuthServiceBackendConfig> configClass) {
+                                         Class<? extends AuthServiceBackend> backendClass,
+                                         Class<? extends AuthServiceBackend.Factory<? extends AuthServiceBackend>> factoryClass,
+                                         Class<? extends AuthServiceBackendConfig> configClass) {
         install(new FactoryModuleBuilder().implement(AuthServiceBackend.class, backendClass).build(factoryClass));
         authServiceBackendBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(configClass, name);
@@ -345,5 +350,28 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addExportFormat(ExportFormat exportFormat) {
         exportFormatBinder().addBinding().toInstance(exportFormat);
+    }
+
+    /**
+     * Bind a message queue implementation. If any of the given classes implements the {@link Service} interface, it
+     * will also be registered with the {@link #serviceBinder()}.
+     *
+     * @param readerClass       Reader implementation
+     * @param writerClass       Writer implementation
+     * @param acknowledgerClass Acknowledger implementation
+     */
+    protected void bindMessageQueueImplementation(Class<? extends MessageQueueReader> readerClass,
+                                                  Class<? extends MessageQueueWriter> writerClass,
+                                                  Class<? extends MessageQueueAcknowledger> acknowledgerClass) {
+
+        bind(MessageQueueReader.class).to(readerClass).in(Scopes.SINGLETON);
+        bind(MessageQueueWriter.class).to(writerClass).in(Scopes.SINGLETON);
+        bind(MessageQueueAcknowledger.class).to(acknowledgerClass).in(Scopes.SINGLETON);
+
+        //noinspection unchecked
+        Stream.of(readerClass, writerClass, acknowledgerClass)
+                .filter(Service.class::isAssignableFrom)
+                .forEach(service ->
+                        serviceBinder().addBinding().to((Class<? extends Service>) service).in(Scopes.SINGLETON));
     }
 }

@@ -106,7 +106,7 @@ public class JournalDecode extends AbstractJournalCommand {
                         "Could not use codec {} to decode raw message id {} at offset {}",
                         new Object[]{raw.getCodecName(), raw.getId(), entry.getOffset()}));
             } else {
-                message.setJournalOffset(raw.getJournalOffset());
+                message.setMessageQueueId(raw.getMessageQueueId());
             }
 
             final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
@@ -116,7 +116,7 @@ public class JournalDecode extends AbstractJournalCommand {
             sb.append("Message ").append(raw.getId()).append('\n')
                     .append(" at ").append(raw.getTimestamp()).append('\n')
                     .append(" in format ").append(raw.getCodecName()).append('\n')
-                    .append(" at offset ").append(raw.getJournalOffset()).append('\n')
+                    .append(" at offset ").append(raw.getMessageQueueId()).append('\n')
                     .append(" received from remote address ").append(remote).append('\n')
                     .append(" (source field: ").append(message == null ? "unparsed" : message.getSource()).append(')').append('\n');
             if (message != null) {
