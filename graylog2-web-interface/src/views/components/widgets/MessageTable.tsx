@@ -36,13 +36,6 @@ import { SOURCE_FIELD } from 'views/Constants';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 import InteractiveContext from '../contexts/InteractiveContext';
 
-const TableWrapper = styled.div`
-  grid-row: 1;
-  -ms-grid-row: 1;
-  grid-column: 1;
-  -ms-grid-column: 1;
-`;
-
 const Table = styled.table(({ theme }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
@@ -140,6 +133,19 @@ const Table = styled.table(({ theme }) => css`
       left: 0;
       padding: 5px;
       position: static;
+    }
+  }
+`);
+
+const TableWrapper = styled.div(({ theme }) => css`
+  grid-row: 1;
+  -ms-grid-row: 1;
+  grid-column: 1;
+  -ms-grid-column: 1;
+
+  @media screen and (max-width: ${theme.breakpoints.max.md}) {
+    &.table-responsive {
+      overflow-y: auto;
     }
   }
 `);

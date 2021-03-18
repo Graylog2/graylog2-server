@@ -31,6 +31,7 @@ import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
 type Props = {
   data: WidgetDataMap,
+  editing: boolean,
   errors: WidgetErrorsMap,
   fields: Immutable.List<TFieldTypeMapping>,
   onPositionsChange: (position?: WidgetPosition) => void,
@@ -43,6 +44,7 @@ type Props = {
 
 const WidgetComponent = ({
   data,
+  editing,
   errors,
   fields,
   onPositionsChange = () => undefined,
@@ -61,17 +63,18 @@ const WidgetComponent = ({
       <WidgetContext.Provider value={widget}>
         <AdditionalContext.Provider value={{ widget }}>
           <ExportSettingsContextProvider>
-            <Widget id={widget.id}
-                    widget={widget}
-                    data={widgetData}
+            <Widget data={widgetData}
+                    editing={editing}
                     errors={widgetErrors}
-                    height={height}
-                    position={position}
-                    width={width}
                     fields={fields}
+                    height={height}
+                    id={widget.id}
                     onPositionsChange={onPositionsChange}
                     onSizeChange={onWidgetSizeChange}
-                    title={title} />
+                    position={position}
+                    title={title}
+                    widget={widget}
+                    width={width} />
           </ExportSettingsContextProvider>
         </AdditionalContext.Provider>
       </WidgetContext.Provider>
@@ -80,15 +83,16 @@ const WidgetComponent = ({
 };
 
 WidgetComponent.propTypes = {
-  widget: PropTypes.object.isRequired,
   data: PropTypes.object.isRequired,
+  editing: PropTypes.bool.isRequired,
   errors: PropTypes.object.isRequired,
-  widgetDimension: PropTypes.object.isRequired,
-  title: PropTypes.string.isRequired,
-  position: PropTypes.object.isRequired,
-  onPositionsChange: PropTypes.func,
   fields: PropTypes.object.isRequired,
+  onPositionsChange: PropTypes.func,
   onWidgetSizeChange: PropTypes.func,
+  position: PropTypes.object.isRequired,
+  title: PropTypes.string.isRequired,
+  widget: PropTypes.object.isRequired,
+  widgetDimension: PropTypes.object.isRequired,
 };
 
 WidgetComponent.defaultProps = {

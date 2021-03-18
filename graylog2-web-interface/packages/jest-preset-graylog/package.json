@@ -21,7 +21,7 @@
     "@testing-library/jest-dom": "5.11.9",
     "@testing-library/react": "11.2.5",
     "@types/enzyme": "3.10.8",
-    "@types/jest": "26.0.20",
+    "@types/jest": "26.0.21",
     "babel-jest": "^26.6.3",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
@@ -35,10 +35,10 @@
     "react-select-event": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.0",
-    "@babel/core": "^7.8.7",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/preset-env": "7.12.1",
+    "@babel/cli": "7.13.10",
+    "@babel/core": "7.13.10",
+    "@babel/plugin-proposal-class-properties": "7.13.0",
+    "@babel/preset-env": "7.13.10",
     "babel-plugin-add-module-exports": "^1.0.2"
   }
 }
