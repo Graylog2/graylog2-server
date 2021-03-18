@@ -17,14 +17,17 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
+import MockStore from 'helpers/mocking/StoreMock';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
+import Widget from 'views/logic/widgets/Widget';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import SearchBarForm from './searchbar/SearchBarForm';
+import WidgetContext from './contexts/WidgetContext';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -42,7 +45,15 @@ jest.mock('views/actions/SearchActions', () => ({
   refresh: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('stores/connect', () => (x) => x);
+jest.mock('stores/connect', () => {
+  const originalModule = jest.requireActual('stores/connect');
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: (x) => x,
+  };
+});
 
 jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');
@@ -51,6 +62,15 @@ jest.mock('moment', () => {
 });
 
 jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Input</span>);
+
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore(['getInitialState', () => ({
+    searchesClusterConfig: {
+      relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
+      query_time_range_limit: 'PT0S',
+    },
+  })]),
+}));
 
 describe('WidgetQueryControls', () => {
   beforeEach(() => { jest.clearAllMocks(); });
@@ -67,15 +87,17 @@ describe('WidgetQueryControls', () => {
 
   const emptyGlobalOverride = {};
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
+  const widget = Widget.builder()
+    .id('deadbeef')
+    .type('dummy')
+    .config({})
+    .build();
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <WrappingContainer>
-      <SearchBarForm initialValues={{ timerange: DEFAULT_TIMERANGE, queryString: '', streams: [] }}
-                     limitDuration={0}
-                     onSubmit={() => {}}
-                     validateOnMount={false}>
+      <WidgetContext.Provider value={widget}>
         {children}
-      </SearchBarForm>
+      </WidgetContext.Provider>
     </WrappingContainer>
   );
 
