@@ -95,10 +95,10 @@ const MetricElement: AggregationElement = {
   key: 'metrics',
   order: 2,
   allowCreate: () => true,
-  fromConfig: (providedConfig: AggregationWidgetConfig) => ({
-    metrics: seriesToMetrics(providedConfig.series),
+  fromConfig: (config: AggregationWidgetConfig) => ({
+    metrics: seriesToMetrics(config.series),
   }),
-  toConfig: (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => currentConfig
+  toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => config
     .toBuilder()
     .series(metricsToSeries(formValues.metrics))
     .build(),

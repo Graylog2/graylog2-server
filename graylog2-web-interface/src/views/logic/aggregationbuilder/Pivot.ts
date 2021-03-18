@@ -15,7 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-type ConfigType = { [key: string]: unknown };
+export type DatePivotConfig = {
+  interval: {
+    type: 'auto',
+    scaling: number
+  } | {
+    type: 'timeunit',
+    value: number,
+    unit: string
+  }
+}
+
+export type ValuesPivotConfig = {
+  limit: number
+}
+
+type ConfigType = DatePivotConfig | ValuesPivotConfig;
 
 export const DateType = 'time';
 export const ValuesType = 'values';
