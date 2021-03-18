@@ -4,7 +4,7 @@ import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 
-const makeOptions = (options: Array<string | [string, any]>) => {
+const makeOptions = (options: ReadonlyArray<string | [string, any]>) => {
   return options.map((option) => {
     if (typeof option === 'string') {
       return { label: option, value: option };
