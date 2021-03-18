@@ -44,46 +44,36 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
 public abstract class ViewSummaryDTO implements ContentPackable<ViewEntity.Builder> {
-
-    public static final String FIELD_ID = "id";
-    public static final String FIELD_TYPE = "type";
-    public static final String FIELD_TITLE = "title";
-    public static final String FIELD_SUMMARY = "summary";
-    public static final String FIELD_DESCRIPTION = "description";
-    public static final String FIELD_SEARCH_ID = "search_id";
-    public static final String FIELD_CREATED_AT = "created_at";
-    public static final String FIELD_OWNER = "owner";
-
-    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
+    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(ViewDTO.FIELD_ID, ViewDTO.FIELD_TITLE, ViewDTO.FIELD_CREATED_AT);
 
     @ObjectId
     @Id
     @Nullable
-    @JsonProperty(FIELD_ID)
+    @JsonProperty(ViewDTO.FIELD_ID)
     public abstract String id();
 
-    @JsonProperty(FIELD_TYPE)
+    @JsonProperty(ViewDTO.FIELD_TYPE)
     public abstract ViewDTO.Type type();
 
-    @JsonProperty(FIELD_TITLE)
+    @JsonProperty(ViewDTO.FIELD_TITLE)
     @NotBlank
     public abstract String title();
 
     // A short, one sentence description of the view
-    @JsonProperty(FIELD_SUMMARY)
+    @JsonProperty(ViewDTO.FIELD_SUMMARY)
     public abstract String summary();
 
     // A longer description of the view, probably including markup text
-    @JsonProperty(FIELD_DESCRIPTION)
+    @JsonProperty(ViewDTO.FIELD_DESCRIPTION)
     public abstract String description();
 
-    @JsonProperty(FIELD_SEARCH_ID)
+    @JsonProperty(ViewDTO.FIELD_SEARCH_ID)
     public abstract String searchId();
 
-    @JsonProperty(FIELD_OWNER)
+    @JsonProperty(ViewDTO.FIELD_OWNER)
     public abstract Optional<String> owner();
 
-    @JsonProperty(FIELD_CREATED_AT)
+    @JsonProperty(ViewDTO.FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
     public static Builder builder() {
@@ -101,28 +91,28 @@ public abstract class ViewSummaryDTO implements ContentPackable<ViewEntity.Build
     public static abstract class Builder {
         @ObjectId
         @Id
-        @JsonProperty(FIELD_ID)
+        @JsonProperty(ViewDTO.FIELD_ID)
         public abstract Builder id(String id);
 
-        @JsonProperty(FIELD_TYPE)
+        @JsonProperty(ViewDTO.FIELD_TYPE)
         public abstract Builder type(ViewDTO.Type type);
 
-        @JsonProperty(FIELD_TITLE)
+        @JsonProperty(ViewDTO.FIELD_TITLE)
         public abstract Builder title(String title);
 
-        @JsonProperty(FIELD_SUMMARY)
+        @JsonProperty(ViewDTO.FIELD_SUMMARY)
         public abstract Builder summary(String summary);
 
-        @JsonProperty(FIELD_DESCRIPTION)
+        @JsonProperty(ViewDTO.FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
-        @JsonProperty(FIELD_SEARCH_ID)
+        @JsonProperty(ViewDTO.FIELD_SEARCH_ID)
         public abstract Builder searchId(String searchId);
 
-        @JsonProperty(FIELD_OWNER)
+        @JsonProperty(ViewDTO.FIELD_OWNER)
         public abstract Builder owner(@Nullable String owner);
 
-        @JsonProperty(FIELD_CREATED_AT)
+        @JsonProperty(ViewDTO.FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
         @JsonCreator
