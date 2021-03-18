@@ -60,7 +60,7 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   });
 };
 
-const WorldMapVisualization: VisualizationComponent = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
+const WorldMapVisualization = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
   const hasMetric = !isEmpty(config.series);

@@ -79,7 +79,7 @@ type Layout = {
   barmode?: string;
 };
 
-const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const BarVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const visualizationConfig = config.visualizationConfig as BarVisualizationConfig;
   const layout: Layout = {};
 

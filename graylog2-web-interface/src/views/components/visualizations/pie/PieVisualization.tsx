@@ -84,7 +84,7 @@ const labelMapper = (data: Array<{ labels: Array<string>}>) => data.reduce((acc,
   return union(acc, labels);
 }, []);
 
-const PieVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const transformedData = chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries);
 
   return (
