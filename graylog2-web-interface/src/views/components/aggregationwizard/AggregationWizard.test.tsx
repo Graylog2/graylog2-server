@@ -223,7 +223,49 @@ describe('AggregationWizard', () => {
 
     const updatedConfig = AggregationWidgetConfig
       .builder()
-      .series([Series.create('percentile', 'http_method', 50.0).toBuilder().build()])
+      .series([Series.create('percentile', 'http_method', 50.0)])
+      .build();
+
+    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should configure metric with multiple functions', async () => {
+    const onChangeMock = jest.fn();
+    const config = AggregationWidgetConfig
+      .builder()
+      .series([Series.create('max', 'took_ms')])
+      .build();
+    renderSUT({ config, onChange: onChangeMock });
+
+    const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
+    fireEvent.click(addMetricButton);
+
+    await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
+    const newNameInput = screen.getAllByLabelText('Name')[1];
+    const newFunctionSelect = screen.getAllByLabelText('Select a function')[1];
+    const newFieldSelect = screen.getAllByLabelText('Select a field')[1];
+
+    userEvent.type(newNameInput, 'New function');
+
+    await act(async () => {
+      await selectEvent.openMenu(newFunctionSelect);
+      await selectEvent.select(newFunctionSelect, 'min');
+      await selectEvent.openMenu(newFieldSelect);
+      await selectEvent.select(newFieldSelect, 'http_method');
+    });
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    fireEvent.click(applyButton);
+
+    const updatedConfig = config.toBuilder()
+      .series([
+        Series.create('max', 'took_ms'),
+        Series.create('min', 'http_method').toBuilder()
+          .config(SeriesConfig.empty().toBuilder().name('New function').build())
+          .build(),
+      ])
       .build();
 
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
