@@ -36,7 +36,7 @@ const Wrapper = styled.div(({ theme }) => css`
   }
 
   .form-group {
-    margin: 0;
+    margin: 0 0 5px 0;
   }
 
   .control-label {
@@ -52,21 +52,6 @@ const Header = styled.div`
   justify-content: space-between;
   margin-bottom: 5px;
 `;
-
-const ConfigurationWrapper = styled.div(({ theme }) => css`
-  > div {
-    border-bottom: 1px solid ${theme.colors.variant.lighter.default};
-    margin-bottom: 5px;
-
-    :last-child {
-      border-bottom: 0;
-      margin-bottom: 0;
-    }
-  }
-  .form-group {
-    margin-bottom: 5px;
-  }
-`);
 
 type Props = {
   children: React.ReactNode,
@@ -91,9 +76,9 @@ const ElementConfigurationContainer = ({
           )}
         </div>
       </Header>
-      <ConfigurationWrapper>
+      <div>
         {children}
-      </ConfigurationWrapper>
+      </div>
     </Wrapper>
   );
 };

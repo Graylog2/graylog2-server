@@ -19,6 +19,7 @@ import { useFormikContext, FieldArray } from 'formik';
 
 import { Button, ButtonToolbar } from 'components/graylog';
 
+import ElementConfigurationSection from './ElementConfigurationSection';
 import Metric from './Metric';
 
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
@@ -32,14 +33,16 @@ const MetricsConfiguration = () => {
       <FieldArray name="metrics"
                   render={(arrayHelpers) => (
                     <>
-                      {metrics.map((metric, index) => {
-                        return (
+                      <div>
+                        {metrics.map((metric, index) => {
+                          return (
                           // eslint-disable-next-line react/no-array-index-key
-                          <div key={`metrics-${index}`}>
-                            <Metric index={index} />
-                          </div>
-                        );
-                      })}
+                            <ElementConfigurationSection key={`metrics-${index}`}>
+                              <Metric index={index} />
+                            </ElementConfigurationSection>
+                          );
+                        })}
+                      </div>
                       <ButtonToolbar>
                         <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push({})}>
                           Add a Metric
