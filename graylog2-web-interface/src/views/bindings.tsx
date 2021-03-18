@@ -82,14 +82,13 @@ import {
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
-import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import {
   AreaVisualizationConfigFormValues,
-  BarVisualizationConfigFormValues,
+  BarVisualizationConfigFormValues, HeatMapVisualizationConfigFormValues,
   LineVisualizationConfigFormValues, NumberVisualizationConfigFormValues,
 } from 'views/components/aggregationwizard/WidgetConfigForm';
-import { HoverForHelp } from 'components/common';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -435,7 +434,7 @@ const exports: PluginExports = {
           type: 'select',
           options: [['Lower', 'LOWER'], ['Neutral', 'NEUTRAL'], ['Higher', 'HIGHER']],
           required: true,
-          isShown: (formValues: NumberVisualizationConfigFormValues) => (formValues?.trend === true),
+          isShown: (formValues: NumberVisualizationConfigFormValues) => formValues?.trend === true,
         }],
       },
     },
@@ -448,6 +447,53 @@ const exports: PluginExports = {
       type: HeatmapVisualization.type,
       displayName: 'Heatmap',
       component: HeatmapVisualization,
+      config: {
+        fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig): HeatMapVisualizationConfigFormValues => {
+          console.log({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin });
+
+          return ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin });
+        },
+        toConfig: ({ autoScale, colorScale, reverseScale, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
+          .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
+        fields: [{
+          name: 'colorScale',
+          title: 'Color Scale',
+          required: true,
+          type: 'select',
+          options: COLORSCALES,
+        }, {
+          name: 'reverseScale',
+          type: 'boolean',
+          title: 'Reverse Scale',
+          required: true,
+        }, {
+          name: 'autoScale',
+          type: 'boolean',
+          title: 'Auto Scale',
+          required: true,
+        }, {
+          name: 'zMin',
+          type: 'numeric',
+          title: 'Min',
+          required: true,
+        }, {
+          name: 'zMax',
+          type: 'numeric',
+          title: 'Max',
+          required: true,
+        }, {
+          name: 'useSmallestAsDefault',
+          type: 'boolean',
+          title: 'Use smallest as default',
+          required: true,
+        }, {
+          name: 'defaultValue',
+          type: 'numeric',
+          title: 'Default Value',
+          isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.useSmallestAsDefault,
+          required: true,
+        }],
+      },
     },
   ],
   visualizationConfigTypes: [

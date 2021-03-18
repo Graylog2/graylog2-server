@@ -99,14 +99,18 @@ type BaseField = {
 
 type SelectField = BaseField & {
   type: 'select',
-  options: Array<string | [string, any]>,
+  options: ReadonlyArray<string | [string, any]>,
 };
 
 type BooleanField = BaseField & {
   type: 'boolean',
 };
 
-type ConfigurationField = SelectField | BooleanField;
+type NumericField = BaseField & {
+  type: 'numeric',
+};
+
+type ConfigurationField = SelectField | BooleanField | NumericField;
 
 interface VisualizationType {
   type: string;

@@ -18,25 +18,41 @@ import { isEmpty } from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import type { AggregationElement } from './AggregationElementType';
 
 import VisualizationConfiguration from '../elementConfiguration/VisualizationConfiguration';
 import { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
-const formValuesToVisualizationConfig = (visualizationType: string, formValues: VisualizationConfigFormValues) => {
+const findVisualizationType = (visualizationType: string) => {
   const visualizationTypeDefinition = PluginStore.exports('visualizationTypes').find(({ type }) => (type === visualizationType));
 
   if (!visualizationTypeDefinition) {
     throw new Error(`Invalid visualization type: ${visualizationType}`);
   }
 
-  const { config: { toConfig } } = visualizationTypeDefinition;
+  return visualizationTypeDefinition;
+};
+
+const formValuesToVisualizationConfig = (visualizationType: string, formValues: VisualizationConfigFormValues) => {
+  const { config: { toConfig } } = findVisualizationType(visualizationType);
 
   return toConfig(formValues);
 };
 
-const fromConfig = (config: AggregationWidgetConfig) => ({ visualization: { type: config.visualization } });
+const visualizationConfigToFormValues = (visualizationType: string, config: VisualizationConfig) => {
+  const { config: { fromConfig } } = findVisualizationType(visualizationType);
+
+  return fromConfig(config);
+};
+
+const fromConfig = (config: AggregationWidgetConfig) => ({
+  visualization: {
+    type: config.visualization,
+    config: visualizationConfigToFormValues(config.visualization, config.visualizationConfig),
+  },
+});
 const toConfig = (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => currentConfig
   .toBuilder()
   .visualization(formValues.visualization.type)

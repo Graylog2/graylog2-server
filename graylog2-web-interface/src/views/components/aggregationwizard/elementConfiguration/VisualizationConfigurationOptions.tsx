@@ -6,6 +6,7 @@ import { VisualizationConfigFormValues } from 'views/components/aggregationwizar
 import BooleanField from 'views/components/aggregationwizard/elementConfiguration/configurationFields/BooleanField';
 import { HoverForHelp } from 'components/common';
 
+import InputField from './configurationFields/InputField';
 import SelectField from './configurationFields/SelectField';
 
 type Props = {
@@ -17,6 +18,7 @@ const componentForType = (type: string) => {
   switch (type) {
     case 'select': return SelectField;
     case 'boolean': return BooleanField;
+    case 'numeric': return (props) => <InputField type="number" {...props} />;
     default: throw new Error(`Invalid configuration field type: ${type}`);
   }
 };
@@ -49,7 +51,7 @@ const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Pr
       const title = titleForField(field);
 
       return (
-        <Field name={`${namePrefix}.${field.name}`}>
+        <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <Component name={name} value={value} onChange={onChange} error={error} field={field} title={title} />
           )}
