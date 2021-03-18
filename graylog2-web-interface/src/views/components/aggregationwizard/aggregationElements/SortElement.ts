@@ -25,7 +25,7 @@ const SortElement: AggregationElement = {
   title: 'Sort',
   key: 'sort',
   order: 3,
-  allowCreate: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.sort),
+  allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.sort),
   component: SortConfiguration,
 };
 

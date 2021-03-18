@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEmpty } from 'lodash';
-
 import type { AggregationElement } from './AggregationElementType';
 
 import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const GroupByElement: AggregationElement = {
   title: 'Group By',
   key: 'groupBy',
   order: 1,
-  allowCreate: (formValues: WidgetConfigFormValues) => !isEmpty(formValues.groupBy),
+  allowCreate: () => true,
   component: GroupByConfiguration,
 };
 
