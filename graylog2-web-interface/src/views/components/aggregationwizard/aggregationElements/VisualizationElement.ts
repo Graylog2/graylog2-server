@@ -59,6 +59,27 @@ const toConfig = (formValues: WidgetConfigFormValues, currentConfig: Aggregation
   .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
   .build();
 
+const validate = (formValues: WidgetConfigFormValues) => {
+  const { visualization: { type, config } } = formValues;
+
+  if (!type) {
+    return { 'visualization.type': 'Type is required.' };
+  }
+
+  const visualizationType = findVisualizationType(type);
+
+  if (visualizationType.config) {
+    const { fields } = visualizationType.config;
+
+    return fields.filter(({ required }) => required)
+      .filter(({ name }) => config[name] === undefined || config[name] === '')
+      .map(({ name, title }) => ({ [`visualization.config.${name}`]: `${title} is required.` }))
+      .reduce((prev, cur) => ({ ...prev, ...cur }), {});
+  }
+
+  return {};
+};
+
 const VisualizationElement: AggregationElement = {
   title: 'Visualization',
   key: 'visualization',
@@ -67,6 +88,7 @@ const VisualizationElement: AggregationElement = {
   component: VisualizationConfiguration,
   fromConfig,
   toConfig,
+  validate,
 };
 
 export default VisualizationElement;
