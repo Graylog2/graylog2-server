@@ -310,15 +310,13 @@ const exports: PluginExports = {
       config: {
         fromConfig: (config: AreaVisualizationConfig): AreaVisualizationConfigFormValues => ({ interpolation: config.interpolation }),
         toConfig: (formValues: AreaVisualizationConfigFormValues): AreaVisualizationConfig => AreaVisualizationConfig.create(formValues.interpolation),
-        fields: [
-          {
-            name: 'interpolation',
-            title: 'Interpolation',
-            type: 'select',
-            options: ['linear', 'step-after', 'spline'],
-            required: true,
-          },
-        ],
+        fields: [{
+          name: 'interpolation',
+          title: 'Interpolation',
+          type: 'select',
+          options: ['linear', 'step-after', 'spline'],
+          required: true,
+        }],
       },
     },
     {
@@ -375,15 +373,13 @@ const exports: PluginExports = {
       config: {
         fromConfig: (config: LineVisualizationConfig): LineVisualizationConfigFormValues => ({ interpolation: config.interpolation }),
         toConfig: (formValues: LineVisualizationConfigFormValues): LineVisualizationConfig => LineVisualizationConfig.create(formValues.interpolation),
-        fields: [
-          {
-            name: 'interpolation',
-            title: 'Interpolation',
-            type: 'select',
-            options: ['linear', 'step-after', 'spline'],
-            required: true,
-          },
-        ],
+        fields: [{
+          name: 'interpolation',
+          title: 'Interpolation',
+          type: 'select',
+          options: ['linear', 'step-after', 'spline'],
+          required: true,
+        }],
       },
     },
     {
