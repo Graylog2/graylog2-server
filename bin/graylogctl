@@ -56,14 +56,9 @@ if $JAVA_CMD -XX:+PrintFlagsFinal 2>&1 |grep -q UseParNewGC; then
 	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+UseParNewGC"
 fi
 if $JAVA_CMD -XX:+PrintFlagsFinal 2>&1 |grep -q UseConcMarkSweepGC; then
-	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+UseConcMarkSweepGC"
+	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled"
 fi
-if $JAVA_CMD -XX:+PrintFlagsFinal 2>&1 |grep -q CMSConcurrentMTEnabled; then
-	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+CMSConcurrentMTEnabled"
-fi
-if $JAVA_CMD -XX:+PrintFlagsFinal 2>&1 |grep -q CMSClassUnloadingEnabled; then
-	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+CMSClassUnloadingEnabled"
-fi
+
 JAVA_OPTS="${JAVA_OPTS:="$DEFAULT_JAVA_OPTS"}"
 
 start() {
