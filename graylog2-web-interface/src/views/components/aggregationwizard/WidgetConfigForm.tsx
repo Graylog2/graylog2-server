@@ -24,7 +24,29 @@ export type MetricFormValues = {
   percentile?: number | undefined,
 };
 
-export type GroupByFormValues = {};
+export type GroupingDirection = 'row' | 'column';
+
+export type DateGrouping = {
+  direction: GroupingDirection,
+  field: string,
+  interval: {
+    type: 'auto',
+    scaling: number,
+  } | {
+    type: 'timeunit',
+    value: number,
+    unit: string,
+  }
+
+}
+
+export type ValuesGrouping = {
+  direction: GroupingDirection,
+  field: string,
+  limit: number,
+};
+
+export type GroupByFormValues = DateGrouping | ValuesGrouping;
 
 export type VisualizationFormValues = {};
 

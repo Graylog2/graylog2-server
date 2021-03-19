@@ -20,59 +20,32 @@ import type { DatePivotConfig, ValuesPivotConfig } from 'views/logic/aggregation
 
 import type { AggregationElement } from './AggregationElementType';
 
+import type { GroupingDirection, DateGrouping, ValuesGrouping, GroupByFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
 
-type Direction = 'row' | 'column';
-
-type DateGroupBy = {
-  direction: Direction,
-  field: string,
-  type: 'time',
-  interval: {
-    type: 'auto',
-    scaling: number,
-  } | {
-    type: 'timeunit',
-    value: number,
-    unit: string,
-  }
-
-}
-
-type ValuesGroupBy = {
-  direction: Direction,
-  field: string,
-  type: 'values',
-  limit: number,
-}
-
-type GroupByEntry = DateGroupBy | ValuesGroupBy;
-
-const datePivotToGroupBy = (pivot: Pivot, direction: Direction): DateGroupBy => {
+const datePivotToGroupBy = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
   const { field, config } = pivot;
   const { interval } = config as DatePivotConfig;
 
   return ({
-    type: 'time',
     field,
     direction,
     interval,
   });
 };
 
-const valuesPivotToGroupBy = (pivot: Pivot, direction: Direction): ValuesGroupBy => {
+const valuesPivotToGroupBy = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
   const { field, config } = pivot;
   const { limit } = config as ValuesPivotConfig;
 
   return ({
-    type: 'values',
     field,
     direction,
     limit,
   });
 };
 
-const pivotToGroupBy = (pivot: Pivot, direction: Direction): GroupByEntry => {
+const pivotToGroupBy = (pivot: Pivot, direction: GroupingDirection): GroupByFormValues => {
   if (pivot.type === 'time') {
     return datePivotToGroupBy(pivot, direction);
   }
@@ -91,6 +64,19 @@ const pivotsToGroupBy = (config: AggregationWidgetConfig) => {
   return [...transformedRowPivots, ...transformedColumnPivots];
 };
 
+const groupByToPivot = (groupBy: GroupByFormValues) => {
+  const pivotConfig = 'interval' in groupBy ? { interval: groupBy.interval } : { limit: groupBy.limit };
+
+  return new Pivot(groupBy.field, 'interval' in groupBy ? 'time' : 'values', pivotConfig);
+};
+
+const groupByToConfigWithPivots = (groupByEntires: Array<GroupByFormValues>, config: AggregationWidgetConfig) => {
+  const rowPivots = groupByEntires.filter((groupBy) => groupBy.direction === 'row').map(groupByToPivot);
+  const columnPivots = groupByEntires.filter((groupBy) => groupBy.direction === 'column').map(groupByToPivot);
+
+  return config.toBuilder().rowPivots(rowPivots).columnPivots(columnPivots).build();
+};
+
 const GroupByElement: AggregationElement = {
   title: 'Group By',
   key: 'groupBy',
@@ -99,6 +85,7 @@ const GroupByElement: AggregationElement = {
   fromConfig: (config: AggregationWidgetConfig) => ({
     groupBy: pivotsToGroupBy(config),
   }),
+  toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => groupByToConfigWithPivots(formValues.groupBy, config),
   component: GroupByConfiguration,
 };
 
