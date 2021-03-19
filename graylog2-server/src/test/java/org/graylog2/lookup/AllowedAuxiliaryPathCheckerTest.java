@@ -66,7 +66,7 @@ public class AllowedAuxiliaryPathCheckerTest {
 
     @Test
     public void noPathsFileLocationOk() {
-        pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<Path>(Collections.EMPTY_SET));
+        pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<Path>(Collections.emptySet()));
         assertTrue(pathChecker.fileIsInAllowedPath(Paths.get("")));
     }
 
