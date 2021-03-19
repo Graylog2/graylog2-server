@@ -35,8 +35,8 @@ interface CustomizationActions {
 }
 
 interface CustomizationType {
-  hooks: CustomizationHooks;
-  actions: CustomizationActions;
+  hooks?: CustomizationHooks;
+  actions?: CustomizationActions;
 }
 
 declare module 'graylog-web-plugin/plugin' {
