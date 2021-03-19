@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useContext } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 import { Field, useFormikContext } from 'formik';
 
@@ -58,13 +58,9 @@ type Props = {
 }
 
 const GroupBy = ({ index }: Props) => {
-  const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
-  const selectedFieldName = groupBy.groupings[index].field;
+  const { values: { groupBy }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const fieldType = groupBy.groupings[index].field.type;
   const fieldTypes = useContext(FieldTypesContext);
-
-  const selectedField = useMemo(() => fieldTypes.all.find((field) => field.value.name === selectedFieldName), [selectedFieldName, fieldTypes.all]);
-
-  const isDateField = selectedField?.type.type === 'date';
 
   const toggleIntervalType = (name, currentType, onChange) => {
     if (currentType === 'auto') {
@@ -72,6 +68,34 @@ const GroupBy = ({ index }: Props) => {
     } else {
       onChange({ target: { name, value: { type: 'auto', scaling: 1.0 } } });
     }
+  };
+
+  const onChangeField = (e, name, onChange) => {
+    const fieldName = e.target.value;
+    const newField = fieldTypes.all.find((field) => field.name === fieldName);
+    const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
+
+    if (fieldType !== newFieldType) {
+      if (newFieldType === 'time') {
+        setFieldValue(`groupBy.groupings.${index}.interval`, {
+          type: 'auto',
+        });
+      }
+
+      if (newFieldType === 'values') {
+        setFieldValue(`groupBy.groupings.${index}.limit`, 15);
+      }
+    }
+
+    onChange({
+      target: {
+        name,
+        value: {
+          field: newField.name,
+          type: newFieldType,
+        },
+      },
+    });
   };
 
   return (
@@ -109,16 +133,16 @@ const GroupBy = ({ index }: Props) => {
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <FieldSelect id="group-by-field-select"
                        label="Field"
-                       onChange={onChange}
+                       onChange={(e) => onChangeField(e, name, onChange)}
                        error={error}
                        clearable={false}
                        name={name}
-                       value={value}
+                       value={value.field}
                        aria-label="Select a field" />
         )}
       </Field>
 
-      {isDateField && (
+      {fieldType === 'time' && (
         <Field name={`groupBy.groupings.${index}.interval`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <Input id="group-by-interval"
@@ -179,7 +203,7 @@ const GroupBy = ({ index }: Props) => {
         </Field>
       )}
 
-      {!isDateField && (
+      {fieldType === 'values' && (
         <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" />
       )}
     </Wrapper>

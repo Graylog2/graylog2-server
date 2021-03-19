@@ -24,7 +24,7 @@ import { Button, ButtonToolbar, Checkbox } from 'components/graylog';
 import ElementConfigurationSection from './ElementConfigurationSection';
 import GroupBy from './GroupBy';
 
-import GroupByElement from '../aggregationElements/GroupByElement';
+import { emptyGrouping } from '../aggregationElements/GroupByElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const ActionsBar = styled.div`
@@ -44,7 +44,6 @@ const RollupHoverForHelp = styled(HoverForHelp)`
 
 const GroupByConfiguration = () => {
   const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
-  console.log({ groupBy });
   const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
 
   return (
@@ -78,7 +77,7 @@ const GroupByConfiguration = () => {
                           )}
                         </Field>
                         <ButtonToolbar>
-                          <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(GroupByElement.createEmpty())}>
+                          <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(emptyGrouping)}>
                             Add Grouping
                           </Button>
                         </ButtonToolbar>

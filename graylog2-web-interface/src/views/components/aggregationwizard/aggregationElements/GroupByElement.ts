@@ -23,56 +23,57 @@ import type { AggregationElement } from './AggregationElementType';
 import type { GroupingDirection, DateGrouping, ValuesGrouping, GroupByFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
 
-const datePivotToGroupBy = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
+const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
   const { field, config } = pivot;
+
   const { interval } = config as DatePivotConfig;
 
   return ({
-    field,
     direction,
+    field: { field, type: 'time' },
     interval,
   });
 };
 
-const valuesPivotToGroupBy = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
+const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
   const { field, config } = pivot;
   const { limit } = config as ValuesPivotConfig;
 
   return ({
-    field,
     direction,
+    field: { field, type: 'values' },
     limit,
   });
 };
 
-const pivotToGroupBy = (pivot: Pivot, direction: GroupingDirection): GroupByFormValues => {
+const pivotToGroupings = (pivot: Pivot, direction: GroupingDirection): GroupByFormValues => {
   if (pivot.type === 'time') {
-    return datePivotToGroupBy(pivot, direction);
+    return datePivotToGrouping(pivot, direction);
   }
 
   if (pivot.type === 'values') {
-    return valuesPivotToGroupBy(pivot, direction);
+    return valuesPivotToGrouping(pivot, direction);
   }
 
   throw new Error(`Widget has not supported pivot type "${pivot.type}"`);
 };
 
-const pivotsToGroupBy = (config: AggregationWidgetConfig) => {
-  const transformedRowPivots = config.rowPivots.map((pivot) => pivotToGroupBy(pivot, 'row'));
-  const transformedColumnPivots = config.columnPivots.map((pivot) => pivotToGroupBy(pivot, 'column'));
+const pivotsToGrouping = (config: AggregationWidgetConfig) => {
+  const transformedRowPivots = config.rowPivots.map((pivot) => pivotToGroupings(pivot, 'row'));
+  const transformedColumnPivots = config.columnPivots.map((pivot) => pivotToGroupings(pivot, 'column'));
 
   return [...transformedRowPivots, ...transformedColumnPivots];
 };
 
-const groupByToPivot = (groupBy: GroupByFormValues) => {
-  const pivotConfig = 'interval' in groupBy ? { interval: groupBy.interval } : { limit: groupBy.limit };
+const groupingToPivot = (grouping: GroupByFormValues) => {
+  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: grouping.limit };
 
-  return new Pivot(groupBy.field, 'interval' in groupBy ? 'time' : 'values', pivotConfig);
+  return new Pivot(grouping.field.field, grouping.field.type, pivotConfig);
 };
 
 const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: AggregationWidgetConfig) => {
-  const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupByToPivot);
-  const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupByToPivot);
+  const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupingToPivot);
+  const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupingToPivot);
   const { columnRollup } = groupBy;
 
   return config.toBuilder()
@@ -82,20 +83,28 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
     .build();
 };
 
+export const emptyGrouping: ValuesGrouping = {
+  direction: 'row',
+  field: {
+    field: undefined,
+    type: 'values',
+  },
+  limit: 15,
+};
+
 const GroupByElement: AggregationElement = {
   title: 'Group By',
   key: 'groupBy',
   order: 1,
   allowCreate: () => true,
-  createEmpty: (): GroupByFormValues => ({
-    direction: 'row',
-    field: undefined,
-    limit: 15,
+  createEmpty: (): WidgetConfigFormValues['groupBy'] => ({
+    columnRollup: true,
+    groupings: [emptyGrouping],
   }),
   fromConfig: (config: AggregationWidgetConfig) => ({
     groupBy: {
       columnRollup: config.rollup,
-      groupings: pivotsToGroupBy(config),
+      groupings: pivotsToGrouping(config),
     },
   }),
   toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => groupByToConfig(formValues.groupBy, config),
