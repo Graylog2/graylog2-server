@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
+import AggregationWidgetConfig from 'src/views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import connect from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -78,7 +79,7 @@ export type Result = {
 export type OnVisualizationConfigChange = (newConfig: VisualizationConfig) => void;
 
 export type WidgetProps = {
-  config: any,
+  config: AggregationWidgetConfig,
   data: { [key: string]: Result },
   editing?: boolean,
   toggleEdit: () => void,
