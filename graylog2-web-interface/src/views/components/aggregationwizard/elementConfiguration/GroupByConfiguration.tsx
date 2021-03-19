@@ -16,17 +16,35 @@
  */
 import * as React from 'react';
 import { useFormikContext, FieldArray } from 'formik';
+import styled from 'styled-components';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import { HoverForHelp } from 'components/common';
+import { Button, ButtonToolbar, Checkbox } from 'components/graylog';
 
 import ElementConfigurationSection from './ElementConfigurationSection';
 import GroupBy from './GroupBy';
 
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
+const ActionsBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const RollupColumnsLabel = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const RollupHoverForHelp = styled(HoverForHelp)`
+  margin-left: 5px;
+`;
+
 const GroupByConfiguration = () => {
   const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
   const defaultValues = { direction: 'row' };
+  const disableColumnRollup = !groupBy.find(({ direction }) => direction === 'column');
 
   return (
     <>
@@ -43,11 +61,23 @@ const GroupByConfiguration = () => {
                           );
                         })}
                       </div>
-                      <ButtonToolbar>
-                        <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(defaultValues)}>
-                          Add an Entry
-                        </Button>
-                      </ButtonToolbar>
+                      <ActionsBar>
+                        <Checkbox onChange={() => {}}
+                                  disabled={disableColumnRollup}
+                                  checked={false}>
+                          <RollupColumnsLabel>
+                            Rollup Columns
+                            <RollupHoverForHelp title="Rollup Columns">
+                              When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                            </RollupHoverForHelp>
+                          </RollupColumnsLabel>
+                        </Checkbox>
+                        <ButtonToolbar>
+                          <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(defaultValues)}>
+                            Add an Entry
+                          </Button>
+                        </ButtonToolbar>
+                      </ActionsBar>
                     </>
                   )} />
     </>
