@@ -16,12 +16,26 @@
  */
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import type { DatePivotConfig, ValuesPivotConfig } from 'views/logic/aggregationbuilder/Pivot';
 
 import type { AggregationElement } from './AggregationElementType';
 
 import type { GroupingDirection, DateGrouping, ValuesGrouping, GroupByFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
+
+export type DatePivotConfig = {
+  interval: {
+    type: 'auto',
+    scaling: number
+  } | {
+    type: 'timeunit',
+    value: number,
+    unit: string
+  }
+}
+
+export type ValuesPivotConfig = {
+  limit: number
+}
 
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
   const { field, config } = pivot;
