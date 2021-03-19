@@ -15,19 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useFormikContext, FieldArray } from 'formik';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { Button, ButtonToolbar } from 'components/graylog';
 
-type Props = {
-  config: AggregationWidgetConfig,
-  onConfigChange: (newConfig: AggregationWidgetConfig) => void
-}
+import ElementConfigurationSection from './ElementConfigurationSection';
+import GroupBy from './GroupBy';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const GroupByConfiguration = ({ config, onConfigChange }: Props) => {
+import { WidgetConfigFormValues } from '../WidgetConfigForm';
+
+const GroupByConfiguration = () => {
+  const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
+  const defaultValues = { direction: 'row' };
+
   return (
     <>
-      Configuration Elements
+      <FieldArray name="groupBy"
+                  render={(arrayHelpers) => (
+                    <>
+                      <div>
+                        {groupBy.map((groupByEntity, index) => {
+                          return (
+                          // eslint-disable-next-line react/no-array-index-key
+                            <ElementConfigurationSection key={`metrics-${index}`}>
+                              <GroupBy index={index} />
+                            </ElementConfigurationSection>
+                          );
+                        })}
+                      </div>
+                      <ButtonToolbar>
+                        <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(defaultValues)}>
+                          Add an Entry
+                        </Button>
+                      </ButtonToolbar>
+                    </>
+                  )} />
     </>
   );
 };
