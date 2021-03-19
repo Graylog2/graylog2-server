@@ -28,7 +28,7 @@ export type GroupingDirection = 'row' | 'column';
 
 export type DateGrouping = {
   direction: GroupingDirection,
-  field: string,
+  field: string | undefined,
   interval: {
     type: 'auto',
     scaling: number,
@@ -42,7 +42,7 @@ export type DateGrouping = {
 
 export type ValuesGrouping = {
   direction: GroupingDirection,
-  field: string,
+  field: string | undefined,
   limit: number,
 };
 

@@ -67,11 +67,14 @@ const _onElementCreate = (
   values: WidgetConfigFormValues,
   setValues: (formValues: WidgetConfigFormValues) => void,
 ) => {
+  const aggregationElement = aggregationElementsByKey[elementKey];
+  const newElement = 'createEmpty' in aggregationElement ? aggregationElement.createEmpty() : {};
+
   setValues({
     ...values,
     [elementKey]: [
       ...(values[elementKey] ?? []),
-      {},
+      newElement ?? {},
     ],
   });
 };

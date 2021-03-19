@@ -64,7 +64,7 @@ const GroupBy = ({ index }: Props) => {
 
   const selectedField = useMemo(() => fieldTypes.all.find((field) => field.value.name === selectedFieldName), [selectedFieldName, fieldTypes.all]);
 
-  const isDateField = selectedField.type.type === 'date';
+  const isDateField = selectedField?.type.type === 'date';
 
   const toggleIntervalType = (name, currentType, onChange) => {
     if (currentType === 'auto') {
@@ -146,7 +146,7 @@ const GroupBy = ({ index }: Props) => {
                                    max={10}
                                    step={0.5}
                                    value={value.scaling ? (1 / value.scaling) : 1.0}
-                                   onChange={(e) => { console.log(e.target.value, value); onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } }); }} />
+                                   onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
                       <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
                       <CurrentScale>
                         {value.scaling ? (1 / value.scaling) : 1.0}x

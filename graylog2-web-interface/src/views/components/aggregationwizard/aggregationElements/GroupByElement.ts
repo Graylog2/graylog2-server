@@ -82,6 +82,11 @@ const GroupByElement: AggregationElement = {
   key: 'groupBy',
   order: 1,
   allowCreate: () => true,
+  createEmpty: (): GroupByFormValues => ({
+    direction: 'row',
+    field: undefined,
+    limit: 15,
+  }),
   fromConfig: (config: AggregationWidgetConfig) => ({
     groupBy: pivotsToGroupBy(config),
   }),

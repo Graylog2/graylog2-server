@@ -24,6 +24,7 @@ import { Button, ButtonToolbar, Checkbox } from 'components/graylog';
 import ElementConfigurationSection from './ElementConfigurationSection';
 import GroupBy from './GroupBy';
 
+import GroupByElement from '../aggregationElements/GroupByElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const ActionsBar = styled.div`
@@ -73,7 +74,7 @@ const GroupByConfiguration = () => {
                           </RollupColumnsLabel>
                         </Checkbox>
                         <ButtonToolbar>
-                          <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(defaultValues)}>
+                          <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(GroupByElement.createEmpty())}>
                             Add an Entry
                           </Button>
                         </ButtonToolbar>
