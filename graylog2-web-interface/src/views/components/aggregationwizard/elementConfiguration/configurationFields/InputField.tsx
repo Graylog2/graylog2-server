@@ -16,7 +16,8 @@ const InputField = ({ type, onChange, value, error, name, title, field }: Props)
     : onChange(e)), [onChange, type]);
 
   return (
-    <Input type={type}
+    <Input id={`${name}-input`}
+           type={type}
            name={name}
            onChange={_onChange}
            value={value}

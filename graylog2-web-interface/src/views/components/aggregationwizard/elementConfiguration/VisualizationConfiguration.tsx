@@ -51,6 +51,7 @@ const VisualizationConfiguration = () => {
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9">
             <Select options={visualizationTypeOptions}
+                    aria-label="Select visualization type"
                     clearable={false}
                     name={name}
                     value={value}

@@ -30,6 +30,7 @@ const SelectField = ({ name, field, title, error, value, onChange }: FieldCompon
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9">
       <Select options={makeOptions(field.options)}
+              aria-label={`Select ${field.title}`}
               clearable={!field.required}
               name={name}
               value={value}
