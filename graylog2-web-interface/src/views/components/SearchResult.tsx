@@ -77,7 +77,7 @@ const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
   const results = searches && searches.result;
   const widgetMapping = searches && searches.widgetMapping;
 
-  const hasFocusedWidget = !!focusedWidget;
+  const hasFocusedWidget = !!focusedWidget?.id;
 
   const currentResults = results ? results.forId(queryId) : undefined;
   const allFields = fieldTypes.all;

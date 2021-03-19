@@ -28,7 +28,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,17 +56,17 @@ public class MessageFilterChainProcessor implements MessageProcessor {
 
     private final List<MessageFilter> filterRegistry;
     private final MetricRegistry metricRegistry;
-    private final Journal journal;
+    private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final ServerStatus serverStatus;
     private final Meter filteredOutMessages;
 
     @Inject
     public MessageFilterChainProcessor(MetricRegistry metricRegistry,
                                        Set<MessageFilter> filterRegistry,
-                                       Journal journal,
+                                       MessageQueueAcknowledger messageQueueAcknowledger,
                                        ServerStatus serverStatus) {
         this.metricRegistry = metricRegistry;
-        this.journal = journal;
+        this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.serverStatus = serverStatus;
         // we need to keep this sorted properly, so that the filters run in the correct order
         this.filterRegistry = Ordering.from(new Comparator<MessageFilter>() {
@@ -103,7 +103,7 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                                 msg.getId());
                         msg.setFilterOut(true);
                         filteredOutMessages.mark();
-                        journal.markJournalOffsetCommitted(msg.getJournalOffset());
+                        messageQueueAcknowledger.acknowledge(msg);
                     }
                 } catch (Exception e) {
                     LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ",

@@ -18,7 +18,35 @@ package org.graylog2.plugin;
 
 import java.util.Collection;
 
+/**
+ * A graylog plugin.
+ * <p>
+ * Core configuration beans like {@link org.graylog2.Configuration} are made available to plugins via member injection.
+ * If you need access to them, you can define a field of the required bean type and annotate it with
+ *
+ * @{@link javax.inject.Inject} as in the following example:
+ * <pre>
+ * {@code
+ * public class MyPlugin implements Plugin {
+ *     @Inject
+ *     private Configuration configuration;
+ *
+ *     @Override
+ *     public PluginMetaData metadata() {
+ *         return new MyPluginMetaData();
+ *     }
+ *
+ *     @Override
+ *     public Collection<PluginModule> modules() {
+ *         return Collections.singletonList(new MyPluginModule(configuration));
+ *     }
+ * }
+ * }
+ * </pre>
+ * </p>
+ */
 public interface Plugin {
     PluginMetaData metadata();
+
     Collection<PluginModule> modules();
 }

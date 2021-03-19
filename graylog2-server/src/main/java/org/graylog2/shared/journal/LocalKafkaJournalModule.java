@@ -17,13 +17,11 @@
 package org.graylog2.shared.journal;
 
 import com.google.inject.Scopes;
-import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.PluginModule;
 
-public class NoopJournalModule extends Graylog2Module {
+public class LocalKafkaJournalModule extends PluginModule {
     @Override
     protected void configure() {
-        serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
-        binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
-
+        bind(Journal.class).to(LocalKafkaJournal.class).in(Scopes.SINGLETON);
     }
 }

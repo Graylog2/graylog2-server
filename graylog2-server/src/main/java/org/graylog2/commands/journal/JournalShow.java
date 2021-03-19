@@ -19,7 +19,7 @@ package org.graylog2.commands.journal;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import org.graylog.shaded.kafka09.log.LogSegment;
-import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -68,7 +68,7 @@ public class JournalShow extends AbstractJournalCommand {
         System.out.flush();
     }
 
-    private void appendSegmentDetails(KafkaJournal journal, StringBuilder sb) {
+    private void appendSegmentDetails(LocalKafkaJournal journal, StringBuilder sb) {
         final Iterable<LogSegment> segments = journal.getSegments();
         int i = 1;
         for (LogSegment segment : segments) {
@@ -76,7 +76,8 @@ public class JournalShow extends AbstractJournalCommand {
             sb.append("\t\t\t").append("Base offset: ").append(segment.baseOffset()).append("\n");
             sb.append("\t\t\t").append("Size in bytes: ").append(segment.size()).append("\n");
             sb.append("\t\t\t").append("Created at: ").append(new DateTime(segment.created(), DateTimeZone.UTC)).append("\n");
-            sb.append("\t\t\t").append("Last modified: ").append(new DateTime(segment.lastModified(), DateTimeZone.UTC)).append("\n");
+            sb.append("\t\t\t").append("Last modified: ").append(new DateTime(segment.lastModified(),
+                    DateTimeZone.UTC)).append("\n");
         }
     }
 

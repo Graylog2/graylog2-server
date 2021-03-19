@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.base.Suppliers;
 import org.graylog.shaded.elasticsearch7.org.apache.http.HttpHost;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
@@ -26,8 +27,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Elastics
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Sniffer;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -38,14 +37,11 @@ import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
-
-    private final RestHighLevelClient client;
-    private final Sniffer sniffer;
+    private final Supplier<RestHighLevelClient> clientSupplier;
 
     @SuppressWarnings("unused")
     @Inject
@@ -65,23 +61,23 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider) {
-        client = buildClient(
-                hosts,
-                connectTimeout,
-                socketTimeout,
-                maxTotalConnections,
-                maxTotalConnectionsPerRoute,
-                useExpectContinue,
-                muteElasticsearchDeprecationWarnings,
+        clientSupplier = Suppliers.memoize(() -> {
+            final RestHighLevelClient client = buildClient(hosts,
+                    connectTimeout,
+                    socketTimeout,
+                    maxTotalConnections,
+                    maxTotalConnectionsPerRoute,
+                    useExpectContinue,
+                    muteElasticsearchDeprecationWarnings,
                 credentialsProvider);
 
-        sniffer = discoveryEnabled
-                ? createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter)
-                : null;
+            if (discoveryEnabled) {
+                final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
+                shutdownService.register(sniffer::close);
+            }
 
-        if (discoveryEnabled) {
-            registerSnifferShutdownHook(shutdownService);
-        }
+            return client;
+        });
     }
 
     private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
@@ -107,7 +103,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
     @Override
     public RestHighLevelClient get() {
-        return client;
+        return this.clientSupplier.get();
     }
 
     private RestHighLevelClient buildClient(
@@ -139,9 +135,5 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
         }
 
         return new RestHighLevelClient(restClientBuilder);
-    }
-
-    private void registerSnifferShutdownHook(GracefulShutdownService shutdownService) {
-        shutdownService.register(sniffer::close);
     }
 }

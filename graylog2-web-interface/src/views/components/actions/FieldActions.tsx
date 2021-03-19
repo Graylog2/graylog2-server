@@ -55,7 +55,7 @@ const FieldElement = styled.span.attrs({
 
 const FieldActions = ({ children, disabled, element, menuContainer, name, type, queryId }: Props) => {
   const actionContext = useContext(ActionContext);
-  const { setFocusedWidget } = useContext(WidgetFocusContext);
+  const { setWidgetFocusing } = useContext(WidgetFocusContext);
   const allFieldActions = usePluginEntities('fieldActions');
 
   const [open, setOpen] = useState(false);
@@ -82,7 +82,7 @@ const FieldActions = ({ children, disabled, element, menuContainer, name, type, 
         const { resetFocus = false } = action;
 
         if (resetFocus) {
-          setFocusedWidget(undefined);
+          setWidgetFocusing(undefined);
         }
 
         _onMenuToggle();
