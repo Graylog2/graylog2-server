@@ -86,7 +86,7 @@ export type VisualizationFormValues = {
 };
 
 export type VisualizationConfigDefinition = {
-  fromConfig: (config: VisualizationConfig) => VisualizationConfigFormValues,
+  fromConfig: (config: VisualizationConfig | undefined) => VisualizationConfigFormValues,
   toConfig: (formValues: VisualizationConfigFormValues) => VisualizationConfig,
   fields: Array<ConfigurationField>,
 };

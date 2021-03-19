@@ -35,14 +35,18 @@ const findVisualizationType = (visualizationType: string) => {
   return visualizationTypeDefinition;
 };
 
+const defaultToConfig = () => undefined;
+
 const formValuesToVisualizationConfig = (visualizationType: string, formValues: VisualizationConfigFormValues) => {
-  const { config: { toConfig } } = findVisualizationType(visualizationType);
+  const { config: { toConfig = defaultToConfig } = {} } = findVisualizationType(visualizationType);
 
   return toConfig(formValues);
 };
 
-const visualizationConfigToFormValues = (visualizationType: string, config: VisualizationConfig) => {
-  const { config: { fromConfig } } = findVisualizationType(visualizationType);
+const defaultFromConfig = () => ({});
+
+const visualizationConfigToFormValues = (visualizationType: string, config: VisualizationConfig | undefined) => {
+  const { config: { fromConfig = defaultFromConfig } = {} } = findVisualizationType(visualizationType);
 
   return fromConfig(config);
 };
@@ -75,7 +79,7 @@ const validate = (formValues: WidgetConfigFormValues) => {
   const visualizationType = findVisualizationType(type);
 
   if (visualizationType.config) {
-    const { fields } = visualizationType.config;
+    const { fields = [] } = visualizationType.config;
 
     const configErrors = fields
       .filter((field) => 'required' in field && field.required)

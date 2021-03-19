@@ -324,7 +324,7 @@ const exports: PluginExports = {
       displayName: 'Bar Chart',
       component: BarVisualization,
       config: {
-        fromConfig: (config: BarVisualizationConfig): BarVisualizationConfigFormValues => ({ barmode: config.barmode }),
+        fromConfig: (config: BarVisualizationConfig | undefined): BarVisualizationConfigFormValues => ({ barmode: config?.barmode ?? 'group' }),
         toConfig: (formValues: BarVisualizationConfigFormValues): BarVisualizationConfig => BarVisualizationConfig.create(formValues.barmode),
         fields: [{
           name: 'barmode',
@@ -371,7 +371,7 @@ const exports: PluginExports = {
       displayName: 'Line Chart',
       component: LineVisualization,
       config: {
-        fromConfig: (config: LineVisualizationConfig): LineVisualizationConfigFormValues => ({ interpolation: config.interpolation }),
+        fromConfig: (config: LineVisualizationConfig | undefined): LineVisualizationConfigFormValues => ({ interpolation: config?.interpolation }),
         toConfig: (formValues: LineVisualizationConfigFormValues): LineVisualizationConfig => LineVisualizationConfig.create(formValues.interpolation),
         fields: [{
           name: 'interpolation',
@@ -402,7 +402,7 @@ const exports: PluginExports = {
       displayName: 'Single Number',
       component: NumberVisualization,
       config: {
-        fromConfig: (config: NumberVisualizationConfig): NumberVisualizationConfigFormValues => ({ trend: config?.trend, trend_preference: config?.trendPreference }),
+        fromConfig: (config: NumberVisualizationConfig | undefined): NumberVisualizationConfigFormValues => ({ trend: config?.trend, trend_preference: config?.trendPreference }),
         toConfig: (formValues: NumberVisualizationConfigFormValues) => NumberVisualizationConfig.create(formValues.trend, formValues.trend_preference),
         fields: [{
           name: 'trend',
