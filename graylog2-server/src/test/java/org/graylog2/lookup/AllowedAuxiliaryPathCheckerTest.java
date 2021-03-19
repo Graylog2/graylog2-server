@@ -22,36 +22,76 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class AllowedAuxiliaryPathCheckerTest {
 
-    public static final String ALLOWED_PATH = "/allowed-path";
     AllowedAuxiliaryPathChecker pathChecker;
 
     @Test
-    public void success() {
-        final SortedSet<Path> paths = new TreeSet<>(Collections.singleton(Paths.get(ALLOWED_PATH)));
-        pathChecker = new AllowedAuxiliaryPathChecker(paths);
-        assertTrue(pathChecker.isInAllowedPath(ALLOWED_PATH + "/file.csv"));
+    public void inAllowedPath() throws IOException {
+        final Path filePath = validPath();
+        final Path permittedPath = validPath();
+        when(filePath.startsWith(eq(permittedPath))).thenReturn(true);
+
+        pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.singleton(permittedPath)));
+        assertTrue(pathChecker.fileIsInAllowedPath(filePath));
+    }
+
+    private Path validPath() throws IOException {
+        final Path filePath = mock(Path.class);
+        when(filePath.toRealPath()).thenReturn(filePath);
+        return filePath;
     }
 
     @Test
-    public void successRelativePaths() {
-        final SortedSet<Path> paths = new TreeSet<>(Collections.singleton(Paths.get(ALLOWED_PATH + "/sub-dir/../")));
-        pathChecker = new AllowedAuxiliaryPathChecker(paths);
-        assertTrue(pathChecker.isInAllowedPath(ALLOWED_PATH + "/file.csv"));
+    public void outsideOfAllowedPath() throws IOException {
+        final Path filePath = validPath();
+        final Path permittedPath = validPath();
+        when(filePath.startsWith(eq(permittedPath))).thenReturn(false);
+
+        pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.singleton(permittedPath)));
+        assertFalse(pathChecker.fileIsInAllowedPath(filePath));
+        verify(filePath, times(1)).startsWith(eq(permittedPath));
     }
 
     @Test
-    public void failureOutsideOfAllowedPath() {
-        final SortedSet<Path> paths = new TreeSet<>(Collections.singleton(Paths.get(ALLOWED_PATH)));
-        pathChecker = new AllowedAuxiliaryPathChecker(paths);
-        assertFalse(pathChecker.isInAllowedPath("/disallowed-path/file.csv"));
+    public void noPathsFileLocationOk() {
+        pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<Path>(Collections.EMPTY_SET));
+        assertTrue(pathChecker.fileIsInAllowedPath(Paths.get("")));
+    }
+
+    @Test
+    public void fileDoesNotExist() throws IOException {
+        final Path filePath = mock(Path.class);
+        when(filePath.toRealPath()).thenReturn(null);
+
+        pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.singleton(Paths.get(""))));
+        assertFalse(pathChecker.fileIsInAllowedPath(filePath));
+    }
+
+    @Test
+    public void permittedPathDoesNotExist() throws IOException {
+        final Path permittedPath = mock(Path.class);
+        when(permittedPath.toRealPath()).thenReturn(null);
+
+        pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.singleton(permittedPath)));
+        assertFalse(pathChecker.fileIsInAllowedPath(validPath()));
+    }
+
+    @Test
+    public void realPathNullWhenDoesNotExist() throws IOException {
+        final Path path = mock(Path.class);
+        when(path.toRealPath()).thenThrow(new IOException());
+        assertNull(AllowedAuxiliaryPathChecker.resolveRealPath(path));
     }
 }

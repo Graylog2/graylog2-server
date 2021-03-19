@@ -86,7 +86,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (isNullOrEmpty(config.path())) {
             throw new IllegalStateException("File path needs to be set");
         }
-        if (!pathChecker.isInAllowedPath(config.path())) {
+        if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
             throw new IllegalStateException("The specified CSV file is not in a allowed path.");
         }
         if (config.checkInterval() < 1) {

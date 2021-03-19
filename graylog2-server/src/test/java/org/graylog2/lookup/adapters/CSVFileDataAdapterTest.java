@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.graylog2.lookup.adapters.CSVFileDataAdapter.Config;
 import static org.graylog2.lookup.adapters.CSVFileDataAdapter.NAME;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -58,7 +58,7 @@ public class CSVFileDataAdapterTest {
     public void doGet_successfully_returns_values() throws Exception {
         final Config config = baseConfig();
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
-        when(pathChecker.isInAllowedPath(anyString())).thenReturn(true);
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true);
         csvFileDataAdapter.doStart();
 
         assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("23"));
@@ -79,7 +79,7 @@ public class CSVFileDataAdapterTest {
                                     .caseInsensitiveLookup(false)
                                     .build();
         csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
-        when(pathChecker.isInAllowedPath(anyString())).thenReturn(true);
+        when(pathChecker.fileIsInAllowedPath((isA(Path.class)))).thenReturn(true);
         csvFileDataAdapter.doStart();
 
         assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("foo"));
@@ -90,7 +90,7 @@ public class CSVFileDataAdapterTest {
     @Test
     public void doGet_failure_filePathInvalid() throws Exception {
         final Config config = baseConfig();
-        when(pathChecker.isInAllowedPath(anyString())).thenReturn(false);
+        when(pathChecker.fileIsInAllowedPath((isA(Path.class)))).thenReturn(false);
         csvFileDataAdapter = new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker);
         assertThatThrownBy(() -> csvFileDataAdapter.doStart())
                 .isExactlyInstanceOf(IllegalStateException.class)
