@@ -14,11 +14,13 @@ type Props = {
   fields: Array<ConfigurationField>,
 };
 
+const NumericField = (props) => <InputField type="number" {...props} />;
+
 const componentForType = (type: string) => {
   switch (type) {
     case 'select': return SelectField;
     case 'boolean': return BooleanField;
-    case 'numeric': return (props) => <InputField type="number" {...props} />;
+    case 'numeric': return NumericField;
     default: throw new Error(`Invalid configuration field type: ${type}`);
   }
 };
@@ -53,7 +55,7 @@ const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Pr
       return (
         <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
-            <Component name={name} value={value} onChange={onChange} error={error} field={field} title={title} />
+            <Component key={`${namePrefix}.${field.name}`} name={name} value={value} onChange={onChange} error={error} field={field} title={title} />
           )}
         </Field>
       );
