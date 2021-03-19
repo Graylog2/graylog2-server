@@ -53,7 +53,10 @@ export type VisualizationFormValues = {};
 export type SortFormValues = {}
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
-  groupBy?: Array<GroupByFormValues>,
+  groupBy?: {
+    columnRollup: boolean,
+    groupings: Array<GroupByFormValues>,
+  },
   visualization?: VisualizationFormValues,
   sort?: SortFormValues,
 }

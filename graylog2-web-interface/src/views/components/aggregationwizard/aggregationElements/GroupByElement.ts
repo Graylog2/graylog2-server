@@ -70,11 +70,16 @@ const groupByToPivot = (groupBy: GroupByFormValues) => {
   return new Pivot(groupBy.field, 'interval' in groupBy ? 'time' : 'values', pivotConfig);
 };
 
-const groupByToConfigWithPivots = (groupByEntires: Array<GroupByFormValues>, config: AggregationWidgetConfig) => {
-  const rowPivots = groupByEntires.filter((groupBy) => groupBy.direction === 'row').map(groupByToPivot);
-  const columnPivots = groupByEntires.filter((groupBy) => groupBy.direction === 'column').map(groupByToPivot);
+const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: AggregationWidgetConfig) => {
+  const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupByToPivot);
+  const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupByToPivot);
+  const { columnRollup } = groupBy;
 
-  return config.toBuilder().rowPivots(rowPivots).columnPivots(columnPivots).build();
+  return config.toBuilder()
+    .rowPivots(rowPivots)
+    .columnPivots(columnPivots)
+    .rollup(columnRollup)
+    .build();
 };
 
 const GroupByElement: AggregationElement = {
@@ -88,9 +93,12 @@ const GroupByElement: AggregationElement = {
     limit: 15,
   }),
   fromConfig: (config: AggregationWidgetConfig) => ({
-    groupBy: pivotsToGroupBy(config),
+    groupBy: {
+      columnRollup: config.rollup,
+      groupings: pivotsToGroupBy(config),
+    },
   }),
-  toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => groupByToConfigWithPivots(formValues.groupBy, config),
+  toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => groupByToConfig(formValues.groupBy, config),
   component: GroupByConfiguration,
 };
 

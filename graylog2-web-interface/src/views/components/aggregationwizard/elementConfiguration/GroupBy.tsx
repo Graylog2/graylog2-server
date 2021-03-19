@@ -59,7 +59,7 @@ type Props = {
 
 const GroupBy = ({ index }: Props) => {
   const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
-  const selectedFieldName = groupBy[index].field;
+  const selectedFieldName = groupBy.groupings[index].field;
   const fieldTypes = useContext(FieldTypesContext);
 
   const selectedField = useMemo(() => fieldTypes.all.find((field) => field.value.name === selectedFieldName), [selectedFieldName, fieldTypes.all]);
@@ -76,7 +76,7 @@ const GroupBy = ({ index }: Props) => {
 
   return (
     <Wrapper>
-      <Field name={`groupBy.${index}.direction`}>
+      <Field name={`groupBy.groupings.${index}.direction`}>
         {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
           <Input id="group-by-direction"
                  label="Direction"
@@ -105,7 +105,7 @@ const GroupBy = ({ index }: Props) => {
         )}
       </Field>
 
-      <Field name={`groupBy.${index}.field`}>
+      <Field name={`groupBy.groupings.${index}.field`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <FieldSelect id="group-by-field-select"
                        label="Field"
@@ -119,72 +119,68 @@ const GroupBy = ({ index }: Props) => {
       </Field>
 
       {isDateField && (
-        <Field name={`groupBy.${index}.interval`}>
-          {({ field: { name, value, onChange }, meta: { error } }) => {
-            console.log({ value });
+        <Field name={`groupBy.groupings.${index}.interval`}>
+          {({ field: { name, value, onChange }, meta: { error } }) => (
+            <Input id="group-by-interval"
+                   label="Interval"
+                   error={error}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9">
+              <TypeCheckboxWrapper>
+                <Checkbox onChange={() => toggleIntervalType(name, value.type, onChange)}
+                          checked={value.type === 'auto'}>
+                  Auto
+                </Checkbox>
+              </TypeCheckboxWrapper>
 
-            return (
-              <Input id="group-by-interval"
-                     label="Interval"
-                     error={error}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <TypeCheckboxWrapper>
-                  <Checkbox onChange={() => toggleIntervalType(name, value.type, onChange)}
-                            checked={value.type === 'auto'}>
-                    Auto
-                  </Checkbox>
-                </TypeCheckboxWrapper>
-
-                {value.type === 'auto' && (
-                  <>
-                    <RangeSelect>
-                      <Icon name="search-minus" size="lg" style={{ paddingRight: '0.5rem' }} />
-                      <FormControl type="range"
-                                   style={{ padding: 0, border: 0 }}
-                                   min={0.5}
-                                   max={10}
-                                   step={0.5}
-                                   value={value.scaling ? (1 / value.scaling) : 1.0}
-                                   onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
-                      <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
-                      <CurrentScale>
-                        {value.scaling ? (1 / value.scaling) : 1.0}x
-                      </CurrentScale>
-                    </RangeSelect>
-                    <HelpBlock className="no-bm">
-                      A smaller granularity leads to <strong>less</strong>, a bigger to <strong>more</strong> values.
-                    </HelpBlock>
-                  </>
-                )}
-                {value.type !== 'auto' && (
-                  <>
-                    <InputGroup>
-                      <FormControl type="number"
-                                   value={value.value}
-                                   step="1"
-                                   min="1"
-                                   onChange={(e) => onChange({ target: { name, value: { ...value, value: e.target.value } } })} />
-                      <InputGroup.Button>
-                        <DropdownButton id="input-dropdown-addon"
-                                        title={TimeUnits[value.unit] || ''}>
-                          {Object.keys(TimeUnits).map((unit) => <MenuItem key={unit} onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>{TimeUnits[unit]}</MenuItem>)}
-                        </DropdownButton>
-                      </InputGroup.Button>
-                    </InputGroup>
-                    <HelpBlock className="no-bm">
-                      The size of the buckets for this timestamp type.
-                    </HelpBlock>
-                  </>
-                )}
-              </Input>
-            );
-          }}
+              {value.type === 'auto' && (
+                <>
+                  <RangeSelect>
+                    <Icon name="search-minus" size="lg" style={{ paddingRight: '0.5rem' }} />
+                    <FormControl type="range"
+                                 style={{ padding: 0, border: 0 }}
+                                 min={0.5}
+                                 max={10}
+                                 step={0.5}
+                                 value={value.scaling ? (1 / value.scaling) : 1.0}
+                                 onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
+                    <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
+                    <CurrentScale>
+                      {value.scaling ? (1 / value.scaling) : 1.0}x
+                    </CurrentScale>
+                  </RangeSelect>
+                  <HelpBlock className="no-bm">
+                    A smaller granularity leads to <strong>less</strong>, a bigger to <strong>more</strong> values.
+                  </HelpBlock>
+                </>
+              )}
+              {value.type !== 'auto' && (
+                <>
+                  <InputGroup>
+                    <FormControl type="number"
+                                 value={value.value}
+                                 step="1"
+                                 min="1"
+                                 onChange={(e) => onChange({ target: { name, value: { ...value, value: e.target.value } } })} />
+                    <InputGroup.Button>
+                      <DropdownButton id="input-dropdown-addon"
+                                      title={TimeUnits[value.unit] || ''}>
+                        {Object.keys(TimeUnits).map((unit) => <MenuItem key={unit} onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>{TimeUnits[unit]}</MenuItem>)}
+                      </DropdownButton>
+                    </InputGroup.Button>
+                  </InputGroup>
+                  <HelpBlock className="no-bm">
+                    The size of the buckets for this timestamp type.
+                  </HelpBlock>
+                </>
+              )}
+            </Input>
+          )}
         </Field>
       )}
 
       {!isDateField && (
-        <FormikFormGroup label="Limit" name={`groupBy.${index}.limit`} type="number" />
+        <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" />
       )}
     </Wrapper>
   );

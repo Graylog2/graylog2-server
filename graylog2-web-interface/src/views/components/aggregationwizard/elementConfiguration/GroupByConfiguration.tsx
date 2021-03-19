@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useFormikContext, FieldArray } from 'formik';
+import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
 import { HoverForHelp } from 'components/common';
@@ -44,8 +44,8 @@ const RollupHoverForHelp = styled(HoverForHelp)`
 
 const GroupByConfiguration = () => {
   const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
-  const defaultValues = { direction: 'row' };
-  const disableColumnRollup = !groupBy.find(({ direction }) => direction === 'column');
+  console.log({ groupBy });
+  const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
 
   return (
     <>
@@ -53,29 +53,33 @@ const GroupByConfiguration = () => {
                   render={(arrayHelpers) => (
                     <>
                       <div>
-                        {groupBy.map((groupByEntity, index) => {
+                        {groupBy.groupings.map((grouping, index) => {
                           return (
-                          // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationSection key={`metrics-${index}`}>
+                            // eslint-disable-next-line react/no-array-index-key
+                            <ElementConfigurationSection key={`grouping-${index}`}>
                               <GroupBy index={index} />
                             </ElementConfigurationSection>
                           );
                         })}
                       </div>
                       <ActionsBar>
-                        <Checkbox onChange={() => {}}
-                                  disabled={disableColumnRollup}
-                                  checked={false}>
-                          <RollupColumnsLabel>
-                            Rollup Columns
-                            <RollupHoverForHelp title="Rollup Columns">
-                              When rollup is enabled, an additional trace totalling individual subtraces will be included.
-                            </RollupHoverForHelp>
-                          </RollupColumnsLabel>
-                        </Checkbox>
+                        <Field name="groupBy.columnRollup">
+                          {({ field: { name, onChange, value } }) => (
+                            <Checkbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
+                                      checked={value}
+                                      disabled={disableColumnRollup}>
+                              <RollupColumnsLabel>
+                                Rollup Columns
+                                <RollupHoverForHelp title="Rollup Columns">
+                                  When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                                </RollupHoverForHelp>
+                              </RollupColumnsLabel>
+                            </Checkbox>
+                          )}
+                        </Field>
                         <ButtonToolbar>
                           <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(GroupByElement.createEmpty())}>
-                            Add an Entry
+                            Add Grouping
                           </Button>
                         </ButtonToolbar>
                       </ActionsBar>
