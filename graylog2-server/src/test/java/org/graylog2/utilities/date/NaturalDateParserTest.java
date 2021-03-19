@@ -17,35 +17,13 @@
 package org.graylog2.utilities.date;
 
 import org.graylog2.plugin.utilities.date.NaturalDateParser;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
-
-    final String[] testsThatAlignToStartOfDay = {
-            "yesterday", "the day before yesterday", "today",
-            "monday", "monday to friday", "last week"
-    };
-
-    final String[][] singleDaytestsThatAlignToAGivenTime = {
-            {"yesterday at noon", "12:00:00"},
-            {"the day before yesterday at 10", "10:00:00"},
-            {"today at 5", "05:00:00"},
-            {"monday at 7", "07:00:00"}
-    };
-
-    final String[][] multipleDaytestsThatAlignToAGivenTime =  {
-            {"monday to friday at 7", "07:00:00"},
-            {"monday to friday at 7:59", "07:59:00"},
-            {"monday to friday at 7:59:59", "07:59:59"}
-    };
 
     @Before
     public void setUp() {
@@ -61,67 +39,6 @@ public class NaturalDateParserTest {
         // It's enough if this does not throw exceptions because we are not testing the underlying library.
         naturalDateParser.parse("today");
         naturalDateParser.parse("last week to today");
-    }
-
-    @Test
-    public void testParseAlignToStartOfDay() throws Exception {
-        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-
-        for(String test: testsThatAlignToStartOfDay) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test);
-            assertNotNull(result.getFrom());
-            assertNotNull(result.getTo());
-
-            assertThat(df.print(result.getFrom())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
-            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
-        }
-    }
-
-    @Test
-    @Ignore
-    /**
-     * This test should be ignored for now. The problem is, that the to-date has the hour subtracted by 1 - which is not reasonable
-     * at all in this context but without further digging into Natty not solvable. And that effort would be too much by now.
-     */
-    public void multipleDaytestParseAlignToAGivenTime() throws Exception {
-        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-
-        for(String[] test: multipleDaytestsThatAlignToAGivenTime) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
-            assertNotNull(result.getFrom());
-            assertNotNull(result.getTo());
-
-            assertThat(df.print(result.getFrom())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
-            assertThat(df.print(result.getTo())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
-        }
-    }
-
-    @Test
-    public void singleDaytestParseAlignToAGivenTime() throws Exception {
-        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-
-        for(String[] test: singleDaytestsThatAlignToAGivenTime) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
-            assertNotNull(result.getFrom());
-            assertNotNull(result.getTo());
-
-            assertThat(df.print(result.getFrom())).as("time part of date should equal "+ test[1] + " in").isEqualTo(test[1]);
-        }
-    }
-
-    @Test
-    public void testParseAlignToStartOfDayEuropeBerlin() throws Exception {
-        final NaturalDateParser naturalDateParser = new NaturalDateParser("Europe/Berlin");
-        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-
-        for(String test: testsThatAlignToStartOfDay) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test);
-            assertNotNull(result.getFrom());
-            assertNotNull(result.getTo());
-
-            assertThat(df.print(result.getFrom())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
-            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
-        }
     }
 
     @Test(expected = NaturalDateParser.DateNotParsableException.class)
@@ -146,16 +63,15 @@ public class NaturalDateParserTest {
     }
 
     // https://github.com/Graylog2/graylog2-server/issues/1226
-    // proposed change of how it works, is that the to-part is actually the first moment of the next day so that comparisons work
     @Test
     public void issue1226() throws Exception {
         NaturalDateParser.Result result99days = naturalDateParser.parse("last 99 days");
-        org.assertj.jodatime.api.Assertions.assertThat(result99days.getFrom()).isEqualToIgnoringMillis(result99days.getTo().minusDays(100));
+        org.assertj.jodatime.api.Assertions.assertThat(result99days.getFrom()).isEqualToIgnoringMillis(result99days.getTo().minusDays(99));
 
         NaturalDateParser.Result result100days = naturalDateParser.parse("last 100 days");
-        org.assertj.jodatime.api.Assertions.assertThat(result100days.getFrom()).isEqualToIgnoringMillis(result100days.getTo().minusDays(101));
+        org.assertj.jodatime.api.Assertions.assertThat(result100days.getFrom()).isEqualToIgnoringMillis(result100days.getTo().minusDays(100));
 
         NaturalDateParser.Result result101days = naturalDateParser.parse("last 101 days");
-        org.assertj.jodatime.api.Assertions.assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(102));
+        org.assertj.jodatime.api.Assertions.assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
     }
 }
