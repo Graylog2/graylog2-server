@@ -48,7 +48,7 @@ const GroupByConfiguration = () => {
 
   return (
     <>
-      <FieldArray name="groupBy"
+      <FieldArray name="groupBy.groupings"
                   render={(arrayHelpers) => (
                     <>
                       <div>
