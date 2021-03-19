@@ -56,7 +56,7 @@
     "react-router-bootstrap": "0.25.0",
     "react-router-dom": "5.2.0",
     "reflux": "0.2.13",
-    "styled-components": "5.1.1",
+    "styled-components": "5.2.1",
     "typescript": "4.2.3",
     "webpack": "4.44.2",
     "webpack-cleanup-plugin": "0.5.1",
