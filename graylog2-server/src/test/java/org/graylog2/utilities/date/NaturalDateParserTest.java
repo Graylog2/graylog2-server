@@ -43,8 +43,8 @@ public class NaturalDateParserTest {
 
     final String[][] multipleDaytestsThatAlignToAGivenTime =  {
             {"monday to friday at 7", "07:00:00"},
-            {"monday to friday at 7", "07:59:00"},
-            {"monday to friday at 7", "07:59:59"}
+            {"monday to friday at 7:59", "07:59:00"},
+            {"monday to friday at 7:59:59", "07:59:59"}
     };
 
     @Before
