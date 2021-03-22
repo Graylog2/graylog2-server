@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 const WidgetWrap = styled.div(({ theme }) => css`
   height: inherit;
   margin: 0;
-  padding: 20px;
+  padding: 12px 15px 15px 15px;
   display: grid;
   display: -ms-grid;
   grid-template-rows: auto minmax(10px, 1fr);

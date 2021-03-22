@@ -18,12 +18,35 @@ import * as React from 'react';
 
 import { singleton } from 'views/logic/singleton';
 
+export type WidgetFocusingState = {
+  id: string,
+  editing: false,
+  focusing: true,
+}
+
+export type WidgetEditingState = {
+  id: string,
+  editing: true,
+  focusing: true,
+}
+
+export type FocusContextState = WidgetFocusingState | WidgetEditingState;
+
 export type WidgetFocusContextType = {
-  focusedWidget: string | undefined | null,
-  setFocusedWidget: (focusedWidget: string | undefined | null) => void,
+  focusedWidget: FocusContextState | undefined,
+  setWidgetFocusing: (widgetId: string) => void,
+  setWidgetEditing: (widgetId: string) => void,
+  unsetWidgetFocusing: () => void,
+  unsetWidgetEditing: () => void,
 };
 
-const defaultContext = { focusedWidget: undefined, setFocusedWidget: () => {} };
+const defaultContext = {
+  focusedWidget: undefined,
+  setWidgetFocusing: () => {},
+  setWidgetEditing: () => {},
+  unsetWidgetFocusing: () => {},
+  unsetWidgetEditing: () => {},
+};
 
 const WidgetFocus = React.createContext<WidgetFocusContextType>(defaultContext);
 

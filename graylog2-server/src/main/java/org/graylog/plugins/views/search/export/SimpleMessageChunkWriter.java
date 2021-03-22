@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.journal;
+package org.graylog.plugins.views.search.export;
 
-import com.google.inject.Scopes;
-import org.graylog2.plugin.inject.Graylog2Module;
+import javax.ws.rs.ext.MessageBodyWriter;
+import java.lang.reflect.Type;
 
-public class KafkaJournalModule extends Graylog2Module {
-    @Override
-    protected void configure() {
-        bind(Journal.class).to(KafkaJournal.class).in(Scopes.SINGLETON);
+public abstract class SimpleMessageChunkWriter implements MessageBodyWriter<SimpleMessageChunk> {
+    protected boolean typesMatch(Class<?> type, Type genericType) {
+        return SimpleMessageChunk.class.equals(type) || isAutoValueType(type, genericType);
+    }
+
+    private boolean isAutoValueType(Class<?> type, Type genericType) {
+        return AutoValue_SimpleMessageChunk.class.equals(type) && SimpleMessageChunk.class.equals(genericType);
     }
 }

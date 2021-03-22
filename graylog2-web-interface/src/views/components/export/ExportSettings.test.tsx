@@ -22,11 +22,11 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import CSVExportSettings from 'views/components/searchbar/csvexport/CSVExportSettings';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
+import ExportSettings from './ExportSettings';
 import { viewWithoutWidget, stateWithOneWidget } from './Fixtures';
 
 const CustomExportComponent = () => <>This is a custom export component</>;
@@ -59,10 +59,10 @@ const pluginExports = {
 
 const fields = Immutable.List([FieldTypeMapping.create('foo', FieldType.create('long'))]);
 
-const SimpleExportSettings = (props: Omit<React.ComponentProps<typeof CSVExportSettings>, 'fields'>) => (
+const SimpleExportSettings = (props: Omit<React.ComponentProps<typeof ExportSettings>, 'fields'>) => (
   <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
     {() => (
-      <CSVExportSettings fields={fields} {...props} />
+      <ExportSettings fields={fields} {...props} />
     )}
   </Formik>
 );
@@ -74,7 +74,7 @@ const view = viewWithoutWidget(View.Type.Search).toBuilder()
   .state(Immutable.Map({ 'query-id-1': stateWithOneWidget(customWidget) }))
   .build();
 
-describe('CSVExportSettings', () => {
+describe('ExportSettings', () => {
   beforeAll(() => {
     PluginStore.register(pluginExports);
   });

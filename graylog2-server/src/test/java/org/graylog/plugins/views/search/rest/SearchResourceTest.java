@@ -121,6 +121,7 @@ public class SearchResourceTest {
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
+        when(searchDbService.get(null)).thenThrow(NullPointerException.class);
         this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), permittedStreams);
 
         when(currentUser.getName()).thenReturn("admin");
@@ -309,6 +310,13 @@ public class SearchResourceTest {
 
         assertThatExceptionOfType(ForbiddenException.class)
                 .isThrownBy(() -> searchResource.createSearch(search));
+    }
+
+    @Test
+    public void allowCreatingNewSearchWithoutId() {
+        final Search search = Search.builder().id(null).build();
+
+        this.searchResource.createSearch(search);
     }
 
     private void mockCurrentUserName(String name) {

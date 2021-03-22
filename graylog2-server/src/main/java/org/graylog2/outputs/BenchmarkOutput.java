@@ -28,7 +28,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -45,19 +45,19 @@ public class BenchmarkOutput implements MessageOutput {
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final Meter messagesWritten;
     private final CsvReporter csvReporter;
-    private final Journal journal;
+    private final MessageQueueAcknowledger messageQueueAcknowledger;
 
     @AssistedInject
     public BenchmarkOutput(final MetricRegistry metricRegistry,
-                           final Journal journal,
+                           final MessageQueueAcknowledger messageQueueAcknowledger,
                            @Assisted Stream stream,
                            @Assisted Configuration configuration) {
-        this(metricRegistry, journal);
+        this(metricRegistry, messageQueueAcknowledger);
     }
 
     @Inject
-    public BenchmarkOutput(final MetricRegistry metricRegistry, final Journal journal) {
-        this.journal = journal;
+    public BenchmarkOutput(final MetricRegistry metricRegistry, MessageQueueAcknowledger messageQueueAcknowledger) {
+        this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
 
         final File directory = new File("benchmark-csv");
@@ -89,19 +89,13 @@ public class BenchmarkOutput implements MessageOutput {
 
     @Override
     public void write(Message message) throws Exception {
-        journal.markJournalOffsetCommitted(message.getJournalOffset());
+        messageQueueAcknowledger.acknowledge(message);
         messagesWritten.mark();
     }
 
     @Override
     public void write(List<Message> messages) throws Exception {
-        long maxOffset = Long.MIN_VALUE;
-
-        for (final Message message : messages) {
-            maxOffset = Math.max(message.getJournalOffset(), maxOffset);
-        }
-
-        journal.markJournalOffsetCommitted(maxOffset);
+        messageQueueAcknowledger.acknowledge(messages);
 
         messagesWritten.mark(messages.size());
     }

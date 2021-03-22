@@ -107,6 +107,7 @@ export class Builder {
       .send(body)
       .type('json')
       .accept(mimeType)
+      .parse(({ text }) => text)
       .then((resp) => {
         if (resp.ok) {
           reportServerSuccess();

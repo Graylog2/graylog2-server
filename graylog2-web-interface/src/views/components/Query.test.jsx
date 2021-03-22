@@ -50,7 +50,7 @@ const widgets = Immutable.Map({ widget1, widget2 });
 
 describe('Query', () => {
   const SUT = (props) => (
-    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setFocusedWidget: () => {} }}>
+    <WidgetFocusContext.Provider value={{ focusedWidget: undefined, setWidgetFocusing: () => {}, setWidgetEditing: () => {} }}>
       <Query results={{ errors: [], searchTypes: {} }}
              widgetMapping={widgetMapping}
              widgets={widgets}

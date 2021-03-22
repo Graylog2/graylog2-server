@@ -31,12 +31,12 @@ import Widget from 'views/logic/widgets/Widget';
 import { Icon, Spinner } from 'components/common';
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CSVExportSettings from 'views/components/searchbar/csvexport/CSVExportSettings';
-import CSVExportWidgetSelection from 'views/components/searchbar/csvexport/CSVExportWidgetSelection';
+import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
-import { ExportSettings } from 'views/components/ExportSettingsContext';
+import { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
 
+import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
@@ -73,10 +73,11 @@ type FormState = {
   selectedWidget: Widget | undefined,
   limit: number,
   selectedFields: Array<{ field: string }>,
-  customSettings: ExportSettings,
+  customSettings: ExportSettingsType,
+  format: string,
 };
 
-const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
+const ExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
   const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
@@ -87,10 +88,10 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
 
   const singleWidgetDownload = !!directExportWidgetId;
 
-  const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings }: FormState) => {
+  const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings, format }: FormState) => {
     setLoading(true);
 
-    return startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings)
+    return startDownload(format, downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings)
       .then(closeModal)
       .finally(() => setLoading(false));
   };
@@ -100,6 +101,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
     selectedFields: initialSelectedFields,
     limit: undefined,
     customSettings: {},
+    format: 'csv',
   };
 
   return (
@@ -120,7 +122,6 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
               </Modal.Header>
               <Modal.Body>
                 <Content>
-
                   {showWidgetSelection && (
                   <Field name="selectedWidget">
                     {({ field: { name, onChange } }) => {
@@ -131,24 +132,24 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
                       };
 
                       return (
-                        <CSVExportWidgetSelection selectWidget={onChangeSelectWidget}
-                                                  view={view}
-                                                  widgets={exportableWidgets.toList()} />
+                        <ExportWidgetSelection selectWidget={onChangeSelectWidget}
+                                               view={view}
+                                               widgets={exportableWidgets.toList()} />
                       );
                     }}
                   </Field>
                   )}
                   {!showWidgetSelection && (
-                  <CSVExportSettings fields={fields}
-                                     selectedWidget={initialSelectedWidget}
-                                     view={view} />
+                  <ExportSettings fields={fields}
+                                  selectedWidget={initialSelectedWidget}
+                                  view={view} />
                   )}
                 </Content>
               </Modal.Body>
               <Modal.Footer>
                 {allowWidgetSelection && <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">Select different message table</Button>}
                 <Button type="button" onClick={closeModal}>Close</Button>
-                <Button type="submit" onClick={submitForm} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+                <Button type="submit" onClick={submitForm} disabled={!enableDownload} bsStyle="primary" data-testid="download-button">
                   {loading
                     ? <Spinner text="Downloading..." delay={0} />
                     : <><Icon name="cloud-download-alt" />&nbsp;Start Download</>}
@@ -162,19 +163,19 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   );
 };
 
-CSVExportModal.propTypes = {
+ExportModal.propTypes = {
   closeModal: PropTypes.func,
   directExportWidgetId: PropTypes.string,
   fields: CustomPropTypes.FieldListType.isRequired,
 };
 
-CSVExportModal.defaultProps = {
+ExportModal.defaultProps = {
   closeModal: () => {},
   directExportWidgetId: null,
 };
 
 export default connect(
-  CSVExportModal,
+  ExportModal,
   {
     fields: FieldTypesStore,
     executionState: SearchExecutionStateStore,

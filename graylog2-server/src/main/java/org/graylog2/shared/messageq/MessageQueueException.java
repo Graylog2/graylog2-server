@@ -14,21 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.journal;
+package org.graylog2.shared.messageq;
 
-import com.google.common.util.concurrent.Service;
-import com.google.inject.Scopes;
-import com.google.inject.multibindings.Multibinder;
-import org.graylog2.plugin.inject.Graylog2Module;
-
-public class JournalReaderModule extends Graylog2Module {
-
-    @Override
-    protected void configure() {
-        final Multibinder<Service> serviceBinder = serviceBinder();
-        serviceBinder.addBinding().to(JournalReader.class).in(Scopes.SINGLETON);
-        serviceBinder.addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
-
+public class MessageQueueException extends Exception {
+    public MessageQueueException(String message, Throwable cause) {
+        super(message, cause);
     }
 
+    public MessageQueueException(String message) {
+        super(message);
+    }
 }
