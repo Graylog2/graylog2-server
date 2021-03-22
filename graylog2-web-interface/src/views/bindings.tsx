@@ -33,8 +33,6 @@ import AggregationBuilder from 'views/components/aggregationbuilder/AggregationB
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
-import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
-import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
@@ -82,14 +80,9 @@ import {
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
-import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
-import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
-import {
-  AreaVisualizationConfigFormValues,
-  BarVisualizationConfigFormValues, HeatMapVisualizationConfigFormValues,
-  LineVisualizationConfigFormValues, NumberVisualizationConfigFormValues,
-} from 'views/components/aggregationwizard/WidgetConfigForm';
+import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import visualizationBindings from 'views/components/visualizations/bindings';
+import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
