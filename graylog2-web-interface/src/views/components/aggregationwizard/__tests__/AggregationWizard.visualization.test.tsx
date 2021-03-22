@@ -21,19 +21,14 @@ const SimpleAggregationWizard = (props) => (
 
 const dataTableVisualization = makeVisualization(() => <span>This is the chart.</span>, 'table');
 
-type ExtraConfigSettings = {
+interface ExtraConfigSettings {
   mode: 'onemode' | 'anothermode' | 'thirdmode',
   color?: 'red' | 'green' | 'blue',
   invert: boolean,
   factor: number,
 }
 
-interface ExtraConfigWidget extends VisualizationConfig {
-  mode: 'onemode' | 'anothermode' | 'thirdmode',
-  color?: 'red' | 'green' | 'blue',
-  invert: boolean,
-  factor: number,
-}
+interface ExtraConfigWidget extends VisualizationConfig, ExtraConfigSettings {}
 
 const fromConfig = (config: ExtraConfigWidget): ExtraConfigSettings => ({ ...config });
 const createVisualizationConfig = (config: ExtraConfigSettings) => ({ ...config }) as ExtraConfigWidget;
