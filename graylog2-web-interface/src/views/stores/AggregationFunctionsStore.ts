@@ -19,10 +19,15 @@ import Reflux from 'reflux';
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'views/logic/singleton';
+import { Store } from 'stores/StoreTypes';
 
 const functionsUrl = URLUtils.qualifyUrl('/views/functions');
 
-export default singletonStore(
+type AggregationFunctionsStoreState = {
+  [functionName: string]: { type: string } | undefined,
+}
+
+const AggregationFunctionsStore: Store<AggregationFunctionsStoreState> = singletonStore(
   'views.AggregationFunctions',
   () => Reflux.createStore({
     init() {
@@ -47,3 +52,5 @@ export default singletonStore(
     },
   }),
 );
+
+export default AggregationFunctionsStore;

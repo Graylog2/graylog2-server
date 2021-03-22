@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type { AggregationElement } from './AggregationElementType';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
 
-type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
+const GroupByElement: AggregationElement = {
+  title: 'Group By',
+  key: 'groupBy',
+  order: 1,
+  allowCreate: () => true,
+  component: GroupByConfiguration,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
-);
-
-export default SaveOrCancelButtons;
+export default GroupByElement;
