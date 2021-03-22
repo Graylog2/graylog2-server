@@ -95,7 +95,6 @@ describe('StreamSearchPage', () => {
 
   it('shows loading spinner before rendering page', async () => {
     const { findByText, getByText } = render(<SimpleStreamSearchPage />);
-    // @ts-ignore
     act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();

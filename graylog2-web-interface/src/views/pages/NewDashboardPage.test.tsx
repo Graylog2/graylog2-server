@@ -59,7 +59,6 @@ describe('NewDashboardPage', () => {
   it('shows loading spinner before rendering page', async () => {
     const { findByText, getByText } = render(<SimpleNewDashboardPage />);
 
-    // @ts-ignore
     act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();

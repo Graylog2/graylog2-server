@@ -29,17 +29,17 @@ import { Colors } from './colors';
 import { THEME_MODES, ThemeMode } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
-interface generateCustomFn {
+interface generateCustomThemeColorsType {
   graylogColors: Colors,
   mode: ThemeMode,
   initialLoad: boolean,
 }
 
-interface generateFn {
+interface generateThemeType {
   changeMode: (ThemeMode) => void,
   mode: ThemeMode,
   initialLoad?: boolean,
-  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomFn) => Promise<Colors> | undefined,
+  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<Colors> | undefined,
 }
 
 function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
@@ -63,7 +63,7 @@ function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
   };
 }
 
-const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLoad = false }: generateFn) => {
+const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLoad = false }: generateThemeType) => {
   if (generateCustomThemeColors) {
     return generateCustomThemeColors({
       graylogColors: colors[mode],
