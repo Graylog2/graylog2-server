@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { isEmpty } from 'lodash';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import type { AggregationElement } from './AggregationElementType';
 
-type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
+import VisualizationConfiguration from '../elementConfiguration/VisualizationConfiguration';
+import { WidgetConfigFormValues } from '../WidgetConfigForm';
+
+const VisualizationElement: AggregationElement = {
+  title: 'Visualization',
+  key: 'visualization',
+  order: 4,
+  allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.visualization),
+  component: VisualizationConfiguration,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
-);
-
-export default SaveOrCancelButtons;
+export default VisualizationElement;

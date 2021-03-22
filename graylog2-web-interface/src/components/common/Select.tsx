@@ -214,6 +214,7 @@ type Props = {
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
+  ref?: React.Ref<React.ComponentType>,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   value?: Object | Array<Object> | null | undefined,
@@ -293,6 +294,7 @@ class Select extends React.Component<Props, State> {
      */
     value: PropTypes.oneOfType([
       PropTypes.string,
+      PropTypes.number,
       PropTypes.object,
       PropTypes.arrayOf(PropTypes.object),
     ]),

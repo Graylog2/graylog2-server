@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import { ConfigurationField } from 'components/configurationforms/types';
 
-type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
+export const hasAttribute = (array: Array<string>, attribute: string): boolean => {
+  return array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
-);
+export const optionalMarker = (field: ConfigurationField): React.ReactNode | null => {
+  return field.is_optional && field.type !== 'boolean' ? <span className="configuration-field-optional">(optional)</span> : null;
+};
 
-export default SaveOrCancelButtons;
+export default {
+  hasAttribute,
+  optionalMarker,
+};

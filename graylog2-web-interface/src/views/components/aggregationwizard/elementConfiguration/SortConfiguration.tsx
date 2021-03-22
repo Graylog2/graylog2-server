@@ -16,18 +16,20 @@
  */
 import * as React from 'react';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
+  config: AggregationWidgetConfig,
+  onConfigChange: (newConfig: AggregationWidgetConfig) => void
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const SortConfiguration = ({ config, onConfigChange }: Props) => {
+  return (
+    <>
+      Configuration Elements
+    </>
+  );
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
-);
-
-export default SaveOrCancelButtons;
+export default SortConfiguration;

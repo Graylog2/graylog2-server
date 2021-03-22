@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { isEmpty } from 'lodash';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import type { AggregationElement } from './AggregationElementType';
 
-type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
+import SortConfiguration from '../elementConfiguration/SortConfiguration';
+import { WidgetConfigFormValues } from '../WidgetConfigForm';
+
+const SortElement: AggregationElement = {
+  title: 'Sort',
+  key: 'sort',
+  order: 3,
+  allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.sort),
+  component: SortConfiguration,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
-);
-
-export default SaveOrCancelButtons;
+export default SortElement;

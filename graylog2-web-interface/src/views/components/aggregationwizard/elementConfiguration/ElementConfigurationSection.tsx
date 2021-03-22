@@ -15,19 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+const SectionContainer = styled.div(({ theme }) => css`
+  border-bottom: 1px solid ${theme.colors.variant.lighter.default};
+  margin-bottom: 5px;
+
+  :last-of-type {
+    border-bottom: 0;
+    margin-bottom: 0;
+  }
+`);
 
 type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
-};
+  children: React.ReactNode,
+}
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
+const ElementConfigurationSection = ({ children }: Props) => (
+  <SectionContainer>
+    {children}
+  </SectionContainer>
 );
 
-export default SaveOrCancelButtons;
+export default ElementConfigurationSection;

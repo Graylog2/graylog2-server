@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import type { AggregationElement } from './AggregationElementType';
 
-const FieldHelpers = {
-  hasAttribute: (ary, attribute) => {
-    return ary.indexOf(attribute) > -1;
-  },
-  optionalMarker: (field) => {
-    return field.is_optional && field.type !== 'boolean' ? <span className="configuration-field-optional">(optional)</span> : null;
-  },
+import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
+
+const GroupByElement: AggregationElement = {
+  title: 'Group By',
+  key: 'groupBy',
+  order: 1,
+  allowCreate: () => true,
+  component: GroupByConfiguration,
 };
 
-/** @component */
-export default FieldHelpers;
+export default GroupByElement;

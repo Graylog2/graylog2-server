@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import MetricElement from './MetricElement';
+import VisualizationElement from './VisualizationElement';
+import SortElement from './SortElement';
+import GroupByElement from './GroupByElement';
 
-type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
-};
-
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
-);
-
-export default SaveOrCancelButtons;
+export default [
+  VisualizationElement,
+  MetricElement,
+  SortElement,
+  GroupByElement,
+];
