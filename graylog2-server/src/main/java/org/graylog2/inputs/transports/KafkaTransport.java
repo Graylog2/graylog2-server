@@ -28,24 +28,23 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import kafka.consumer.Consumer;
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.ConsumerIterator;
-import kafka.consumer.ConsumerTimeoutException;
-import kafka.consumer.KafkaStream;
-import kafka.consumer.TopicFilter;
-import kafka.consumer.Whitelist;
-import kafka.javaapi.consumer.ConsumerConnector;
-import kafka.message.MessageAndMetadata;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.InvalidOffsetException;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.errors.AuthorizationException;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.graylog.shaded.kafka09.consumer.Consumer;
+import org.graylog.shaded.kafka09.consumer.ConsumerConfig;
+import org.graylog.shaded.kafka09.consumer.ConsumerIterator;
+import org.graylog.shaded.kafka09.consumer.ConsumerTimeoutException;
+import org.graylog.shaded.kafka09.consumer.KafkaStream;
+import org.graylog.shaded.kafka09.consumer.TopicFilter;
+import org.graylog.shaded.kafka09.consumer.Whitelist;
+import org.graylog.shaded.kafka09.javaapi.consumer.ConsumerConnector;
+import org.graylog.shaded.kafka09.message.MessageAndMetadata;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -71,6 +70,7 @@ import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -78,7 +78,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -250,18 +249,16 @@ public class KafkaTransport extends ThrottleableTransport {
     }
 
     private class ConsumerRunnable implements Runnable {
-        private final Properties props;
         private final MessageInput input;
         private final KafkaConsumer<byte[], byte[]> consumer;
 
         public ConsumerRunnable(Properties props, MessageInput input, int threadId) {
             this.input = input;
             final Properties nprops = (Properties) props.clone();
-            nprops.put("client.id", "gl2-" + nodeId + "-" + input.getId() + "-" + threadId);
-            this.props = nprops;
-            consumer = new KafkaConsumer<>(props);
+            nprops.put("client.id", "gl2-" + nodeId.getShortNodeId() + "-" + input.getId() + "-" + threadId);
+            consumer = new KafkaConsumer<>(nprops);
             //noinspection ConstantConditions
-            consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)), new NoOpConsumerRebalanceListener());
+            consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)));
         }
 
         private void consumeRecords(ConsumerRecords<byte[], byte[]> consumerRecords) {
@@ -297,14 +294,11 @@ public class KafkaTransport extends ThrottleableTransport {
 
         private Optional<ConsumerRecords<byte[], byte[]>> tryPoll() {
             try {
-                // Workaround https://issues.apache.org/jira/browse/KAFKA-4189 by calling wakeup()
-                final ScheduledFuture<?> future = scheduler.schedule(consumer::wakeup, 2000, TimeUnit.MILLISECONDS);
-                final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(1000);
-                future.cancel(true);
+                final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(Duration.ofSeconds(1));
 
                 return Optional.of(consumerRecords);
             } catch (WakeupException e) {
-                LOG.error("WakeupException in poll. Kafka server is not responding.");
+                LOG.error("WakeupException in poll.");
             } catch (InvalidOffsetException | AuthorizationException e) {
                 LOG.error("Exception in poll.", e);
             }
@@ -339,9 +333,7 @@ public class KafkaTransport extends ThrottleableTransport {
             // this might trigger a couple of times, but it won't hurt
             consumer.commitAsync();
             stopLatch.countDown();
-            // TODO once we update our kafka client, we should call this with a timeout
-            // Otherwise might hang if kafka is not available: https://issues.apache.org/jira/browse/KAFKA-3822
-            consumer.close();
+            consumer.close(Duration.ofSeconds(5));
         }
     }
 
@@ -349,7 +341,7 @@ public class KafkaTransport extends ThrottleableTransport {
         final Properties props = new Properties();
 
         props.put("group.id", configuration.getString(CK_GROUP_ID, DEFAULT_GROUP_ID));
-        props.put("client.id", "gl2-" + nodeId + "-" + input.getId());
+        props.put("client.id", "gl2-" + nodeId.getShortNodeId() + "-" + input.getId());
 
         props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
         props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));

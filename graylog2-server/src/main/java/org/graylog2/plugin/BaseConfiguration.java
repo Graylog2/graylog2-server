@@ -17,6 +17,8 @@
 package org.graylog2.plugin;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -26,13 +28,18 @@ import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.graylog2.utilities.ProxyHostsPatternConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+
+import static org.graylog2.shared.messageq.MessageQueueModule.DISK_JOURNAL_MODE;
+import static org.graylog2.shared.messageq.MessageQueueModule.NOOP_JOURNAL_MODE;
 
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration extends PathConfiguration {
@@ -64,6 +71,9 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     @Parameter("message_journal_enabled")
     private boolean messageJournalEnabled = true;
+
+    @Parameter(value = "message_journal_mode")
+    private String messageJournalMode = MessageQueueModule.DISK_JOURNAL_MODE;
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
@@ -188,5 +198,31 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public String getInstallationSource() {
         return installationSource;
+    }
+
+    /**
+     * Journal mode will be "noop" if the journal is disabled or the configured journal mode otherwise.
+     */
+    public String getMessageJournalMode() {
+        return messageJournalEnabled ? messageJournalMode : NOOP_JOURNAL_MODE;
+    }
+
+    @ValidatorMethod
+    public void validateJournalMode() throws ValidationException {
+        if (!messageJournalEnabled) {
+            return;
+        }
+
+        // the noop implementation is not fully functional and relies on the journal mode being disabled because
+        // otherwise message would be lost.
+        if (messageJournalMode.equals(NOOP_JOURNAL_MODE)) {
+            throw new ValidationException("Setting message journal mode to <" + NOOP_JOURNAL_MODE +
+                    "> without disabling the message journal is not supported.");
+        }
+
+        if (StringUtils.isBlank(messageJournalMode)) {
+            throw new ValidationException("Journal mode (e.g. <" + DISK_JOURNAL_MODE + ">) needs to be " +
+                    "provided when the journal is enabled.");
+        }
     }
 }

@@ -18,6 +18,7 @@ package org.graylog2.shared.journal;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
@@ -28,23 +29,29 @@ import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Uninterruptibles;
-import kafka.common.KafkaException;
-import kafka.common.OffsetOutOfRangeException;
-import kafka.common.TopicAndPartition;
-import kafka.log.CleanerConfig;
-import kafka.log.Log;
-import kafka.log.LogAppendInfo;
-import kafka.log.LogConfig;
-import kafka.log.LogManager;
-import kafka.log.LogSegment;
-import kafka.message.ByteBufferMessageSet;
-import kafka.message.Message;
-import kafka.message.MessageAndOffset;
-import kafka.message.MessageSet;
-import kafka.server.BrokerState;
-import kafka.server.RunningAsBroker;
-import kafka.utils.KafkaScheduler;
-import kafka.utils.Time;
+import org.apache.commons.lang3.StringUtils;
+import org.graylog.shaded.kafka09.common.KafkaException;
+import org.graylog.shaded.kafka09.common.OffsetOutOfRangeException;
+import org.graylog.shaded.kafka09.common.TopicAndPartition;
+import org.graylog.shaded.kafka09.log.CleanerConfig;
+import org.graylog.shaded.kafka09.log.Log;
+import org.graylog.shaded.kafka09.log.LogAppendInfo;
+import org.graylog.shaded.kafka09.log.LogConfig;
+import org.graylog.shaded.kafka09.log.LogManager;
+import org.graylog.shaded.kafka09.log.LogSegment;
+import org.graylog.shaded.kafka09.message.ByteBufferMessageSet;
+import org.graylog.shaded.kafka09.message.Message;
+import org.graylog.shaded.kafka09.message.MessageAndOffset;
+import org.graylog.shaded.kafka09.message.MessageSet;
+import org.graylog.shaded.kafka09.scala.Option;
+import org.graylog.shaded.kafka09.scala.collection.Iterator;
+import org.graylog.shaded.kafka09.scala.collection.JavaConversions;
+import org.graylog.shaded.kafka09.scala.collection.Map$;
+import org.graylog.shaded.kafka09.scala.runtime.AbstractFunction1;
+import org.graylog.shaded.kafka09.server.BrokerState;
+import org.graylog.shaded.kafka09.server.RunningAsBroker;
+import org.graylog.shaded.kafka09.utils.KafkaScheduler;
+import org.graylog.shaded.kafka09.utils.Time;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
@@ -55,11 +62,6 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Option;
-import scala.collection.Iterator;
-import scala.collection.JavaConversions;
-import scala.collection.Map$;
-import scala.runtime.AbstractFunction1;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -98,9 +100,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.graylog2.plugin.Tools.bytesToHex;
 
 @Singleton
-public class KafkaJournal extends AbstractIdleService implements Journal {
+public class LocalKafkaJournal extends AbstractIdleService implements Journal {
+    private static final Logger LOG = LoggerFactory.getLogger(LocalKafkaJournal.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaJournal.class);
+    private static final String LEGACY_CLASS_NAME = "org.graylog2.shared.journal.KafkaJournal";
 
     private static final int NUM_IO_THREADS = 1;
 
@@ -176,38 +179,38 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final int throttleThresholdPercentage;
 
     @Inject
-    public KafkaJournal(@Named("message_journal_dir") Path journalDirectory,
-                        @Named("scheduler") ScheduledExecutorService scheduler,
-                        @Named("message_journal_segment_size") Size segmentSize,
-                        @Named("message_journal_segment_age") Duration segmentAge,
-                        @Named("message_journal_max_size") Size retentionSize,
-                        @Named("message_journal_max_age") Duration retentionAge,
-                        @Named("message_journal_flush_interval") long flushInterval,
-                        @Named("message_journal_flush_age") Duration flushAge,
-                        @Named("lb_throttle_threshold_percentage") int throttleThresholdPercentage,
-                        MetricRegistry metricRegistry,
-                        ServerStatus serverStatus) {
+    public LocalKafkaJournal(@Named("message_journal_dir") Path journalDirectory,
+                             @Named("scheduler") ScheduledExecutorService scheduler,
+                             @Named("message_journal_segment_size") Size segmentSize,
+                             @Named("message_journal_segment_age") Duration segmentAge,
+                             @Named("message_journal_max_size") Size retentionSize,
+                             @Named("message_journal_max_age") Duration retentionAge,
+                             @Named("message_journal_flush_interval") long flushInterval,
+                             @Named("message_journal_flush_age") Duration flushAge,
+                             @Named("lb_throttle_threshold_percentage") int throttleThresholdPercentage,
+                             MetricRegistry metricRegistry,
+                             ServerStatus serverStatus) {
 
         this(journalDirectory, scheduler, segmentSize, segmentAge, retentionSize, retentionAge, flushInterval, flushAge,
-             throttleThresholdPercentage, metricRegistry, serverStatus, KafkaJournal.class.getName());
+             throttleThresholdPercentage, metricRegistry, serverStatus, LocalKafkaJournal.class.getName());
     }
 
     /**
      * @param throttleThresholdPercentage The journal utilization percent at which throttling will be triggered.
      *                                    Expressed as an integer between 1 and 100. The value -1 disables throttling.
      */
-    public KafkaJournal(Path journalDirectory,
-                        ScheduledExecutorService scheduler,
-                        Size segmentSize,
-                        Duration segmentAge,
-                        Size retentionSize,
-                        Duration retentionAge,
-                        long flushInterval,
-                        Duration flushAge,
-                        int throttleThresholdPercentage,
-                        MetricRegistry metricRegistry,
-                        ServerStatus serverStatus,
-                        String metricPrefix) {
+    public LocalKafkaJournal(Path journalDirectory,
+                             ScheduledExecutorService scheduler,
+                             Size segmentSize,
+                             Duration segmentAge,
+                             Size retentionSize,
+                             Duration retentionAge,
+                             long flushInterval,
+                             Duration flushAge,
+                             int throttleThresholdPercentage,
+                             MetricRegistry metricRegistry,
+                             ServerStatus serverStatus,
+                             String metricPrefix) {
 
         // Only check throttleThresholdPercentage range if throttling is not disabled;
         if (throttleThresholdPercentage == THRESHOLD_THROTTLING_DISABLED) {
@@ -349,7 +352,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 @Override
                 public Date getValue() {
                     long oldestSegment = Long.MAX_VALUE;
-                    for (final LogSegment segment : KafkaJournal.this.getSegments()) {
+                    for (final LogSegment segment : LocalKafkaJournal.this.getSegments()) {
                         oldestSegment = Math.min(oldestSegment, segment.created());
                     }
 
@@ -369,6 +372,26 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             throw new RuntimeException(e);
         }
 
+        if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
+            registerLegacyMetrics();
+        }
+    }
+
+    /**
+     * This class has been renamed. For backwards compatibility, register the metrics under the old name as well.
+     */
+    private void registerLegacyMetrics() {
+        this.metricRegistry.getMetrics().entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(LocalKafkaJournal.class.getName()))
+                .forEach(entry -> {
+                    String legacyName = LEGACY_CLASS_NAME +
+                            StringUtils.removeStart(entry.getKey(), LocalKafkaJournal.class.getName());
+                    try {
+                        this.metricRegistry.register(legacyName, entry.getValue());
+                    } catch (Exception e) {
+                        LOG.warn("Unable to register metric <{}> under legacy name <{}>.", entry.getKey(), legacyName);
+                    }
+                });
     }
 
     /**
@@ -435,6 +458,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_RECOVERY_POINT));
         this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME));
         this.metricRegistry.remove(getOldestSegmentMetricName());
+
+        if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
+            this.metricRegistry.removeMatching(MetricFilter.startsWith(LEGACY_CLASS_NAME));
+        }
     }
 
     private String getOldestSegmentMetricName() {
@@ -444,7 +471,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
          * of KafkaJournal. This is an override to provide the old metric name for the input journal, and unique names
          * for instances. */
         String journalOldestSegmentMetricName = GlobalMetricNames.JOURNAL_OLDEST_SEGMENT;
-        if (!KafkaJournal.class.getName().equals(metricPrefix)) {
+        if (!LocalKafkaJournal.class.getName().equals(metricPrefix)) {
             journalOldestSegmentMetricName = name(metricPrefix, GlobalMetricNames.OLDEST_SEGMENT_SUFFIX);
         }
         return journalOldestSegmentMetricName;
@@ -602,7 +629,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             while (iterator.hasNext()) {
                 final MessageAndOffset messageAndOffset = iterator.next();
 
-                if (firstOffset == Long.MIN_VALUE) firstOffset = messageAndOffset.offset();
+                if (firstOffset == Long.MIN_VALUE) {
+                    firstOffset = messageAndOffset.offset();
+                }
                 // always remember the last seen offset for debug purposes below
                 lastOffset = messageAndOffset.offset();
 
@@ -892,7 +921,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             int total = 0;
             final Timer.Context ctx = new Timer().time();
             for (final Log kafkaLog : JavaConversions.asJavaIterable(logManager.allLogs())) {
-                if (kafkaLog.config().compact()) continue;
+                if (kafkaLog.config().compact()) {
+                    continue;
+                }
                 loggerForCleaner.debug("Garbage collecting {}", kafkaLog.name());
                 total += cleanupExpiredSegments(kafkaLog) +
                         cleanupSegmentsToMaintainSize(kafkaLog) +
@@ -908,7 +939,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         private int cleanupExpiredSegments(final Log kafkaLog) {
             // don't run if nothing will be done
             if (kafkaLog.size() == 0 && kafkaLog.numberOfSegments() < 1) {
-                KafkaJournal.this.purgedSegmentsInLastRetention.set(0);
+                LocalKafkaJournal.this.purgedSegmentsInLastRetention.set(0);
                 return 0;
             }
             int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
@@ -925,7 +956,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     return shouldDelete;
                 }
             });
-            KafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
+            LocalKafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
             return deletedSegments;
         }
 
@@ -956,9 +987,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             final long retentionSize = kafkaLog.config().retentionSize();
             final long currentSize = kafkaLog.size();
             final double utilizationPercentage = retentionSize > 0 ? (currentSize * 100) / retentionSize : 0.0;
-            if (utilizationPercentage > KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
+            if (utilizationPercentage > LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
                 LOG.warn("Journal utilization ({}%) has gone over {}%.", utilizationPercentage,
-                        KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE);
+                        LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE);
             }
 
             // Don't update the load balancer state if throttling is disabled.
@@ -967,7 +998,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             }
 
             if (retentionSize < 0 || currentSize < retentionSize) {
-                KafkaJournal.this.purgedSegmentsInLastRetention.set(0);
+                LocalKafkaJournal.this.purgedSegmentsInLastRetention.set(0);
                 return 0;
             }
             final long[] diff = {currentSize - retentionSize};
@@ -988,7 +1019,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     }
                 }
             });
-            KafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
+            LocalKafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
             return deletedSegments;
         }
 
@@ -1002,7 +1033,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             // we need to iterate through all segments to the find the cutoff point for the committed offset.
             // unfortunately finding the largest offset contained in a segment is expensive (it involves reading the entire file)
             // so we have to get a global view.
-            final long committedOffset = KafkaJournal.this.committedOffset.get();
+            final long committedOffset = LocalKafkaJournal.this.committedOffset.get();
             final HashSet<LogSegment> logSegments = Sets.newHashSet(
                     JavaConversions.asJavaIterable(kafkaLog.logSegments(committedOffset, Long.MAX_VALUE))
             );
