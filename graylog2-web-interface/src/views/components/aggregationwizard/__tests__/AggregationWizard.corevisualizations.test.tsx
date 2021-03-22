@@ -5,11 +5,11 @@ import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
-import bindings from 'views/bindings';
+import bindings from 'views/components/visualizations/bindings';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-const plugin: PluginRegistration = { exports: bindings };
+const plugin: PluginRegistration = { exports: { visualizationTypes: bindings } };
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
