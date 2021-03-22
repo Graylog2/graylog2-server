@@ -19,6 +19,7 @@ package org.graylog2.lookup.adapters;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.io.Resources;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
+import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.graylog2.lookup.adapters.CSVFileDataAdapter.Config;
 import static org.graylog2.lookup.adapters.CSVFileDataAdapter.NAME;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -47,6 +50,9 @@ public class CSVFileDataAdapterTest {
 
     @Mock
     AllowedAuxiliaryPathChecker pathChecker;
+
+    @Mock
+    LookupCachePurge cachePurge;
 
     public CSVFileDataAdapterTest() throws Exception {
         final URL resource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterTest.csv");
@@ -95,6 +101,26 @@ public class CSVFileDataAdapterTest {
         assertThatThrownBy(() -> csvFileDataAdapter.doStart())
                 .isExactlyInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("The specified CSV file is not in an allowed path.");
+    }
+
+    @Test
+    public void refresh_success() throws Exception {
+        final Config config = baseConfig();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true).thenReturn(true);
+        csvFileDataAdapter.doStart();
+        csvFileDataAdapter.doRefresh(cachePurge);
+        assertFalse(csvFileDataAdapter.getError().isPresent());
+    }
+
+    @Test
+    public void refresh_failure_disallowedFileLocation() throws Exception {
+        final Config config = baseConfig();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true).thenReturn(false);
+        csvFileDataAdapter.doStart();
+        csvFileDataAdapter.doRefresh(cachePurge);
+        assertTrue(csvFileDataAdapter.getError().isPresent());
     }
 
     private Config baseConfig() {

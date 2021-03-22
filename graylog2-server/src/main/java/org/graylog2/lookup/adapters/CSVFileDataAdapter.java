@@ -62,6 +62,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(CSVFileDataAdapter.class);
 
     public static final String NAME = "csvfile";
+    public static final String ALLOWED_PATH_ERROR = "The specified CSV file is not in an allowed path.";
 
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
@@ -87,7 +88,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             throw new IllegalStateException("File path needs to be set");
         }
         if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
-            throw new IllegalStateException("The specified CSV file is not in an allowed path.");
+            throw new IllegalStateException(ALLOWED_PATH_ERROR);
         }
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
@@ -105,6 +106,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
+        if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
+            LOG.error(ALLOWED_PATH_ERROR);
+            setError(new IllegalStateException(ALLOWED_PATH_ERROR));
+            return;
+        }
+
         try {
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
             if (!fileChanged.isChanged() && !getError().isPresent()) {
