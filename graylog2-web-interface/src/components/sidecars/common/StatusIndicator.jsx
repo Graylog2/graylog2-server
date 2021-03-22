@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Tooltip, OverlayTrigger } from 'components/graylog';
+import { OverlayTrigger, Popover } from 'components/graylog';
 import { Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import DateTime from 'logic/datetimes/DateTime';
@@ -68,10 +68,14 @@ class StatusIndicator extends React.Component {
     }
 
     if (this.props.message && this.props.id) {
-      const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{message}</Tooltip>;
+      const popover = (
+        <Popover id={`${this.props.id}-status-tooltip`}>
+          {message}
+        </Popover>
+      );
 
       return (
-        <OverlayTrigger placement="top" overlay={tooltip} rootClose>
+        <OverlayTrigger placement="top" overlay={popover} rootClose trigger="hover">
           <span className={`${className} ${style.indicator}`}>
             <Icon name={icon} fixedWidth /> {text}
           </span>
