@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 export default styled(SketchPicker)(({ theme }) => css`
   background-color: ${theme.colors.global.background} !important;
-  box-shadow: ${theme.colors.global.navigationBoxShadow} 0px 0px 2px 1px, ${theme.colors.global.navigationBoxShadow} 0px 5px 5px !important;
+  box-shadow: ${theme.colors.global.navigationBoxShadow} 0 0 2px 1px, ${theme.colors.global.navigationBoxShadow} 0 5px 5px !important;
   
   &::after {
     border-right-color: ${theme.colors.global.background} !important;
