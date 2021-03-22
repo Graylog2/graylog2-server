@@ -446,7 +446,7 @@ const exports: PluginExports = {
         fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig): HeatMapVisualizationConfigFormValues => ({
           autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin,
         }),
-        toConfig: ({ autoScale, colorScale, reverseScale, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
+        toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
           .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
         fields: [{
           name: 'colorScale',
