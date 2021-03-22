@@ -64,7 +64,11 @@ export type VisualizationConfigDefinition = {
   fields: Array<ConfigurationField>,
 };
 
-export type SortFormValues = {}
+export type SortFormValues = {
+  field: string,
+  direction: 'Ascending' | 'Descending',
+}
+
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
   groupBy?: {
@@ -72,7 +76,7 @@ export interface WidgetConfigFormValues {
     groupings: Array<GroupByFormValues>,
   },
   visualization?: VisualizationFormValues,
-  sort?: SortFormValues,
+  sort?: Array<SortFormValues>,
 }
 
 export interface WidgetConfigValidationErrors {

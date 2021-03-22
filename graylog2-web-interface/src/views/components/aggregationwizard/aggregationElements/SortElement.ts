@@ -16,6 +16,10 @@
  */
 import { isEmpty } from 'lodash';
 
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+
 import type { AggregationElement } from './AggregationElementType';
 
 import SortConfiguration from '../elementConfiguration/SortConfiguration';
@@ -27,6 +31,15 @@ const SortElement: AggregationElement = {
   order: 3,
   allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.sort),
   component: SortConfiguration,
+  fromConfig: (config: AggregationWidgetConfig) => ({
+    sort: config.sort.map((s) => ({
+      field: s.field,
+      direction: s.direction?.direction,
+    })),
+  }),
+  toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => config.toBuilder()
+    .sort(formValues.sort.map((sort) => new SortConfig('foo', sort.field, Direction.fromString(sort.direction))))
+    .build(),
 };
 
 export default SortElement;
