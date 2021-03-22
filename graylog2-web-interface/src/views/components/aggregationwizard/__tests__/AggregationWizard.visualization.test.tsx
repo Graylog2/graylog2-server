@@ -28,7 +28,16 @@ type ExtraConfigSettings = {
   factor: number,
 }
 
-const createVisualizationConfig = (config): VisualizationConfig => ({ ...config });
+interface ExtraConfigWidget extends VisualizationConfig {
+  mode: 'onemode' | 'anothermode' | 'thirdmode',
+  color?: 'red' | 'green' | 'blue',
+  invert: boolean,
+  factor: number,
+}
+
+const fromConfig = (config: ExtraConfigWidget): ExtraConfigSettings => ({ ...config });
+const createVisualizationConfig = (config: ExtraConfigSettings) => ({ ...config }) as ExtraConfigWidget;
+const toConfig = (config: ExtraConfigSettings): ExtraConfigWidget => createVisualizationConfig(config);
 
 const visualizationPlugin: PluginRegistration = {
   exports: {
@@ -41,8 +50,8 @@ const visualizationPlugin: PluginRegistration = {
       displayName: 'Extra Config Required',
       component: dataTableVisualization,
       config: {
-        fromConfig: (config: VisualizationConfig): ExtraConfigSettings => createVisualizationConfig(config),
-        toConfig: (config: ExtraConfigSettings): VisualizationConfig => createVisualizationConfig(config),
+        fromConfig,
+        toConfig,
         fields: [{
           name: 'mode',
           title: 'Mode',
