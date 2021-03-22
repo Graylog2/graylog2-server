@@ -209,7 +209,7 @@ public class MongoProbe {
                     memoryMap.getInt("resident"),
                     memoryMap.getInt("virtual"),
                     memoryMap.getBoolean("supported"),
-                    memoryMap.getInt("mapped"),
+                    memoryMap.getInt("mapped", -1),
                     memoryMap.getInt("mappedWithJournal", -1)
             );
 
