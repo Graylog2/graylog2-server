@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
