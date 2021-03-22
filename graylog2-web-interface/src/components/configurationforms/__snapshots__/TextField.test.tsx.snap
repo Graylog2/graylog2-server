@@ -59,7 +59,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
 
 <div>
   <div
-    class="form-group"
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
   >
     <label
       class="c0 control-label"
@@ -156,7 +156,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
 
 <div>
   <div
-    class="form-group"
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
   >
     <label
       class="c0 control-label"
@@ -253,7 +253,7 @@ fieldset[disabled] .c1.form-control:not([type="range"]) {
 
 <div>
   <div
-    class="form-group"
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
   >
     <label
       class="c0 control-label"
