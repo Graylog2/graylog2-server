@@ -16,14 +16,17 @@
  */
 import React from 'react';
 
-const FieldHelpers = {
-  hasAttribute: (ary, attribute) => {
-    return ary.indexOf(attribute) > -1;
-  },
-  optionalMarker: (field) => {
-    return field.is_optional && field.type !== 'boolean' ? <span className="configuration-field-optional">(optional)</span> : null;
-  },
+import { ConfigurationField } from 'components/configurationforms/types';
+
+export const hasAttribute = (array: Array<string>, attribute: string): boolean => {
+  return array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
 };
 
-/** @component */
-export default FieldHelpers;
+export const optionalMarker = (field: ConfigurationField): React.ReactNode | null => {
+  return field.is_optional && field.type !== 'boolean' ? <span className="configuration-field-optional">(optional)</span> : null;
+};
+
+export default {
+  hasAttribute,
+  optionalMarker,
+};

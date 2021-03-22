@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<NumberField> should render an empty field 1`] = `
+.c0 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c1.form-control:not([type="range"]) {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c1.form-control:not([type="range"])::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c1.form-control:not([type="range"])::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c1.form-control:not([type="range"]):-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c1.form-control:not([type="range"])::placeholder {
+  color: #9b9b9b;
+}
+
+.c1.form-control:not([type="range"]):focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c1.form-control:not([type="range"])[disabled],
+.c1.form-control:not([type="range"])[readonly],
+fieldset[disabled] .c1.form-control:not([type="range"]) {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c1.form-control:not([type="range"]) ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c2 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c3 {
+  color: inherit;
+}
+
+<div>
+  <div
+    class="form-group"
+  >
+    <label
+      class="c0 control-label"
+      for="number-example_number_field"
+    >
+      number field
+       
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <span>
+      <input
+        class="c1 form-control"
+        id="number-example_number_field"
+        label="[object Object]"
+        max="9007199254740991"
+        min="-9007199254740991"
+        name="configuration[example_number_field]"
+        placeholder=""
+        type="number"
+        value="0"
+      />
+      <span
+        class="c2 help-block"
+      >
+        <span
+          class="c3"
+        >
+          my number description
+        </span>
+      </span>
+    </span>
+  </div>
+</div>
+`;
