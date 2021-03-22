@@ -14,7 +14,7 @@ exports[`<BooleanField> should render a checked field 1`] = `
 
 <div>
   <div
-    class="form-group"
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
   >
     <span>
       <div
@@ -62,7 +62,7 @@ exports[`<BooleanField> should render an unchecked field by default 1`] = `
 
 <div>
   <div
-    class="form-group"
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
   >
     <span>
       <div
