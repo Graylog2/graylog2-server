@@ -83,7 +83,6 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
   const [mode, changeMode] = useCurrentThemeMode(initialThemeModeOverride);
 
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
-  // @ts-ignore
   const generateCustomThemeColors = themeCustomizer?.[0]?.actions?.generateCustomThemeColors;
 
   const [theme, setTheme] = useState<DefaultTheme>();

@@ -105,7 +105,6 @@ describe('EntityShareModal', () => {
       asMock(EntityShareStore.getInitialState).mockReturnValueOnce(mockEmptyStore);
       const { getByText } = render(<SimpleEntityShareModal />);
 
-      // @ts-ignore
       act(() => jest.advanceTimersByTime(200));
 
       expect(getByText('Loading...')).not.toBeNull();
