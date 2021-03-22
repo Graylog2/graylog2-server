@@ -25,9 +25,6 @@ import { Modal, Button } from 'components/graylog';
  */
 const ConfirmDialog = ({
   show,
-  onDialogHide,
-  onDialogOpen,
-  onDialogClose,
   title,
   children,
   onCancel,
@@ -38,7 +35,7 @@ const ConfirmDialog = ({
   btnConfirmText,
 }) => {
   return (
-    <Modal show={show} onHide={onDialogHide} onEnter={onDialogOpen} onExit={onDialogClose}>
+    <Modal show={show}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -71,12 +68,6 @@ ConfirmDialog.propTypes = {
   btnCancelDisabled: PropTypes.bool,
   /** Indicates whether the confirm button should be disabled or not. */
   btnConfirmDisabled: PropTypes.bool,
-  /** Function to call when the modal is hidden. The function does not receive any arguments. */
-  onDialogHide: PropTypes.func,
-  /** Function to call when the modal is opened. The function does not receive any arguments. */
-  onDialogOpen: PropTypes.func,
-  /** Function to call when the modal is closed. The function does not receive any arguments. */
-  onDialogClose: PropTypes.func,
   /** Function to call when the action is not confirmed. The function does not receive any arguments. */
   onCancel: PropTypes.func,
   /**
@@ -101,9 +92,6 @@ ConfirmDialog.defaultProps = {
   btnCancelDisabled: false,
   show: false,
   onCancel: () => {},
-  onDialogHide: () => {},
-  onDialogOpen: () => {},
-  onDialogClose: () => {},
 };
 
 export default ConfirmDialog;
