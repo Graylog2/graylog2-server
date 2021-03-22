@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 
+import { Button, ButtonToolbar } from 'components/graylog';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import ElementConfigurationSection
   from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationSection';
@@ -28,13 +29,20 @@ const SortConfiguration = () => {
 
   return (
     <FieldArray name="sort"
-                render={() => (
+                render={({ push }) => (
                   <>
-                    {sort.map((s, index) => (
-                      <ElementConfigurationSection key={`sort-${index}`}>
-                        <Sort index={index} />
-                      </ElementConfigurationSection>
-                    ))}
+                    <div>
+                      {sort.map((s, index) => (
+                        <ElementConfigurationSection key={`sort-${index}`}>
+                          <Sort index={index} />
+                        </ElementConfigurationSection>
+                      ))}
+                    </div>
+                    <ButtonToolbar>
+                      <Button className="pull-right" bsSize="small" type="button" onClick={() => push({})}>
+                        Add a Sort
+                      </Button>
+                    </ButtonToolbar>
                   </>
                 )} />
   );

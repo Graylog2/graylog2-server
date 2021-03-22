@@ -25,6 +25,39 @@ import type { AggregationElement } from './AggregationElementType';
 import SortConfiguration from '../elementConfiguration/SortConfiguration';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
+type SortError = {
+  field?: string,
+  direction?: string,
+}
+
+const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+  return errors.filter((error) => Object.keys(error).length > 0).length > 0;
+};
+
+const validateSorts = (values: WidgetConfigFormValues) => {
+  const errors = {};
+
+  if (!values.sort) {
+    return errors;
+  }
+
+  const sortErrors = values.sort.map((sort) => {
+    const sortError: SortError = {};
+
+    if (!sort.field || sort.field === '') {
+      sortError.field = 'Field is required.';
+    }
+
+    if (!sort.direction) {
+      sortError.direction = 'Direction is required.';
+    }
+
+    return sortError;
+  });
+
+  return hasErrors(sortErrors) ? { sort: sortErrors } : {};
+};
+
 const SortElement: AggregationElement = {
   title: 'Sort',
   key: 'sort',
@@ -40,6 +73,7 @@ const SortElement: AggregationElement = {
   toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => config.toBuilder()
     .sort(formValues.sort.map((sort) => new SortConfig('foo', sort.field, Direction.fromString(sort.direction))))
     .build(),
+  validate: validateSorts,
 };
 
 export default SortElement;
