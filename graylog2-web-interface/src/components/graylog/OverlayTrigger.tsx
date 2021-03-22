@@ -61,6 +61,10 @@ class OverlayTrigger extends React.Component<Props, State> {
     };
   }
 
+  hide() {
+    this.setState({ show: false });
+  }
+
   render() {
     let triggerables;
     const { children, container, placement, overlay, rootClose, trigger, ...overlayProps } = this.props;
