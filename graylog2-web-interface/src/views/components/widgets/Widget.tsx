@@ -17,8 +17,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import AggregationWidgetConfig from 'src/views/logic/aggregationbuilder/AggregationWidgetConfig';
 
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import connect from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
