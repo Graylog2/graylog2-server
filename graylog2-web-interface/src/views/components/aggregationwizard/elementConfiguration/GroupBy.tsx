@@ -137,6 +137,7 @@ const GroupBy = ({ index }: Props) => {
                        onChange={(e) => onChangeField(e, name, onChange)}
                        error={error}
                        clearable={false}
+                       ariaLabel="Field"
                        name={name}
                        value={value.field}
                        aria-label="Select a field" />
