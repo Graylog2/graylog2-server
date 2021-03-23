@@ -37,6 +37,92 @@ export type ValuesPivotConfig = {
   limit: number
 }
 
+type GroupByError = {
+  field?: string,
+  limit?: string,
+  interval?: {
+    scaling?: string,
+    value?: string,
+  },
+};
+
+const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
+  const groupByError = {} as GroupByError;
+
+  if (!grouping.field?.field) {
+    groupByError.field = 'Field is required';
+  }
+
+  if (grouping.interval.type === 'auto') {
+    if (!grouping.interval.scaling) {
+      groupByError.interval.scaling = 'Scaling is required.';
+    }
+
+    if (grouping.interval.scaling && (grouping.interval.scaling <= 0 || grouping.interval.scaling >= 10)) {
+      groupByError.interval.scaling = 'Scaling is out of range.';
+    }
+  }
+
+  if (grouping.interval.type === 'timeunit') {
+    if (!grouping.interval.value) {
+      groupByError.interval.value = 'Value is required.';
+    }
+
+    if (grouping.interval.value && grouping.interval.value <= 0) {
+      groupByError.interval.value = 'Value must be greater than 0.';
+    }
+  }
+
+  return groupByError;
+};
+
+const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
+  const groupByError = {} as GroupByError;
+
+  if (!grouping.field?.field) {
+    groupByError.field = 'Field is required.';
+  }
+
+  if (!grouping.limit) {
+    groupByError.limit = 'Limit is required.';
+  }
+
+  if (grouping.limit && grouping.limit <= 0) {
+    groupByError.limit = 'Must be greater than 0.';
+  }
+
+  return groupByError;
+};
+
+const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
+  return errors.filter((error) => Object.keys(error).length > 0).length > 0;
+};
+
+const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
+  if ('interval' in grouping) {
+    const dateGrouping = grouping as DateGrouping;
+
+    return validateDateGrouping(dateGrouping);
+  }
+
+  const valuesGrouping = grouping as ValuesGrouping;
+
+  return validateValuesGrouping(valuesGrouping);
+};
+
+const validateGroupBy = (values: WidgetConfigFormValues) => {
+  const emptyErrors = {};
+
+  if (!values.groupBy) {
+    return emptyErrors;
+  }
+
+  const { groupings } = values.groupBy;
+  const groupByErrors = groupings.map(validateGrouping);
+
+  return hasErrors(groupByErrors) ? { groupBy: { groupings: groupByErrors } } : emptyErrors;
+};
+
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
   const { field, config } = pivot;
 
@@ -129,6 +215,7 @@ const GroupByElement: AggregationElement = {
   }),
   toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => groupByToConfig(formValues.groupBy, config),
   component: GroupByConfiguration,
+  validate: validateGroupBy,
 };
 
 export default GroupByElement;
