@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 
-import FormikInput from 'components/common/FormikInput';
 import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
+import { MetricFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 type Props = {
   index: number,
@@ -14,15 +14,35 @@ const directionOptions = [
   { label: 'Descending', value: 'Descending' },
 ];
 
+const formatSeries = (metric: MetricFormValues) => (metric.name ? metric.name : `${metric.function}(${metric.field ?? ''})`);
+
 const Sort = ({ index }: Props) => {
+  const { values } = useFormikContext<WidgetConfigFormValues>();
+  const { metrics = [] } = values;
+
+  const metricsOptions = metrics.map(formatSeries).map((metric) => ({ label: metric, value: metric }));
+
   return (
     <>
-      <FormikInput id="field"
-                   label="Field"
-                   placeholder="Specify field/metric to be sorted on"
-                   name={`sort.${index}.field`}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" />
+      <Field name={`sort.${index}.field`}>
+        {({ field: { name, value, onChange }, meta: { error } }) => (
+          <Input id="field-select"
+                 label="Field"
+                 error={error}
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9">
+            <Select options={metricsOptions}
+                    clearable={false}
+                    name={name}
+                    value={value}
+                    placeholder="Specify field/metric to be sorted on"
+                    aria-label="Select field for sorting"
+                    onChange={(newValue) => {
+                      onChange({ target: { name, value: newValue } });
+                    }} />
+          </Input>
+        )}
+      </Field>
 
       <Field name={`sort.${index}.direction`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
