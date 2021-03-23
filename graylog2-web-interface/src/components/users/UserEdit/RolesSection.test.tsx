@@ -47,8 +47,8 @@ describe('<RolesSection />', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
-    await act(() => mockRolesForUserPromise);
-    await act(() => mockLoadRolesPromise);
+    await act(() => mockRolesForUserPromise.then());
+    await act(() => mockLoadRolesPromise.then());
 
     const assignRoleButton = screen.getByRole('button', { name: 'Assign Role' });
     const rolesSelector = screen.getByLabelText('Search for roles');
@@ -65,8 +65,8 @@ describe('<RolesSection />', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
-    await act(() => mockRolesForUserPromise);
-    await act(() => mockLoadRolesPromise);
+    await act(() => mockRolesForUserPromise.then());
+    await act(() => mockLoadRolesPromise.then());
 
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
     const filterSubmitButton = screen.getByRole('button', { name: 'Filter' });
@@ -86,8 +86,8 @@ describe('<RolesSection />', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((data: { roles: string[]}) => Promise.resolve());
     render(<RolesSection user={newExampleUser} onSubmit={(data) => onSubmitStub(data)} />);
-    await act(() => mockRolesForUserPromise);
-    await act(() => mockLoadRolesPromise);
+    await act(() => mockRolesForUserPromise.then());
+    await act(() => mockLoadRolesPromise.then());
 
     const unassignRoleButton = screen.getByRole('button', { name: `Remove ${assignedRole1.name}` });
     fireEvent.click(unassignRoleButton);
