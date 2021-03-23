@@ -40,36 +40,33 @@ export type ValuesPivotConfig = {
 type GroupByError = {
   field?: string,
   limit?: string,
-  interval?: {
-    scaling?: string,
-    value?: string,
-  },
+  interval?: string,
 };
 
 const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
   const groupByError = {} as GroupByError;
 
   if (!grouping.field?.field) {
-    groupByError.field = 'Field is required';
+    groupByError.field = 'Field is required.';
   }
 
   if (grouping.interval.type === 'auto') {
     if (!grouping.interval.scaling) {
-      groupByError.interval.scaling = 'Scaling is required.';
+      groupByError.interval = 'Scaling is required.';
     }
 
     if (grouping.interval.scaling && (grouping.interval.scaling <= 0 || grouping.interval.scaling >= 10)) {
-      groupByError.interval.scaling = 'Scaling is out of range.';
+      groupByError.interval = 'Must be greater than 0 and smaller or equals 10.';
     }
   }
 
   if (grouping.interval.type === 'timeunit') {
     if (!grouping.interval.value) {
-      groupByError.interval.value = 'Value is required.';
+      groupByError.interval = 'Value is required.';
     }
 
     if (grouping.interval.value && grouping.interval.value <= 0) {
-      groupByError.interval.value = 'Value must be greater than 0.';
+      groupByError.interval = 'Must be greater than 0.';
     }
   }
 

@@ -79,6 +79,7 @@ const GroupBy = ({ index }: Props) => {
       if (newFieldType === 'time') {
         setFieldValue(`groupBy.groupings.${index}.interval`, {
           type: 'auto',
+          scaling: 1.0,
         });
       }
 

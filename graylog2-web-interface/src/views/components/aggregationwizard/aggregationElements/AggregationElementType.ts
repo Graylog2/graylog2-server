@@ -32,5 +32,5 @@ export type AggregationElement = {
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
   }>,
-  validate?: (formValues: WidgetConfigFormValues) => { [key: string]: string },
+  validate?: (formValues: WidgetConfigFormValues) => { [key: string]: any },
 }
