@@ -112,8 +112,8 @@ View.propTypes = {
   requires: PropTypes.objectOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
-  })),
-  requirementsProvided: PropTypes.arrayOf(PropTypes.string),
+  })).isRequired,
+  requirementsProvided: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 View.defaultProps = {
@@ -121,8 +121,6 @@ View.defaultProps = {
   title: 'Unnamed View',
   summary: null,
   description: null,
-  requires: {},
-  requirementsProvided: [],
 };
 
 export default withPluginEntities(View, { requirementsProvided: 'views.requires.provided' });

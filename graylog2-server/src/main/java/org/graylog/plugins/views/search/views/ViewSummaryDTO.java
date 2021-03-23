@@ -21,11 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.contentpacks.ContentPackable;
-import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.entities.ViewEntity;
-import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -34,6 +31,8 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
 @JsonDeserialize(builder = ViewSummaryDTO.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
-public abstract class ViewSummaryDTO implements ContentPackable<ViewEntity.Builder> {
+public abstract class ViewSummaryDTO {
     @ObjectId
     @Id
     @Nullable
@@ -66,6 +65,12 @@ public abstract class ViewSummaryDTO implements ContentPackable<ViewEntity.Build
 
     @JsonProperty(ViewDTO.FIELD_SEARCH_ID)
     public abstract String searchId();
+
+    @JsonProperty(ViewDTO.FIELD_PROPERTIES)
+    public abstract ImmutableSet<String> properties();
+
+    @JsonProperty(ViewDTO.FIELD_REQUIRES)
+    public abstract Map<String, PluginMetadataSummary> requires();
 
     @JsonProperty(ViewDTO.FIELD_OWNER)
     public abstract Optional<String> owner();
@@ -106,6 +111,17 @@ public abstract class ViewSummaryDTO implements ContentPackable<ViewEntity.Build
         @JsonProperty(ViewDTO.FIELD_SEARCH_ID)
         public abstract Builder searchId(String searchId);
 
+        abstract ImmutableSet.Builder<String> propertiesBuilder();
+
+        @JsonProperty(ViewDTO.FIELD_PROPERTIES)
+        public Builder properties(Set<String> properties) {
+            propertiesBuilder().addAll(properties);
+            return this;
+        }
+
+        @JsonProperty(ViewDTO.FIELD_REQUIRES)
+        public abstract Builder requires(Map<String, PluginMetadataSummary> requirements);
+
         @JsonProperty(ViewDTO.FIELD_OWNER)
         public abstract Builder owner(@Nullable String owner);
 
@@ -118,25 +134,11 @@ public abstract class ViewSummaryDTO implements ContentPackable<ViewEntity.Build
                     .type(ViewDTO.Type.DASHBOARD)
                     .summary("")
                     .description("")
+                    .properties(ImmutableSet.of())
+                    .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC));
         }
 
         public abstract ViewSummaryDTO build();
-    }
-
-    @Override
-    public ViewEntity.Builder toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        final ViewEntity.Builder viewEntityBuilder = ViewEntity.builder()
-                .type(this.type())
-                .title(ValueReference.of(this.title()))
-                .summary(ValueReference.of(this.summary()))
-                .description(ValueReference.of(this.description()))
-                .createdAt(this.createdAt());
-
-        if (this.owner().isPresent()) {
-            viewEntityBuilder.owner(this.owner().get());
-        }
-
-        return viewEntityBuilder;
     }
 }
