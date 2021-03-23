@@ -94,8 +94,6 @@
     "react-ultimate-pagination": "^1.2.0",
     "react-window": "^1.8.2",
     "sockjs-client": "^1.4.0",
-    "superagent": "^6.1.0",
-    "superagent-bluebird-promise": "^4.1.0",
     "terser-webpack-plugin": "^4.0.0",
     "toastr": "^2.1.2",
     "twix": "^1.1.4",
