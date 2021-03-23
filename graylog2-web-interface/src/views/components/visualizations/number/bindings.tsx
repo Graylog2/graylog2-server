@@ -19,7 +19,11 @@ import type { VisualizationType } from 'views/types';
 
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import { NumberVisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+
+type NumberVisualizationConfigFormValues = {
+  trend: boolean,
+  trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER',
+};
 
 const singleNumber: VisualizationType = {
   type: NumberVisualization.type,

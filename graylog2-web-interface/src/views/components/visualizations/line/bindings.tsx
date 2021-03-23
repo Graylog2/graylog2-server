@@ -18,7 +18,10 @@ import type { VisualizationType } from 'views/types';
 
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
-import { LineVisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+
+type LineVisualizationConfigFormValues = {
+  interpolation: 'linear' | 'step-after' | 'spline';
+};
 
 const lineChart: VisualizationType = {
   type: LineVisualization.type,

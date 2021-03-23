@@ -18,7 +18,10 @@ import type { VisualizationType } from 'views/types';
 
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
-import { AreaVisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+
+type AreaVisualizationConfigFormValues = {
+  interpolation: 'linear' | 'step-after' | 'spline';
+};
 
 const areaChart: VisualizationType = {
   type: AreaVisualization.type,

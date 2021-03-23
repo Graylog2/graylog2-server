@@ -19,7 +19,6 @@ import { Form, Formik, FormikProps } from 'formik';
 import { ConfigurationField } from 'views/types';
 
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 
@@ -49,33 +48,6 @@ export type ValuesGrouping = {
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
-
-export type AreaVisualizationConfigFormValues = {
-  interpolation: 'linear' | 'step-after' | 'spline';
-};
-
-export type LineVisualizationConfigFormValues = {
-  interpolation: 'linear' | 'step-after' | 'spline';
-};
-
-export type BarVisualizationConfigFormValues = {
-  barmode: 'group' | 'stack' | 'relative' | 'overlay',
-};
-
-export type NumberVisualizationConfigFormValues = {
-  trend: boolean,
-  trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER',
-};
-
-export type HeatMapVisualizationConfigFormValues = {
-  colorScale: typeof COLORSCALES[number],
-  reverseScale: boolean,
-  autoScale: boolean,
-  zMin: number,
-  zMax: number
-  useSmallestAsDefault: boolean,
-  defaultValue: number,
-};
 
 export type VisualizationConfigFormValues = {};
 

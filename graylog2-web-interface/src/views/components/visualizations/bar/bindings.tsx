@@ -19,7 +19,10 @@ import type { VisualizationType } from 'views/types';
 
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
-import { BarVisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+
+type BarVisualizationConfigFormValues = {
+  barmode: 'group' | 'stack' | 'relative' | 'overlay',
+};
 
 const barChart: VisualizationType = {
   type: BarVisualization.type,

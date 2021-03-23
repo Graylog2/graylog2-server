@@ -18,7 +18,16 @@ import type { VisualizationType } from 'views/types';
 
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
-import { HeatMapVisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+
+type HeatMapVisualizationConfigFormValues = {
+  colorScale: typeof COLORSCALES[number],
+  reverseScale: boolean,
+  autoScale: boolean,
+  zMin: number,
+  zMax: number
+  useSmallestAsDefault: boolean,
+  defaultValue: number,
+};
 
 const heatmap: VisualizationType = {
   type: HeatmapVisualization.type,
