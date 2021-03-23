@@ -24,6 +24,8 @@ import userEvent from '@testing-library/user-event';
 import bindings from 'views/components/visualizations/bindings';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
+import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: bindings } };
 
@@ -224,6 +226,27 @@ describe('AggregationWizard/Core Visualizations', () => {
         trend: true,
         trendPreference: 'HIGHER',
       }),
+    })));
+  });
+
+  it('clears validation errors properly when switching visualization', async () => {
+    const areaChart = widgetConfig.toBuilder()
+      .visualization(AreaVisualization.type)
+      .visualizationConfig(AreaVisualizationConfig.create('linear'))
+      .build();
+    const onChange = jest.fn();
+
+    render(<SimpleAggregationWizard config={areaChart} onChange={onChange} />);
+
+    await selectOption('Select visualization type', 'Data Table');
+
+    await expectSubmitButtonNotToBeDisabled();
+
+    userEvent.click(await submitButton());
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
+      visualization: 'table',
+      visualizationConfig: expect.objectContaining({}),
     })));
   });
 });

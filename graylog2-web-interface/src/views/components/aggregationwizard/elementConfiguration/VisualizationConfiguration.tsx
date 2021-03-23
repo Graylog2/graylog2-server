@@ -44,7 +44,7 @@ const VisualizationConfiguration = () => {
   return (
     <div>
       <Field name="visualization.type">
-        {({ field: { name, value, onChange }, meta: { error } }) => (
+        {({ field: { name, value }, meta: { error } }) => (
           <Input id="visualization-type-select"
                  label="Type"
                  error={error}
@@ -57,8 +57,7 @@ const VisualizationConfiguration = () => {
                     value={value}
                     onChange={(newValue) => {
                       if (newValue !== value) {
-                        setFieldValue('visualization.config', {});
-                        onChange({ target: { name, value: newValue } });
+                        setFieldValue('visualization', { type: newValue, config: {} }, true);
                       }
                     }} />
           </Input>
