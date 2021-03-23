@@ -20,6 +20,7 @@ import { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import App from 'routing/App';
+import AppConfig from 'util/AppConfig';
 import * as Permissions from 'views/Permissions';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
@@ -82,6 +83,7 @@ import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplay
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -152,7 +154,9 @@ const exports: PluginExports = {
       defaultWidth: 4,
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
-      editComponent: AggregationControls,
+      editComponent: AppConfig.isFeatureEnabled('aggregation-wizard')
+        ? AggregationWizard
+        : AggregationControls,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [
