@@ -58,6 +58,8 @@ type Props = {
 
 const StyledPopover = styled(Popover)(({ theme }) => css`
   min-width: 100%;
+  transform: translateX(-15px);
+  background-color: ${theme.colors.variant.lightest.default};
   
   @media (min-width: ${theme.breakpoints.min.md}) {
     min-width: 750px;
