@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import chroma from 'chroma-js';
+import * as React from 'react';
 
-export const lightThemeRatio = ['0.22', '0.55', '0.88'];
-export const darkThemeRatio = ['0.15', '0.55', '0.95'];
+import { singleton } from 'views/logic/singleton';
 
-function lighten(color, ratio) { return chroma.mix(color, '#fff', ratio).hex(); }
-function darken(color, ratio) { return chroma.mix(color, '#000', ratio).hex(); }
+const RegeneratableThemeContext = React.createContext<{regenerateTheme:() => void} | undefined>(undefined);
 
-export {
-  darken,
-  lighten,
-};
+export default singleton('contexts.RegeneratableThemeContext', () => RegeneratableThemeContext);

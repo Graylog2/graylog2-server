@@ -47,6 +47,10 @@ const AppConfig = {
     return this.appConfig().rootTimeZone;
   },
 
+  customThemeColors() {
+    return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
+  },
+
   appConfig() {
     return window.appConfig || {};
   },
