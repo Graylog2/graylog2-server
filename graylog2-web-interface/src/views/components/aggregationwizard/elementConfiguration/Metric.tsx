@@ -82,7 +82,7 @@ const Metric = ({ index }: Props) => {
                        clearable={!isFieldRequired}
                        name={name}
                        value={value}
-                       aria-label="Select a field" />
+                       ariaLabel="Select a field" />
         )}
       </Field>
       {isPercentile && (
