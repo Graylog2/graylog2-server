@@ -15,28 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { TimeUnits } from 'views/Constants';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
 
 import type { AggregationElement } from './AggregationElementType';
 
 import type { GroupingDirection, DateGrouping, ValuesGrouping, GroupByFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
-
-export type DatePivotConfig = {
-  interval: {
-    type: 'auto',
-    scaling: number
-  } | {
-    type: 'timeunit',
-    value: number,
-    unit: keyof typeof TimeUnits,
-  }
-}
-
-export type ValuesPivotConfig = {
-  limit: number
-}
 
 type GroupByError = {
   field?: string,
@@ -124,7 +108,7 @@ const validateGroupBy = (values: WidgetConfigFormValues) => {
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
   const { field, config } = pivot;
 
-  const { interval } = config as DatePivotConfig;
+  const { interval } = config as TimeConfigType;
 
   return ({
     direction,
@@ -135,7 +119,7 @@ const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGr
 
 const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
   const { field, config } = pivot;
-  const { limit } = config as ValuesPivotConfig;
+  const { limit } = config as ValuesConfigType;
 
   return ({
     direction,

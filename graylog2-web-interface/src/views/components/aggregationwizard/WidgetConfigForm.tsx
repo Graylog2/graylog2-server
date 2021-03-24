@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
 
-import { TimeUnits } from 'views/Constants';
+import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 
 export type MetricFormValues = {
   function: string,
@@ -36,15 +36,7 @@ export type GroupingDirection = 'row' | 'column';
 export type DateGrouping = {
   direction: GroupingDirection,
   field: GroupingField<'time'>,
-  interval: {
-    type: 'auto',
-    scaling: number,
-  } | {
-    type: 'timeunit',
-    value: number,
-    unit: keyof typeof TimeUnits,
-  }
-
+  interval: AutoTimeConfig | TimeUnitConfig,
 }
 export type ValuesGrouping = {
   direction: GroupingDirection,
