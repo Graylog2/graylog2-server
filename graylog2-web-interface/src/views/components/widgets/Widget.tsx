@@ -251,7 +251,7 @@ class Widget extends React.Component<Props, State> {
             )}
           </InteractiveContext.Consumer>
           {editing && (
-            <EditWidgetFrame>
+            <EditWidgetFrame onFinish={this._onToggleEdit} onCancel={this._onCancelEdit}>
               <EditComponent config={config}
                              fields={fields}
                              editing={editing}
@@ -262,7 +262,6 @@ class Widget extends React.Component<Props, State> {
                   {visualization}
                 </WidgetErrorBoundary>
               </EditComponent>
-              <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
             </EditWidgetFrame>
           )}
           {!editing && (

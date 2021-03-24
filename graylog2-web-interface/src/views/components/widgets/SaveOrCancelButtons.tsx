@@ -21,11 +21,12 @@ import { Button, ButtonToolbar } from 'components/graylog';
 type Props = {
   onCancel: () => void,
   onFinish: () => void,
+  disableSave?: boolean,
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
+const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props) => (
   <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary">Save</Button>
+    <Button onClick={onFinish} bsStyle="primary" disabled={disableSave}>Save</Button>
     <Button onClick={onCancel}>Cancel</Button>
   </ButtonToolbar>
 );

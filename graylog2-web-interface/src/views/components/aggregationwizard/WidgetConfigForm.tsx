@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
+import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
 
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 
@@ -76,6 +77,7 @@ const WidgetConfigForm = ({ children, onSubmit, initialValues, validate }: Props
                                     onSubmit={onSubmit}>
       {(...args) => (
         <Form className="form form-horizontal">
+          <PropagateValidationState />
           {typeof children === 'function' ? children(...args) : children}
         </Form>
       )}
