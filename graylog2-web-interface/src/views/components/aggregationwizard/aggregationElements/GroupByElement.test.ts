@@ -75,7 +75,7 @@ describe('GroupByElement', () => {
       });
 
       it('should add an error if value is out of range', () => {
-        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'timeunit', value: -1, unit: 'second' } } as GroupByFormValues;
+        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'timeunit', value: -1, unit: 'seconds' } } as GroupByFormValues;
         values.groupBy.groupings = [grouping];
         const result = validate(values);
 
@@ -83,7 +83,7 @@ describe('GroupByElement', () => {
       });
 
       it('should add an error if value is absent', () => {
-        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'timeunit', value: undefined, unit: 'second' } } as GroupByFormValues;
+        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'timeunit', value: undefined, unit: 'seconds' } } as GroupByFormValues;
         values.groupBy.groupings = [grouping];
         const result = validate(values);
 

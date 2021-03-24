@@ -20,11 +20,11 @@ import { $Shape } from 'utility-types';
 
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Pivot, { TimeConfigType, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 import type { Definition } from 'views/logic/aggregationbuilder/Series';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type { TimeUnit } from 'views/Constants';
 
-import type { TimeUnit } from '../../../Constants';
 import SortConfig from '../../aggregationbuilder/SortConfig';
 
 const mapTimeunit = (unit: TimeUnit) => {
@@ -39,39 +39,29 @@ const mapTimeunit = (unit: TimeUnit) => {
   }
 };
 
+type FormattedInterval = {
+  timeunit: string,
+  type: string,
+}
+
 type FormattedPivot = {
   type: string,
   field: string,
-  interval: {
-    timeunit: string,
-    type: string,
-  },
-};
-
-type TimeConfig = {
-  interval: 'timeunit',
-  unit: TimeUnit,
-  value: number,
-};
-
-type TimePivotConfig = {
-  interval: {
-    type: string;
-  };
+  interval: FormattedInterval,
 };
 
 const formatPivot = (pivot: Pivot): FormattedPivot => {
   const { type, field, config } = pivot;
-  const newConfig = { ...config };
+  const newConfig = { ...config } as unknown;
 
   switch (type) {
     // eslint-disable-next-line no-case-declarations
     case 'time':
-      if ((newConfig as TimePivotConfig).interval.type === 'timeunit') {
-        const { interval } = newConfig;
-        const { unit, value } = interval as TimeConfig;
+      if ((config as TimeConfigType).interval.type === 'timeunit') {
+        const { interval } = config as TimeConfigType;
 
-        newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
+        const { unit, value } = (interval as TimeUnitConfig);
+        (newConfig as { interval: FormattedInterval }).interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
       }
 
       break;
@@ -81,7 +71,7 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
   return {
     type,
     field,
-    ...newConfig,
+    ...(newConfig as { interval: FormattedInterval }),
   } as FormattedPivot;
 };
 

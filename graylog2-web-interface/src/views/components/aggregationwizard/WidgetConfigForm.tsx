@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
 
+import { TimeUnits } from 'views/Constants';
+
 export type MetricFormValues = {
   function: string,
   field: string | undefined,
@@ -40,7 +42,7 @@ export type DateGrouping = {
   } | {
     type: 'timeunit',
     value: number,
-    unit: string,
+    unit: keyof typeof TimeUnits,
   }
 
 }

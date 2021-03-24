@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { TimeUnits } from 'views/Constants';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import type { AggregationElement } from './AggregationElementType';
@@ -29,7 +30,7 @@ export type DatePivotConfig = {
   } | {
     type: 'timeunit',
     value: number,
-    unit: string
+    unit: keyof typeof TimeUnits,
   }
 }
 

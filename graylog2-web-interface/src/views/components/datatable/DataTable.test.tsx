@@ -51,7 +51,7 @@ describe('DataTable', () => {
   };
 
   const columnPivot = new Pivot('source', 'values', { limit: 15 });
-  const rowPivot = new Pivot('timestamp', 'time', { interval: 'auto' });
+  const rowPivot = new Pivot('timestamp', 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const series = new Series('count()');
 
   const SimplifiedDataTable = (props) => (
