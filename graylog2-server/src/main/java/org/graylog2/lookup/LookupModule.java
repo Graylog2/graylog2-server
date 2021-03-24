@@ -33,6 +33,7 @@ public class LookupModule extends Graylog2Module {
     protected void configure() {
         serviceBinder().addBinding().to(UrlWhitelistService.class).in(Scopes.SINGLETON);
         binder().bind(UrlWhitelistNotificationService.class).in(Scopes.SINGLETON);
+        binder().bind(AllowedAuxiliaryPathChecker.class).in(Scopes.SINGLETON);
 
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
