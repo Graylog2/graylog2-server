@@ -21,11 +21,11 @@ import { Field } from 'formik';
 import { Input } from 'components/bootstrap';
 
 const DirectionOptions = styled.div`
-  display: flex;
+display: flex;
 
-  div:first-child {
-    margin-right: 5px;
-  }
+div:first-child {
+  margin-right: 5px;
+}
 `;
 
 type Props = {
