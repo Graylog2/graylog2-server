@@ -53,12 +53,10 @@ public class LookupModule extends Graylog2Module {
                 CaffeineLookupCache.Factory.class,
                 CaffeineLookupCache.Config.class);
 
-        if (!configuration.isCloud()) {
-            installLookupDataAdapter(CSVFileDataAdapter.NAME,
-                    CSVFileDataAdapter.class,
-                    CSVFileDataAdapter.Factory.class,
-                    CSVFileDataAdapter.Config.class);
-        }
+        installLookupDataAdapter(CSVFileDataAdapter.NAME,
+                CSVFileDataAdapter.class,
+                CSVFileDataAdapter.Factory.class,
+                CSVFileDataAdapter.Config.class);
 
         installLookupDataAdapter2(DnsLookupDataAdapter.NAME,
                 DnsLookupDataAdapter.class,
