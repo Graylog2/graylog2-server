@@ -31,4 +31,8 @@ const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props)
   </ButtonToolbar>
 );
 
+SaveOrCancelButtons.defaultProps = {
+  disableSave: false,
+};
+
 export default SaveOrCancelButtons;

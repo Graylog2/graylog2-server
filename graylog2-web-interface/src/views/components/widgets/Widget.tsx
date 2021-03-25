@@ -41,7 +41,6 @@ import EditWidgetFrame from './EditWidgetFrame';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
-import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import WidgetActionsMenu from './WidgetActionsMenu';
