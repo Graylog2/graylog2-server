@@ -19,7 +19,13 @@ import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregation
 
 import type { AggregationElement } from './AggregationElementType';
 
-import type { GroupingDirection, DateGrouping, ValuesGrouping, GroupByFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
+import type {
+  DateGrouping,
+  GroupByFormValues,
+  GroupingDirection,
+  ValuesGrouping,
+  WidgetConfigFormValues,
+} from '../WidgetConfigForm';
 import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
 
 type GroupByError = {
@@ -59,7 +65,7 @@ const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
 };
 
 const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
-  const groupByError = {} as GroupByError;
+  const groupByError: GroupByError = {};
 
   if (!grouping.field?.field) {
     groupByError.field = 'Field is required.';
@@ -82,14 +88,10 @@ const hasErrors = <T extends {}>(errors: Array<T>): boolean => {
 
 const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
   if ('interval' in grouping) {
-    const dateGrouping = grouping as DateGrouping;
-
-    return validateDateGrouping(dateGrouping);
+    return validateDateGrouping(grouping);
   }
 
-  const valuesGrouping = grouping as ValuesGrouping;
-
-  return validateValuesGrouping(valuesGrouping);
+  return validateValuesGrouping(grouping);
 };
 
 const validateGroupBy = (values: WidgetConfigFormValues) => {

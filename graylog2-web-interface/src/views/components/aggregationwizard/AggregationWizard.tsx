@@ -69,7 +69,7 @@ const _onElementCreate = (
 ) => {
   const aggregationElement = aggregationElementsByKey[elementKey];
 
-  if ('addEmptyElement' in aggregationElement) {
+  if (aggregationElement?.addEmptyElement) {
     setValues(aggregationElement.addEmptyElement(values));
   } else {
     setValues({
