@@ -27,7 +27,13 @@ import { WidgetConfigFormValues } from 'views/components/aggregationwizard/Widge
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
 const isTimeline = (values: WidgetConfigFormValues) => {
-  return values.groupBy?.length > 0 && values.groupBy?.find((pivot) => pivot.type === 'row')?.field === TIMESTAMP_FIELD;
+  if (!values.groupBy?.groupings || values.groupBy.groupings.length === 0) {
+    return false;
+  }
+
+  const firstRowGrouping = values.groupBy.groupings.find((grouping) => grouping.direction === 'row');
+
+  return firstRowGrouping?.field?.field === TIMESTAMP_FIELD;
 };
 
 const VisualizationConfiguration = () => {

@@ -19,7 +19,6 @@ import { Form, Formik, FormikProps } from 'formik';
 import { ConfigurationField } from 'views/types';
 
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 
 export type MetricFormValues = {
@@ -76,7 +75,7 @@ export interface WidgetConfigFormValues {
 
 export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
-  groupBy?: Array<{ [key: string]: string }>,
+  groupBy?: { groupings: Array<{ [key: string]: string }> },
   visualization?: { [key: string]: string | any },
   sort?: { [key: string]: string },
 }
