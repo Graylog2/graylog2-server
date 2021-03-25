@@ -18,7 +18,6 @@ import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
 
 import PropagateValidationState from 'views/components/aggregationwizard/PropagateValidationState';
-
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 
 export type MetricFormValues = {
