@@ -19,6 +19,7 @@ import { isEqual } from 'lodash';
 
 import type { Store } from 'stores/StoreTypes';
 import { singletonStore } from 'views/logic/singleton';
+import { ViewType } from 'views/logic/views/View';
 
 import { ViewStore } from './ViewStore';
 
@@ -28,6 +29,7 @@ export type ViewMetaData = {
   id: string,
   summary: string,
   title: string,
+  type: ViewType,
 };
 
 export type ViewMetadataStoreType = Store<ViewMetaData>;
@@ -47,9 +49,9 @@ export const ViewMetadataStore: ViewMetadataStoreType = singletonStore(
       let newState;
 
       if (view) {
-        const { id, title, description, summary } = view;
+        const { id, title, description, summary, type } = view;
 
-        newState = { id, title, description, summary, activeQuery };
+        newState = { id, title, description, summary, activeQuery, type };
       } else {
         newState = {};
       }
