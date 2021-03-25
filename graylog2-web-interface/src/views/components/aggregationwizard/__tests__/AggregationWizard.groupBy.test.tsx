@@ -174,4 +174,37 @@ describe('AggregationWizard', () => {
     await screen.findByText('took_ms');
     await screen.findByText('timestamp');
   });
+
+  it('should correctly change config', async () => {
+    const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
+    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const config = AggregationWidgetConfig
+      .builder()
+      .rowPivots([pivot0])
+      .build();
+
+    const onChange = jest.fn();
+    renderSUT({ onChange, config });
+
+    await screen.findByText('timestamp');
+
+    const fieldSelection = await screen.findByLabelText('Field');
+
+    await act(async () => {
+      await selectEvent.openMenu(fieldSelection);
+      await selectEvent.select(fieldSelection, 'took_ms');
+    });
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    fireEvent.click(applyButton);
+
+    const updatedConfig = AggregationWidgetConfig
+      .builder()
+      .rowPivots([pivot1])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  });
 });

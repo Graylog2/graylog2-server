@@ -38,6 +38,8 @@ const FieldComponent = ({ index, fieldType }: Props) => {
 
     if (fieldType !== newFieldType) {
       if (newFieldType === 'time') {
+        setFieldValue(`groupBy.groupings.${index}.limit`, undefined, false);
+
         setFieldValue(`groupBy.groupings.${index}.interval`, {
           type: 'auto',
           scaling: 1.0,
@@ -45,6 +47,7 @@ const FieldComponent = ({ index, fieldType }: Props) => {
       }
 
       if (newFieldType === 'values') {
+        setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
         setFieldValue(`groupBy.groupings.${index}.limit`, 15);
       }
     }
