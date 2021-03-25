@@ -23,6 +23,7 @@ export type AggregationElement = {
   key: string,
   allowCreate: (formValues: WidgetConfigFormValues) => boolean,
   order: number,
+  addEmptyElement?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   toConfig?: (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => AggregationWidgetConfig,
   fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,
   onCreate?: () => void,
@@ -31,5 +32,5 @@ export type AggregationElement = {
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
   }>,
-  validate?: (formValues: WidgetConfigFormValues) => { [key: string]: string },
+  validate?: (formValues: WidgetConfigFormValues) => { [key: string]: any },
 }

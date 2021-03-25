@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
 
+import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+
 export type MetricFormValues = {
   function: string,
   field: string | undefined,
@@ -24,14 +26,35 @@ export type MetricFormValues = {
   percentile?: number | undefined,
 };
 
-export type GroupByFormValues = {};
+type GroupingField<T extends 'values' | 'time'> = {
+  field: string | undefined
+  type: T;
+}
+
+export type GroupingDirection = 'row' | 'column';
+
+export type DateGrouping = {
+  direction: GroupingDirection,
+  field: GroupingField<'time'>,
+  interval: AutoTimeConfig | TimeUnitConfig,
+}
+export type ValuesGrouping = {
+  direction: GroupingDirection,
+  field: GroupingField<'values'>,
+  limit: number,
+};
+
+export type GroupByFormValues = DateGrouping | ValuesGrouping;
 
 export type VisualizationFormValues = {};
 
 export type SortFormValues = {}
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
-  groupBy?: Array<GroupByFormValues>,
+  groupBy?: {
+    columnRollup: boolean,
+    groupings: Array<GroupByFormValues>,
+  },
   visualization?: VisualizationFormValues,
   sort?: SortFormValues,
 }

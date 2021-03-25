@@ -15,19 +15,75 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useFormikContext, FieldArray, Field } from 'formik';
+import styled from 'styled-components';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { HoverForHelp } from 'components/common';
+import { Button, ButtonToolbar, Checkbox } from 'components/graylog';
 
-type Props = {
-  config: AggregationWidgetConfig,
-  onConfigChange: (newConfig: AggregationWidgetConfig) => void
-}
+import ElementConfigurationSection from './ElementConfigurationSection';
+import GroupBy from './GroupBy';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const GroupByConfiguration = ({ config, onConfigChange }: Props) => {
+import { emptyGrouping } from '../aggregationElements/GroupByElement';
+import { WidgetConfigFormValues } from '../WidgetConfigForm';
+
+const ActionsBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const RollupColumnsLabel = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const RollupHoverForHelp = styled(HoverForHelp)`
+  margin-left: 5px;
+`;
+
+const GroupByConfiguration = () => {
+  const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
+  const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
+
   return (
     <>
-      Configuration Elements
+      <FieldArray name="groupBy.groupings"
+                  render={(arrayHelpers) => (
+                    <>
+                      <div>
+                        {groupBy.groupings.map((grouping, index) => {
+                          return (
+                            // eslint-disable-next-line react/no-array-index-key
+                            <ElementConfigurationSection key={`grouping-${index}`}>
+                              <GroupBy index={index} />
+                            </ElementConfigurationSection>
+                          );
+                        })}
+                      </div>
+                      <ActionsBar>
+                        <Field name="groupBy.columnRollup">
+                          {({ field: { name, onChange, value } }) => (
+                            <Checkbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
+                                      checked={value}
+                                      disabled={disableColumnRollup}>
+                              <RollupColumnsLabel>
+                                Rollup Columns
+                                <RollupHoverForHelp title="Rollup Columns">
+                                  When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                                </RollupHoverForHelp>
+                              </RollupColumnsLabel>
+                            </Checkbox>
+                          )}
+                        </Field>
+                        <ButtonToolbar>
+                          <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(emptyGrouping)}>
+                            Add Grouping
+                          </Button>
+                        </ButtonToolbar>
+                      </ActionsBar>
+                    </>
+                  )} />
     </>
   );
 };

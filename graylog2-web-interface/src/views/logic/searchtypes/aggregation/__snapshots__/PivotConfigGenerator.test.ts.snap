@@ -9,6 +9,7 @@ Object {
     "row_groups": Array [
       Object {
         "field": "field",
+        "limit": 15,
         "type": "type",
       },
     ],
@@ -41,6 +42,7 @@ Object {
   "row_groups": Array [
     Object {
       "field": "field",
+      "limit": 15,
       "type": "type",
     },
   ],
@@ -62,6 +64,7 @@ Object {
     "row_groups": Array [
       Object {
         "field": "field",
+        "limit": 15,
         "type": "type",
       },
     ],
@@ -87,6 +90,7 @@ Object {
     "row_groups": Array [
       Object {
         "field": "field",
+        "limit": 15,
         "type": "type",
       },
     ],

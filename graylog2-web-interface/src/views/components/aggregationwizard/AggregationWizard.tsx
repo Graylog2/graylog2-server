@@ -67,13 +67,19 @@ const _onElementCreate = (
   values: WidgetConfigFormValues,
   setValues: (formValues: WidgetConfigFormValues) => void,
 ) => {
-  setValues({
-    ...values,
-    [elementKey]: [
-      ...(values[elementKey] ?? []),
-      {},
-    ],
-  });
+  const aggregationElement = aggregationElementsByKey[elementKey];
+
+  if (aggregationElement?.addEmptyElement) {
+    setValues(aggregationElement.addEmptyElement(values));
+  } else {
+    setValues({
+      ...values,
+      [elementKey]: [
+        ...(values[elementKey] ?? []),
+        {},
+      ],
+    });
+  }
 };
 
 const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void) => {

@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import { Field, useFormikContext } from 'formik';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import { useStore } from 'stores/connect';
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import FormikInput from 'components/common/FormikInput';
+
+import FieldSelect from './FieldSelect';
 
 type Props = {
   index: number,
@@ -37,12 +37,10 @@ const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({
 
 const Metric = ({ index }: Props) => {
   const functions = useStore(AggregationFunctionsStore);
-  const fieldTypes = useContext(FieldTypesContext);
-  const fieldTypeOptions = fieldTypes.all.map((fieldType) => ({ label: fieldType.name, value: fieldType.name })).toArray().sort(sortByLabel);
   const functionOptions = Object.values(functions).map(({ type }) => ({ label: type, value: type })).sort(sortByLabel);
 
-  const { values } = useFormikContext<WidgetConfigFormValues>();
-  const currentFunction = values.metrics[index].function;
+  const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
+  const currentFunction = metrics[index].function;
 
   const isFieldRequired = currentFunction !== 'count';
 
@@ -59,7 +57,7 @@ const Metric = ({ index }: Props) => {
 
       <Field name={`metrics.${index}.function`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
-          <Input id="function-select"
+          <Input id="metric-function-select"
                  label="Function"
                  error={error}
                  labelClassName="col-sm-3"
@@ -75,27 +73,22 @@ const Metric = ({ index }: Props) => {
           </Input>
         )}
       </Field>
-
       <Field name={`metrics.${index}.field`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
-          <Input id="field-select"
-                 label="Field"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select options={fieldTypeOptions}
-                    clearable={!isFieldRequired}
-                    name={name}
-                    value={value}
-                    aria-label="Select a field"
-                    onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
-          </Input>
+          <FieldSelect id="metric-field-select"
+                       label="Field"
+                       onChange={onChange}
+                       error={error}
+                       clearable={!isFieldRequired}
+                       name={name}
+                       value={value}
+                       ariaLabel="Select a field" />
         )}
       </Field>
       {isPercentile && (
         <Field name={`metrics.${index}.percentile`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
-            <Input id="percentile-select"
+            <Input id="metric-percentile-select"
                    label="Percentile"
                    error={error}
                    labelClassName="col-sm-3"

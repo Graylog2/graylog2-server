@@ -25,8 +25,7 @@ import Metric from './Metric';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
-  const { values } = useFormikContext<WidgetConfigFormValues>();
-  const { metrics } = values;
+  const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <>

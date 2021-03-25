@@ -20,7 +20,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 export default (fieldName: string, type: FieldType) => {
   switch (type.type) {
     case 'date':
-      return new Pivot(fieldName, 'time', { interval: { type: 'auto' } });
+      return new Pivot(fieldName, 'time', { interval: { type: 'auto', scaling: 1.0 } });
     default:
       return new Pivot(fieldName, 'values', { limit: 15 });
   }

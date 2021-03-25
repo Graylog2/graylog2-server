@@ -14,8 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { TimeUnits } from 'views/Constants';
 
-type ConfigType = { [key: string]: unknown };
+export type AutoTimeConfig = {
+  type: 'auto',
+  scaling: number,
+};
+
+export type TimeUnitConfig = {
+  type: 'timeunit',
+  value: number,
+  unit: keyof typeof TimeUnits,
+};
+
+export type TimeConfigType = {
+  interval: AutoTimeConfig | TimeUnitConfig,
+};
+
+export type ValuesConfigType = {
+  limit: number,
+}
+
+export type PivotConfigType = TimeConfigType | ValuesConfigType;
 
 export const DateType = 'time';
 export const ValuesType = 'values';
@@ -23,19 +43,19 @@ export const ValuesType = 'values';
 export type PivotJson = {
   field: string,
   type: string,
-  config: ConfigType,
+  config: PivotConfigType,
 };
 
 type InternalState = {
   field: string,
   type: string,
-  config: ConfigType,
+  config: PivotConfigType,
 };
 
 export default class Pivot {
   _value: InternalState;
 
-  constructor(field: string, type: string, config: ConfigType = {}) {
+  constructor(field: string, type: string, config: PivotConfigType = { limit: 15 }) {
     this._value = { field, type, config };
   }
 
@@ -51,12 +71,12 @@ export default class Pivot {
     return this._value.config;
   }
 
-  static create(field: string, type: string, config: ConfigType = {}) {
+  static create(field: string, type: string, config: PivotConfigType = { limit: 15 }) {
     return new Pivot(field, type, config);
   }
 
   static fromJSON(value: PivotJson) {
-    const { field, type, config = {} } = value;
+    const { field, type, config = { limit: 15 } } = value;
 
     return new Pivot(field, type, config);
   }
