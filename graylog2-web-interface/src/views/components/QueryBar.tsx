@@ -26,7 +26,7 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
-import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 
 import QueryTabs from './QueryTabs';
@@ -59,7 +59,9 @@ type Props = {
   children?: React.ReactElement,
   queries: string[],
   queryTitles: Immutable.Map<string, string>,
-  viewMetadata: ViewMetaData,
+  viewMetadata: {
+    activeQuery: string,
+  },
 };
 
 const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
@@ -84,10 +86,6 @@ QueryBar.propTypes = {
   queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
-    id: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    summary: PropTypes.string,
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
 };
