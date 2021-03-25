@@ -81,6 +81,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
+import org.graylog.plugins.views.search.views.ViewSummaryRequirements;
+import org.graylog.plugins.views.search.views.ViewSummaryRequiresParameterSupport;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
@@ -184,9 +186,11 @@ public class ViewsBindings extends ViewsModule {
         registerParameterSubtypes();
 
         install(new FactoryModuleBuilder().build(ViewRequirements.Factory.class));
+        install(new FactoryModuleBuilder().build(ViewSummaryRequirements.Factory.class));
         install(new FactoryModuleBuilder().build(SearchRequirements.Factory.class));
 
         registerViewRequirement(RequiresParameterSupport.class);
+        registerViewSummaryRequirement(ViewSummaryRequiresParameterSupport.class);
         registerSearchRequirement(SearchRequiresParameterSupport.class);
 
         // trigger capability binder once to set it up

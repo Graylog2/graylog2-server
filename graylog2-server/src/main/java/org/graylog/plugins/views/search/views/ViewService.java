@@ -149,6 +149,10 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         return super.streamAll().map(this::requirementsForView);
     }
 
+    public Stream<ViewSummaryDTO> streamAllViewSummaries() {
+        return viewSummaryService.streamAll();
+    }
+
     @Override
     public Stream<ViewDTO> streamByIds(Set<String> idSet) {
         return super.streamByIds(idSet).map(this::requirementsForView);

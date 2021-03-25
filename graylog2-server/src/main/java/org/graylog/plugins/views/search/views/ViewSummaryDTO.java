@@ -142,3 +142,4 @@ public abstract class ViewSummaryDTO {
         public abstract ViewSummaryDTO build();
     }
 }
+

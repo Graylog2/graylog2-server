@@ -27,16 +27,20 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
     private static final String COLLECTION_NAME = "views";
 
+    private final ViewSummaryRequirements.Factory viewRequirementsFactory;
+
     @Inject
     protected ViewSummaryService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper) {
+                                 MongoJackObjectMapperProvider mapper, ViewSummaryRequirements.Factory viewRequirementsFactory) {
         super(mongoConnection, mapper, ViewSummaryDTO.class, COLLECTION_NAME);
+        this.viewRequirementsFactory = viewRequirementsFactory;
     }
 
     private PaginatedList<ViewSummaryDTO> searchPaginated(DBQuery.Query query,
@@ -72,4 +76,15 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                 perPage
         );
     }
+
+    @Override
+    public Stream<ViewSummaryDTO> streamAll() {
+        return super.streamAll().map(this::requirementsForView);
+    }
+
+    private ViewSummaryDTO requirementsForView(ViewSummaryDTO view) {
+        return viewRequirementsFactory.create(view)
+                .rebuildRequirements(ViewSummaryDTO::requires, (v, newRequirements) -> v.toBuilder().requires(newRequirements).build());
+    }
+
 }
