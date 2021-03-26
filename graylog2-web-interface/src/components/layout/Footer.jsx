@@ -15,23 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled, { type StyledComponent, css } from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { ThemeInterface } from 'theme';
-import Version from 'util/Version';
-import connect from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
 
-const SystemStore = StoreProvider.getStore('System');
-
-type Props = {
-  system?: {
-    version: string,
-    hostname: string,
-  },
-};
+import StandardFooter from './StandardFooter';
 
 const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.footer(({ theme }) => css`
   text-align: center;
@@ -45,47 +35,26 @@ const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.fo
   }
 `);
 
-const Footer = ({ system }: Props) => {
-  const [jvm, setJvm] = useState();
+const Footer = () => {
+  const customFooter = PluginStore.exports('pageFooter');
 
-  useEffect(() => {
-    let mounted = true;
+  if (customFooter.length === 1) {
+    const CustomFooter = customFooter[0].component;
 
-    SystemStore.jvm().then((jvmInfo) => {
-      if (mounted) {
-        setJvm(jvmInfo);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!(system && jvm)) {
     return (
       <StyledFooter>
-        Graylog {Version.getFullVersion()}
+        <CustomFooter />
       </StyledFooter>
     );
   }
 
   return (
     <StyledFooter>
-      Graylog {system.version} on {system.hostname} ({jvm.info})
+      <StandardFooter />
     </StyledFooter>
   );
 };
 
-Footer.propTypes = {
-  system: PropTypes.shape({
-    version: PropTypes.string,
-    hostname: PropTypes.string,
-  }),
-};
+Footer.propTypes = {};
 
-Footer.defaultProps = {
-  system: undefined,
-};
-
-export default connect(Footer, { system: SystemStore }, ({ system: { system } = {} }) => ({ system }));
+export default Footer;
