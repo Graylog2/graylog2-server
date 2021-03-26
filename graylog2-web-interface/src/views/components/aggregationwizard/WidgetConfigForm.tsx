@@ -36,13 +36,16 @@ type GroupingField<T extends 'values' | 'time'> = {
 
 export type GroupingDirection = 'row' | 'column';
 
-export type DateGrouping = {
+export type BaseGrouping = {
   direction: GroupingDirection,
+};
+
+export type DateGrouping = BaseGrouping & {
   field: GroupingField<'time'>,
   interval: AutoTimeConfig | TimeUnitConfig,
-}
-export type ValuesGrouping = {
-  direction: GroupingDirection,
+};
+
+export type ValuesGrouping = BaseGrouping & {
   field: GroupingField<'values'>,
   limit: number,
 };
@@ -65,6 +68,7 @@ export type VisualizationConfigDefinition = {
 };
 
 export type SortFormValues = {
+  type: 'metric' | 'groupBy',
   field: string,
   direction: 'Ascending' | 'Descending',
 }

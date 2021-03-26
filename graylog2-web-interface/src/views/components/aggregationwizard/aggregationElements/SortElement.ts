@@ -58,6 +58,22 @@ const validateSorts = (values: WidgetConfigFormValues) => {
   return hasErrors(sortErrors) ? { sort: sortErrors } : {};
 };
 
+const configTypeToFormValueType = (type: 'pivot' | 'series') => {
+  switch (type) {
+    case 'pivot': return 'groupBy';
+    case 'series': return 'metric';
+    default: throw new Error(`Invalid sort type: ${type}`);
+  }
+};
+
+const formValueTypeToConfigType = (type: 'groupBy' | 'metric') => {
+  switch (type) {
+    case 'groupBy': return 'pivot';
+    case 'metric': return 'series';
+    default: throw new Error(`Invalid sort type: ${type}`);
+  }
+};
+
 const SortElement: AggregationElement = {
   title: 'Sort',
   key: 'sort',
@@ -66,12 +82,13 @@ const SortElement: AggregationElement = {
   component: SortConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
     sort: config.sort.map((s) => ({
+      type: configTypeToFormValueType(s.type),
       field: s.field,
       direction: s.direction?.direction,
     })),
   }),
   toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => config.toBuilder()
-    .sort(formValues.sort.map((sort) => new SortConfig('foo', sort.field, Direction.fromString(sort.direction))))
+    .sort(formValues.sort.map((sort) => new SortConfig(formValueTypeToConfigType(sort.type), sort.field, Direction.fromString(sort.direction))))
     .build(),
   validate: validateSorts,
 };
