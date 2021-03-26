@@ -35,7 +35,7 @@ import java.net.URI;
 
 public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
-    private static final String DEFAULT_VERSION = "7.8.0";
+    private static final String ES_VERSION = "7.8.0";
 
     private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
@@ -75,7 +75,7 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     }
 
     public static ElasticsearchInstanceES7 create(Network network) {
-        return create(DEFAULT_VERSION, network);
+        return create(ES_VERSION, network);
     }
 
     public static ElasticsearchInstanceES7 create(String versionString, Network network) {
