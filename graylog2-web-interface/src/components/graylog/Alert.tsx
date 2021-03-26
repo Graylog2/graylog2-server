@@ -43,6 +43,12 @@ const Alert = styled(BootstrapAlert)(({ bsStyle = 'default', theme }: { bsStyle:
         text-decoration: none;
       }
     }
+
+    &.alert-dismissible {
+      .close {
+        top: -9px;
+      }
+    }
   `;
 });
 
