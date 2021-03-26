@@ -47,7 +47,7 @@ const NewDashboardPage = ({ location }: Props) => {
     }
 
     return ViewActions.create(View.Type.Dashboard).then(({ view }) => view);
-  }, [searchView]);
+  }, []);
 
   const [loaded, HookComponent] = useLoadView(loadedView, location.query);
 
