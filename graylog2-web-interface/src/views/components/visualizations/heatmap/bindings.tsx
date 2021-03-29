@@ -39,6 +39,7 @@ const heatmap: VisualizationType = {
     }),
     toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
       .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
+    createConfig: (): Partial<HeatMapVisualizationConfigFormValues> => ({ colorScale: 'Viridis', autoScale: true }),
     fields: [{
       name: 'colorScale',
       title: 'Color Scale',
