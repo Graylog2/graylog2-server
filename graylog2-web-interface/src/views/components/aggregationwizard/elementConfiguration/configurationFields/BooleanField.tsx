@@ -28,7 +28,9 @@ const BooleanField = ({ field, name, error, title }: FieldComponentProps) => (
            error={error}
            labelClassName="col-sm-11"
            wrapperClassName="col-sm-1">
-      <Field type="checkbox" name={name} />
+      <Field type="checkbox"
+             aria-label={field.title}
+             name={name} />
     </Input>
     <HelpBlock>{field.description}</HelpBlock>
   </>
