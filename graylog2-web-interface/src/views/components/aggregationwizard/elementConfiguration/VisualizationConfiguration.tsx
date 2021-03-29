@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
@@ -38,12 +39,25 @@ const isTimeline = (values: WidgetConfigFormValues) => {
 
 const VisualizationConfiguration = () => {
   const visualizationTypes = usePluginEntities('visualizationTypes');
+  const findVisualizationType = useCallback((type: string) => visualizationTypes
+    .find((visualizationType) => visualizationType.type === type), [visualizationTypes]);
 
-  const visualizationTypeOptions = visualizationTypes.sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
-    .map(({ displayName, type }) => ({ label: displayName, value: type }));
+  const visualizationTypeOptions = useMemo(() => visualizationTypes
+    .sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
+    .map(({ displayName, type }) => ({ label: displayName, value: type })), [visualizationTypes]);
 
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
-  const currentVisualizationType = visualizationTypes.find((visualizationType) => visualizationType.type === values.visualization.type);
+  const currentVisualizationType = findVisualizationType(values.visualization.type);
+
+  const setNewVisualizationType = useCallback((newValue: string) => {
+    const type = findVisualizationType(newValue);
+    const createConfig = type.config?.createConfig ?? (() => ({}));
+
+    setFieldValue('visualization', {
+      type: newValue,
+      config: createConfig(),
+    }, true);
+  }, [findVisualizationType, setFieldValue]);
 
   const isTimelineChart = isTimeline(values);
 
@@ -63,7 +77,7 @@ const VisualizationConfiguration = () => {
                     value={value}
                     onChange={(newValue) => {
                       if (newValue !== value) {
-                        setFieldValue('visualization', { type: newValue, config: {} }, true);
+                        setNewVisualizationType(newValue);
                       }
                     }} />
           </Input>
