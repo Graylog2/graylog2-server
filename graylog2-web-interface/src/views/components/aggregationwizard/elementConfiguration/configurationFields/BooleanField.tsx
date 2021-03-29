@@ -15,19 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Field } from 'formik';
 
 import { Input } from 'components/bootstrap';
-import { Checkbox, HelpBlock } from 'components/graylog';
+import { HelpBlock } from 'components/graylog';
 import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 
-const BooleanField = ({ field, name, onChange, error, title, value }: FieldComponentProps) => (
+const BooleanField = ({ field, name, error, title }: FieldComponentProps) => (
   <>
     <Input id={`${name}-input`}
            label={title}
            error={error}
            labelClassName="col-sm-11"
            wrapperClassName="col-sm-1">
-      <Checkbox id={`${name}-input`} name={name} onChange={onChange} defaultValue={value} />
+      <Field type="checkbox" name={name} />
     </Input>
     <HelpBlock>{field.description}</HelpBlock>
   </>
