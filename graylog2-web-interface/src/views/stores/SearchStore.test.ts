@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import asMock from 'helpers/mocking/AsMock';
+
 import fetch from 'logic/rest/FetchProvider';
 import Search from 'views/logic/search/Search';
 
 import { SearchActions } from './SearchStore';
-import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
