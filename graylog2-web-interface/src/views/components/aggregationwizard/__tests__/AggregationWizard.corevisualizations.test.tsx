@@ -174,19 +174,6 @@ describe('AggregationWizard/Core Visualizations', () => {
 
     await expectSubmitButtonToBeDisabled();
 
-    await selectOption('Select Color Scale', 'Viridis');
-
-    const autoScale = await screen.findByRole('checkbox', { name: 'Auto Scale' });
-    userEvent.click(autoScale);
-
-    await expectSubmitButtonToBeDisabled();
-
-    const minInput = await screen.findByRole('spinbutton', { name: 'Min' });
-    userEvent.type(minInput, '1');
-
-    const maxInput = await screen.findByRole('spinbutton', { name: 'Max' });
-    userEvent.type(maxInput, '100');
-
     const useSmallestAsDefault = await screen.findByRole('checkbox', { name: 'Use smallest as default' });
     userEvent.click(useSmallestAsDefault);
 
@@ -197,12 +184,10 @@ describe('AggregationWizard/Core Visualizations', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({
       visualization: 'heatmap',
       visualizationConfig: expect.objectContaining({
-        autoScale: false,
+        autoScale: true,
         colorScale: 'Viridis',
         reverseScale: false,
         useSmallestAsDefault: true,
-        zMin: 1,
-        zMax: 100,
       }),
     })));
   });
