@@ -82,7 +82,7 @@ describe('AggregationWizard/Core Visualizations', () => {
     ${'Area Chart'}    | ${['Interpolation']}
     ${'Bar Chart'}     | ${['Mode']}
     ${'Line Chart'}    | ${['Interpolation']}
-    ${'Heatmap'}       | ${['Color Scale', 'Min', 'Max', 'Default Value']}
+    ${'Heatmap'}       | ${['Default Value']}
     ${'Pie Chart'}     | ${[]}
     ${'Scatter Plot'}  | ${[]}
     ${'Single Number'} | ${[]}
@@ -98,10 +98,11 @@ describe('AggregationWizard/Core Visualizations', () => {
       await expectSubmitButtonNotToBeDisabled();
     }
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const field of fields) {
-      expect(screen.getByText(`${field} is required.`)).toBeInTheDocument();
-    }
+    const validationErrors = screen.queryAllByText(/ is required/);
+    const erroredFields = validationErrors.map((f) => f.innerHTML)
+      .map((text) => text.replace(' is required.', ''));
+
+    expect(erroredFields).toEqual(fields);
   });
 
   it('creates Area Chart config when all required fields are present', async () => {
@@ -174,6 +175,11 @@ describe('AggregationWizard/Core Visualizations', () => {
     await expectSubmitButtonToBeDisabled();
 
     await selectOption('Select Color Scale', 'Viridis');
+
+    const autoScale = await screen.findByRole('checkbox', { name: 'Auto Scale' });
+    userEvent.click(autoScale);
+
+    await expectSubmitButtonToBeDisabled();
 
     const minInput = await screen.findByRole('spinbutton', { name: 'Min' });
     userEvent.type(minInput, '1');
