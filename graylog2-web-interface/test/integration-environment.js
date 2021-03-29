@@ -35,6 +35,7 @@ class IntegrationEnvironment extends JSDomEnvironment {
       version: '3.0.0',
       tagline: 'Manage your logs in the dark and have lasers going and make it look like you\'re from space!',
     }));
+
     api.post(`${prefix}cluster/metrics/multiple`, (req, res) => res.json({}));
     api.get(`${prefix}dashboards`, (req, res) => res.json([]));
     api.get(`${prefix}search/decorators/available`, (req, res) => res.json({}));
@@ -47,10 +48,12 @@ class IntegrationEnvironment extends JSDomEnvironment {
     api.get(`${prefix}system/sessions`, (req, res) => res.json({ session_id: null, username: null, is_valid: false }));
     api.get(`${prefix}system/notifications`, (req, res) => res.json([]));
     api.get(`${prefix}system/cluster/nodes`, (req, res) => res.json({ nodes: [], total: 0 }));
+
     api.get(`${prefix}system/cluster_config/org.graylog2.indexer.searches.SearchesClusterConfig`, (req, res) => res.json({
       relative_timerange_options: {},
       query_time_range_limit: 'P5M',
     }));
+
     api.get(`${prefix}views`, (req, res) => res.json({
       total: 0,
       page: 1,
@@ -58,17 +61,22 @@ class IntegrationEnvironment extends JSDomEnvironment {
       count: 0,
       views: [],
     }));
+
     api.get(`${prefix}views/fields`, (req, res) => res.json([]));
     api.get(`${prefix}views/functions`, (req, res) => res.json([]));
+
     api.post(`${prefix}views/search`, (req, res) => {
       const search = req.body;
       searches[search.id] = search;
+
       return res.json(search);
     });
+
     api.post(`${prefix}views/search/metadata`, (req, res) => res.json({
       query_metadata: {},
       declared_parameters: {},
     }));
+
     api.post(/views\/search\/(\w+)\/execute$/, (req, res) => {
       const search = searches[req.params[0]];
       const results = search.queries.map(({ id }) => [id, {
@@ -84,6 +92,7 @@ class IntegrationEnvironment extends JSDomEnvironment {
         state: 'COMPLETED',
       }])
         .reduce((prev, [id, result]) => ({ ...prev, [id]: result }), {});
+
       return res.json({
         id: `${req.params[0]}-job`,
         search_id: req.params[0],
@@ -101,6 +110,9 @@ class IntegrationEnvironment extends JSDomEnvironment {
     const { port } = this.server.address();
 
     this.global.api_url = `http://localhost:${port}${prefix}`;
+
+    // eslint-disable-next-line global-require
+    this.global.window.fetch = require('node-fetch');
   }
 
   async setup() {
