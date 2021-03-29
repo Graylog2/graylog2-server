@@ -39,6 +39,7 @@ public class LookupModule extends Graylog2Module {
     protected void configure() {
         serviceBinder().addBinding().to(UrlWhitelistService.class).in(Scopes.SINGLETON);
         binder().bind(UrlWhitelistNotificationService.class).in(Scopes.SINGLETON);
+        binder().bind(AllowedAuxiliaryPathChecker.class).in(Scopes.SINGLETON);
 
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
@@ -52,12 +53,10 @@ public class LookupModule extends Graylog2Module {
                 CaffeineLookupCache.Factory.class,
                 CaffeineLookupCache.Config.class);
 
-        if (!configuration.isCloud()) {
-            installLookupDataAdapter(CSVFileDataAdapter.NAME,
-                    CSVFileDataAdapter.class,
-                    CSVFileDataAdapter.Factory.class,
-                    CSVFileDataAdapter.Config.class);
-        }
+        installLookupDataAdapter(CSVFileDataAdapter.NAME,
+                CSVFileDataAdapter.class,
+                CSVFileDataAdapter.Factory.class,
+                CSVFileDataAdapter.Config.class);
 
         installLookupDataAdapter2(DnsLookupDataAdapter.NAME,
                 DnsLookupDataAdapter.class,

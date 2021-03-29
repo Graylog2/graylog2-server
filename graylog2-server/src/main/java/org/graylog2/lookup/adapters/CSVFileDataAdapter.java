@@ -30,6 +30,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -61,8 +62,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(CSVFileDataAdapter.class);
 
     public static final String NAME = "csvfile";
+    public static final String ALLOWED_PATH_ERROR = "The specified CSV file is not in an allowed path.";
 
     private final Config config;
+    private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -71,9 +74,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     public CSVFileDataAdapter(@Assisted("id") String id,
                               @Assisted("name") String name,
                               @Assisted LookupDataAdapterConfiguration config,
-                              MetricRegistry metricRegistry) {
+                              MetricRegistry metricRegistry,
+                              AllowedAuxiliaryPathChecker pathChecker) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
+        this.pathChecker = pathChecker;
     }
 
     @Override
@@ -81,6 +86,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         LOG.debug("Starting CSV data adapter for file: {}", config.path());
         if (isNullOrEmpty(config.path())) {
             throw new IllegalStateException("File path needs to be set");
+        }
+        if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
+            throw new IllegalStateException(ALLOWED_PATH_ERROR);
         }
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
@@ -98,6 +106,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
+        if (!pathChecker.fileIsInAllowedPath(Paths.get(config.path()))) {
+            LOG.error(ALLOWED_PATH_ERROR);
+            setError(new IllegalStateException(ALLOWED_PATH_ERROR));
+            return;
+        }
+
         try {
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
             if (!fileChanged.isChanged() && !getError().isPresent()) {
