@@ -17,16 +17,12 @@
 package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.SearchRequirements;
-import org.graylog.plugins.views.search.views.ViewRequirements;
-import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
-import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.joda.time.DateTime;
@@ -45,7 +41,6 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -60,11 +55,10 @@ public class SearchesCleanUpJobWithDBServicesTest {
     private SearchesCleanUpJob searchesCleanUpJob;
     private SearchDbService searchDbService;
 
-    static class TestViewService extends ViewService {
+    static class TestViewService extends ViewSummaryService {
         TestViewService(MongoConnection mongoConnection,
-                        MongoJackObjectMapperProvider mapper,
-                        ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), mock(EntityOwnershipService.class), mock(ViewSummaryService.class));
+                        MongoJackObjectMapperProvider mapper) {
+            super(mongoConnection, mapper);
         }
     }
 
@@ -72,11 +66,9 @@ public class SearchesCleanUpJobWithDBServicesTest {
     public void setup(MongoJackObjectMapperProvider mapperProvider) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
-        final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
-        final ViewService viewService = new TestViewService(
+        final ViewSummaryService viewService = new TestViewService(
                 mongodb.mongoConnection(),
-                mapperProvider,
-                clusterConfigService
+                mapperProvider
         );
         this.searchDbService = spy(
                 new SearchDbService(

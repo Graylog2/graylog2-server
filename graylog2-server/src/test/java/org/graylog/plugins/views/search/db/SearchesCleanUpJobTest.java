@@ -17,8 +17,8 @@
 package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -45,7 +45,7 @@ public class SearchesCleanUpJobTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private ViewService viewService;
+    private ViewSummaryService viewService;
 
     @Mock
     private SearchDbService searchDbService;
@@ -69,7 +69,7 @@ public class SearchesCleanUpJobTest {
 
     @Test
     public void testForEmptySearches() {
-        final ViewDTO view = mock(ViewDTO.class);
+        final ViewSummaryDTO view = mock(ViewSummaryDTO.class);
 
         when(viewService.streamAll()).thenReturn(Stream.of(view));
         when(searchDbService.streamAll()).thenReturn(Stream.empty());
@@ -98,7 +98,7 @@ public class SearchesCleanUpJobTest {
     @Test
     public void testForReferencedSearches() {
         final String searchId = "This search is in use";
-        final ViewDTO view = mock(ViewDTO.class);
+        final ViewSummaryDTO view = mock(ViewSummaryDTO.class);
         when(view.searchId()).thenReturn(searchId);
         when(viewService.streamAll()).thenReturn(Stream.of(view));
 
@@ -116,7 +116,7 @@ public class SearchesCleanUpJobTest {
     @Test
     public void testForMixedReferencedNonReferencedExpiredAndNonexpiredSearches() {
         final String searchId = "This search is in use";
-        final ViewDTO view = mock(ViewDTO.class);
+        final ViewSummaryDTO view = mock(ViewSummaryDTO.class);
         when(view.searchId()).thenReturn(searchId);
         when(viewService.streamAll()).thenReturn(Stream.of(view));
 
