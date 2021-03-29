@@ -186,8 +186,8 @@ describe('AggregationWizard', () => {
   it('should correctly change config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
     const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
-    const config = AggregationWidgetConfig
-      .builder()
+    const config = widgetConfig
+      .toBuilder()
       .rowPivots([pivot0])
       .build();
 
@@ -206,8 +206,8 @@ describe('AggregationWizard', () => {
     const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
     fireEvent.click(applyButton);
 
-    const updatedConfig = AggregationWidgetConfig
-      .builder()
+    const updatedConfig = widgetConfig
+      .toBuilder()
       .rowPivots([pivot1])
       .build();
 
