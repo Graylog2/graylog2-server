@@ -40,6 +40,10 @@ describe('ExtraWidgetActions', () => {
     ...dummyActionWithoutIsHidden,
     isHidden: jest.fn(() => false),
   };
+  const dummyActionWhichIsDisabled = {
+    ...dummyActionWithoutIsHidden,
+    disabled: jest.fn(() => true),
+  };
 
   it('returns `null` if no action is configured', () => {
     const { container } = render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
@@ -109,5 +113,16 @@ describe('ExtraWidgetActions', () => {
     render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 
     await screen.findByRole('separator');
+  });
+
+  it('renders a disabled action disabled', async () => {
+    asMock(usePluginEntities).mockReturnValue([dummyActionWhichIsDisabled]);
+
+    render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+
+    const menuItem = await screen.findByRole('presentation');
+
+    expect(menuItem).toHaveClass('disabled');
+    expect(dummyActionWhichIsDisabled.disabled).toHaveBeenCalledTimes(1);
   });
 });
