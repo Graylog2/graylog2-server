@@ -72,6 +72,7 @@
     "numeral": "^2.0.6",
     "opensans-npm-webfont": "1.0.0",
     "plotly.js": "^1.58.4",
+    "promise-polyfill": "^8.2.0",
     "qs": "^6.3.0",
     "react-ace": "9.2.1",
     "react-color": "^2.14.0",
@@ -101,7 +102,8 @@
     "ua-parser-js": "^0.7.12",
     "urijs": "^1.19.1",
     "utility-types": "^3.10.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "whatwg-fetch": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "7.13.10",
