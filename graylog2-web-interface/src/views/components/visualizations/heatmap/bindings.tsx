@@ -58,11 +58,13 @@ const heatmap: VisualizationType = {
       type: 'numeric',
       title: 'Min',
       required: true,
+      isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
     }, {
       name: 'zMax',
       type: 'numeric',
       title: 'Max',
       required: true,
+      isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
     }, {
       name: 'useSmallestAsDefault',
       type: 'boolean',
