@@ -53,6 +53,14 @@ public class HTTPFileRetriever {
     }
 
     /**
+     * Request file bytes. No "If-Modified-Since" header will be sent so the file will be fetched again, even if hasn't
+     * been modified since the last fetch.
+     */
+    public Optional<byte[]> fetchFileBytes(String url) throws IOException {
+        return fetchFileBytes(url, false);
+    }
+
+    /**
      * Request file by sending an "If-Modified-Since" header so that the file won't be fetched if it hasn't been
      * modified since the last request.
      */
@@ -60,7 +68,33 @@ public class HTTPFileRetriever {
         return fetchFile(url, true);
     }
 
+    /**
+     * Request file bytes by sending an "If-Modified-Since" header so that the file won't be fetched if it hasn't been
+     * modified since the last request.
+     */
+    public Optional<byte[]> fetchFileBytesIfNotModified(String url) throws IOException {
+        return fetchFileBytes(url, true);
+    }
+
+    private Optional<byte[]> fetchFileBytes(String url, boolean addIfModifiedSinceHeader) throws IOException {
+        try (Response response = doHttpGet(url, addIfModifiedSinceHeader)) {
+            if (null != response && null != response.body()) {
+                return Optional.of(response.body().bytes());
+            }
+        }
+        return Optional.empty();
+    }
+
     private Optional<String> fetchFile(String url, boolean addIfModifiedSinceHeader) throws IOException {
+        try (Response response = doHttpGet(url, addIfModifiedSinceHeader)) {
+            if (null != response && null != response.body()) {
+                return Optional.of(response.body().string());
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Response doHttpGet(String url, boolean addIfModifiedSinceHeader) throws IOException {
         final Request.Builder requestBuilder = new Request.Builder()
                 .get()
                 .url(url)
@@ -73,24 +107,20 @@ public class HTTPFileRetriever {
         }
         final Call request = client.newCall(requestBuilder.build());
 
-        try (final Response response = request.execute()) {
-            if (response.isSuccessful()) {
-                final String lastModifiedHeader = response.header("Last-Modified", DateTime.now(DateTimeZone.UTC).toString());
-                final Map<String, String> newLastModified = new HashMap<>(this.lastLastModified.get());
-                newLastModified.put(url, lastModifiedHeader);
-                this.lastLastModified.set(ImmutableMap.copyOf(newLastModified));
+        final Response response = request.execute();
+        if (response.isSuccessful()) {
+            final String lastModifiedHeader = response.header("Last-Modified", DateTime.now(DateTimeZone.UTC).toString());
+            final Map<String, String> newLastModified = new HashMap<>(this.lastLastModified.get());
+            newLastModified.put(url, lastModifiedHeader);
+            this.lastLastModified.set(ImmutableMap.copyOf(newLastModified));
 
-                if (response.body() != null) {
-                    final String body = response.body().string();
-                    return Optional.ofNullable(body);
-                }
-            } else {
-                if (response.code() != 304) {
-                    throw new IOException("Request failed: " + response.message());
-                }
+            return response;
+        } else {
+            if (response.code() != 304) {
+                throw new IOException("Request failed: " + response.message());
             }
         }
 
-        return Optional.empty();
+        return null;
     }
 }
