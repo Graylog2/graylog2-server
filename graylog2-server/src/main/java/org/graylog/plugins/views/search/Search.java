@@ -56,7 +56,7 @@ import static java.util.stream.Collectors.toSet;
 @JsonDeserialize(builder = Search.Builder.class)
 public abstract class Search implements ContentPackable<SearchEntity> {
     public static final String FIELD_REQUIRES = "requires";
-    private static final String FIELD_CREATED_AT = "created_at";
+    static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
     // generated during build to help quickly find a query by id.

@@ -88,8 +88,6 @@ public class SearchesCleanUpJob extends Periodical {
     @Override
     public void doRun() {
         final Set<String> requiredIds = viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet());
-        searchDbService.streamAll()
-                .filter(search -> search.createdAt().isBefore(mustNotBeOlderThan) && !requiredIds.contains(search.id()))
-                .forEach(search -> searchDbService.delete(search.id()));
+        searchDbService.getExpiredSearches(requiredIds, mustNotBeOlderThan).forEach(id -> searchDbService.delete(id));
     }
 }

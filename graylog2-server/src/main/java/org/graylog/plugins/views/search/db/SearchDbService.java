@@ -21,9 +21,12 @@ import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
+import org.graylog.plugins.views.search.SearchSummary;
+import org.graylog.plugins.views.search.SearchSummaryRequirements;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.joda.time.Instant;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -47,18 +50,26 @@ import java.util.stream.Stream;
  */
 public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
+    protected final JacksonDBCollection<SearchSummary, ObjectId> summarydb;
     private final SearchRequirements.Factory searchRequirementsFactory;
+    private final SearchSummaryRequirements.Factory searchSummaryRequirementsFactory;
 
     @Inject
     protected SearchDbService(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
-                              SearchRequirements.Factory searchRequirementsFactory) {
+                              SearchRequirements.Factory searchRequirementsFactory,
+                              SearchSummaryRequirements.Factory searchSummaryRequirementsFactory) {
         this.searchRequirementsFactory = searchRequirementsFactory;
+        this.searchSummaryRequirementsFactory = searchSummaryRequirementsFactory;
         db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
                 Search.class,
                 ObjectId.class,
                 mapper.get());
         db.createIndex(new BasicDBObject("created_at", 1), new BasicDBObject("unique", false));
+        summarydb = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
+                SearchSummary.class,
+                ObjectId.class,
+                mapper.get());
     }
 
     public Optional<Search> get(String id) {
@@ -116,5 +127,18 @@ public class SearchDbService {
     private Search requirementsForSearch(Search search) {
         return searchRequirementsFactory.create(search)
                 .rebuildRequirements(Search::requires, (s, newRequirements) -> s.toBuilder().requires(newRequirements).build());
+    }
+
+    private SearchSummary requirementsForSearchSummary(SearchSummary search) {
+        return searchSummaryRequirementsFactory.create(search)
+                .rebuildRequirements(SearchSummary::requires, (s, newRequirements) -> s.toBuilder().requires(newRequirements).build());
+    }
+
+    public Set<String> getExpiredSearches(final Set<String> requiredIds, final Instant mustNotBeOlderThan) {
+        return Streams.stream((Iterable<SearchSummary>) summarydb.find())
+                .map(this::requirementsForSearchSummary)
+                .filter(search -> search.createdAt().isBefore(mustNotBeOlderThan) && !requiredIds.contains(search.id()))
+                .map(search -> search.id())
+                .collect(Collectors.toSet());
     }
 }
