@@ -23,20 +23,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.graylog.plugins.views.search.Search.FIELD_CREATED_AT;
 import static org.graylog.plugins.views.search.Search.FIELD_OWNER;
-import static org.graylog.plugins.views.search.Search.FIELD_REQUIRES;
 
 @AutoValue
 @JsonAutoDetect
@@ -48,9 +44,6 @@ public abstract class SearchSummary {
     @Nullable
     @JsonProperty
     public abstract String id();
-
-    @JsonProperty(FIELD_REQUIRES)
-    public abstract Map<String, PluginMetadataSummary> requires();
 
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
@@ -72,9 +65,6 @@ public abstract class SearchSummary {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @JsonProperty(FIELD_REQUIRES)
-        public abstract Builder requires(Map<String, PluginMetadataSummary> requirements);
-
         @JsonProperty(FIELD_OWNER)
         public abstract Builder owner(@Nullable String owner);
 
@@ -85,14 +75,11 @@ public abstract class SearchSummary {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_SearchSummary.Builder()
-                    .requires(Collections.emptyMap())
-                    .createdAt(DateTime.now(DateTimeZone.UTC));
+            return new AutoValue_SearchSummary.Builder().createdAt(DateTime.now(DateTimeZone.UTC));
         }
 
         public SearchSummary build() {
-            final SearchSummary search = autoBuild();
-            return search;
+            return autoBuild();
         }
     }
 }

@@ -22,7 +22,6 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchSummary;
-import org.graylog.plugins.views.search.SearchSummaryRequirements;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
@@ -52,15 +51,12 @@ public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
     protected final JacksonDBCollection<SearchSummary, ObjectId> summarydb;
     private final SearchRequirements.Factory searchRequirementsFactory;
-    private final SearchSummaryRequirements.Factory searchSummaryRequirementsFactory;
 
     @Inject
     protected SearchDbService(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
-                              SearchRequirements.Factory searchRequirementsFactory,
-                              SearchSummaryRequirements.Factory searchSummaryRequirementsFactory) {
+                              SearchRequirements.Factory searchRequirementsFactory) {
         this.searchRequirementsFactory = searchRequirementsFactory;
-        this.searchSummaryRequirementsFactory = searchSummaryRequirementsFactory;
         db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
                 Search.class,
                 ObjectId.class,
@@ -129,14 +125,8 @@ public class SearchDbService {
                 .rebuildRequirements(Search::requires, (s, newRequirements) -> s.toBuilder().requires(newRequirements).build());
     }
 
-    private SearchSummary requirementsForSearchSummary(SearchSummary search) {
-        return searchSummaryRequirementsFactory.create(search)
-                .rebuildRequirements(SearchSummary::requires, (s, newRequirements) -> s.toBuilder().requires(newRequirements).build());
-    }
-
-    public Set<String> getExpiredSearches(final Set<String> requiredIds, final Instant mustNotBeOlderThan) {
+     public Set<String> getExpiredSearches(final Set<String> requiredIds, final Instant mustNotBeOlderThan) {
         return Streams.stream((Iterable<SearchSummary>) summarydb.find())
-                .map(this::requirementsForSearchSummary)
                 .filter(search -> search.createdAt().isBefore(mustNotBeOlderThan) && !requiredIds.contains(search.id()))
                 .map(search -> search.id())
                 .collect(Collectors.toSet());

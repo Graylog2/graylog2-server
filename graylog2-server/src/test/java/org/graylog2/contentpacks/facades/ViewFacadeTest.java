@@ -26,7 +26,6 @@ import com.google.common.graph.Graph;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
-import org.graylog.plugins.views.search.SearchSummaryRequirements;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.filter.OrFilter;
@@ -102,7 +101,7 @@ public class ViewFacadeTest {
     public static class TestSearchDBService extends SearchDbService {
         protected TestSearchDBService(MongoConnection mongoConnection,
                                       MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto), sum -> new SearchSummaryRequirements(Collections.emptySet(), sum));
+            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto));
         }
     }
 
