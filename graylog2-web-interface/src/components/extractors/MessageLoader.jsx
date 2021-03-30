@@ -20,6 +20,8 @@ import React from 'react';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 
+import { Button } from '../graylog';
+
 const MessagesActions = ActionsProvider.getActions('Messages');
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
@@ -90,9 +92,12 @@ class MessageLoader extends React.Component {
         <form className="form-inline message-loader-form" onSubmit={this.loadMessage}>
           <input type="text" ref={(messageId) => { this.messageId = messageId; }} className="form-control message-id-input" placeholder="Message ID" required />
           <input type="text" ref={(index) => { this.index = index; }} className="form-control" placeholder="Index" required />
-          <button ref={(submitButton) => { this.submitButton = submitButton; }} type="submit" className="btn btn-info" disabled={this.state.loading}>
+          <Button bsStyle="info"
+                  ref={(submitButton) => { this.submitButton = submitButton; }}
+                  disabled={this.state.loading}
+                  type="submit">
             {this.state.loading ? 'Loading message...' : 'Load message'}
-          </button>
+          </Button>
         </form>
       </div>
     );
