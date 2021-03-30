@@ -18,6 +18,7 @@ import type { VisualizationType } from 'views/types';
 
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 type HeatMapVisualizationConfigFormValues = {
   colorScale: typeof COLORSCALES[number],
@@ -45,7 +46,7 @@ const heatmap: VisualizationType = {
       title: 'Color Scale',
       required: true,
       type: 'select',
-      options: COLORSCALES,
+      options: [...COLORSCALES].sort(defaultCompare),
     }, {
       name: 'reverseScale',
       type: 'boolean',
