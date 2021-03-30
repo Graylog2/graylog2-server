@@ -18,7 +18,7 @@ import * as React from 'react';
 import { values, merge, fill, find, isEmpty, get } from 'lodash';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
@@ -128,7 +128,7 @@ const _chartLayout = (heatmapData) => {
 
 const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
 
-const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = data.chart || Object.values(data)[0];
   const heatmapData = chartData(config, rows, 'heatmap', _generateSeries(visualizationConfig), _formatSeries(visualizationConfig), _leafSourceMatcher);

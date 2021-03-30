@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
@@ -26,6 +27,7 @@ import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -41,6 +43,8 @@ const fieldTypeMapping3 = new FieldTypeMapping('timestamp', FieldTypes.DATE());
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2, fieldTypeMapping3]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
+const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
@@ -55,6 +59,10 @@ describe('AggregationWizard', () => {
       </AggregationWizard>,
     </FieldTypesContext.Provider>,
   );
+
+  beforeAll(() => PluginStore.register(plugin));
+
+  afterAll(() => PluginStore.unregister(plugin));
 
   it('should require group by function when adding a group by element', async () => {
     renderSUT();
@@ -87,8 +95,8 @@ describe('AggregationWizard', () => {
     fireEvent.click(applyButton);
 
     const pivot = Pivot.create('took_ms', 'values', { limit: 15 });
-    const updatedConfig = AggregationWidgetConfig
-      .builder()
+    const updatedConfig = widgetConfig
+      .toBuilder()
       .rowPivots([pivot])
       .build();
 
@@ -151,8 +159,8 @@ describe('AggregationWizard', () => {
 
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
     const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
-    const updatedConfig = AggregationWidgetConfig
-      .builder()
+    const updatedConfig = widgetConfig
+      .toBuilder()
       .rowPivots([pivot0, pivot1])
       .build();
 
@@ -164,8 +172,8 @@ describe('AggregationWizard', () => {
   it('should display group by with values from config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
     const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
-    const config = AggregationWidgetConfig
-      .builder()
+    const config = widgetConfig
+      .toBuilder()
       .rowPivots([pivot0, pivot1])
       .build();
 
@@ -178,8 +186,8 @@ describe('AggregationWizard', () => {
   it('should correctly change config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
     const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
-    const config = AggregationWidgetConfig
-      .builder()
+    const config = widgetConfig
+      .toBuilder()
       .rowPivots([pivot0])
       .build();
 
@@ -198,8 +206,8 @@ describe('AggregationWizard', () => {
     const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
     fireEvent.click(applyButton);
 
-    const updatedConfig = AggregationWidgetConfig
-      .builder()
+    const updatedConfig = widgetConfig
+      .toBuilder()
       .rowPivots([pivot1])
       .build();
 

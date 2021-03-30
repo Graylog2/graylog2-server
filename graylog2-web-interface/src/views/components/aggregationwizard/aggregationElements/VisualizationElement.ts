@@ -15,11 +15,84 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty } from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import type { AggregationElement } from './AggregationElementType';
 
 import VisualizationConfiguration from '../elementConfiguration/VisualizationConfiguration';
-import { WidgetConfigFormValues } from '../WidgetConfigForm';
+import { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
+
+const findVisualizationType = (visualizationType: string) => {
+  const visualizationTypeDefinition = PluginStore.exports('visualizationTypes').find(({ type }) => (type === visualizationType));
+
+  if (!visualizationTypeDefinition) {
+    throw new Error(`Invalid visualization type: ${visualizationType}`);
+  }
+
+  return visualizationTypeDefinition;
+};
+
+const defaultToConfig = () => undefined;
+
+const formValuesToVisualizationConfig = (visualizationType: string, formValues: VisualizationConfigFormValues) => {
+  const { config: { toConfig = defaultToConfig } = {} } = findVisualizationType(visualizationType);
+
+  return toConfig(formValues);
+};
+
+const defaultFromConfig = () => ({});
+
+const visualizationConfigToFormValues = (visualizationType: string, config: VisualizationConfig | undefined) => {
+  const { config: { fromConfig = defaultFromConfig } = {} } = findVisualizationType(visualizationType);
+
+  return fromConfig(config);
+};
+
+const fromConfig = (config: AggregationWidgetConfig) => ({
+  visualization: {
+    type: config.visualization,
+    config: visualizationConfigToFormValues(config.visualization, config.visualizationConfig),
+    eventAnnotation: config.eventAnnotation,
+  },
+});
+const toConfig = (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => currentConfig
+  .toBuilder()
+  .visualization(formValues.visualization.type)
+  .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
+  .eventAnnotation(formValues.visualization.eventAnnotation)
+  .build();
+
+const hasErrors = (errors: { [key: string]: string }) => Object.values(errors)
+  .filter((value) => value !== undefined)
+  .length > 0;
+
+const validate = (formValues: WidgetConfigFormValues) => {
+  const { visualization: { type, config } } = formValues;
+
+  if (!type) {
+    return { 'visualization.type': 'Type is required.' };
+  }
+
+  const visualizationType = findVisualizationType(type);
+
+  if (visualizationType.config) {
+    const { fields = [] } = visualizationType.config;
+
+    const configErrors = fields
+      .filter((field) => 'required' in field && field.required)
+      .filter((field) => !field.isShown || field.isShown(config))
+      .filter(({ name }) => config[name] === undefined || config[name] === '')
+      .map(({ name, title }) => ({ [name]: `${title} is required.` }))
+      .reduce((prev, cur) => ({ ...prev, ...cur }), {});
+
+    return hasErrors(configErrors) ? { visualization: { config: configErrors } } : {};
+  }
+
+  return {};
+};
 
 const VisualizationElement: AggregationElement = {
   title: 'Visualization',
@@ -27,6 +100,9 @@ const VisualizationElement: AggregationElement = {
   order: 4,
   allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.visualization),
   component: VisualizationConfiguration,
+  fromConfig,
+  toConfig,
+  validate,
 };
 
 export default VisualizationElement;

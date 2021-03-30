@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import { Form, Formik, FormikProps } from 'formik';
+import { ConfigurationField } from 'views/types';
 
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
 
 export type MetricFormValues = {
@@ -46,7 +48,20 @@ export type ValuesGrouping = {
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
 
-export type VisualizationFormValues = {};
+export type VisualizationConfigFormValues = {};
+
+export type VisualizationFormValues = {
+  type: string,
+  config?: VisualizationConfigFormValues,
+  eventAnnotation?: boolean,
+};
+
+export type VisualizationConfigDefinition = {
+  fromConfig: (config: VisualizationConfig | undefined) => VisualizationConfigFormValues,
+  toConfig: (formValues: VisualizationConfigFormValues) => VisualizationConfig,
+  createConfig?: () => Partial<VisualizationConfigFormValues>,
+  fields: Array<ConfigurationField>,
+};
 
 export type SortFormValues = {}
 export interface WidgetConfigFormValues {
@@ -57,6 +72,13 @@ export interface WidgetConfigFormValues {
   },
   visualization?: VisualizationFormValues,
   sort?: SortFormValues,
+}
+
+export interface WidgetConfigValidationErrors {
+  metrics?: Array<{ [key: string]: string }>,
+  groupBy?: { groupings: Array<{ [key: string]: string }> },
+  visualization?: { [key: string]: string | any },
+  sort?: { [key: string]: string },
 }
 
 type Props = {

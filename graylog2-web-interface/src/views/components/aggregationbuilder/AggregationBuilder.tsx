@@ -55,19 +55,19 @@ export type VisualizationComponentProps = {
   toggleEdit: () => void,
 };
 
-export type VisualizationComponent =
-  { type: string, propTypes?: any }
+export type VisualizationComponent<T extends string> =
+  { type: T, propTypes?: any }
   & React.ComponentType<VisualizationComponentProps>;
 
-export const makeVisualization = (component: React.ComponentType<VisualizationComponentProps>, type: string): VisualizationComponent => {
-  const visualizationComponent = component as VisualizationComponent;
+export const makeVisualization = <T extends string>(component: React.ComponentType<VisualizationComponentProps>, type: T): VisualizationComponent<T> => {
+  const visualizationComponent = component as VisualizationComponent<T>;
 
   visualizationComponent.type = type;
 
   return visualizationComponent;
 };
 
-const _visualizationForType = (type: string): VisualizationComponent => {
+const _visualizationForType = <T extends string>(type: T): VisualizationComponent<T> => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');
   const visualization = visualizationTypes.filter((viz) => viz.type === type)[0];
 

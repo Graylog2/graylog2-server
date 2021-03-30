@@ -30,6 +30,7 @@ import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
 import { OverrideProps } from 'views/components/WidgetOverrideElements';
+import { VisualizationConfigDefinition, VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -83,10 +84,38 @@ interface VisualizationConfigType {
   component: React.ComponentType<VisualizationConfigProps>;
 }
 
+type BaseField = {
+  title: string,
+  name: string,
+  helpComponent?: React.ComponentType,
+  description?: string,
+  isShown?: (formValues: VisualizationConfigFormValues) => boolean,
+};
+
+type BaseRequiredField = BaseField & {
+  required: boolean,
+};
+
+type SelectField = BaseRequiredField & {
+  type: 'select',
+  options: ReadonlyArray<string | [string, any]>,
+};
+
+type BooleanField = BaseField & {
+  type: 'boolean',
+};
+
+type NumericField = BaseRequiredField & {
+  type: 'numeric',
+};
+
+type ConfigurationField = SelectField | BooleanField | NumericField;
+
 interface VisualizationType {
   type: string;
   displayName: string;
   component: VisualizationComponent;
+  config?: VisualizationConfigDefinition;
 }
 
 interface ResultHandler<T, R> {

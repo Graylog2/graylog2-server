@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
@@ -27,6 +28,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import DataTable from 'views/components/datatable/DataTable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -46,6 +48,8 @@ jest.mock('views/stores/AggregationFunctionsStore', () => ({
   listen: jest.fn(),
 }));
 
+const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
@@ -60,6 +64,10 @@ describe('AggregationWizard', () => {
       </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
+
+  beforeAll(() => PluginStore.register(plugin));
+
+  afterAll(() => PluginStore.unregister(plugin));
 
   it('should require metric function when adding a metric element', async () => {
     renderSUT();
@@ -88,8 +96,8 @@ describe('AggregationWizard', () => {
   });
 
   it('should not require metric field when metric function count', async () => {
-    const config = AggregationWidgetConfig
-      .builder()
+    const config = widgetConfig
+      .toBuilder()
       .series([Series.create('count')])
       .build();
     renderSUT({ config });
@@ -115,8 +123,8 @@ describe('AggregationWizard', () => {
 
   it('should update config with updated metric', async () => {
     const onChangeMock = jest.fn();
-    const config = AggregationWidgetConfig
-      .builder()
+    const config = widgetConfig
+      .toBuilder()
       .series([Series.create('count')])
       .build();
 
@@ -139,8 +147,8 @@ describe('AggregationWizard', () => {
     fireEvent.click(applyButton);
 
     const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('New name').build();
-    const updatedConfig = AggregationWidgetConfig
-      .builder()
+    const updatedConfig = widgetConfig
+      .toBuilder()
       .series([Series.create('count', 'http_method').toBuilder().config(updatedSeriesConfig).build()])
       .build();
 
@@ -151,8 +159,8 @@ describe('AggregationWizard', () => {
 
   it('should update config with percentile metric function', async () => {
     const onChangeMock = jest.fn();
-    const config = AggregationWidgetConfig
-      .builder()
+    const config = widgetConfig
+      .toBuilder()
       .series([Series.create('count')])
       .build();
 
@@ -178,8 +186,8 @@ describe('AggregationWizard', () => {
     const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
     fireEvent.click(applyButton);
 
-    const updatedConfig = AggregationWidgetConfig
-      .builder()
+    const updatedConfig = widgetConfig
+      .toBuilder()
       .series([Series.create('percentile', 'http_method', 50.0)])
       .build();
 
@@ -190,8 +198,8 @@ describe('AggregationWizard', () => {
 
   it('should configure metric with multiple functions', async () => {
     const onChangeMock = jest.fn();
-    const config = AggregationWidgetConfig
-      .builder()
+    const config = widgetConfig
+      .toBuilder()
       .series([Series.create('max', 'took_ms')])
       .build();
     renderSUT({ config, onChange: onChangeMock });

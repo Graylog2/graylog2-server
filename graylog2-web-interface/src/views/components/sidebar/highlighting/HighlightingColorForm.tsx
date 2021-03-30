@@ -62,7 +62,7 @@ const OptionContainer = styled.div`
 `;
 const createOption = (name) => ({ label: <OptionContainer><GradientColorPreview gradient={name} />{name}</OptionContainer>, value: name });
 
-const GRADIENTS = COLORSCALES.sort(defaultCompare).map(createOption);
+const GRADIENTS = [...COLORSCALES].sort(defaultCompare).map(createOption);
 
 type ColorErrors = Record<string, string>;
 
