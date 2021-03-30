@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+// eslint-disable-next-line import/no-named-as-default
 import Version, { getFullVersion, getMajorAndMinorVersion, parseVersion } from './Version';
 
 jest.unmock('util/Version');
@@ -24,11 +25,13 @@ describe('<Version>', () => {
   it('returns the full version from package information', () => {
     const version = '4.0.6-SNAPSHOT';
 
+    // eslint-disable-next-line import/no-named-as-default-member
     expect(Version.getFullVersion()).toBe(version);
     expect(getFullVersion()).toBe(version);
   });
 
   it('returns the major and minor version from package information', () => {
+    // eslint-disable-next-line import/no-named-as-default-member
     expect(Version.getMajorAndMinorVersion()).toBe('4.0');
     expect(getMajorAndMinorVersion()).toBe('4.0');
   });

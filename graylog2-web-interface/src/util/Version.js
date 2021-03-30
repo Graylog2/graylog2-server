@@ -33,6 +33,7 @@ export const parseVersion = (version?: string = defaultVersion): Version | void 
   const result = versionRegex.exec(version);
 
   if (!result || !result.groups) {
+    // eslint-disable-next-line no-console
     console.error('Failed to parse version', version);
 
     return undefined;

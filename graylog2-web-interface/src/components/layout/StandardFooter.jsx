@@ -18,7 +18,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import Version from 'util/Version';
+import { getFullVersion } from 'util/Version';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -50,7 +50,7 @@ const StandardFooter = ({ system }: Props) => {
 
   if (!(system && jvm)) {
     return (
-      <>Graylog {Version.getFullVersion()}</>
+      <>Graylog {getFullVersion()}</>
     );
   }
 
