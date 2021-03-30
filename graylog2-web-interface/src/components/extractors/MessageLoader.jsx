@@ -82,7 +82,7 @@ class MessageLoader extends React.Component {
       explanatoryText = (
         <p>
           Wrong example? You can{' '}
-          <button className="btn btn-link btn-small btn-text" onClick={this.toggleMessageForm}>load another message</button>.
+          <Button bsStyle="link" bsSize="sm" onClick={this.toggleMessageForm}>load another message</Button>.
         </p>
       );
     }
