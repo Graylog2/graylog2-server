@@ -34,7 +34,10 @@ const useLoadView = (view: Promise<View>, query: { [key: string]: any }) => {
       loadingViewHooks,
       executingViewHooks,
       query,
-      () => setLoaded(true),
+      () => {
+        setLoaded(true);
+        setHookComponent(undefined);
+      },
     ).catch((e) => {
       if (e instanceof Error) {
         throw e;
