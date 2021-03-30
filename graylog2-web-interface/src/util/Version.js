@@ -15,6 +15,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// $FlowFixMe: Import fail in enterprise plugin
 import pjson from '../../package.json';
 
 const versionRegex = /(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(-(?<preRelease>[\w.\d]+))?(\+(?<buildMetadata>\w+))?/;
