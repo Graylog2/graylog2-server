@@ -38,7 +38,7 @@ const SimpleAggregationWizard = (props) => (
   <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
 );
 
-const submitButton = async () => screen.findByRole('button', { name: 'Apply Changes' });
+const submitButton = async () => screen.findByText('Apply Changes');
 
 const expectSubmitButtonToBeDisabled = async () => {
   expect(await submitButton()).toBeDisabled();
