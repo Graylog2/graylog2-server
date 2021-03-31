@@ -66,7 +66,7 @@ export const SearchExecutionStateStore: Store<SearchExecutionState> = singletonS
 
     clear(): SearchExecutionState {
       this.executionState = defaultExecutionState;
-      this.trigger(this.executionState);
+      this._trigger();
       SearchExecutionStateActions.clear.promise(Promise.resolve(this.executionState));
 
       return this.executionState;
@@ -76,7 +76,7 @@ export const SearchExecutionStateStore: Store<SearchExecutionState> = singletonS
       this.executionState = executionState;
 
       if (trigger) {
-        this.trigger(this.executionState);
+        this._trigger();
       }
 
       SearchExecutionStateActions.replace.promise(Promise.resolve(executionState));
@@ -92,7 +92,7 @@ export const SearchExecutionStateStore: Store<SearchExecutionState> = singletonS
       });
 
       this.executionState = this.executionState.toBuilder().parameterBindings(parameterBindings).build();
-      this.trigger(this.executionState);
+      this._trigger();
       SearchExecutionStateActions.setParameterValues.promise(Promise.resolve(this.executionState));
 
       return this.executionState;
@@ -103,7 +103,7 @@ export const SearchExecutionStateStore: Store<SearchExecutionState> = singletonS
         .parameterBindings(this.executionState.parameterBindings.set(parameterName, ParameterBinding.forValue(value)))
         .build();
 
-      this.trigger(this.executionState);
+      this._trigger();
       SearchExecutionStateActions.bindParameterValue.promise(Promise.resolve(this.executionState));
 
       return this.executionState;
@@ -114,10 +114,14 @@ export const SearchExecutionStateStore: Store<SearchExecutionState> = singletonS
         .globalOverride(newGlobalOverride)
         .build();
 
-      this.trigger(this.executionState);
+      this._trigger();
       SearchExecutionStateActions.globalOverride.promise(Promise.resolve(this.executionState));
 
       return this.executionState;
+    },
+
+    _trigger() {
+      this.trigger(this.executionState);
     },
   }),
 );

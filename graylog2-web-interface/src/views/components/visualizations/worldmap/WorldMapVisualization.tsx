@@ -21,7 +21,7 @@ import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -60,7 +60,7 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   });
 };
 
-const WorldMapVisualization: VisualizationComponent = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
+const WorldMapVisualization = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
   const hasMetric = !isEmpty(config.series);

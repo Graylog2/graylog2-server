@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 
 import EventHandler, { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -42,7 +42,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ line: { color: colors.get(chart.name) } });
 
-const AreaVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+const AreaVisualization = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({

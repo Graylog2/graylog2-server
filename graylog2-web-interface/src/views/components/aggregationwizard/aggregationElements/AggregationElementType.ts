@@ -16,7 +16,7 @@
  */
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import type { WidgetConfigFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from '../WidgetConfigForm';
 
 export type AggregationElement = {
   title: string,
@@ -32,5 +32,5 @@ export type AggregationElement = {
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
   }>,
-  validate?: (formValues: WidgetConfigFormValues) => { [key: string]: any },
+  validate?: (formValues: WidgetConfigFormValues) => WidgetConfigValidationErrors,
 }

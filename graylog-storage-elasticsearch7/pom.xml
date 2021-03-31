@@ -35,7 +35,6 @@
     <description>Graylog Storage Module for Elasticsearch 7</description>
 
     <properties>
-        <it.es.version>7.6.2</it.es.version>
         <elasticsearch.version>7.9.1-0</elasticsearch.version>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>

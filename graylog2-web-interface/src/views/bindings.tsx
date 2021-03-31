@@ -33,8 +33,6 @@ import AggregationBuilder from 'views/components/aggregationbuilder/AggregationB
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
-import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
-import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
@@ -83,6 +81,7 @@ import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplay
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfiguration from 'views/components/aggregationbuilder/HeatmapVisualizationConfiguration';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import visualizationBindings from 'views/components/visualizations/bindings';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
@@ -297,53 +296,7 @@ const exports: PluginExports = {
       resetFocus: false,
     },
   ],
-  visualizationTypes: [
-    {
-      type: AreaVisualization.type,
-      displayName: 'Area Chart',
-      component: AreaVisualization,
-    },
-    {
-      type: BarVisualization.type,
-      displayName: 'Bar Chart',
-      component: BarVisualization,
-    },
-    {
-      type: LineVisualization.type,
-      displayName: 'Line Chart',
-      component: LineVisualization,
-    },
-    {
-      type: WorldMapVisualization.type,
-      displayName: 'World Map',
-      component: WorldMapVisualization,
-    },
-    {
-      type: PieVisualization.type,
-      displayName: 'Pie Chart',
-      component: PieVisualization,
-    },
-    {
-      type: DataTable.type,
-      displayName: 'Data Table',
-      component: DataTable,
-    },
-    {
-      type: NumberVisualization.type,
-      displayName: 'Single Number',
-      component: NumberVisualization,
-    },
-    {
-      type: ScatterVisualization.type,
-      displayName: 'Scatter Plot',
-      component: ScatterVisualization,
-    },
-    {
-      type: HeatmapVisualization.type,
-      displayName: 'Heatmap',
-      component: HeatmapVisualization,
-    },
-  ],
+  visualizationTypes: visualizationBindings,
   visualizationConfigTypes: [
     {
       type: AreaVisualization.type,

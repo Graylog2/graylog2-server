@@ -19,10 +19,12 @@ import * as Immutable from 'immutable';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from './AggregationWizard';
 
@@ -38,6 +40,8 @@ jest.mock('views/stores/AggregationFunctionsStore', () => ({
 
 const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
 
+const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
@@ -52,6 +56,10 @@ describe('AggregationWizard', () => {
       </AggregationWizard>
     </FieldTypesContext.Provider>,
   );
+
+  beforeAll(() => PluginStore.register(plugin));
+
+  afterAll(() => PluginStore.unregister(plugin));
 
   it('should render visualization passed as children', () => {
     renderSUT();
