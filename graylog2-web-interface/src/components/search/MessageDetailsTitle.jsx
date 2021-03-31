@@ -25,7 +25,7 @@ const Title = styled.h3(({ theme }) => css`
   }
 
   .label {
-    font-size: calc(${theme.fonts.size.h3} - 40%);
+    font-size: ${theme.fonts.size.tiny};
     line-height: 200%;
     margin-left: 5px;
     vertical-align: bottom;
