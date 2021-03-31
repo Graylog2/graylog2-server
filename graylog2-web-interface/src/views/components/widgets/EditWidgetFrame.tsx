@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext';
+import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -66,37 +67,46 @@ const Footer = styled.div`
 `;
 
 type Props = {
-  children: Array<React.ReactNode>,
+  children: React.ReactNode,
+  onCancel: () => void,
+  onFinish: () => void,
 };
 
-const EditWidgetFrame = ({ children }: Props) => {
+type ValidationState = [boolean, (hasErrors: boolean) => void];
+export const ValidationStateContext = React.createContext<ValidationState>([false, () => {}]);
+
+const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
   const widget = useContext(WidgetContext);
+
+  const [hasErrors, setHasErrors] = useState(false);
 
   if (!widget) {
     return <Spinner text="Loading widget ..." />;
   }
 
   return (
-    <Container>
-      <IfDashboard>
-        <QueryControls>
-          <QueryEditModeContext.Provider value="widget">
-            <HeaderElements />
-            <WidgetQueryControls />
-          </QueryEditModeContext.Provider>
-        </QueryControls>
-      </IfDashboard>
-      <Visualization>
-        <div role="presentation" style={{ height: '100%' }}>
-          <WidgetOverrideElements>
-            {children[0]}
-          </WidgetOverrideElements>
-        </div>
-      </Visualization>
-      <Footer>
-        {children[1]}
-      </Footer>
-    </Container>
+    <ValidationStateContext.Provider value={[hasErrors, setHasErrors]}>
+      <Container>
+        <IfDashboard>
+          <QueryControls>
+            <QueryEditModeContext.Provider value="widget">
+              <HeaderElements />
+              <WidgetQueryControls />
+            </QueryEditModeContext.Provider>
+          </QueryControls>
+        </IfDashboard>
+        <Visualization>
+          <div role="presentation" style={{ height: '100%' }}>
+            <WidgetOverrideElements>
+              {children}
+            </WidgetOverrideElements>
+          </div>
+        </Visualization>
+        <Footer>
+          <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={hasErrors} />
+        </Footer>
+      </Container>
+    </ValidationStateContext.Provider>
   );
 };
 

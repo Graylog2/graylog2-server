@@ -14,25 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext, useEffect } from 'react';
+import { useFormikContext } from 'formik';
 
-import { Button, ButtonToolbar } from 'components/graylog';
+import { ValidationStateContext } from '../widgets/EditWidgetFrame';
 
-type Props = {
-  onCancel: () => void,
-  onFinish: () => void,
-  disableSave?: boolean,
+const PropagateValidationState = () => {
+  const { isValid } = useFormikContext();
+  const [, setHasErrors] = useContext(ValidationStateContext);
+
+  useEffect(() => setHasErrors(!isValid), [isValid, setHasErrors]);
+
+  return null;
 };
 
-const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props) => (
-  <ButtonToolbar className="pull-right">
-    <Button onClick={onFinish} bsStyle="primary" disabled={disableSave}>Save</Button>
-    <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
-);
-
-SaveOrCancelButtons.defaultProps = {
-  disableSave: false,
-};
-
-export default SaveOrCancelButtons;
+export default PropagateValidationState;

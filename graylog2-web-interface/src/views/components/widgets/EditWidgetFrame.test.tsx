@@ -74,7 +74,7 @@ describe('EditWidgetFrame', () => {
     const renderSUT = () => render((
       <ViewTypeContext.Provider value="DASHBOARD">
         <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame>
+          <EditWidgetFrame onCancel={() => {}} onFinish={() => {}}>
             <>Hello World!</>
             <>These are some buttons!</>
           </EditWidgetFrame>
