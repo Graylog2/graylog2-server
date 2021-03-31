@@ -22,13 +22,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.assertj.jodatime.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
 
     @Before
     public void setUp() {
-        naturalDateParser = new NaturalDateParser("Etc/UTC");
+        naturalDateParser = new NaturalDateParser();
     }
 
     @Test
@@ -50,6 +51,46 @@ public class NaturalDateParserTest {
     @Test(expected = NaturalDateParser.DateNotParsableException.class)
     public void testParseFailsOnEmptyDate() throws Exception {
         naturalDateParser.parse("");
+    }
+
+    @Test
+    public void testDefaultTZ() throws Exception {
+        NaturalDateParser p = new NaturalDateParser();
+
+        NaturalDateParser.Result today = p.parse("today");
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Etc/UTC as Timezone").isEqualTo("Etc/UTC");
+    }
+
+    @Test
+    public void testUTCTZ() throws Exception {
+        NaturalDateParser p = new NaturalDateParser("Etc/UTC");
+
+        NaturalDateParser.Result today = p.parse("today");
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Etc/UTC as Timezone").isEqualTo("Etc/UTC");
+    }
+
+    @Test
+    public void testEuropeBerlinTZ() throws Exception {
+        NaturalDateParser p = new NaturalDateParser("Europe/Berlin");
+
+        NaturalDateParser.Result today = p.parse("today");
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Europe/Berlin as Timezone").isEqualTo("Europe/Berlin");
+    }
+
+    @Test
+    public void testInvalidTZ() throws Exception {
+        NaturalDateParser p = new NaturalDateParser("LOLWut");
+
+        NaturalDateParser.Result today = p.parse("today");
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Etc/UTC as Timezone").isEqualTo("UTC");
     }
 
     @Test
