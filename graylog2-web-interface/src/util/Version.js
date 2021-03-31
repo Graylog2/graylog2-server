@@ -1,3 +1,4 @@
+// @flow strict
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -14,25 +15,59 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// $FlowFixMe: Import fail in enterprise plugin
 import pjson from '../../package.json';
 
-class Version {
-  constructor() {
-    this.full = pjson.version;
-    const splitVersion = this.full.split('.');
+const versionRegex = /(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(-(?<preRelease>[\w.\d]+))?(\+(?<buildMetadata>\w+))?/;
+const defaultVersion = pjson.version;
 
-    this.major = splitVersion[0];
-    this.minor = splitVersion[1];
+export type Version = {
+  major: string,
+  minor: string,
+  patch: string,
+  preRelease?: string,
+  buildMetadata?: string,
+};
+
+export const parseVersion = (version?: string = defaultVersion): Version | void => {
+  const result = versionRegex.exec(version);
+
+  if (!result || !result.groups) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to parse version', version);
+
+    return undefined;
   }
 
-  getMajorAndMinorVersion() {
-    return `${this.major}.${this.minor}`;
+  const versionGroups = (result.groups: Version);
+
+  return {
+    major: versionGroups.major,
+    minor: versionGroups.minor,
+    patch: versionGroups.patch,
+    preRelease: versionGroups.preRelease,
+    buildMetadata: versionGroups.buildMetadata,
+  };
+};
+
+export const getFullVersion = (): string => {
+  return defaultVersion;
+};
+
+export const getMajorAndMinorVersion = (): string => {
+  const result = parseVersion();
+
+  if (!result) {
+    return getFullVersion();
   }
 
-  getFullVersion() {
-    return this.full;
-  }
-}
+  const { major, minor } = result;
 
-const version = new Version();
-export default version;
+  return `${major}.${minor}`;
+};
+
+export default {
+  parseVersion,
+  getMajorAndMinorVersion,
+  getFullVersion,
+};
