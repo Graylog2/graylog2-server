@@ -16,33 +16,45 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { withTheme } from 'styled-components';
-import d3 from 'd3';
+import styled, { css, withTheme, DefaultTheme } from 'styled-components';
 
+import { themePropTypes } from 'theme';
 import { Label } from 'components/graylog';
 
-const ColorLabelWrap = styled.span(({ size, theme }) => {
+type Size = 'normal' | 'small' | 'xsmall';
+
+interface ColorLabelWrapProps {
+  size: Size,
+  theme: DefaultTheme
+}
+
+interface ColorLabelProps {
+  color: string,
+  size?: Size,
+  text?: string | React.ReactNode,
+  theme: DefaultTheme
+}
+
+const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
   const { body, small, tiny } = theme.fonts.size;
   const fontSize = size === 'small' ? small : body;
 
-  return `
+  return css`
     vertical-align: middle;
     font-size: ${size === 'xsmall' ? tiny : fontSize};
   `;
 });
 
-const ColorLabel = ({ color, size, text, theme }) => {
-  const backgroundColor = d3.hsl(color);
-  const borderColor = backgroundColor.darker();
-  // Use dark font on brighter backgrounds and light font in darker backgrounds
-  const textColor = backgroundColor.l > 0.6 ? d3.rgb(theme.colors.global.textDefault) : d3.rgb(theme.colors.global.textAlt);
+const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {
+  const borderColor = theme.utils.colorLevel(color, 5);
+  const textColor = theme.utils.contrastingColor(color);
 
   return (
     <ColorLabelWrap size={size}>
       <Label style={{
-        backgroundColor: backgroundColor.toString(),
-        border: `1px solid ${borderColor.toString()}`,
-        color: textColor.toString(),
+        backgroundColor: color,
+        border: `1px solid ${borderColor}`,
+        color: textColor,
       }}>
         {text}
       </Label>
@@ -54,9 +66,7 @@ ColorLabel.propTypes = {
   color: PropTypes.string.isRequired,
   text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
-  theme: PropTypes.shape({
-    colors: PropTypes.object,
-  }).isRequired,
+  theme: themePropTypes.isRequired,
 };
 
 ColorLabel.defaultProps = {
