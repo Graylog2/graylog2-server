@@ -26,6 +26,7 @@ import org.graylog.integrations.aws.resources.AWSResource;
 import org.graylog.integrations.aws.resources.KinesisSetupResource;
 import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
+import org.graylog.integrations.dataadapters.GreyNoiseDataAdapter;
 import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xCodec;
@@ -108,6 +109,12 @@ public class IntegrationsModule extends PluginModule {
                     PagerDutyNotificationConfig.class,
                     PagerDutyNotification.class,
                     PagerDutyNotification.Factory.class);
+
+            // GreyNoise Data Adapter
+            installLookupDataAdapter(GreyNoiseDataAdapter.NAME,
+                                     GreyNoiseDataAdapter.class,
+                                     GreyNoiseDataAdapter.Factory.class,
+                                     GreyNoiseDataAdapter.Config.class);
         }
     }
 

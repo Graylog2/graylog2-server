@@ -30,6 +30,9 @@ import SlackNotificationForm from './event-notifications/event-notification-type
 import SlackNotificationSummary from './event-notifications/event-notification-types/SlackNotificationSummary';
 
 import packageJson from '../../package.json';
+import GreyNoiseAdapterFieldSet from "./dataadapters/GreyNoiseAdapterFieldSet";
+import GreyNoiseAdapterSummary from "./dataadapters/GreyNoiseAdapterSummary";
+import GreyNoiseAdapterDocumentation from "./dataadapters/GreyNoiseAdapterDocumentation";
 
 const manifest = new PluginManifest(packageJson, {
   routes: [
@@ -59,6 +62,14 @@ const manifest = new PluginManifest(packageJson, {
       defaultConfig: SlackNotificationForm.defaultConfig,
     },
   ],
+  lookupTableAdapters: [
+    {
+      type: 'GreyNoise',
+      displayName: 'GreyNoise',
+      formComponent: GreyNoiseAdapterFieldSet,
+      summaryComponent: GreyNoiseAdapterSummary,
+      documentationComponent: GreyNoiseAdapterDocumentation,
+    }],
 });
 
 PluginStore.register(manifest);
