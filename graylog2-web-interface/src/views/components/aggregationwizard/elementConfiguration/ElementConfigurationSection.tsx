@@ -42,7 +42,7 @@ type Props = {
 const ElementConfigurationSection = ({ children, onRemove }: Props) => (
   <SectionContainer>
     <Header>{
-      onRemove && <IconButton onClick={onRemove} name="trash" title="remove" />
+      onRemove && <IconButton onClick={onRemove} name="trash" title="Remove" />
     }
     </Header>
     {children}
