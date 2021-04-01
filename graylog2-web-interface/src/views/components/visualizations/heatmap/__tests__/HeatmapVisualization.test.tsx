@@ -23,12 +23,11 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 import * as fixtures from './HeatmapVisualization.fixtures';
 
 import HeatmapVisualization from '../HeatmapVisualization';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
