@@ -27,6 +27,8 @@ import { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import * as fixtures from './HeatmapVisualization.fixtures';
 
 import HeatmapVisualization from '../HeatmapVisualization';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
@@ -64,6 +66,53 @@ describe('HeatmapVisualization', () => {
                                                 height={1024}
                                                 onChange={() => {}}
                                                 toggleEdit={() => {}}
+                                                width={800} />);
+    const genericPlot = wrapper.find('GenericPlot');
+
+    expect(genericPlot).toHaveProp('layout', plotLayout);
+    expect(genericPlot).toHaveProp('chartData', plotChartData);
+  });
+
+  it('generates correct props for plot component with empty data with use smallest value as default', () => {
+    const columnPivot = new Pivot('http_status', 'values');
+    const rowPivot = new Pivot('hour', 'values');
+    const series = new Series('count()');
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot]).series([series])
+      .visualization('heatmap')
+      .visualizationConfig(HeatmapVisualizationConfig.empty().toBuilder().useSmallestAsDefault(true).build())
+      .build();
+    const effectiveTimerange: AbsoluteTimeRange = {
+      type: 'absolute',
+      from: '2019-10-22T11:54:35.850Z',
+      to: '2019-10-29T11:53:50.000Z',
+    };
+    const plotLayout = { yaxis: { fixedrange: true }, xaxis: { fixedrange: true }, margin: { b: 40 } };
+    const plotChartData = [
+      {
+        type: 'heatmap',
+        name: 'Heatmap Chart',
+        x: [],
+        y: [],
+        z: [],
+        text: [],
+        customdata: [],
+        hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
+        colorscale: 'Viridis',
+        reversescale: false,
+      },
+    ];
+
+    const wrapper = mount(<HeatmapVisualization data={{ chart: [] }}
+                                                config={config}
+                                                effectiveTimerange={effectiveTimerange}
+                                                fields={Immutable.List()}
+                                                height={1024}
+                                                onChange={() => {
+                                                }}
+                                                toggleEdit={() => {
+                                                }}
                                                 width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
 
