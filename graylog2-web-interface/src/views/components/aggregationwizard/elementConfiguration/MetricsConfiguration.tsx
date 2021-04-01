@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
 import { Button, ButtonToolbar } from 'components/graylog';
@@ -22,10 +23,14 @@ import { Button, ButtonToolbar } from 'components/graylog';
 import ElementConfigurationSection from './ElementConfigurationSection';
 import Metric from './Metric';
 
+import MetricElement from '../aggregationElements/MetricElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
-  const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { metrics }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
+  const removeMetric = useCallback((index) => {
+    setValues(MetricElement.removeElement(index, values));
+  }, [setValues, values]);
 
   return (
     <>
@@ -36,7 +41,7 @@ const MetricsConfiguration = () => {
                         {metrics.map((metric, index) => {
                           return (
                           // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationSection key={`metrics-${index}`}>
+                            <ElementConfigurationSection key={`metrics-${index}`} onRemove={() => removeMetric(index)}>
                               <Metric index={index} />
                             </ElementConfigurationSection>
                           );
