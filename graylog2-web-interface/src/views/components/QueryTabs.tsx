@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useRef } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import throttle from 'lodash/throttle';
 
 import { Col, Row, Nav, NavItem, NavDropdown, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -60,106 +62,121 @@ type Props = {
 
 const adjustTabs = () => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
+  const allTabs = dashboardTabs.querySelectorAll('li');
   const tabItems = dashboardTabs.querySelectorAll('li:not(.dropdown):not(.query-tabs-new):not(.dropdown-menu li)');
   const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li');
   const moreBtn = dashboardTabs.querySelector('li.query-tabs-more') as HTMLElement;
   const newBtn = dashboardTabs.querySelector('li.query-tabs-new') as HTMLElement;
 
-  let maxWidth = moreBtn.offsetWidth + newBtn.offsetWidth;
+  let maxWidth = moreBtn.offsetWidth + newBtn.offsetWidth + 30; // magic number is PageContentLayout__Container padding
   const hiddenItems = [];
   const primaryWidth = dashboardTabs.offsetWidth;
 
+  allTabs.forEach((tabItem) => {
+    tabItem.classList.remove('hidden');
+  });
+
   tabItems.forEach((tabItem: HTMLElement, idx) => {
-    if (primaryWidth >= maxWidth + tabItem.offsetWidth) {
-      maxWidth += tabItem.offsetWidth;
+    maxWidth += tabItem.offsetWidth;
+
+    if (primaryWidth >= maxWidth) {
+      tabItem.classList.remove('hidden');
+      hiddenItems.splice(idx, 1);
     } else {
       tabItem.classList.add('hidden');
       hiddenItems.push(idx);
     }
   });
 
-  moreItems.forEach((moreItem: HTMLElement, idx) => {
-    if (hiddenItems.includes(idx)) {
-      moreItem.classList.remove('hidden');
+  moreItems.forEach((tabItem: HTMLElement, idx) => {
+    if (!hiddenItems.includes(idx)) {
+      tabItem.classList.add('hidden');
     }
   });
+
+  if (!hiddenItems.length) {
+    moreBtn.classList.add('hidden');
+  }
 };
 
-class QueryTabs extends React.Component<Props> {
-  private queryTitleEditModal: QueryTitleEditModal | undefined | null;
+const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }:Props) => {
+  const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
 
-  static propTypes = {
-    onRemove: PropTypes.func.isRequired,
-    onSelect: PropTypes.func.isRequired,
-    onTitleChange: PropTypes.func.isRequired,
-    queries: PropTypes.object.isRequired,
-    selectedQueryId: PropTypes.string.isRequired,
-    titles: PropTypes.object.isRequired,
-  }
-
-  componentDidMount() {
-    adjustTabs();
-    window.addEventListener('resize', adjustTabs);
-  }
-
-  openTitleEditModal = (activeQueryTitle: string) => {
-    if (this.queryTitleEditModal) {
-      this.queryTitleEditModal.open(activeQueryTitle);
+  const openTitleEditModal = (activeQueryTitle: string) => {
+    if (queryTitleEditModal) {
+      queryTitleEditModal.current.open(activeQueryTitle);
     }
-  }
+  };
 
-  render() {
-    const {
-      onRemove,
-      onSelect,
-      onTitleChange,
-      queries,
-      selectedQueryId,
-      titles,
-    } = this.props;
-    const queryTitles = titles;
-    const queryTabs = (itemType: 'navItem' | 'menuItem') => queries.map((id, index) => {
-      const title = queryTitles.get(id, `Page#${index + 1}`);
-      const tabTitle = (
-        <QueryTitle active={id === selectedQueryId}
-                    id={id}
-                    onClose={() => onRemove(id)}
-                    openEditModal={this.openTitleEditModal}
-                    title={title} />
-      );
+  const queryTabs = (itemType: 'navItem' | 'menuItem') => queries.map((id, index) => {
+    const title = titles.get(id, `Page#${index + 1}`);
+    const tabTitle = (
+      <QueryTitle active={id === selectedQueryId}
+                  id={id}
+                  onClose={() => onRemove(id)}
+                  openEditModal={openTitleEditModal}
+                  title={title} />
+    );
 
-      const output = {
-        navItem: <NavItem eventKey={id} key={id} onClick={() => onSelect(id)}>{tabTitle}</NavItem>,
-        menuItem: <MenuItem eventKey={id} key={id} onClick={() => onSelect(id)} className="hidden">{tabTitle}</MenuItem>,
-      };
+    const output = {
+      navItem: <NavItem eventKey={id} key={id} onClick={() => onSelect(id)}>{tabTitle}</NavItem>,
+      menuItem: <MenuItem eventKey={id} key={id} onClick={() => onSelect(id)}>{tabTitle}</MenuItem>,
+    };
 
-      return output[itemType];
-    });
-    const newTab = <NavItem key="new" eventKey="new" onClick={() => onSelect('new')} className="query-tabs-new"><Icon name="plus" /></NavItem>;
-    const dropDownTabs = queryTabs('menuItem');
+    return output[itemType];
+  });
 
-    return (
-      <Row style={{ marginBottom: 0 }}>
-        <Col>
-          <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
-            {queryTabs('navItem')}
-            <NavDropdown eventKey="more" title={<Icon name="ellipsis-h" />} className="query-tabs-more" noCaret pullRight>
-              {dropDownTabs}
-            </NavDropdown>
-            {newTab}
-          </StyledQueryNav>
+  const newTab = (
+    <NavItem key="new"
+             eventKey="new"
+             onClick={() => onSelect('new')}
+             className="query-tabs-new">
+      <Icon name="plus" />
+    </NavItem>
+  );
 
-          {/*
+  const dropDownTabs = queryTabs('menuItem');
+
+  useEffect(() => {
+    adjustTabs();
+    window.addEventListener('resize', throttle(adjustTabs, 250));
+  });
+
+  return (
+    <Row style={{ marginBottom: 0 }}>
+      <Col>
+        <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
+          {queryTabs('navItem')}
+          <NavDropdown eventKey="more"
+                       title={<Icon name="ellipsis-h" />}
+                       className="query-tabs-more"
+                       id="query-tabs-more"
+                       noCaret
+                       pullRight>
+            {dropDownTabs}
+          </NavDropdown>
+          {newTab}
+        </StyledQueryNav>
+
+        {/*
           The title edit modal can't be part of the QueryTitle component,
           due to the react bootstrap tabs keybindings.
           The input would always lose the focus when using the arrow keys.
         */}
-          <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
-                               ref={(queryTitleEditModal) => { this.queryTitleEditModal = queryTitleEditModal; }} />
-        </Col>
-      </Row>
-    );
-  }
-}
+        <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
+                             ref={queryTitleEditModal} />
+      </Col>
+    </Row>
+  );
+};
+
+QueryTabs.propTypes = {
+  onRemove: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onTitleChange: PropTypes.func.isRequired,
+  queries: PropTypes.object.isRequired,
+  selectedQueryId: PropTypes.string.isRequired,
+  titles: PropTypes.object.isRequired,
+};
 
 export default QueryTabs;
