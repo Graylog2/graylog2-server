@@ -29,6 +29,15 @@ import Query, { QueryId } from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
 
+type Props = {
+  onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
+  onSelect: (queryId: string) => Promise<Query> | Promise<string>,
+  onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
+  queries: Array<QueryId>,
+  selectedQueryId: string,
+  titles: Immutable.Map<string, string>,
+};
+
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
   &.nav.nav-tabs {
     border-bottom: 0;
@@ -79,15 +88,6 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
     }
   }
 `);
-
-type Props = {
-  onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
-  onSelect: (queryId: string) => Promise<Query> | Promise<string>,
-  onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  queries: Array<QueryId>,
-  selectedQueryId: string,
-  titles: Immutable.Map<string, string>,
-};
 
 const adjustTabs = () => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;

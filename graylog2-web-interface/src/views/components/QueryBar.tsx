@@ -56,15 +56,13 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 };
 
 type Props = {
-  children?: React.ReactElement,
   queries: string[],
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };
 
-const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
+const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
   const { activeQuery } = viewMetadata;
-  const childrenWithQueryId = React.Children.map(children, (child) => React.cloneElement(child, { queryId: activeQuery }));
   const selectQueryAndExecute = (queryId) => onSelectQuery(queryId);
 
   return (
@@ -73,14 +71,11 @@ const QueryBar = ({ children, queries, queryTitles, viewMetadata }: Props) => {
                titles={queryTitles}
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}
-               onRemove={(queryId) => onCloseTab(queryId, activeQuery, queries)}>
-      {childrenWithQueryId}
-    </QueryTabs>
+               onRemove={(queryId) => onCloseTab(queryId, activeQuery, queries)} />
   );
 };
 
 QueryBar.propTypes = {
-  children: PropTypes.element,
   queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
@@ -90,10 +85,6 @@ QueryBar.propTypes = {
     summary: PropTypes.string,
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
-};
-
-QueryBar.defaultProps = {
-  children: null,
 };
 
 export default connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore });
