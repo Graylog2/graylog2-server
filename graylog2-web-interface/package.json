@@ -18,7 +18,7 @@
     "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
     "lint": "eslint src",
     "lint:path": "eslint",
-    "lint:styles": "stylelint './src/**/*.{js,jsx,ts,tsx}' --syntax css-in-js --ignore-disables",
+    "lint:styles": "stylelint './src/**/*.{js,jsx,ts,tsx}' --syntax css-in-js",
     "lint:styles:path": "stylelint --syntax css-in-js --",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
