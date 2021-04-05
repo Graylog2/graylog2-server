@@ -30,23 +30,52 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
 
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
-  border-bottom: 0;
-  display: flex;
-  white-space: nowrap;
-  z-index: 2; // without it renders under widget management icons
-  position: relative;
+  &.nav.nav-tabs {
+    border-bottom: 0;
+    display: flex;
+    white-space: nowrap;
+    z-index: 2; // without it renders under widget management icons
+    position: relative;
 
-  > li {
-    > a {
-      border-color: ${theme.colors.gray[80]};
+    > li {
+      > a {
+        color: ${theme.colors.variant.default};
+        border: none;
+        
+        :hover,
+        :active,
+        :focus {
+          transition: color 150ms ease-in-out;
+          background: transparent;
+          color: ${theme.colors.variant.primary};
+        }
+      }
     }
-  }
 
-  > li.active {
-    z-index: 1;
+    > li.active {
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 9px;
 
-    > a {
-      border-bottom-color: transparent;
+      > a {
+        padding: 9px 15px 0;
+        border: none;
+        background-color: transparent;
+        color: ${theme.colors.variant.darker.primary};
+
+        :hover,
+        :active,
+        :focus {
+          background: transparent;
+          color: ${theme.colors.variant.darker.primary};
+        }
+      }
+    }
+    
+    > li.query-tabs-more {
+      cursor: pointer;
     }
   }
 `);
@@ -71,6 +100,8 @@ const adjustTabs = () => {
   let maxWidth = moreBtn.offsetWidth + newBtn.offsetWidth + 30; // magic number is PageContentLayout__Container padding
   const hiddenItems = [];
   const primaryWidth = dashboardTabs.offsetWidth;
+
+  moreBtn.classList.remove('active');
 
   allTabs.forEach((tabItem) => {
     tabItem.classList.remove('hidden');
