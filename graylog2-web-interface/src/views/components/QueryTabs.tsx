@@ -82,8 +82,9 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
         }
       }
     }
-    
-    > li.query-tabs-more {
+
+    > li.query-tabs-more,
+    > li.query-tabs-more a {
       cursor: pointer;
     }
   }
@@ -171,6 +172,10 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
   useEffect(() => {
     adjustTabs();
     window.addEventListener('resize', throttle(adjustTabs, 250));
+
+    return () => {
+      window.removeEventListener('resize', throttle(adjustTabs, 250));
+    };
   });
 
   return (

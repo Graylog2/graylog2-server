@@ -64,7 +64,7 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
       }
     }
 
-    &${navTabsStyles} /* stylelint-disable-line */
+    &${navTabsStyles}
   }
 `);
 
