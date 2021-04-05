@@ -1,12 +1,3 @@
-package org.graylog2.lookup.dto;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-import org.joda.time.DateTime;
-import org.mongojack.Id;
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -23,6 +14,15 @@ import org.mongojack.Id;
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.lookup.dto;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
+import org.joda.time.DateTime;
+import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
