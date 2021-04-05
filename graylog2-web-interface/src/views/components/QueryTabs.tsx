@@ -34,7 +34,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
     border-bottom: 0;
     display: flex;
     white-space: nowrap;
-    z-index: 2; // without it renders under widget management icons
+    z-index: 2; /* without it renders under widget management icons */
     position: relative;
 
     > li {
