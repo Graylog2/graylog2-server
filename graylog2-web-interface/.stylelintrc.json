@@ -1,6 +1,9 @@
 {
   "processors": ["stylelint-processor-styled-components"],
-  "extends": ["stylelint-config-standard",  "stylelint-config-styled-components"],
+  "extends": [
+    "stylelint-config-recommended",
+    "stylelint-config-styled-components"
+  ],
   "rules": {
     "declaration-block-trailing-semicolon": "always",
     "declaration-colon-newline-after": null,
