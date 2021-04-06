@@ -33,6 +33,7 @@ const SortConfiguration = () => {
                   <>
                     <div>
                       {sort.map((s, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
                         <ElementConfigurationSection key={`sort-${index}`}>
                           <Sort index={index} />
                         </ElementConfigurationSection>
