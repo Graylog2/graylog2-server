@@ -46,6 +46,7 @@ const Wrapper = styled.div(({ theme }) => css`
   .control-label {
     padding-left: 0;
     padding-right: 5px;
+    padding-top: 5px;
     font-weight: normal;
     text-align: left;
   }
