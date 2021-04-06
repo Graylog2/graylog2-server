@@ -17,7 +17,7 @@
 import { isEmpty } from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import type { AggregationElement } from './AggregationElementType';
@@ -58,12 +58,10 @@ const fromConfig = (config: AggregationWidgetConfig) => ({
     eventAnnotation: config.eventAnnotation,
   },
 });
-const toConfig = (formValues: WidgetConfigFormValues, currentConfig: AggregationWidgetConfig) => currentConfig
-  .toBuilder()
+const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
   .visualization(formValues.visualization.type)
   .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
-  .eventAnnotation(formValues.visualization.eventAnnotation)
-  .build();
+  .eventAnnotation(formValues.visualization.eventAnnotation);
 
 const hasErrors = (errors: { [key: string]: string }) => Object.values(errors)
   .filter((value) => value !== undefined)

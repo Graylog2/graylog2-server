@@ -93,9 +93,9 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
     }
 
     return toConfig;
-  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder().build());
+  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder());
 
-  onConfigChange(newConfig);
+  onConfigChange(newConfig.build());
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
