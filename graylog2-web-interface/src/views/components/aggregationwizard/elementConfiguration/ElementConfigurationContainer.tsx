@@ -36,7 +36,7 @@ const Wrapper = styled.div(({ theme }) => css`
   }
 
   .form-group {
-    margin: 0 0 5px 0;
+    margin: 0 0 3px 0;
   }
 
   .control-label {
@@ -44,6 +44,10 @@ const Wrapper = styled.div(({ theme }) => css`
     padding-right: 5px;
     font-weight: normal;
     text-align: left;
+  }
+
+  :last-child .form-group {
+    margin-bottom: 0;
   }
 `);
 
