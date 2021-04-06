@@ -20,10 +20,8 @@ import AceEditor from './ace';
 
 const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
-  /* stylelint-disable property-no-unknown */
   theme: aceTheme,
   scTheme: theme,
-  /* stylelint-enable property-no-unknown */
 }))(({ scTheme }) => css`
   &.ace-queryinput {
     height: 34px !important;

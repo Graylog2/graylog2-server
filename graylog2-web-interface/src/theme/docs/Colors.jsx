@@ -34,9 +34,7 @@ const Value = styled.span`
 `;
 
 const StyledTooltip = styled(Tooltip).attrs((props) => ({
-  /* stylelint-disable property-no-unknown */
   className: props.opened ? 'in' : '',
-  /* stylelint-enable property-no-unknown */
 }))(({ opened }) => css`
   display: ${opened ? 'block' : 'none'};
 `);
