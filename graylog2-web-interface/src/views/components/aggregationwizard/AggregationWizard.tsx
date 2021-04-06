@@ -39,10 +39,6 @@ const _initialFormValues = (config: AggregationWidgetConfig) => {
 const Wrapper = styled.div(({ theme }) => css`
   height: 100%;
   display: flex;
-
-  input {
-    font-size: ${theme.fonts.size.body};
-  }
 `);
 
 const Controls = styled.div`

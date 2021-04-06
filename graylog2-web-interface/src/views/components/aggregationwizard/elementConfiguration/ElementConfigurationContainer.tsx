@@ -22,7 +22,7 @@ import IconButton from 'components/common/IconButton';
 const Wrapper = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
   border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: 6px;
+  padding: 6px 6px 3px 6px;
   border-radius: 6px;
   margin-bottom: 10px;
 
@@ -33,6 +33,10 @@ const Wrapper = styled.div(({ theme }) => css`
   div[class^="col-"] {
     padding-right: 0;
     padding-left: 0;
+  }
+
+  input {
+    font-size: ${theme.fonts.size.body};
   }
 
   .form-group {
@@ -46,8 +50,8 @@ const Wrapper = styled.div(({ theme }) => css`
     text-align: left;
   }
 
-  :last-child .form-group {
-    margin-bottom: 0;
+  .help-block {
+    margin: 0;
   }
 `);
 
