@@ -38,6 +38,7 @@ type Props = {
   minLength?: number,
   maxLength?: number,
   required?: boolean,
+  bsSize?: 'large' | 'small' | 'xsmall',
   validate?: (any) => string | undefined,
 };
 

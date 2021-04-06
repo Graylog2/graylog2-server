@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { EditWidgetComponentProps } from 'views/types';
 
 import { ButtonToolbar } from 'components/graylog';
@@ -36,10 +36,14 @@ const _initialFormValues = (config: AggregationWidgetConfig) => {
   }), {});
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled.div(({ theme }) => css`
   height: 100%;
   display: flex;
-`;
+
+  input {
+    font-size: ${theme.fonts.size.body};
+  }
+`);
 
 const Controls = styled.div`
   height: 100%;

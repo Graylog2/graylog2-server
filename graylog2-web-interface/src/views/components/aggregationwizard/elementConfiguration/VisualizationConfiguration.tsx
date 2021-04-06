@@ -79,7 +79,8 @@ const VisualizationConfiguration = () => {
                       if (newValue !== value) {
                         setNewVisualizationType(newValue);
                       }
-                    }} />
+                    }}
+                    size="small" />
           </Input>
         )}
       </Field>

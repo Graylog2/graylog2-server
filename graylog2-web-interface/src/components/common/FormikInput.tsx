@@ -24,6 +24,7 @@ import { Input } from 'components/bootstrap';
 type Props = {
   autoComplete?: string,
   buttonAfter?: React.ReactElement | string,
+  bsSize?: 'large' | 'small' | 'xsmall',
   id: string,
   label?: React.ReactElement | string,
   name: string,

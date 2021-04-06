@@ -50,6 +50,7 @@ const Metric = ({ index }: Props) => {
     <>
       <FormikInput id="name"
                    label="Name"
+                   bsSize="small"
                    placeholder="Specify optional name"
                    name={`metrics.${index}.name`}
                    labelClassName="col-sm-3"
@@ -67,6 +68,7 @@ const Metric = ({ index }: Props) => {
                     name={name}
                     value={value}
                     aria-label="Select a function"
+                    size="small"
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
                     }} />
@@ -98,6 +100,7 @@ const Metric = ({ index }: Props) => {
                       name={name}
                       value={value}
                       aria-label="Select percentile"
+                      size="small"
                       onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
             </Input>
           )}
