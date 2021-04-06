@@ -78,7 +78,7 @@ const SortElement: AggregationElement = {
   title: 'Sort',
   key: 'sort',
   order: 3,
-  allowCreate: (formValues: WidgetConfigFormValues) => isEmpty(formValues.sort),
+  allowCreate: () => true,
   component: SortConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
     sort: config.sort.map((s) => ({
