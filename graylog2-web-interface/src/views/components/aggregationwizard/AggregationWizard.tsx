@@ -36,10 +36,10 @@ const _initialFormValues = (config: AggregationWidgetConfig) => {
   }), {});
 };
 
-const Wrapper = styled.div(({ theme }) => css`
+const Wrapper = styled.div`
   height: 100%;
   display: flex;
-`);
+`;
 
 const Controls = styled.div`
   height: 100%;

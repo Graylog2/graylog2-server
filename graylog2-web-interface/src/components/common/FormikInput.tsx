@@ -95,6 +95,7 @@ FormikInput.propTypes = {
 
 FormikInput.defaultProps = {
   buttonAfter: undefined,
+  bsSize: undefined,
   autoComplete: undefined,
   label: undefined,
   help: undefined,

@@ -55,6 +55,7 @@ const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChan
 
 FormikFormGroup.defaultProps = {
   autoComplete: undefined,
+  bsSize: undefined,
   buttonAfter: undefined,
   disabled: false,
   onChange: undefined,
