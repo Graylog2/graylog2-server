@@ -20,8 +20,10 @@ import styled, { css } from 'styled-components';
 import { IconButton } from 'components/common';
 
 const SectionContainer = styled.div(({ theme }) => css`
-  border-bottom: 1px solid ${theme.colors.variant.lighter.default};
+  background-color: ${theme.colors.variant.lightest.default};
+  border-radius: 3px;
   margin-bottom: 5px;
+  padding: 6px 6px 3px 6px;
 
   :last-of-type {
     border-bottom: 0;
