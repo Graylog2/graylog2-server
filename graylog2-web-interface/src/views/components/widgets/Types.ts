@@ -30,4 +30,5 @@ export type WidgetActionType = {
   title: (w: Widget) => React.ReactNode,
   isHidden?: (w: Widget) => boolean,
   action: WidgetAction,
+  disabled?: () => boolean,
 };
