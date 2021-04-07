@@ -27,6 +27,9 @@
   "eslintConfig": {
     "extends": "graylog"
   },
+  "stylelint": {
+    "extends": "stylelint-config-graylog"
+  },
   "jest": {
     "preset": "jest-preset-graylog",
     "setupFiles": [
