@@ -112,7 +112,7 @@ describe('GroupByElement', () => {
     const { removeElementSection } = GroupByElement;
     const values = { groupBy: { columnRollup: true, groupings: [] } } as WidgetConfigFormValues;
 
-    it('should remove form values from a group by', () => {
+    it('should remove form values from a grouping', () => {
       const grouping1 = { direction: 'row', field: { field: 'action' }, limit: 15 } as GroupByFormValues;
       const grouping2 = { direction: 'column', field: { field: 'controller' }, limit: 10 } as GroupByFormValues;
       values.groupBy.groupings = [grouping1, grouping2];
@@ -122,7 +122,7 @@ describe('GroupByElement', () => {
       expect(result.groupBy.groupings).toStrictEqual([grouping1]);
     });
 
-    it('should remove form values to the last from a group by', () => {
+    it('should remove form values to the last from a grouping', () => {
       const grouping1 = { direction: 'row', field: { field: 'action' }, limit: 15 } as GroupByFormValues;
       values.groupBy.groupings = [grouping1];
 

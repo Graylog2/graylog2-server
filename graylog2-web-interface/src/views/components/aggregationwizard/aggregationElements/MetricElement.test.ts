@@ -24,7 +24,7 @@ describe('MetricElement', () => {
     const metric1 = { function: 'count', field: undefined } as MetricFormValues;
     const metric2 = { function: 'avg', field: 'took_ms' } as MetricFormValues;
 
-    it('should remove an metric from the form', () => {
+    it('should remove a metric from the form', () => {
       const values = { metrics: [metric1, metric2] } as WidgetConfigFormValues;
       const result = removeElementSection(1, values);
 
