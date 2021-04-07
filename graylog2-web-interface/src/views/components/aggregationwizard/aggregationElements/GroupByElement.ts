@@ -190,6 +190,15 @@ const GroupByElement: AggregationElement = {
       ],
     },
   }),
+  removeElementSection: ((index, formValues) => ({
+    ...formValues,
+    groupBy: {
+      columnRollup: 'columnRollup' in formValues.groupBy ? formValues.groupBy.columnRollup : true,
+      groupings: [
+        ...formValues.groupBy.groupings.filter((value, i) => (index !== i)),
+      ],
+    },
+  })),
   fromConfig: (config: AggregationWidgetConfig) => ({
     groupBy: {
       columnRollup: config.rollup,
