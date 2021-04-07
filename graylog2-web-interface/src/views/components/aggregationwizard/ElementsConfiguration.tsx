@@ -16,12 +16,19 @@
  */
 import * as React from 'react';
 import { useFormikContext } from 'formik';
-import AggregationWidgetConfig from 'src/views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { isEmpty } from 'lodash';
+import styled from 'styled-components';
+
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
+import ElementsConfigurationActions from './ElementsConfigurationActions';
 import type { AggregationElement } from './aggregationElements/AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
+
+const Container = styled.div`
+  position: relative;
+`;
 
 const _sortConfiguredElements = (
   values: WidgetConfigFormValues,
@@ -31,6 +38,7 @@ const _sortConfiguredElements = (
     aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
   ),
 );
+
 type Props = {
   aggregationElementsByKey: { [elementKey: string]: AggregationElement }
   config: AggregationWidgetConfig,
@@ -38,7 +46,7 @@ type Props = {
 }
 
 const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange }: Props) => {
-  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
+  const { values, setValues, dirty } = useFormikContext<WidgetConfigFormValues>();
 
   const _onDeleteElement = (aggregationElement) => {
     if (typeof aggregationElement.onDeleteAll !== 'function') {
@@ -49,30 +57,33 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
   };
 
   return (
-    <div>
-      {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-        if (isEmpty(elementFormValues)) {
-          return null;
-        }
+    <Container>
+      <div>
+        {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
+          if (isEmpty(elementFormValues)) {
+            return null;
+          }
 
-        const aggregationElement = aggregationElementsByKey[elementKey];
+          const aggregationElement = aggregationElementsByKey[elementKey];
 
-        if (!aggregationElement) {
-          throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
-        }
+          if (!aggregationElement) {
+            throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
+          }
 
-        const AggregationElementComponent = aggregationElement.component;
+          const AggregationElementComponent = aggregationElement.component;
 
-        return (
-          <ElementConfigurationContainer isPermanentElement={aggregationElement.onDeleteAll === undefined}
-                                         title={aggregationElement.title}
-                                         onDeleteAll={() => _onDeleteElement(aggregationElement)}
-                                         key={aggregationElement.key}>
-            <AggregationElementComponent config={config} onConfigChange={onConfigChange} />
-          </ElementConfigurationContainer>
-        );
-      })}
-    </div>
+          return (
+            <ElementConfigurationContainer isPermanentElement={aggregationElement.onDeleteAll === undefined}
+                                           title={aggregationElement.title}
+                                           onDeleteAll={() => _onDeleteElement(aggregationElement)}
+                                           key={aggregationElement.key}>
+              <AggregationElementComponent config={config} onConfigChange={onConfigChange} />
+            </ElementConfigurationContainer>
+          );
+        })}
+      </div>
+      {dirty && <ElementsConfigurationActions />}
+    </Container>
   );
 };
 
