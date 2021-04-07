@@ -41,7 +41,7 @@ const GroupBy = ({ index }: Props) => {
       <FieldComponent index={index} fieldType={fieldType} />
       {fieldType === 'time' && (<Time index={index} />)}
       {fieldType === 'values' && (
-        <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" />
+        <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" bsSize="small" />
       )}
     </Wrapper>
   );
