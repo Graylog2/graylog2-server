@@ -16,10 +16,17 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
+
+const StyledInputDropdown = styled(Input)`
+  float: left;
+  width: 400px;
+  margin-right: 10px;
+`;
 
 class InputDropdown extends React.Component {
   static propTypes = {
@@ -46,9 +53,9 @@ class InputDropdown extends React.Component {
 
   _formatStaticInput = (input) => {
     return (
-      <Input id={`${input.type}-select`} type="select" style={{ float: 'left', width: 400, marginRight: 10 /* stylelint-disable-line declaration-colon-space-after */ }} disabled>
+      <StyledInputDropdown id={`${input.type}-select`} type="select" disabled>
         <option>{`${input.title} (${input.type})`}</option>
-      </Input>
+      </StyledInputDropdown>
     );
   };
 
@@ -83,15 +90,14 @@ class InputDropdown extends React.Component {
 
       return (
         <div>
-          <Input id="placeholder-select"
-                 type="select"
-                 style={{ float: 'left', width: 400, marginRight: 10 /* stylelint-disable-line declaration-colon-space-after */ }}
-                 value={selectedInput}
-                 onChange={this.onSelectedInputChange}
-                 placeholder={this.PLACEHOLDER}>
+          <StyledInputDropdown id="placeholder-select"
+                               type="select"
+                               value={selectedInput}
+                               onChange={this.onSelectedInputChange}
+                               placeholder={this.PLACEHOLDER}>
             <option value={this.PLACEHOLDER}>Select an input</option>
             {inputs.toArray()}
-          </Input>
+          </StyledInputDropdown>
 
           <Button bsStyle="info"
                   disabled={this.props.disabled || selectedInput === this.PLACEHOLDER}

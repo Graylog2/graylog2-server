@@ -43,9 +43,7 @@ const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, t
     ${trend && css`
       background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
-
-      /* stylelint-disable-next-line property-no-vendor-prefix */
-      -webkit-print-color-adjust: exact !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
     `}
   `;
 });
@@ -57,9 +55,7 @@ const TextContainer = styled.div<{ trend: TrendDirection | undefined, ref }>(({ 
       margin: 5px;
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
       font-family: ${theme.fonts.family.body};
-
-      /* stylelint-disable-next-line property-no-vendor-prefix */
-      -webkit-print-color-adjust: exact !important; /* Needed for report generation */`;
+      color-adjust: exact !important; /* Needed for report generation */`;
 });
 
 const StyledIcon = styled(Icon)<{ trend: TrendDirection | undefined }>(({ theme, trend }) => {

@@ -34,7 +34,7 @@ const Value = styled.span`
 `;
 
 const StyledTooltip = styled(Tooltip).attrs((props) => ({
-  className: props.opened ? 'in' : '',
+  className: props.opened ? 'in' : '', /* stylelint-disable-line */
 }))(({ opened }) => css`
   display: ${opened ? 'block' : 'none'};
 `);
