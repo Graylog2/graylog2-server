@@ -79,6 +79,7 @@ const Sort = ({ index }: Props) => {
                       value={selectedOption}
                       placeholder="Specify field/metric to be sorted on"
                       aria-label="Select field for sorting"
+                      size="small"
                       onChange={(newValue: Option['value']) => {
                         const option = options[newValue];
                         setFieldValue(`sort.${index}.type`, option.type);
@@ -101,6 +102,7 @@ const Sort = ({ index }: Props) => {
                     name={name}
                     value={value}
                     aria-label="Select direction for sorting"
+                    size="small"
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
                     }} />
