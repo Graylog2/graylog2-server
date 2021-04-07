@@ -57,6 +57,7 @@
     "react-router-dom": "5.2.0",
     "reflux": "0.2.13",
     "styled-components": "5.2.1",
+    "stylelint-config-graylog": "file:../stylelint-config-graylog",
     "typescript": "4.2.3",
     "webpack": "4.44.2",
     "webpack-cleanup-plugin": "0.5.1",
