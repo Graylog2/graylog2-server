@@ -75,7 +75,7 @@ class NotificationsForm extends React.Component {
     const { showAddNotificationForm } = this.state;
 
     const notificationIds = eventDefinition.notifications.map((n) => n.notification_id);
-    const missingPermissions = notificationIds.filter((id) => !isPermitted(currentUser.permissions, `eventnotifications:read${id}`));
+    const missingPermissions = notificationIds.filter((id) => !isPermitted(currentUser.permissions, `eventnotifications:read:${id}`));
 
     if (missingPermissions.length > 0) {
       return (
