@@ -47,8 +47,8 @@ const ConfigActions = styled.div<{ isStuck: boolean }>(({ theme, isStuck }) => `
 const VisiblityIndicator = styled.div`
   width: 100%;
   position: absolute;
-  bottom: 1px;
-  height: 10px;
+  bottom: 0px;
+  height: 5px;
   z-index: 0;
 `;
 
@@ -62,7 +62,7 @@ const useIsStuck = (): {
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       setIsStuck(!entry.isIntersecting);
-    }, { threshold: 1 });
+    }, { threshold: 0.9 });
 
     if (visiblilityIndicatorRef) {
       observer.observe(visiblilityIndicatorRef);
