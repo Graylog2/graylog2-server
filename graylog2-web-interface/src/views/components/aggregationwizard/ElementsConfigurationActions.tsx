@@ -47,7 +47,7 @@ const ConfigActions = styled.div<{ isStuck: boolean }>(({ theme, isStuck }) => `
 const VisiblityIndicator = styled.div`
   width: 100%;
   position: absolute;
-  bottom: 0px;
+  top: 0;
   height: 5px;
   z-index: 0;
 `;

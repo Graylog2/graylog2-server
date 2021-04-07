@@ -40,6 +40,7 @@ const Wrapper = styled.div`
 `;
 
 const Controls = styled.div`
+  position: relative;
   height: 100%;
   min-width: 300px;
   max-width: 500px;
@@ -50,14 +51,6 @@ const Controls = styled.div`
 const Visualization = styled.div`
   height: 100%;
   flex: 3;
-`;
-
-const Section = styled.div`
-  margin-bottom: 10px;
-
-  :last-child {
-    margin-bottom: 0;
-  }
 `;
 
 const _onElementCreate = (
@@ -115,16 +108,15 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
                           validate={validateForm}>
           {({ values, setValues }) => (
             <>
-              <Section data-testid="add-element-section">
-                <AggregationElementSelect onElementCreate={(elementKey) => _onElementCreate(elementKey, values, setValues)}
-                                          aggregationElements={aggregationElements}
-                                          formValues={values} />
-              </Section>
-              <Section data-testid="configure-elements-section">
-                <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
-                                       config={config}
-                                       onConfigChange={onChange} />
-              </Section>
+
+              <AggregationElementSelect onElementCreate={(elementKey) => _onElementCreate(elementKey, values, setValues)}
+                                        aggregationElements={aggregationElements}
+                                        formValues={values} />
+
+              <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
+                                     config={config}
+                                     onConfigChange={onChange} />
+
             </>
           )}
         </WidgetConfigForm>

@@ -57,7 +57,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
   };
 
   return (
-    <Container>
+    <Container data-testid="configure-elements-section">
       <div>
         {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
           if (isEmpty(elementFormValues)) {
