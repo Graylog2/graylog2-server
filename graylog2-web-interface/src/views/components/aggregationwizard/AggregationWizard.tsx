@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { EditWidgetComponentProps } from 'views/types';
 
 import { ButtonToolbar } from 'components/graylog';
