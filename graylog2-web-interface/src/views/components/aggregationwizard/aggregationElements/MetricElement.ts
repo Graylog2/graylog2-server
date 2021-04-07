@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
@@ -98,10 +98,8 @@ const MetricElement: AggregationElement = {
   fromConfig: (config: AggregationWidgetConfig) => ({
     metrics: seriesToMetrics(config.series),
   }),
-  toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => config
-    .toBuilder()
-    .series(metricsToSeries(formValues.metrics))
-    .build(),
+  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
+    .series(metricsToSeries(formValues.metrics)),
   component: MetricsConfiguration,
   validate: validateMetrics,
 };

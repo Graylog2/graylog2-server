@@ -93,9 +93,9 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
     }
 
     return toConfig;
-  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder().build());
+  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder());
 
-  onConfigChange(newConfig);
+  onConfigChange(newConfig.build());
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
@@ -119,7 +119,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
         <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
                           initialValues={initialFormValues}
                           validate={validateForm}>
-          {({ isValid, dirty, values, setValues }) => (
+          {({ isSubmitting, isValid, dirty, values, setValues }) => (
             <>
               <Section data-testid="add-element-section">
                 <AggregationElementSelect onElementCreate={(elementKey) => _onElementCreate(elementKey, values, setValues)}
@@ -132,7 +132,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
                                        onConfigChange={onChange} />
                 {dirty && (
                   <StyledButtonToolbar>
-                    <Button bsStyle="primary" className="pull-right" type="submit" disabled={!isValid}>Apply Changes</Button>
+                    <Button bsStyle="primary" className="pull-right" type="submit" disabled={!isValid || isSubmitting}>{isSubmitting ? 'Applying Changes' : 'Apply Changes'}</Button>
                   </StyledButtonToolbar>
                 )}
               </Section>

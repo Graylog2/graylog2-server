@@ -297,3 +297,5 @@ class Builder {
     );
   }
 }
+
+export type AggregationWidgetConfigBuilder = InstanceType<typeof Builder>;

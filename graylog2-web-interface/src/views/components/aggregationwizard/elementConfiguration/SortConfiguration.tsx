@@ -15,20 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { FieldArray, useFormikContext } from 'formik';
 
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { Button, ButtonToolbar } from 'components/graylog';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import ElementConfigurationSection
+  from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationSection';
+import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
 
-type Props = {
-  config: AggregationWidgetConfig,
-  onConfigChange: (newConfig: AggregationWidgetConfig) => void
-}
+const SortConfiguration = () => {
+  const { values } = useFormikContext<WidgetConfigFormValues>();
+  const { sort } = values;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const SortConfiguration = ({ config, onConfigChange }: Props) => {
   return (
-    <>
-      Configuration Elements
-    </>
+    <FieldArray name="sort"
+                render={({ push }) => (
+                  <>
+                    <div>
+                      {sort.map((s, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <ElementConfigurationSection key={`sort-${index}`}>
+                          <Sort index={index} />
+                        </ElementConfigurationSection>
+                      ))}
+                    </div>
+                    <ButtonToolbar>
+                      <Button className="pull-right" bsSize="small" type="button" onClick={() => push({})}>
+                        Add a Sort
+                      </Button>
+                    </ButtonToolbar>
+                  </>
+                )} />
   );
 };
 
