@@ -98,7 +98,7 @@ const MetricElement: AggregationElement = {
   fromConfig: (config: AggregationWidgetConfig) => ({
     metrics: seriesToMetrics(config.series),
   }),
-  removeElement: ((index, formValues) => ({
+  removeElementSection: ((index, formValues) => ({
     ...formValues,
     metrics: formValues.metrics.filter((value, i) => index !== i),
   })),
