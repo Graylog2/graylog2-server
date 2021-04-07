@@ -56,6 +56,14 @@ public abstract class MoreMediaTypes {
      */
     public final static MediaType APPLICATION_JSON_TYPE = new MediaType("application", "json");
     /**
+     * A {@code String} constant representing {@value #APPLICATION_NDJSON} media type.
+     */
+    public final static String APPLICATION_NDJSON = "application/x-ndjson";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_NDJSON} media type.
+     */
+    public final static MediaType APPLICATION_NDJSON_TYPE = new MediaType("application", "x-ndjson");
+    /**
      * A {@code String} constant representing {@value #APPLICATION_JSON} media type.
      */
     public final static String TEXT_PLAIN = "text/plain";
