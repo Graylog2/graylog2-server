@@ -297,10 +297,14 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         @Override
-        public Optional<Multimap<String, String>> validate() {
+        public Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext context) {
             final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
 
             final Path path = Paths.get(path());
+            if (!context.getPathChecker().fileIsInAllowedPath(path)) {
+                errors.put("path", ALLOWED_PATH_ERROR);
+            }
+
             if (!Files.exists(path)) {
                 errors.put("path", "The file does not exist.");
             } else if (!Files.isReadable(path)) {
