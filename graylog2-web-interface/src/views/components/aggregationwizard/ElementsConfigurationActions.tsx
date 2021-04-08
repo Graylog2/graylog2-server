@@ -56,7 +56,7 @@ const useIsStuck = (): {
   setVisibilityIndicatorRef: (ref: HTMLDivElement) => void,
   isStuck: boolean
 } => {
-  const [visiblilityIndicatorRef, setVisibilityIndicatorRef] = useState(null);
+  const [visibilityIndicatorRef, setVisibilityIndicatorRef] = useState(null);
   const [isStuck, setIsStuck] = useState(false);
 
   useEffect(() => {
@@ -64,16 +64,16 @@ const useIsStuck = (): {
       setIsStuck(!entry.isIntersecting);
     }, { threshold: 0.9 });
 
-    if (visiblilityIndicatorRef) {
-      observer.observe(visiblilityIndicatorRef);
+    if (visibilityIndicatorRef) {
+      observer.observe(visibilityIndicatorRef);
     }
 
     return () => {
-      if (visiblilityIndicatorRef) {
-        observer.unobserve(visiblilityIndicatorRef);
+      if (visibilityIndicatorRef) {
+        observer.unobserve(visibilityIndicatorRef);
       }
     };
-  }, [visiblilityIndicatorRef]);
+  }, [visibilityIndicatorRef]);
 
   return { setVisibilityIndicatorRef, isStuck };
 };
