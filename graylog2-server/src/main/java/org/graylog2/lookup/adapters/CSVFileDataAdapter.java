@@ -303,6 +303,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             final Path path = Paths.get(path());
             if (!context.getPathChecker().fileIsInAllowedPath(path)) {
                 errors.put("path", ALLOWED_PATH_ERROR);
+                return;
             }
 
             if (!Files.exists(path)) {
