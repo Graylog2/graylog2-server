@@ -34,6 +34,7 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import TopRow from 'views/components/searchbar/TopRow';
 import { SearchesConfig } from 'components/search/SearchConfig';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -60,63 +61,67 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
 
   return (
-    <ScrollToHint value={queryString}>
-      <Row className="content">
-        <Col md={12}>
-          <DashboardSearchForm initialValues={{ timerange, queryString }}
-                               limitDuration={limitDuration}
-                               onSubmit={submitForm}>
-            {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-              <>
-                <TopRow>
-                  <Col lg={8} md={9} xs={10}>
-                    <TimeRangeInput disabled={disableSearch}
-                                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                    value={values?.timerange}
-                                    hasErrorOnMount={!isValid}
-                                    noOverride />
-                  </Col>
-                  <Col lg={4} md={3} xs={2}>
-                    <RefreshControls />
-                  </Col>
-                </TopRow>
+    <WidgetFocusContext.Consumer>
+      {({ focusedWidget: { editing } = { editing: false } }) => (
+        <ScrollToHint value={queryString}>
+          <Row className="content">
+            <Col md={12}>
+              <DashboardSearchForm initialValues={{ timerange, queryString }}
+                                   limitDuration={limitDuration}
+                                   onSubmit={submitForm}>
+                {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+                  <>
+                    <TopRow>
+                      <Col lg={8} md={9} xs={10}>
+                        <TimeRangeInput disabled={disableSearch}
+                                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                        value={values?.timerange}
+                                        hasErrorOnMount={!isValid}
+                                        noOverride />
+                      </Col>
+                      <Col lg={4} md={3} xs={2}>
+                        <RefreshControls />
+                      </Col>
+                    </TopRow>
 
-                <Row className="no-bm">
-                  <Col md={8} lg={9}>
-                    <div className="pull-right search-help">
-                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                         title="Search query syntax documentation"
-                                         text={<Icon name="lightbulb" />} />
-                    </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                  glyph="filter"
-                                  dirty={dirty} />
+                    <Row className="no-bm">
+                      <Col md={8} lg={9}>
+                        <div className="pull-right search-help">
+                          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                             title="Search query syntax documentation"
+                                             text={<Icon name="lightbulb" />} />
+                        </div>
+                        <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                                      glyph="filter"
+                                      dirty={dirty} />
 
-                    <Field name="queryString">
-                      {({ field: { name, value, onChange } }) => (
-                        <QueryInput value={value}
-                                    placeholder="Apply filter to all widgets"
-                                    onChange={(newQuery) => {
-                                      onChange({ target: { value: newQuery, name } });
+                        <Field name="queryString">
+                          {({ field: { name, value, onChange } }) => (
+                            <QueryInput value={value}
+                                        placeholder="Apply filter to all widgets"
+                                        onChange={(newQuery) => {
+                                          onChange({ target: { value: newQuery, name } });
 
-                                      return Promise.resolve(newQuery);
-                                    }}
-                                    onExecute={handleSubmit as () => void} />
-                      )}
-                    </Field>
-                  </Col>
-                  <Col md={4} lg={3}>
-                    <div className="pull-right">
-                      <ViewActionsMenu />
-                    </div>
-                  </Col>
-                </Row>
-              </>
-            )}
-          </DashboardSearchForm>
-        </Col>
-      </Row>
-    </ScrollToHint>
+                                          return Promise.resolve(newQuery);
+                                        }}
+                                        onExecute={handleSubmit as () => void} />
+                          )}
+                        </Field>
+                      </Col>
+                      <Col md={4} lg={3}>
+                        <div className="pull-right">
+                          {!editing && <ViewActionsMenu />}
+                        </div>
+                      </Col>
+                    </Row>
+                  </>
+                )}
+              </DashboardSearchForm>
+            </Col>
+          </Row>
+        </ScrollToHint>
+      )}
+    </WidgetFocusContext.Consumer>
   );
 };
 
