@@ -56,7 +56,7 @@ const useScrolledToBottom = (): {
   setScrolledToBottomIndicatorRef: (ref: HTMLDivElement) => void,
   scrolledToBottom: boolean
 } => {
-  const [visibilityIndicatorRef, setScrolledToBottomIndicatorRef] = useState(null);
+  const [scrolledToBottomIndicatorRef, setScrolledToBottomIndicatorRef] = useState(null);
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
 
   useEffect(() => {
@@ -64,16 +64,16 @@ const useScrolledToBottom = (): {
       setScrolledToBottom(!entry.isIntersecting);
     }, { threshold: 0.9 });
 
-    if (visibilityIndicatorRef) {
-      observer.observe(visibilityIndicatorRef);
+    if (scrolledToBottomIndicatorRef) {
+      observer.observe(scrolledToBottomIndicatorRef);
     }
 
     return () => {
-      if (visibilityIndicatorRef) {
-        observer.unobserve(visibilityIndicatorRef);
+      if (scrolledToBottomIndicatorRef) {
+        observer.unobserve(scrolledToBottomIndicatorRef);
       }
     };
-  }, [visibilityIndicatorRef]);
+  }, [scrolledToBottomIndicatorRef]);
 
   return { setScrolledToBottomIndicatorRef, scrolledToBottom };
 };
