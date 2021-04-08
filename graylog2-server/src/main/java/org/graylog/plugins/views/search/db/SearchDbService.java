@@ -125,8 +125,12 @@ public class SearchDbService {
                 .rebuildRequirements(Search::requires, (s, newRequirements) -> s.toBuilder().requires(newRequirements).build());
     }
 
-     public Set<String> getExpiredSearches(final Set<String> requiredIds, final Instant mustNotBeOlderThan) {
-        return Streams.stream((Iterable<SearchSummary>) summarydb.find())
+    Stream<SearchSummary> findSummaries() {
+        return Streams.stream((Iterable<SearchSummary>) summarydb.find());
+    }
+
+    public Set<String> getExpiredSearches(final Set<String> requiredIds, final Instant mustNotBeOlderThan) {
+        return this.findSummaries()
                 .filter(search -> search.createdAt().isBefore(mustNotBeOlderThan) && !requiredIds.contains(search.id()))
                 .map(search -> search.id())
                 .collect(Collectors.toSet());
