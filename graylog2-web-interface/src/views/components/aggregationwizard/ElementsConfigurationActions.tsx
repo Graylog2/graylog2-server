@@ -30,7 +30,7 @@ const ConfigActions = styled.div<{ isStuck: boolean }>(({ theme, isStuck }) => `
   bottom: 0px;
   padding-top: 5px;
   background: ${theme.colors.global.contentBackground};
-  z-indes: 1;
+  z-index: 1;
 
   :before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
