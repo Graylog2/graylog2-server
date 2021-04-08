@@ -17,6 +17,7 @@
 package org.graylog2.lookup.adapters;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.Multimap;
 import com.google.common.io.Resources;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
@@ -30,13 +31,16 @@ import org.mockito.junit.MockitoRule;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.graylog2.lookup.adapters.CSVFileDataAdapter.Config;
 import static org.graylog2.lookup.adapters.CSVFileDataAdapter.NAME;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -52,7 +56,10 @@ public class CSVFileDataAdapterTest {
     AllowedAuxiliaryPathChecker pathChecker;
 
     @Mock
-    LookupCachePurge cachePurge;
+    private LookupCachePurge cachePurge;
+
+    @Mock
+    private LookupDataAdapterValidationContext validationContext;
 
     public CSVFileDataAdapterTest() throws Exception {
         final URL resource = Resources.getResource("org/graylog2/lookup/adapters/CSVFileDataAdapterTest.csv");
@@ -121,6 +128,63 @@ public class CSVFileDataAdapterTest {
         csvFileDataAdapter.doStart();
         csvFileDataAdapter.doRefresh(cachePurge);
         assertTrue(csvFileDataAdapter.getError().isPresent());
+    }
+
+    @Test
+    public void testConfigValidationSuccess() {
+        final Config config = Config.builder()
+                                    .type(NAME)
+                                    .path(csvFile.toString())
+                                    .separator(",")
+                                    .quotechar("\"")
+                                    .keyColumn("key")
+                                    .valueColumn("value")
+                                    .checkInterval(60)
+                                    .caseInsensitiveLookup(false)
+                                    .build();
+        when(validationContext.getPathChecker()).thenReturn(pathChecker);
+        when(pathChecker.fileIsInAllowedPath(any(Path.class))).thenReturn(true);
+        final Optional<Multimap<String, String>> result = config.validate(validationContext);
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void testConfigValidationFileDoesNotExist() {
+        final Config config = Config.builder()
+                                    .type(NAME)
+                                    .path("fake-path")
+                                    .separator(",")
+                                    .quotechar("\"")
+                                    .keyColumn("key")
+                                    .valueColumn("value")
+                                    .checkInterval(60)
+                                    .caseInsensitiveLookup(false)
+                                    .build();
+        when(validationContext.getPathChecker()).thenReturn(pathChecker);
+        when(pathChecker.fileIsInAllowedPath(any(Path.class))).thenReturn(true);
+        final Optional<Multimap<String, String>> result = config.validate(validationContext);
+        assertTrue(result.isPresent());
+        assertEquals("The file does not exist.", String.join("", result.get().asMap().get("path")));
+    }
+
+    @Test
+    public void testConfigValidationFileNotInPermittedLocation() {
+        final Config config = Config.builder()
+                                    .type(NAME)
+                                    .path("fake-path")
+                                    .separator(",")
+                                    .quotechar("\"")
+                                    .keyColumn("key")
+                                    .valueColumn("value")
+                                    .checkInterval(60)
+                                    .caseInsensitiveLookup(false)
+                                    .build();
+        when(validationContext.getPathChecker()).thenReturn(pathChecker);
+        when(pathChecker.fileIsInAllowedPath(any(Path.class))).thenReturn(false);
+        final Optional<Multimap<String, String>> result = config.validate(validationContext);
+        assertTrue(result.isPresent());
+        assertEquals("The specified CSV file is not in an allowed path.",
+                     String.join("", result.get().asMap().get("path")));
     }
 
     private Config baseConfig() {
