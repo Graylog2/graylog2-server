@@ -101,13 +101,14 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
 const adjustTabs = () => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
   const allTabs = dashboardTabs.querySelectorAll('li');
-  const tabItems = dashboardTabs.querySelectorAll('li:not(.dropdown):not(.query-tabs-new):not(.dropdown-menu li)');
+  const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)');
   const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li');
   const lockedItems = dashboardTabs.querySelectorAll(`li.${CLASS_LOCKED}`);
   const moreBtn = dashboardTabs.querySelector('li.query-tabs-more') as HTMLElement;
   const newBtn = dashboardTabs.querySelector('li.query-tabs-new') as HTMLElement;
   const primaryWidth = dashboardTabs.offsetWidth;
   const hiddenItems = [];
+
   let maxWidth = moreBtn.offsetWidth + newBtn.offsetWidth; // magic number is PageContentLayout__Container padding
 
   if (lockedItems.length) {
