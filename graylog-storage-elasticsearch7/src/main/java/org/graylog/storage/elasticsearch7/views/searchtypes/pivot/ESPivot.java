@@ -250,7 +250,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                     if (pivot.rollup()) {
                         pivot.series().stream()
                                 .flatMap(seriesSpec -> createRowValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec))
-                                .forEach(rowBuilder::addValue);
+                                .forEach(value -> rowBuilder.addValue(value));
                     }
                     if (!pivot.columnGroups().isEmpty()) {
                         final String columnsAggName = queryContext.contextMap().get(pivot.id() + "-columns").toString();
