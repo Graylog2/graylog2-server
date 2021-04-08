@@ -38,6 +38,10 @@ type Props = {
   titles: Immutable.Map<string, string>,
 };
 
+const CLASS_HIDDEN = 'hidden';
+const CLASS_ACTIVE = 'active';
+const CLASS_LOCKED = 'locked';
+
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
   &.nav.nav-tabs {
     border-bottom: 0;
@@ -45,6 +49,8 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
     white-space: nowrap;
     z-index: 2; /* without it renders under widget management icons */
     position: relative;
+    margin-bottom: -1px;
+    padding-left: 15px;
 
     > li {
       > a {
@@ -66,18 +72,20 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-bottom: 9px;
+      margin-bottom: -3px;
 
       > a {
-        padding: 9px 15px 0;
-        border: none;
-        background-color: transparent;
+        padding: 9px 15px;
+        border: 1px solid ${theme.colors.variant.lighter.default};
+        border-bottom: none;
+        background-color: ${theme.colors.global.contentBackground};
         color: ${theme.colors.variant.darker.primary};
 
         :hover,
         :active,
         :focus {
-          background: transparent;
+          border: 1px solid ${theme.colors.variant.lighter.default};
+          border-bottom: none;
           color: ${theme.colors.variant.darker.primary};
         }
       }
@@ -95,39 +103,60 @@ const adjustTabs = () => {
   const allTabs = dashboardTabs.querySelectorAll('li');
   const tabItems = dashboardTabs.querySelectorAll('li:not(.dropdown):not(.query-tabs-new):not(.dropdown-menu li)');
   const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li');
+  const lockedItems = dashboardTabs.querySelectorAll(`li.${CLASS_LOCKED}`);
   const moreBtn = dashboardTabs.querySelector('li.query-tabs-more') as HTMLElement;
   const newBtn = dashboardTabs.querySelector('li.query-tabs-new') as HTMLElement;
-
-  let maxWidth = moreBtn.offsetWidth + newBtn.offsetWidth + 30; // magic number is PageContentLayout__Container padding
-  const hiddenItems = [];
   const primaryWidth = dashboardTabs.offsetWidth;
+  const hiddenItems = [];
+  let maxWidth = moreBtn.offsetWidth + newBtn.offsetWidth; // magic number is PageContentLayout__Container padding
 
-  moreBtn.classList.remove('active');
+  if (lockedItems.length) {
+    lockedItems.forEach((tabItem: HTMLElement) => {
+      maxWidth += tabItem.offsetWidth;
+    });
+  }
+
+  moreBtn.classList.remove(CLASS_ACTIVE);
 
   allTabs.forEach((tabItem) => {
-    tabItem.classList.remove('hidden');
+    tabItem.classList.remove(CLASS_HIDDEN);
   });
 
   tabItems.forEach((tabItem: HTMLElement, idx) => {
-    maxWidth += tabItem.offsetWidth;
+    if (!tabItem.classList.contains(CLASS_LOCKED)) {
+      maxWidth += tabItem.offsetWidth;
+      tabItem.classList.remove(CLASS_HIDDEN);
 
-    if (primaryWidth >= maxWidth) {
-      tabItem.classList.remove('hidden');
-      hiddenItems.splice(idx, 1);
-    } else {
-      tabItem.classList.add('hidden');
-      hiddenItems.push(idx);
+      if (primaryWidth >= maxWidth) {
+        hiddenItems.splice(idx, 1);
+      } else {
+        tabItem.classList.add(CLASS_HIDDEN);
+        hiddenItems.push(idx);
+      }
     }
   });
 
   moreItems.forEach((tabItem: HTMLElement, idx) => {
     if (!hiddenItems.includes(idx)) {
-      tabItem.classList.add('hidden');
+      tabItem.classList.add(CLASS_HIDDEN);
+    }
+
+    if (!tabItem.classList.contains(CLASS_HIDDEN) && tabItem.classList.contains(CLASS_ACTIVE)) {
+      const topTabItem = tabItems[idx] as HTMLElement;
+      const parent = moreBtn.parentNode;
+
+      topTabItem.classList.add(CLASS_LOCKED);
+      topTabItem.classList.remove(CLASS_HIDDEN);
+      tabItem.classList.add(CLASS_HIDDEN);
+
+      parent.insertBefore(moreBtn, topTabItem);
+
+      adjustTabs();
     }
   });
 
   if (!hiddenItems.length) {
-    moreBtn.classList.add('hidden');
+    moreBtn.classList.add(CLASS_HIDDEN);
   }
 };
 
