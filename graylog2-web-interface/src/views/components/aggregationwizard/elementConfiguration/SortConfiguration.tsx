@@ -29,7 +29,7 @@ const SortConfiguration = () => {
 
   return (
     <FieldArray name="sort"
-                render={({ push }) => (
+                render={() => (
                   <>
                     <div>
                       {sort.map((s, index) => (
@@ -39,11 +39,6 @@ const SortConfiguration = () => {
                         </ElementConfigurationSection>
                       ))}
                     </div>
-                    <ButtonToolbar>
-                      <Button className="pull-right" bsSize="small" type="button" onClick={() => push({})}>
-                        Add a Sort
-                      </Button>
-                    </ButtonToolbar>
                   </>
                 )} />
   );
