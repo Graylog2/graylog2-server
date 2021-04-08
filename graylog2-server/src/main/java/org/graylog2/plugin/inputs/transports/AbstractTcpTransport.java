@@ -61,7 +61,6 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.util.KeyUtil;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -277,7 +275,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 certFile = ssc.certificate();
 
                 if (!Strings.isNullOrEmpty(tlsKeyPassword)) {
-                    keyFile = KeyStoreUtils.generatePKSC8PrivateKey(tlsKeyPassword.toCharArray(), ssc.key());
+                    keyFile = KeyUtil.generatePKSC8PrivateKey(tlsKeyPassword.toCharArray(), ssc.key());
                 }
                 else {
                     keyFile = ssc.privateKey();
@@ -321,14 +319,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 }
             }
 
-            private SSLEngine createSslEngine(MessageInput input) throws IOException, CertificateException, PKCSException, OperatorCreationException, NoSuchProviderException {
+            private SSLEngine createSslEngine(MessageInput input) throws IOException, CertificateException, OperatorCreationException, PKCSException {
                 final X509Certificate[] clientAuthCerts;
                 if (EnumSet.of(ClientAuth.OPTIONAL, ClientAuth.REQUIRE).contains(clientAuth)) {
                     if (clientAuthCertFile.exists()) {
-                        clientAuthCerts = KeyUtil.loadCertificates(clientAuthCertFile.toPath()).stream()
-                                .filter(certificate -> certificate instanceof X509Certificate)
-                                .map(certificate -> (X509Certificate) certificate)
-                                .toArray(X509Certificate[]::new);
+                        clientAuthCerts = KeyUtil.loadX509Certificates(clientAuthCertFile.toPath());
                     } else {
                         LOG.warn("Client auth configured, but no authorized certificates / certificate authorities configured for input [{}/{}]",
                                 input.getName(), input.getId());
@@ -340,8 +335,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
                 // Netty's SSLContextBuilder chokes on some PKCS8 key file formats. So we need to pass a
                 // private key and keyCertChain instead of the corresponding files.
-                PrivateKey privateKey = KeyStoreUtils.privateKeyFromFile(password, keyFile);
-                Iterable<X509Certificate> keyCertChain = KeyStoreUtils.keyCertChainFromFile(certFile);
+                PrivateKey privateKey = KeyUtil.privateKeyFromFile(password, keyFile);
+                X509Certificate[] keyCertChain = KeyUtil.loadX509Certificates(certFile.toPath());
                 final SslContextBuilder sslContext = SslContextBuilder.forServer(privateKey, keyCertChain)
                         .sslProvider(tlsProvider)
                         .clientAuth(clientAuth)

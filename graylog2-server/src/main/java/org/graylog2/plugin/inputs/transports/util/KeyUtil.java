@@ -24,6 +24,20 @@ import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 import io.netty.handler.ssl.PemPrivateKey;
 import io.netty.handler.ssl.PemX509Certificate;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.PKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
+import org.bouncycastle.operator.InputDecryptorProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.OutputEncryptor;
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.pkcs.PKCSException;
+import org.bouncycastle.util.io.pem.PemObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +52,11 @@ import javax.net.ssl.KeyManagerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -51,6 +68,7 @@ import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -67,6 +85,13 @@ public class KeyUtil {
     private static final Logger LOG = LoggerFactory.getLogger(KeyUtil.class);
     private static final Joiner JOINER = Joiner.on(",").skipNulls();
     private static final Pattern KEY_PATTERN = Pattern.compile("-{5}BEGIN (?:(RSA|DSA|EC)? )?(ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n([A-Z0-9a-z+/\\r\\n]+={0,2})\\r?\\n-{5}END (?:(?:RSA|DSA|EC)? )?(?:ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n$", Pattern.MULTILINE);
+
+    public static X509Certificate[] loadX509Certificates(Path certificatePath) throws CertificateException, IOException {
+        return loadCertificates(certificatePath).stream()
+                .filter(certificate -> certificate instanceof X509Certificate)
+                .map(certificate -> (X509Certificate) certificate)
+                .toArray(X509Certificate[]::new);
+    }
 
     public static Collection<? extends Certificate> loadCertificates(Path certificatePath) throws CertificateException, IOException {
         final CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -173,5 +198,70 @@ public class KeyUtil {
     public static PrivateKey readPrivateKey(Path path) throws IOException {
         final byte[] bytes = Files.readAllBytes(path);
         return PemPrivateKey.valueOf(bytes);
+    }
+
+    /**
+     * Build a password-encrypted PKCS8 private key and write it to a PEM file in the temp directory.
+     * Caller is responsible for ensuring that the temp directory is writable. The file will be deleted
+     * when the VM exits.
+     * @param password to protect the key
+     * @param key encrypt this key
+     * @return PEM file
+     * @throws GeneralSecurityException
+     */
+    public static File generatePKSC8PrivateKey(char[] password, PrivateKey key) throws GeneralSecurityException {
+        try {
+            JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
+                    new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC)
+                            .setRandom(new SecureRandom())
+                            .setPasssword(password);
+            OutputEncryptor encryptor = encryptorBuilder.build();
+
+            // construct object to create the PKCS8 object from the private key and encryptor
+            PemObject pemObj = new JcaPKCS8Generator(key, encryptor).generate();
+            StringWriter stringWriter = new StringWriter();
+            try (JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter)) {
+                pemWriter.writeObject(pemObj);
+            }
+
+            // write PKCS8 to file
+            String pkcs8Key = stringWriter.toString();
+            File tmpFile = File.createTempFile("key", ".key");
+            tmpFile.deleteOnExit();
+            FileOutputStream fos = new FileOutputStream(tmpFile);
+            fos.write(pkcs8Key.getBytes(StandardCharsets.UTF_8));
+            fos.flush();
+            fos.close();
+            return tmpFile;
+        } catch (IOException | OperatorCreationException e) {
+            throw new GeneralSecurityException(e);
+        }
+    }
+
+    /**
+     * Obtain a private key from a PKS8 PEM file, which is optionally password-protected.
+     * @param password password to decrypt the file - it may be null or empty in case of an unencrypted file
+     * @param keyFile the key file
+     * @return the corresponding private key
+     */
+    public static PrivateKey privateKeyFromFile(String password, File keyFile) throws IOException, PKCSException, OperatorCreationException {
+        PrivateKey privateKey;
+
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+        PEMParser pemParser = new PEMParser(new FileReader(keyFile));
+        Object object = pemParser.readObject();
+        if (object instanceof PKCS8EncryptedPrivateKeyInfo) {
+            PKCS8EncryptedPrivateKeyInfo pInfo = (PKCS8EncryptedPrivateKeyInfo) object;
+            JceOpenSSLPKCS8DecryptorProviderBuilder providerBuilder = new JceOpenSSLPKCS8DecryptorProviderBuilder();
+            InputDecryptorProvider provider = providerBuilder.build(Strings.nullToEmpty(password).toCharArray());
+            PrivateKeyInfo info = pInfo.decryptPrivateKeyInfo(provider);
+            privateKey = converter.getPrivateKey(info);
+        } else if (object instanceof PrivateKeyInfo) {
+            privateKey = converter.getPrivateKey((PrivateKeyInfo) object);
+        } else {
+            throw new PKCSException("Encountered unexpected object type: " + object.getClass().getName());
+        }
+
+        return privateKey;
     }
 }
