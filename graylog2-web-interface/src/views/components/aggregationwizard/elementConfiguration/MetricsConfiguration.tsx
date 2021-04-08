@@ -47,11 +47,6 @@ const MetricsConfiguration = () => {
                           );
                         })}
                       </div>
-                      <ButtonToolbar>
-                        <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push({})}>
-                          Add a Metric
-                        </Button>
-                      </ButtonToolbar>
                     </>
                   )} />
     </>

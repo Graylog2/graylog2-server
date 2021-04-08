@@ -43,18 +43,15 @@ type Props = {
   aggregationElementsByKey: { [elementKey: string]: AggregationElement }
   config: AggregationWidgetConfig,
   onConfigChange: (config: AggregationWidgetConfig) => void,
+  onAddElementSection: (
+    elementKey: string,
+    values: WidgetConfigFormValues,
+    setValues: (formValues: WidgetConfigFormValues) => void,
+  ) => void,
 }
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange }: Props) => {
+const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onAddElementSection }: Props) => {
   const { values, setValues, dirty } = useFormikContext<WidgetConfigFormValues>();
-
-  const _onDeleteElement = (aggregationElement) => {
-    if (typeof aggregationElement.onDeleteAll !== 'function') {
-      return;
-    }
-
-    setValues(aggregationElement.onDeleteAll(values));
-  };
 
   return (
     <Container>
@@ -73,9 +70,9 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
           const AggregationElementComponent = aggregationElement.component;
 
           return (
-            <ElementConfigurationContainer isPermanentElement={aggregationElement.onDeleteAll === undefined}
+            <ElementConfigurationContainer allowAddSection={aggregationElement.allowCreate(values)}
                                            title={aggregationElement.title}
-                                           onDeleteAll={() => _onDeleteElement(aggregationElement)}
+                                           onAddElementSection={() => onAddElementSection(aggregationElement.key, values, setValues)}
                                            key={aggregationElement.key}>
               <AggregationElementComponent config={config} onConfigChange={onConfigChange} />
             </ElementConfigurationContainer>

@@ -56,31 +56,65 @@ const Wrapper = styled.div(({ theme }) => css`
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
+  align-items: center;
+  margin-bottom: 1px;
+  min-height: 26px;
+  font-weight: bold;
+  position: relative;
+
+  :before {
+    content: ' ';
+    top: 50%;
+    width: 100%;
+    border-bottom: 1px solid grey;
+    position: absolute;
+  }
+
+  button {
+    color: #1f1f1f;
+  }
 `;
 
+const ElementTitle = styled.div`
+  background: white;
+  z-index: 1;
+  padding-right: 8px;
+`;
+
+const ElementActions = styled.div`
+  background: white;
+  z-index: 1;
+  padding-left: 5px;
+`;
+
+const StyledIconButton = styled(IconButton)(({ theme }) => `
+  color: ${theme.colors.variant.primary};
+`);
+
 type Props = {
+  allowAddSection: boolean,
   children: React.ReactNode,
-  isPermanentElement: boolean,
-  onDeleteAll: () => void
+  onAddElementSection: () => void,
   title: string,
 }
 
 const ElementConfigurationContainer = ({
   children,
-  isPermanentElement,
-  onDeleteAll,
+  allowAddSection,
+  onAddElementSection,
   title,
 }: Props) => {
   return (
     <Wrapper>
       <Header>
-        <div>{title}</div>
-        <div>
-          {!isPermanentElement && (
-            <IconButton title={`Remove ${title}`} name="trash" onClick={onDeleteAll} />
+        <ElementTitle>
+          {title}
+        </ElementTitle>
+        <ElementActions>
+          {allowAddSection && (
+            <StyledIconButton title={`Add new section for ${title}`} name="plus" onClick={onAddElementSection} />
           )}
-        </div>
+        </ElementActions>
       </Header>
       <div>
         {children}

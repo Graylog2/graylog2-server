@@ -56,16 +56,6 @@ const GroupByConfiguration = () => {
       <FieldArray name="groupBy.groupings"
                   render={(arrayHelpers) => (
                     <>
-                      <div>
-                        {groupBy.groupings.map((grouping, index) => {
-                          return (
-                            // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationSection key={`grouping-${index}`} onRemove={() => removeGrouping(index)}>
-                              <GroupBy index={index} />
-                            </ElementConfigurationSection>
-                          );
-                        })}
-                      </div>
                       <ActionsBar>
                         <Field name="groupBy.columnRollup">
                           {({ field: { name, onChange, value } }) => (
@@ -81,12 +71,17 @@ const GroupByConfiguration = () => {
                             </Checkbox>
                           )}
                         </Field>
-                        <ButtonToolbar>
-                          <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push(emptyGrouping)}>
-                            Add Grouping
-                          </Button>
-                        </ButtonToolbar>
                       </ActionsBar>
+                      <div>
+                        {groupBy.groupings.map((grouping, index) => {
+                          return (
+                            // eslint-disable-next-line react/no-array-index-key
+                            <ElementConfigurationSection key={`grouping-${index}`} onRemove={() => removeGrouping(index)}>
+                              <GroupBy index={index} />
+                            </ElementConfigurationSection>
+                          );
+                        })}
+                      </div>
                     </>
                   )} />
     </>
