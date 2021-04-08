@@ -322,4 +322,14 @@ public class MongoIndexSetTest {
 
         verify(indices, times(1)).cycleAlias("graylog_deflector", indexName);
     }
+
+    @Test
+    public void identifiesIndicesWithPlusAsBeingManaged() {
+        final IndexSetConfig configWithPlus = config.toBuilder().indexPrefix("some+index").build();
+        final String indexName = configWithPlus.indexPrefix() + "_0";
+
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(configWithPlus, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+
+        assertThat(mongoIndexSet.isManagedIndex(indexName)).isTrue();
+    }
 }
