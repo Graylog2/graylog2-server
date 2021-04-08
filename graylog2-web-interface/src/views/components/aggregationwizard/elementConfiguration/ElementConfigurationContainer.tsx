@@ -24,7 +24,7 @@ const Wrapper = styled.div(({ theme }) => css`
   border: 1px solid ${theme.colors.variant.lighter.default};
   padding: 6px 6px 3px 6px;
   border-radius: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 
   :last-child {
     margin-bottom: 0;
