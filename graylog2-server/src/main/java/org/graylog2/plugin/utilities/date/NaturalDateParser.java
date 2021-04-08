@@ -23,6 +23,7 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -37,9 +38,16 @@ public class NaturalDateParser {
         this("Etc/UTC");
     }
 
-    public NaturalDateParser(final String timeZone) {
+    public NaturalDateParser(final String timeZone) throws IllegalArgumentException {
+        if(!isValidTimeZone(timeZone))
+            throw new IllegalArgumentException(String.format("TimeZone %s is not a valid TimeZone", timeZone));
+
         this.timeZone = TimeZone.getTimeZone(timeZone);
         this.dateTimeZone = DateTimeZone.forTimeZone(this.timeZone);
+    }
+
+    boolean isValidTimeZone(final String timeZone) {
+        return Arrays.stream(TimeZone.getAvailableIDs()).anyMatch(id -> id.equals(timeZone));
     }
 
     public Result parse(final String string) throws DateNotParsableException {

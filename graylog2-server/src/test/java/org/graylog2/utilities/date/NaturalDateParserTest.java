@@ -83,14 +83,9 @@ public class NaturalDateParserTest {
         assertThat(today.getDateTimeZone().getID()).as("should have the Europe/Berlin as Timezone").isEqualTo("Europe/Berlin");
     }
 
-    @Test
-    public void testInvalidTZ() throws Exception {
-        NaturalDateParser p = new NaturalDateParser("LOLWut");
-
-        NaturalDateParser.Result today = p.parse("today");
-        assertThat(today.getFrom()).as("From should not be null").isNotNull();
-        assertThat(today.getTo()).as("To should not be null").isNotNull();
-        assertThat(today.getDateTimeZone().getID()).as("should have the Etc/UTC as Timezone").isEqualTo("UTC");
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidTZ() {
+        new NaturalDateParser("LOLWut");
     }
 
     @Test
