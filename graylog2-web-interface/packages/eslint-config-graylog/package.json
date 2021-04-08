@@ -26,6 +26,6 @@
     "eslint-plugin-react": "7.22.0",
     "eslint-plugin-react-hooks": "4.2.0",
     "eslint-plugin-testing-library": "3.10.2",
-    "eslint-plugin-jest-dom": "3.6.5"
+    "eslint-plugin-jest-dom": "3.7.0"
   }
 }
