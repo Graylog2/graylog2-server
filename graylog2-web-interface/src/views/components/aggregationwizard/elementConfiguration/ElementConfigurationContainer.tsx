@@ -96,6 +96,7 @@ type Props = {
   children: React.ReactNode,
   onAddElementSection: () => void,
   title: string,
+  titleSingular?: string,
 }
 
 const ElementConfigurationContainer = ({
@@ -103,6 +104,7 @@ const ElementConfigurationContainer = ({
   allowAddSection,
   onAddElementSection,
   title,
+  titleSingular,
 }: Props) => {
   return (
     <Wrapper>
@@ -112,7 +114,7 @@ const ElementConfigurationContainer = ({
         </ElementTitle>
         <ElementActions>
           {allowAddSection && (
-            <StyledIconButton title={`Add new section for ${title}`} name="plus" onClick={onAddElementSection} />
+            <StyledIconButton title={`Add a ${titleSingular ?? title}`} name="plus" onClick={onAddElementSection} />
           )}
         </ElementActions>
       </Header>
@@ -121,6 +123,10 @@ const ElementConfigurationContainer = ({
       </div>
     </Wrapper>
   );
+};
+
+ElementConfigurationContainer.defaultProps = {
+  titleSingular: undefined,
 };
 
 export default ElementConfigurationContainer;

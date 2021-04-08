@@ -55,7 +55,7 @@ describe('ElementConfigurationContainer', () => {
       </ElementConfigurationContainer>,
     );
 
-    const addButton = screen.getByTitle('Add new section for Aggregation Element Title');
+    const addButton = screen.getByTitle('Add a Aggregation Element Title');
 
     fireEvent.click(addButton);
 
@@ -71,6 +71,6 @@ describe('ElementConfigurationContainer', () => {
       </ElementConfigurationContainer>,
     );
 
-    expect(screen.queryByTitle('Add new section for Aggregation Element Title')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Add a Aggregation Element Title')).not.toBeInTheDocument();
   });
 });

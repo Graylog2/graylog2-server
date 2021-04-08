@@ -177,6 +177,7 @@ export const emptyGrouping: ValuesGrouping = {
 
 const GroupByElement: AggregationElement = {
   title: 'Group By',
+  titleSingular: 'Grouping',
   key: 'groupBy',
   order: 1,
   allowCreate: () => true,
