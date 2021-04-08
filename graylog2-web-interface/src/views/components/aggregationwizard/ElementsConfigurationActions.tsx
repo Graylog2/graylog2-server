@@ -17,14 +17,14 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useFormikContext } from 'formik';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonToolbar } from 'components/graylog';
 import Button from 'components/graylog/Button';
 
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
-const ConfigActions = styled.div<{ isStuck: boolean }>(({ theme, isStuck }) => `
+const ConfigActions = styled.div<{ scrolledToBottom: boolean }>(({ theme, scrolledToBottom }) => css`
   position: sticky;
   width: 100%;
   bottom: 0px;
@@ -35,7 +35,7 @@ const ConfigActions = styled.div<{ isStuck: boolean }>(({ theme, isStuck }) => `
   :before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
     content: ' ';
-    display: ${isStuck ? 'block' : 'none'};
+    display: ${scrolledToBottom ? 'block' : 'none'};
     height: 3px;
     position: absolute;
     left: 0;
@@ -44,7 +44,7 @@ const ConfigActions = styled.div<{ isStuck: boolean }>(({ theme, isStuck }) => `
   }
 `);
 
-const VisiblityIndicator = styled.div`
+const ScrolledToBottomIndicator = styled.div`
   width: 100%;
   position: absolute;
   bottom: 0px;
@@ -52,16 +52,16 @@ const VisiblityIndicator = styled.div`
   z-index: 0;
 `;
 
-const useIsStuck = (): {
-  setVisibilityIndicatorRef: (ref: HTMLDivElement) => void,
-  isStuck: boolean
+const useScrolledToBottom = (): {
+  setScrolledToBottomIndicatorRef: (ref: HTMLDivElement) => void,
+  scrolledToBottom: boolean
 } => {
-  const [visibilityIndicatorRef, setVisibilityIndicatorRef] = useState(null);
-  const [isStuck, setIsStuck] = useState(false);
+  const [visibilityIndicatorRef, setScrolledToBottomIndicatorRef] = useState(null);
+  const [scrolledToBottom, setScrolledToBottom] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
-      setIsStuck(!entry.isIntersecting);
+      setScrolledToBottom(!entry.isIntersecting);
     }, { threshold: 0.9 });
 
     if (visibilityIndicatorRef) {
@@ -75,23 +75,23 @@ const useIsStuck = (): {
     };
   }, [visibilityIndicatorRef]);
 
-  return { setVisibilityIndicatorRef, isStuck };
+  return { setScrolledToBottomIndicatorRef, scrolledToBottom };
 };
 
 const ElementsConfigurationActions = () => {
   const { isSubmitting, isValid } = useFormikContext<WidgetConfigFormValues>();
-  const { setVisibilityIndicatorRef, isStuck } = useIsStuck();
+  const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
 
   return (
     <>
-      <ConfigActions isStuck={isStuck}>
+      <ConfigActions scrolledToBottom={scrolledToBottom}>
         <ButtonToolbar>
           <Button bsStyle="primary" className="pull-right" type="submit" disabled={!isValid || isSubmitting}>
             {isSubmitting ? 'Applying Changes' : 'Apply Changes'}
           </Button>
         </ButtonToolbar>
       </ConfigActions>
-      <VisiblityIndicator ref={setVisibilityIndicatorRef} />
+      <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
     </>
   );
 };
