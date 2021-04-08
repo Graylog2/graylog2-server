@@ -23,7 +23,7 @@ import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import WidgetFocusContext, {
   WidgetEditingState,
-  WidgetFocusingState
+  WidgetFocusingState,
 } from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
