@@ -50,6 +50,7 @@ const SelectField = ({ name, field, title, error, value, onChange }: FieldCompon
               clearable={!field.required}
               name={name}
               value={value}
+              size="small"
               onChange={(newValue) => onChange(createEvent(name, newValue))} />
     </Input>
   );

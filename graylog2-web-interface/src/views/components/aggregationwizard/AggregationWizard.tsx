@@ -18,9 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { EditWidgetComponentProps } from 'views/types';
 
-import { ButtonToolbar } from 'components/graylog';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Button from 'components/graylog/Button';
 
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
 import AggregationElementSelect from './AggregationElementSelect';
@@ -93,9 +91,9 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
     }
 
     return toConfig;
-  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder().build());
+  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), AggregationWidgetConfig.builder());
 
-  onConfigChange(newConfig);
+  onConfigChange(newConfig.build());
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
@@ -106,10 +104,6 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
   return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
-const StyledButtonToolbar = styled(ButtonToolbar)`
-  margin-top: 5px;
-`;
-
 const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentProps<AggregationWidgetConfig>) => {
   const initialFormValues = _initialFormValues(config);
 
@@ -119,7 +113,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
         <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
                           initialValues={initialFormValues}
                           validate={validateForm}>
-          {({ isValid, dirty, values, setValues }) => (
+          {({ values, setValues }) => (
             <>
               <Section data-testid="add-element-section">
                 <AggregationElementSelect onElementCreate={(elementKey) => _onElementCreate(elementKey, values, setValues)}
@@ -130,11 +124,6 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
                 <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
                                        config={config}
                                        onConfigChange={onChange} />
-                {dirty && (
-                  <StyledButtonToolbar>
-                    <Button bsStyle="primary" className="pull-right" type="submit" disabled={!isValid}>Apply Changes</Button>
-                  </StyledButtonToolbar>
-                )}
               </Section>
             </>
           )}

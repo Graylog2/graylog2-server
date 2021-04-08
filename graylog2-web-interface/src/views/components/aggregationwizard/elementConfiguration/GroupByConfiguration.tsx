@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
@@ -24,13 +25,14 @@ import { Button, ButtonToolbar, Checkbox } from 'components/graylog';
 import ElementConfigurationSection from './ElementConfigurationSection';
 import GroupBy from './GroupBy';
 
-import { emptyGrouping } from '../aggregationElements/GroupByElement';
+import GroupByElement, { emptyGrouping } from '../aggregationElements/GroupByElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const ActionsBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 3px;
 `;
 
 const RollupColumnsLabel = styled.div`
@@ -43,8 +45,11 @@ const RollupHoverForHelp = styled(HoverForHelp)`
 `;
 
 const GroupByConfiguration = () => {
-  const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { groupBy }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
+  const removeGrouping = useCallback((index) => {
+    setValues(GroupByElement.removeElementSection(index, values));
+  }, [setValues, values]);
 
   return (
     <>
@@ -55,7 +60,7 @@ const GroupByConfiguration = () => {
                         {groupBy.groupings.map((grouping, index) => {
                           return (
                             // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationSection key={`grouping-${index}`}>
+                            <ElementConfigurationSection key={`grouping-${index}`} onRemove={() => removeGrouping(index)}>
                               <GroupBy index={index} />
                             </ElementConfigurationSection>
                           );

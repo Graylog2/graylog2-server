@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
 
 import type { AggregationElement } from './AggregationElementType';
@@ -155,16 +155,15 @@ const groupingToPivot = (grouping: GroupByFormValues) => {
   return new Pivot(grouping.field.field, grouping.field.type, pivotConfig);
 };
 
-const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: AggregationWidgetConfig) => {
+const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: AggregationWidgetConfigBuilder) => {
   const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupingToPivot);
   const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupingToPivot);
   const { columnRollup } = groupBy;
 
-  return config.toBuilder()
+  return config
     .rowPivots(rowPivots)
     .columnPivots(columnPivots)
-    .rollup(columnRollup)
-    .build();
+    .rollup(columnRollup);
 };
 
 export const emptyGrouping: ValuesGrouping = {
@@ -191,13 +190,22 @@ const GroupByElement: AggregationElement = {
       ],
     },
   }),
+  removeElementSection: ((index, formValues) => ({
+    ...formValues,
+    groupBy: {
+      columnRollup: 'columnRollup' in formValues.groupBy ? formValues.groupBy.columnRollup : true,
+      groupings: [
+        ...formValues.groupBy.groupings.filter((value, i) => (index !== i)),
+      ],
+    },
+  })),
   fromConfig: (config: AggregationWidgetConfig) => ({
     groupBy: {
       columnRollup: config.rollup,
       groupings: pivotsToGrouping(config),
     },
   }),
-  toConfig: (formValues: WidgetConfigFormValues, config: AggregationWidgetConfig) => groupByToConfig(formValues.groupBy, config),
+  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
   component: GroupByConfiguration,
   validate: validateGroupBy,
 };

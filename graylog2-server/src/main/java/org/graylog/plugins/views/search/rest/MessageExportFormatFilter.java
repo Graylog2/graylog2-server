@@ -35,7 +35,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@SupportOnlyValidExportFormats
 @PreMatching
 public class MessageExportFormatFilter implements ContainerRequestFilter {
     private final Map<MediaType, ExportFormat> supportedFormats;

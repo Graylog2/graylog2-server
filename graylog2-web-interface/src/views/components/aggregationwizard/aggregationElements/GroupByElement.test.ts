@@ -107,4 +107,38 @@ describe('GroupByElement', () => {
       });
     });
   });
+
+  describe('remove grouping', () => {
+    const { removeElementSection } = GroupByElement;
+    const values = { groupBy: { columnRollup: true, groupings: [] } } as WidgetConfigFormValues;
+
+    it('should remove form values from a grouping', () => {
+      const grouping1 = { direction: 'row', field: { field: 'action' }, limit: 15 } as GroupByFormValues;
+      const grouping2 = { direction: 'column', field: { field: 'controller' }, limit: 10 } as GroupByFormValues;
+      values.groupBy.groupings = [grouping1, grouping2];
+
+      const result = removeElementSection(1, values);
+
+      expect(result.groupBy.groupings).toStrictEqual([grouping1]);
+    });
+
+    it('should remove form values to the last from a grouping', () => {
+      const grouping1 = { direction: 'row', field: { field: 'action' }, limit: 15 } as GroupByFormValues;
+      values.groupBy.groupings = [grouping1];
+
+      const result = removeElementSection(0, values);
+
+      expect(result.groupBy.groupings).toStrictEqual([]);
+    });
+
+    it('should remove nothing if index is not contained', () => {
+      const grouping1 = { direction: 'row', field: { field: 'action' }, limit: 15 } as GroupByFormValues;
+      const grouping2 = { direction: 'column', field: { field: 'controller' }, limit: 10 } as GroupByFormValues;
+      values.groupBy.groupings = [grouping1, grouping2];
+
+      const result = removeElementSection(4, values);
+
+      expect(result.groupBy.groupings).toStrictEqual([grouping1, grouping2]);
+    });
+  });
 });

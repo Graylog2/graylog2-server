@@ -22,9 +22,9 @@ import IconButton from 'components/common/IconButton';
 const Wrapper = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
   border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: 6px;
+  padding: 6px 6px 3px 6px;
   border-radius: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 
   :last-child {
     margin-bottom: 0;
@@ -35,15 +35,24 @@ const Wrapper = styled.div(({ theme }) => css`
     padding-left: 0;
   }
 
+  input {
+    font-size: ${theme.fonts.size.body};
+  }
+
   .form-group {
-    margin: 0 0 5px 0;
+    margin: 0 0 3px 0;
   }
 
   .control-label {
     padding-left: 0;
     padding-right: 5px;
+    padding-top: 5px;
     font-weight: normal;
     text-align: left;
+  }
+
+  .help-block {
+    margin: 0;
   }
 `);
 

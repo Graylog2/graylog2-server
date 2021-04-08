@@ -17,6 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { IconButton } from 'components/common';
+
 const SectionContainer = styled.div(({ theme }) => css`
   border-bottom: 1px solid ${theme.colors.variant.lighter.default};
   margin-bottom: 5px;
@@ -27,14 +29,28 @@ const SectionContainer = styled.div(({ theme }) => css`
   }
 `);
 
+const Header = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
+`;
+
 type Props = {
   children: React.ReactNode,
-}
+  onRemove?: () => void,
+};
 
-const ElementConfigurationSection = ({ children }: Props) => (
+const ElementConfigurationSection = ({ children, onRemove }: Props) => (
   <SectionContainer>
+    <Header>{
+      onRemove && <IconButton onClick={onRemove} name="trash" title="Remove" />
+    }
+    </Header>
     {children}
   </SectionContainer>
 );
+
+ElementConfigurationSection.defaultProps = {
+  onRemove: undefined,
+};
 
 export default ElementConfigurationSection;

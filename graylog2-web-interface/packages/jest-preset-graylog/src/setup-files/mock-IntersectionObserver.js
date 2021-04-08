@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+const observe = jest.fn();
+const unobserve = jest.fn();
 
-import javax.ws.rs.NameBinding;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-@NameBinding
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SupportOnlyValidExportFormats {
-}
+window.IntersectionObserver = jest.fn(() => ({
+  observe,
+  unobserve,
+}));
