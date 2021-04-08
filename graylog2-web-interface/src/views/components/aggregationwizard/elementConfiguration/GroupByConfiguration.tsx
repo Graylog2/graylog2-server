@@ -20,20 +20,13 @@ import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
 import { HoverForHelp } from 'components/common';
-import { Button, ButtonToolbar, Checkbox } from 'components/graylog';
+import { Checkbox } from 'components/graylog';
 
 import ElementConfigurationSection from './ElementConfigurationSection';
 import GroupBy from './GroupBy';
 
-import GroupByElement, { emptyGrouping } from '../aggregationElements/GroupByElement';
+import GroupByElement from '../aggregationElements/GroupByElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
-
-const ActionsBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3px;
-`;
 
 const RollupColumnsLabel = styled.div`
   display: flex;
@@ -53,25 +46,23 @@ const GroupByConfiguration = () => {
 
   return (
     <>
+      <Field name="groupBy.columnRollup">
+        {({ field: { name, onChange, value } }) => (
+          <Checkbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
+                    checked={value}
+                    disabled={disableColumnRollup}>
+            <RollupColumnsLabel>
+              Rollup Columns
+              <RollupHoverForHelp title="Rollup Columns">
+                When rollup is enabled, an additional trace totalling individual subtraces will be included.
+              </RollupHoverForHelp>
+            </RollupColumnsLabel>
+          </Checkbox>
+        )}
+      </Field>
       <FieldArray name="groupBy.groupings"
-                  render={(arrayHelpers) => (
+                  render={() => (
                     <>
-                      <ActionsBar>
-                        <Field name="groupBy.columnRollup">
-                          {({ field: { name, onChange, value } }) => (
-                            <Checkbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
-                                      checked={value}
-                                      disabled={disableColumnRollup}>
-                              <RollupColumnsLabel>
-                                Rollup Columns
-                                <RollupHoverForHelp title="Rollup Columns">
-                                  When rollup is enabled, an additional trace totalling individual subtraces will be included.
-                                </RollupHoverForHelp>
-                              </RollupColumnsLabel>
-                            </Checkbox>
-                          )}
-                        </Field>
-                      </ActionsBar>
                       <div>
                         {groupBy.groupings.map((grouping, index) => {
                           return (
