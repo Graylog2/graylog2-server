@@ -32,6 +32,15 @@ type Props = {
 
 const NumericField = (props) => <InputField type="number" {...props} />;
 
+const TitleWithHelp = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const TitleHoverForHelp = styled(HoverForHelp)`
+  margin-left: 5px;
+`;
+
 const componentForType = (type: string) => {
   switch (type) {
     case 'select': return SelectField;
@@ -45,7 +54,14 @@ const titleForField = (field: ConfigurationField) => {
   const { helpComponent: HelpComponent } = field;
 
   return HelpComponent
-    ? <>{field.title}<HoverForHelp title={`Help for ${field.title}`}><HelpComponent /></HoverForHelp></>
+    ? (
+      <TitleWithHelp>
+        {field.title}
+        <TitleHoverForHelp title={`Help for ${field.title}`}>
+          <HelpComponent />
+        </TitleHoverForHelp>
+      </TitleWithHelp>
+    )
     : field.title;
 };
 
