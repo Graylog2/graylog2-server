@@ -54,7 +54,7 @@ type Props = {
 const IntervalCheckboxDesc = () => (
   <IntervalCheckboxDescWithHelp>
     Auto
-    <IntervalHoverForHelp title="Interval Options">
+    <IntervalHoverForHelp title="Interval Types">
       <ul>
         <li>
           <h4>Auto bucket size</h4>
