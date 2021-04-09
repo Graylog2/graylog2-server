@@ -29,6 +29,7 @@ const BooleanField = ({ field, name, error, title }: FieldComponentProps) => (
            labelClassName="col-sm-11"
            wrapperClassName="col-sm-1">
       <Field type="checkbox"
+             className="pull-right"
              aria-label={field.title}
              name={name} />
     </Input>
