@@ -18,9 +18,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Field } from 'formik';
 
-import { Icon } from 'components/common';
+import { Icon, HoverForHelp } from 'components/common';
 import { TimeUnits } from 'views/Constants';
-import { FormControl, Checkbox, DropdownButton, HelpBlock, MenuItem, InputGroup } from 'components/graylog';
+import { FormControl, Checkbox, DropdownButton, MenuItem, InputGroup } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 const RangeSelect = styled.div`
@@ -38,9 +38,37 @@ const TypeCheckboxWrapper = styled.div`
   margin-bottom: 5px;
 `;
 
+const IntervalCheckboxDescWithHelp = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const IntervalHoverForHelp = styled(HoverForHelp)`
+  margin-left: 5px;
+`;
+
 type Props = {
   index: number
 };
+
+const IntervalCheckboxDesc = () => (
+  <IntervalCheckboxDescWithHelp>
+    Auto
+    <IntervalHoverForHelp title="Interval Options">
+      <ul>
+        <li>
+          <h4>Auto bucket size</h4>
+          For example, 1.5x. A smaller granularity leads to <strong>less</strong>; conversely, a larger one shows <strong>more</strong> values.
+        </li>
+
+        <li>
+          <h4>Fixed bucket size</h4>
+          For example, 2 minutes. The time defines the size of the buckets for this timestamp type.
+        </li>
+      </ul>
+    </IntervalHoverForHelp>
+  </IntervalCheckboxDescWithHelp>
+);
 
 const Time = ({ index }: Props) => {
   const toggleIntervalType = (name, currentType, onChange) => {
@@ -62,7 +90,7 @@ const Time = ({ index }: Props) => {
           <TypeCheckboxWrapper>
             <Checkbox onChange={() => toggleIntervalType(name, value.type, onChange)}
                       checked={value.type === 'auto'}>
-              Auto
+              <IntervalCheckboxDesc />
             </Checkbox>
           </TypeCheckboxWrapper>
 
@@ -82,9 +110,6 @@ const Time = ({ index }: Props) => {
                   {value.scaling ? (1 / value.scaling) : 1.0}x
                 </CurrentScale>
               </RangeSelect>
-              <HelpBlock className="no-bm">
-                A smaller granularity leads to <strong>less</strong>, a bigger to <strong>more</strong> values.
-              </HelpBlock>
             </>
           )}
           {value.type !== 'auto' && (
@@ -102,9 +127,6 @@ const Time = ({ index }: Props) => {
                   </DropdownButton>
                 </InputGroup.Button>
               </InputGroup>
-              <HelpBlock className="no-bm">
-                The size of the buckets for this timestamp type.
-              </HelpBlock>
             </>
           )}
         </Input>

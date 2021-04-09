@@ -32,7 +32,7 @@ type Props = {
 
 const NumericField = (props) => <InputField type="number" {...props} />;
 
-const TitleWithHelp = styled.div`
+const TitleLabelWithHelp = styled.div`
   display: flex;
   align-items: center;
 `;
@@ -55,12 +55,12 @@ const titleForField = (field: ConfigurationField) => {
 
   return HelpComponent
     ? (
-      <TitleWithHelp>
+      <TitleLabelWithHelp>
         {field.title}
         <TitleHoverForHelp title={`Help for ${field.title}`}>
           <HelpComponent />
         </TitleHoverForHelp>
-      </TitleWithHelp>
+      </TitleLabelWithHelp>
     )
     : field.title;
 };
