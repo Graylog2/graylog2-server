@@ -84,10 +84,6 @@ const ElementActions = styled.div(({ theme }) => css`
 `);
 
 const StyledIconButton = styled(IconButton)(({ theme }) => `
-  color: ${theme.colors.global.textDefault};
-`);
-
-const StyledIconButton = styled(IconButton)(({ theme }) => `
   color: ${theme.colors.variant.primary};
 `);
 
