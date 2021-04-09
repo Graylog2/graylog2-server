@@ -18,11 +18,11 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import ElementConfigurationSection from './ElementConfigurationSection';
+import ElementConfigurationContainer from './ElementConfigurationContainer';
 
-describe('ElementConfigurationSection', () => {
+describe('ElementConfigurationContainer', () => {
   it('should render the component with children', async () => {
-    render(<ElementConfigurationSection><span>Doom</span></ElementConfigurationSection>);
+    render(<ElementConfigurationContainer><span>Doom</span></ElementConfigurationContainer>);
 
     const child = await screen.findByText('Doom');
 
@@ -31,7 +31,7 @@ describe('ElementConfigurationSection', () => {
 
   it('should handle onRemove button', async () => {
     const onRemove = jest.fn();
-    render(<ElementConfigurationSection onRemove={onRemove}><span>Doom</span></ElementConfigurationSection>);
+    render(<ElementConfigurationContainer onRemove={onRemove}><span>Doom</span></ElementConfigurationContainer>);
 
     const removeBtn = await screen.findByTitle('Remove');
     userEvent.click(removeBtn);

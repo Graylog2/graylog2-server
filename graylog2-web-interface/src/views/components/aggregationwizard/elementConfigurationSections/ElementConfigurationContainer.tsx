@@ -48,7 +48,7 @@ type Props = {
   onRemove?: () => void,
 };
 
-const ElementConfigurationSection = ({ children, onRemove }: Props) => (
+const ElementConfigurationContainer = ({ children, onRemove }: Props) => (
   <SectionContainer>
     <SectionConfiguration>
       {children}
@@ -59,8 +59,8 @@ const ElementConfigurationSection = ({ children, onRemove }: Props) => (
   </SectionContainer>
 );
 
-ElementConfigurationSection.defaultProps = {
+ElementConfigurationContainer.defaultProps = {
   onRemove: undefined,
 };
 
-export default ElementConfigurationSection;
+export default ElementConfigurationContainer;
