@@ -228,10 +228,10 @@ public class KeyUtil {
             String pkcs8Key = stringWriter.toString();
             File tmpFile = File.createTempFile("key", ".key");
             tmpFile.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(tmpFile);
-            fos.write(pkcs8Key.getBytes(StandardCharsets.UTF_8));
-            fos.flush();
-            fos.close();
+            try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
+                fos.write(pkcs8Key.getBytes(StandardCharsets.UTF_8));
+                fos.flush();
+            }
             return tmpFile;
         } catch (IOException | OperatorCreationException e) {
             throw new GeneralSecurityException(e);
@@ -250,10 +250,12 @@ public class KeyUtil {
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 
         // Be sure to specify charset for reader - don't use plain FileReader
+        Object object;
         final InputStream inputStream = Files.newInputStream(keyFile.toPath());
         final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        PEMParser pemParser = new PEMParser(fileReader);
-        Object object = pemParser.readObject();
+        try (PEMParser pemParser = new PEMParser(fileReader)) {
+            object = pemParser.readObject();
+        }
 
         if (object instanceof PKCS8EncryptedPrivateKeyInfo) {
             PKCS8EncryptedPrivateKeyInfo pInfo = (PKCS8EncryptedPrivateKeyInfo) object;

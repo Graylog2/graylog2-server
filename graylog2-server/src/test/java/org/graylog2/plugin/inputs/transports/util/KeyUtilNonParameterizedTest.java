@@ -56,7 +56,7 @@ public class KeyUtilNonParameterizedTest {
         final String tmpPassword = "dummypassword";
         File pkcs8EncryptedKeyFile = KeyUtil.generatePKSC8PrivateKey(tmpPassword.toCharArray(), privateKey);
         final PrivateKey retrievedKey = fileToKey(pkcs8EncryptedKeyFile, tmpPassword);
-        assertThat(retrievedKey.equals(privateKey));
+        assertThat(retrievedKey).hasToString(privateKey.toString());
     }
 
     private File resourceToFile(String fileName) throws URISyntaxException {
