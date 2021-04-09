@@ -17,7 +17,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
-import ElementConfigurationSection from './ElementConfigurationSectionNew';
+import ElementConfigurationSection from './ElementConfigurationSection';
 
 describe('ElementConfigurationSection', () => {
   it('should render elements passed as children', () => {

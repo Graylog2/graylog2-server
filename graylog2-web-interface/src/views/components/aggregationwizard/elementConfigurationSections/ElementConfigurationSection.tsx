@@ -95,7 +95,7 @@ type Props = {
   sectionTitle?: string,
 }
 
-const ElementConfigurationContainer = ({
+const ElementConfigurationSection = ({
   allowAddEmptyElement,
   children,
   elementTitle,
@@ -121,8 +121,8 @@ const ElementConfigurationContainer = ({
   );
 };
 
-ElementConfigurationContainer.defaultProps = {
+ElementConfigurationSection.defaultProps = {
   sectionTitle: undefined,
 };
 
-export default ElementConfigurationContainer;
+export default ElementConfigurationSection;
