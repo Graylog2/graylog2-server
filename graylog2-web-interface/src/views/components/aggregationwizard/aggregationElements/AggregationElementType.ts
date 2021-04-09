@@ -21,9 +21,8 @@ import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from '../Wi
 export type AggregationElement = {
   sectionTitle?: string,
   title: string,
-  titleSingular?: string,
   key: string,
-  allowAddEmptyElement: (formValues: WidgetConfigFormValues) => boolean,
+  allowCreate: (formValues: WidgetConfigFormValues) => boolean,
   order: number,
   onRemove?: (index: number, formValues) => WidgetConfigFormValues,
   toConfig?: (formValues: WidgetConfigFormValues, currentConfigBuilder: AggregationWidgetConfigBuilder) => AggregationWidgetConfigBuilder,
