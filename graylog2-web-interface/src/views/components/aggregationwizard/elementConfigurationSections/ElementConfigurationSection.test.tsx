@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import ElementConfigurationSection from './ElementConfigurationSectionNew';
+import ElementConfigurationSection from './ElementConfigurationSection';
 
 describe('ElementConfigurationContainer', () => {
   it('should render the component with children', async () => {
