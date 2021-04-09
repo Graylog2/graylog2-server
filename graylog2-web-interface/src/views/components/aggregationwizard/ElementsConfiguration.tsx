@@ -43,14 +43,14 @@ type Props = {
   aggregationElementsByKey: { [elementKey: string]: AggregationElement }
   config: AggregationWidgetConfig,
   onConfigChange: (config: AggregationWidgetConfig) => void,
-  onAddElementSection: (
+  onAddEmptyElement: (
     elementKey: string,
     values: WidgetConfigFormValues,
     setValues: (formValues: WidgetConfigFormValues) => void,
   ) => void,
 }
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onAddElementSection }: Props) => {
+const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onAddEmptyElement }: Props) => {
   const { values, setValues, dirty } = useFormikContext<WidgetConfigFormValues>();
 
   return (
@@ -73,7 +73,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             <ElementConfigurationContainer allowAddEmptyElement={aggregationElement.allowCreate(values)}
                                            title={aggregationElement.title}
                                            titleSingular={aggregationElement.titleSingular}
-                                           onAddElementSection={() => onAddElementSection(aggregationElement.key, values, setValues)}
+                                           onAddEmptyElement={() => onAddEmptyElement(aggregationElement.key, values, setValues)}
                                            key={aggregationElement.key}>
               <AggregationElementComponent config={config} onConfigChange={onConfigChange} />
             </ElementConfigurationContainer>

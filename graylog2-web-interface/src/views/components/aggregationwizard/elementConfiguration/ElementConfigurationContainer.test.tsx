@@ -23,7 +23,7 @@ describe('ElementConfigurationContainer', () => {
   it('should render elements passed as children', () => {
     render(
       <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddElementSection={() => {}}
+                                     onAddEmptyElement={() => {}}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
@@ -35,7 +35,7 @@ describe('ElementConfigurationContainer', () => {
   it('should render title', () => {
     render(
       <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddElementSection={() => {}}
+                                     onAddEmptyElement={() => {}}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
@@ -44,12 +44,12 @@ describe('ElementConfigurationContainer', () => {
     expect(screen.getByText('Aggregation Element Title')).toBeInTheDocument();
   });
 
-  it('should call on onAddElementSection when adding a section', async () => {
-    const onAddElementSectionMock = jest.fn();
+  it('should call on onAddEmptyElement when adding a section', async () => {
+    const onAddEmptyElementMock = jest.fn();
 
     render(
       <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddElementSection={onAddElementSectionMock}
+                                     onAddEmptyElement={onAddEmptyElementMock}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
@@ -59,13 +59,13 @@ describe('ElementConfigurationContainer', () => {
 
     fireEvent.click(addButton);
 
-    expect(onAddElementSectionMock).toHaveBeenCalledTimes(1);
+    expect(onAddEmptyElementMock).toHaveBeenCalledTimes(1);
   });
 
   it('should not display add section icon if adding element section is not allowed', async () => {
     render(
       <ElementConfigurationContainer allowAddEmptyElement={false}
-                                     onAddElementSection={() => {}}
+                                     onAddEmptyElement={() => {}}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
