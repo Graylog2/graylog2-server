@@ -53,9 +53,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
@@ -248,8 +248,13 @@ public class KeyUtil {
         PrivateKey privateKey;
 
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
-        PEMParser pemParser = new PEMParser(new FileReader(keyFile));
+
+        // Be sure to specify charset for reader - don't use plain FileReader
+        final InputStream inputStream = Files.newInputStream(keyFile.toPath());
+        final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        PEMParser pemParser = new PEMParser(fileReader);
         Object object = pemParser.readObject();
+
         if (object instanceof PKCS8EncryptedPrivateKeyInfo) {
             PKCS8EncryptedPrivateKeyInfo pInfo = (PKCS8EncryptedPrivateKeyInfo) object;
             JceOpenSSLPKCS8DecryptorProviderBuilder providerBuilder = new JceOpenSSLPKCS8DecryptorProviderBuilder();
