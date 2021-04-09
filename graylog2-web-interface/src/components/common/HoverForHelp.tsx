@@ -16,9 +16,28 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Popover, OverlayTrigger } from 'components/graylog';
 import Icon from 'components/common/Icon';
+
+const StyledPopover = styled(Popover)(({ theme }) => `
+  ul {
+    padding-left: 0;
+  }
+
+  li {
+    margin-bottom: 5px;
+
+    :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  h4 {
+    font-size: ${theme.fonts.size.large};
+  }
+`);
 
 type Props = {
   children: React.ReactNode,
@@ -32,9 +51,9 @@ const HoverForHelp = ({ children, className, title, id, pullRight }: Props) => (
   <OverlayTrigger trigger={['hover', 'focus']}
                   placement="bottom"
                   overlay={(
-                    <Popover title={title} id={id}>
+                    <StyledPopover title={title} id={id}>
                       {children}
-                    </Popover>
+                    </StyledPopover>
                   )}>
     <Icon className={`${className} ${pullRight ? 'pull-right' : ''}`} name="question-circle" />
   </OverlayTrigger>
