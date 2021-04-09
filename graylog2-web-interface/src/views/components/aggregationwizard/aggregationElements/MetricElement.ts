@@ -105,7 +105,7 @@ const MetricElement: AggregationElement = {
   })),
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
     .series(metricsToSeries(formValues.metrics)),
-  sectionComponent: MetricsConfiguration,
+  configurationSectionComponent: MetricsConfiguration,
   validate: validateMetrics,
 };
 
