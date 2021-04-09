@@ -31,7 +31,7 @@ export type AggregationElement = {
   onCreate?: () => void,
   onDeleteAll?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   // The section component allows the configuration of all aggregation elements with the same type.
-  sectionComponent: React.ComponentType<{
+  configurationSectionComponent: React.ComponentType<{
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
   }>,

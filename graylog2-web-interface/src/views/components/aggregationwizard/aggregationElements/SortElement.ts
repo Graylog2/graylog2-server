@@ -77,7 +77,7 @@ const SortElement: AggregationElement = {
   key: 'sort',
   order: 3,
   allowAddEmptyElement: () => true,
-  sectionComponent: SortConfiguration,
+  configurationSectionComponent: SortConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
     sort: config.sort.map((s) => ({
       type: configTypeToFormValueType(s.type),

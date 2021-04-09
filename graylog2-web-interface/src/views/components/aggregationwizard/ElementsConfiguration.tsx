@@ -67,7 +67,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
           }
 
-          const AggregationElementSection = aggregationElement.sectionComponent;
+          const ConfigurationSection = aggregationElement.configurationSectionComponent;
 
           return (
             <ElementConfigurationSection allowAddEmptyElement={aggregationElement.allowAddEmptyElement(values)}
@@ -75,7 +75,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
                                          elementTitle={aggregationElement.title}
                                          sectionTitle={aggregationElement.sectionTitle}
                                          key={aggregationElement.key}>
-              <AggregationElementSection config={config} onConfigChange={onConfigChange} />
+              <ConfigurationSection config={config} onConfigChange={onConfigChange} />
             </ElementConfigurationSection>
           );
         })}

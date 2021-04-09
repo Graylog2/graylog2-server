@@ -230,7 +230,7 @@ const GroupByElement: AggregationElement = {
     };
   },
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
-  sectionComponent: GroupByConfiguration,
+  configurationSectionComponent: GroupByConfiguration,
   validate: validateGroupBy,
 };
 
