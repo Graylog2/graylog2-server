@@ -121,11 +121,11 @@ describe('AggregationWizard', () => {
     });
 
     const autoCheckbox = await screen.findByRole('checkbox', { name: 'Auto' });
-    await screen.findByText(/A smaller granularity leads to/);
+    await screen.findByRole('slider', { name: /interval/i });
 
     await userEvent.click(autoCheckbox);
 
-    await screen.findByText('The size of the buckets for this timestamp type.');
+    await screen.findByRole('button', { name: /minutes/i });
   });
 
   it('should create group by with multiple groupings', async () => {
