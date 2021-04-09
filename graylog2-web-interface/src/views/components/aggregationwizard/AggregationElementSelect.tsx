@@ -24,7 +24,7 @@ import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const _getOptions = (aggregationElements: Array<AggregationElement>, formValues: WidgetConfigFormValues) => {
   return aggregationElements.reduce((availableElements, aggregationElement) => {
-    if (!aggregationElement.allowCreate(formValues)) {
+    if (!aggregationElement.allowAddEmptyElement(formValues)) {
       return availableElements;
     }
 

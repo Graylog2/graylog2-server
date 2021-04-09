@@ -186,7 +186,7 @@ const GroupByElement: AggregationElement = {
   titleSingular: 'Grouping',
   key: 'groupBy',
   order: 1,
-  allowCreate: () => true,
+  allowAddEmptyElement: () => true,
   addEmptyElement: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
     ...formValues,
     groupBy: {

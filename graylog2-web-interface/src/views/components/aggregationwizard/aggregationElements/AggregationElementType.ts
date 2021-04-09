@@ -22,7 +22,7 @@ export type AggregationElement = {
   title: string,
   titleSingular?: string,
   key: string,
-  allowCreate: (formValues: WidgetConfigFormValues) => boolean,
+  allowAddEmptyElement: (formValues: WidgetConfigFormValues) => boolean,
   order: number,
   addEmptyElement?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   removeElementSection?: (index: number, formValues) => WidgetConfigFormValues,
