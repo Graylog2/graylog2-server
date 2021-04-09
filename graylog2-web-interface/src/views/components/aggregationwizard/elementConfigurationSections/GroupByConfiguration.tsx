@@ -28,6 +28,12 @@ import GroupBy from './GroupBy';
 import GroupByElement from '../aggregationElements/GroupByElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
+const RollupColumnsCheckbox = styled(Checkbox)`
+  .checkbox {
+    padding-top: 0;
+  }
+`;
+
 const RollupColumnsLabel = styled.div`
   display: flex;
   align-items: center;
@@ -48,16 +54,16 @@ const GroupByConfiguration = () => {
     <>
       <Field name="groupBy.columnRollup">
         {({ field: { name, onChange, value } }) => (
-          <Checkbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
-                    checked={value}
-                    disabled={disableColumnRollup}>
+          <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
+                                 checked={value}
+                                 disabled={disableColumnRollup}>
             <RollupColumnsLabel>
               Rollup Columns
               <RollupHoverForHelp title="Rollup Columns">
                 When rollup is enabled, an additional trace totalling individual subtraces will be included.
               </RollupHoverForHelp>
             </RollupColumnsLabel>
-          </Checkbox>
+          </RollupColumnsCheckbox>
         )}
       </Field>
       <FieldArray name="groupBy.groupings"

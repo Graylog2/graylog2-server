@@ -16,10 +16,17 @@
  */
 import * as React from 'react';
 import { Field } from 'formik';
+import styled from 'styled-components';
 
 import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { Input } from 'components/bootstrap';
 import { HelpBlock } from 'components/graylog';
+
+const StyledField = styled(Field)`
+  &&[type="checkbox"] {
+    margin-top: 8px;
+  }
+`;
 
 const BooleanField = ({ field, name, error, title }: FieldComponentProps) => (
   <>
@@ -28,10 +35,10 @@ const BooleanField = ({ field, name, error, title }: FieldComponentProps) => (
            error={error}
            labelClassName="col-sm-11"
            wrapperClassName="col-sm-1">
-      <Field type="checkbox"
-             className="pull-right"
-             aria-label={field.title}
-             name={name} />
+      <StyledField type="checkbox"
+                   className="pull-right"
+                   aria-label={field.title}
+                   name={name} />
     </Input>
     <HelpBlock>{field.description}</HelpBlock>
   </>
