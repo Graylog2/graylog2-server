@@ -335,12 +335,12 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
         <OverlayTrigger
           container={null}
           overlay={
-            <Popover
+            <HoverForHelp__StyledPopover
               id="help-popover"
               title="Sharing not possible"
             >
               Only saved searches can be shared.
-            </Popover>
+            </HoverForHelp__StyledPopover>
           }
           placement="bottom"
           rootClose={false}
