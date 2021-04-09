@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { Field, getIn, useFormikContext } from 'formik';
 import { ConfigurationField } from 'views/types';
-
 import BooleanField from 'views/components/aggregationwizard/elementConfiguration/configurationFields/BooleanField';
+
 import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { HoverForHelp } from 'components/common';
 

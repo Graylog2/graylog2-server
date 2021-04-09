@@ -20,7 +20,7 @@ import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 import type { AggregationElement } from './AggregationElementType';
 
-import MetricsConfiguration from '../elementConfiguration/MetricsConfiguration';
+import MetricsConfiguration from '../elementConfigurationSections/MetricsConfiguration';
 import { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
 
 type MetricError = {

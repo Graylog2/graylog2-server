@@ -20,7 +20,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import type { AggregationElement } from './AggregationElementType';
 
-import SortConfiguration from '../elementConfiguration/SortConfiguration';
+import SortConfiguration from '../elementConfigurationSections/SortConfiguration';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type SortError = {
