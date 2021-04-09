@@ -54,7 +54,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
 
     > li {
       > a {
-        color: ${theme.colors.variant.default};
+        color: ${theme.colors.variant.dark.default};
         border: none;
         
         :hover,
@@ -62,7 +62,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
         :focus {
           transition: color 150ms ease-in-out;
           background: transparent;
-          color: ${theme.colors.variant.primary};
+          color: ${theme.colors.variant.dark.primary};
         }
       }
     }
@@ -79,14 +79,14 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
         border: 1px solid ${theme.colors.variant.lighter.default};
         border-bottom: none;
         background-color: ${theme.colors.global.contentBackground};
-        color: ${theme.colors.variant.darker.primary};
+        color: ${theme.colors.variant.darkest.primary};
 
         :hover,
         :active,
         :focus {
           border: 1px solid ${theme.colors.variant.lighter.default};
           border-bottom: none;
-          color: ${theme.colors.variant.darker.primary};
+          color: ${theme.colors.variant.darkest.primary};
         }
       }
     }
