@@ -181,7 +181,7 @@ const GroupByElement: AggregationElement = {
   key: 'groupBy',
   order: 1,
   allowCreate: () => true,
-  addEmptySection: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
+  addEmptyElement: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
     ...formValues,
     groupBy: {
       columnRollup: 'columnRollup' in formValues.groupBy ? formValues.groupBy.columnRollup : true,
