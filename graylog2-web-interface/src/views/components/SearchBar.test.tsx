@@ -22,6 +22,9 @@ import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';
+import WidgetFocusContext, {
+  WidgetEditingState, WidgetFocusingState,
+} from 'views/components/contexts/WidgetFocusContext';
 
 import SearchBar from './SearchBar';
 
@@ -39,7 +42,7 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
 ));
 
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
-jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => 'saved-search-controls');
+jest.mock('views/components/searchbar/saved-search/SavedSearchControls', () => jest.fn(() => <div>Saved Search Controls</div>));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
@@ -100,5 +103,47 @@ describe('SearchBar', () => {
       expect(searchButton).toHaveAttribute('disabled');
       expect(timeRangeButton.firstChild).toHaveClass('fa-exclamation-triangle');
     });
+  });
+
+  it('should hide the save load controls if editing the widget', () => {
+    const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <SearchBar config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    const saveBtn = screen.queryByText('Saved Search Controls');
+
+    expect(saveBtn).toBeNull();
+  });
+
+  it('should show the save load controls if the widget is not edited', async () => {
+    const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <SearchBar config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    const saveBtn = await screen.findByText('Saved Search Controls');
+
+    expect(saveBtn).not.toBeNull();
   });
 });
