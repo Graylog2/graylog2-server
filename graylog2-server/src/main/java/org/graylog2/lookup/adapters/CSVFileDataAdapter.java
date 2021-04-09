@@ -62,7 +62,16 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(CSVFileDataAdapter.class);
 
     public static final String NAME = "csvfile";
-    public static final String ALLOWED_PATH_ERROR = "The specified CSV file is not in an allowed path.";
+
+    /**
+     * If the AllowedAuxiliaryPathChecker is enabled (one or more paths provided to the allowed_auxiliary_paths server
+     * configuration property), then this error path will also be triggered for cases where the file does not exist.
+     * This is unavoidable, since the AllowedAuxiliaryPathChecker tries to resolve symbolic links and relative paths,
+     * which cannot be done if the file does not exist. Therefore this error message also indicates the possibility
+     * that the file does not exist.
+     */
+    public static final String ALLOWED_PATH_ERROR =
+            "The specified CSV file either does not exist or is not in an allowed path.";
 
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
@@ -303,6 +312,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             final Path path = Paths.get(path());
             if (!context.getPathChecker().fileIsInAllowedPath(path)) {
                 errors.put("path", ALLOWED_PATH_ERROR);
+
+                // Intentionally return here, because in the Cloud context, we should not perform the following checks
+                // to report to the user whether or not a file exists.
                 return Optional.of(errors);
             }
 

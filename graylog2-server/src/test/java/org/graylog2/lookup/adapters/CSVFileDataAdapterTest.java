@@ -107,7 +107,7 @@ public class CSVFileDataAdapterTest {
         csvFileDataAdapter = new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker);
         assertThatThrownBy(() -> csvFileDataAdapter.doStart())
                 .isExactlyInstanceOf(IllegalStateException.class)
-                .hasMessageStartingWith("The specified CSV file is not in an allowed path.");
+                .hasMessageStartingWith(CSVFileDataAdapter.ALLOWED_PATH_ERROR);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class CSVFileDataAdapterTest {
         when(pathChecker.fileIsInAllowedPath(any(Path.class))).thenReturn(false);
         final Optional<Multimap<String, String>> result = config.validate(validationContext);
         assertTrue(result.isPresent());
-        assertEquals("The specified CSV file is not in an allowed path.",
+        assertEquals(CSVFileDataAdapter.ALLOWED_PATH_ERROR,
                      String.join("", result.get().asMap().get("path")));
     }
 
