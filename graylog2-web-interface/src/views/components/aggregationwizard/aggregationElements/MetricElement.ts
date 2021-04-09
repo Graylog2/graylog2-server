@@ -91,6 +91,7 @@ const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
 });
 
 const MetricElement: AggregationElement = {
+  sectionTitle: 'Metrics',
   title: 'Metric',
   key: 'metrics',
   order: 2,

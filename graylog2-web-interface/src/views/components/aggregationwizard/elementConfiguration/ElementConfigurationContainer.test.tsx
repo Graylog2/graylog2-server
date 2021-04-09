@@ -24,7 +24,7 @@ describe('ElementConfigurationContainer', () => {
     render(
       <ElementConfigurationContainer allowAddEmptyElement
                                      onAddEmptyElement={() => {}}
-                                     title="Aggregation Element Title">
+                                     elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
     );
@@ -36,7 +36,7 @@ describe('ElementConfigurationContainer', () => {
     render(
       <ElementConfigurationContainer allowAddEmptyElement
                                      onAddEmptyElement={() => {}}
-                                     title="Aggregation Element Title">
+                                     elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
     );
@@ -50,7 +50,7 @@ describe('ElementConfigurationContainer', () => {
     render(
       <ElementConfigurationContainer allowAddEmptyElement
                                      onAddEmptyElement={onAddEmptyElementMock}
-                                     title="Aggregation Element Title">
+                                     elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
     );
@@ -66,7 +66,7 @@ describe('ElementConfigurationContainer', () => {
     render(
       <ElementConfigurationContainer allowAddEmptyElement={false}
                                      onAddEmptyElement={() => {}}
-                                     title="Aggregation Element Title">
+                                     elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
     );

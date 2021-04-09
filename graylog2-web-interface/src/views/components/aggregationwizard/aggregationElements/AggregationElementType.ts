@@ -19,8 +19,8 @@ import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/l
 import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from '../WidgetConfigForm';
 
 export type AggregationElement = {
+  sectionTitle?: string,
   title: string,
-  titleSingular?: string,
   key: string,
   allowAddEmptyElement: (formValues: WidgetConfigFormValues) => boolean,
   order: number,

@@ -71,9 +71,9 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
 
           return (
             <ElementConfigurationContainer allowAddEmptyElement={aggregationElement.allowAddEmptyElement(values)}
-                                           title={aggregationElement.title}
-                                           titleSingular={aggregationElement.titleSingular}
                                            onAddEmptyElement={() => onAddEmptyElement(aggregationElement.key, values, setValues)}
+                                           elementTitle={aggregationElement.title}
+                                           sectionTitle={aggregationElement.sectionTitle}
                                            key={aggregationElement.key}>
               <AggregationElementComponent config={config} onConfigChange={onConfigChange} />
             </ElementConfigurationContainer>

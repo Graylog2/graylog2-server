@@ -90,27 +90,27 @@ const StyledIconButton = styled(IconButton)(({ theme }) => `
 type Props = {
   allowAddEmptyElement: boolean,
   children: React.ReactNode,
+  elementTitle: string,
   onAddEmptyElement: () => void,
-  title: string,
-  titleSingular?: string,
+  sectionTitle?: string,
 }
 
 const ElementConfigurationContainer = ({
-  children,
   allowAddEmptyElement,
+  children,
+  elementTitle,
   onAddEmptyElement,
-  title,
-  titleSingular,
+  sectionTitle,
 }: Props) => {
   return (
     <Wrapper>
       <Header>
         <ElementTitle>
-          {title}
+          {sectionTitle ?? elementTitle}
         </ElementTitle>
         <ElementActions>
           {allowAddEmptyElement && (
-            <StyledIconButton title={`Add a ${titleSingular ?? title}`} name="plus" onClick={onAddEmptyElement} />
+            <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onAddEmptyElement} />
           )}
         </ElementActions>
       </Header>
@@ -122,7 +122,7 @@ const ElementConfigurationContainer = ({
 };
 
 ElementConfigurationContainer.defaultProps = {
-  titleSingular: undefined,
+  sectionTitle: undefined,
 };
 
 export default ElementConfigurationContainer;
