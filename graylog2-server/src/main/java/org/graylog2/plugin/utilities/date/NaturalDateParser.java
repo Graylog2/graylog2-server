@@ -51,11 +51,15 @@ public class NaturalDateParser {
     }
 
     public Result parse(final String string) throws DateNotParsableException {
+        return this.parse(string, new Date());
+    }
+
+    Result parse(final String string, final Date referenceDate) throws DateNotParsableException {
         Date from = null;
         Date to = null;
 
         final Parser parser = new Parser(this.timeZone);
-        final List<DateGroup> groups = parser.parse(string);
+        final List<DateGroup> groups = parser.parse(string, referenceDate);
         if (!groups.isEmpty()) {
             final List<Date> dates = groups.get(0).getDates();
             Collections.sort(dates);

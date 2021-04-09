@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.utilities.date;
+package org.graylog2.plugin.utilities.date;
 
-import org.graylog2.plugin.utilities.date.NaturalDateParser;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.assertj.jodatime.api.Assertions.assertThat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.jodatime.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
@@ -110,5 +113,65 @@ public class NaturalDateParserTest {
 
         NaturalDateParser.Result result101days = naturalDateParser.parse("last 101 days");
         assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
+    }
+
+    @Test
+    public void testTZ1() throws Exception {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date reference = isoFormat.parse("2021-04-09T23:59:00");
+
+        NaturalDateParser p = new NaturalDateParser("Europe/Berlin");
+
+        NaturalDateParser.Result today = p.parse("today", reference);
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Europe/Berlin as Timezone").isEqualTo("Europe/Berlin");
+        assertThat(today.getFrom().dayOfMonth().get()).as("should be April, 10").isEqualTo(10);
+    }
+
+    @Test
+    public void testTZ2() throws Exception {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date reference = isoFormat.parse("2021-04-09T00:01:00");
+
+        NaturalDateParser p = new NaturalDateParser("Europe/Berlin");
+
+        NaturalDateParser.Result today = p.parse("today", reference);
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Europe/Berlin as Timezone").isEqualTo("Europe/Berlin");
+        assertThat(today.getFrom().dayOfMonth().get()).as("should be April, 9").isEqualTo(9);
+    }
+
+    @Test
+    public void testTZ3() throws Exception {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+        Date reference = isoFormat.parse("2021-04-09T23:59:00");
+
+        NaturalDateParser p = new NaturalDateParser("Europe/Berlin");
+
+        NaturalDateParser.Result today = p.parse("today", reference);
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Europe/Berlin as Timezone").isEqualTo("Europe/Berlin");
+        assertThat(today.getFrom().dayOfMonth().get()).as("should be April, 9").isEqualTo(9);
+    }
+
+    @Test
+    public void testTZ4() throws Exception {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+        Date reference = isoFormat.parse("2021-04-09T00:01:00");
+
+        NaturalDateParser p = new NaturalDateParser("Europe/Berlin");
+
+        NaturalDateParser.Result today = p.parse("today", reference);
+        assertThat(today.getFrom()).as("From should not be null").isNotNull();
+        assertThat(today.getTo()).as("To should not be null").isNotNull();
+        assertThat(today.getDateTimeZone().getID()).as("should have the Europe/Berlin as Timezone").isEqualTo("Europe/Berlin");
+        assertThat(today.getFrom().dayOfMonth().get()).as("should be April, 9").isEqualTo(9);
     }
 }
