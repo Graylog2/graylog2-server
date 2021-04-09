@@ -27,7 +27,7 @@ import { WidgetConfigFormValues } from '../WidgetConfigForm';
 const MetricsConfiguration = () => {
   const { values: { metrics }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const removeMetric = useCallback((index) => {
-    setValues(MetricElement.removeElementSection(index, values));
+    setValues(MetricElement.removeElement(index, values));
   }, [setValues, values]);
 
   return (

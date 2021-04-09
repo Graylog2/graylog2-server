@@ -41,7 +41,7 @@ const GroupByConfiguration = () => {
   const { values: { groupBy }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => {
-    setValues(GroupByElement.removeElementSection(index, values));
+    setValues(GroupByElement.removeElement(index, values));
   }, [setValues, values]);
 
   return (

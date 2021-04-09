@@ -109,7 +109,7 @@ describe('GroupByElement', () => {
   });
 
   describe('remove grouping', () => {
-    const { removeElementSection } = GroupByElement;
+    const { removeElement } = GroupByElement;
     const values = { groupBy: { columnRollup: true, groupings: [] } } as WidgetConfigFormValues;
 
     it('should remove form values from a grouping', () => {
@@ -117,7 +117,7 @@ describe('GroupByElement', () => {
       const grouping2 = { direction: 'column', field: { field: 'controller' }, limit: 10 } as GroupByFormValues;
       values.groupBy.groupings = [grouping1, grouping2];
 
-      const result = removeElementSection(1, values);
+      const result = removeElement(1, values);
 
       expect(result.groupBy.groupings).toStrictEqual([grouping1]);
     });
@@ -126,7 +126,7 @@ describe('GroupByElement', () => {
       const grouping1 = { direction: 'row', field: { field: 'action' }, limit: 15 } as GroupByFormValues;
       values.groupBy.groupings = [grouping1];
 
-      const result = removeElementSection(0, values);
+      const result = removeElement(0, values);
 
       expect(result.groupBy).toStrictEqual(undefined);
     });
@@ -136,7 +136,7 @@ describe('GroupByElement', () => {
       const grouping2 = { direction: 'column', field: { field: 'controller' }, limit: 10 } as GroupByFormValues;
       values.groupBy.groupings = [grouping1, grouping2];
 
-      const result = removeElementSection(4, values);
+      const result = removeElement(4, values);
 
       expect(result.groupBy.groupings).toStrictEqual([grouping1, grouping2]);
     });
