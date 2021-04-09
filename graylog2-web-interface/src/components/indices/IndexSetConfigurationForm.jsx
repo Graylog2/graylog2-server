@@ -20,13 +20,14 @@ import moment from 'moment';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import HideOnCloud from 'util/conditional/HideOnCloud'; // Load rotation plugin UI plugins from core.
 import { LinkContainer } from 'components/graylog/router';
 import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
-import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.
+import {} from 'components/indices/retention';
 
 class IndexSetConfigurationForm extends React.Component {
   static propTypes = {
@@ -231,38 +232,40 @@ class IndexSetConfigurationForm extends React.Component {
                        help="Add a description of this index set."
                        required />
                 {readOnlyconfig}
-                <Input type="number"
-                       id="index-set-shards"
-                       label="Index shards"
-                       name="shards"
-                       onChange={this._onInputChange}
-                       value={indexSet.shards}
-                       help="Number of Elasticsearch shards used per index in this index set."
-                       required />
-                <Input type="number"
-                       id="index-set-replicas"
-                       label="Index replicas"
-                       name="replicas"
-                       onChange={this._onInputChange}
-                       value={indexSet.replicas}
-                       help="Number of Elasticsearch replicas used per index in this index set."
-                       required />
-                <Input type="number"
-                       id="index-set-max-num-segments"
-                       label="Max. number of segments"
-                       name="index_optimization_max_num_segments"
-                       min="1"
-                       onChange={this._onInputChange}
-                       value={indexSet.index_optimization_max_num_segments}
-                       help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
-                       required />
-                <Input type="checkbox"
-                       id="index-set-disable-optimization"
-                       label="Disable index optimization after rotation"
-                       name="index_optimization_disabled"
-                       onChange={this._onDisableOptimizationClick}
-                       checked={indexSet.index_optimization_disabled}
-                       help="Disable Elasticsearch index optimization (force merge) after rotation." />
+                <HideOnCloud>
+                  <Input type="number"
+                         id="index-set-shards"
+                         label="Index shards"
+                         name="shards"
+                         onChange={this._onInputChange}
+                         value={indexSet.shards}
+                         help="Number of Elasticsearch shards used per index in this index set."
+                         required />
+                  <Input type="number"
+                         id="index-set-replicas"
+                         label="Index replicas"
+                         name="replicas"
+                         onChange={this._onInputChange}
+                         value={indexSet.replicas}
+                         help="Number of Elasticsearch replicas used per index in this index set."
+                         required />
+                  <Input type="number"
+                         id="index-set-max-num-segments"
+                         label="Max. number of segments"
+                         name="index_optimization_max_num_segments"
+                         min="1"
+                         onChange={this._onInputChange}
+                         value={indexSet.index_optimization_max_num_segments}
+                         help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
+                         required />
+                  <Input type="checkbox"
+                         id="index-set-disable-optimization"
+                         label="Disable index optimization after rotation"
+                         name="index_optimization_disabled"
+                         onChange={this._onDisableOptimizationClick}
+                         checked={indexSet.index_optimization_disabled}
+                         help="Disable Elasticsearch index optimization (force merge) after rotation." />
+                </HideOnCloud>
                 <TimeUnitInput id="field-type-refresh-interval"
                                label="Field type refresh interval"
                                help="How often the field type information for the active write index will be updated."

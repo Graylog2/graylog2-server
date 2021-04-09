@@ -17,6 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Row, Col } from 'components/graylog';
 import { IndicesConfiguration } from 'components/indices';
 
@@ -47,10 +48,10 @@ class IndexSetDetails extends React.Component {
 
             <dt>Shards:</dt>
             <dd>{indexSet.shards}</dd>
-
-            <dt>Replicas:</dt>
-            <dd>{indexSet.replicas}</dd>
-
+            <HideOnCloud>
+              <dt>Replicas:</dt>
+              <dd>{indexSet.replicas}</dd>
+            </HideOnCloud>
             <dt>Field type refresh interval:</dt>
             <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
           </dl>

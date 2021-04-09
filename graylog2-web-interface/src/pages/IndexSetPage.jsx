@@ -20,6 +20,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/graylog/router';
 import { Alert, Row, Col, Panel, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
@@ -159,7 +160,9 @@ const IndexSetPage = createReactClass({
             {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
             current write-active index is <i>{deflectorInfo.current_target}</i>.
           </Alert>
-          <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
+          <HideOnCloud>
+            <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
+          </HideOnCloud>
         </span>
       );
 

@@ -17,6 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col, Row, Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
@@ -99,21 +100,20 @@ class IndexDetails extends React.Component {
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />{' '}
 
-        {index.all_shards.segments} segments,{' '}
-        {index.all_shards.open_search_contexts} open search contexts,{' '}
-        {index.all_shards.documents.deleted} deleted messages
-
-        <Row style={{ marginBottom: '10' }}>
-          <Col md={4} className="shard-meters">
-            <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
-          </Col>
-          <Col md={4} className="shard-meters">
-            <ShardMeter title="Total shard operations" shardMeter={index.all_shards} />
-          </Col>
-        </Row>
-
-        <ShardRoutingOverview routing={index.routing} indexName={indexName} />
-
+        <HideOnCloud>
+          {index.all_shards.segments} segments,{' '}
+          {index.all_shards.open_search_contexts} open search contexts,{' '}
+          {index.all_shards.documents.deleted} deleted messages
+          <Row style={{ marginBottom: '10' }}>
+            <Col md={4} className="shard-meters">
+              <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
+            </Col>
+            <Col md={4} className="shard-meters">
+              <ShardMeter title="Total shard operations" shardMeter={index.all_shards} />
+            </Col>
+          </Row>
+          <ShardRoutingOverview routing={index.routing} indexName={indexName} />
+        </HideOnCloud>
         <hr style={{ marginBottom: '5', marginTop: '10' }} />
 
         {this._formatActionButtons()}
