@@ -86,7 +86,8 @@ public class ViewServiceUsesViewRequirementsTest {
                 objectMapperProvider,
                 clusterConfigService,
                 viewRequirementsFactory,
-                mock(EntityOwnershipService.class));
+                mock(EntityOwnershipService.class),
+                mock(ViewSummaryService.class));
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
     }
 

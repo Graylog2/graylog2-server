@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.VersionAwareModule;
@@ -59,8 +60,16 @@ public abstract class ViewsModule extends VersionAwareModule {
         viewRequirementBinder().addBinding().to(viewRequirement);
     }
 
+    protected void registerViewSummaryRequirement(Class<? extends Requirement<ViewSummaryDTO>> viewSummaryRequirement) {
+        viewSummaryRequirementBinder().addBinding().to(viewSummaryRequirement);
+    }
+
     protected Multibinder<Requirement<ViewDTO>> viewRequirementBinder() {
         return Multibinder.newSetBinder(binder(), new TypeLiteral<Requirement<ViewDTO>>() {});
+    }
+
+    protected Multibinder<Requirement<ViewSummaryDTO>> viewSummaryRequirementBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<Requirement<ViewSummaryDTO>>() {});
     }
 
     protected void registerSearchRequirement(Class<? extends Requirement<Search>> searchRequirement) {

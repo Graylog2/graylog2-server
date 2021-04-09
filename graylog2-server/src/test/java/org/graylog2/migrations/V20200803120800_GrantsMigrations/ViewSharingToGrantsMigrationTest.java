@@ -26,6 +26,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -202,7 +203,7 @@ class ViewSharingToGrantsMigrationTest {
                                MongoJackObjectMapperProvider mapper,
                                ClusterConfigService clusterConfigService,
                                EntityOwnershipService entityOwnerShipService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService);
+            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, mock(ViewSummaryService.class));
         }
     }
 }

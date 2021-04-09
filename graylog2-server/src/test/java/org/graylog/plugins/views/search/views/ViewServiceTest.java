@@ -74,7 +74,8 @@ public class ViewServiceTest {
                 objectMapperProvider,
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
-                mock(EntityOwnershipService.class));
+                mock(EntityOwnershipService.class),
+                mock(ViewSummaryService.class));
 
     }
 

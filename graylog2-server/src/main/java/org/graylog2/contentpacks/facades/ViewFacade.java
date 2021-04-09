@@ -161,7 +161,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         return viewService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
     }
 
-        @Override
+    @Override
     public EntityExcerpt createExcerpt(ViewDTO nativeEntity) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(nativeEntity.id()))
