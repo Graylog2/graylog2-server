@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import ElementConfigurationContainer from './elementConfigurationSections/ElementConfigurationContainer';
+import ElementConfigurationSection from './elementConfigurationSections/ElementConfigurationSectionNew';
 import ElementsConfigurationActions from './ElementsConfigurationActions';
 import type { AggregationElement } from './aggregationElements/AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
@@ -70,13 +70,13 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
           const AggregationElementSection = aggregationElement.sectionComponent;
 
           return (
-            <ElementConfigurationContainer allowAddEmptyElement={aggregationElement.allowAddEmptyElement(values)}
-                                           onAddEmptyElement={() => onAddEmptyElement(aggregationElement.key, values, setValues)}
-                                           elementTitle={aggregationElement.title}
-                                           sectionTitle={aggregationElement.sectionTitle}
-                                           key={aggregationElement.key}>
+            <ElementConfigurationSection allowAddEmptyElement={aggregationElement.allowAddEmptyElement(values)}
+                                         onAddEmptyElement={() => onAddEmptyElement(aggregationElement.key, values, setValues)}
+                                         elementTitle={aggregationElement.title}
+                                         sectionTitle={aggregationElement.sectionTitle}
+                                         key={aggregationElement.key}>
               <AggregationElementSection config={config} onConfigChange={onConfigChange} />
-            </ElementConfigurationContainer>
+            </ElementConfigurationSection>
           );
         })}
       </div>

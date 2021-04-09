@@ -17,16 +17,16 @@
 import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
-import ElementConfigurationContainer from './ElementConfigurationContainer';
+import ElementConfigurationSection from './ElementConfigurationSectionNew';
 
-describe('ElementConfigurationContainer', () => {
+describe('ElementConfigurationSection', () => {
   it('should render elements passed as children', () => {
     render(
-      <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddEmptyElement={() => {}}
-                                     elementTitle="Aggregation Element Title">
+      <ElementConfigurationSection allowAddEmptyElement
+                                   onAddEmptyElement={() => {}}
+                                   elementTitle="Aggregation Element Title">
         Children of Dune
-      </ElementConfigurationContainer>,
+      </ElementConfigurationSection>,
     );
 
     expect(screen.getByText('Children of Dune')).toBeInTheDocument();
@@ -34,11 +34,11 @@ describe('ElementConfigurationContainer', () => {
 
   it('should render title', () => {
     render(
-      <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddEmptyElement={() => {}}
-                                     elementTitle="Aggregation Element Title">
+      <ElementConfigurationSection allowAddEmptyElement
+                                   onAddEmptyElement={() => {}}
+                                   elementTitle="Aggregation Element Title">
         Children of Dune
-      </ElementConfigurationContainer>,
+      </ElementConfigurationSection>,
     );
 
     expect(screen.getByText('Aggregation Element Title')).toBeInTheDocument();
@@ -48,11 +48,11 @@ describe('ElementConfigurationContainer', () => {
     const onAddEmptyElementMock = jest.fn();
 
     render(
-      <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddEmptyElement={onAddEmptyElementMock}
-                                     elementTitle="Aggregation Element Title">
+      <ElementConfigurationSection allowAddEmptyElement
+                                   onAddEmptyElement={onAddEmptyElementMock}
+                                   elementTitle="Aggregation Element Title">
         Children of Dune
-      </ElementConfigurationContainer>,
+      </ElementConfigurationSection>,
     );
 
     const addButton = screen.getByTitle('Add a Aggregation Element Title');
@@ -64,11 +64,11 @@ describe('ElementConfigurationContainer', () => {
 
   it('should not display add section icon if adding element section is not allowed', async () => {
     render(
-      <ElementConfigurationContainer allowAddEmptyElement={false}
-                                     onAddEmptyElement={() => {}}
-                                     elementTitle="Aggregation Element Title">
+      <ElementConfigurationSection allowAddEmptyElement={false}
+                                   onAddEmptyElement={() => {}}
+                                   elementTitle="Aggregation Element Title">
         Children of Dune
-      </ElementConfigurationContainer>,
+      </ElementConfigurationSection>,
     );
 
     expect(screen.queryByTitle('Add a Aggregation Element Title')).not.toBeInTheDocument();
