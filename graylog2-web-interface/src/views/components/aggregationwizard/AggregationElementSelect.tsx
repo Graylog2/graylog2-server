@@ -37,16 +37,16 @@ const _getOptions = (aggregationElements: Array<AggregationElement>, formValues:
 type Props = {
   aggregationElements: Array<AggregationElement>,
   formValues: WidgetConfigFormValues,
-  onElementCreate: (elementKey: string) => void,
+  onAddEmptyElement: (elementKey: string) => void,
 }
 
-const AggregationElementSelect = ({ aggregationElements, onElementCreate, formValues }: Props) => {
+const AggregationElementSelect = ({ aggregationElements, onAddEmptyElement, formValues }: Props) => {
   const selectRef = useRef(null);
   const options = _getOptions(aggregationElements, formValues);
 
   const _onSelect = (elementKey: string) => {
     selectRef.current.clearValue();
-    onElementCreate(elementKey);
+    onAddEmptyElement(elementKey);
   };
 
   return (

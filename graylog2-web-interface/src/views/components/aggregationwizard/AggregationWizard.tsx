@@ -117,7 +117,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
           {({ values, setValues }) => (
             <>
               <Section data-testid="add-element-section">
-                <AggregationElementSelect onElementCreate={(elementKey) => onAddEmptyElement(elementKey, values, setValues)}
+                <AggregationElementSelect onAddEmptyElement={(elementKey) => onAddEmptyElement(elementKey, values, setValues)}
                                           aggregationElements={aggregationElements}
                                           formValues={values} />
               </Section>
