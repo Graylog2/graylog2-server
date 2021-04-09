@@ -237,18 +237,13 @@ const AppRouter = () => {
 
                         <Route exact path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
 
-                        {!isCloud && (
-                          <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
-                        )}
-                        {!isCloud && (
-                          <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
-                        )}
-                        {!isCloud && (
-                          <Route exact
-                                 path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                                 component={IndexSetConfigurationPage} />
-                        )}
-                        {!isCloud && <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />}
+                        <Route exact path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage} />
+                        <Route exact path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage} />
+                        <Route exact
+                               path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
+                               component={IndexSetConfigurationPage} />
+
+                        <Route exact path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
                         {!isCloud && (
                           <Route exact path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage} />
                         )}
