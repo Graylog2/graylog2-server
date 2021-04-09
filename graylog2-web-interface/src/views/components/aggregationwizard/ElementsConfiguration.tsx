@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
+import ElementConfigurationContainer from './elementConfigurationSections/ElementConfigurationContainer';
 import ElementsConfigurationActions from './ElementsConfigurationActions';
 import type { AggregationElement } from './aggregationElements/AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';

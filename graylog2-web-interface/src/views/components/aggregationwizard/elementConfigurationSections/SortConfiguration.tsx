@@ -19,8 +19,8 @@ import { FieldArray, useFormikContext } from 'formik';
 
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import ElementConfigurationSection
-  from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationSection';
-import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
+  from 'views/components/aggregationwizard/elementConfigurationSections/ElementConfigurationSection';
+import Sort from 'views/components/aggregationwizard/elementConfigurationSections/Sort';
 
 const SortConfiguration = () => {
   const { values } = useFormikContext<WidgetConfigFormValues>();
