@@ -70,7 +70,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
           const AggregationElementComponent = aggregationElement.component;
 
           return (
-            <ElementConfigurationContainer allowAddSection={aggregationElement.allowCreate(values)}
+            <ElementConfigurationContainer allowAddEmptyElement={aggregationElement.allowCreate(values)}
                                            title={aggregationElement.title}
                                            titleSingular={aggregationElement.titleSingular}
                                            onAddElementSection={() => onAddElementSection(aggregationElement.key, values, setValues)}
