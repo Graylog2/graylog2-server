@@ -48,14 +48,6 @@ const Metric = ({ index }: Props) => {
 
   return (
     <>
-      <FormikInput id="name"
-                   label="Name"
-                   bsSize="small"
-                   placeholder="Specify optional name"
-                   name={`metrics.${index}.name`}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" />
-
       <Field name={`metrics.${index}.function`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="metric-function-select"
@@ -106,6 +98,13 @@ const Metric = ({ index }: Props) => {
           )}
         </Field>
       )}
+      <FormikInput id="name"
+                   label="Name"
+                   bsSize="small"
+                   placeholder="Specify optional name"
+                   name={`metrics.${index}.name`}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9" />
     </>
   );
 };
