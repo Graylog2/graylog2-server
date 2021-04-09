@@ -79,7 +79,7 @@ describe('AggregationWizard', () => {
     const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
     const notConfiguredElements = [
       'Metric',
-      'Group By',
+      'Grouping',
       'Sort',
     ];
 
@@ -101,6 +101,6 @@ describe('AggregationWizard', () => {
     await selectEvent.openMenu(aggregationElementSelect);
     await selectEvent.select(aggregationElementSelect, 'Metric');
 
-    await waitFor(() => expect(within(configureElementsSection).getByText('Metric')).toBeInTheDocument());
+    await waitFor(() => expect(within(configureElementsSection).getByText('Metrics')).toBeInTheDocument());
   });
 });

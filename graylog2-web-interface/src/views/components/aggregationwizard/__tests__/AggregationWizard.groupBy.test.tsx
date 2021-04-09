@@ -70,7 +70,7 @@ describe('AggregationWizard', () => {
     const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
 
     await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Group By');
+    await selectEvent.select(aggregationElementSelect, 'Grouping');
 
     await waitFor(() => expect(screen.getByText('Field is required.')).toBeInTheDocument());
   });
@@ -82,7 +82,7 @@ describe('AggregationWizard', () => {
     const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
 
     await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Group By');
+    await selectEvent.select(aggregationElementSelect, 'Grouping');
 
     const fieldSelection = await screen.findByLabelText('Field');
 
@@ -111,7 +111,7 @@ describe('AggregationWizard', () => {
     const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
 
     await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Group By');
+    await selectEvent.select(aggregationElementSelect, 'Grouping');
 
     const fieldSelection = await screen.findByLabelText('Field');
 
@@ -135,7 +135,7 @@ describe('AggregationWizard', () => {
     const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
 
     await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Group By');
+    await selectEvent.select(aggregationElementSelect, 'Grouping');
 
     const fieldSelection = await screen.findByLabelText('Field');
 
@@ -145,7 +145,7 @@ describe('AggregationWizard', () => {
     });
 
     await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Group By');
+    await selectEvent.select(aggregationElementSelect, 'Grouping');
 
     const fieldSelections = await screen.findAllByLabelText('Field');
 
