@@ -76,7 +76,7 @@ const SortElement: AggregationElement = {
   title: 'Sort',
   key: 'sort',
   order: 3,
-  allowCreate: () => true,
+  allowAddEmptyElement: () => true,
   component: SortConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
     sort: config.sort.map((s) => ({
