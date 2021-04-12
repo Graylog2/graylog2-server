@@ -41,9 +41,10 @@ const Wrapper = styled.div`
 
 const Controls = styled.div`
   height: 100%;
-  min-width: 300px;
+  min-width: 315px;
   max-width: 500px;
-  flex: 1;
+  flex: 1.2;
+  padding-right: 15px;
   overflow-y: auto;
 `;
 
