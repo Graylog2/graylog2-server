@@ -25,16 +25,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
@@ -86,7 +86,20 @@ public abstract class Pivot implements SearchType {
 
     @Override
     public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
-        return this;
+        final Builder builder = toBuilder();
+        final PartialPivot partialPivot = objectMapper.convertValue(state, PartialPivot.class);
+
+        partialPivot.name().ifPresent(builder::name);
+        partialPivot.rowGroups().ifPresent(builder::rowGroups);
+        partialPivot.columnGroups().ifPresent(builder::columnGroups);
+        partialPivot.series().ifPresent(builder::series);
+        partialPivot.rollup().ifPresent(builder::rollup);
+        partialPivot.filter().ifPresent(builder::filter);
+        partialPivot.timerange().ifPresent(builder::timerange);
+        partialPivot.query().ifPresent(builder::query);
+        partialPivot.streams().ifPresent(builder::streams);
+
+        return builder.build();
     }
 
     public static Builder builder() {

@@ -103,19 +103,20 @@ public abstract class MessageList implements SearchType {
 
     @Override
     public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
-        final boolean hasLimit = state.hasNonNull("limit");
-        final boolean hasOffset = state.hasNonNull("offset");
-        if (hasLimit || hasOffset) {
-            final Builder builder = toBuilder();
-            if (hasLimit) {
-                builder.limit(state.path("limit").asInt());
-            }
-            if (hasOffset) {
-                builder.offset(state.path("offset").asInt());
-            }
-            return builder.build();
-        }
-        return this;
+        final Builder builder = toBuilder();
+        final PartialMessageList partialMessageList = objectMapper.convertValue(state, PartialMessageList.class);
+
+        partialMessageList.name().ifPresent(builder::name);
+        partialMessageList.filter().ifPresent(builder::filter);
+        partialMessageList.limit().ifPresent(builder::limit);
+        partialMessageList.offset().ifPresent(builder::offset);
+        partialMessageList.sort().ifPresent(builder::sort);
+        partialMessageList.decorators().ifPresent(builder::decorators);
+        partialMessageList.timerange().ifPresent(builder::timerange);
+        partialMessageList.query().ifPresent(builder::query);
+        partialMessageList.streams().ifPresent(builder::streams);
+
+        return builder.build();
     }
 
     @AutoValue.Builder
