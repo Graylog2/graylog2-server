@@ -75,6 +75,7 @@
     "numeral": "^2.0.6",
     "opensans-npm-webfont": "1.0.0",
     "plotly.js": "^1.58.4",
+    "promise-polyfill": "^8.2.0",
     "qs": "^6.3.0",
     "react-ace": "9.2.1",
     "react-color": "^2.14.0",
@@ -97,8 +98,6 @@
     "react-ultimate-pagination": "^1.2.0",
     "react-window": "^1.8.2",
     "sockjs-client": "^1.4.0",
-    "superagent": "^6.1.0",
-    "superagent-bluebird-promise": "^4.1.0",
     "terser-webpack-plugin": "^4.0.0",
     "toastr": "^2.1.2",
     "twix": "^1.1.4",
@@ -106,7 +105,8 @@
     "ua-parser-js": "^0.7.12",
     "urijs": "^1.19.1",
     "utility-types": "^3.10.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "whatwg-fetch": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "7.13.10",
@@ -145,6 +145,7 @@
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
     "less-loader": "^7.0.0",
+    "node-fetch": "^2.6.1",
     "puppeteer": "^2.1.1",
     "react-styleguidist": "^11.0.8",
     "style-loader": "2.0.0",

@@ -14,9 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import request from 'superagent-bluebird-promise';
-import BluebirdPromise from 'bluebird';
-
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import StoreProvider from 'injection/StoreProvider';
@@ -58,11 +55,34 @@ const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
   throw fetchError;
 };
 
+const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSON.stringify(body) : body);
+
 export class Builder {
+  private options = {};
+
+  private readonly url: string;
+
+  private readonly method: string;
+
+  private body: { body: any, mimeType: string };
+
+  private accept: string;
+
+  private responseHandler: (response: any) => any;
+
+  private errorHandler: (error: any) => any;
+
   constructor(method, url) {
-    this.request = request(method, url.replace(/([^:])\/\//, '$1/'))
-      .set('X-Requested-With', 'XMLHttpRequest')
-      .set('X-Requested-By', 'XMLHttpRequest');
+    this.method = method;
+    this.url = url.replace(/([^:])\/\//, '$1/');
+
+    this.options = {
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-Requested-By': 'XMLHttpRequest',
+    };
+
+    this.responseHandler = (response) => response;
+    this.errorHandler = undefined;
   }
 
   authenticated() {
@@ -73,50 +93,59 @@ export class Builder {
   }
 
   session(sessionId) {
-    this.request = this.request.auth(sessionId, 'session');
+    const buffer = Buffer.from(`${sessionId}:session`);
+
+    this.options = {
+      ...this.options,
+      Authorization: `Basic ${buffer.toString('base64')}`,
+    };
 
     return this;
   }
 
   setHeader(header, value) {
-    this.request = this.request.set(header, value);
+    this.options = {
+      ...this.options,
+      [header]: value,
+    };
 
     return this;
   }
 
   json(body) {
-    this.request = this.request
-      .send(body)
-      .type('json')
-      .accept('json')
-      .then((resp) => {
-        if (resp.ok) {
-          reportServerSuccess();
+    this.body = { body: maybeStringify(body), mimeType: 'application/json' };
+    this.accept = 'application/json';
 
-          return resp.body;
-        }
+    this.responseHandler = (resp: Response) => {
+      if (resp.ok) {
+        reportServerSuccess();
 
-        throw new FetchError(resp.statusText, resp);
-      }, (error) => onServerError(error));
+        return resp.json();
+      }
+
+      throw new FetchError(resp.statusText, resp);
+    };
+
+    this.errorHandler = (error) => onServerError(error);
 
     return this;
   }
 
   file(body, mimeType) {
-    this.request = this.request
-      .send(body)
-      .type('json')
-      .accept(mimeType)
-      .parse(({ text }) => text)
-      .then((resp) => {
-        if (resp.ok) {
-          reportServerSuccess();
+    this.body = { body: maybeStringify(body), mimeType: 'application/json' };
+    this.accept = mimeType;
 
-          return resp.text;
-        }
+    this.responseHandler = (resp) => {
+      if (resp.ok) {
+        reportServerSuccess();
 
-        throw new FetchError(resp.statusText, resp);
-      }, (error) => onServerError(error));
+        return resp.text();
+      }
+
+      throw new FetchError(resp.statusText, resp);
+    };
+
+    this.errorHandler = (error) => onServerError(error);
 
     return this;
   }
@@ -124,31 +153,43 @@ export class Builder {
   plaintext(body) {
     const onUnauthorized = () => history.replace(Routes.STARTPAGE);
 
-    this.request = this.request
-      .send(body)
-      .type('text/plain')
-      .accept('json')
-      .then((resp) => {
-        if (resp.ok) {
-          reportServerSuccess();
+    this.body = { body, mimeType: 'text/plain' };
+    this.accept = 'application/json';
 
-          return resp.body;
-        }
+    this.responseHandler = (resp) => {
+      if (resp.ok) {
+        reportServerSuccess();
 
-        throw new FetchError(resp.statusText, resp);
-      }, (error) => onServerError(error, onUnauthorized));
+        return resp.json();
+      }
+
+      throw new FetchError(resp.statusText, resp);
+    };
+
+    this.errorHandler = (error) => onServerError(error, onUnauthorized);
 
     return this;
   }
 
   noSessionExtension() {
-    this.request = this.request.set('X-Graylog-No-Session-Extension', 'true');
+    this.options = {
+      ...this.options,
+      'X-Graylog-No-Session-Extension': 'true',
+    };
 
     return this;
   }
 
   build() {
-    return this.request;
+    const headers = this.body
+      ? { ...this.options, 'Content-Type': this.body.mimeType }
+      : this.options;
+
+    return window.fetch(this.url, {
+      method: this.method,
+      headers,
+      body: this.body ? this.body.body : undefined,
+    }).then(this.responseHandler, this.errorHandler);
   }
 }
 
@@ -156,7 +197,7 @@ function queuePromiseIfNotLoggedin(promise) {
   const SessionStore = StoreProvider.getStore('Session');
 
   if (!SessionStore.isLoggedIn()) {
-    return () => new BluebirdPromise((resolve, reject) => {
+    return () => new Promise((resolve, reject) => {
       const SessionActions = ActionsProvider.getActions('Session');
 
       SessionActions.login.completed.listen(() => {
@@ -168,7 +209,7 @@ function queuePromiseIfNotLoggedin(promise) {
   return promise;
 }
 
-export default function fetch(method, url, body) {
+export default function fetch(method, url, body?) {
   const promise = () => new Builder(method, url)
     .authenticated()
     .json(body)
@@ -186,7 +227,7 @@ export function fetchPlainText(method, url, body) {
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPeriodically(method, url, body) {
+export function fetchPeriodically(method, url, body?) {
   const promise = () => new Builder(method, url)
     .authenticated()
     .noSessionExtension()
