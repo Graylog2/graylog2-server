@@ -25,7 +25,7 @@ const SectionContainer = styled.div(({ theme }) => css`
   margin-bottom: 5px;
   border-radius: 3px;
   border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: 6px 5px 3px 5px;
+  padding: 6px 5px 3px 7px;
 
   :last-of-type {
     margin-bottom: 0;
@@ -36,7 +36,7 @@ const SectionActions = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 25px;
-  margin-left: 3px;
+  margin-left: 5px;
 `;
 
 const SectionConfiguration = styled.div`
