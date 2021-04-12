@@ -24,18 +24,18 @@ type AreaVisualizationConfigFormValues = {
   interpolation: 'linear' | 'step-after' | 'spline';
 };
 
-const DEFAULT_INTERPOLATION: AreaVisualizationConfigFormValues['interpolation'] = 'linear';
+const DEFAULT_INTERPOLATION = 'linear';
 
 const validate = hasAtLeastOneMetric('Area chart');
 
-const areaChart: VisualizationType = {
+const areaChart: VisualizationType<AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
   type: AreaVisualization.type,
   displayName: 'Area Chart',
   component: AreaVisualization,
   config: {
-    createConfig: (): AreaVisualizationConfigFormValues => ({ interpolation: DEFAULT_INTERPOLATION }),
-    fromConfig: (config: AreaVisualizationConfig): AreaVisualizationConfigFormValues => ({ interpolation: config.interpolation }),
-    toConfig: (formValues: AreaVisualizationConfigFormValues): AreaVisualizationConfig => AreaVisualizationConfig.create(formValues.interpolation),
+    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
+    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config.interpolation }),
+    toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation),
     fields: [{
       name: 'interpolation',
       title: 'Interpolation',

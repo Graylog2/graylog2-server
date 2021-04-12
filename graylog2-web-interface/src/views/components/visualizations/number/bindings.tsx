@@ -25,12 +25,12 @@ type NumberVisualizationConfigFormValues = {
   trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER',
 };
 
-const singleNumber: VisualizationType = {
+const singleNumber: VisualizationType<NumberVisualizationConfig, NumberVisualizationConfigFormValues> = {
   type: NumberVisualization.type,
   displayName: 'Single Number',
   component: NumberVisualization,
   config: {
-    fromConfig: (config: NumberVisualizationConfig | undefined): NumberVisualizationConfigFormValues => ({ trend: config?.trend, trend_preference: config?.trendPreference }),
+    fromConfig: (config: NumberVisualizationConfig | undefined) => ({ trend: config?.trend, trend_preference: config?.trendPreference }),
     toConfig: ({ trend = false, trend_preference }: NumberVisualizationConfigFormValues) => NumberVisualizationConfig.create(trend, trend_preference),
     fields: [{
       name: 'trend',

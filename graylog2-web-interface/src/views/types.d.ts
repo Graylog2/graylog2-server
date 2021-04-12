@@ -37,6 +37,7 @@ import {
   VisualizationFormValues,
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard/WidgetConfigForm';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -123,11 +124,11 @@ export interface VisualizationCapabilities {
 
 export type VisualizationCapability = keyof VisualizationCapabilities;
 
-interface VisualizationType {
+interface VisualizationType<ConfigType extends VisualizationConfig = VisualizationConfig, ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues> {
   type: string;
   displayName: string;
   component: VisualizationComponent;
-  config?: VisualizationConfigDefinition;
+  config?: VisualizationConfigDefinition<ConfigType, ConfigFormValuesType>;
   capabilities?: Array<VisualizationCapability>;
   validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
 }

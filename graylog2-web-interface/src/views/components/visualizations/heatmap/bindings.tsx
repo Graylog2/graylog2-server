@@ -57,17 +57,17 @@ const validate = (formValues: WidgetConfigFormValues) => {
     : {};
 };
 
-const heatmap: VisualizationType = {
+const heatmap: VisualizationType<HeatmapVisualizationConfig, HeatMapVisualizationConfigFormValues> = {
   type: HeatmapVisualization.type,
   displayName: 'Heatmap',
   component: HeatmapVisualization,
   config: {
-    fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig): HeatMapVisualizationConfigFormValues => ({
+    fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig) => ({
       autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin,
     }),
     toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
       .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
-    createConfig: (): Partial<HeatMapVisualizationConfigFormValues> => ({ colorScale: 'Viridis', autoScale: true }),
+    createConfig: () => ({ colorScale: 'Viridis', autoScale: true }),
     fields: [{
       name: 'colorScale',
       title: 'Color Scale',
