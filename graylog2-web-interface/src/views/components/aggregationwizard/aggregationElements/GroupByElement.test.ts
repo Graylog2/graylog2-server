@@ -128,7 +128,7 @@ describe('GroupByElement', () => {
 
       const result = removeElementSection(0, values);
 
-      expect(result.groupBy.groupings).toStrictEqual([]);
+      expect(result.groupBy).toStrictEqual(undefined);
     });
 
     it('should remove nothing if index is not contained', () => {
