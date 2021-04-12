@@ -62,7 +62,7 @@ const Header = styled.div(({ theme }) => css`
   font-weight: bold;
   position: relative;
 
-  :before {
+  ::before {
     content: ' ';
     top: 50%;
     width: 100%;

@@ -32,7 +32,7 @@ const ConfigActions = styled.div<{ scrolledToBottom: boolean }>(({ theme, scroll
   background: ${theme.colors.global.contentBackground};
   z-index: 1;
 
-  :before {
+  ::before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
     content: ' ';
     display: ${scrolledToBottom ? 'block' : 'none'};
