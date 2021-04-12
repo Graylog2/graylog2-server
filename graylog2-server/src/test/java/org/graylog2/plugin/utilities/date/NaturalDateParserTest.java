@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -117,7 +118,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ1() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date reference = isoFormat.parse("2021-04-09T23:59:00");
 
@@ -132,7 +133,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ2() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date reference = isoFormat.parse("2021-04-09T00:01:00");
 
@@ -147,7 +148,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ3() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
         isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         Date reference = isoFormat.parse("2021-04-09T23:59:00");
 
@@ -162,7 +163,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ4() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
         isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         Date reference = isoFormat.parse("2021-04-09T00:01:00");
 
