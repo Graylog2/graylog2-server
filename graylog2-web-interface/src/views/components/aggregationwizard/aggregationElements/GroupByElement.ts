@@ -197,15 +197,24 @@ const GroupByElement: AggregationElement = {
       ],
     },
   }),
-  removeElementSection: ((index, formValues) => ({
-    ...formValues,
-    groupBy: {
-      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
-      groupings: [
-        ...(formValues.groupBy ? formValues.groupBy.groupings.filter((value, i) => (index !== i)) : []),
-      ],
-    },
-  })),
+  removeElementSection: ((index, formValues) => {
+    const newFormValues = { ...formValues };
+    const newGroupings = formValues.groupBy?.groupings.filter((value, i) => (index !== i));
+
+    if (isEmpty(newGroupings)) {
+      delete newFormValues.groupBy;
+
+      return newFormValues;
+    }
+
+    return ({
+      ...newFormValues,
+      groupBy: {
+        columnRollup: newFormValues.groupBy.columnRollup ?? true,
+        groupings: newGroupings,
+      },
+    });
+  }),
   fromConfig: (config: AggregationWidgetConfig) => {
     const groupings = pivotsToGrouping(config);
 
