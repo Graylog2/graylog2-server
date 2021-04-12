@@ -29,7 +29,7 @@ import GroupByElement from '../aggregationElements/GroupByElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const RollupColumnsCheckbox = styled(Checkbox)`
-  .checkbox {
+  &.checkbox {
     padding-top: 0;
   }
 `;
