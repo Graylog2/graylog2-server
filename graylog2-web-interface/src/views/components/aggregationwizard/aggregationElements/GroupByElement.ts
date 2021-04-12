@@ -209,8 +209,12 @@ const GroupByElement: AggregationElement = {
   fromConfig: (config: AggregationWidgetConfig) => {
     const groupings = pivotsToGrouping(config);
 
+    if (isEmpty(groupings)) {
+      return undefined;
+    }
+
     return {
-      groupBy: isEmpty(groupings) ? undefined : {
+      groupBy: {
         columnRollup: config.rollup,
         groupings,
       },
