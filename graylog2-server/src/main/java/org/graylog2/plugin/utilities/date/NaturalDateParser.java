@@ -40,7 +40,7 @@ public class NaturalDateParser {
 
     public NaturalDateParser(final String timeZone) throws IllegalArgumentException {
         if(!isValidTimeZone(timeZone))
-            throw new IllegalArgumentException(String.format("TimeZone %s is not a valid TimeZone", timeZone));
+            throw new IllegalArgumentException("Invalid timeZone: " + timeZone);
 
         this.timeZone = TimeZone.getTimeZone(timeZone);
         this.dateTimeZone = DateTimeZone.forTimeZone(this.timeZone);
