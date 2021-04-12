@@ -209,7 +209,7 @@ public class KeyUtil {
      * @return PEM file
      * @throws GeneralSecurityException
      */
-    public static File generatePKSC8PrivateKey(char[] password, PrivateKey key) throws GeneralSecurityException {
+    public static File generatePKSC8FromPrivateKey(char[] password, PrivateKey key) throws GeneralSecurityException {
         try {
             JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
                     new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC)
