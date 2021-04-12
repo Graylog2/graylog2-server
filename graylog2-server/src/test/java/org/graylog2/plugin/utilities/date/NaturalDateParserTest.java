@@ -116,8 +116,15 @@ public class NaturalDateParserTest {
         assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
     }
 
+    /**
+     * Test to validate, that Natty's reference date/timezone (usually taken from the VM's env) and
+     * the user's requested timezone does not accidentially roll over during parsing of e.g. "today" (full day parsing).
+     * The day of the point of time where the parsing occurs differs in relation to the timezone.
+     *
+     * Here: VM is almost midnight at Apr, 9 UTC, User requests "today" at April, 10 in "Europe/Berlin"
+     */
     @Test
-    public void testTZ1() throws Exception {
+    public void testNattyReferenceDateDiffersFromUsersTZButDoesNotRollToADifferentDayEndOfDayVMRunsUTC() throws Exception {
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date reference = isoFormat.parse("2021-04-09T23:59:00");
@@ -131,8 +138,15 @@ public class NaturalDateParserTest {
         assertThat(today.getFrom().dayOfMonth().get()).as("should be April, 10").isEqualTo(10);
     }
 
+    /**
+     * Test to validate, that Natty's reference date/timezone (usually taken from the VM's env) and
+     * the user's requested timezone does not accidentially roll over during parsing of e.g. "today" (full day parsing).
+     * The day of the point of time where the parsing occurs differs in relation to the timezone.
+     *
+     * Here: VM is as bit after midnight at Apr, 9 UTC, User requests "today" at April, 9 in "Europe/Berlin"
+     */
     @Test
-    public void testTZ2() throws Exception {
+    public void testNattyReferenceDateDiffersFromUsersTZButDoesNotRollToADifferentDayStartOfDayVMRunsUTC() throws Exception {
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date reference = isoFormat.parse("2021-04-09T00:01:00");
@@ -146,8 +160,15 @@ public class NaturalDateParserTest {
         assertThat(today.getFrom().dayOfMonth().get()).as("should be April, 9").isEqualTo(9);
     }
 
+    /**
+     * Test to validate, that Natty's reference date/timezone (usually taken from the VM's env) and
+     * the user's requested timezone does not accidentially roll over during parsing of e.g. "today" (full day parsing).
+     * The day of the point of time where the parsing occurs differs in relation to the timezone.
+     *
+     * Here: VM is almost midnight at Apr, 9 Europe/Berlin, User requests "today" at April, 9 in "UTC"
+     */
     @Test
-    public void testTZ3() throws Exception {
+    public void testNattyReferenceDateDiffersFromUsersTZButDoesNotRollToADifferentDayEndOfDayUserIsUTC() throws Exception {
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         Date reference = isoFormat.parse("2021-04-09T23:59:00");
@@ -161,8 +182,15 @@ public class NaturalDateParserTest {
         assertThat(today.getFrom().dayOfMonth().get()).as("should be April, 9").isEqualTo(9);
     }
 
+    /**
+     * Test to validate, that Natty's reference date/timezone (usually taken from the VM's env) and
+     * the user's requested timezone does not accidentially roll over during parsing of e.g. "today" (full day parsing).
+     * The day of the point of time where the parsing occurs differs in relation to the timezone.
+     *
+     * Here: VM is almost midnight at Apr, 9 Europe/Berlin, User requests "today" at April, 9 in "UTC"
+     */
     @Test
-    public void testTZ4() throws Exception {
+    public void testNattyReferenceDateDiffersFromUsersTZButDoesNotRollToADifferentDayStartOfDayUserIsUTC() throws Exception {
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         Date reference = isoFormat.parse("2021-04-09T00:01:00");
