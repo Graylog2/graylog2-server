@@ -19,14 +19,15 @@ package org.graylog.storage.elasticsearch6.views.searchtypes.pivot;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
-import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.HasAggregations;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 
 import java.util.stream.Stream;
 
@@ -42,6 +43,10 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
     }
 
     protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
+        return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
+    }
+
+    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
         return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
     }
 

@@ -20,7 +20,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
+import io.searchbox.core.search.aggregation.Bucket;
 import io.searchbox.core.search.aggregation.MetricAggregation;
+import io.searchbox.core.search.aggregation.TermsAggregation;
 import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
@@ -33,6 +35,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.script.Script;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
@@ -52,6 +55,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,9 +201,55 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // once we exhaust the row groups, we descend into the columns, which get added as values to their corresponding rows
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
 
-        processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), aggregations);
+        final String rowsAggName = queryContext.contextMap().get(pivot.id() + "-rows").toString();
+        final TermsAggregation rowsResult = queryResult.getAggregations().getTermsAggregation(rowsAggName); // s().getAggregation(rowsAggName, Klasse_hier_benennen);
+        final List<PivotResult.Row> rows = rowsResult.getBuckets()
+                .stream()
+                .map(bucket -> {
+                    final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
+                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys)
+                            .source("leaf");
+                    if (pivot.rollup()) {
+                        pivot.series().stream()
+                                .flatMap(seriesSpec -> createRowValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec))
+                                .forEach(value -> rowBuilder.addValue(value));
+                    }
+                    if (!pivot.columnGroups().isEmpty()) {
+                        final String columnsAggName = queryContext.contextMap().get(pivot.id() + "-columns").toString();
+                        final TermsAggregation columnsResult = bucket.getTermsAggregation(columnsAggName);
+                        columnsResult.getBuckets().forEach(columnBucket -> {
+                            final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                            pivot.series().stream()
+                                    .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
+                                    .forEach(rowBuilder::addValue);
+                        });
+                    }
+                    return rowBuilder.build();
+                })
+                .collect(Collectors.toList());
+
+        resultBuilder.addAllRows(rows);
 
         return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+    }
+
+    private Stream<PivotResult.Value> createRowValuesForSeries(Pivot pivot, SearchResult queryResult, ESGeneratedQueryContext queryContext, Bucket bucket, SeriesSpec seriesSpec) {
+        return createValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec, true, "row-leaf", Collections.emptyList());
+    }
+
+    private Stream<PivotResult.Value> createColumnValuesForSeries(Pivot pivot, SearchResult queryResult, ESGeneratedQueryContext queryContext, Bucket bucket, SeriesSpec seriesSpec, List<String> additionalKeys) {
+        return createValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec, false, "col-leaf", additionalKeys);
+    }
+
+    private Stream<PivotResult.Value> createValuesForSeries(Pivot pivot, SearchResult queryResult, ESGeneratedQueryContext queryContext, Bucket bucket, SeriesSpec seriesSpec, boolean rollup, String source, List<String> additionalKeys) {
+        final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
+        final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, bucket, queryContext);
+        final Collection<String> keys = ImmutableList.<String>builder()
+                .addAll(additionalKeys)
+                .add(seriesSpec.literal())
+                .build();
+        return seriesHandler.handleResult(pivot, seriesSpec, queryResult, series, this, queryContext)
+                .map(value -> PivotResult.Value.create(keys, value.value(), rollup, source));
     }
 
     private long extractDocumentCount(SearchResult queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
@@ -346,6 +397,11 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         public Aggregation getSubAggregation(PivotSpec pivotSpec, MetricAggregation currentAggregationOrBucket) {
             final Tuple2<String, Class<? extends Aggregation>> tuple2 = getTypes(pivotSpec);
             return currentAggregationOrBucket.getAggregation(tuple2.v1, tuple2.v2);
+        }
+
+        public Aggregation getSubAggregation(PivotSpec pivotSpec, HasAggregations currentAggregationOrBucket) {
+            final Tuple2<String, Class<? extends Aggregation>> tuple2 = getTypes(pivotSpec);
+            return currentAggregationOrBucket.getAggregations().get(tuple2.v1);
         }
 
         public Tuple2<String, Class<? extends Aggregation>> getTypes(PivotSpec pivotSpec) {
