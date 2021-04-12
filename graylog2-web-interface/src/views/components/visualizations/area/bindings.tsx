@@ -18,10 +18,13 @@ import type { VisualizationType } from 'views/types';
 
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 type AreaVisualizationConfigFormValues = {
   interpolation: 'linear' | 'step-after' | 'spline';
 };
+
+const validate = hasAtLeastOneMetric('Area chart');
 
 const areaChart: VisualizationType = {
   type: AreaVisualization.type,
@@ -39,6 +42,7 @@ const areaChart: VisualizationType = {
     }],
   },
   capabilities: ['event-annotations'],
+  validate,
 };
 
 export default areaChart;

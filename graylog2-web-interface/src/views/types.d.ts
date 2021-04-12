@@ -30,7 +30,11 @@ import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
 import { OverrideProps } from 'views/components/WidgetOverrideElements';
-import { VisualizationConfigDefinition, VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import {
+  VisualizationConfigDefinition,
+  VisualizationConfigFormValues,
+  WidgetConfigFormValues,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -123,6 +127,7 @@ interface VisualizationType {
   component: VisualizationComponent;
   config?: VisualizationConfigDefinition;
   capabilities?: Array<VisualizationCapability>;
+  validate?: (formValues: WidgetConfigFormValues) => { [key: string]: string | any };
 }
 
 interface ResultHandler<T, R> {

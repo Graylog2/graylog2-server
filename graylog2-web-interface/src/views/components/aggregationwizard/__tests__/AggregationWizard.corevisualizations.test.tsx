@@ -26,6 +26,9 @@ import AggregationWizard from 'views/components/aggregationwizard/AggregationWiz
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import Series from 'views/logic/aggregationbuilder/Series';
+import FieldTypesContext, { FieldTypes } from 'views/components/contexts/FieldTypesContext';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: bindings } };
 
@@ -34,8 +37,14 @@ const widgetConfig = AggregationWidgetConfig
   .visualization('table')
   .build();
 
+const fieldTypes: FieldTypes = {
+  all: Immutable.List([]),
+  queryFields: Immutable.Map(),
+};
 const SimpleAggregationWizard = (props) => (
-  <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
+  <FieldTypesContext.Provider value={fieldTypes}>
+    <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
+  </FieldTypesContext.Provider>
 );
 
 const submitButton = async () => screen.findByText('Apply Changes');
@@ -78,21 +87,21 @@ describe('AggregationWizard/Core Visualizations', () => {
   });
 
   it.each`
-    visualization      | fields
-    ${'Area Chart'}    | ${['Interpolation']}
-    ${'Bar Chart'}     | ${['Mode']}
-    ${'Line Chart'}    | ${['Interpolation']}
-    ${'Heatmap'}       | ${['Default Value']}
-    ${'Pie Chart'}     | ${[]}
-    ${'Scatter Plot'}  | ${[]}
-    ${'Single Number'} | ${[]}
-    ${'World Map'}     | ${[]}
-  `('expects mandatory fields for $visualization', async ({ visualization, fields }: { visualization: string, fields: Array<string> }) => {
+    visualization      | fields               | disabled
+    ${'Area Chart'}    | ${['Interpolation']} | ${true}
+    ${'Bar Chart'}     | ${['Mode']}          | ${true}
+    ${'Line Chart'}    | ${['Interpolation']} | ${true}
+    ${'Heatmap'}       | ${['Default Value']} | ${true}
+    ${'Pie Chart'}     | ${[]}                | ${true}
+    ${'Scatter Plot'}  | ${[]}                | ${true}
+    ${'Single Number'} | ${[]}                | ${false}
+    ${'World Map'}     | ${[]}                | ${false}
+  `('expects mandatory fields for $visualization', async ({ visualization, fields, disabled }: { visualization: string, fields: Array<string>, disabled: boolean }) => {
     render(<SimpleAggregationWizard />);
 
     await selectEvent.select(await visualizationSelect(), visualization);
 
-    if (fields.length > 0) {
+    if (disabled) {
       await expectSubmitButtonToBeDisabled();
     } else {
       await expectSubmitButtonNotToBeDisabled();
@@ -107,8 +116,9 @@ describe('AggregationWizard/Core Visualizations', () => {
 
   it('creates Area Chart config when all required fields are present', async () => {
     const onChange = jest.fn();
+    const areaChartConfig = widgetConfig.toBuilder().series([Series.create('count')]).build();
 
-    render(<SimpleAggregationWizard onChange={onChange} />);
+    render(<SimpleAggregationWizard onChange={onChange} config={areaChartConfig} />);
 
     await selectOption('Select visualization type', 'Area Chart');
 
@@ -127,8 +137,9 @@ describe('AggregationWizard/Core Visualizations', () => {
 
   it('creates Bar Chart config when all required fields are present', async () => {
     const onChange = jest.fn();
+    const barChartConfig = widgetConfig.toBuilder().series([Series.create('count')]).build();
 
-    render(<SimpleAggregationWizard onChange={onChange} />);
+    render(<SimpleAggregationWizard onChange={onChange} config={barChartConfig} />);
 
     await selectOption('Select visualization type', 'Bar Chart');
 
@@ -147,8 +158,9 @@ describe('AggregationWizard/Core Visualizations', () => {
 
   it('creates Line Chart config when all required fields are present', async () => {
     const onChange = jest.fn();
+    const lineChartConfig = widgetConfig.toBuilder().series([Series.create('count')]).build();
 
-    render(<SimpleAggregationWizard onChange={onChange} />);
+    render(<SimpleAggregationWizard onChange={onChange} config={lineChartConfig} />);
 
     await selectOption('Select visualization type', 'Line Chart');
 
@@ -167,8 +179,13 @@ describe('AggregationWizard/Core Visualizations', () => {
 
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
+    const heatMapConfig = widgetConfig.toBuilder()
+      .rowPivots([Pivot.create('foo', 'values')])
+      .columnPivots([Pivot.create('bar', 'values')])
+      .series([Series.create('count')])
+      .build();
 
-    render(<SimpleAggregationWizard onChange={onChange} />);
+    render(<SimpleAggregationWizard onChange={onChange} config={heatMapConfig} />);
 
     await selectOption('Select visualization type', 'Heatmap');
 
@@ -239,5 +256,25 @@ describe('AggregationWizard/Core Visualizations', () => {
       visualization: 'table',
       visualizationConfig: expect.objectContaining({}),
     })));
+  });
+
+  describe('has visualization-specific validation for aggregation config', () => {
+    it.each`
+    visualization      | error
+    ${'Area Chart'}    | ${'Area chart requires at least one metric'}
+    ${'Bar Chart'}     | ${'Bar chart requires at least one metric'}
+    ${'Heatmap'}       | ${'Heatmap requires at least two groupings. At least one metric must be configured.'}
+    ${'Line Chart'}    | ${'Line chart requires at least one metric'}
+    ${'Pie Chart'}     | ${'Pie chart requires at least one metric'}
+    ${'Scatter Plot'}  | ${'Scatter plot requires at least one metric'}
+  `('expects constraints for $visualization', async ({ visualization, error }: { visualization: string, error: string }) => {
+      render(<SimpleAggregationWizard />);
+
+      await selectOption('Select visualization type', visualization);
+
+      await expectSubmitButtonToBeDisabled();
+
+      await waitFor(() => screen.findByText(error));
+    });
   });
 });

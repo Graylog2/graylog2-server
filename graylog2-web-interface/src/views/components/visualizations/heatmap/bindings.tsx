@@ -19,6 +19,11 @@ import type { VisualizationType } from 'views/types';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import {
+  areAtLeastNGroupingsConfigured,
+  areAtLeastNMetricsConfigured,
+} from 'views/components/visualizations/validations';
 
 type HeatMapVisualizationConfigFormValues = {
   colorScale: typeof COLORSCALES[number],
@@ -28,6 +33,28 @@ type HeatMapVisualizationConfigFormValues = {
   zMax: number
   useSmallestAsDefault: boolean,
   defaultValue: number,
+};
+
+const validate = (formValues: WidgetConfigFormValues) => {
+  const errors = [];
+
+  if (!areAtLeastNGroupingsConfigured(formValues, 2)) {
+    errors.push('Heatmap requires at least two groupings.');
+  } else {
+    const groupingDirections = formValues.groupBy.groupings.map((grouping) => grouping.direction);
+
+    if (!groupingDirections.includes('row') || !groupingDirections.includes('column')) {
+      errors.push('Groupings must include row and column groupings.');
+    }
+  }
+
+  if (!areAtLeastNMetricsConfigured(formValues, 1)) {
+    errors.push('At least one metric must be configured.');
+  }
+
+  return errors.length > 0
+    ? { type: errors.join(' ') }
+    : {};
 };
 
 const heatmap: VisualizationType = {
@@ -79,6 +106,7 @@ const heatmap: VisualizationType = {
       required: true,
     }],
   },
+  validate,
 };
 
 export default heatmap;
