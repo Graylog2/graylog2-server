@@ -53,7 +53,7 @@ const Wrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const Header = styled.div`
+const Header = styled.div(({ theme }) => css`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -66,29 +66,25 @@ const Header = styled.div`
     content: ' ';
     top: 50%;
     width: 100%;
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid ${theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
     position: absolute;
   }
+`);
 
-  button {
-    color: #1f1f1f;
-  }
-`;
-
-const ElementTitle = styled.div`
-  background: white;
+const ElementTitle = styled.div(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
   z-index: 1;
   padding-right: 8px;
-`;
+`);
 
-const ElementActions = styled.div`
-  background: white;
+const ElementActions = styled.div(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
   z-index: 1;
   padding-left: 5px;
-`;
+`);
 
 const StyledIconButton = styled(IconButton)(({ theme }) => `
-  color: ${theme.colors.variant.primary};
+  color: ${theme.colors.global.textDefault};
 `);
 
 type Props = {
