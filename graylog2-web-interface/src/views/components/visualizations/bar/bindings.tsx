@@ -25,6 +25,8 @@ type BarVisualizationConfigFormValues = {
   barmode: 'group' | 'stack' | 'relative' | 'overlay',
 };
 
+const DEFAULT_BARMODE: BarVisualizationConfigFormValues['barmode'] = 'group';
+
 const validate = hasAtLeastOneMetric('Bar chart');
 
 const barChart: VisualizationType = {
@@ -32,6 +34,7 @@ const barChart: VisualizationType = {
   displayName: 'Bar Chart',
   component: BarVisualization,
   config: {
+    createConfig: (): BarVisualizationConfigFormValues => ({ barmode: DEFAULT_BARMODE }),
     fromConfig: (config: BarVisualizationConfig | undefined): BarVisualizationConfigFormValues => ({ barmode: config?.barmode ?? 'group' }),
     toConfig: (formValues: BarVisualizationConfigFormValues): BarVisualizationConfig => BarVisualizationConfig.create(formValues.barmode),
     fields: [{
