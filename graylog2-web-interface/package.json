@@ -19,13 +19,16 @@
     "lint": "eslint src",
     "lint:path": "eslint",
     "lint:styles": "stylelint './src/**/*.{js,jsx,ts,tsx}' --syntax css-in-js",
-    "lint:styles:path": "stylelint --syntax css-in-js --",
+    "lint:styles:path": "stylelint --syntax css-in-js",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"
   },
   "eslintConfig": {
     "extends": "graylog"
+  },
+  "stylelint": {
+    "extends": "stylelint-config-graylog"
   },
   "jest": {
     "preset": "jest-preset-graylog",
@@ -145,10 +148,7 @@
     "puppeteer": "^2.1.1",
     "react-styleguidist": "^11.0.8",
     "style-loader": "2.0.0",
-    "stylelint": "^13.6.0",
-    "stylelint-config-standard": "20.0.0",
-    "stylelint-config-styled-components": "^0.1.1",
-    "stylelint-processor-styled-components": "^1.10.0",
+    "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
     "url-loader": "^4.0.0",
     "webpack-bundle-analyzer": "^3.5.2",
     "webpack-cli": "3.3.12",

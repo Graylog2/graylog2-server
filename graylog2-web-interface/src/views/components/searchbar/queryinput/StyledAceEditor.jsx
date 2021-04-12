@@ -20,41 +20,39 @@ import AceEditor from './ace';
 
 const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
-  /* stylelint-disable property-no-unknown */
-  theme: aceTheme,
-  scTheme: theme,
-  /* stylelint-enable property-no-unknown */
-}))(({ scTheme }) => css`
+  theme: aceTheme, /* stylelint-disable-line */
+  $scTheme: theme,
+}))(({ $scTheme }) => css`
   &.ace-queryinput {
     height: 34px !important;
     width: 100% !important;
-    background-color: ${scTheme.colors.input.background};
-    color: ${scTheme.utils.contrastingColor(scTheme.colors.input.background, 'AAA')};
+    background-color: ${$scTheme.colors.input.background};
+    color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
 
     &.ace_multiselect .ace_selection.ace_start {
-      box-shadow: 0 0 3px 0 ${scTheme.colors.input.background};
+      box-shadow: 0 0 3px 0 ${$scTheme.colors.input.background};
     }
 
     .ace_gutter {
-      background: ${scTheme.colors.input.background};
-      color: ${scTheme.utils.contrastingColor(scTheme.colors.input.background, 'AAA')};
+      background: ${$scTheme.colors.input.background};
+      color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
     }
 
     .ace_print-margin {
       width: 1px;
-      background: ${scTheme.colors.input.background};
+      background: ${$scTheme.colors.input.background};
     }
 
     .ace_cursor {
-      color: ${scTheme.colors.gray[50]};
+      color: ${$scTheme.colors.gray[50]};
     }
 
     .ace_marker-layer .ace_selection {
-      background: ${scTheme.colors.variant.lightest.default};
+      background: ${$scTheme.colors.variant.lightest.default};
     }
 
     .ace_marker-layer .ace_step {
-      background: ${scTheme.colors.variant.warning};
+      background: ${$scTheme.colors.variant.warning};
     }
 
     .ace_marker-layer .ace_bracket {
@@ -63,19 +61,19 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     }
 
     .ace_marker-layer .ace_active-line {
-      background: ${scTheme.colors.input.background};
+      background: ${$scTheme.colors.input.background};
     }
 
     .ace_gutter-active-line {
-      background-color: ${scTheme.colors.input.background};
+      background-color: ${$scTheme.colors.input.background};
     }
 
     .ace_marker-layer .ace_selected-word {
-      border: 1px solid ${scTheme.colors.gray[80]};
+      border: 1px solid ${$scTheme.colors.gray[80]};
     }
 
     .ace_invisible {
-      color: ${scTheme.colors.input.background};
+      color: ${$scTheme.colors.input.background};
     }
 
     .ace_keyword,
@@ -83,11 +81,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_storage,
     .ace_storage.ace_type,
     .ace_support.ace_type {
-      color: ${scTheme.colors.variant.primary};
+      color: ${$scTheme.colors.variant.primary};
     }
 
     .ace_keyword.ace_operator {
-      color: ${scTheme.colors.variant.darker.info};
+      color: ${$scTheme.colors.variant.darker.info};
     }
 
     .ace_constant.ace_character,
@@ -96,44 +94,44 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_keyword.ace_other.ace_unit,
     .ace_support.ace_constant,
     .ace_variable.ace_parameter {
-      color: ${scTheme.colors.variant.dark.danger};
+      color: ${$scTheme.colors.variant.dark.danger};
     }
 
     .ace_constant.ace_other {
-      color: ${scTheme.colors.variant.default};
+      color: ${$scTheme.colors.variant.default};
     }
 
     .ace_invalid {
-      color: ${scTheme.utils.readableColor(scTheme.colors.brand.primary)};
-      background-color: ${scTheme.colors.brand.primary};
+      color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
+      background-color: ${$scTheme.colors.brand.primary};
     }
 
     .ace_invalid.ace_deprecated {
-      color: ${scTheme.utils.readableColor(scTheme.colors.brand.primary)};
-      background-color: ${scTheme.colors.variant.dark.primary};
+      color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
+      background-color: ${$scTheme.colors.variant.dark.primary};
     }
 
     .ace_fold {
-      background-color: ${scTheme.colors.variant.info};
-      border-color: ${scTheme.utils.contrastingColor(scTheme.colors.input.background, 'AAA')};
+      background-color: ${$scTheme.colors.variant.info};
+      border-color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
     }
 
     .ace_entity.ace_name.ace_function,
     .ace_support.ace_function,
     .ace_variable,
     .ace_term {
-      color: ${scTheme.colors.variant.info};
+      color: ${$scTheme.colors.variant.info};
     }
 
     .ace_support.ace_class,
     .ace_support.ace_type {
-      color: ${scTheme.colors.variant.dark.warning};
+      color: ${$scTheme.colors.variant.dark.warning};
     }
 
     .ace_heading,
     .ace_markup.ace_heading,
     .ace_string {
-      color: ${scTheme.colors.variant.dark.success};
+      color: ${$scTheme.colors.variant.dark.success};
     }
 
     .ace_entity.ace_name.ace_tag,
@@ -141,11 +139,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_meta.ace_tag,
     .ace_string.ace_regexp,
     .ace_variable {
-      color: ${scTheme.colors.brand.primary};
+      color: ${$scTheme.colors.brand.primary};
     }
 
     .ace_comment {
-      color: ${scTheme.colors.gray[60]};
+      color: ${$scTheme.colors.gray[60]};
     }
 
     .ace_indent-guide {
