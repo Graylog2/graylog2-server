@@ -30,12 +30,16 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.script.Script;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.HasAggregations;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
@@ -60,6 +64,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,8 +112,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final String rowsAggregationName = queryContext.nextName();
         contextMap.put(pivot.id() + "-rows", rowsAggregationName);
 
-//        final List<BucketOrder> bucketOrder = orderListForPivot(pivot, queryContext);
-        final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups()); // , bucketOrder);
+        final List<Order> bucketOrder = orderListForPivot(pivot, queryContext);
+        final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
 
         if (pivot.rollup()) {
             seriesAggregations.forEach(rowsAggregation::subAggregation);
@@ -119,7 +124,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         if (!pivot.columnGroups().isEmpty()) {
             final String columnsAggregationName = queryContext.nextName();
             contextMap.put(pivot.id() + "-columns", columnsAggregationName);
-            final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups()); // , bucketOrder);
+            final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
 
             seriesAggregations.forEach(columnsAggregation::subAggregation);
 
@@ -140,13 +145,13 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .collect(Collectors.joining(" + '" + TERMS_SEPARATOR + "' + "));
     }
 
-    private AggregationBuilder createAggregation(String name, List<BucketSpec> pivots) { // , List<BucketOrder> bucketOrder) {
+    private AggregationBuilder createAggregation(String name, List<BucketSpec> pivots, List<Order> bucketOrder) {
         final String aggregationScript = createScript(pivots);
 
         final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
                 .script(new Script(aggregationScript));
 
-        return builder; // bucketOrder.isEmpty() ? builder : builder.order(bucketOrder);
+        return bucketOrder.isEmpty() ? builder : builder.order(bucketOrder);
     }
 
 
@@ -202,7 +207,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
 
         final String rowsAggName = queryContext.contextMap().get(pivot.id() + "-rows").toString();
-        final TermsAggregation rowsResult = queryResult.getAggregations().getTermsAggregation(rowsAggName); // s().getAggregation(rowsAggName, Klasse_hier_benennen);
+        final TermsAggregation rowsResult = queryResult.getAggregations().getTermsAggregation(rowsAggName);
         final List<PivotResult.Row> rows = rowsResult.getBuckets()
                 .stream()
                 .map(bucket -> {
@@ -250,6 +255,34 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .build();
         return seriesHandler.handleResult(pivot, seriesSpec, queryResult, series, this, queryContext)
                 .map(value -> PivotResult.Value.create(keys, value.value(), rollup, source));
+    }
+
+    private List<Order> orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext) {
+        return pivot.sort()
+                .stream()
+                .map(sortSpec -> {
+                    if (sortSpec instanceof PivotSort) {
+                        return Order.term(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                    }
+                    if (sortSpec instanceof SeriesSort) {
+                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
+                                .stream()
+                                .filter(series -> series.literal().equals(sortSpec.field()))
+                                .findFirst();
+                        return matchingSeriesSpec
+                                .map(seriesSpec -> {
+                                    if (seriesSpec.literal().equals("count()")) {
+                                        return Order.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    }
+                                    return Order.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                })
+                                .orElse(null);
+                    }
+
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private long extractDocumentCount(SearchResult queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
