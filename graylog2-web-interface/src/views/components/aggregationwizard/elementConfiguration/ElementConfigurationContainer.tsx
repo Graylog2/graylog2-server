@@ -84,7 +84,7 @@ const ElementActions = styled.div(({ theme }) => css`
 `);
 
 const StyledIconButton = styled(IconButton)(({ theme }) => `
-  color: ${theme.colors.variant.primary};
+  color: ${theme.colors.global.textDefault};
 `);
 
 type Props = {
