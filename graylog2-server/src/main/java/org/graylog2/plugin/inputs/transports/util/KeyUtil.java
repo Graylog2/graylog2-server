@@ -204,12 +204,13 @@ public class KeyUtil {
      * Build a password-encrypted PKCS8 private key and write it to a PEM file in the temp directory.
      * Caller is responsible for ensuring that the temp directory is writable. The file will be deleted
      * when the VM exits.
+     * @param tmpDir path to directory in which to create the
      * @param password to protect the key
      * @param key encrypt this key
      * @return PEM file
      * @throws GeneralSecurityException
      */
-    public static File generatePKSC8PrivateKey(char[] password, PrivateKey key) throws GeneralSecurityException {
+    public static File generatePKSC8FromPrivateKey(Path tmpDir, char[] password, PrivateKey key) throws GeneralSecurityException {
         try {
             JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
                     new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC)
@@ -226,11 +227,10 @@ public class KeyUtil {
 
             // write PKCS8 to file
             String pkcs8Key = stringWriter.toString();
-            File tmpFile = File.createTempFile("key", ".key");
-            tmpFile.deleteOnExit();
+            File tmpFile = Files.createTempFile(tmpDir, "pkcs8", ".key").toFile();
             try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
                 fos.write(pkcs8Key.getBytes(StandardCharsets.UTF_8));
-                fos.flush();
+                tmpFile.deleteOnExit();
             }
             return tmpFile;
         } catch (IOException | OperatorCreationException e) {
@@ -252,8 +252,8 @@ public class KeyUtil {
         // Be sure to specify charset for reader - don't use plain FileReader
         Object object;
         final InputStream inputStream = Files.newInputStream(keyFile.toPath());
-        final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        try (PEMParser pemParser = new PEMParser(fileReader)) {
+        try (InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             PEMParser pemParser = new PEMParser(fileReader)) {
             object = pemParser.readObject();
         }
 

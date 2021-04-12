@@ -16,15 +16,17 @@
  */
 package org.graylog2.plugin.inputs.transports.util;
 
-import com.google.common.io.Resources;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
+import org.graylog.testing.ResourceUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.Security;
@@ -38,9 +40,18 @@ public class KeyUtilNonParameterizedTest {
     }
 
     @Test
+    // Read a PKCS5 v2.0 encrypted private key in PKCS8 format
     public void testPrivateKeyFromProtectedFile() throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
         final String password = "test";
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.protected"), password);
+        assertThat(privateKey).isNotNull();
+    }
+
+    @Test
+    // Read a PKCS5 v1.5 encrypted private key in PKCS8 format
+    public void testPrivateKeyFromLegacyProtectedFile() throws URISyntaxException, IOException, OperatorCreationException, PKCSException {
+        final String password = "test";
+        final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.v1.protected"), password);
         assertThat(privateKey).isNotNull();
     }
 
@@ -54,13 +65,14 @@ public class KeyUtilNonParameterizedTest {
     public void testGeneratePKSC8PrivateKey() throws GeneralSecurityException, IOException, OperatorCreationException, PKCSException, URISyntaxException {
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.unprotected"), null);
         final String tmpPassword = "dummypassword";
-        File pkcs8EncryptedKeyFile = KeyUtil.generatePKSC8PrivateKey(tmpPassword.toCharArray(), privateKey);
+        final Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+        File pkcs8EncryptedKeyFile = KeyUtil.generatePKSC8FromPrivateKey(tmpDir, tmpPassword.toCharArray(), privateKey);
         final PrivateKey retrievedKey = fileToKey(pkcs8EncryptedKeyFile, tmpPassword);
         assertThat(retrievedKey).hasToString(privateKey.toString());
     }
 
     private File resourceToFile(String fileName) throws URISyntaxException {
-        return new File(Resources.getResource("org/graylog2/plugin/inputs/transports/util/" + fileName).toURI());
+        return ResourceUtil.resourceToTmpFile("org/graylog2/plugin/inputs/transports/util/" + fileName);
     }
 
     private PrivateKey fileToKey(File keyFile, String password) throws URISyntaxException, IOException, OperatorCreationException, PKCSException {

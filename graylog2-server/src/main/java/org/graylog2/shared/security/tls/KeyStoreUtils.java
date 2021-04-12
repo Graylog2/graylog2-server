@@ -31,5 +31,4 @@ public final class KeyStoreUtils {
 
         return stream.toByteArray();
     }
-
 }
