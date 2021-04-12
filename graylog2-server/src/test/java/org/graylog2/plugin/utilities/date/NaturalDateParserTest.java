@@ -118,7 +118,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ1() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date reference = isoFormat.parse("2021-04-09T23:59:00");
 
@@ -133,7 +133,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ2() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date reference = isoFormat.parse("2021-04-09T00:01:00");
 
@@ -148,7 +148,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ3() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         Date reference = isoFormat.parse("2021-04-09T23:59:00");
 
@@ -163,7 +163,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTZ4() throws Exception {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         Date reference = isoFormat.parse("2021-04-09T00:01:00");
 
