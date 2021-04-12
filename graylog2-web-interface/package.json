@@ -151,7 +151,7 @@
     "style-loader": "2.0.0",
     "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
     "url-loader": "^4.0.0",
-    "webpack-bundle-analyzer": "^3.5.2",
+    "webpack-bundle-analyzer": "^4.4.0",
     "webpack-cli": "3.3.12",
     "webpack-dev-middleware": "^3.7.1",
     "webpack-dev-server": "^3.8.0",
