@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 import IconButton from 'components/common/IconButton';
 
 const Wrapper = styled.div(({ theme }) => css`
-  border-radius: 6px;
   margin-bottom: 6px;
+  border-radius: 6px;
 
   :last-child {
     margin-bottom: 0;
