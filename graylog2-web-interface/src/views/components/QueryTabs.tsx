@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import throttle from 'lodash/throttle';
 
-import { Col, Row, Nav, NavItem, NavDropdown, MenuItem } from 'components/graylog';
+import { Col, Row, Nav, NavItem, MenuItem } from 'components/graylog';
+import { ModifiedNavDropdown as NavDropdown } from 'components/graylog/NavDropdown';
 import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
@@ -41,6 +42,10 @@ type Props = {
 const CLASS_HIDDEN = 'hidden';
 const CLASS_ACTIVE = 'active';
 const CLASS_LOCKED = 'locked';
+
+const StyledRow = styled(Row)`
+  margin-bottom: 0;
+`;
 
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
   &.nav.nav-tabs {
@@ -117,8 +122,6 @@ const adjustTabs = () => {
     });
   }
 
-  moreBtn.classList.remove(CLASS_ACTIVE);
-
   allTabs.forEach((tabItem) => {
     tabItem.classList.remove(CLASS_HIDDEN);
   });
@@ -163,6 +166,7 @@ const adjustTabs = () => {
 
 const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }:Props) => {
   const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
+  const [openedMore, setOpenedMore] = useState<boolean>(false);
 
   const openTitleEditModal = (activeQueryTitle: string) => {
     if (queryTitleEditModal) {
@@ -209,7 +213,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
   });
 
   return (
-    <Row style={{ marginBottom: 0 }}>
+    <StyledRow>
       <Col>
         <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
           {queryTabs('navItem')}
@@ -218,7 +222,10 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
                        className="query-tabs-more"
                        id="query-tabs-more"
                        noCaret
-                       pullRight>
+                       pullRight
+                       active={openedMore}
+                       open={openedMore}
+                       onToggle={(isOpened) => setOpenedMore(isOpened)}>
             {dropDownTabs}
           </NavDropdown>
           {newTab}
@@ -232,7 +239,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
         <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
                              ref={queryTitleEditModal} />
       </Col>
-    </Row>
+    </StyledRow>
   );
 };
 
