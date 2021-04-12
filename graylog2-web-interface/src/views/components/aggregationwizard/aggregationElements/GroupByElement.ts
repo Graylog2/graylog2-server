@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { isEmpty } from 'lodash';
+
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
 
@@ -184,9 +186,9 @@ const GroupByElement: AggregationElement = {
   addEmptyElement: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
     ...formValues,
     groupBy: {
-      columnRollup: 'columnRollup' in formValues.groupBy ? formValues.groupBy.columnRollup : true,
+      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
       groupings: [
-        ...formValues.groupBy.groupings,
+        ...(formValues.groupBy?.groupings ?? []),
         emptyGrouping,
       ],
     },
@@ -194,18 +196,22 @@ const GroupByElement: AggregationElement = {
   removeElementSection: ((index, formValues) => ({
     ...formValues,
     groupBy: {
-      columnRollup: 'columnRollup' in formValues.groupBy ? formValues.groupBy.columnRollup : true,
+      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
       groupings: [
-        ...formValues.groupBy.groupings.filter((value, i) => (index !== i)),
+        ...(formValues.groupBy ? formValues.groupBy.groupings.filter((value, i) => (index !== i)) : []),
       ],
     },
   })),
-  fromConfig: (config: AggregationWidgetConfig) => ({
-    groupBy: {
-      columnRollup: config.rollup,
-      groupings: pivotsToGrouping(config),
-    },
-  }),
+  fromConfig: (config: AggregationWidgetConfig) => {
+    const groupings = pivotsToGrouping(config);
+
+    return {
+      groupBy: isEmpty(groupings) ? undefined : {
+        columnRollup: config.rollup,
+        groupings,
+      },
+    };
+  },
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
   component: GroupByConfiguration,
   validate: validateGroupBy,
