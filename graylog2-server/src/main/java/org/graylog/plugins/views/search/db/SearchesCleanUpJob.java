@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.search.db;
 
-import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
+import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -32,15 +32,15 @@ import java.util.stream.Collectors;
 public class SearchesCleanUpJob extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(SearchesCleanUpJob.class);
 
-    private final ViewService viewService;
+    private final ViewSummaryService viewSummaryService;
     private final SearchDbService searchDbService;
     private final Instant mustNotBeOlderThan;
 
     @Inject
-    public SearchesCleanUpJob(ViewService viewService,
+    public SearchesCleanUpJob(ViewSummaryService viewSummaryService,
                               SearchDbService searchDbService,
                               @Named("views_maximum_search_age") Duration maximumSearchAge) {
-        this.viewService = viewService;
+        this.viewSummaryService = viewSummaryService;
         this.searchDbService = searchDbService;
         this.mustNotBeOlderThan = Instant.now().minus(maximumSearchAge);
     }
@@ -87,9 +87,7 @@ public class SearchesCleanUpJob extends Periodical {
 
     @Override
     public void doRun() {
-        final Set<String> requiredIds = viewService.streamAll().map(ViewDTO::searchId).collect(Collectors.toSet());
-        searchDbService.streamAll()
-                .filter(search -> search.createdAt().isBefore(mustNotBeOlderThan) && !requiredIds.contains(search.id()))
-                .forEach(search -> searchDbService.delete(search.id()));
+        final Set<String> requiredIds = viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet());
+        searchDbService.getExpiredSearches(requiredIds, mustNotBeOlderThan).forEach(id -> searchDbService.delete(id));
     }
 }

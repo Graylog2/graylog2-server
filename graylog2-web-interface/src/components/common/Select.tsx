@@ -131,6 +131,7 @@ const singleValueAndPlaceholder = ({ theme }) => (base) => ({
 
 const placeholder = ({ theme }) => (base) => ({
   ...base,
+  color: theme.colors.input.placeholder,
   lineHeight: '28px',
   fontFamily: theme.fonts.family.body,
   fontSize: theme.fonts.size.body,

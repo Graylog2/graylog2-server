@@ -41,9 +41,10 @@ const Wrapper = styled.div`
 
 const Controls = styled.div`
   height: 100%;
-  min-width: 300px;
+  min-width: 315px;
   max-width: 500px;
-  flex: 1;
+  flex: 1.2;
+  padding-right: 15px;
   overflow-y: auto;
 `;
 
@@ -60,7 +61,7 @@ const Section = styled.div`
   }
 `;
 
-const _onElementCreate = (
+const onAddEmptyElement = (
   elementKey: string,
   values: WidgetConfigFormValues,
   setValues: (formValues: WidgetConfigFormValues) => void,
@@ -116,13 +117,14 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
           {({ values, setValues }) => (
             <>
               <Section data-testid="add-element-section">
-                <AggregationElementSelect onElementCreate={(elementKey) => _onElementCreate(elementKey, values, setValues)}
+                <AggregationElementSelect onElementCreate={(elementKey) => onAddEmptyElement(elementKey, values, setValues)}
                                           aggregationElements={aggregationElements}
                                           formValues={values} />
               </Section>
               <Section data-testid="configure-elements-section">
                 <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
                                        config={config}
+                                       onAddEmptyElement={onAddEmptyElement}
                                        onConfigChange={onChange} />
               </Section>
             </>

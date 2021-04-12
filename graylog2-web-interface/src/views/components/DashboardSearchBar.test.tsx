@@ -21,6 +21,10 @@ import MockStore from 'helpers/mocking/StoreMock';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
+import WidgetFocusContext, {
+  WidgetEditingState,
+  WidgetFocusingState,
+} from 'views/components/contexts/WidgetFocusContext';
 
 import DashboardSearchBar from './DashboardSearchBar';
 
@@ -99,5 +103,47 @@ describe('DashboardSearchBar', () => {
     fireEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
+  });
+
+  it('should hide the save and load controls if a widget is being edited', () => {
+    const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <DashboardSearchBar onExecute={onExecute} config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    const saveBtn = screen.queryByText('View Actions');
+
+    expect(saveBtn).toBeNull();
+  });
+
+  it('should show the save and load controls if a widget is not being edited', async () => {
+    const focusedWidget: WidgetFocusingState = { id: 'foo', editing: false, focusing: true };
+    const widgetFocusContext = {
+      focusedWidget,
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    };
+
+    render(
+      <WidgetFocusContext.Provider value={widgetFocusContext}>
+        <DashboardSearchBar onExecute={onExecute} config={config} />
+      </WidgetFocusContext.Provider>,
+    );
+
+    const saveBtn = await screen.findByText('View Actions');
+
+    expect(saveBtn).not.toBeNull();
   });
 });

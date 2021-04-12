@@ -22,8 +22,8 @@ import ElementConfigurationContainer from './ElementConfigurationContainer';
 describe('ElementConfigurationContainer', () => {
   it('should render elements passed as children', () => {
     render(
-      <ElementConfigurationContainer isPermanentElement={false}
-                                     onDeleteAll={() => {}}
+      <ElementConfigurationContainer allowAddEmptyElement
+                                     onAddEmptyElement={() => {}}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
@@ -34,8 +34,8 @@ describe('ElementConfigurationContainer', () => {
 
   it('should render title', () => {
     render(
-      <ElementConfigurationContainer isPermanentElement={false}
-                                     onDeleteAll={() => {}}
+      <ElementConfigurationContainer allowAddEmptyElement
+                                     onAddEmptyElement={() => {}}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
@@ -44,33 +44,33 @@ describe('ElementConfigurationContainer', () => {
     expect(screen.getByText('Aggregation Element Title')).toBeInTheDocument();
   });
 
-  it('should call on delete when clicking delete icon', async () => {
-    const onDeleteAllMock = jest.fn();
+  it('should call on onAddEmptyElement when adding a section', async () => {
+    const onAddEmptyElementMock = jest.fn();
 
     render(
-      <ElementConfigurationContainer isPermanentElement={false}
-                                     onDeleteAll={onDeleteAllMock}
+      <ElementConfigurationContainer allowAddEmptyElement
+                                     onAddEmptyElement={onAddEmptyElementMock}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
     );
 
-    const deleteButton = screen.getByTitle('Remove Aggregation Element Title');
+    const addButton = screen.getByTitle('Add a Aggregation Element Title');
 
-    fireEvent.click(deleteButton);
+    fireEvent.click(addButton);
 
-    expect(onDeleteAllMock).toHaveBeenCalledTimes(1);
+    expect(onAddEmptyElementMock).toHaveBeenCalledTimes(1);
   });
 
-  it('should not display delete icon if element is permanent', async () => {
+  it('should not display add section icon if adding element section is not allowed', async () => {
     render(
-      <ElementConfigurationContainer isPermanentElement
-                                     onDeleteAll={() => {}}
+      <ElementConfigurationContainer allowAddEmptyElement={false}
+                                     onAddEmptyElement={() => {}}
                                      title="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationContainer>,
     );
 
-    expect(screen.queryByTitle('Remove Aggregation Element Title')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Add a Aggregation Element Title')).not.toBeInTheDocument();
   });
 });

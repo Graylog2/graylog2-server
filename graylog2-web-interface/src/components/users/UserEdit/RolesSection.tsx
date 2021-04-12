@@ -37,9 +37,10 @@ type Props = {
   user: User,
   onSubmit: (payload: { roles: string[] }) => Promise<void>,
 };
+
 const Container = styled.div`
-  margin-top 15px;
-  margin-bottom 15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 `;
 
 const RolesSection = ({ user, onSubmit }: Props) => {

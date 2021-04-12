@@ -18,8 +18,6 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
-import { Button, ButtonToolbar } from 'components/graylog';
-
 import ElementConfigurationSection from './ElementConfigurationSection';
 import Metric from './Metric';
 
@@ -33,28 +31,21 @@ const MetricsConfiguration = () => {
   }, [setValues, values]);
 
   return (
-    <>
-      <FieldArray name="metrics"
-                  render={(arrayHelpers) => (
-                    <>
-                      <div>
-                        {metrics.map((metric, index) => {
-                          return (
-                          // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationSection key={`metrics-${index}`} onRemove={() => removeMetric(index)}>
-                              <Metric index={index} />
-                            </ElementConfigurationSection>
-                          );
-                        })}
-                      </div>
-                      <ButtonToolbar>
-                        <Button className="pull-right" bsSize="small" type="button" onClick={() => arrayHelpers.push({})}>
-                          Add a Metric
-                        </Button>
-                      </ButtonToolbar>
-                    </>
-                  )} />
-    </>
+    <FieldArray name="metrics"
+                render={() => (
+                  <>
+                    <div>
+                      {metrics.map((metric, index) => {
+                        return (
+                        // eslint-disable-next-line react/no-array-index-key
+                          <ElementConfigurationSection key={`metrics-${index}`} onRemove={() => removeMetric(index)}>
+                            <Metric index={index} />
+                          </ElementConfigurationSection>
+                        );
+                      })}
+                    </div>
+                  </>
+                )} />
   );
 };
 
