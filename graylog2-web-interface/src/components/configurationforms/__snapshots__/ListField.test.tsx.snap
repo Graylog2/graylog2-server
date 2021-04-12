@@ -46,7 +46,7 @@ exports[`<ListField> should render an empty field 1`] = `
             class="css-1hio1c"
           >
             <div
-              class="css-1nlt8zk-placeholder"
+              class="css-1fbh878-placeholder"
             >
               Select list field
             </div>
