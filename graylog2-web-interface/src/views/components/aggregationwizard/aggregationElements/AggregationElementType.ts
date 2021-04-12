@@ -20,6 +20,7 @@ import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from '../Wi
 
 export type AggregationElement = {
   title: string,
+  titleSingular?: string,
   key: string,
   allowCreate: (formValues: WidgetConfigFormValues) => boolean,
   order: number,

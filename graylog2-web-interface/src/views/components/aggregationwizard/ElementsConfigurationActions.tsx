@@ -27,12 +27,12 @@ import type { WidgetConfigFormValues } from './WidgetConfigForm';
 const ConfigActions = styled.div<{ scrolledToBottom: boolean }>(({ theme, scrolledToBottom }) => css`
   position: sticky;
   width: 100%;
-  bottom: 0px;
+  bottom: 0;
   padding-top: 5px;
   background: ${theme.colors.global.contentBackground};
   z-index: 1;
 
-  :before {
+  ::before {
     box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
     content: ' ';
     display: ${scrolledToBottom ? 'block' : 'none'};
@@ -47,7 +47,7 @@ const ConfigActions = styled.div<{ scrolledToBottom: boolean }>(({ theme, scroll
 const ScrolledToBottomIndicator = styled.div`
   width: 100%;
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   height: 5px;
   z-index: 0;
 `;

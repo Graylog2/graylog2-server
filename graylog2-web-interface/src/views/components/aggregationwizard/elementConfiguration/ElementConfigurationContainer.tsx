@@ -20,11 +20,8 @@ import styled, { css } from 'styled-components';
 import IconButton from 'components/common/IconButton';
 
 const Wrapper = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: 6px 6px 3px 6px;
-  border-radius: 6px;
   margin-bottom: 6px;
+  border-radius: 6px;
 
   :last-child {
     margin-bottom: 0;
@@ -56,40 +53,76 @@ const Wrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const Header = styled.div`
+const Header = styled.div(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
-`;
+  align-items: center;
+  margin-bottom: 1px;
+  min-height: 26px;
+  font-weight: bold;
+  position: relative;
+
+  ::before {
+    content: ' ';
+    top: 50%;
+    width: 100%;
+    border-bottom: 1px solid ${theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
+    position: absolute;
+  }
+`);
+
+const ElementTitle = styled.div(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
+  z-index: 1;
+  padding-right: 8px;
+`);
+
+const ElementActions = styled.div(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
+  z-index: 1;
+  padding-left: 5px;
+`);
+
+const StyledIconButton = styled(IconButton)(({ theme }) => `
+  color: ${theme.colors.global.textDefault};
+`);
 
 type Props = {
+  allowAddEmptyElement: boolean,
   children: React.ReactNode,
-  isPermanentElement: boolean,
-  onDeleteAll: () => void
+  onAddEmptyElement: () => void,
   title: string,
+  titleSingular?: string,
 }
 
 const ElementConfigurationContainer = ({
   children,
-  isPermanentElement,
-  onDeleteAll,
+  allowAddEmptyElement,
+  onAddEmptyElement,
   title,
+  titleSingular,
 }: Props) => {
   return (
     <Wrapper>
       <Header>
-        <div>{title}</div>
-        <div>
-          {!isPermanentElement && (
-            <IconButton title={`Remove ${title}`} name="trash" onClick={onDeleteAll} />
+        <ElementTitle>
+          {title}
+        </ElementTitle>
+        <ElementActions>
+          {allowAddEmptyElement && (
+            <StyledIconButton title={`Add a ${titleSingular ?? title}`} name="plus" onClick={onAddEmptyElement} />
           )}
-        </div>
+        </ElementActions>
       </Header>
       <div>
         {children}
       </div>
     </Wrapper>
   );
+};
+
+ElementConfigurationContainer.defaultProps = {
+  titleSingular: undefined,
 };
 
 export default ElementConfigurationContainer;
