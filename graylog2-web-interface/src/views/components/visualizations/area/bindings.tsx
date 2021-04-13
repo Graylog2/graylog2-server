@@ -38,6 +38,7 @@ const areaChart: VisualizationType = {
       required: true,
     }],
   },
+  capabilities: ['event-annotations'],
 };
 
 export default areaChart;

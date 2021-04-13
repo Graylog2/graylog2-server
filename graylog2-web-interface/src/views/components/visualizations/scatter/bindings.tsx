@@ -22,6 +22,7 @@ const scatterChart: VisualizationType = {
   type: ScatterVisualization.type,
   displayName: 'Scatter Plot',
   component: ScatterVisualization,
+  capabilities: ['event-annotations'],
 };
 
 export default scatterChart;

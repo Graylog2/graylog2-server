@@ -38,6 +38,7 @@ const lineChart: VisualizationType = {
       required: true,
     }],
   },
+  capabilities: ['event-annotations'],
 };
 
 export default lineChart;

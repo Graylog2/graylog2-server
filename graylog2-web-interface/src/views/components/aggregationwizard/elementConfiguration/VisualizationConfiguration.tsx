@@ -62,6 +62,7 @@ const VisualizationConfiguration = () => {
   }, [findVisualizationType, setFieldValue]);
 
   const isTimelineChart = isTimeline(values);
+  const supportsEventAnnotations = currentVisualizationType.capabilities?.includes('event-annotations') ?? false;
 
   return (
     <ElementConfigurationSection>
@@ -86,7 +87,7 @@ const VisualizationConfiguration = () => {
           </Input>
         )}
       </Field>
-      {isTimelineChart && (
+      {isTimelineChart && supportsEventAnnotations && (
         <Field name="visualization.eventAnnotation">
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <Input id={`${name}-input`}

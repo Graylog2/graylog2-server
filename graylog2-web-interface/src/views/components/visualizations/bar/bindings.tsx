@@ -70,6 +70,7 @@ const barChart: VisualizationType = {
       },
     }],
   },
+  capabilities: ['event-annotations'],
 };
 
 export default barChart;

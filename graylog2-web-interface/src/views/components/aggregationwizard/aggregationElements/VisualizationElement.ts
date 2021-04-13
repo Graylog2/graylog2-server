@@ -58,6 +58,7 @@ const fromConfig = (config: AggregationWidgetConfig) => ({
     eventAnnotation: config.eventAnnotation,
   },
 });
+
 const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
   .visualization(formValues.visualization.type)
   .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
