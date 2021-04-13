@@ -19,13 +19,13 @@ package org.graylog2.periodical;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +50,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
     private final ContentPackService contentPackService;
     private final ContentPackPersistenceService contentPackPersistenceService;
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
+    private final Configuration configuration;
     private final boolean contentPacksLoaderEnabled;
     private final Path contentPacksDir;
     private final Set<String> contentPacksAutoInstall;
@@ -59,6 +60,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
                                        ContentPackService contentPackService,
                                        ContentPackPersistenceService contentPackPersistenceService,
                                        ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
+                                       Configuration configuration,
                                        @Named("content_packs_loader_enabled") boolean contentPacksLoaderEnabled,
                                        @Named("content_packs_dir") Path contentPacksDir,
                                        @Named("content_packs_auto_install") Set<String> contentPacksAutoInstall) {
@@ -66,6 +68,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.contentPackService = contentPackService;
         this.contentPackPersistenceService = contentPackPersistenceService;
+        this.configuration = configuration;
         this.contentPacksLoaderEnabled = contentPacksLoaderEnabled;
         this.contentPacksDir = contentPacksDir;
         this.contentPacksAutoInstall = ImmutableSet.copyOf(contentPacksAutoInstall);
@@ -180,7 +183,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
                 }
 
                 contentPackService.installContentPack(contentPack, Collections.emptyMap(),
-                        "Installed by auto loader", "local:admin");
+                        "Installed by auto loader", configuration.getRootUsername());
             }
 
         }
