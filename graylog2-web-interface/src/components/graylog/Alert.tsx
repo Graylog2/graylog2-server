@@ -14,11 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import PropTypes from 'prop-types';
 import styled, { css, DefaultTheme } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-const Alert = styled(BootstrapAlert)(({ bsStyle = 'default', theme }: { bsStyle: string, theme: DefaultTheme }) => {
+class ModifiedBootstrapAlert extends BootstrapAlert {
+  static propTypes = {
+    ...BootstrapAlert.propTypes,
+    bsStyle: PropTypes.oneOf(['danger', 'default', 'info', 'primary', 'success', 'warning']),
+  }
+
+  static defaultProps = {
+    ...BootstrapAlert.defaultProps,
+    bsStyle: 'default',
+  }
+}
+
+const Alert = styled(ModifiedBootstrapAlert)(({ bsStyle, theme }: { bsStyle: string, theme: DefaultTheme }) => {
   const borderColor = theme.colors.variant.lighter[bsStyle];
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
 
