@@ -239,34 +239,53 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // once we exhaust the row groups, we descend into the columns, which get added as values to their corresponding rows
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
 
-        final String rowsAggName = queryContext.contextMap().get(pivot.id() + "-rows").toString();
-        final MultiBucketsAggregation rowsResult = queryResult.getAggregations().get(rowsAggName);
-        final List<PivotResult.Row> rows = rowsResult.getBuckets()
-                .stream()
-                .map(bucket -> {
-                    final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
-                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys)
-                            .source("leaf");
-                    if (pivot.rollup()) {
-                        pivot.series().stream()
-                                .flatMap(seriesSpec -> createRowValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec))
-                                .forEach(value -> rowBuilder.addValue(value));
-                    }
-                    if (!pivot.columnGroups().isEmpty()) {
-                        final String columnsAggName = queryContext.contextMap().get(pivot.id() + "-columns").toString();
-                        final MultiBucketsAggregation columnsResult = bucket.getAggregations().get(columnsAggName);
-                        columnsResult.getBuckets().forEach(columnBucket -> {
-                            final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
-                            pivot.series().stream()
-                                    .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
-                                    .forEach(rowBuilder::addValue);
-                        });
-                    }
-                    return rowBuilder.build();
-                })
-                .collect(Collectors.toList());
+        // valid queryContext and queryResult are expected
+        final String rowKey = pivot.id() + "-rows";
+        if(queryContext.contextMap().containsKey(rowKey)) {
+            final String rowsAggName = queryContext.contextMap().get(rowKey).toString();
+            final MultiBucketsAggregation rowsResult = queryResult.getAggregations().get(rowsAggName);
+            if (rowsResult != null) {
+                final List<PivotResult.Row> rows = rowsResult.getBuckets()
+                        .stream()
+                        .map(bucket -> {
+                            final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
+                            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys)
+                                    .source("leaf");
+                            if (pivot.rollup()) {
+                                pivot.series().stream()
+                                        .flatMap(seriesSpec -> createRowValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec))
+                                        .forEach(value -> rowBuilder.addValue(value));
+                            }
+                            if (!pivot.columnGroups().isEmpty()) {
+                                final String columnsKey = pivot.id() + "-columns";
+                                if(queryContext.contextMap().containsKey(columnsKey)) {
+                                    final String columnsAggName = queryContext.contextMap().get(columnsKey).toString();
+                                    final MultiBucketsAggregation columnsResult = bucket.getAggregations().get(columnsAggName);
+                                    if (columnsResult != null) {
+                                        columnsResult.getBuckets().forEach(columnBucket -> {
+                                            final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                                            pivot.series().stream()
+                                                    .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
+                                                    .forEach(rowBuilder::addValue);
+                                        });
+                                    } else {
+                                        LOG.warn("Expected aggregation '{}' not found in aggregations.", columnsAggName);
+                                    }
+                                } else {
+                                    LOG.warn("Expected columns-key '{}' not found in queryContext", columnsKey);
+                                }
+                            }
+                            return rowBuilder.build();
+                        })
+                        .collect(Collectors.toList());
 
-        resultBuilder.addAllRows(rows);
+                resultBuilder.addAllRows(rows);
+            } else {
+                LOG.warn("Expected aggregation '{}' not found in aggregations.", rowsAggName);
+            }
+        } else {
+            LOG.warn("Expected row-key '{}' not found in queryContext", rowKey);
+        }
 
         return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
     }
