@@ -57,6 +57,7 @@ jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: jest.fn(() => Promise.resolve()),
     setWidgetsToSearch: jest.fn(),
+    executeWithCurrentState: jest.fn(),
   },
   SearchStore: MockStore(
     ['listen', () => jest.fn()],
