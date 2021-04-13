@@ -210,7 +210,7 @@ public class KeyUtil {
      * @return PEM file
      * @throws GeneralSecurityException
      */
-    public static File generatePKSC8FromPrivateKey(Path tmpDir, char[] password, PrivateKey key) throws GeneralSecurityException {
+    public static File generatePKCS8FromPrivateKey(Path tmpDir, char[] password, PrivateKey key) throws GeneralSecurityException {
         try {
             JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
                     new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC)
@@ -251,8 +251,8 @@ public class KeyUtil {
 
         // Be sure to specify charset for reader - don't use plain FileReader
         Object object;
-        final InputStream inputStream = Files.newInputStream(keyFile.toPath());
-        try (InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        try (InputStream inputStream = Files.newInputStream(keyFile.toPath());
+             InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
              PEMParser pemParser = new PEMParser(fileReader)) {
             object = pemParser.readObject();
         }

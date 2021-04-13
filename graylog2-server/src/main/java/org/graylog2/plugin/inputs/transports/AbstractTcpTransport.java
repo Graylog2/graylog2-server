@@ -275,7 +275,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 certFile = ssc.certificate();
 
                 if (!Strings.isNullOrEmpty(tlsKeyPassword)) {
-                    keyFile = KeyUtil.generatePKSC8FromPrivateKey(tmpPath, tlsKeyPassword.toCharArray(), ssc.key());
+                    keyFile = KeyUtil.generatePKCS8FromPrivateKey(tmpPath, tlsKeyPassword.toCharArray(), ssc.key());
                     ssc.privateKey().delete();
                 }
                 else {

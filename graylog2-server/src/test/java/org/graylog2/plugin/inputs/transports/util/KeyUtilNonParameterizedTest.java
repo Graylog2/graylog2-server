@@ -66,7 +66,7 @@ public class KeyUtilNonParameterizedTest {
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.unprotected"), null);
         final String tmpPassword = "dummypassword";
         final Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
-        File pkcs8EncryptedKeyFile = KeyUtil.generatePKSC8FromPrivateKey(tmpDir, tmpPassword.toCharArray(), privateKey);
+        File pkcs8EncryptedKeyFile = KeyUtil.generatePKCS8FromPrivateKey(tmpDir, tmpPassword.toCharArray(), privateKey);
         final PrivateKey retrievedKey = fileToKey(pkcs8EncryptedKeyFile, tmpPassword);
         assertThat(retrievedKey).hasToString(privateKey.toString());
     }
