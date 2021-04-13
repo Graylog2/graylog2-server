@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
@@ -181,6 +181,18 @@ describe('AggregationWizard', () => {
 
     await screen.findByText('took_ms');
     await screen.findByText('timestamp');
+  });
+
+  it('should not display group by section if config has no pivots', () => {
+    const config = widgetConfig
+      .toBuilder()
+      .build();
+
+    renderSUT({ config });
+
+    const configureElementsSection = screen.getByTestId('configure-elements-section');
+
+    expect(within(configureElementsSection).queryByText('Group By')).not.toBeInTheDocument();
   });
 
   it('should correctly change config', async () => {
