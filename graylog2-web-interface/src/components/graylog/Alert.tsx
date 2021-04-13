@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, DefaultTheme } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-class ModifiedBootstrapAlert extends BootstrapAlert {
+// eslint-disable-next-line react/prefer-stateless-function
+class ModifiedBootstrapAlert extends React.Component<BootstrapAlert> {
   static propTypes = {
     ...BootstrapAlert.propTypes,
+    // eslint-disable-next-line react/no-unused-prop-types
     bsStyle: PropTypes.oneOf(['danger', 'default', 'info', 'primary', 'success', 'warning']),
   }
 
