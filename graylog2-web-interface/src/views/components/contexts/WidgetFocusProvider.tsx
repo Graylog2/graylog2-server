@@ -24,6 +24,7 @@ import URI from 'urijs';
 import { useStore } from 'stores/connect';
 import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
+import { SearchActions } from 'views/stores/SearchStore';
 
 import WidgetFocusContext, { FocusContextState } from './WidgetFocusContext';
 
@@ -81,6 +82,8 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       }
 
       setFocusedWidget(nextFocusedWidget);
+      const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : undefined;
+      SearchActions.setFilterSearchTypes(filter);
     }
   }, [focusedWidget, setFocusedWidget, widgets, focusUriParams]);
 };

@@ -26,7 +26,7 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchJobActions } from 'views/stores/SearchJobStore';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import SearchResult from 'views/logic/SearchResult';
-import SearchActions from 'views/actions/SearchActions';
+import SearchActions, { FilterSearchTypes } from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
@@ -55,6 +55,7 @@ export type SearchStoreState = {
   search: Search,
   result: SearchResult,
   widgetMapping: WidgetMapping,
+  filterSearchTypes: FilterSearchTypes | undefined | null;
 };
 
 export const SearchStore: Store<SearchStoreState> = singletonStore(
@@ -169,6 +170,10 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
+    setFilterSearchTypes(filter: FilterSearchTypes) {
+      this.filterSearchTypes = filter;
+    },
+
     executeWithCurrentState(): Promise<SearchExecutionResult> {
       const promise = SearchActions.execute(this.executionState);
 
@@ -186,13 +191,27 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return promise;
     },
 
-    _executePromise(executionState: SearchExecutionState, startActionPromise: (promise: Promise<SearchResult>) => void, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
+    _executePromise(executionStateParam: SearchExecutionState, startActionPromise: (promise: Promise<SearchResult>) => void, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
+      const { filterSearchTypes } = this._state();
+
       if (this.executePromise && this.executePromise.cancel) {
         this.executePromise.cancel();
       }
 
       if (this.search) {
         const { widgetMapping, search } = this.view;
+
+        let executionStateBuilder = executionStateParam.toBuilder();
+
+        if (filterSearchTypes) {
+          const { globalOverride = GlobalOverride.empty() } = executionStateParam;
+          const keepSearchTypes = filterSearchTypes.map((widgetId) => widgetMapping.get(widgetId))
+            .reduce((acc, searchTypeSet) => [...acc, ...searchTypeSet.toArray()], globalOverride.keepSearchTypes || []);
+          const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();
+          executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
+        }
+
+        const executionState = executionStateBuilder.build();
 
         this.executePromise = this.trackJob(search, executionState)
           .then((result: SearchResult) => {
@@ -213,7 +232,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
     },
 
     _state(): SearchStoreState {
-      return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };
+      return { search: this.search, result: this.result, widgetMapping: this.widgetMapping, filterSearchTypes: this.filterSearchTypes };
     },
 
     _trigger() {

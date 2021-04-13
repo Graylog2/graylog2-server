@@ -56,6 +56,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: jest.fn(() => Promise.resolve()),
+    setFilterSearchTypes: jest.fn(),
   },
   SearchStore: MockStore(
     ['listen', () => jest.fn()],
