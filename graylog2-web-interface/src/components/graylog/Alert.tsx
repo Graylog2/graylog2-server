@@ -15,28 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import styled, { css, DefaultTheme } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-// eslint-disable-next-line react/prefer-stateless-function
-class ModifiedBootstrapAlert extends React.Component<BootstrapAlert> {
-  static propTypes = {
-    ...BootstrapAlert.propTypes,
-    // eslint-disable-next-line react/no-unused-prop-types
-    bsStyle: PropTypes.oneOf(['danger', 'default', 'info', 'primary', 'success', 'warning']),
-  }
+import { ColorVariants } from 'theme/colors';
 
-  static defaultProps = {
-    ...BootstrapAlert.defaultProps,
-    bsStyle: 'default',
-  }
+interface AlertProps {
+  $bsStyle: ColorVariants,
+  theme: DefaultTheme
 }
 
-const Alert = styled(ModifiedBootstrapAlert)(({ bsStyle, theme }: { bsStyle: string, theme: DefaultTheme }) => {
-  const borderColor = theme.colors.variant.lighter[bsStyle];
-  const backgroundColor = theme.colors.variant.lightest[bsStyle];
+const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorVariants }) => ({
+  bsStyle: null,
+  $bsStyle: bsStyle || 'default',
+}))(({ $bsStyle, theme }: AlertProps) => {
+  const borderColor = theme.colors.variant.lighter[$bsStyle];
+  const backgroundColor = theme.colors.variant.lightest[$bsStyle];
 
   return css`
     background-color: ${backgroundColor};
@@ -67,5 +63,9 @@ const Alert = styled(ModifiedBootstrapAlert)(({ bsStyle, theme }: { bsStyle: str
     }
   `;
 });
+
+const Alert = ({ bsStyle, ...rest }: {bsStyle: ColorVariants}) => {
+  return <StyledAlert bsStyle={bsStyle} {...rest} />;
+};
 
 export default Alert;
