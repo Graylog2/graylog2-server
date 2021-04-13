@@ -26,7 +26,7 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchJobActions } from 'views/stores/SearchJobStore';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import SearchResult from 'views/logic/SearchResult';
-import SearchActions, { FilterSearchTypes } from 'views/actions/SearchActions';
+import SearchActions, { WidgetsToSearch } from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
@@ -55,7 +55,7 @@ export type SearchStoreState = {
   search: Search,
   result: SearchResult,
   widgetMapping: WidgetMapping,
-  filterSearchTypes: FilterSearchTypes | undefined | null;
+  widgetsToSearch: WidgetsToSearch | null;
 };
 
 export const SearchStore: Store<SearchStoreState> = singletonStore(
@@ -170,8 +170,8 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
-    setFilterSearchTypes(filter: FilterSearchTypes) {
-      this.filterSearchTypes = filter;
+    setWidgetsToSearch(widgetIds: WidgetsToSearch) {
+      this.widgetsToSearch = widgetIds;
     },
 
     executeWithCurrentState(): Promise<SearchExecutionResult> {
@@ -192,7 +192,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
     },
 
     _executePromise(executionStateParam: SearchExecutionState, startActionPromise: (promise: Promise<SearchResult>) => void, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
-      const { filterSearchTypes } = this._state();
+      const { widgetsToSearch } = this._state();
 
       if (this.executePromise && this.executePromise.cancel) {
         this.executePromise.cancel();
@@ -203,9 +203,9 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
 
         let executionStateBuilder = executionStateParam.toBuilder();
 
-        if (filterSearchTypes) {
+        if (widgetsToSearch) {
           const { globalOverride = GlobalOverride.empty() } = executionStateParam;
-          const keepSearchTypes = filterSearchTypes.map((widgetId) => widgetMapping.get(widgetId))
+          const keepSearchTypes = widgetsToSearch.map((widgetId) => widgetMapping.get(widgetId))
             .reduce((acc, searchTypeSet) => [...acc, ...searchTypeSet.toArray()], globalOverride.keepSearchTypes || []);
           const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();
           executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
@@ -232,7 +232,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
     },
 
     _state(): SearchStoreState {
-      return { search: this.search, result: this.result, widgetMapping: this.widgetMapping, filterSearchTypes: this.filterSearchTypes };
+      return { search: this.search, result: this.result, widgetMapping: this.widgetMapping, widgetsToSearch: this.widgetsToSearch };
     },
 
     _trigger() {

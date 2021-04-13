@@ -40,7 +40,7 @@ export type SearchExecutionResult = {
   widgetMapping: WidgetMapping,
 };
 
-export type FilterSearchTypes = string[];
+export type WidgetsToSearch = string[];
 
 type SearchActionsType = RefluxActions<{
   create: (search: Search) => Promise<CreateSearchResponse>,
@@ -53,7 +53,7 @@ type SearchActionsType = RefluxActions<{
   refresh: () => Promise<void>,
   get: (searchId: SearchId) => Promise<SearchJson>,
   parameters: (parameters: (Array<Parameter> | Immutable.List<Parameter>)) => Promise<View>,
-  setFilterSearchTypes: (FilterSearchTypes) => Promise<void>,
+  setWidgetsToSearch: (filter: WidgetsToSearch) => Promise<void>,
 }>;
 
 const SearchActions: SearchActionsType = singletonActions(
@@ -80,7 +80,7 @@ const SearchActions: SearchActionsType = singletonActions(
     refresh: {
       asyncResult: true,
     },
-    setFilterSearchTypes: {
+    setWidgetsToSearch: {
       asyncResult: false,
     },
   }),

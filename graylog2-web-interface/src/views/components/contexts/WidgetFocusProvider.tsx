@@ -82,8 +82,12 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       }
 
       setFocusedWidget(nextFocusedWidget);
-      const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : undefined;
-      SearchActions.setFilterSearchTypes(filter);
+      const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : null;
+      SearchActions.setWidgetsToSearch(filter);
+
+      if (filter === null) {
+        SearchActions.executeWithCurrentState();
+      }
     }
   }, [focusedWidget, setFocusedWidget, widgets, focusUriParams]);
 };

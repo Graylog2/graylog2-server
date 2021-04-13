@@ -56,7 +56,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: jest.fn(() => Promise.resolve()),
-    setFilterSearchTypes: jest.fn(),
+    setWidgetsToSearch: jest.fn(),
   },
   SearchStore: MockStore(
     ['listen', () => jest.fn()],
@@ -262,7 +262,7 @@ describe('Search', () => {
       });
   });
 
-  it('refreshing after query change parses search metadata first', (done) => {
+  it('refreshing after query change parses search metadata first', () => {
     const wrapper = mount(<SimpleSearch />);
 
     const searchBar = wrapper.find(DashboardSearchBar);
@@ -272,11 +272,9 @@ describe('Search', () => {
 
     const promise = cb(view as View);
 
-    promise.then(() => {
+    return promise.then(() => {
       expect(SearchMetadataActions.parseSearch).toHaveBeenCalled();
       expect(SearchActions.execute).toHaveBeenCalled();
-
-      done();
     });
   });
 
