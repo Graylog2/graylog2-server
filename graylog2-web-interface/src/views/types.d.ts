@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
+import { FormikErrors } from 'formik';
 
 import Widget from 'views/logic/widgets/Widget';
 import { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -30,7 +31,12 @@ import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
 import { OverrideProps } from 'views/components/WidgetOverrideElements';
-import { VisualizationConfigDefinition, VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import {
+  VisualizationConfigDefinition,
+  VisualizationConfigFormValues,
+  VisualizationFormValues,
+  WidgetConfigFormValues,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -123,6 +129,7 @@ interface VisualizationType {
   component: VisualizationComponent;
   config?: VisualizationConfigDefinition;
   capabilities?: Array<VisualizationCapability>;
+  validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
 }
 
 interface ResultHandler<T, R> {

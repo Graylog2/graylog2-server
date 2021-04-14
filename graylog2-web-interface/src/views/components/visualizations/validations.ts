@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { VisualizationType } from 'views/types';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
-import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
-import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
+export const areAtLeastNMetricsConfigured = (formValues: WidgetConfigFormValues, minimumMetrics: number) => formValues.metrics?.length >= minimumMetrics;
+export const areAtLeastNGroupingsConfigured = (formValues: WidgetConfigFormValues, minimumGroupings: number) => formValues.groupBy?.groupings?.length >= minimumGroupings;
 
-const validate = hasAtLeastOneMetric('Pie chart');
-
-const pieChart: VisualizationType = {
-  type: PieVisualization.type,
-  displayName: 'Pie Chart',
-  component: PieVisualization,
-  validate,
-};
-
-export default pieChart;
+export const hasAtLeastOneMetric = (name: string) => (formValues: WidgetConfigFormValues) => (!areAtLeastNMetricsConfigured(formValues, 1)
+  ? { type: `${name} requires at least one metric` }
+  : {});

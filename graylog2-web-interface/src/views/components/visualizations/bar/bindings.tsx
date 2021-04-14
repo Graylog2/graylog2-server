@@ -19,10 +19,13 @@ import type { VisualizationType } from 'views/types';
 
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 type BarVisualizationConfigFormValues = {
   barmode: 'group' | 'stack' | 'relative' | 'overlay',
 };
+
+const validate = hasAtLeastOneMetric('Bar chart');
 
 const barChart: VisualizationType = {
   type: BarVisualization.type,
@@ -71,6 +74,7 @@ const barChart: VisualizationType = {
     }],
   },
   capabilities: ['event-annotations'],
+  validate,
 };
 
 export default barChart;

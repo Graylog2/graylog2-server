@@ -16,6 +16,7 @@
  */
 import { isEmpty } from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { VisualizationType } from 'views/types';
 
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
@@ -64,9 +65,20 @@ const toConfig = (formValues: WidgetConfigFormValues, configBuilder: Aggregation
   .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
   .eventAnnotation(formValues.visualization.eventAnnotation);
 
-const hasErrors = (errors: { [key: string]: string }) => Object.values(errors)
+const hasErrors = (errors: {}) => Object.values(errors)
   .filter((value) => value !== undefined)
   .length > 0;
+
+const validateConfig = (visualizationType: VisualizationType, config: VisualizationConfigFormValues) => {
+  const { fields = [] } = visualizationType.config;
+
+  return fields
+    .filter((field) => 'required' in field && field.required)
+    .filter((field) => !field.isShown || field.isShown(config))
+    .filter(({ name }) => config[name] === undefined || config[name] === '')
+    .map(({ name, title }) => ({ [name]: `${title} is required.` }))
+    .reduce((prev, cur) => ({ ...prev, ...cur }), {});
+};
 
 const validate = (formValues: WidgetConfigFormValues) => {
   const { visualization: { type, config } } = formValues;
@@ -77,20 +89,15 @@ const validate = (formValues: WidgetConfigFormValues) => {
 
   const visualizationType = findVisualizationType(type);
 
-  if (visualizationType.config) {
-    const { fields = [] } = visualizationType.config;
+  const visualizationErrors = visualizationType.validate?.(formValues) ?? {};
 
-    const configErrors = fields
-      .filter((field) => 'required' in field && field.required)
-      .filter((field) => !field.isShown || field.isShown(config))
-      .filter(({ name }) => config[name] === undefined || config[name] === '')
-      .map(({ name, title }) => ({ [name]: `${title} is required.` }))
-      .reduce((prev, cur) => ({ ...prev, ...cur }), {});
+  const configErrors = visualizationType.config
+    ? validateConfig(visualizationType, config)
+    : {};
 
-    return hasErrors(configErrors) ? { visualization: { config: configErrors } } : {};
-  }
-
-  return {};
+  return hasErrors(configErrors) || hasErrors(visualizationErrors)
+    ? { visualization: { ...visualizationErrors, config: configErrors } }
+    : {};
 };
 
 const VisualizationElement: AggregationElement = {

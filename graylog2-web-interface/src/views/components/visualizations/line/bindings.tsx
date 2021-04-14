@@ -18,10 +18,13 @@ import type { VisualizationType } from 'views/types';
 
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
+import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 type LineVisualizationConfigFormValues = {
   interpolation: 'linear' | 'step-after' | 'spline';
 };
+
+const validate = hasAtLeastOneMetric('Line chart');
 
 const lineChart: VisualizationType = {
   type: LineVisualization.type,
@@ -39,6 +42,7 @@ const lineChart: VisualizationType = {
     }],
   },
   capabilities: ['event-annotations'],
+  validate,
 };
 
 export default lineChart;
