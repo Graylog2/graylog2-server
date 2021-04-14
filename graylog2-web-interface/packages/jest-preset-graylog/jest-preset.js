@@ -55,4 +55,5 @@ module.exports = {
     '.fixtures.[jt]s$',
   ],
   testTimeout: (Number.isFinite(TIMEOUT_MULTIPLIER) ? TIMEOUT_MULTIPLIER : 1.0) * 5000,
+  reporters: ['default', 'jest-junit'],
 };
