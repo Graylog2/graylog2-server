@@ -17,6 +17,8 @@
 package org.graylog2.outputs;
 
 import com.google.common.collect.Iterables;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -113,7 +115,10 @@ public class OutputRegistryTest {
         final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
         assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
 
+        // temporarily set logger-level to off to suppress deceptive exception-stacktrace
+        Configurator.setLevel(OutputRegistry.class.getName(), Level.OFF);
         MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);
+        Configurator.setLevel(OutputRegistry.class.getName(), Level.INFO);
 
         assertNull(result);
         assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
