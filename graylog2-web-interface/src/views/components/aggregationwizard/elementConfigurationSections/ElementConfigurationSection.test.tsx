@@ -23,7 +23,7 @@ describe('ElementConfigurationSection', () => {
   it('should render elements passed as children', () => {
     render(
       <ElementConfigurationSection allowCreate
-                                   onAddEmptyElement={() => {}}
+                                   onCreate={() => {}}
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,
@@ -35,7 +35,7 @@ describe('ElementConfigurationSection', () => {
   it('should render title', () => {
     render(
       <ElementConfigurationSection allowCreate
-                                   onAddEmptyElement={() => {}}
+                                   onCreate={() => {}}
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,
@@ -44,12 +44,12 @@ describe('ElementConfigurationSection', () => {
     expect(screen.getByText('Aggregation Element Title')).toBeInTheDocument();
   });
 
-  it('should call on onAddEmptyElement when adding a section', async () => {
-    const onAddEmptyElementMock = jest.fn();
+  it('should call on onCreate when adding a section', async () => {
+    const onCreateMock = jest.fn();
 
     render(
       <ElementConfigurationSection allowCreate
-                                   onAddEmptyElement={onAddEmptyElementMock}
+                                   onCreate={onCreateMock}
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,
@@ -59,13 +59,13 @@ describe('ElementConfigurationSection', () => {
 
     fireEvent.click(addButton);
 
-    expect(onAddEmptyElementMock).toHaveBeenCalledTimes(1);
+    expect(onCreateMock).toHaveBeenCalledTimes(1);
   });
 
   it('should not display add section icon if adding element section is not allowed', async () => {
     render(
       <ElementConfigurationSection allowCreate={false}
-                                   onAddEmptyElement={() => {}}
+                                   onCreate={() => {}}
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,

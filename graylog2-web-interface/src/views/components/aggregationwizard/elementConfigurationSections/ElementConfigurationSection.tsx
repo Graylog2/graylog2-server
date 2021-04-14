@@ -91,7 +91,7 @@ type Props = {
   allowCreate: boolean,
   children: React.ReactNode,
   elementTitle: string,
-  onAddEmptyElement: () => void,
+  onCreate: () => void,
   sectionTitle?: string,
 }
 
@@ -99,7 +99,7 @@ const ElementConfigurationSection = ({
   allowCreate,
   children,
   elementTitle,
-  onAddEmptyElement,
+  onCreate,
   sectionTitle,
 }: Props) => {
   return (
@@ -110,7 +110,7 @@ const ElementConfigurationSection = ({
         </ElementTitle>
         <ElementActions>
           {allowCreate && (
-            <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onAddEmptyElement} />
+            <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onCreate} />
           )}
         </ElementActions>
       </Header>
