@@ -39,7 +39,9 @@ const SortConfiguration = () => {
                     <div>
                       {sort.map((s, index) => (
                         // eslint-disable-next-line react/no-array-index-key
-                        <ElementConfigurationContainer key={`sort-${index}`} onRemove={() => removeSort(index)}>
+                        <ElementConfigurationContainer key={`sort-${index}`}
+                                                       onRemove={() => removeSort(index)}
+                                                       elementTitle={SortElement.title}>
                           <Sort index={index} />
                         </ElementConfigurationContainer>
                       ))}

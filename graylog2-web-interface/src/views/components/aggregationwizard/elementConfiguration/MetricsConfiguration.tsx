@@ -38,7 +38,9 @@ const MetricsConfiguration = () => {
                       {metrics.map((metric, index) => {
                         return (
                         // eslint-disable-next-line react/no-array-index-key
-                          <ElementConfigurationContainer key={`metrics-${index}`} onRemove={() => removeMetric(index)}>
+                          <ElementConfigurationContainer key={`metrics-${index}`}
+                                                         onRemove={() => removeMetric(index)}
+                                                         elementTitle={MetricElement.title}>
                             <Metric index={index} />
                           </ElementConfigurationContainer>
                         );

@@ -29,6 +29,8 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 
 import ElementConfigurationContainer from './ElementConfigurationContainer';
 
+import VisualizationElement from '../aggregationElements/VisualizationElement';
+
 const isTimeline = (values: WidgetConfigFormValues) => {
   if (!values.groupBy?.groupings || values.groupBy.groupings.length === 0) {
     return false;
@@ -65,7 +67,7 @@ const VisualizationConfiguration = () => {
   const supportsEventAnnotations = currentVisualizationType.capabilities?.includes('event-annotations') ?? false;
 
   return (
-    <ElementConfigurationContainer>
+    <ElementConfigurationContainer elementTitle={VisualizationElement.title}>
       <Field name="visualization.type">
         {({ field: { name, value }, meta: { error } }) => (
           <Input id="visualization-type-select"
