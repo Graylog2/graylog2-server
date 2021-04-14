@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 
 import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
@@ -22,9 +23,14 @@ import ElementConfigurationContainer
   from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationContainer';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
+import SortElement from '../aggregationElements/SortElement';
+
 const SortConfiguration = () => {
-  const { values } = useFormikContext<WidgetConfigFormValues>();
+  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const { sort } = values;
+  const removeSort = useCallback((index) => {
+    setValues(SortElement.removeElementSection(index, values));
+  }, [setValues, values]);
 
   return (
     <FieldArray name="sort"
@@ -33,7 +39,7 @@ const SortConfiguration = () => {
                     <div>
                       {sort.map((s, index) => (
                         // eslint-disable-next-line react/no-array-index-key
-                        <ElementConfigurationContainer key={`sort-${index}`}>
+                        <ElementConfigurationContainer key={`sort-${index}`} onRemove={() => removeSort(index)}>
                           <Sort index={index} />
                         </ElementConfigurationContainer>
                       ))}
