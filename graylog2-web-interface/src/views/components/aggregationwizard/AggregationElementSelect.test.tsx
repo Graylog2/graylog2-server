@@ -28,7 +28,7 @@ const aggregationElements: Array<AggregationElement> = [
     order: 1,
     allowAddEmptyElement: () => true,
     onCreate: () => {},
-    configurationSectionComponent: () => <div />,
+    component: () => <div />,
   },
   {
     title: 'Sort',
@@ -36,7 +36,7 @@ const aggregationElements: Array<AggregationElement> = [
     order: 1,
     allowAddEmptyElement: () => false,
     onCreate: () => {},
-    configurationSectionComponent: () => <div />,
+    component: () => <div />,
   },
 ];
 

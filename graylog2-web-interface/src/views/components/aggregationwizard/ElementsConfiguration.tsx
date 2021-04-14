@@ -67,7 +67,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
           }
 
-          const ConfigurationSection = aggregationElement.configurationSectionComponent;
+          const ConfigurationSection = aggregationElement.component;
 
           return (
             <ElementConfigurationSection allowAddEmptyElement={aggregationElement.allowAddEmptyElement(values)}
