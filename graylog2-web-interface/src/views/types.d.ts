@@ -111,11 +111,18 @@ type NumericField = BaseRequiredField & {
 
 type ConfigurationField = SelectField | BooleanField | NumericField;
 
+export interface VisualizationCapabilities {
+  'event-annotations': undefined,
+}
+
+export type VisualizationCapability = keyof VisualizationCapabilities;
+
 interface VisualizationType {
   type: string;
   displayName: string;
   component: VisualizationComponent;
   config?: VisualizationConfigDefinition;
+  capabilities?: Array<VisualizationCapability>;
 }
 
 interface ResultHandler<T, R> {
