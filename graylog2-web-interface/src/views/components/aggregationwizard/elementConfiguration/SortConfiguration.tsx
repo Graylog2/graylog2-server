@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { FieldArray, useFormikContext } from 'formik';
-import Sort from 'src/views/components/aggregationwizard/elementConfiguration/Sort';
 
+import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
 import ElementConfigurationContainer
   from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationContainer';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
