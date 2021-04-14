@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { Field } from 'formik';
 
-import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfigurationSections/VisualizationConfigurationOptions';
+import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { Input } from 'components/bootstrap';
 import { HelpBlock } from 'components/graylog';
 

@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { FieldArray, useFormikContext } from 'formik';
+import Sort from 'src/views/components/aggregationwizard/elementConfiguration/Sort';
 
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import ElementConfigurationContainer
-  from 'views/components/aggregationwizard/elementConfigurationSections/ElementConfigurationContainer';
-import Sort from 'views/components/aggregationwizard/elementConfigurationSections/Sort';
+  from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationContainer';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 const SortConfiguration = () => {
   const { values } = useFormikContext<WidgetConfigFormValues>();

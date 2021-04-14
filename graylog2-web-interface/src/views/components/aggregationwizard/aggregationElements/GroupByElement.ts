@@ -28,7 +28,7 @@ import type {
   ValuesGrouping,
   WidgetConfigFormValues,
 } from '../WidgetConfigForm';
-import GroupByConfiguration from '../elementConfigurationSections/GroupByConfiguration';
+import GroupByConfiguration from '../elementConfiguration/GroupByConfiguration';
 
 type GroupByError = {
   field?: string,

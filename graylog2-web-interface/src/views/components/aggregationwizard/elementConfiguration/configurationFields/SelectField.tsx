@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfigurationSections/VisualizationConfigurationOptions';
+import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 
