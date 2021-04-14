@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button } from 'components/graylog';
@@ -43,16 +43,6 @@ const PublicNotifications = () => {
   const localStorageItem = 'gl-notifications';
   const notificationStore = new Set(Store.get(localStorageItem) || []);
   const [showReadMore, setShowReadMore] = useState<string>(undefined);
-
-  // useEffect(()=>{
-  //   const visibleNotifications = [];
-  //
-  //   Object.keys(AppConfig.loginNotifications()).forEach((notificationId)=>{
-  //     if (!notificationStore.has(notificationId)) {
-  //       visibleNotifications.push(notificationId);
-  //     }
-  //   });
-  // })
 
   const notifications = Object.keys(AppConfig.loginNotifications()).map((notificationId) => {
     if (notificationStore.has(notificationId)) {
