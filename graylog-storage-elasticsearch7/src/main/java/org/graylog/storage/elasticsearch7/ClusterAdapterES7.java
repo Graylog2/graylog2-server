@@ -54,6 +54,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -180,7 +181,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     private ClusterHealth clusterHealthFrom(ClusterHealthResponse response) {
-        return ClusterHealth.create(response.getStatus().toString(),
+        return ClusterHealth.create(response.getStatus().toString().toLowerCase(Locale.ENGLISH),
                 ClusterHealth.ShardStatus.create(
                         response.getActiveShards(),
                         response.getInitializingShards(),
