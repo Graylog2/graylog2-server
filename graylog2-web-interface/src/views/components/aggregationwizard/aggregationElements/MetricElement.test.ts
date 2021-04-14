@@ -20,27 +20,27 @@ import MetricElement from './MetricElement';
 
 describe('MetricElement', () => {
   describe('Remove section from form', () => {
-    const { removeElement } = MetricElement;
+    const { onRemove } = MetricElement;
     const metric1 = { function: 'count', field: undefined } as MetricFormValues;
     const metric2 = { function: 'avg', field: 'took_ms' } as MetricFormValues;
 
     it('should remove a metric from the form', () => {
       const values = { metrics: [metric1, metric2] } as WidgetConfigFormValues;
-      const result = removeElement(1, values);
+      const result = onRemove(1, values);
 
       expect(result.metrics).toStrictEqual([metric1]);
     });
 
     it('should remove the last metric from the form', () => {
       const values = { metrics: [metric2] } as WidgetConfigFormValues;
-      const result = removeElement(0, values);
+      const result = onRemove(0, values);
 
       expect(result.metrics).toStrictEqual([]);
     });
 
     it('should remove no metric from the form if the index does not fit', () => {
       const values = { metrics: [metric1, metric2] } as WidgetConfigFormValues;
-      const result = removeElement(3, values);
+      const result = onRemove(3, values);
 
       expect(result.metrics).toStrictEqual([metric1, metric2]);
     });

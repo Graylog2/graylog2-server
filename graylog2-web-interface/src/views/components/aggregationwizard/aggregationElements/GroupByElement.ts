@@ -197,7 +197,7 @@ const GroupByElement: AggregationElement = {
       ],
     },
   }),
-  removeElement: ((index, formValues) => {
+  onRemove: ((index, formValues) => {
     const newFormValues = { ...formValues };
     const newGroupings = formValues.groupBy?.groupings.filter((value, i) => (index !== i));
 
