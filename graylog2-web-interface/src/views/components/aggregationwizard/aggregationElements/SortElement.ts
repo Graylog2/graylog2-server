@@ -78,6 +78,10 @@ const SortElement: AggregationElement = {
   order: 3,
   allowCreate: () => true,
   component: SortConfiguration,
+  removeElementSection: ((index, formValues) => ({
+    ...formValues,
+    sort: formValues.sort.filter((value, i) => index !== i),
+  })),
   fromConfig: (config: AggregationWidgetConfig) => ({
     sort: config.sort.map((s) => ({
       type: configTypeToFormValueType(s.type),
