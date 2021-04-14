@@ -27,7 +27,7 @@ const aggregationElements: Array<AggregationElement> = [
     key: 'metric',
     order: 1,
     allowCreate: () => true,
-    onCreate: () => {},
+    onCreate: () => ({}),
     component: () => <div />,
   },
   {
@@ -35,7 +35,7 @@ const aggregationElements: Array<AggregationElement> = [
     key: 'sort',
     order: 1,
     allowCreate: () => false,
-    onCreate: () => {},
+    onCreate: () => ({}),
     component: () => <div />,
   },
 ];
