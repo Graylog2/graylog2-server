@@ -17,6 +17,8 @@
 package org.graylog2.inputs.codecs;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.graylog2.inputs.TestHelper;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -32,7 +34,6 @@ import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.time.DateTimeException;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -145,7 +146,10 @@ public class GelfCodecTest {
         final byte[] payload = TestHelper.zlibCompress(json);
         assumeTrue(payload.length > 100);
         final RawMessage rawMessage = new RawMessage(payload);
+        // temporarily set logger-level to off to suppress deceptive exception-stacktrace
+        Configurator.setLevel(GelfCodec.class.getName(), Level.OFF);
         codec.decode(rawMessage);
+        Configurator.setLevel(GelfCodec.class.getName(), Level.INFO);
     }
 
     @Test
@@ -239,7 +243,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeSucceedsWithEmptyShortMessageButWithMessage() throws Exception {
+    public void decodeSucceedsWithEmptyShortMessageButWithMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -384,7 +388,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeSucceedsWithValidTimestampIssue4027() throws Exception {
+    public void decodeSucceedsWithValidTimestampIssue4027() {
         // https://github.com/Graylog2/graylog2-server/issues/4027
         final String json = "{"
                 + "\"version\": \"1.1\","
@@ -400,7 +404,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeSucceedsWithValidTimestampAsStringIssue4027() throws Exception {
+    public void decodeSucceedsWithValidTimestampAsStringIssue4027() {
         // https://github.com/Graylog2/graylog2-server/issues/4027
         final String json = "{"
                 + "\"version\": \"1.1\","
