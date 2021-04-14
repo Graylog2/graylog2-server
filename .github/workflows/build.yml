@@ -5,6 +5,8 @@ on:
 
 jobs:
   build:
+    if: ${{ github.base_ref == 'Graylog2:master' }}
+
     runs-on: ubuntu-latest 
 
     steps:
