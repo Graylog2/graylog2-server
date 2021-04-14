@@ -95,7 +95,7 @@ const MetricElement: AggregationElement = {
   title: 'Metric',
   key: 'metrics',
   order: 2,
-  allowAddEmptyElement: () => true,
+  allowCreate: () => true,
   fromConfig: (config: AggregationWidgetConfig) => ({
     metrics: seriesToMetrics(config.series),
   }),

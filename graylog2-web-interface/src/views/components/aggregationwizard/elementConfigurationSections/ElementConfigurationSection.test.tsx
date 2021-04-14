@@ -22,7 +22,7 @@ import ElementConfigurationSection from './ElementConfigurationSection';
 describe('ElementConfigurationSection', () => {
   it('should render elements passed as children', () => {
     render(
-      <ElementConfigurationSection allowAddEmptyElement
+      <ElementConfigurationSection allowCreate
                                    onAddEmptyElement={() => {}}
                                    elementTitle="Aggregation Element Title">
         Children of Dune
@@ -34,7 +34,7 @@ describe('ElementConfigurationSection', () => {
 
   it('should render title', () => {
     render(
-      <ElementConfigurationSection allowAddEmptyElement
+      <ElementConfigurationSection allowCreate
                                    onAddEmptyElement={() => {}}
                                    elementTitle="Aggregation Element Title">
         Children of Dune
@@ -48,7 +48,7 @@ describe('ElementConfigurationSection', () => {
     const onAddEmptyElementMock = jest.fn();
 
     render(
-      <ElementConfigurationSection allowAddEmptyElement
+      <ElementConfigurationSection allowCreate
                                    onAddEmptyElement={onAddEmptyElementMock}
                                    elementTitle="Aggregation Element Title">
         Children of Dune
@@ -64,7 +64,7 @@ describe('ElementConfigurationSection', () => {
 
   it('should not display add section icon if adding element section is not allowed', async () => {
     render(
-      <ElementConfigurationSection allowAddEmptyElement={false}
+      <ElementConfigurationSection allowCreate={false}
                                    onAddEmptyElement={() => {}}
                                    elementTitle="Aggregation Element Title">
         Children of Dune

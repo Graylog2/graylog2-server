@@ -88,7 +88,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => `
 `);
 
 type Props = {
-  allowAddEmptyElement: boolean,
+  allowCreate: boolean,
   children: React.ReactNode,
   elementTitle: string,
   onAddEmptyElement: () => void,
@@ -96,7 +96,7 @@ type Props = {
 }
 
 const ElementConfigurationSection = ({
-  allowAddEmptyElement,
+  allowCreate,
   children,
   elementTitle,
   onAddEmptyElement,
@@ -109,7 +109,7 @@ const ElementConfigurationSection = ({
           {sectionTitle ?? elementTitle}
         </ElementTitle>
         <ElementActions>
-          {allowAddEmptyElement && (
+          {allowCreate && (
             <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onAddEmptyElement} />
           )}
         </ElementActions>
