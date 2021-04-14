@@ -40,9 +40,9 @@ const aggregationElements: Array<AggregationElement> = [
 
 describe('AggregationElementSelect', () => {
   it('should select an aggregation element', async () => {
-    const onCreateMock = jest.fn();
+    const onSelectMock = jest.fn();
 
-    render(<AggregationElementSelect onSelect={onCreateMock}
+    render(<AggregationElementSelect onSelect={onSelectMock}
                                      formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
@@ -51,8 +51,8 @@ describe('AggregationElementSelect', () => {
     await selectEvent.openMenu(aggregationElementSelect);
     await selectEvent.select(aggregationElementSelect, 'Metric');
 
-    expect(onCreateMock).toHaveBeenCalledTimes(1);
-    expect(onCreateMock).toHaveBeenCalledWith('metric');
+    expect(onSelectMock).toHaveBeenCalledTimes(1);
+    expect(onSelectMock).toHaveBeenCalledWith('metric');
   });
 
   it('should not list already configured aggregation elements which can not be configured multiple times', async () => {
