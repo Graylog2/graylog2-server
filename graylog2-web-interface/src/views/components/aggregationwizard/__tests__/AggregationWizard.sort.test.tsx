@@ -48,11 +48,6 @@ const widgetConfig = AggregationWidgetConfig
   .rowPivots([pivot0, pivot1])
   .build();
 
-jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({ count: { type: 'count' }, min: { type: 'min' }, max: { type: 'max' }, percentile: { type: 'percentile' } })),
-  listen: jest.fn(),
-}));
-
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
 describe('AggregationWizard', () => {
@@ -75,7 +70,6 @@ describe('AggregationWizard', () => {
   afterAll(() => PluginStore.unregister(plugin));
 
   it('should display sort element form with values from config', async () => {
-    // const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('Metric name').build();
     const config = widgetConfig
       .toBuilder()
       .sort([new SortConfig('pivot', 'http_method', Direction.Ascending)])
@@ -89,7 +83,7 @@ describe('AggregationWizard', () => {
     expect(within(httpMethodSortContainer).getByText('Ascending')).toBeInTheDocument();
   });
 
-  it('should update config with updated sort element', async () => {
+  it('should update configured sort element', async () => {
     const onChangeMock = jest.fn();
     const config = widgetConfig
       .toBuilder()
@@ -122,7 +116,45 @@ describe('AggregationWizard', () => {
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
   });
 
-  it('should add another sort element', async () => {
+  it('should configure new sort element', async () => {
+    const onChangeMock = jest.fn();
+    const config = widgetConfig
+      .toBuilder()
+      .sort([])
+      .build();
+
+    renderSUT({ config, onChange: onChangeMock });
+
+    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
+
+    await selectEvent.openMenu(aggregationElementSelect);
+    await selectEvent.select(aggregationElementSelect, 'Sort');
+
+    const newSortContainer = await screen.findByTestId('sort-element-0');
+    const newSortFieldSelect = within(newSortContainer).getByLabelText('Select field for sorting');
+    const newSortDirectionSelect = within(newSortContainer).getByLabelText('Select direction for sorting');
+
+    await selectEvent.openMenu(newSortFieldSelect);
+    await selectEvent.select(newSortFieldSelect, 'took_ms');
+    await selectEvent.openMenu(newSortDirectionSelect);
+    await selectEvent.select(newSortDirectionSelect, 'Descending');
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    userEvent.click(applyButton);
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .sort([
+        new SortConfig('pivot', 'took_ms', Direction.Descending),
+      ])
+      .build();
+
+    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should configure another sort element', async () => {
     const onChangeMock = jest.fn();
     const config = widgetConfig
       .toBuilder()
@@ -157,6 +189,30 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should require field when creating a sort element', async () => {
+    renderSUT();
+
+    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
+
+    await selectEvent.openMenu(aggregationElementSelect);
+    await selectEvent.select(aggregationElementSelect, 'Sort');
+
+    const newSortContainer = await screen.findByTestId('sort-element-0');
+    await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
+  });
+
+  it('should require direction when creating a sort element', async () => {
+    renderSUT();
+
+    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
+
+    await selectEvent.openMenu(aggregationElementSelect);
+    await selectEvent.select(aggregationElementSelect, 'Sort');
+
+    const newSortContainer = await screen.findByTestId('sort-element-0');
+    await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
   });
 
   it('should remove sort', async () => {
