@@ -86,32 +86,14 @@ describe('AggregationWizard/Core Visualizations', () => {
     await screen.findByText('World Map');
   });
 
-  it.each`
-    visualization      | fields               | disabled
-    ${'Area Chart'}    | ${['Interpolation']} | ${true}
-    ${'Bar Chart'}     | ${['Mode']}          | ${true}
-    ${'Line Chart'}    | ${['Interpolation']} | ${true}
-    ${'Heatmap'}       | ${['Default Value']} | ${true}
-    ${'Pie Chart'}     | ${[]}                | ${true}
-    ${'Scatter Plot'}  | ${[]}                | ${true}
-    ${'Single Number'} | ${[]}                | ${false}
-    ${'World Map'}     | ${[]}                | ${false}
-  `('expects mandatory fields for $visualization', async ({ visualization, fields, disabled }: { visualization: string, fields: Array<string>, disabled: boolean }) => {
+  it('heat map expects mandatory default value field', async () => {
     render(<SimpleAggregationWizard />);
 
-    await selectEvent.select(await visualizationSelect(), visualization);
+    await selectEvent.select(await visualizationSelect(), 'Heatmap');
 
-    if (disabled) {
-      await expectSubmitButtonToBeDisabled();
-    } else {
-      await expectSubmitButtonNotToBeDisabled();
-    }
+    await expectSubmitButtonToBeDisabled();
 
-    const validationErrors = screen.queryAllByText(/ is required/);
-    const erroredFields = validationErrors.map((f) => f.innerHTML)
-      .map((text) => text.replace(' is required.', ''));
-
-    expect(erroredFields).toEqual(fields);
+    await screen.findByText(/Default Value is required/);
   });
 
   it('creates Area Chart config when all required fields are present', async () => {
