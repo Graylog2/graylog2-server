@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
+import { FormikErrors } from 'formik';
 
 import Widget from 'views/logic/widgets/Widget';
 import { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -33,6 +34,7 @@ import { OverrideProps } from 'views/components/WidgetOverrideElements';
 import {
   VisualizationConfigDefinition,
   VisualizationConfigFormValues,
+  VisualizationFormValues,
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard/WidgetConfigForm';
 
@@ -127,7 +129,7 @@ interface VisualizationType {
   component: VisualizationComponent;
   config?: VisualizationConfigDefinition;
   capabilities?: Array<VisualizationCapability>;
-  validate?: (formValues: WidgetConfigFormValues) => { [key: string]: string | any };
+  validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
 }
 
 interface ResultHandler<T, R> {

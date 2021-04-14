@@ -65,7 +65,7 @@ const toConfig = (formValues: WidgetConfigFormValues, configBuilder: Aggregation
   .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
   .eventAnnotation(formValues.visualization.eventAnnotation);
 
-const hasErrors = (errors: { [key: string]: string }) => Object.values(errors)
+const hasErrors = (errors: {}) => Object.values(errors)
   .filter((value) => value !== undefined)
   .length > 0;
 
