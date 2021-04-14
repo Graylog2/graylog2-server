@@ -42,7 +42,7 @@ describe('AggregationElementSelect', () => {
   it('should select an aggregation element', async () => {
     const onCreateMock = jest.fn();
 
-    render(<AggregationElementSelect onCreate={onCreateMock}
+    render(<AggregationElementSelect onSelect={onCreateMock}
                                      formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
@@ -56,7 +56,7 @@ describe('AggregationElementSelect', () => {
   });
 
   it('should not list already configured aggregation elements which can not be configured multiple times', async () => {
-    render(<AggregationElementSelect onCreate={() => {}}
+    render(<AggregationElementSelect onSelect={() => {}}
                                      formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
