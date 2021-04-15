@@ -24,7 +24,8 @@ const Container = styled.div(({ theme }) => css`
   background-color: ${theme.colors.variant.lightest.default};
   border-radius: 3px;
   margin-bottom: 5px;
-  padding: 6px 5px 3px 5px;
+  padding: 6px 5px 3px 7px;
+  border: 1px solid ${theme.colors.variant.lighter.default};
 
   :last-of-type {
     border-bottom: 0;
