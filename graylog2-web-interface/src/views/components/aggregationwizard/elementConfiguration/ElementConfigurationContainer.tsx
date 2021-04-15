@@ -21,14 +21,13 @@ import { IconButton } from 'components/common';
 
 const Container = styled.div(({ theme }) => css`
   display: flex;
-  background-color: ${theme.colors.variant.lightest.default};
-  border-radius: 3px;
-  margin-bottom: 5px;
   padding: 6px 5px 3px 7px;
+  margin-bottom: 5px;
+  border-radius: 3px;
   border: 1px solid ${theme.colors.variant.lighter.default};
+  background-color: ${theme.colors.variant.lightest.default};
 
   :last-of-type {
-    border-bottom: 0;
     margin-bottom: 0;
   }
 `);
@@ -37,7 +36,7 @@ const ElementActions = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 25px;
-  margin-left: 3px;
+  margin-left: 5px;
 `;
 
 const ElementConfiguration = styled.div`
