@@ -119,8 +119,9 @@ export class Builder {
     this.responseHandler = (resp: Response) => {
       if (resp.ok) {
         reportServerSuccess();
+        const contentLength = Number.parseInt(resp.headers.get('Content-Length'), 10);
 
-        return resp.json();
+        return contentLength > 0 ? resp.json() : null;
       }
 
       throw new FetchError(resp.statusText, resp);
