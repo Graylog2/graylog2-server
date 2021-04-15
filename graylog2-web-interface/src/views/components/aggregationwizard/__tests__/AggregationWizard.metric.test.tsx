@@ -237,4 +237,28 @@ describe('AggregationWizard', () => {
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
   });
+
+  it('should remove metric', async () => {
+    const onChangeMock = jest.fn();
+    const config = widgetConfig
+      .toBuilder()
+      .series([Series.create('count')])
+      .build();
+    renderSUT({ config, onChange: onChangeMock });
+
+    const removeSortElementButton = screen.getByRole('button', { name: 'Remove Metric' });
+    userEvent.click(removeSortElementButton);
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    userEvent.click(applyButton);
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .series([])
+      .build();
+
+    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
 });
