@@ -16,8 +16,12 @@
  */
 package org.graylog2.system.shutdown;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.graylog2.IgnoreDeceptiveExceptionExtension;
+import org.graylog2.IgnoreDeceptiveExceptionsAnnotation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,10 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@ExtendWith(IgnoreDeceptiveExceptionExtension.class)
 public class GracefulShutdownServiceTest {
     private GracefulShutdownService shutdownService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.shutdownService = new GracefulShutdownService();
         shutdownService.startAsync().awaitRunning();
@@ -57,6 +62,7 @@ public class GracefulShutdownServiceTest {
     }
 
     @Test
+    @IgnoreDeceptiveExceptionsAnnotation(clazz=GracefulShutdownService.class)
     public void withExceptionOnShutdown() throws Exception {
         final AtomicBoolean hook1Called = new AtomicBoolean(false);
         final AtomicBoolean hook2Called = new AtomicBoolean(false);
