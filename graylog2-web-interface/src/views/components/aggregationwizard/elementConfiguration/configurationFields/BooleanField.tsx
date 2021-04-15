@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { Field } from 'formik';
 
+import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 import { Input } from 'components/bootstrap';
 import { HelpBlock } from 'components/graylog';
-import { FieldComponentProps } from 'views/components/aggregationwizard/elementConfiguration/VisualizationConfigurationOptions';
 
 const BooleanField = ({ field, name, error, title }: FieldComponentProps) => (
   <>

@@ -182,12 +182,12 @@ export const emptyGrouping: ValuesGrouping = {
 };
 
 const GroupByElement: AggregationElement = {
-  title: 'Group By',
-  titleSingular: 'Grouping',
+  sectionTitle: 'Group By',
+  title: 'Grouping',
   key: 'groupBy',
   order: 1,
   allowCreate: () => true,
-  addEmptyElement: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
+  onCreate: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
     ...formValues,
     groupBy: {
       columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
@@ -197,7 +197,7 @@ const GroupByElement: AggregationElement = {
       ],
     },
   }),
-  removeElementSection: ((index, formValues) => {
+  onRemove: ((index, formValues) => {
     const newFormValues = { ...formValues };
     const newGroupings = formValues.groupBy?.groupings.filter((value, i) => (index !== i));
 

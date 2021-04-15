@@ -17,112 +17,50 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import IconButton from 'components/common/IconButton';
+import { IconButton } from 'components/common';
 
-const Wrapper = styled.div(({ theme }) => css`
-  margin-bottom: 6px;
-  border-radius: 6px;
+const SectionContainer = styled.div(({ theme }) => css`
+  display: flex;
+  background-color: ${theme.colors.variant.lightest.default};
+  margin-bottom: 5px;
+  border-radius: 3px;
+  border: 1px solid ${theme.colors.variant.lighter.default};
+  padding: 6px 5px 3px 7px;
 
-  :last-child {
+  :last-of-type {
     margin-bottom: 0;
   }
-
-  div[class^="col-"] {
-    padding-right: 0;
-    padding-left: 0;
-  }
-
-  input {
-    font-size: ${theme.fonts.size.body};
-  }
-
-  .form-group {
-    margin: 0 0 3px 0;
-  }
-
-  .control-label {
-    padding-left: 0;
-    padding-right: 5px;
-    padding-top: 5px;
-    font-weight: normal;
-    text-align: left;
-  }
-
-  .help-block {
-    margin: 0;
-  }
 `);
 
-const Header = styled.div(({ theme }) => css`
+const SectionActions = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1px;
-  min-height: 26px;
-  font-weight: bold;
-  position: relative;
+  flex-direction: column;
+  min-width: 25px;
+  margin-left: 5px;
+`;
 
-  ::before {
-    content: ' ';
-    top: 50%;
-    width: 100%;
-    border-bottom: 1px solid ${theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
-    position: absolute;
-  }
-`);
-
-const ElementTitle = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  z-index: 1;
-  padding-right: 8px;
-`);
-
-const ElementActions = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  z-index: 1;
-  padding-left: 5px;
-`);
-
-const StyledIconButton = styled(IconButton)(({ theme }) => `
-  color: ${theme.colors.global.textDefault};
-`);
+const SectionConfiguration = styled.div`
+  flex: 1;
+`;
 
 type Props = {
-  allowAddEmptyElement: boolean,
   children: React.ReactNode,
-  onAddEmptyElement: () => void,
-  title: string,
-  titleSingular?: string,
-}
-
-const ElementConfigurationContainer = ({
-  children,
-  allowAddEmptyElement,
-  onAddEmptyElement,
-  title,
-  titleSingular,
-}: Props) => {
-  return (
-    <Wrapper>
-      <Header>
-        <ElementTitle>
-          {title}
-        </ElementTitle>
-        <ElementActions>
-          {allowAddEmptyElement && (
-            <StyledIconButton title={`Add a ${titleSingular ?? title}`} name="plus" onClick={onAddEmptyElement} />
-          )}
-        </ElementActions>
-      </Header>
-      <div>
-        {children}
-      </div>
-    </Wrapper>
-  );
+  onRemove?: () => void,
 };
 
+const ElementConfigurationContainer = ({ children, onRemove }: Props) => (
+  <SectionContainer>
+    <SectionConfiguration>
+      {children}
+    </SectionConfiguration>
+    <SectionActions>
+      {onRemove && <IconButton onClick={onRemove} name="trash" title="Remove" />}
+    </SectionActions>
+  </SectionContainer>
+);
+
 ElementConfigurationContainer.defaultProps = {
-  titleSingular: undefined,
+  onRemove: undefined,
 };
 
 export default ElementConfigurationContainer;
