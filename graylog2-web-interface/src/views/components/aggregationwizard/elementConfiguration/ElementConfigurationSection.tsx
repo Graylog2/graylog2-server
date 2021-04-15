@@ -23,7 +23,7 @@ const Wrapper = styled.div(({ theme }) => css`
   border-radius: 6px;
   margin-bottom: 6px;
 
-  ::last-child {
+  :last-child {
     margin-bottom: 0;
   }
 
@@ -67,13 +67,15 @@ const Header = styled.div`
   min-height: 26px;
   font-weight: bold;
   position: relative;
-  :before {
+
+  ::before {
     content: ' ';
     top: 50%;
     width: 100%;
     border-bottom: 1px solid grey;
     position: absolute;
   }
+
   button {
     color: #1f1f1f;
   }
