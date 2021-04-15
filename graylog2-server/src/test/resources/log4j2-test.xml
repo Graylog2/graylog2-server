@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration packages="org.graylog2.junit.extensions">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%d %-5p: %c - %m%n"/>
+            <IgnoreDeceptiveExceptionsByRegexFilter regex=".*Default pattern for deceptive exceptions.*" onMatch="DENY" onMismatch="ACCEPT"/>
         </Console>
     </Appenders>
     <Loggers>

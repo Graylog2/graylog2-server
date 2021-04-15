@@ -16,12 +16,11 @@
  */
 package org.graylog2.system.shutdown;
 
-import org.graylog2.IgnoreDeceptiveExceptionExtension;
-import org.graylog2.IgnoreDeceptiveExceptionsAnnotation;
+import org.graylog2.junit.extensions.IgnoreDeceptiveExceptionExtension;
+import org.graylog2.junit.extensions.IgnoreDeceptiveExceptionsAnnotation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;

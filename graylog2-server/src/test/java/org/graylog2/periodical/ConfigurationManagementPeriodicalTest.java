@@ -17,14 +17,15 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.junit.extensions.IgnoreDeceptiveExceptionExtension;
+import org.graylog2.junit.extensions.IgnoreDeceptiveExceptionsByRegexAnnotation;
 import org.graylog2.migrations.Migration;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -33,10 +34,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 
+@ExtendWith(IgnoreDeceptiveExceptionExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class ConfigurationManagementPeriodicalTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
     @Spy
     private Migration migration1 = stubMigration(ZonedDateTime.of(2016, 12, 1, 0, 0, 0, 0, ZoneOffset.UTC));
     @Spy
@@ -46,7 +46,7 @@ public class ConfigurationManagementPeriodicalTest {
 
     private ConfigurationManagementPeriodical periodical;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         periodical = new ConfigurationManagementPeriodical(ImmutableSet.of(migration1, migration2, migration3));
     }
@@ -63,6 +63,7 @@ public class ConfigurationManagementPeriodicalTest {
     }
 
     @Test
+    @IgnoreDeceptiveExceptionsByRegexAnnotation(regex = ".*Boom.*")
     public void doRunExecutesMigrationIfExceptionIsThrown() throws Exception {
         final InOrder invocationOrder = inOrder(migration1, migration2, migration3);
 
