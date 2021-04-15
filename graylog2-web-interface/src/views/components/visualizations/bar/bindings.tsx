@@ -35,7 +35,7 @@ const barChart: VisualizationType<BarVisualizationConfig, BarVisualizationConfig
   component: BarVisualization,
   config: {
     createConfig: () => ({ barmode: DEFAULT_BARMODE }),
-    fromConfig: (config: BarVisualizationConfig | undefined) => ({ barmode: config?.barmode ?? 'group' }),
+    fromConfig: (config: BarVisualizationConfig | undefined) => ({ barmode: config?.barmode ?? DEFAULT_BARMODE }),
     toConfig: (formValues: BarVisualizationConfigFormValues) => BarVisualizationConfig.create(formValues.barmode),
     fields: [{
       name: 'barmode',
