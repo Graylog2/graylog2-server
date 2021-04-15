@@ -200,7 +200,9 @@ describe('AggregationWizard', () => {
     await selectEvent.select(aggregationElementSelect, 'Sort');
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
+    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
 
   it('should require direction when creating a sort element', async () => {
@@ -212,7 +214,9 @@ describe('AggregationWizard', () => {
     await selectEvent.select(aggregationElementSelect, 'Sort');
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
+    await waitFor(() => expect(expect(applyButton).toBeDisabled()));
   });
 
   it('should remove sort', async () => {
