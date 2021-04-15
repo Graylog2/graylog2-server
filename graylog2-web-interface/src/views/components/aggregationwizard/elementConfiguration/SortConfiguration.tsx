@@ -29,7 +29,7 @@ const SortConfiguration = () => {
   const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const { sort } = values;
   const removeSort = useCallback((index) => {
-    setValues(SortElement.removeElementSection(index, values));
+    setValues(SortElement.onRemove(index, values));
   }, [setValues, values]);
 
   return (

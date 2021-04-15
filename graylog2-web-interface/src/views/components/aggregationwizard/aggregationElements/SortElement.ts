@@ -78,7 +78,7 @@ const SortElement: AggregationElement = {
   order: 3,
   allowCreate: () => true,
   component: SortConfiguration,
-  removeElementSection: ((index, formValues) => ({
+  onRemove: ((index, formValues) => ({
     ...formValues,
     sort: formValues.sort.filter((value, i) => index !== i),
   })),
