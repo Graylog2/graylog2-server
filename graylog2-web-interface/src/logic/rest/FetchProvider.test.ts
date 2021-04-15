@@ -47,6 +47,11 @@ const setUpServer = () => {
     res.send(undefined);
   });
 
+  app.delete('/test5', (req, res) => {
+    res.status(204).end();
+  });
+
+
   return app.listen(PORT, () => {});
 };
 
@@ -64,10 +69,11 @@ describe('FetchProvider', () => {
   });
 
   it.each([
-    ['a get method with json', 'GET', 'test1', { text: 'test' }],
-    ['a post method with json', 'POST', 'test2', { text: 'test' }],
-    ['a post method with text', 'POST', 'test3', 'uuid-beef-feed'],
-    ['a post method with text', 'POST', 'test4', null],
+    ['a GET with json', 'GET', 'test1', { text: 'test' }],
+    ['a POST with json', 'POST', 'test2', { text: 'test' }],
+    ['a POST with text', 'POST', 'test3', 'uuid-beef-feed'],
+    ['a POST without content', 'POST', 'test4', null],
+    ['a DELETE without content and status 204', 'DELETE', 'test5', null],
   ])('should receive a %s', async (text, method, url, expectedResponse) => {
     return fetch(method, `http://localhost:${server.address().port}/${url}`, undefined).then((response) => {
       expect(response).toStrictEqual(expectedResponse);
