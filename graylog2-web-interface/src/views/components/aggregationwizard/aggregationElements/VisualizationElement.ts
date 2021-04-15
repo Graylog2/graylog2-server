@@ -23,7 +23,7 @@ import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/V
 
 import type { AggregationElement } from './AggregationElementType';
 
-import VisualizationConfiguration from '../elementConfigurationSections/VisualizationConfiguration';
+import VisualizationConfiguration from '../elementConfiguration/VisualizationConfiguration';
 import { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const findVisualizationType = (visualizationType: string) => {
