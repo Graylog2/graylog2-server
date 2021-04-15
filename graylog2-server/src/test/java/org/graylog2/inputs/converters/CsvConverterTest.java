@@ -17,6 +17,8 @@
 package org.graylog2.inputs.converters;
 
 import com.google.common.collect.Maps;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.graylog2.ConfigurationException;
 import org.junit.Test;
 
@@ -75,7 +77,10 @@ public class CsvConverterTest {
         assertNull("Too many fields in data doesn't work", result);
 
         // unclosed quote level
+        // temporarily set logger-level to off to suppress deceptive exception-stacktrace
+        Configurator.setLevel(CsvConverter.class.getName(), Level.OFF);
         result = (Map<String, String>) csvConverter.convert("field1,field2,\"field3");
+        Configurator.setLevel(CsvConverter.class.getName(), Level.INFO);
         assertNull("Unbalanced quoting does not work", result);
     }
 
