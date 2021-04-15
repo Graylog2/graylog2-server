@@ -246,8 +246,8 @@ describe('AggregationWizard', () => {
       .build();
     renderSUT({ config, onChange: onChangeMock });
 
-    const removeSortElementButton = screen.getByRole('button', { name: 'Remove Metric' });
-    userEvent.click(removeSortElementButton);
+    const removeMetricElementButton = screen.getByRole('button', { name: 'Remove Metric' });
+    userEvent.click(removeMetricElementButton);
 
     const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
     userEvent.click(applyButton);
