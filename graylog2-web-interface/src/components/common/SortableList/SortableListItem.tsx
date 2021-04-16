@@ -36,20 +36,20 @@ export type DragHandleAttributes = Partial<{
 }>;
 
 export type RenderCustomItem<ItemType extends ListItemType> = ({
-  item,
-  index,
+  disableDragging,
   dragHandleAttributes,
   dragHandleListeners,
+  index,
+  item,
   ref,
-  disableDragging,
 } : {
-  item: ItemType,
-  index: number,
+  className?: string,
+  disableDragging?: boolean
   dragHandleAttributes: DragHandleAttributes,
   dragHandleListeners: DraggableSyntheticListeners,
-  className?: string,
+  index: number,
+  item: ItemType,
   ref: React.Ref<any>,
-  disableDragging?: boolean
 }) => React.ReactNode;
 
 const StyledListItem = styled(ListItem)(({
@@ -75,11 +75,11 @@ type Props<ItemType extends ListItemType> = {
 };
 
 const SortableListItem = <ItemType extends ListItemType>({
+  className,
+  disableDragging,
   index,
   item,
-  className,
   renderCustomItem,
-  disableDragging,
 }: Props<ItemType>) => {
   const {
     attributes,
@@ -89,6 +89,8 @@ const SortableListItem = <ItemType extends ListItemType>({
     transform,
     transition,
   } = useSortable({ id: item.id });
+
+  console.log({ id: item.id, isDragging });
 
   return (
     <StyledListItem className={className}
@@ -107,8 +109,8 @@ const SortableListItem = <ItemType extends ListItemType>({
 
 SortableListItem.defaultProps = {
   className: undefined,
-  renderCustomItem: undefined,
   disableDragging: false,
+  renderCustomItem: undefined,
 };
 
 export default SortableListItem;
