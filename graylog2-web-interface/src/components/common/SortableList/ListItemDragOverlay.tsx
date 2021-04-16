@@ -18,16 +18,16 @@ import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { DragOverlay, defaultDropAnimation } from '@dnd-kit/core';
 
-import type { RenderListItem, ListItemType } from './SortableListItem';
+import type { RenderCustomItem, ListItemType } from './SortableListItem';
 import ListItem from './ListItem';
 
 type Props = {
   activeId: ListItemType['id'],
   items: Array<ListItemType>
-  renderListItem?: RenderListItem<ListItemType>,
+  renderCustomItem?: RenderCustomItem<ListItemType>,
 }
 
-const ListItemDragOverlay = ({ activeId, items, renderListItem }: Props) => {
+const ListItemDragOverlay = ({ activeId, items, renderCustomItem }: Props) => {
   const activeItemIndex = items.findIndex((item) => item.id === activeId);
   const activeItem = items[activeItemIndex];
 
@@ -36,7 +36,7 @@ const ListItemDragOverlay = ({ activeId, items, renderListItem }: Props) => {
       {activeId && (
       <ListItem item={activeItem}
                 index={activeItemIndex}
-                renderListItem={renderListItem} />
+                renderCustomItem={renderCustomItem} />
       )}
     </DragOverlay>,
     document.body,

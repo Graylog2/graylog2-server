@@ -34,15 +34,15 @@ import {
 
 import SortableListItem from './SortableListItem';
 import ListItemDragOverlay from './ListItemDragOverlay';
-import type { RenderListItem, ListItemType } from './SortableListItem';
+import type { RenderCustomItem, ListItemType } from './SortableListItem';
 
 export type Props<ItemType extends ListItemType> = {
   items: Array<ItemType>,
   onSortChange: (newList: Array<ItemType>, oldItemIndex: number, newItemIndex: number) => void,
-  renderListItem?: RenderListItem<ListItemType>,
+  renderCustomItem?: RenderCustomItem<ListItemType>,
 }
 
-const SortableList = <ListItem extends ListItemType>({ items, onSortChange, renderListItem }: Props<ListItem>) => {
+const SortableList = <ListItem extends ListItemType>({ items, onSortChange, renderCustomItem }: Props<ListItem>) => {
   const [activeId, setActiveId] = useState<string>(null);
   const [list, setList] = useState(items);
   const sensors = useSensors(
@@ -82,18 +82,18 @@ const SortableList = <ListItem extends ListItemType>({ items, onSortChange, rend
         {list.map((item, index) => (
           <SortableListItem item={item}
                             index={index}
-                            renderListItem={renderListItem}
+                            renderCustomItem={renderCustomItem}
                             key={item.id} />
         ))}
       </SortableContext>
 
-      <ListItemDragOverlay renderListItem={renderListItem} items={list} activeId={activeId} />
+      <ListItemDragOverlay renderCustomItem={renderCustomItem} items={list} activeId={activeId} />
     </DndContext>
   );
 };
 
 SortableList.defaultProps = {
-  renderListItem: undefined,
+  renderCustomItem: undefined,
 };
 
 export default SortableList;

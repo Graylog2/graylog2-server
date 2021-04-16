@@ -21,7 +21,7 @@ import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { ListGroupItem } from 'components/graylog';
 import { Icon } from 'components/common';
 
-import type { ListItemType, DragHandleAttributes, RenderListItem } from './SortableListItem';
+import type { ListItemType, DragHandleAttributes, RenderCustomItem } from './SortableListItem';
 
 const DragHandleIcon = styled(Icon)`
     margin-right: 5px;
@@ -30,7 +30,7 @@ const DragHandleIcon = styled(Icon)`
 const ListItem = <ItemType extends ListItemType>({
   item,
   index,
-  renderListItem,
+  renderCustomItem,
   dragHandleAttributes,
   dragHandleListeners,
   className,
@@ -39,13 +39,13 @@ const ListItem = <ItemType extends ListItemType>({
     index: number,
     dragHandleAttributes?: DragHandleAttributes,
     dragHandleListeners?: DraggableSyntheticListeners,
-    renderListItem?: RenderListItem<ItemType>,
+    renderCustomItem?: RenderCustomItem<ItemType>,
     className?: string,
 }) => {
   return (
     <>
-      {renderListItem
-        ? renderListItem(item, index, dragHandleAttributes, dragHandleListeners)
+      {renderCustomItem
+        ? renderCustomItem(item, index, dragHandleAttributes, dragHandleListeners)
         : (
           <ListGroupItem className={className}>
             <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
@@ -59,7 +59,7 @@ const ListItem = <ItemType extends ListItemType>({
 ListItem.defaultProps = {
   dragHandleAttributes: {},
   dragHandleListeners: {},
-  renderListItem: undefined,
+  renderCustomItem: undefined,
   className: undefined,
 };
 
