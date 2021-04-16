@@ -15,112 +15,109 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  defaultDropAnimation,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
-import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
-// import SortableListItem from './SortableListItem';
-import List from './List';
+import SortableListItem, { ListItem } from './SortableListItem';
+import type { RenderListItem, ListItemType } from './SortableListItem';
 
-const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-};
+const getItemIndex = (items: Array<ListItemType>, itemId: ListItemType['id']) => items.findIndex((item) => item.id === itemId);
 
 export type Props<ItemType extends ListItemType> = {
-  customContentRender?: CustomContentRender<ItemType>,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal?: boolean,
   items: Array<ItemType>,
-  onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
+  onSortChange: (newList: Array<ItemType>, oldItemIndex: number, newItemIndex: number) => void,
+  renderListItem?: RenderListItem<ListItemType>,
 }
 
-/**
- * Component that renders a list of elements and let users manually
- * sort them by dragging and dropping them or by using the keyboard.
- *
- * `SortableList` just displays the provided items, consumers will need to store the state.
- * This way consumers can add or remove items easily.
- */
-const SortableList = <ItemType extends ListItemType>({
-  customContentRender,
-  customListItemRender,
-  disableDragging,
-  displayOverlayInPortal,
-  items,
-  onMoveItem,
-}: Props<ItemType>) => {
-  const onDragEnd = (result) => {
-    if (!result.destination) {
-      return;
-    }
+const ListItemDragOverlay = ({ activeId, items, renderListItem }: {
+  activeId: ListItemType['id'],
+  items: Array<ListItemType>
+  renderListItem?: RenderListItem<ListItemType>,
+}) => {
+  const activeItemIndex = getItemIndex(items, activeId);
+  const activeItem = items[activeItemIndex];
 
-    if (result.source.index !== result.destination.index) {
-      const newList: Array<ItemType> = reorder(
-        items,
-        result.source.index,
-        result.destination.index,
-      );
+  return createPortal(
+    <DragOverlay dropAnimation={{ ...defaultDropAnimation, dragSourceOpacity: 0.5 }} zIndex={1100}>
+      {activeId && (
+        <ListItem item={activeItem}
+                  index={activeItemIndex}
+                  renderListItem={renderListItem} />
+      )}
+    </DragOverlay>,
+    document.body,
+  );
+};
 
-      onMoveItem(newList, result.source.index, result.destination.index);
+const SortableList = <ListItem extends ListItemType>({ items, onSortChange, renderListItem }: Props<ListItem>) => {
+  const [activeId, setActiveId] = useState<string>(null);
+  const [list, setList] = useState(items);
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const onDragStart = (event) => {
+    setActiveId(event.active.id);
+  };
+
+  const onDragEnd = (data: DragEndEvent) => {
+    setActiveId(null);
+
+    if (data.over) {
+      const overIndex = list.findIndex((item) => data.over.id === item.id);
+      const activeIndex = list.findIndex((item) => activeId === item.id);
+
+      if (activeIndex !== overIndex) {
+        const updatedList = arrayMove(list, activeIndex, overIndex);
+        setList(updatedList);
+        onSortChange(updatedList, activeIndex, overIndex);
+      }
     }
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable">
-        {({ droppableProps, innerRef, placeholder }) => (
-          <div {...droppableProps}
-               ref={innerRef}>
-            <List items={items}
-                  disableDragging={disableDragging}
-                  displayOverlayInPortal={displayOverlayInPortal}
-                  customContentRender={customContentRender}
-                  customListItemRender={customListItemRender} />
-            {placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <DndContext sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
+                onDragCancel={onDragEnd}>
+      <SortableContext items={list.map(({ id }) => id)}
+                       strategy={verticalListSortingStrategy}>
+        {list.map((item, index) => (
+          <SortableListItem item={item}
+                            index={index}
+                            renderListItem={renderListItem}
+                            key={item.id} />
+        ))}
+      </SortableContext>
+
+      <ListItemDragOverlay renderListItem={renderListItem} items={list} activeId={activeId} />
+    </DndContext>
   );
 };
 
-SortableList.propTypes = {
-  /** Specifies if dragging and dropping is disabled or not. */
-  disableDragging: PropTypes.bool,
-  /**
-   * Array of objects that will be displayed in the list. Each item is
-   * expected to have an `id` and a `title` key. `id` must be unique
-   * and will be used for sorting the item. `title` is used to display the
-   * element name in the list.
-   */
-  items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  /**
-   * Function that will be called when an item of the list was moved.
-   * The function will receive the newly sorted list as an argument
-   * and the source and destination index of the moved item.
-   */
-  onMoveItem: PropTypes.func.isRequired,
-  /**
-   * Custom list item content renderer. Allows rendering custom content next to the drag handle.
-   * The default content is the item title. This method is not being called when `customListItemRender` is defined.
-   */
-  customContentRender: PropTypes.func,
-  /**
-   * Custom renderer for the complete list item. Can be used if `ListGroupItem` component is not suitable
-   * or the drag handle needs to be displayed differently. When defined, `customContentRender` will not be called.
-   */
-  customListItemRender: PropTypes.func,
-};
-
 SortableList.defaultProps = {
-  disableDragging: false,
-  customContentRender: undefined,
-  customListItemRender: undefined,
+  renderListItem: undefined,
 };
 
 export default SortableList;

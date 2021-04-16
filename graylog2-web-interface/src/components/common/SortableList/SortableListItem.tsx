@@ -15,64 +15,129 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createPortal } from 'react-dom';
-import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
+import { CSS } from '@dnd-kit/utilities';
+import { useSortable } from '@dnd-kit/sortable';
+import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 
-import ListItem from './ListItem';
-import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
+import { ListGroupItem } from 'components/graylog';
+import { Icon } from 'components/common';
+
+export type ListItemType = {
+  id: string,
+  title?: string,
+}
+
+type DragHandleAttributes = Partial<{
+  role: string;
+  tabIndex: number;
+  'aria-pressed': boolean | undefined;
+  'aria-roledescription': string;
+  'aria-describedby': string;
+}>;
+
+export type RenderListItem<ItemType extends ListItemType> = (
+  item: ItemType,
+  index: number,
+  dragHandleAttributes: DragHandleAttributes,
+  dragHandleListeners: DraggableSyntheticListeners,
+) => React.ReactNode;
+
+const DragHandleIcon = styled(Icon)`
+  margin-right: 5px;
+`;
+
+export const ListItem = <ItemType extends ListItemType>({
+  item,
+  index,
+  renderListItem,
+  dragHandleAttributes,
+  dragHandleListeners,
+  className,
+}: {
+  item: ItemType,
+  index: number,
+  dragHandleAttributes?: DragHandleAttributes,
+  dragHandleListeners?: DraggableSyntheticListeners,
+  renderListItem?: RenderListItem<ItemType>,
+  className?: string,
+}) => {
+  return (
+    <>
+      {renderListItem
+        ? renderListItem(item, index, dragHandleAttributes, dragHandleListeners)
+        : (
+          <ListGroupItem className={className}>
+            <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
+            {'title' in item ? item.title : item.id}
+          </ListGroupItem>
+        )}
+    </>
+  );
+};
+
+ListItem.defaultProps = {
+  dragHandleAttributes: {},
+  dragHandleListeners: {},
+  renderListItem: undefined,
+  className: undefined,
+};
 
 type Props<ItemType extends ListItemType> = {
   className?: string,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  customContentRender?: CustomContentRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal: boolean,
   index: number,
   item: ItemType,
+  renderListItem?: RenderListItem<ItemType>,
 };
 
-const StyledListItem = styled(ListItem)(({ $isDragging }: { $isDragging: boolean }) => `
-  box-shadow: ${$isDragging ? 'rgba(0, 0, 0, 0.24) 0px 3px 8px' : 'none'};
+const ListItemWithSortStyling = styled(ListItem)(({
+  $opacity,
+  $transform,
+  $transition,
+}: {
+  $opacity: React.CSSProperties['opacity'],
+  $transform: React.CSSProperties['transform'],
+  $transition: React.CSSProperties['transition'],
+ }) => `
+  opacity: ${$opacity};
+  transform: ${$transform};
+  transition: ${$transition};
 `);
 
 const SortableListItem = <ItemType extends ListItemType>({
-  className,
-  customContentRender,
-  customListItemRender,
-  disableDragging,
-  displayOverlayInPortal,
   index,
   item,
-}: Props<ItemType>) => (
-  <Draggable draggableId={item.id} index={index}>
-    {({ draggableProps, dragHandleProps, innerRef }, { isDragging }) => {
-      const listItem = (
-        <StyledListItem item={item}
-                        index={index}
-                        className={className}
-                        ref={innerRef}
-                        customContentRender={customContentRender}
-                        customListItemRender={customListItemRender}
-                        disableDragging={disableDragging}
-                        displayOverlayInPortal={displayOverlayInPortal}
-                        draggableProps={draggableProps}
-                        dragHandleProps={dragHandleProps}
-                        $isDragging={isDragging} />
-      );
+  className,
+  renderListItem,
+}: Props<ItemType>) => {
+  const {
+    attributes,
+    isDragging,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: item.id });
 
-      return (displayOverlayInPortal && isDragging)
-        ? createPortal(listItem, document.body)
-        : listItem;
-    }}
-  </Draggable>
+  return (
+    <div ref={setNodeRef}>
+      <ListItemWithSortStyling item={item}
+                               index={index}
+                               className={className}
+                               dragHandleAttributes={attributes}
+                               dragHandleListeners={listeners}
+                               renderListItem={renderListItem}
+                               $transform={CSS.Transform.toString(transform)}
+                               $transition={transition}
+                               $opacity={isDragging ? 0.5 : 1} />
+    </div>
+
   );
+};
 
 SortableListItem.defaultProps = {
   className: undefined,
-  customContentRender: undefined,
-  customListItemRender: undefined,
-  disableDragging: false,
+  renderListItem: undefined,
 };
 
 export default SortableListItem;
