@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createPortal } from 'react-dom';
 import { DragOverlay, defaultDropAnimation } from '@dnd-kit/core';
 
 import type { RenderCustomItem, ListItemType } from './SortableListItem';
@@ -23,7 +22,7 @@ import ListItem from './ListItem';
 
 type Props = {
   activeId: ListItemType['id'],
-  items: Array<ListItemType>
+  items: Array<ListItemType>,
   renderCustomItem?: RenderCustomItem<ListItemType>,
 }
 
@@ -31,15 +30,14 @@ const ListItemDragOverlay = ({ activeId, items, renderCustomItem }: Props) => {
   const activeItemIndex = items.findIndex((item) => item.id === activeId);
   const activeItem = items[activeItemIndex];
 
-  return createPortal(
+  return (
     <DragOverlay dropAnimation={{ ...defaultDropAnimation, dragSourceOpacity: 0.5 }} zIndex={1100}>
       {activeId && (
         <ListItem index={activeItemIndex}
                   item={activeItem}
                   renderCustomItem={renderCustomItem} />
       )}
-    </DragOverlay>,
-    document.body,
+    </DragOverlay>
   );
 };
 

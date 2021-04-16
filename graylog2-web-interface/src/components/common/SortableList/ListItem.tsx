@@ -36,9 +36,11 @@ type Props<ItemType extends ListItemType> = {
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
+  align-items: flex-start;
 `;
 
 const DragHandleIcon = styled(Icon)`
+  margin-top: 3px;
   margin-right: 5px;
 `;
 
