@@ -57,14 +57,12 @@ const ListItem = forwardRef(<ItemType extends ListItemType>({
     {renderCustomItem
       ? renderCustomItem({ item, index, dragHandleAttributes, dragHandleListeners, className, ref, disableDragging })
       : (
-        <div ref={ref} className={className}>
-          <StyledListGroupItem>
-            {!disableDragging && (
-              <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
-            )}
-            {'title' in item ? item.title : item.id}
-          </StyledListGroupItem>
-        </div>
+        <StyledListGroupItem ref={ref} className={className}>
+          {!disableDragging && (
+            <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
+          )}
+          {'title' in item ? item.title : item.id}
+        </StyledListGroupItem>
       )}
   </>
   ));

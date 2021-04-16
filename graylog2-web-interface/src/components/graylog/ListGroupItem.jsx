@@ -19,6 +19,22 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
+const RefContainer = styled.div(({ theme }) => `
+  border: 1px solid ${theme.colors.variant.lighter.default};
+  margin-bottom: -1px;
+
+  &:first-child {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+`);
+
 const variantStyles = css(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;
@@ -61,7 +77,7 @@ const variantStyles = css(({ bsStyle, theme }) => {
 
 const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
-  border-color: ${theme.colors.variant.lighter.default};
+  border: 0;
 
   .list-group-item-heading {
     font-weight: bold;
@@ -133,7 +149,11 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
 `);
 
 const ListGroupItem = forwardRef((props, ref) => {
-  return <StyledListGroupItem {...props} ref={ref} />;
+  return (
+    <RefContainer ref={ref}>
+      <StyledListGroupItem {...props} />
+    </RefContainer>
+  );
 });
 
 export default ListGroupItem;
