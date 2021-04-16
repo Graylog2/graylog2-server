@@ -34,6 +34,10 @@ type Props<ItemType extends ListItemType> = {
   renderCustomItem?: RenderCustomItem<ItemType>,
 }
 
+const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
+`;
+
 const DragHandleIcon = styled(Icon)`
   margin-right: 5px;
 `;
@@ -52,12 +56,12 @@ const ListItem = forwardRef(<ItemType extends ListItemType>({
       ? renderCustomItem({ item, index, dragHandleAttributes, dragHandleListeners, className, ref, disableDragging })
       : (
         <div ref={ref} className={className}>
-          <ListGroupItem>
+          <StyledListGroupItem>
             {!disableDragging && (
               <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
             )}
             {'title' in item ? item.title : item.id}
-          </ListGroupItem>
+          </StyledListGroupItem>
         </div>
       )}
   </>

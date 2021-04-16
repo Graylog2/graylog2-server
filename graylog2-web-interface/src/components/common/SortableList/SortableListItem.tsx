@@ -90,8 +90,6 @@ const SortableListItem = <ItemType extends ListItemType>({
     transition,
   } = useSortable({ id: item.id });
 
-  console.log({ id: item.id, isDragging });
-
   return (
     <StyledListItem className={className}
                     disableDragging={disableDragging}
