@@ -46,24 +46,22 @@ const ListItem = forwardRef(<ItemType extends ListItemType>({
   index,
   item,
   renderCustomItem,
-}: Props<ItemType>, ref) => {
-  return (
-    <>
-      {renderCustomItem
-        ? renderCustomItem({ item, index, dragHandleAttributes, dragHandleListeners, className, ref, disableDragging })
-        : (
-          <div ref={ref}>
-            <ListGroupItem>
-              {!disableDragging && (
-                <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
-              )}
-              {'title' in item ? item.title : item.id}
-            </ListGroupItem>
-          </div>
-        )}
-    </>
-  );
-});
+}: Props<ItemType>, ref) => (
+  <>
+    {renderCustomItem
+      ? renderCustomItem({ item, index, dragHandleAttributes, dragHandleListeners, className, ref, disableDragging })
+      : (
+        <div ref={ref} className={className}>
+          <ListGroupItem>
+            {!disableDragging && (
+              <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
+            )}
+            {'title' in item ? item.title : item.id}
+          </ListGroupItem>
+        </div>
+      )}
+  </>
+  ));
 
 ListItem.defaultProps = {
   className: undefined,

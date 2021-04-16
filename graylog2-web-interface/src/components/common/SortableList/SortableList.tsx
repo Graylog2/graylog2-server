@@ -43,14 +43,14 @@ export type Props<ItemType extends ListItemType> = {
   renderCustomItem?: RenderCustomItem<ListItemType>
 }
 
-const SortableList = <ListItem extends ListItemType>({
+const SortableList = <ItemType extends ListItemType>({
+  disableDragging,
   items,
   onSortChange,
   renderCustomItem,
-  disableDragging,
-}: Props<ListItem>) => {
+}: Props<ItemType>) => {
   const [activeId, setActiveId] = useState<string>(null);
-  const [list, setList] = useState(items);
+  const [list, setList] = useState<Array<ItemType>>(items);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -78,23 +78,24 @@ const SortableList = <ListItem extends ListItemType>({
   };
 
   return (
-    <DndContext sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={onDragStart}
+    <DndContext collisionDetection={closestCenter}
+                onDragCancel={onDragEnd}
                 onDragEnd={onDragEnd}
-                onDragCancel={onDragEnd}>
+                onDragStart={onDragStart}
+                sensors={sensors}>
       <SortableContext items={list.map(({ id }) => id)}
                        strategy={verticalListSortingStrategy}>
         {list.map((item, index) => (
-          <SortableListItem item={item}
-                            disableDragging={disableDragging}
+          <SortableListItem disableDragging={disableDragging}
                             index={index}
-                            renderCustomItem={renderCustomItem}
-                            key={item.id} />
+                            item={item}
+                            key={item.id}
+                            renderCustomItem={renderCustomItem} />
         ))}
       </SortableContext>
-
-      <ListItemDragOverlay renderCustomItem={renderCustomItem} items={list} activeId={activeId} />
+      <ListItemDragOverlay activeId={activeId}
+                           items={list}
+                           renderCustomItem={renderCustomItem} />
     </DndContext>
   );
 };

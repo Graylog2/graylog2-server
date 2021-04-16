@@ -34,9 +34,9 @@ const ListItemDragOverlay = ({ activeId, items, renderCustomItem }: Props) => {
   return createPortal(
     <DragOverlay dropAnimation={{ ...defaultDropAnimation, dragSourceOpacity: 0.5 }} zIndex={1100}>
       {activeId && (
-      <ListItem item={activeItem}
-                index={activeItemIndex}
-                renderCustomItem={renderCustomItem} />
+        <ListItem index={activeItemIndex}
+                  item={activeItem}
+                  renderCustomItem={renderCustomItem} />
       )}
     </DragOverlay>,
     document.body,
