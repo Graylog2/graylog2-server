@@ -20,15 +20,14 @@ import { CSS } from '@dnd-kit/utilities';
 import { useSortable } from '@dnd-kit/sortable';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 
-import { ListGroupItem } from 'components/graylog';
-import { Icon } from 'components/common';
+import ListItem from './ListItem';
 
 export type ListItemType = {
   id: string,
   title?: string,
 }
 
-type DragHandleAttributes = Partial<{
+export type DragHandleAttributes = Partial<{
   role: string;
   tabIndex: number;
   'aria-pressed': boolean | undefined;
@@ -43,46 +42,6 @@ export type RenderListItem<ItemType extends ListItemType> = (
   dragHandleListeners: DraggableSyntheticListeners,
 ) => React.ReactNode;
 
-const DragHandleIcon = styled(Icon)`
-  margin-right: 5px;
-`;
-
-export const ListItem = <ItemType extends ListItemType>({
-  item,
-  index,
-  renderListItem,
-  dragHandleAttributes,
-  dragHandleListeners,
-  className,
-}: {
-  item: ItemType,
-  index: number,
-  dragHandleAttributes?: DragHandleAttributes,
-  dragHandleListeners?: DraggableSyntheticListeners,
-  renderListItem?: RenderListItem<ItemType>,
-  className?: string,
-}) => {
-  return (
-    <>
-      {renderListItem
-        ? renderListItem(item, index, dragHandleAttributes, dragHandleListeners)
-        : (
-          <ListGroupItem className={className}>
-            <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
-            {'title' in item ? item.title : item.id}
-          </ListGroupItem>
-        )}
-    </>
-  );
-};
-
-ListItem.defaultProps = {
-  dragHandleAttributes: {},
-  dragHandleListeners: {},
-  renderListItem: undefined,
-  className: undefined,
-};
-
 type Props<ItemType extends ListItemType> = {
   className?: string,
   index: number,
@@ -90,7 +49,7 @@ type Props<ItemType extends ListItemType> = {
   renderListItem?: RenderListItem<ItemType>,
 };
 
-const ListItemWithSortStyling = styled(ListItem)(({
+const StyledListItem = styled(ListItem)(({
   $opacity,
   $transform,
   $transition,
@@ -121,15 +80,15 @@ const SortableListItem = <ItemType extends ListItemType>({
 
   return (
     <div ref={setNodeRef}>
-      <ListItemWithSortStyling item={item}
-                               index={index}
-                               className={className}
-                               dragHandleAttributes={attributes}
-                               dragHandleListeners={listeners}
-                               renderListItem={renderListItem}
-                               $transform={CSS.Transform.toString(transform)}
-                               $transition={transition}
-                               $opacity={isDragging ? 0.5 : 1} />
+      <StyledListItem item={item}
+                      index={index}
+                      className={className}
+                      dragHandleAttributes={attributes}
+                      dragHandleListeners={listeners}
+                      renderListItem={renderListItem}
+                      $transform={CSS.Transform.toString(transform)}
+                      $transition={transition}
+                      $opacity={isDragging ? 0.5 : 1} />
     </div>
 
   );
