@@ -35,7 +35,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import SortableListItem, { ListItem } from './SortableListItem';
+import SortableListItem from './SortableListItem';
+import ListItem from './ListItem';
 import type { RenderListItem, ListItemType } from './SortableListItem';
 
 const getItemIndex = (items: Array<ListItemType>, itemId: ListItemType['id']) => items.findIndex((item) => item.id === itemId);
