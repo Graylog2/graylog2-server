@@ -60,6 +60,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'airbnb',
+    'plugin:compat/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/react',
@@ -151,5 +152,9 @@ module.exports = {
         config: './webpack.config.js',
       },
     },
+    polyfills: [
+      'Promise',
+      'fetch',
+    ],
   },
 };

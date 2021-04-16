@@ -19,6 +19,7 @@
     "eslint": "7.21.0",
     "eslint-config-airbnb": "18.2.0",
     "eslint-import-resolver-webpack": "0.13.0",
+    "eslint-plugin-compat": "3.9.0",
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-jest": "24.3.5",
     "eslint-plugin-jest-formatting": "2.0.1",
