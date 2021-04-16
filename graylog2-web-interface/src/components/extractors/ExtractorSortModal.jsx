@@ -64,7 +64,7 @@ class ExtractorSortModal extends React.Component {
           <p>Drag and drop the extractors on the list to change the order in which they will be applied.</p>
           <Row className="row-sm">
             <Col md={12}>
-              <SortableList items={this.props.extractors} onMoveItem={this._updateSorting} />
+              <SortableList items={this.props.extractors} onSortChange={this._updateSorting} />
             </Col>
           </Row>
         </Modal.Body>
