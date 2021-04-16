@@ -16,16 +16,13 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import {
   DndContext,
-  DragOverlay,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  defaultDropAnimation,
 } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import {
@@ -36,36 +33,14 @@ import {
 } from '@dnd-kit/sortable';
 
 import SortableListItem from './SortableListItem';
-import ListItem from './ListItem';
+import ListItemDragOverlay from './ListItemDragOverlay';
 import type { RenderListItem, ListItemType } from './SortableListItem';
-
-const getItemIndex = (items: Array<ListItemType>, itemId: ListItemType['id']) => items.findIndex((item) => item.id === itemId);
 
 export type Props<ItemType extends ListItemType> = {
   items: Array<ItemType>,
   onSortChange: (newList: Array<ItemType>, oldItemIndex: number, newItemIndex: number) => void,
   renderListItem?: RenderListItem<ListItemType>,
 }
-
-const ListItemDragOverlay = ({ activeId, items, renderListItem }: {
-  activeId: ListItemType['id'],
-  items: Array<ListItemType>
-  renderListItem?: RenderListItem<ListItemType>,
-}) => {
-  const activeItemIndex = getItemIndex(items, activeId);
-  const activeItem = items[activeItemIndex];
-
-  return createPortal(
-    <DragOverlay dropAnimation={{ ...defaultDropAnimation, dragSourceOpacity: 0.5 }} zIndex={1100}>
-      {activeId && (
-        <ListItem item={activeItem}
-                  index={activeItemIndex}
-                  renderListItem={renderListItem} />
-      )}
-    </DragOverlay>,
-    document.body,
-  );
-};
 
 const SortableList = <ListItem extends ListItemType>({ items, onSortChange, renderListItem }: Props<ListItem>) => {
   const [activeId, setActiveId] = useState<string>(null);
