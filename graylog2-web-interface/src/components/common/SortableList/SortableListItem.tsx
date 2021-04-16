@@ -35,12 +35,18 @@ export type DragHandleAttributes = Partial<{
   'aria-describedby': string;
 }>;
 
-export type RenderCustomItem<ItemType extends ListItemType> = (
+export type RenderCustomItem<ItemType extends ListItemType> = ({
+  item,
+  index,
+  dragHandleAttributes,
+  dragHandleListeners,
+} : {
   item: ItemType,
   index: number,
   dragHandleAttributes: DragHandleAttributes,
   dragHandleListeners: DraggableSyntheticListeners,
-) => React.ReactNode;
+  className?: string,
+}) => React.ReactNode;
 
 type Props<ItemType extends ListItemType> = {
   className?: string,

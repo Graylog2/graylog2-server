@@ -45,9 +45,9 @@ const ListItem = <ItemType extends ListItemType>({
   return (
     <>
       {renderCustomItem
-        ? renderCustomItem(item, index, dragHandleAttributes, dragHandleListeners)
+        ? renderCustomItem({ item, index, dragHandleAttributes, dragHandleListeners, className })
         : (
-          <ListGroupItem className={className}>
+          <ListGroupItem>
             <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
             {'title' in item ? item.title : item.id}
           </ListGroupItem>

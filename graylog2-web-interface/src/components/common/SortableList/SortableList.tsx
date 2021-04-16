@@ -60,13 +60,13 @@ const SortableList = <ListItem extends ListItemType>({ items, onSortChange, rend
     setActiveId(null);
 
     if (data.over) {
-      const overIndex = list.findIndex((item) => data.over.id === item.id);
-      const activeIndex = list.findIndex((item) => activeId === item.id);
+      const oldItemIndex = list.findIndex((item) => activeId === item.id);
+      const newItemIndex = list.findIndex((item) => data.over.id === item.id);
 
-      if (activeIndex !== overIndex) {
-        const updatedList = arrayMove(list, activeIndex, overIndex);
+      if (oldItemIndex !== newItemIndex) {
+        const updatedList = arrayMove(list, oldItemIndex, newItemIndex);
         setList(updatedList);
-        onSortChange(updatedList, activeIndex, overIndex);
+        onSortChange(updatedList, oldItemIndex, newItemIndex);
       }
     }
   };
