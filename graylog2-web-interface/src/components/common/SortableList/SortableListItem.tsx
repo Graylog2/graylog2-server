@@ -35,7 +35,7 @@ export type DragHandleAttributes = Partial<{
   'aria-describedby': string;
 }>;
 
-export type RenderListItem<ItemType extends ListItemType> = (
+export type RenderCustomItem<ItemType extends ListItemType> = (
   item: ItemType,
   index: number,
   dragHandleAttributes: DragHandleAttributes,
@@ -46,7 +46,7 @@ type Props<ItemType extends ListItemType> = {
   className?: string,
   index: number,
   item: ItemType,
-  renderListItem?: RenderListItem<ItemType>,
+  renderCustomItem?: RenderCustomItem<ItemType>,
 };
 
 const StyledListItem = styled(ListItem)(({
@@ -67,7 +67,7 @@ const SortableListItem = <ItemType extends ListItemType>({
   index,
   item,
   className,
-  renderListItem,
+  renderCustomItem,
 }: Props<ItemType>) => {
   const {
     attributes,
@@ -85,7 +85,7 @@ const SortableListItem = <ItemType extends ListItemType>({
                       className={className}
                       dragHandleAttributes={attributes}
                       dragHandleListeners={listeners}
-                      renderListItem={renderListItem}
+                      renderCustomItem={renderCustomItem}
                       $transform={CSS.Transform.toString(transform)}
                       $transition={transition}
                       $opacity={isDragging ? 0.5 : 1} />
@@ -96,7 +96,7 @@ const SortableListItem = <ItemType extends ListItemType>({
 
 SortableListItem.defaultProps = {
   className: undefined,
-  renderListItem: undefined,
+  renderCustomItem: undefined,
 };
 
 export default SortableListItem;
