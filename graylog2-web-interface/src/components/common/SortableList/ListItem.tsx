@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { forwardRef } from 'react';
 import styled from 'styled-components';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 
@@ -23,44 +24,53 @@ import { Icon } from 'components/common';
 
 import type { ListItemType, DragHandleAttributes, RenderCustomItem } from './SortableListItem';
 
+type Props<ItemType extends ListItemType> = {
+  className?: string,
+  disableDragging?: boolean,
+  dragHandleAttributes?: DragHandleAttributes,
+  dragHandleListeners?: DraggableSyntheticListeners,
+  index: number,
+  item: ItemType,
+  renderCustomItem?: RenderCustomItem<ItemType>,
+}
+
 const DragHandleIcon = styled(Icon)`
-    margin-right: 5px;
+  margin-right: 5px;
 `;
 
-const ListItem = <ItemType extends ListItemType>({
-  item,
-  index,
-  renderCustomItem,
+const ListItem = forwardRef(<ItemType extends ListItemType>({
+  className,
+  disableDragging,
   dragHandleAttributes,
   dragHandleListeners,
-  className,
-}: {
-    item: ItemType,
-    index: number,
-    dragHandleAttributes?: DragHandleAttributes,
-    dragHandleListeners?: DraggableSyntheticListeners,
-    renderCustomItem?: RenderCustomItem<ItemType>,
-    className?: string,
-}) => {
+  index,
+  item,
+  renderCustomItem,
+}: Props<ItemType>, ref) => {
   return (
     <>
       {renderCustomItem
-        ? renderCustomItem({ item, index, dragHandleAttributes, dragHandleListeners, className })
+        ? renderCustomItem({ item, index, dragHandleAttributes, dragHandleListeners, className, ref, disableDragging })
         : (
-          <ListGroupItem>
-            <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
-            {'title' in item ? item.title : item.id}
-          </ListGroupItem>
+          <div ref={ref}>
+            <ListGroupItem>
+              {!disableDragging && (
+                <DragHandleIcon name="bars" {...dragHandleAttributes} {...dragHandleListeners} />
+              )}
+              {'title' in item ? item.title : item.id}
+            </ListGroupItem>
+          </div>
         )}
     </>
   );
-};
+});
 
 ListItem.defaultProps = {
-  dragHandleAttributes: {},
-  dragHandleListeners: {},
-  renderCustomItem: undefined,
   className: undefined,
+  disableDragging: false,
+  dragHandleAttributes: undefined,
+  dragHandleListeners: undefined,
+  renderCustomItem: undefined,
 };
 
 export default ListItem;

@@ -37,12 +37,18 @@ import ListItemDragOverlay from './ListItemDragOverlay';
 import type { RenderCustomItem, ListItemType } from './SortableListItem';
 
 export type Props<ItemType extends ListItemType> = {
+  disableDragging?: boolean,
   items: Array<ItemType>,
   onSortChange: (newList: Array<ItemType>, oldItemIndex: number, newItemIndex: number) => void,
-  renderCustomItem?: RenderCustomItem<ListItemType>,
+  renderCustomItem?: RenderCustomItem<ListItemType>
 }
 
-const SortableList = <ListItem extends ListItemType>({ items, onSortChange, renderCustomItem }: Props<ListItem>) => {
+const SortableList = <ListItem extends ListItemType>({
+  items,
+  onSortChange,
+  renderCustomItem,
+  disableDragging,
+}: Props<ListItem>) => {
   const [activeId, setActiveId] = useState<string>(null);
   const [list, setList] = useState(items);
   const sensors = useSensors(
@@ -81,6 +87,7 @@ const SortableList = <ListItem extends ListItemType>({ items, onSortChange, rend
                        strategy={verticalListSortingStrategy}>
         {list.map((item, index) => (
           <SortableListItem item={item}
+                            disableDragging={disableDragging}
                             index={index}
                             renderCustomItem={renderCustomItem}
                             key={item.id} />
@@ -94,6 +101,7 @@ const SortableList = <ListItem extends ListItemType>({ items, onSortChange, rend
 
 SortableList.defaultProps = {
   renderCustomItem: undefined,
+  disableDragging: undefined,
 };
 
 export default SortableList;

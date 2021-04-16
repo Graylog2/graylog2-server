@@ -24,7 +24,7 @@ import ListItem from './ListItem';
 
 export type ListItemType = {
   id: string,
-  title?: string,
+  title?: string | React.ReactElement,
 }
 
 export type DragHandleAttributes = Partial<{
@@ -40,20 +40,17 @@ export type RenderCustomItem<ItemType extends ListItemType> = ({
   index,
   dragHandleAttributes,
   dragHandleListeners,
+  ref,
+  disableDragging,
 } : {
   item: ItemType,
   index: number,
   dragHandleAttributes: DragHandleAttributes,
   dragHandleListeners: DraggableSyntheticListeners,
   className?: string,
+  ref: React.Ref<any>,
+  disableDragging?: boolean
 }) => React.ReactNode;
-
-type Props<ItemType extends ListItemType> = {
-  className?: string,
-  index: number,
-  item: ItemType,
-  renderCustomItem?: RenderCustomItem<ItemType>,
-};
 
 const StyledListItem = styled(ListItem)(({
   $opacity,
@@ -69,11 +66,20 @@ const StyledListItem = styled(ListItem)(({
   transition: ${$transition};
 `);
 
+type Props<ItemType extends ListItemType> = {
+  className?: string,
+  disableDragging?: boolean,
+  index: number,
+  item: ItemType,
+  renderCustomItem?: RenderCustomItem<ItemType>,
+};
+
 const SortableListItem = <ItemType extends ListItemType>({
   index,
   item,
   className,
   renderCustomItem,
+  disableDragging,
 }: Props<ItemType>) => {
   const {
     attributes,
@@ -85,24 +91,24 @@ const SortableListItem = <ItemType extends ListItemType>({
   } = useSortable({ id: item.id });
 
   return (
-    <div ref={setNodeRef}>
-      <StyledListItem item={item}
-                      index={index}
-                      className={className}
-                      dragHandleAttributes={attributes}
-                      dragHandleListeners={listeners}
-                      renderCustomItem={renderCustomItem}
-                      $transform={CSS.Transform.toString(transform)}
-                      $transition={transition}
-                      $opacity={isDragging ? 0.5 : 1} />
-    </div>
-
+    <StyledListItem className={className}
+                    disableDragging={disableDragging}
+                    dragHandleAttributes={attributes}
+                    dragHandleListeners={listeners}
+                    index={index}
+                    item={item}
+                    ref={setNodeRef}
+                    renderCustomItem={renderCustomItem}
+                    $transform={CSS.Transform.toString(transform)}
+                    $transition={transition}
+                    $opacity={isDragging ? 0.5 : 1} />
   );
 };
 
 SortableListItem.defaultProps = {
   className: undefined,
   renderCustomItem: undefined,
+  disableDragging: false,
 };
 
 export default SortableListItem;
