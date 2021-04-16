@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   DndContext,
   closestCenter,
@@ -38,6 +39,7 @@ import type { RenderCustomItem, ListItemType } from './SortableListItem';
 
 export type Props<ItemType extends ListItemType> = {
   disableDragging?: boolean,
+  displayOverlayInPortal?: boolean,
   items: Array<ItemType>,
   onSortChange: (newList: Array<ItemType>, oldItemIndex: number, newItemIndex: number) => void,
   renderCustomItem?: RenderCustomItem<ListItemType>
@@ -45,6 +47,7 @@ export type Props<ItemType extends ListItemType> = {
 
 const SortableList = <ItemType extends ListItemType>({
   disableDragging,
+  displayOverlayInPortal,
   items,
   onSortChange,
   renderCustomItem,
@@ -77,6 +80,12 @@ const SortableList = <ItemType extends ListItemType>({
     }
   };
 
+  const listItemOverlay = (
+    <ListItemDragOverlay activeId={activeId}
+                         items={list}
+                         renderCustomItem={renderCustomItem} />
+  );
+
   return (
     <DndContext collisionDetection={closestCenter}
                 onDragCancel={onDragEnd}
@@ -93,9 +102,8 @@ const SortableList = <ItemType extends ListItemType>({
                             renderCustomItem={renderCustomItem} />
         ))}
       </SortableContext>
-      <ListItemDragOverlay activeId={activeId}
-                           items={list}
-                           renderCustomItem={renderCustomItem} />
+
+      {displayOverlayInPortal ? createPortal(listItemOverlay, document.body) : listItemOverlay}
     </DndContext>
   );
 };
@@ -103,6 +111,7 @@ const SortableList = <ItemType extends ListItemType>({
 SortableList.defaultProps = {
   renderCustomItem: undefined,
   disableDragging: undefined,
+  displayOverlayInPortal: false,
 };
 
 export default SortableList;
