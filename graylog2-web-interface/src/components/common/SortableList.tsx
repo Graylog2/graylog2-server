@@ -14,130 +14,110 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
-import styled, { css } from 'styled-components';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import * as React from 'react';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  defaultDropAnimation,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
-import { ListGroup } from 'components/graylog';
+import SortableListItem, { ListItem } from './SortableListItem';
+import type { RenderListItem, ListItemType } from './SortableListItem';
 
-import SortableListItem from './SortableListItem';
+const getItemIndex = (items: Array<ListItemType>, itemId: ListItemType['id']) => items.findIndex((item) => item.id === itemId);
 
-const SortableListGroup = styled(ListGroup)(({ $disableDragging, theme }) => css`
-  cursor: ${$disableDragging ? 'default' : 'move'};
-  margin: 0 0 15px;
+export type Props<ItemType extends ListItemType> = {
+  items: Array<ItemType>,
+  onSortChange: (newList: Array<ItemType>, oldItemIndex: number, newItemIndex: number) => void,
+  renderListItem?: RenderListItem<ListItemType>,
+}
 
-  .dragging {
-    opacity: 0.5;
-  }
+const ListItemDragOverlay = ({ activeId, items, renderListItem }: {
+  activeId: ListItemType['id'],
+  items: Array<ListItemType>
+  renderListItem?: RenderListItem<ListItemType>,
+}) => {
+  const activeItemIndex = getItemIndex(items, activeId);
+  const activeItem = items[activeItemIndex];
 
-  .over {
-    border: 1px dashed ${theme.colors.gray[50]};
-  }
+  return createPortal(
+    <DragOverlay dropAnimation={{ ...defaultDropAnimation, dragSourceOpacity: 0.5 }} zIndex={1100}>
+      {activeId && (
+        <ListItem item={activeItem}
+                  index={activeItemIndex}
+                  renderListItem={renderListItem} />
+      )}
+    </DragOverlay>,
+    document.body,
+  );
+};
 
-  .list-group-item {
-    border-radius: 0;
-  }
+const SortableList = <ListItem extends ListItemType>({ items, onSortChange, renderListItem }: Props<ListItem>) => {
+  const [activeId, setActiveId] = useState<string>(null);
+  const [list, setList] = useState(items);
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
-  & > div:first-child .list-group-item {
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
-  }
-
-  & > div:last-child .list-group-item {
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
-    margin-bottom: 0;
-  }
-`);
-
-/**
- * Component that renders a list of elements and let users manually
- * sort them by dragging and dropping them.
- *
- * `SortableList` keeps the current sorting in its state, so that consumers
- * using a different array or object to keep the sorting state can still
- * use it.
- */
-class SortableList extends React.Component {
-  static propTypes = {
-    /** Specifies if dragging and dropping is disabled or not. */
-    disableDragging: PropTypes.bool,
-    /**
-     * Array of objects that will be displayed in the list. Each item is
-     * expected to have an `id` and a `title` key. `id` must be unique
-     * and will be used for sorting the item. `title` is used to display the
-     * element name in the list.
-     */
-    items: PropTypes.arrayOf(PropTypes.object).isRequired,
-    /**
-     * Function that will be called when an item of the list was moved.
-     * The function will receive the newly sorted list as an argument.
-     */
-    onMoveItem: PropTypes.func,
-    /**
-     * Custom content renderer for the SortableListItem
-     */
-    customContentRender: PropTypes.func,
+  const onDragStart = (event) => {
+    setActiveId(event.active.id);
   };
 
-  static defaultProps = {
-    disableDragging: false,
-    onMoveItem: () => {},
-    customContentRender: undefined,
-  };
+  const onDragEnd = (data: DragEndEvent) => {
+    setActiveId(null);
 
-  constructor(props) {
-    super(props);
+    if (data.over) {
+      const overIndex = list.findIndex((item) => data.over.id === item.id);
+      const activeIndex = list.findIndex((item) => activeId === item.id);
 
-    this.state = {
-      items: props.items,
-    };
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({ items: nextProps.items });
-  }
-
-  _moveItem = (dragIndex, hoverIndex) => {
-    const { onMoveItem } = this.props;
-    const { items } = this.state;
-    const tempItem = items[dragIndex];
-
-    items[dragIndex] = items[hoverIndex];
-    items[hoverIndex] = tempItem;
-    this.setState({ items });
-
-    if (typeof onMoveItem === 'function') {
-      onMoveItem(items);
+      if (activeIndex !== overIndex) {
+        const updatedList = arrayMove(list, activeIndex, overIndex);
+        setList(updatedList);
+        onSortChange(updatedList, activeIndex, overIndex);
+      }
     }
   };
 
-  render() {
-    const { items } = this.state;
-    const { disableDragging, customContentRender } = this.props;
+  return (
+    <DndContext sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
+                onDragCancel={onDragEnd}>
+      <SortableContext items={list.map(({ id }) => id)}
+                       strategy={verticalListSortingStrategy}>
+        {list.map((item, index) => (
+          <SortableListItem item={item}
+                            index={index}
+                            renderListItem={renderListItem}
+                            key={item.id} />
+        ))}
+      </SortableContext>
 
-    const formattedItems = items.map((item, idx) => {
-      return (
-        <SortableListItem key={`sortable-list-item-${item.id}`}
-                          disableDragging={disableDragging}
-                          customContentRender={customContentRender}
-                          index={idx}
-                          id={item.id}
-                          content={item.title}
-                          moveItem={this._moveItem} />
-      );
-    });
+      <ListItemDragOverlay renderListItem={renderListItem} items={list} activeId={activeId} />
+    </DndContext>
+  );
+};
 
-    return (
-      <DndProvider backend={HTML5Backend}>
-        <SortableListGroup $disableDragging={disableDragging}>
-          {formattedItems}
-        </SortableListGroup>
-      </DndProvider>
-    );
-  }
-}
+SortableList.defaultProps = {
+  renderListItem: undefined,
+};
 
 export default SortableList;
