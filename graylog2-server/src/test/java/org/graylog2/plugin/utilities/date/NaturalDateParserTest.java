@@ -121,8 +121,15 @@ public class NaturalDateParserTest {
         assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
     }
 
-    // Ausserdem Zeiträume usw. bei Sommer/Winterzeitumstellung usw
-    // Warum startet Natty die Woche an einem Samstag?
+/*
+Things to discuss:
+- why does Natty start the week on saturday?
+https://www.timeanddate.com/calendar/days/#:~:text=According%20to%20international%20standard%20ISO,last%20day%20of%20the%20week.
+- should we be able to set this to sun/mon depending on the tz/country?
+
+Missing tests:
+- intervals that have dst etc. in it
+ */
 
     /*
     Natty/Naturaldateparser related issues from github:
