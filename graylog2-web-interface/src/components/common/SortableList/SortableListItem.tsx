@@ -16,35 +16,10 @@
  */
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import styled from 'styled-components';
 import { Draggable } from 'react-beautiful-dnd';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
-import { ListGroupItem } from 'components/graylog';
-
-import { Icon } from '..';
-
-export type ListItemType = {
-  id: string,
-  title?: string | React.ReactElement,
-}
-
-export type RenderCustomItem<ItemType extends ListItemType> = ({
-  disableDragging,
-  draggableProps,
-  dragHandleProps,
-  index,
-  item,
-  ref,
-} : {
-  className?: string,
-  disableDragging?: boolean
-  draggableProps: DraggableProvidedDraggableProps;
-  dragHandleProps: DraggableProvidedDragHandleProps;
-  index: number,
-  item: ItemType,
-  ref: React.Ref<any>,
-}) => React.ReactNode;
+import ListItem from './ListItem';
+import type { ListItemType, RenderCustomItem } from './ListItem';
 
 type Props<ItemType extends ListItemType> = {
   className?: string,
@@ -54,15 +29,6 @@ type Props<ItemType extends ListItemType> = {
   item: ItemType,
   renderCustomItem?: RenderCustomItem<ItemType>,
 };
-
-const StyledListGroupItem = styled(ListGroupItem)`
-  display: flex;
-  align-items: flex-start;
-`;
-
-const DragHandle = styled.div`
-  margin-right: 5px;
-`;
 
 const SortableListItem = <ItemType extends ListItemType>({
   item,
@@ -74,31 +40,21 @@ const SortableListItem = <ItemType extends ListItemType>({
 }: Props<ItemType>) => (
   <Draggable draggableId={item.id} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }, { isDragging }) => {
-      const listItem = renderCustomItem
-        ? renderCustomItem({
-          className,
-          disableDragging,
-          draggableProps: draggableProps,
-          dragHandleProps: dragHandleProps,
-          index,
-          item,
-          ref: innerRef,
-        }) : (
-          <StyledListGroupItem ref={innerRef}
-                               className={className}
-                               containerProps={{ ...draggableProps }}>
-            {!disableDragging && (
-            <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
-              <Icon name="bars" />
-            </DragHandle>
-            )}
-            {'title' in item ? item.title : item.id}
-          </StyledListGroupItem>
-        );
-
-      return (
-        <>{(displayOverlayInPortal && isDragging) ? createPortal(listItem, document.body) : listItem}</>
+      const listItem = (
+        <ListItem item={item}
+                  index={index}
+                  className={className}
+                  ref={innerRef}
+                  renderCustomItem={renderCustomItem}
+                  disableDragging={disableDragging}
+                  displayOverlayInPortal={displayOverlayInPortal}
+                  draggableProps={draggableProps}
+                  dragHandleProps={dragHandleProps} />
       );
+
+      return (displayOverlayInPortal && isDragging)
+        ? createPortal(listItem, document.body)
+        : listItem;
     }}
   </Draggable>
   );
