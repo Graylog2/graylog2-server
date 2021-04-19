@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import PropTypes from 'prop-types';
 
 import type { ListItemType, RenderCustomItem } from './ListItem';
 import SortableListItem from './SortableListItem';
@@ -37,6 +37,13 @@ export type Props<ItemType extends ListItemType> = {
   renderCustomItem?: RenderCustomItem<ListItemType>
 }
 
+/**
+ * Component that renders a list of elements and let users manually
+ * sort them by dragging and dropping them or by using the keyboard.
+ *
+ * `SortableList` just displays the provided items, consumers will need to store the state.
+ * This way consumers can add or remove items easily.
+ */
 const SortableList = <ItemType extends ListItemType>({
   disableDragging,
   displayOverlayInPortal,
@@ -77,6 +84,33 @@ const SortableList = <ItemType extends ListItemType>({
       </Droppable>
     </DragDropContext>
   );
+};
+
+SortableList.propTypes = {
+  /** Specifies if dragging and dropping is disabled or not. */
+  disableDragging: PropTypes.bool,
+  /**
+   * Array of objects that will be displayed in the list. Each item is
+   * expected to have an `id` and a `title` key. `id` must be unique
+   * and will be used for sorting the item. `title` is used to display the
+   * element name in the list.
+   */
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  /**
+   * Function that will be called when an item of the list was moved.
+   * The function will receive the newly sorted list as an argument
+   * and the source and destination index of the moved item.
+   */
+  onSortChange: PropTypes.func.isRequired,
+  /**
+   * Custom content renderer for the SortableListItem. Will receive props to display custom drag handle.
+   */
+  renderCustomItem: PropTypes.func,
+};
+
+SortableList.defaultProps = {
+  disableDragging: false,
+  renderCustomItem: undefined,
 };
 
 export default SortableList;
