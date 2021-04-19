@@ -308,6 +308,8 @@ describe('useStore', () => {
 
     const wrapper = mount(<Component />);
 
+    expect(wrapper).toHaveText('No value.');
+
     act(() => SimpleStore.setValue(42));
 
     expect(wrapper).toHaveText('Value is: 84');
@@ -336,5 +338,27 @@ describe('useStore', () => {
     act(() => SimpleStore.setValue(42));
 
     expect(renderCount).toEqual(beforeSecondSet);
+  });
+
+  it('does not reregister if props mapper is provided as arrow function', () => {
+    SimpleStore.listen = jest.fn(SimpleStore.listen);
+
+    const ComponentWithPropsMapper = ({ propsMapper }: { propsMapper: (state: { value: number }) => ({ value: number }) }) => {
+      const { value } = useStore(SimpleStore, propsMapper) || { value: undefined };
+
+      return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
+    };
+
+    const wrapper = mount(<ComponentWithPropsMapper propsMapper={(x) => x} />);
+
+    expect(wrapper).toHaveText('No value.');
+
+    wrapper.setProps({ propsMapper: ({ value: v } = { value: 0 }) => ({ value: v * 2 }) });
+    act(() => SimpleStore.setValue(42));
+    wrapper.update();
+
+    expect(wrapper).toHaveText('Value is: 84');
+
+    expect(SimpleStore.listen).toHaveBeenCalledTimes(2);
   });
 });
