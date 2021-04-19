@@ -69,9 +69,6 @@ export const RELATIVE_RANGE_TYPES = [
   }, {
     type: 'days',
     label: 'Days',
-  }, {
-    type: 'weeks',
-    label: 'Weeks',
   },
 ] as const;
 
