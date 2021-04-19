@@ -17,39 +17,45 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { Draggable } from 'react-beautiful-dnd';
+import styled from 'styled-components';
 
 import ListItem from './ListItem';
 import type { ListItemType, CustomContentRender } from './ListItem';
 
 type Props<ItemType extends ListItemType> = {
   className?: string,
+  customContentRender?: CustomContentRender<ItemType>,
   disableDragging?: boolean,
   displayOverlayInPortal: boolean,
   index: number,
   item: ItemType,
-  customContentRender?: CustomContentRender<ItemType>,
 };
 
+const StyledListItem = styled(ListItem)(({ $isDragging }: { $isDragging: boolean }) => `
+  box-shadow: ${$isDragging ? 'rgba(0, 0, 0, 0.24) 0px 3px 8px' : 'none'};
+`);
+
 const SortableListItem = <ItemType extends ListItemType>({
-  item,
-  index,
   className,
   customContentRender,
   disableDragging,
   displayOverlayInPortal,
+  index,
+  item,
 }: Props<ItemType>) => (
   <Draggable draggableId={item.id} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }, { isDragging }) => {
       const listItem = (
-        <ListItem item={item}
-                  index={index}
-                  className={className}
-                  ref={innerRef}
-                  customContentRender={customContentRender}
-                  disableDragging={disableDragging}
-                  displayOverlayInPortal={displayOverlayInPortal}
-                  draggableProps={draggableProps}
-                  dragHandleProps={dragHandleProps} />
+        <StyledListItem item={item}
+                        index={index}
+                        className={className}
+                        ref={innerRef}
+                        customContentRender={customContentRender}
+                        disableDragging={disableDragging}
+                        displayOverlayInPortal={displayOverlayInPortal}
+                        draggableProps={draggableProps}
+                        dragHandleProps={dragHandleProps}
+                        $isDragging={isDragging} />
       );
 
       return (displayOverlayInPortal && isDragging)
@@ -61,8 +67,8 @@ const SortableListItem = <ItemType extends ListItemType>({
 
 SortableListItem.defaultProps = {
   className: undefined,
-  disableDragging: false,
   customContentRender: undefined,
+  disableDragging: false,
 };
 
 export default SortableListItem;
