@@ -27,14 +27,14 @@ const list = [
 
 describe('SortableList', () => {
   it('should list items', () => {
-    render(<SortableList items={list} onSortChange={() => {}} />);
+    render(<SortableList items={list} onMoveItem={() => {}} />);
 
     list.forEach((item) => expect(screen.getByText(item.title)).toBeInTheDocument());
   });
 
   it('should sort list', async () => {
-    const onSortChangeStub = jest.fn();
-    render(<SortableList items={list} onSortChange={onSortChangeStub} />);
+    const onMoveItemStub = jest.fn();
+    render(<SortableList items={list} onMoveItem={onMoveItemStub} />);
 
     const firstItem = screen.getByTestId('sortable-item-item-1');
     fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
@@ -44,9 +44,9 @@ describe('SortableList', () => {
     fireEvent.keyDown(firstItem, { key: 'ArrowUp', keyCode: 32 });
     await screen.findByText(/You have dropped the item/i);
 
-    await waitFor(() => expect(onSortChangeStub).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onMoveItemStub).toHaveBeenCalledTimes(1));
 
-    expect(onSortChangeStub).toHaveBeenCalledWith([
+    expect(onMoveItemStub).toHaveBeenCalledWith([
       { id: 'item-2', title: 'Item 2' },
       { id: 'item-1', title: 'Item 1' },
       { id: 'item-3', title: 'Item 3' },

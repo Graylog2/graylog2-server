@@ -201,7 +201,7 @@ const MessageProcessorsConfig = createReactClass({
                             submitButtonText="Save">
           <h3>Order</h3>
           <p>Use drag and drop to change the execution order of the message processors.</p>
-          <SortableList items={this._sortableItems()} onSortChange={this._updateSorting} displayOverlayInPortal />
+          <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
 
           <h3>Status</h3>
           <p>Change the checkboxes to change the status of a message processor.</p>
