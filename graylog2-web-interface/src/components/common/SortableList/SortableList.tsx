@@ -44,27 +44,18 @@ const SortableList = <ItemType extends ListItemType>({
   onSortChange,
   renderCustomItem,
 }: Props<ItemType>) => {
-  const [list, setList] = useState(items);
-
   const onDragEnd = (result) => {
     if (!result.destination) {
       return;
     }
 
     const newList: Array<ItemType> = reorder(
-      list,
+      items,
       result.source.index,
       result.destination.index,
     );
-    setList(newList);
     onSortChange(newList, result.source.index, result.destination.index);
   };
-
-  useEffect(() => {
-    if (list?.length !== items?.length) {
-      setList(items);
-    }
-  }, [list, items]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -72,7 +63,7 @@ const SortableList = <ItemType extends ListItemType>({
         {({ droppableProps, innerRef, placeholder }) => (
           <div {...droppableProps}
                ref={innerRef}>
-            {list.map((item, index) => (
+            {items.map((item, index) => (
               <SortableListItem item={item}
                                 index={index}
                                 key={item.id}
