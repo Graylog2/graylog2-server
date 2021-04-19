@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { Draggable } from 'react-beautiful-dnd';
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
@@ -48,6 +49,7 @@ export type RenderCustomItem<ItemType extends ListItemType> = ({
 type Props<ItemType extends ListItemType> = {
   className?: string,
   disableDragging?: boolean,
+  displayOverlayInPortal: boolean,
   index: number,
   item: ItemType,
   renderCustomItem?: RenderCustomItem<ItemType>,
@@ -68,34 +70,36 @@ const SortableListItem = <ItemType extends ListItemType>({
   className,
   renderCustomItem,
   disableDragging,
+  displayOverlayInPortal,
 }: Props<ItemType>) => (
   <Draggable draggableId={item.id} index={index}>
-    {({ draggableProps, dragHandleProps, innerRef }) => (
-      <>
-        {renderCustomItem
-          ? renderCustomItem({
-            className,
-            disableDragging,
-            draggableProps: draggableProps,
-            dragHandleProps: dragHandleProps,
-            index,
-            item,
-            ref: innerRef,
-          })
-          : (
-            <StyledListGroupItem ref={innerRef}
-                                 className={className}
-                                 containerProps={{ ...draggableProps }}>
-              {!disableDragging && (
-                <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
-                  <Icon name="bars" />
-                </DragHandle>
-              )}
-              {'title' in item ? item.title : item.id}
-            </StyledListGroupItem>
-          )}
-      </>
-    )}
+    {({ draggableProps, dragHandleProps, innerRef }, { isDragging }) => {
+      const listItem = renderCustomItem
+        ? renderCustomItem({
+          className,
+          disableDragging,
+          draggableProps: draggableProps,
+          dragHandleProps: dragHandleProps,
+          index,
+          item,
+          ref: innerRef,
+        }) : (
+          <StyledListGroupItem ref={innerRef}
+                               className={className}
+                               containerProps={{ ...draggableProps }}>
+            {!disableDragging && (
+            <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
+              <Icon name="bars" />
+            </DragHandle>
+            )}
+            {'title' in item ? item.title : item.id}
+          </StyledListGroupItem>
+        );
+
+      return (
+        <>{(displayOverlayInPortal && isDragging) ? createPortal(listItem, document.body) : listItem}</>
+      );
+    }}
   </Draggable>
   );
 
