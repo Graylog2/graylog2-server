@@ -27,7 +27,7 @@ export type ListItemType = {
   title?: string | React.ReactElement,
 }
 
-export type RenderCustomItem<ItemType extends ListItemType> = ({
+export type CustomContentRender<ItemType extends ListItemType> = ({
   disableDragging,
   draggableProps,
   dragHandleProps,
@@ -46,13 +46,13 @@ export type RenderCustomItem<ItemType extends ListItemType> = ({
 
 type Props<ItemType extends ListItemType> = {
   className?: string,
+  customContentRender?: CustomContentRender<ItemType>,
   disableDragging?: boolean,
   displayOverlayInPortal: boolean,
   draggableProps: DraggableProvidedDraggableProps,
   dragHandleProps: DraggableProvidedDragHandleProps,
   index: number,
   item: ItemType,
-  renderCustomItem?: RenderCustomItem<ItemType>,
 };
 
 const StyledListGroupItem = styled(ListGroupItem)`
@@ -68,14 +68,14 @@ const SortableListItem = forwardRef(<ItemType extends ListItemType>({
   item,
   index,
   className,
-  renderCustomItem,
+  customContentRender,
   disableDragging,
   draggableProps,
   dragHandleProps,
 }: Props<ItemType>, ref) => {
   return (
-    <>{renderCustomItem
-      ? renderCustomItem({
+    <>{customContentRender
+      ? customContentRender({
         className,
         disableDragging,
         draggableProps: draggableProps,
@@ -102,7 +102,7 @@ const SortableListItem = forwardRef(<ItemType extends ListItemType>({
 SortableListItem.defaultProps = {
   className: undefined,
   disableDragging: false,
-  renderCustomItem: undefined,
+  customContentRender: undefined,
 };
 
 export default SortableListItem;

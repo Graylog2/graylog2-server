@@ -18,7 +18,7 @@ import * as React from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 
-import type { ListItemType, RenderCustomItem } from './ListItem';
+import type { ListItemType, CustomContentRender } from './ListItem';
 import SortableListItem from './SortableListItem';
 
 const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {
@@ -30,11 +30,11 @@ const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startInde
 };
 
 export type Props<ItemType extends ListItemType> = {
+  customContentRender?: CustomContentRender<ListItemType>
   disableDragging?: boolean,
   displayOverlayInPortal?: boolean,
   items: Array<ItemType>,
   onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
-  renderCustomItem?: RenderCustomItem<ListItemType>
 }
 
 /**
@@ -49,7 +49,7 @@ const SortableList = <ItemType extends ListItemType>({
   displayOverlayInPortal,
   items,
   onMoveItem,
-  renderCustomItem,
+  customContentRender,
 }: Props<ItemType>) => {
   const onDragEnd = (result) => {
     if (!result.destination) {
@@ -74,7 +74,7 @@ const SortableList = <ItemType extends ListItemType>({
               <SortableListItem item={item}
                                 index={index}
                                 key={item.id}
-                                renderCustomItem={renderCustomItem}
+                                customContentRender={customContentRender}
                                 disableDragging={disableDragging}
                                 displayOverlayInPortal={displayOverlayInPortal} />
             ))}
@@ -105,12 +105,12 @@ SortableList.propTypes = {
   /**
    * Custom content renderer for the SortableListItem. Will receive props to display custom drag handle.
    */
-  renderCustomItem: PropTypes.func,
+  customContentRender: PropTypes.func,
 };
 
 SortableList.defaultProps = {
   disableDragging: false,
-  renderCustomItem: undefined,
+  customContentRender: undefined,
 };
 
 export default SortableList;
