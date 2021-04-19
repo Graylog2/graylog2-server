@@ -33,7 +33,7 @@ export type Props<ItemType extends ListItemType> = {
   disableDragging?: boolean,
   displayOverlayInPortal?: boolean,
   items: Array<ItemType>,
-  onSortChange: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
+  onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
   renderCustomItem?: RenderCustomItem<ListItemType>
 }
 
@@ -48,7 +48,7 @@ const SortableList = <ItemType extends ListItemType>({
   disableDragging,
   displayOverlayInPortal,
   items,
-  onSortChange,
+  onMoveItem,
   renderCustomItem,
 }: Props<ItemType>) => {
   const onDragEnd = (result) => {
@@ -61,7 +61,7 @@ const SortableList = <ItemType extends ListItemType>({
       result.source.index,
       result.destination.index,
     );
-    onSortChange(newList, result.source.index, result.destination.index);
+    onMoveItem(newList, result.source.index, result.destination.index);
   };
 
   return (
@@ -101,7 +101,7 @@ SortableList.propTypes = {
    * The function will receive the newly sorted list as an argument
    * and the source and destination index of the moved item.
    */
-  onSortChange: PropTypes.func.isRequired,
+  onMoveItem: PropTypes.func.isRequired,
   /**
    * Custom content renderer for the SortableListItem. Will receive props to display custom drag handle.
    */
