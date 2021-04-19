@@ -16,55 +16,34 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { CSS } from '@dnd-kit/utilities';
-import { useSortable } from '@dnd-kit/sortable';
-import type { DraggableSyntheticListeners } from '@dnd-kit/core';
+import { Draggable } from 'react-beautiful-dnd';
+import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
-import ListItem from './ListItem';
+import { ListGroupItem } from 'components/graylog';
+
+import { Icon } from '..';
 
 export type ListItemType = {
   id: string,
   title?: string | React.ReactElement,
 }
 
-export type DragHandleAttributes = Partial<{
-  role: string;
-  tabIndex: number;
-  'aria-pressed': boolean | undefined;
-  'aria-roledescription': string;
-  'aria-describedby': string;
-}>;
-
 export type RenderCustomItem<ItemType extends ListItemType> = ({
   disableDragging,
-  dragHandleAttributes,
-  dragHandleListeners,
+  draggableProps,
+  dragHandleProps,
   index,
   item,
   ref,
 } : {
   className?: string,
   disableDragging?: boolean
-  dragHandleAttributes: DragHandleAttributes,
-  dragHandleListeners: DraggableSyntheticListeners,
+  draggableProps: DraggableProvidedDraggableProps;
+  dragHandleProps: DraggableProvidedDragHandleProps;
   index: number,
   item: ItemType,
   ref: React.Ref<any>,
 }) => React.ReactNode;
-
-const StyledListItem = styled(ListItem)(({
-  $opacity,
-  $transform,
-  $transition,
-}: {
-  $opacity: React.CSSProperties['opacity'],
-  $transform: React.CSSProperties['transform'],
-  $transition: React.CSSProperties['transition'],
- }) => `
-  opacity: ${$opacity};
-  transform: ${$transform};
-  transition: ${$transition};
-`);
 
 type Props<ItemType extends ListItemType> = {
   className?: string,
@@ -74,36 +53,49 @@ type Props<ItemType extends ListItemType> = {
   renderCustomItem?: RenderCustomItem<ItemType>,
 };
 
-const SortableListItem = <ItemType extends ListItemType>({
-  className,
-  disableDragging,
-  index,
-  item,
-  renderCustomItem,
-}: Props<ItemType>) => {
-  const {
-    attributes,
-    isDragging,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: item.id });
+const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
+  align-items: flex-start;
+`;
 
-  return (
-    <StyledListItem className={className}
-                    disableDragging={disableDragging}
-                    dragHandleAttributes={attributes}
-                    dragHandleListeners={listeners}
-                    index={index}
-                    item={item}
-                    ref={setNodeRef}
-                    renderCustomItem={renderCustomItem}
-                    $transform={CSS.Transform.toString(transform)}
-                    $transition={transition}
-                    $opacity={isDragging ? 0.5 : 1} />
+const DragHandle = styled.div`
+  margin-right: 5px;
+`;
+
+const SortableListItem = <ItemType extends ListItemType>({
+  item,
+  index,
+  className,
+  renderCustomItem,
+  disableDragging,
+}: Props<ItemType>) => (
+  <Draggable draggableId={item.id} index={index}>
+    {({ draggableProps, dragHandleProps, innerRef }) => (
+      <>
+        {renderCustomItem
+          ? renderCustomItem({
+            className,
+            disableDragging,
+            draggableProps: draggableProps,
+            dragHandleProps: dragHandleProps,
+            index,
+            item,
+            ref: innerRef,
+          })
+          : (
+            <StyledListGroupItem ref={innerRef}
+                                 className={className}
+                                 containerProps={{ ...draggableProps }}>
+              {!disableDragging && (
+                <DragHandle {...dragHandleProps}><Icon name="bars" /></DragHandle>
+              )}
+              {'title' in item ? item.title : item.id}
+            </StyledListGroupItem>
+          )}
+      </>
+    )}
+  </Draggable>
   );
-};
 
 SortableListItem.defaultProps = {
   className: undefined,

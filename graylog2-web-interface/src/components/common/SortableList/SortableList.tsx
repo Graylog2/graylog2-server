@@ -15,103 +15,76 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { useState, useEffect } from 'react';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 import SortableListItem from './SortableListItem';
-import ListItemDragOverlay from './ListItemDragOverlay';
 import type { RenderCustomItem, ListItemType } from './SortableListItem';
 
 export type Props<ItemType extends ListItemType> = {
   disableDragging?: boolean,
   displayOverlayInPortal?: boolean,
   items: Array<ItemType>,
-  onSortChange: (newList: Array<ItemType>, oldItemIndex: number, newItemIndex: number) => void,
+  onSortChange: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
   renderCustomItem?: RenderCustomItem<ListItemType>
 }
 
-const SortableList = <ItemType extends ListItemType>({
-  disableDragging,
-  displayOverlayInPortal,
-  items,
-  onSortChange,
-  renderCustomItem,
-}: Props<ItemType>) => {
-  const [activeId, setActiveId] = useState<string>(null);
-  const [list, setList] = useState<Array<ItemType>>(items);
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
+const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
 
-  const onDragStart = (event) => {
-    setActiveId(event.active.id);
-  };
-
-  const onDragEnd = (data: DragEndEvent) => {
-    setActiveId(null);
-
-    if (data.over) {
-      const oldItemIndex = list.findIndex((item) => activeId === item.id);
-      const newItemIndex = list.findIndex((item) => data.over.id === item.id);
-
-      if (oldItemIndex !== newItemIndex) {
-        const updatedList = arrayMove(list, oldItemIndex, newItemIndex);
-        setList(updatedList);
-        onSortChange(updatedList, oldItemIndex, newItemIndex);
-      }
-    }
-  };
-
-  const listItemOverlay = (
-    <ListItemDragOverlay activeId={activeId}
-                         items={list}
-                         renderCustomItem={renderCustomItem} />
-  );
-
-  return (
-    <DndContext collisionDetection={closestCenter}
-                onDragCancel={onDragEnd}
-                onDragEnd={onDragEnd}
-                onDragStart={onDragStart}
-                sensors={sensors}>
-      <SortableContext items={list.map(({ id }) => id)}
-                       strategy={verticalListSortingStrategy}>
-        {list.map((item, index) => (
-          <SortableListItem disableDragging={disableDragging}
-                            index={index}
-                            item={item}
-                            key={item.id}
-                            renderCustomItem={renderCustomItem} />
-        ))}
-      </SortableContext>
-
-      {displayOverlayInPortal ? createPortal(listItemOverlay, document.body) : listItemOverlay}
-    </DndContext>
-  );
+  return result;
 };
 
-SortableList.defaultProps = {
-  renderCustomItem: undefined,
-  disableDragging: undefined,
-  displayOverlayInPortal: false,
+const SortableList = <ItemType extends ListItemType>({
+  items,
+  renderCustomItem,
+  disableDragging,
+  onSortChange,
+}: Props<ItemType>) => {
+  const [list, setList] = useState(items);
+
+  const onDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const newList: Array<ItemType> = reorder(
+      list,
+      result.source.index,
+      result.destination.index,
+    );
+
+    setList(newList);
+    onSortChange(newList, result.source.index, result.destination.index);
+  };
+
+  useEffect(() => {
+    if (list?.length !== items?.length) {
+      setList(items);
+    }
+  }, [list, items]);
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="droppable">
+        {({ droppableProps, innerRef, placeholder }) => (
+          <div {...droppableProps}
+               ref={innerRef}>
+            {items.map((item, index) => (
+              <SortableListItem item={item}
+                                index={index}
+                                key={item.id}
+                                renderCustomItem={renderCustomItem}
+                                disableDragging={disableDragging} />
+            ))}
+            {placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
 };
 
 export default SortableList;
