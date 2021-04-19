@@ -341,7 +341,7 @@ describe('useStore', () => {
   });
 
   it('does not reregister if props mapper is provided as arrow function', () => {
-    SimpleStore.listen = jest.fn(SimpleStore.listen);
+    const listenSpy = jest.spyOn(SimpleStore, 'listen');
 
     const ComponentWithPropsMapper = ({ propsMapper }: { propsMapper: (state: { value: number }) => ({ value: number }) }) => {
       const { value } = useStore(SimpleStore, propsMapper) || { value: undefined };
@@ -355,10 +355,9 @@ describe('useStore', () => {
 
     wrapper.setProps({ propsMapper: ({ value: v } = { value: 0 }) => ({ value: v * 2 }) });
     act(() => SimpleStore.setValue(42));
-    wrapper.update();
 
     expect(wrapper).toHaveText('Value is: 84');
 
-    expect(SimpleStore.listen).toHaveBeenCalledTimes(2);
+    expect(listenSpy).toHaveBeenCalledTimes(1);
   });
 });
