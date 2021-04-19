@@ -14,17 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
-import {
-  mockGetComputedSpacing,
-  mockDndElSpacing,
-  makeDnd,
-  DND_DRAGGABLE_DATA_ATTR,
-  DND_DIRECTION_DOWN,
-  DND_DIRECTION_UP,
-} from 'react-beautiful-dnd-test-utils';
 
 import SortableList from './SortableList';
 
@@ -39,7 +30,7 @@ describe('SortableList', () => {
     const onSortChangeStub = jest.fn();
     render(<SortableList items={list} onSortChange={onSortChangeStub} />);
 
-    const firstItem = screen.getByText('Item 1').closest('[data-rbd-draggable-id]');
+    const firstItem = screen.getByTestId('sortable-item-item-1');
     fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
     await screen.findByText(/You have lifted an item/i);
     fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
@@ -49,6 +40,10 @@ describe('SortableList', () => {
 
     await waitFor(() => expect(onSortChangeStub).toHaveBeenCalledTimes(1));
 
-    expect(onSortChangeStub).toHaveBeenCalledWith([{ id: 'item-2', title: 'Item 2' }, { id: 'item-1', title: 'Item 1' }, { id: 'item-3', title: 'Item 3' }], 0, 1);
+    expect(onSortChangeStub).toHaveBeenCalledWith([
+      { id: 'item-2', title: 'Item 2' },
+      { id: 'item-1', title: 'Item 1' },
+      { id: 'item-3', title: 'Item 3' },
+    ], 0, 1);
   });
 });
