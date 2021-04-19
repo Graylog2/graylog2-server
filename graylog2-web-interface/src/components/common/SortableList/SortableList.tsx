@@ -38,10 +38,11 @@ const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startInde
 };
 
 const SortableList = <ItemType extends ListItemType>({
-  items,
-  renderCustomItem,
   disableDragging,
+  displayOverlayInPortal,
+  items,
   onSortChange,
+  renderCustomItem,
 }: Props<ItemType>) => {
   const [list, setList] = useState(items);
 
@@ -76,7 +77,8 @@ const SortableList = <ItemType extends ListItemType>({
                                 index={index}
                                 key={item.id}
                                 renderCustomItem={renderCustomItem}
-                                disableDragging={disableDragging} />
+                                disableDragging={disableDragging}
+                                displayOverlayInPortal={displayOverlayInPortal} />
             ))}
             {placeholder}
           </div>
