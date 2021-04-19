@@ -46,6 +46,16 @@ class ExtractorSortModal extends React.Component {
     this.modal.close();
   };
 
+  _cancel = () => {
+    const { extractors } = this.props;
+
+    this.close();
+
+    this.setState({
+      sortedExtractors: extractors,
+    });
+  }
+
   _updateSorting = (newSorting) => {
     this.setState({
       sortedExtractors: newSorting,
@@ -70,7 +80,7 @@ class ExtractorSortModal extends React.Component {
     const { input } = this.props;
 
     return (
-      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }}>
+      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }} onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>
             <span>Sort extractors for <em>{input.title}</em></span>
@@ -85,7 +95,7 @@ class ExtractorSortModal extends React.Component {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this.close}>Close</Button>
+          <Button type="button" onClick={this._cancel}>Close</Button>
           <Button type="button" bsStyle="info" onClick={this._saveSorting}>Save</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
