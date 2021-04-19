@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import { cloneDeep } from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -33,6 +32,7 @@ type Props = {
   streams: Array<Stream>,
   decorators: Array<Decorator>,
   types: { [key: string]: any },
+  // eslint-disable-next-line react/require-default-props
   show?: boolean,
   onCancel: () => void,
   onSave: (newDecorators: Array<Decorator>) => unknown,
