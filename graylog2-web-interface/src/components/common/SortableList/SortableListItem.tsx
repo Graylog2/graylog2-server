@@ -87,7 +87,9 @@ const SortableListItem = <ItemType extends ListItemType>({
                                  className={className}
                                  containerProps={{ ...draggableProps }}>
               {!disableDragging && (
-                <DragHandle {...dragHandleProps}><Icon name="bars" /></DragHandle>
+                <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
+                  <Icon name="bars" />
+                </DragHandle>
               )}
               {'title' in item ? item.title : item.id}
             </StyledListGroupItem>
