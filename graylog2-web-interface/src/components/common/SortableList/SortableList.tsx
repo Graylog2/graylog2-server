@@ -55,7 +55,6 @@ const SortableList = <ItemType extends ListItemType>({
       result.source.index,
       result.destination.index,
     );
-
     setList(newList);
     onSortChange(newList, result.source.index, result.destination.index);
   };
@@ -72,7 +71,7 @@ const SortableList = <ItemType extends ListItemType>({
         {({ droppableProps, innerRef, placeholder }) => (
           <div {...droppableProps}
                ref={innerRef}>
-            {items.map((item, index) => (
+            {list.map((item, index) => (
               <SortableListItem item={item}
                                 index={index}
                                 key={item.id}
