@@ -55,6 +55,7 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                                                 .build())
                                         .build())
                                 .build())
+                        // TODO: add map for group_by_fields
                         /* TODO: Enable the typed fields once we decided if that's the way to go
                         .add(map()
                                 .put("fields-typed-long", map()

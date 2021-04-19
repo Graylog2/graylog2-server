@@ -39,6 +39,7 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorPreconditionException;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog2.indexer.messages.Messages;
@@ -155,7 +156,6 @@ public class AggregationEventProcessor implements EventProcessor {
         } else {
             final AtomicLong msgCount = new AtomicLong(0L);
             final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
-
                 final List<MessageSummary> summaries = Lists.newArrayList();
                 for (final ResultMessage resultMessage : messages) {
                     if (msgCount.incrementAndGet() > limit) {
@@ -167,8 +167,22 @@ public class AggregationEventProcessor implements EventProcessor {
                 }
                 messageConsumer.accept(summaries);
             };
+
+            ElasticsearchQueryString scrollQueryString = ElasticsearchQueryString.builder().queryString(config.query()).build();
+            if (!config.groupBy().isEmpty()) {
+                ElasticsearchQueryString groupByQueryString = ElasticsearchQueryString.empty();
+                for (String key : event.getGroupByFields().keySet()) {
+                    String value = event.getGroupByFields().get(key);
+                    String query = key + ":" + value;
+                    groupByQueryString = groupByQueryString.concatenate(ElasticsearchQueryString.builder().queryString(query).build());
+                }
+                LOG.info(">>>> group by query: {}", groupByQueryString);
+                scrollQueryString = scrollQueryString.concatenate(groupByQueryString);
+            }
+            LOG.info(">>>> scrollQueryString: {}", scrollQueryString);
+
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            moreSearch.scrollQuery(config.query(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
+            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
 
     }
@@ -304,6 +318,7 @@ public class AggregationEventProcessor implements EventProcessor {
             for (int i = 0; i < config.groupBy().size(); i++) {
                 fields.put(config.groupBy().get(i), keyResult.key().get(i));
             }
+            event.setGroupByFields(fields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 
             // The field name for the series value is composed of the series function and field. We don't take the
             // series ID into account because it would be very hard to use for the user. That means a series with
