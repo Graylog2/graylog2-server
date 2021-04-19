@@ -26,6 +26,12 @@ const list = [
 ];
 
 describe('SortableList', () => {
+  it('should list items', () => {
+    render(<SortableList items={list} onSortChange={() => {}} />);
+
+    list.forEach((item) => expect(screen.getByText(item.title)).toBeInTheDocument());
+  });
+
   it('should sort list', async () => {
     const onSortChangeStub = jest.fn();
     render(<SortableList items={list} onSortChange={onSortChangeStub} />);
