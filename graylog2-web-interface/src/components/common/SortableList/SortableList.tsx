@@ -18,16 +18,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
+import type { ListItemType, RenderCustomItem } from './ListItem';
 import SortableListItem from './SortableListItem';
-import type { RenderCustomItem, ListItemType } from './SortableListItem';
-
-export type Props<ItemType extends ListItemType> = {
-  disableDragging?: boolean,
-  displayOverlayInPortal?: boolean,
-  items: Array<ItemType>,
-  onSortChange: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
-  renderCustomItem?: RenderCustomItem<ListItemType>
-}
 
 const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -36,6 +28,14 @@ const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startInde
 
   return result;
 };
+
+export type Props<ItemType extends ListItemType> = {
+  disableDragging?: boolean,
+  displayOverlayInPortal?: boolean,
+  items: Array<ItemType>,
+  onSortChange: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
+  renderCustomItem?: RenderCustomItem<ListItemType>
+}
 
 const SortableList = <ItemType extends ListItemType>({
   disableDragging,
