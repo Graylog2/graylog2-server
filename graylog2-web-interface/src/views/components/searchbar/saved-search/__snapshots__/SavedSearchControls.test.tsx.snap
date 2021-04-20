@@ -329,6 +329,7 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
       <HoverForHelp
         className="c1"
         id="help-popover"
+        placement="bottom"
         pullRight={false}
         title="Sharing not possible"
       >
