@@ -216,7 +216,7 @@ class EventDefinitionSummary extends React.Component {
     const { currentUser } = this.props;
 
     const effectiveDefinitionNotifications = definitionNotifications
-      .filter((n) => isPermitted(currentUser.permissions, `eventnotifications:read${n.notification_id}`));
+      .filter((n) => isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`));
     const notificationsWithMissingPermissions = definitionNotifications
       .filter((n) => !effectiveDefinitionNotifications.map((nObj) => nObj.notification_id).includes(n.notification_id));
     const warning = notificationsWithMissingPermissions.length > 0
