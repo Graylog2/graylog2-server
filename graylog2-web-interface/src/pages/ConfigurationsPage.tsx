@@ -32,6 +32,7 @@ import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 import {} from 'components/maps/configurations';
 import style from 'components/configurations/ConfigurationStyles.lazy.css';
+import { Store } from 'stores/StoreTypes';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 
@@ -44,7 +45,14 @@ const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration'
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
-const ErrorFallback = ({ error, title }) => (
+type ErrorFallbackProps = {
+  error: {
+    message: string,
+  },
+  title: string,
+};
+
+const ErrorFallback = ({ error, title }: ErrorFallbackProps) => (
   <>
     <h2>{title}</h2>
     <p>Something went wrong:</p>
@@ -52,8 +60,13 @@ const ErrorFallback = ({ error, title }) => (
   </>
 );
 
-const Boundary = ({ children, title }) => <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>{children}</ErrorBoundary>;
-const ConfigletContainer = ({ children, title }) => (
+type BoundaryProps = {
+  children: React.ReactNode,
+  title: string,
+}
+
+const Boundary = ({ children, title }: BoundaryProps) => <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>{children}</ErrorBoundary>;
+const ConfigletContainer = ({ children, title }: BoundaryProps) => (
   <Col md={6}>
     <Boundary title={title}>
       {children}
@@ -61,7 +74,18 @@ const ConfigletContainer = ({ children, title }) => (
   </Col>
 );
 
-class ConfigurationsPage extends React.Component {
+type Props = {
+  currentUser: {
+    permissions: Array<string>,
+  },
+  configuration: Record<string, any>,
+};
+
+type State = {
+  loaded: boolean,
+};
+
+class ConfigurationsPage extends React.Component<Props, State> {
   checkLoadedTimer = undefined
 
   constructor(props) {
@@ -74,25 +98,25 @@ class ConfigurationsPage extends React.Component {
     style.use();
     const { currentUser: { permissions } } = this.props;
 
-    this._checkConfig();
-
-    ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG);
-    ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG);
-    ConfigurationsActions.list(SIDECAR_CONFIG);
-    ConfigurationsActions.list(EVENTS_CONFIG);
+    const promises = [
+      ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG),
+      ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
+      ConfigurationsActions.list(SIDECAR_CONFIG),
+      ConfigurationsActions.list(EVENTS_CONFIG),
+    ];
 
     if (isPermitted(permissions, ['urlwhitelist:read'])) {
-      ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
+      promises.push(ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG));
     }
 
-    PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
-      ConfigurationsActions.list(systemConfig.configType);
-    });
+    const pluginPromises = PluginStore.exports('systemConfigurations')
+      .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
+
+    Promise.all([...promises, ...pluginPromises]).then(() => this.setState({ loaded: true }));
   }
 
   componentWillUnmount() {
     style.unuse();
-    this._clearTimeout();
   }
 
   _getConfig = (configType) => {
@@ -119,9 +143,9 @@ class ConfigurationsPage extends React.Component {
   };
 
   _pluginConfigs = () => PluginStore.exports('systemConfigurations')
-    .map(({ component: SystemConfigComponent, configType }, idx) => (
+    .map(({ component: SystemConfigComponent, configType }) => (
       <ConfigletContainer title={configType}>
-        <SystemConfigComponent key={`system-configuration-${idx}`}
+        <SystemConfigComponent key={`system-configuration-${configType}`}
                                config={this._getConfig(configType) ?? undefined}
                                updateConfig={this._onUpdate(configType)} />
       </ConfigletContainer>
@@ -133,32 +157,13 @@ class ConfigurationsPage extends React.Component {
     // Put two plugin config components per row.
     return chunk(pluginConfigs, 2)
       .map((configChunk, idx) => (
+        // eslint-disable-next-line react/no-array-index-key
         <Row key={`plugin-config-row-${idx}`}>
           {configChunk[0]}
           {configChunk[1]}
         </Row>
       ));
   };
-
-  _checkConfig = () => {
-    const { configuration } = this.props;
-
-    this.checkLoadedTimer = setTimeout(() => {
-      if (Object.keys(configuration).length > 0) {
-        this.setState({ loaded: true }, this._clearTimeout);
-
-        return;
-      }
-
-      this._checkConfig();
-    }, 100);
-  };
-
-  _clearTimeout = () => {
-    if (this.checkLoadedTimer) {
-      clearTimeout(this.checkLoadedTimer);
-    }
-  }
 
   render() {
     const { loaded } = this.state;
@@ -253,8 +258,13 @@ ConfigurationsPage.propTypes = {
   currentUser: PropTypes.object.isRequired,
 };
 
-export default connect(ConfigurationsPage, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({
-  ...configurations,
-  ...currentUser,
-  ...otherProps,
-}));
+export default connect(ConfigurationsPage,
+  {
+    configurations: ConfigurationsStore as Store<{}>,
+    currentUser: CurrentUserStore as Store<{}>,
+  },
+  ({ configurations, currentUser, ...otherProps }) => ({
+    ...configurations,
+    ...currentUser,
+    ...otherProps,
+  }));
