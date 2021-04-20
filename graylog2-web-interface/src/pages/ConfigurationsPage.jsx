@@ -17,6 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { chunk } from 'lodash';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -41,6 +43,23 @@ const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcess
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
+
+const ErrorFallback = ({ error, title }) => (
+  <>
+    <h2>{title}</h2>
+    <p>Something went wrong:</p>
+    <pre>{error.message}</pre>
+  </>
+);
+
+const Boundary = ({ children, title }) => <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>{children}</ErrorBoundary>;
+const ConfigletContainer = ({ children, title }) => (
+  <Col md={6}>
+    <Boundary title={title}>
+      {children}
+    </Boundary>
+  </Col>
+);
 
 class ConfigurationsPage extends React.Component {
   checkLoadedTimer = undefined
@@ -99,39 +118,26 @@ class ConfigurationsPage extends React.Component {
     };
   };
 
-  _pluginConfigs = () => {
-    return PluginStore.exports('systemConfigurations').map((systemConfig, idx) => {
-      return React.createElement(systemConfig.component, {
-        // eslint-disable-next-line react/no-array-index-key
-        key: `system-configuration-${idx}`,
-        config: this._getConfig(systemConfig.configType) || undefined,
-        updateConfig: this._onUpdate(systemConfig.configType),
-      });
-    });
-  };
+  _pluginConfigs = () => PluginStore.exports('systemConfigurations')
+    .map(({ component: SystemConfigComponent, configType }, idx) => (
+      <ConfigletContainer title={configType}>
+        <SystemConfigComponent key={`system-configuration-${idx}`}
+                               config={this._getConfig(configType) ?? undefined}
+                               updateConfig={this._onUpdate(configType)} />
+      </ConfigletContainer>
+    ));
 
   _pluginConfigRows = () => {
     const pluginConfigs = this._pluginConfigs();
-    const rows = [];
-    let idx = 0;
 
     // Put two plugin config components per row.
-    while (pluginConfigs.length > 0) {
-      idx += 1;
-
-      rows.push(
+    return chunk(pluginConfigs, 2)
+      .map((configChunk, idx) => (
         <Row key={`plugin-config-row-${idx}`}>
-          <Col md={6}>
-            {pluginConfigs.shift()}
-          </Col>
-          <Col md={6}>
-            {pluginConfigs.shift() || (<span>&nbsp;</span>)}
-          </Col>
-        </Row>,
-      );
-    }
-
-    return rows;
+          {configChunk[0]}
+          {configChunk[1]}
+        </Row>
+      ));
   };
 
   _checkConfig = () => {
@@ -173,38 +179,38 @@ class ConfigurationsPage extends React.Component {
       Output = (
         <>
           {searchesConfig && (
-          <Col md={6}>
+          <ConfigletContainer title="Search Configuration">
             <SearchesConfig config={searchesConfig}
                             updateConfig={this._onUpdate(SEARCHES_CLUSTER_CONFIG)} />
-          </Col>
+          </ConfigletContainer>
           )}
           {messageProcessorsConfig && (
-          <Col md={6}>
+          <ConfigletContainer title="Message Processor Configuration">
             <MessageProcessorsConfig config={messageProcessorsConfig}
                                      updateConfig={this._onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
-          </Col>
+          </ConfigletContainer>
           )}
           {sidecarConfig && (
-          <Col md={6}>
+          <ConfigletContainer title="Sidecar Configuration">
             <SidecarConfig config={sidecarConfig}
                            updateConfig={this._onUpdate(SIDECAR_CONFIG)} />
-          </Col>
+          </ConfigletContainer>
           )}
           {eventsConfig && (
-          <Col md={6}>
+          <ConfigletContainer title="Events Configuration">
             <EventsConfig config={eventsConfig}
                           updateConfig={this._onUpdate(EVENTS_CONFIG)} />
-          </Col>
+          </ConfigletContainer>
           )}
           {isPermitted(permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
-          <Col md={6}>
+          <ConfigletContainer title="URL Whitelist Configuration">
             <UrlWhiteListConfig config={urlWhiteListConfig}
                                 updateConfig={this._onUpdate(URL_WHITELIST_CONFIG)} />
-          </Col>
+          </ConfigletContainer>
           )}
-          <Col md={6}>
+          <ConfigletContainer title="Decorators Configuration">
             <DecoratorsConfig />
-          </Col>
+          </ConfigletContainer>
         </>
       );
     }
