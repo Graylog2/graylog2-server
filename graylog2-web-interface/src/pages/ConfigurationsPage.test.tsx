@@ -21,19 +21,17 @@ const ComponentWorkingFine = () => (
 );
 
 describe('ConfigurationsPage', () => {
-  it('wrapps core configuration elements with error boundary', async () => {
+  it('wraps core configuration elements with error boundary', async () => {
     asMock(usePluginEntities).mockReturnValue([]);
 
-    asMock(SidecarConfig).mockImplementation(() => {
-      throw Error('Boom!');
-    });
+    asMock(SidecarConfig).mockImplementation(ComponentThrowingError);
 
-    suppressConsole(() => {
+    await suppressConsole(async () => {
       render(<ConfigurationsPage />);
-    });
 
-    await screen.findByText('Message Processors Configuration');
-    await screen.findByText('Boom!');
+      await screen.findByText('Message Processors Configuration');
+      await screen.findByText('Boom!');
+    });
   });
 
   it('wraps plugin configuration elements with error boundary', async () => {
