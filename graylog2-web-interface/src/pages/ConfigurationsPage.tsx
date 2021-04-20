@@ -16,14 +16,13 @@
  */
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
 import { chunk } from 'lodash';
 import { ErrorBoundary } from 'react-error-boundary';
 import { SystemConfiguration } from 'views/types';
 
 import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 import SearchesConfig from 'components/configurations/SearchesConfig';
@@ -76,13 +75,6 @@ const ConfigletContainer = ({ children, title }: BoundaryProps) => (
   </Col>
 );
 
-type Props = {
-  currentUser: {
-    permissions: Array<string>,
-  },
-  configuration: Record<string, any>,
-};
-
 const _onUpdate = (configType: string) => {
   return (config) => {
     switch (configType) {
@@ -128,9 +120,11 @@ const PluginConfigRows = ({ configuration, systemConfigs }: PluginConfigRowsProp
   return <>{configRows}</>;
 };
 
-const ConfigurationsPage = ({ currentUser: { permissions }, configuration }: Props) => {
+const ConfigurationsPage = () => {
   const [loaded, setLoaded] = useState(false);
   const pluginSystemConfigs = usePluginEntities('systemConfigurations');
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const permissions = useStore(CurrentUserStore as Store<{ currentUser: { permissions: Array<string> } }>, (state) => state?.currentUser?.permissions);
 
   useEffect(() => {
     style.use();
@@ -238,24 +232,4 @@ const ConfigurationsPage = ({ currentUser: { permissions }, configuration }: Pro
   );
 };
 
-ConfigurationsPage.propTypes = {
-  configuration: PropTypes.object.isRequired,
-  currentUser: PropTypes.exact({
-    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
-};
-
-export default connect(ConfigurationsPage,
-  {
-    configurations: ConfigurationsStore as Store<{}>,
-    currentUser: CurrentUserStore as Store<{
-      currentUser: {
-        permissions: Array<String>,
-      }
-    }>,
-  },
-  ({ configurations, currentUser, ...otherProps }) => ({
-    ...configurations,
-    ...currentUser,
-    ...otherProps,
-  }));
+export default ConfigurationsPage;
