@@ -45,6 +45,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -88,29 +90,13 @@ public class AggregationEventProcessorTest {
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
-        final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
-                .id("dto-id-1")
-                .title("Test Aggregation")
-                .description("A test aggregation event processors")
-                .priority(1)
-                .alert(false)
-                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
-                .config(AggregationEventProcessorConfig.builder()
-                        .query("")
-                        .streams(ImmutableSet.of("stream-2"))
-                        .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
-                        .series(ImmutableList.of())
-                        .conditions(null)
-                        .searchWithinMs(30000)
-                        .executeEveryMs(30000)
-                        .build())
-                .keySpec(ImmutableList.of())
-                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
 
-        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
+        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(
+                eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
 
         final AggregationResult result = AggregationResult.builder()
                 .effectiveTimerange(timerange)
@@ -177,6 +163,9 @@ public class AggregationEventProcessorTest {
             // Make sure that the count with a "null" field doesn't include the field in the name
             assertThat(message.getField("aggregation_value_count")).isEqualTo(23.0d);
             assertThat(message.getField("aggregation_value_card_source")).isEqualTo(1.0d);
+
+            assertThat(event.getGroupByFields().get("group_field_one")).isEqualTo("one");
+            assertThat(event.getGroupByFields().get("group_field_two")).isEqualTo("two");
         });
     }
 
@@ -201,24 +190,7 @@ public class AggregationEventProcessorTest {
                 ))
                 .build();
 
-        final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
-                .id("dto-id-1")
-                .title("Test Aggregation")
-                .description("A test aggregation event processors")
-                .priority(1)
-                .alert(false)
-                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
-                .config(AggregationEventProcessorConfig.builder()
-                        .query("")
-                        .streams(ImmutableSet.of())
-                        .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
-                        .series(ImmutableList.of())
-                        .conditions(conditions)
-                        .searchWithinMs(30000)
-                        .executeEveryMs(30000)
-                        .build())
-                .keySpec(ImmutableList.of())
-                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), conditions);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -303,6 +275,9 @@ public class AggregationEventProcessorTest {
             assertThat(message.getField("aggregation_key")).isEqualTo("one|two");
             assertThat(message.getField("aggregation_value_count_source")).isEqualTo(42.0d);
             assertThat(message.getField("aggregation_value_card_source")).isEqualTo(1.0d);
+
+            assertThat(event.getGroupByFields().get("group_field_one")).isEqualTo("one");
+            assertThat(event.getGroupByFields().get("group_field_two")).isEqualTo("two");
         });
     }
 
@@ -322,16 +297,7 @@ public class AggregationEventProcessorTest {
                 .searchWithinMs(30000)
                 .executeEveryMs(30000)
                 .build();
-        final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
-                .id("dto-id-1")
-                .title("Test Aggregation")
-                .description("A test aggregation event processors")
-                .priority(1)
-                .alert(false)
-                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
-                .config(config)
-                .keySpec(ImmutableList.of())
-                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -365,16 +331,7 @@ public class AggregationEventProcessorTest {
                 .searchWithinMs(30000)
                 .executeEveryMs(30000)
                 .build();
-        final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
-                .id("dto-id-1")
-                .title("Test Aggregation")
-                .description("A test aggregation event processors")
-                .priority(1)
-                .alert(false)
-                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
-                .config(config)
-                .keySpec(ImmutableList.of())
-                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -432,52 +389,13 @@ public class AggregationEventProcessorTest {
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
-        final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
-                .id("dto-id-1")
-                .title("Test Aggregation")
-                .description("A test aggregation event processors")
-                .priority(1)
-                .alert(false)
-                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
-                .config(AggregationEventProcessorConfig.builder()
-                        .query("")
-                        .streams(ImmutableSet.of("stream-2"))
-                        .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
-                        .series(ImmutableList.of())
-                        .conditions(null)
-                        .searchWithinMs(30000)
-                        .executeEveryMs(30000)
-                        .build())
-                .keySpec(ImmutableList.of())
-                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
-
-        final AggregationResult result = AggregationResult.builder()
-                .effectiveTimerange(timerange)
-                .totalAggregatedMessages(0)
-                .sourceStreams(ImmutableSet.of()) // No streams in result
-                .keyResults(ImmutableList.of(
-                        AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
-                                .timestamp(now)
-                                .seriesValues(ImmutableList.of(
-                                        AggregationSeriesValue.builder()
-                                                .key(ImmutableList.of("a"))
-                                                .value(0.0d)
-                                                .series(AggregationSeries.builder()
-                                                        .id("abc123")
-                                                        .function(AggregationFunction.COUNT)
-                                                        .build())
-                                                .build()
-                                ))
-                                .build()
-                ))
-                .build();
-
+        final AggregationResult result = buildAggregationResult(timerange, now, ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = eventProcessor.eventsFromAggregationResult(eventFactory, parameters, result);
 
         assertThat(eventsWithContext).hasSize(1);
@@ -524,52 +442,13 @@ public class AggregationEventProcessorTest {
                 new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID), Collections.emptyList())
         ));
 
-        final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
-                .id("dto-id-1")
-                .title("Test Aggregation")
-                .description("A test aggregation event processors")
-                .priority(1)
-                .alert(false)
-                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
-                .config(AggregationEventProcessorConfig.builder()
-                        .query("")
-                        .streams(ImmutableSet.of()) // No configured streams!
-                        .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
-                        .series(ImmutableList.of())
-                        .conditions(null)
-                        .searchWithinMs(30000)
-                        .executeEveryMs(30000)
-                        .build())
-                .keySpec(ImmutableList.of())
-                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
-
-        final AggregationResult result = AggregationResult.builder()
-                .effectiveTimerange(timerange)
-                .totalAggregatedMessages(0)
-                .sourceStreams(ImmutableSet.of()) // No streams in result
-                .keyResults(ImmutableList.of(
-                        AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
-                                .timestamp(now)
-                                .seriesValues(ImmutableList.of(
-                                        AggregationSeriesValue.builder()
-                                                .key(ImmutableList.of("a"))
-                                                .value(0.0d)
-                                                .series(AggregationSeries.builder()
-                                                        .id("abc123")
-                                                        .function(AggregationFunction.COUNT)
-                                                        .build())
-                                                .build()
-                                ))
-                                .build()
-                ))
-                .build();
-
+        final AggregationResult result = buildAggregationResult(timerange, now, ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = eventProcessor.eventsFromAggregationResult(eventFactory, parameters, result);
 
         assertThat(eventsWithContext).hasSize(1);
@@ -598,5 +477,53 @@ public class AggregationEventProcessorTest {
             assertThat(message.getField("aggregation_key")).isEqualTo("one|two");
             assertThat(message.getField("aggregation_value_count")).isEqualTo(0.0d);
         });
+    }
+
+    // Helper method to build test AggregationResult, since we only care about a few of the values
+    private AggregationResult buildAggregationResult(AbsoluteRange timeRange, DateTime dateTime, List<String> testKey) {
+        return AggregationResult.builder()
+                .effectiveTimerange(timeRange)
+                .totalAggregatedMessages(0)
+                .sourceStreams(ImmutableSet.of()) // No streams in result
+                .keyResults(ImmutableList.of(
+                        AggregationKeyResult.builder()
+                                .key(testKey)
+                                .timestamp(dateTime)
+                                .seriesValues(ImmutableList.of(
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(0.0d)
+                                                .series(AggregationSeries.builder()
+                                                        .id("abc123")
+                                                        .function(AggregationFunction.COUNT)
+                                                        .build())
+                                                .build()
+                                ))
+                                .build()
+                ))
+                .build();
+    }
+
+    // Helper method to build test EventDefinitionDto, since we only care about a few of the values
+    private EventDefinitionDto buildEventDefinitionDto(
+            Set<String> testStreams, AggregationConditions testConditions) {
+        return EventDefinitionDto.builder()
+                .id("dto-id-1")
+                .title("Test Aggregation")
+                .description("A test aggregation event processors")
+                .priority(1)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .config(AggregationEventProcessorConfig.builder()
+                        .query("")
+                        .streams(testStreams)
+                        .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
+                        .series(ImmutableList.of())
+                        .conditions(testConditions)
+                        .searchWithinMs(30000)
+                        .executeEveryMs(30000)
+                        .build())
+                .keySpec(ImmutableList.of())
+                .build();
     }
 }
