@@ -18,7 +18,7 @@ import * as React from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 
-import type { ListItemType, CustomContentRender } from './ListItem';
+import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
 import SortableListItem from './SortableListItem';
 
 const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {
@@ -30,7 +30,8 @@ const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startInde
 };
 
 export type Props<ItemType extends ListItemType> = {
-  customContentRender?: CustomContentRender<ListItemType>
+  customContentRender?: CustomContentRender<ItemType>,
+  customListItemRender?: CustomListItemRender<ItemType>,
   disableDragging?: boolean,
   displayOverlayInPortal?: boolean,
   items: Array<ItemType>,
@@ -45,11 +46,12 @@ export type Props<ItemType extends ListItemType> = {
  * This way consumers can add or remove items easily.
  */
 const SortableList = <ItemType extends ListItemType>({
+  customContentRender,
+  customListItemRender,
   disableDragging,
   displayOverlayInPortal,
   items,
   onMoveItem,
-  customContentRender,
 }: Props<ItemType>) => {
   const onDragEnd = (result) => {
     if (!result.destination) {
@@ -75,6 +77,7 @@ const SortableList = <ItemType extends ListItemType>({
                                 index={index}
                                 key={item.id}
                                 customContentRender={customContentRender}
+                                customListItemRender={customListItemRender}
                                 disableDragging={disableDragging}
                                 displayOverlayInPortal={displayOverlayInPortal} />
             ))}
@@ -103,14 +106,21 @@ SortableList.propTypes = {
    */
   onMoveItem: PropTypes.func.isRequired,
   /**
-   * Custom content renderer for the SortableListItem. Will receive props to display custom drag handle.
+   * Custom list item content renderer. Allows rendering custom content next to the drag handle.
+   * The default content is the item title. This method is not being called when `customListItemRender` is defined.
    */
   customContentRender: PropTypes.func,
+  /**
+   * Custom renderer for the complete list item. Can be used if `ListGroupItem` component is not suitable
+   * or the drag handle needs to be displayed differently. When defined, `customContentRender` will not be called.
+   */
+  customListItemRender: PropTypes.func,
 };
 
 SortableList.defaultProps = {
   disableDragging: false,
   customContentRender: undefined,
+  customListItemRender: undefined,
 };
 
 export default SortableList;

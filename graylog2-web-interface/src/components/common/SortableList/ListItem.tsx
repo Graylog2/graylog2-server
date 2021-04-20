@@ -27,7 +27,7 @@ export type ListItemType = {
   title?: string | React.ReactElement,
 }
 
-export type CustomContentRender<ItemType extends ListItemType> = ({
+export type CustomListItemRender<ItemType extends ListItemType> = ({
   disableDragging,
   draggableProps,
   dragHandleProps,
@@ -44,8 +44,17 @@ export type CustomContentRender<ItemType extends ListItemType> = ({
   ref: React.Ref<any>,
 }) => React.ReactNode;
 
+export type CustomContentRender<ItemType extends ListItemType> = ({
+  index,
+  item,
+}: {
+  index: number,
+  item: ItemType,
+}) => React.ReactNode;
+
 type Props<ItemType extends ListItemType> = {
   className?: string,
+  customListItemRender?: CustomListItemRender<ItemType>,
   customContentRender?: CustomContentRender<ItemType>,
   disableDragging?: boolean,
   displayOverlayInPortal: boolean,
@@ -68,14 +77,17 @@ const SortableListItem = forwardRef(<ItemType extends ListItemType>({
   item,
   index,
   className,
+  customListItemRender,
   customContentRender,
   disableDragging,
   draggableProps,
   dragHandleProps,
 }: Props<ItemType>, ref) => {
+  const itemContent = customContentRender ? customContentRender({ item, index }) : item.title;
+
   return (
-    <>{customContentRender
-      ? customContentRender({
+    <>{customListItemRender
+      ? customListItemRender({
         className,
         disableDragging,
         draggableProps: draggableProps,
@@ -92,7 +104,7 @@ const SortableListItem = forwardRef(<ItemType extends ListItemType>({
               <Icon name="bars" />
             </DragHandle>
           )}
-          {'title' in item ? item.title : item.id}
+          {itemContent}
         </StyledListGroupItem>
       )}
     </>
@@ -102,6 +114,7 @@ const SortableListItem = forwardRef(<ItemType extends ListItemType>({
 SortableListItem.defaultProps = {
   className: undefined,
   disableDragging: false,
+  customListItemRender: undefined,
   customContentRender: undefined,
 };
 
