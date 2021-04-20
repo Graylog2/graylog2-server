@@ -52,4 +52,24 @@ describe('SortableList', () => {
       { id: 'item-3', title: 'Item 3' },
     ], 0, 1);
   });
+
+  it('should render list items with custom content', () => {
+    render(<SortableList items={list} onMoveItem={() => {}} customContentRender={({ item: { id } }) => `Id: ${id}`} />);
+
+    list.forEach((item) => expect(screen.getByText(`Id: ${item.id}`)).toBeInTheDocument());
+  });
+
+  it('should render custom list items', () => {
+    const customListItemRender = (item, ref, className, dragHandleProps, draggableProps) => (
+      <div ref={ref} className={className} {...dragHandleProps} {...draggableProps}>
+        Id: {item.id}
+      </div>
+    );
+
+    render(<SortableList items={list}
+                         onMoveItem={() => {}}
+                         customListItemRender={({ item, ref, className, dragHandleProps, draggableProps }) => customListItemRender(item, ref, className, dragHandleProps, draggableProps)} />);
+
+    list.forEach((item) => expect(screen.getByText(`Id: ${item.id}`)).toBeInTheDocument());
+  });
 });
