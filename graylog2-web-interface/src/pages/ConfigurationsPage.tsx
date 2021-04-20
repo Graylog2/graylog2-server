@@ -66,7 +66,12 @@ type BoundaryProps = {
   title: string,
 }
 
-const Boundary = ({ children, title }: BoundaryProps) => <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>{children}</ErrorBoundary>;
+const Boundary = ({ children, title }: BoundaryProps) => (
+  <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>
+    {children}
+  </ErrorBoundary>
+);
+
 const ConfigletContainer = ({ children, title }: BoundaryProps) => (
   <Col md={6}>
     <Boundary title={title}>
