@@ -2226,13 +2226,6 @@
   dependencies:
     moment ">=2.14.0"
 
-"@types/moment-precise-range-plugin@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@types/moment-precise-range-plugin/-/moment-precise-range-plugin-0.2.0.tgz#ea9fe4933764a81e70a0f9c3d01d1394d77f0ad1"
-  integrity sha512-YQKQxgAzKAskABzJIrMfKjEJENHtKvWmCvPjiy+sdaAwvYZF9y5P/NqBWVNCIPoYPix1yG8Aocj/0uhfLFoexg==
-  dependencies:
-    moment ">=2.14.0"
-
 "@types/node@*":
   version "13.7.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.7.4.tgz#76c3cb3a12909510f52e5dc04a6298cdf9504ffd"
@@ -8153,11 +8146,11 @@ graceful-fs@^4.2.4:
     "@babel/preset-env" "7.13.10"
     "@babel/preset-typescript" "7.13.0"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-226206f8-e5e7-4d9a-900b-b5775c4c0442-1618864148668/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-efebc0de-cefc-4cac-9cf2-886b280438c4-1618933725567/node_modules/eslint-config-graylog"
     formik "2.2.6"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
-    jest-preset-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-226206f8-e5e7-4d9a-900b-b5775c4c0442-1618864148668/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-efebc0de-cefc-4cac-9cf2-886b280438c4-1618933725567/node_modules/jest-preset-graylog"
     jquery "3.5.1"
     moment "2.29.1"
     moment-timezone "0.5.31"
@@ -8170,7 +8163,7 @@ graceful-fs@^4.2.4:
     react-router-dom "5.2.0"
     reflux "0.2.13"
     styled-components "5.2.1"
-    stylelint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-226206f8-e5e7-4d9a-900b-b5775c4c0442-1618864148668/node_modules/stylelint-config-graylog"
+    stylelint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.1.0-SNAPSHOT-efebc0de-cefc-4cac-9cf2-886b280438c4-1618933725567/node_modules/stylelint-config-graylog"
     typescript "4.2.3"
     webpack "4.44.2"
     webpack-cleanup-plugin "0.5.1"
