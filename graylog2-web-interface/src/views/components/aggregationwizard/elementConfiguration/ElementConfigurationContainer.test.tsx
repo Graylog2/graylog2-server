@@ -14,63 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import ElementConfigurationContainer from './ElementConfigurationContainer';
 
 describe('ElementConfigurationContainer', () => {
-  it('should render elements passed as children', () => {
-    render(
-      <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddEmptyElement={() => {}}
-                                     title="Aggregation Element Title">
-        Children of Dune
-      </ElementConfigurationContainer>,
-    );
+  it('should render the component with children', async () => {
+    render(<ElementConfigurationContainer><span>Doom</span></ElementConfigurationContainer>);
 
-    expect(screen.getByText('Children of Dune')).toBeInTheDocument();
+    const child = await screen.findByText('Doom');
+
+    expect(child).toBeInTheDocument();
   });
 
-  it('should render title', () => {
-    render(
-      <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddEmptyElement={() => {}}
-                                     title="Aggregation Element Title">
-        Children of Dune
-      </ElementConfigurationContainer>,
-    );
+  it('should handle onRemove button', async () => {
+    const onRemove = jest.fn();
+    render(<ElementConfigurationContainer onRemove={onRemove}><span>Doom</span></ElementConfigurationContainer>);
 
-    expect(screen.getByText('Aggregation Element Title')).toBeInTheDocument();
-  });
+    const removeBtn = await screen.findByTitle('Remove');
+    userEvent.click(removeBtn);
 
-  it('should call on onAddEmptyElement when adding a section', async () => {
-    const onAddEmptyElementMock = jest.fn();
-
-    render(
-      <ElementConfigurationContainer allowAddEmptyElement
-                                     onAddEmptyElement={onAddEmptyElementMock}
-                                     title="Aggregation Element Title">
-        Children of Dune
-      </ElementConfigurationContainer>,
-    );
-
-    const addButton = screen.getByTitle('Add a Aggregation Element Title');
-
-    fireEvent.click(addButton);
-
-    expect(onAddEmptyElementMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not display add section icon if adding element section is not allowed', async () => {
-    render(
-      <ElementConfigurationContainer allowAddEmptyElement={false}
-                                     onAddEmptyElement={() => {}}
-                                     title="Aggregation Element Title">
-        Children of Dune
-      </ElementConfigurationContainer>,
-    );
-
-    expect(screen.queryByTitle('Add a Aggregation Element Title')).not.toBeInTheDocument();
+    await waitFor(() => expect(onRemove).toHaveBeenCalledTimes(1));
   });
 });

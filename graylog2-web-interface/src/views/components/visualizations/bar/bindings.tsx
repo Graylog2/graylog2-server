@@ -19,18 +19,24 @@ import type { VisualizationType } from 'views/types';
 
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 type BarVisualizationConfigFormValues = {
   barmode: 'group' | 'stack' | 'relative' | 'overlay',
 };
 
-const barChart: VisualizationType = {
+const DEFAULT_BARMODE = 'group';
+
+const validate = hasAtLeastOneMetric('Bar chart');
+
+const barChart: VisualizationType<BarVisualizationConfig, BarVisualizationConfigFormValues> = {
   type: BarVisualization.type,
   displayName: 'Bar Chart',
   component: BarVisualization,
   config: {
-    fromConfig: (config: BarVisualizationConfig | undefined): BarVisualizationConfigFormValues => ({ barmode: config?.barmode ?? 'group' }),
-    toConfig: (formValues: BarVisualizationConfigFormValues): BarVisualizationConfig => BarVisualizationConfig.create(formValues.barmode),
+    createConfig: () => ({ barmode: DEFAULT_BARMODE }),
+    fromConfig: (config: BarVisualizationConfig | undefined) => ({ barmode: config?.barmode ?? DEFAULT_BARMODE }),
+    toConfig: (formValues: BarVisualizationConfigFormValues) => BarVisualizationConfig.create(formValues.barmode),
     fields: [{
       name: 'barmode',
       title: 'Mode',
@@ -70,6 +76,8 @@ const barChart: VisualizationType = {
       },
     }],
   },
+  capabilities: ['event-annotations'],
+  validate,
 };
 
 export default barChart;

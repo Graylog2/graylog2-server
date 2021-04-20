@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
+import { FormikErrors } from 'formik';
 
 import Widget from 'views/logic/widgets/Widget';
 import { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -30,7 +31,13 @@ import { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import { Result } from 'views/components/widgets/Widget';
 import { Widgets } from 'views/stores/WidgetStore';
 import { OverrideProps } from 'views/components/WidgetOverrideElements';
-import { VisualizationConfigDefinition, VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import {
+  VisualizationConfigDefinition,
+  VisualizationConfigFormValues,
+  VisualizationFormValues,
+  WidgetConfigFormValues,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
@@ -111,11 +118,19 @@ type NumericField = BaseRequiredField & {
 
 type ConfigurationField = SelectField | BooleanField | NumericField;
 
-interface VisualizationType {
+export interface VisualizationCapabilities {
+  'event-annotations': undefined,
+}
+
+export type VisualizationCapability = keyof VisualizationCapabilities;
+
+interface VisualizationType<ConfigType extends VisualizationConfig = VisualizationConfig, ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues> {
   type: string;
   displayName: string;
   component: VisualizationComponent;
-  config?: VisualizationConfigDefinition;
+  config?: VisualizationConfigDefinition<ConfigType, ConfigFormValuesType>;
+  capabilities?: Array<VisualizationCapability>;
+  validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
 }
 
 interface ResultHandler<T, R> {

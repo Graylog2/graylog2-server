@@ -60,10 +60,13 @@ export type VisualizationFormValues = {
   eventAnnotation?: boolean,
 };
 
-export type VisualizationConfigDefinition = {
-  fromConfig: (config: VisualizationConfig | undefined) => VisualizationConfigFormValues,
-  toConfig: (formValues: VisualizationConfigFormValues) => VisualizationConfig,
-  createConfig?: () => Partial<VisualizationConfigFormValues>,
+export type VisualizationConfigDefinition<
+  ConfigType extends VisualizationConfig = VisualizationConfig,
+  ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues
+  > = {
+  fromConfig: (config: ConfigType | undefined) => ConfigFormValuesType,
+  toConfig: (formValues: ConfigFormValuesType) => ConfigType,
+  createConfig?: () => Partial<ConfigFormValuesType>,
   fields: Array<ConfigurationField>,
 };
 

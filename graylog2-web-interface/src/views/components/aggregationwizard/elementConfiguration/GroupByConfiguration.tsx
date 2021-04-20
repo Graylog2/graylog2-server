@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import { HoverForHelp } from 'components/common';
 import { Checkbox } from 'components/graylog';
 
-import ElementConfigurationSection from './ElementConfigurationSection';
+import ElementConfigurationContainer from './ElementConfigurationContainer';
 import GroupBy from './GroupBy';
 
 import GroupByElement from '../aggregationElements/GroupByElement';
@@ -41,7 +41,7 @@ const GroupByConfiguration = () => {
   const { values: { groupBy }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => {
-    setValues(GroupByElement.removeElementSection(index, values));
+    setValues(GroupByElement.onRemove(index, values));
   }, [setValues, values]);
 
   return (
@@ -67,9 +67,9 @@ const GroupByConfiguration = () => {
                         {groupBy.groupings.map((grouping, index) => {
                           return (
                             // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationSection key={`grouping-${index}`} onRemove={() => removeGrouping(index)}>
+                            <ElementConfigurationContainer key={`grouping-${index}`} onRemove={() => removeGrouping(index)}>
                               <GroupBy index={index} />
-                            </ElementConfigurationSection>
+                            </ElementConfigurationContainer>
                           );
                         })}
                       </div>

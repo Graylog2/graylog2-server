@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { isEmpty } from 'lodash';
+
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
 
@@ -156,6 +158,10 @@ const groupingToPivot = (grouping: GroupByFormValues) => {
 };
 
 const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: AggregationWidgetConfigBuilder) => {
+  if (!groupBy) {
+    return config;
+  }
+
   const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupingToPivot);
   const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupingToPivot);
   const { columnRollup } = groupBy;
@@ -176,36 +182,53 @@ export const emptyGrouping: ValuesGrouping = {
 };
 
 const GroupByElement: AggregationElement = {
-  title: 'Group By',
-  titleSingular: 'Grouping',
+  sectionTitle: 'Group By',
+  title: 'Grouping',
   key: 'groupBy',
   order: 1,
   allowCreate: () => true,
-  addEmptyElement: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
+  onCreate: (formValues: WidgetConfigFormValues): WidgetConfigFormValues => ({
     ...formValues,
     groupBy: {
-      columnRollup: 'columnRollup' in formValues.groupBy ? formValues.groupBy.columnRollup : true,
+      columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
       groupings: [
-        ...formValues.groupBy.groupings,
+        ...(formValues.groupBy?.groupings ?? []),
         emptyGrouping,
       ],
     },
   }),
-  removeElementSection: ((index, formValues) => ({
-    ...formValues,
-    groupBy: {
-      columnRollup: 'columnRollup' in formValues.groupBy ? formValues.groupBy.columnRollup : true,
-      groupings: [
-        ...formValues.groupBy.groupings.filter((value, i) => (index !== i)),
-      ],
-    },
-  })),
-  fromConfig: (config: AggregationWidgetConfig) => ({
-    groupBy: {
-      columnRollup: config.rollup,
-      groupings: pivotsToGrouping(config),
-    },
+  onRemove: ((index, formValues) => {
+    const newFormValues = { ...formValues };
+    const newGroupings = formValues.groupBy?.groupings.filter((value, i) => (index !== i));
+
+    if (isEmpty(newGroupings)) {
+      delete newFormValues.groupBy;
+
+      return newFormValues;
+    }
+
+    return ({
+      ...newFormValues,
+      groupBy: {
+        columnRollup: newFormValues.groupBy.columnRollup ?? true,
+        groupings: newGroupings,
+      },
+    });
   }),
+  fromConfig: (config: AggregationWidgetConfig) => {
+    const groupings = pivotsToGrouping(config);
+
+    if (isEmpty(groupings)) {
+      return undefined;
+    }
+
+    return {
+      groupBy: {
+        columnRollup: config.rollup,
+        groupings,
+      },
+    };
+  },
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
   component: GroupByConfiguration,
   validate: validateGroupBy,

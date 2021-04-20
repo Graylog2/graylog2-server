@@ -18,18 +18,24 @@ import type { VisualizationType } from 'views/types';
 
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 type AreaVisualizationConfigFormValues = {
   interpolation: 'linear' | 'step-after' | 'spline';
 };
 
-const areaChart: VisualizationType = {
+const DEFAULT_INTERPOLATION = 'linear';
+
+const validate = hasAtLeastOneMetric('Area chart');
+
+const areaChart: VisualizationType<AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
   type: AreaVisualization.type,
   displayName: 'Area Chart',
   component: AreaVisualization,
   config: {
-    fromConfig: (config: AreaVisualizationConfig): AreaVisualizationConfigFormValues => ({ interpolation: config.interpolation }),
-    toConfig: (formValues: AreaVisualizationConfigFormValues): AreaVisualizationConfig => AreaVisualizationConfig.create(formValues.interpolation),
+    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
+    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config.interpolation }),
+    toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation),
     fields: [{
       name: 'interpolation',
       title: 'Interpolation',
@@ -38,6 +44,8 @@ const areaChart: VisualizationType = {
       required: true,
     }],
   },
+  capabilities: ['event-annotations'],
+  validate,
 };
 
 export default areaChart;

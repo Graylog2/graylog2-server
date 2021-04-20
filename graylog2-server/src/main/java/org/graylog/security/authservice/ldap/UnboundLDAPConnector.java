@@ -262,10 +262,6 @@ public class UnboundLDAPConnector {
             if (OBJECT_CLASS_ATTRIBUTE.equalsIgnoreCase(attribute.getBaseName())) {
                 continue;
             }
-            // We already set the unique ID above
-            if (uniqueIdAttribute.equalsIgnoreCase(attribute.getBaseName())) {
-                continue;
-            }
 
             if (attribute.needsBase64Encoding()) {
                 for (final byte[] value : attribute.getValueByteArrays()) {

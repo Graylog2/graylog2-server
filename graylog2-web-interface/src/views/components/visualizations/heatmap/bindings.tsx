@@ -19,6 +19,11 @@ import type { VisualizationType } from 'views/types';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import {
+  areAtLeastNGroupingsConfigured,
+  areAtLeastNMetricsConfigured,
+} from 'views/components/visualizations/validations';
 
 type HeatMapVisualizationConfigFormValues = {
   colorScale: typeof COLORSCALES[number],
@@ -30,17 +35,39 @@ type HeatMapVisualizationConfigFormValues = {
   defaultValue: number,
 };
 
-const heatmap: VisualizationType = {
+const validate = (formValues: WidgetConfigFormValues) => {
+  const errors = [];
+
+  if (!areAtLeastNGroupingsConfigured(formValues, 2)) {
+    errors.push('Heatmap requires at least two groupings.');
+  } else {
+    const groupingDirections = formValues.groupBy.groupings.map((grouping) => grouping.direction);
+
+    if (!groupingDirections.includes('row') || !groupingDirections.includes('column')) {
+      errors.push('Groupings must include row and column groupings.');
+    }
+  }
+
+  if (!areAtLeastNMetricsConfigured(formValues, 1)) {
+    errors.push('At least one metric must be configured.');
+  }
+
+  return errors.length > 0
+    ? { type: errors.join(' ') }
+    : {};
+};
+
+const heatmap: VisualizationType<HeatmapVisualizationConfig, HeatMapVisualizationConfigFormValues> = {
   type: HeatmapVisualization.type,
   displayName: 'Heatmap',
   component: HeatmapVisualization,
   config: {
-    fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig): HeatMapVisualizationConfigFormValues => ({
+    fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig) => ({
       autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin,
     }),
     toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => HeatmapVisualizationConfig
       .create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue),
-    createConfig: (): Partial<HeatMapVisualizationConfigFormValues> => ({ colorScale: 'Viridis', autoScale: true }),
+    createConfig: () => ({ colorScale: 'Viridis', autoScale: true }),
     fields: [{
       name: 'colorScale',
       title: 'Color Scale',
@@ -79,6 +106,7 @@ const heatmap: VisualizationType = {
       required: true,
     }],
   },
+  validate,
 };
 
 export default heatmap;

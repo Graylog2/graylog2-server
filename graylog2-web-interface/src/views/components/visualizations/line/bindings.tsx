@@ -18,18 +18,24 @@ import type { VisualizationType } from 'views/types';
 
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
+import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
 type LineVisualizationConfigFormValues = {
   interpolation: 'linear' | 'step-after' | 'spline';
 };
 
-const lineChart: VisualizationType = {
+const DEFAULT_INTERPOLATION = 'linear';
+
+const validate = hasAtLeastOneMetric('Line chart');
+
+const lineChart: VisualizationType<LineVisualizationConfig, LineVisualizationConfigFormValues> = {
   type: LineVisualization.type,
   displayName: 'Line Chart',
   component: LineVisualization,
   config: {
-    fromConfig: (config: LineVisualizationConfig | undefined): LineVisualizationConfigFormValues => ({ interpolation: config?.interpolation }),
-    toConfig: (formValues: LineVisualizationConfigFormValues): LineVisualizationConfig => LineVisualizationConfig.create(formValues.interpolation),
+    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
+    fromConfig: (config: LineVisualizationConfig | undefined) => ({ interpolation: config?.interpolation }),
+    toConfig: (formValues: LineVisualizationConfigFormValues) => LineVisualizationConfig.create(formValues.interpolation),
     fields: [{
       name: 'interpolation',
       title: 'Interpolation',
@@ -38,6 +44,8 @@ const lineChart: VisualizationType = {
       required: true,
     }],
   },
+  capabilities: ['event-annotations'],
+  validate,
 };
 
 export default lineChart;

@@ -38,6 +38,8 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.pkcs.PKCSException;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.ByteBufMessageAggregationHandler;
 import org.graylog2.inputs.transports.netty.ChannelRegistrationHandler;
@@ -71,6 +73,8 @@ import java.net.SocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.EnumSet;
@@ -269,8 +273,15 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             try {
                 final SelfSignedCertificate ssc = new SelfSignedCertificate(configuration.getString(CK_BIND_ADDRESS) + ":" + configuration.getString(CK_PORT));
                 certFile = ssc.certificate();
-                keyFile = ssc.privateKey();
-            } catch (CertificateException e) {
+
+                if (!Strings.isNullOrEmpty(tlsKeyPassword)) {
+                    keyFile = KeyUtil.generatePKCS8FromPrivateKey(tmpPath, tlsKeyPassword.toCharArray(), ssc.key());
+                    ssc.privateKey().delete();
+                }
+                else {
+                    keyFile = ssc.privateKey();
+                }
+            } catch (GeneralSecurityException e) {
                 final String msg = String.format(Locale.ENGLISH, "Problem creating a self-signed certificate for input [%s/%s].", input.getName(), input.getId());
                 throw new IllegalStateException(msg, e);
             }
@@ -309,14 +320,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 }
             }
 
-            private SSLEngine createSslEngine(MessageInput input) throws IOException, CertificateException {
+            private SSLEngine createSslEngine(MessageInput input) throws IOException, CertificateException, OperatorCreationException, PKCSException {
                 final X509Certificate[] clientAuthCerts;
                 if (EnumSet.of(ClientAuth.OPTIONAL, ClientAuth.REQUIRE).contains(clientAuth)) {
                     if (clientAuthCertFile.exists()) {
-                        clientAuthCerts = KeyUtil.loadCertificates(clientAuthCertFile.toPath()).stream()
-                                .filter(certificate -> certificate instanceof X509Certificate)
-                                .map(certificate -> (X509Certificate) certificate)
-                                .toArray(X509Certificate[]::new);
+                        clientAuthCerts = KeyUtil.loadX509Certificates(clientAuthCertFile.toPath());
                     } else {
                         LOG.warn("Client auth configured, but no authorized certificates / certificate authorities configured for input [{}/{}]",
                                 input.getName(), input.getId());
@@ -326,7 +334,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                     clientAuthCerts = null;
                 }
 
-                final SslContextBuilder sslContext = SslContextBuilder.forServer(certFile, keyFile, Strings.emptyToNull(password))
+                // Netty's SSLContextBuilder chokes on some PKCS8 key file formats. So we need to pass a
+                // private key and keyCertChain instead of the corresponding files.
+                PrivateKey privateKey = KeyUtil.privateKeyFromFile(password, keyFile);
+                X509Certificate[] keyCertChain = KeyUtil.loadX509Certificates(certFile.toPath());
+                final SslContextBuilder sslContext = SslContextBuilder.forServer(privateKey, keyCertChain)
                         .sslProvider(tlsProvider)
                         .clientAuth(clientAuth)
                         .trustManager(clientAuthCerts);

@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-import ElementConfigurationContainer from './elementConfiguration/ElementConfigurationContainer';
+import ElementConfigurationSection from './elementConfiguration/ElementConfigurationSection';
 import ElementsConfigurationActions from './ElementsConfigurationActions';
 import type { AggregationElement } from './aggregationElements/AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
@@ -43,14 +43,14 @@ type Props = {
   aggregationElementsByKey: { [elementKey: string]: AggregationElement }
   config: AggregationWidgetConfig,
   onConfigChange: (config: AggregationWidgetConfig) => void,
-  onAddEmptyElement: (
+  onCreate: (
     elementKey: string,
     values: WidgetConfigFormValues,
     setValues: (formValues: WidgetConfigFormValues) => void,
   ) => void,
 }
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onAddEmptyElement }: Props) => {
+const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate }: Props) => {
   const { values, setValues, dirty } = useFormikContext<WidgetConfigFormValues>();
 
   return (
@@ -67,16 +67,16 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
           }
 
-          const AggregationElementComponent = aggregationElement.component;
+          const ConfigurationSection = aggregationElement.component;
 
           return (
-            <ElementConfigurationContainer allowAddEmptyElement={aggregationElement.allowCreate(values)}
-                                           title={aggregationElement.title}
-                                           titleSingular={aggregationElement.titleSingular}
-                                           onAddEmptyElement={() => onAddEmptyElement(aggregationElement.key, values, setValues)}
-                                           key={aggregationElement.key}>
-              <AggregationElementComponent config={config} onConfigChange={onConfigChange} />
-            </ElementConfigurationContainer>
+            <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
+                                         onCreate={() => onCreate(aggregationElement.key, values, setValues)}
+                                         elementTitle={aggregationElement.title}
+                                         sectionTitle={aggregationElement.sectionTitle}
+                                         key={aggregationElement.key}>
+              <ConfigurationSection config={config} onConfigChange={onConfigChange} />
+            </ElementConfigurationSection>
           );
         })}
       </div>

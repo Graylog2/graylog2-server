@@ -17,11 +17,16 @@
 import type { VisualizationType } from 'views/types';
 
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
+import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
+
+const validate = hasAtLeastOneMetric('Scatter plot');
 
 const scatterChart: VisualizationType = {
   type: ScatterVisualization.type,
   displayName: 'Scatter Plot',
   component: ScatterVisualization,
+  capabilities: ['event-annotations'],
+  validate,
 };
 
 export default scatterChart;

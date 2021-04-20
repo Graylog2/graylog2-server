@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 
-import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import ElementConfigurationSection
-  from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationSection';
 import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
+import ElementConfigurationContainer
+  from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationContainer';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 const SortConfiguration = () => {
   const { values } = useFormikContext<WidgetConfigFormValues>();
@@ -33,9 +33,9 @@ const SortConfiguration = () => {
                     <div>
                       {sort.map((s, index) => (
                         // eslint-disable-next-line react/no-array-index-key
-                        <ElementConfigurationSection key={`sort-${index}`}>
+                        <ElementConfigurationContainer key={`sort-${index}`}>
                           <Sort index={index} />
-                        </ElementConfigurationSection>
+                        </ElementConfigurationContainer>
                       ))}
                     </div>
                   </>

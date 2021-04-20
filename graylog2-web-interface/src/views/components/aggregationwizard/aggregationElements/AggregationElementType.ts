@@ -19,16 +19,15 @@ import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/l
 import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from '../WidgetConfigForm';
 
 export type AggregationElement = {
+  sectionTitle?: string,
   title: string,
-  titleSingular?: string,
   key: string,
   allowCreate: (formValues: WidgetConfigFormValues) => boolean,
   order: number,
-  addEmptyElement?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
-  removeElementSection?: (index: number, formValues) => WidgetConfigFormValues,
+  onRemove?: (index: number, formValues) => WidgetConfigFormValues,
   toConfig?: (formValues: WidgetConfigFormValues, currentConfigBuilder: AggregationWidgetConfigBuilder) => AggregationWidgetConfigBuilder,
   fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,
-  onCreate?: () => void,
+  onCreate?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   onDeleteAll?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   component: React.ComponentType<{
     config: AggregationWidgetConfig,
