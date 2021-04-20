@@ -20,10 +20,11 @@ import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 
 import ListItem from './ListItem';
-import type { ListItemType, CustomContentRender } from './ListItem';
+import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
 
 type Props<ItemType extends ListItemType> = {
   className?: string,
+  customListItemRender?: CustomListItemRender<ItemType>,
   customContentRender?: CustomContentRender<ItemType>,
   disableDragging?: boolean,
   displayOverlayInPortal: boolean,
@@ -38,6 +39,7 @@ const StyledListItem = styled(ListItem)(({ $isDragging }: { $isDragging: boolean
 const SortableListItem = <ItemType extends ListItemType>({
   className,
   customContentRender,
+  customListItemRender,
   disableDragging,
   displayOverlayInPortal,
   index,
@@ -51,6 +53,7 @@ const SortableListItem = <ItemType extends ListItemType>({
                         className={className}
                         ref={innerRef}
                         customContentRender={customContentRender}
+                        customListItemRender={customListItemRender}
                         disableDragging={disableDragging}
                         displayOverlayInPortal={displayOverlayInPortal}
                         draggableProps={draggableProps}
@@ -68,6 +71,7 @@ const SortableListItem = <ItemType extends ListItemType>({
 SortableListItem.defaultProps = {
   className: undefined,
   customContentRender: undefined,
+  customListItemRender: undefined,
   disableDragging: false,
 };
 
