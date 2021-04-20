@@ -19,7 +19,8 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 
 import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
-import SortableListItem from './SortableListItem';
+// import SortableListItem from './SortableListItem';
+import List from './List';
 
 const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -72,15 +73,11 @@ const SortableList = <ItemType extends ListItemType>({
         {({ droppableProps, innerRef, placeholder }) => (
           <div {...droppableProps}
                ref={innerRef}>
-            {items.map((item, index) => (
-              <SortableListItem item={item}
-                                index={index}
-                                key={item.id}
-                                customContentRender={customContentRender}
-                                customListItemRender={customListItemRender}
-                                disableDragging={disableDragging}
-                                displayOverlayInPortal={displayOverlayInPortal} />
-            ))}
+            <List items={items}
+                  disableDragging={disableDragging}
+                  displayOverlayInPortal={displayOverlayInPortal}
+                  customContentRender={customContentRender}
+                  customListItemRender={customListItemRender} />
             {placeholder}
           </div>
         )}
