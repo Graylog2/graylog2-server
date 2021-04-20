@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { chunk } from 'lodash';
 import { ErrorBoundary } from 'react-error-boundary';
+import { SystemConfiguration } from 'views/types';
 
 import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -33,6 +34,7 @@ import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 import {} from 'components/maps/configurations';
 import style from 'components/configurations/ConfigurationStyles.lazy.css';
 import { Store } from 'stores/StoreTypes';
+import usePluginEntities from 'views/logic/usePluginEntities';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 
@@ -81,23 +83,62 @@ type Props = {
   configuration: Record<string, any>,
 };
 
-type State = {
-  loaded: boolean,
+const _onUpdate = (configType: string) => {
+  return (config) => {
+    switch (configType) {
+      case MESSAGE_PROCESSORS_CONFIG:
+        return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
+      case URL_WHITELIST_CONFIG:
+        return ConfigurationsActions.updateWhitelist(configType, config);
+      default:
+        return ConfigurationsActions.update(configType, config);
+    }
+  };
 };
 
-class ConfigurationsPage extends React.Component<Props, State> {
-  checkLoadedTimer = undefined
+const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
-  constructor(props) {
-    super(props);
+const _pluginConfigs = (systemConfigs, configuration) => systemConfigs
+  .map(({ component: SystemConfigComponent, configType }) => (
+    <ConfigletContainer title={configType}>
+      <SystemConfigComponent key={`system-configuration-${configType}`}
+                             config={_getConfig(configType, configuration) ?? undefined}
+                             updateConfig={_onUpdate(configType)} />
+    </ConfigletContainer>
+  ));
 
-    this.state = { loaded: false };
-  }
+type PluginConfigRowsProps = {
+  configuration: Record<string, any>,
+  systemConfigs: Array<SystemConfiguration>,
+};
 
-  componentDidMount() {
+const PluginConfigRows = ({ configuration, systemConfigs }: PluginConfigRowsProps) => {
+  const pluginConfigs = useMemo(() => _pluginConfigs(systemConfigs, configuration), [configuration, systemConfigs]);
+
+  // Put two plugin config components per row.
+  const configRows = chunk(pluginConfigs, 2)
+    .map((configChunk, idx) => (
+      // eslint-disable-next-line react/no-array-index-key
+      <Row key={`plugin-config-row-${idx}`}>
+        {configChunk[0]}
+        {configChunk[1]}
+      </Row>
+    ));
+
+  return <>{configRows}</>;
+};
+
+const ConfigurationsPage = ({ currentUser: { permissions }, configuration }: Props) => {
+  const [loaded, setLoaded] = useState(false);
+  const pluginSystemConfigs = usePluginEntities('systemConfigurations');
+
+  useEffect(() => {
     style.use();
-    const { currentUser: { permissions } } = this.props;
 
+    return () => { style.unuse(); };
+  }, []);
+
+  useEffect(() => {
     const promises = [
       ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG),
       ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
@@ -109,159 +150,109 @@ class ConfigurationsPage extends React.Component<Props, State> {
       promises.push(ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG));
     }
 
-    const pluginPromises = PluginStore.exports('systemConfigurations')
+    const pluginPromises = pluginSystemConfigs
       .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
 
-    Promise.all([...promises, ...pluginPromises]).then(() => this.setState({ loaded: true }));
-  }
+    Promise.all([...promises, ...pluginPromises]).then(() => setLoaded(true));
+  }, [permissions, pluginSystemConfigs]);
 
-  componentWillUnmount() {
-    style.unuse();
-  }
+  let Output = (
+    <Col md={12}>
+      <Spinner text="Loading Configuration Panel..." />
+    </Col>
+  );
 
-  _getConfig = (configType) => {
-    const { configuration } = this.props;
+  if (loaded) {
+    const searchesConfig = _getConfig(SEARCHES_CLUSTER_CONFIG, configuration);
+    const messageProcessorsConfig = _getConfig(MESSAGE_PROCESSORS_CONFIG, configuration);
+    const sidecarConfig = _getConfig(SIDECAR_CONFIG, configuration);
+    const eventsConfig = _getConfig(EVENTS_CONFIG, configuration);
+    const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
 
-    if (configuration && configuration[configType]) {
-      return configuration[configType];
-    }
-
-    return null;
-  };
-
-  _onUpdate = (configType) => {
-    return (config) => {
-      switch (configType) {
-        case MESSAGE_PROCESSORS_CONFIG:
-          return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
-        case URL_WHITELIST_CONFIG:
-          return ConfigurationsActions.updateWhitelist(configType, config);
-        default:
-          return ConfigurationsActions.update(configType, config);
-      }
-    };
-  };
-
-  _pluginConfigs = () => PluginStore.exports('systemConfigurations')
-    .map(({ component: SystemConfigComponent, configType }) => (
-      <ConfigletContainer title={configType}>
-        <SystemConfigComponent key={`system-configuration-${configType}`}
-                               config={this._getConfig(configType) ?? undefined}
-                               updateConfig={this._onUpdate(configType)} />
-      </ConfigletContainer>
-    ));
-
-  _pluginConfigRows = () => {
-    const pluginConfigs = this._pluginConfigs();
-
-    // Put two plugin config components per row.
-    return chunk(pluginConfigs, 2)
-      .map((configChunk, idx) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Row key={`plugin-config-row-${idx}`}>
-          {configChunk[0]}
-          {configChunk[1]}
-        </Row>
-      ));
-  };
-
-  render() {
-    const { loaded } = this.state;
-    const { currentUser: { permissions } } = this.props;
-    let Output = (
-      <Col md={12}>
-        <Spinner text="Loading Configuration Panel..." />
-      </Col>
-    );
-
-    if (loaded) {
-      const searchesConfig = this._getConfig(SEARCHES_CLUSTER_CONFIG);
-      const messageProcessorsConfig = this._getConfig(MESSAGE_PROCESSORS_CONFIG);
-      const sidecarConfig = this._getConfig(SIDECAR_CONFIG);
-      const eventsConfig = this._getConfig(EVENTS_CONFIG);
-      const urlWhiteListConfig = this._getConfig(URL_WHITELIST_CONFIG);
-
-      Output = (
-        <>
-          {searchesConfig && (
+    Output = (
+      <>
+        {searchesConfig && (
           <ConfigletContainer title="Search Configuration">
             <SearchesConfig config={searchesConfig}
-                            updateConfig={this._onUpdate(SEARCHES_CLUSTER_CONFIG)} />
+                            updateConfig={_onUpdate(SEARCHES_CLUSTER_CONFIG)} />
           </ConfigletContainer>
-          )}
-          {messageProcessorsConfig && (
+        )}
+        {messageProcessorsConfig && (
           <ConfigletContainer title="Message Processor Configuration">
             <MessageProcessorsConfig config={messageProcessorsConfig}
-                                     updateConfig={this._onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
+                                     updateConfig={_onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
           </ConfigletContainer>
-          )}
-          {sidecarConfig && (
+        )}
+        {sidecarConfig && (
           <ConfigletContainer title="Sidecar Configuration">
             <SidecarConfig config={sidecarConfig}
-                           updateConfig={this._onUpdate(SIDECAR_CONFIG)} />
+                           updateConfig={_onUpdate(SIDECAR_CONFIG)} />
           </ConfigletContainer>
-          )}
-          {eventsConfig && (
+        )}
+        {eventsConfig && (
           <ConfigletContainer title="Events Configuration">
             <EventsConfig config={eventsConfig}
-                          updateConfig={this._onUpdate(EVENTS_CONFIG)} />
+                          updateConfig={_onUpdate(EVENTS_CONFIG)} />
           </ConfigletContainer>
-          )}
-          {isPermitted(permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
+        )}
+        {isPermitted(permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
           <ConfigletContainer title="URL Whitelist Configuration">
             <UrlWhiteListConfig config={urlWhiteListConfig}
-                                updateConfig={this._onUpdate(URL_WHITELIST_CONFIG)} />
+                                updateConfig={_onUpdate(URL_WHITELIST_CONFIG)} />
           </ConfigletContainer>
-          )}
-          <ConfigletContainer title="Decorators Configuration">
-            <DecoratorsConfig />
-          </ConfigletContainer>
-        </>
-      );
-    }
-
-    const pluginConfigRows = this._pluginConfigRows();
-
-    return (
-      <DocumentTitle title="Configurations">
-        <span>
-          <PageHeader title="Configurations">
-            <span>
-              You can configure system settings for different sub systems on this page.
-            </span>
-          </PageHeader>
-
-          <Row className="content">
-            {Output}
-          </Row>
-
-          {pluginConfigRows.length > 0 && (
-          <Row className="content">
-            <Col md={12}>
-              <h2>Plugins</h2>
-              <p className="description">Configuration for installed plugins.</p>
-              <hr className="separator" />
-              <div className="top-margin">
-                {pluginConfigRows}
-              </div>
-            </Col>
-          </Row>
-          )}
-        </span>
-      </DocumentTitle>
+        )}
+        <ConfigletContainer title="Decorators Configuration">
+          <DecoratorsConfig />
+        </ConfigletContainer>
+      </>
     );
   }
-}
+
+  return (
+    <DocumentTitle title="Configurations">
+      <span>
+        <PageHeader title="Configurations">
+          <span>
+            You can configure system settings for different sub systems on this page.
+          </span>
+        </PageHeader>
+
+        <Row className="content">
+          {Output}
+        </Row>
+
+        {pluginSystemConfigs.length > 0 && (
+        <Row className="content">
+          <Col md={12}>
+            <h2>Plugins</h2>
+            <p className="description">Configuration for installed plugins.</p>
+            <hr className="separator" />
+            <div className="top-margin">
+              <PluginConfigRows configuration={configuration} systemConfigs={pluginSystemConfigs} />
+            </div>
+          </Col>
+        </Row>
+        )}
+      </span>
+    </DocumentTitle>
+  );
+};
 
 ConfigurationsPage.propTypes = {
   configuration: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired,
+  currentUser: PropTypes.exact({
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
 };
 
 export default connect(ConfigurationsPage,
   {
     configurations: ConfigurationsStore as Store<{}>,
-    currentUser: CurrentUserStore as Store<{}>,
+    currentUser: CurrentUserStore as Store<{
+      currentUser: {
+        permissions: Array<String>,
+      }
+    }>,
   },
   ({ configurations, currentUser, ...otherProps }) => ({
     ...configurations,
