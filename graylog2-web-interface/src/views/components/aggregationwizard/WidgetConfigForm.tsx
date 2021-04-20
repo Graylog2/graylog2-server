@@ -71,9 +71,10 @@ export type VisualizationConfigDefinition<
 };
 
 export type SortFormValues = {
-  type: 'metric' | 'groupBy',
-  field: string,
-  direction: 'Ascending' | 'Descending',
+  type?: 'metric' | 'groupBy',
+  field?: string,
+  direction?: 'Ascending' | 'Descending',
+  id: string,
 }
 
 export interface WidgetConfigFormValues {

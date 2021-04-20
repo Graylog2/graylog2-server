@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import ObjectID from 'bson-objectid';
+
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -77,9 +79,19 @@ const SortElement: AggregationElement = {
   key: 'sort',
   order: 3,
   allowCreate: () => true,
+  onCreate: (formValues) => ({
+    ...formValues,
+    sort: [
+      ...formValues.sort,
+      {
+        id: new ObjectID().toString(),
+      },
+    ],
+  }),
   component: SortConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
     sort: config.sort.map((s) => ({
+      id: new ObjectID().toString(),
       type: configTypeToFormValueType(s.type),
       field: s.field,
       direction: s.direction?.direction,
