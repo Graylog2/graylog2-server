@@ -72,7 +72,7 @@ const Sort = ({ index }: Props) => {
   const selectedOption = currentSort ? options.findIndex((option) => (option.type === currentSort.type && option.field === currentSort.field)) : undefined;
 
   return (
-    <div data-testid={`sort-element-${index}`}>
+    <>
       <Field name={`sort.${index}.field`}>
         {({ field: { name, onChange }, meta: { error } }) => {
           return (
@@ -108,8 +108,8 @@ const Sort = ({ index }: Props) => {
             <Select options={directionOptions}
                     clearable={false}
                     name={name}
-                    aria-label="Select direction for sorting"
                     value={value}
+                    aria-label="Select direction for sorting"
                     size="small"
                     onChange={(newValue) => {
                       onChange({ target: { name, value: newValue } });
@@ -117,7 +117,7 @@ const Sort = ({ index }: Props) => {
           </Input>
         )}
       </Field>
-    </div>
+    </>
   );
 };
 
