@@ -59,12 +59,15 @@ const SortableList = <ItemType extends ListItemType>({
       return;
     }
 
-    const newList: Array<ItemType> = reorder(
-      items,
-      result.source.index,
-      result.destination.index,
-    );
-    onMoveItem(newList, result.source.index, result.destination.index);
+    if (result.source.index !== result.destination.index) {
+      const newList: Array<ItemType> = reorder(
+        items,
+        result.source.index,
+        result.destination.index,
+      );
+
+      onMoveItem(newList, result.source.index, result.destination.index);
+    }
   };
 
   return (
