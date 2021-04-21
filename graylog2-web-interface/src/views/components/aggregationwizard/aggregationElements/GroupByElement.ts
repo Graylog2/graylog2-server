@@ -179,7 +179,7 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
     .rollup(columnRollup);
 };
 
-export const emptyGrouping: ValuesGrouping = addRandomId<ValuesGrouping>({
+export const createEmptyGrouping: () => ValuesGrouping = () => addRandomId<ValuesGrouping>({
   direction: 'row',
   field: {
     field: undefined,
@@ -200,7 +200,7 @@ const GroupByElement: AggregationElement = {
       columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : true,
       groupings: [
         ...(formValues.groupBy?.groupings ?? []),
-        emptyGrouping,
+        createEmptyGrouping(),
       ],
     },
   }),
