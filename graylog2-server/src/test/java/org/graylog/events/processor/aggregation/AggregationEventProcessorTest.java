@@ -17,6 +17,7 @@
 package org.graylog.events.processor.aggregation;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.event.Event;
@@ -28,10 +29,12 @@ import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorDependencyCheck;
+import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorPreconditionException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
@@ -47,6 +50,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -77,6 +81,8 @@ public class AggregationEventProcessorTest {
     private Messages messages;
     @Mock
     private StreamService streamService;
+    @Mock
+    private Consumer<List<MessageSummary>> messageConsumer;
 
     @Test
     public void testEventsFromAggregationResult() {
@@ -90,7 +96,7 @@ public class AggregationEventProcessorTest {
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
-        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), null);
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -190,7 +196,7 @@ public class AggregationEventProcessorTest {
                 ))
                 .build();
 
-        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), conditions);
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), conditions);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -289,7 +295,7 @@ public class AggregationEventProcessorTest {
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
 
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
-                .query("")
+                .query("aQueryString")
                 .streams(ImmutableSet.of())
                 .groupBy(ImmutableList.of())
                 .series(ImmutableList.of())
@@ -297,7 +303,7 @@ public class AggregationEventProcessorTest {
                 .searchWithinMs(30000)
                 .executeEveryMs(30000)
                 .build();
-        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), null);
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -323,7 +329,7 @@ public class AggregationEventProcessorTest {
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
 
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
-                .query("")
+                .query("aQueryString")
                 .streams(ImmutableSet.of())
                 .groupBy(ImmutableList.of())
                 .series(ImmutableList.of())
@@ -331,7 +337,7 @@ public class AggregationEventProcessorTest {
                 .searchWithinMs(30000)
                 .executeEveryMs(30000)
                 .build();
-        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), null);
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -389,7 +395,7 @@ public class AggregationEventProcessorTest {
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
-        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), null);
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -442,7 +448,7 @@ public class AggregationEventProcessorTest {
                 new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID), Collections.emptyList())
         ));
 
-        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), null);
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null);
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
                 .build();
@@ -479,6 +485,29 @@ public class AggregationEventProcessorTest {
         });
     }
 
+    @Test
+    public void testGroupByQueryString() throws EventProcessorException {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
+        final TestEvent event = new TestEvent(timerange.to());
+        event.setTimerangeStart(timerange.from());
+        event.setTimerangeEnd(timerange.to());
+        event.setGroupByFields(ImmutableMap.of("group_field_one", "one", "group_field_two", "two"));
+
+        final AggregationSeries series = AggregationSeries.builder()
+                .id("abc123")
+                .function(AggregationFunction.COUNT)
+                .field("source")
+                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(series), null);
+        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(
+                eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
+
+        eventProcessor.sourceMessagesForEvent(event, messageConsumer, 1);
+
+        verify(moreSearch).scrollQuery(eq("aQueryString AND group_field_one:one AND group_field_two:two"), any(), any(), any(), eq(1), any());
+    }
+
     // Helper method to build test AggregationResult, since we only care about a few of the values
     private AggregationResult buildAggregationResult(AbsoluteRange timeRange, DateTime dateTime, List<String> testKey) {
         return AggregationResult.builder()
@@ -506,7 +535,7 @@ public class AggregationEventProcessorTest {
 
     // Helper method to build test EventDefinitionDto, since we only care about a few of the values
     private EventDefinitionDto buildEventDefinitionDto(
-            Set<String> testStreams, AggregationConditions testConditions) {
+            Set<String> testStreams, List<AggregationSeries> testSeries, AggregationConditions testConditions) {
         return EventDefinitionDto.builder()
                 .id("dto-id-1")
                 .title("Test Aggregation")
@@ -515,10 +544,10 @@ public class AggregationEventProcessorTest {
                 .alert(false)
                 .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
                 .config(AggregationEventProcessorConfig.builder()
-                        .query("")
+                        .query("aQueryString")
                         .streams(testStreams)
                         .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
-                        .series(ImmutableList.of())
+                        .series(testSeries)
                         .conditions(testConditions)
                         .searchWithinMs(30000)
                         .executeEveryMs(30000)

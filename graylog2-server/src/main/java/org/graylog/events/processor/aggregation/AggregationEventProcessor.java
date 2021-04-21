@@ -170,7 +170,7 @@ public class AggregationEventProcessor implements EventProcessor {
 
             ElasticsearchQueryString scrollQueryString = ElasticsearchQueryString.builder().queryString(config.query()).build();
             scrollQueryString = scrollQueryString.concatenate(groupByQueryString(event));
-            LOG.debug(">>>> scrollQueryString: {}", scrollQueryString);
+            LOG.debug("scrollQueryString: {}", scrollQueryString);
 
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
             moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
