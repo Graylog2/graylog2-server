@@ -41,10 +41,13 @@ const GroupBy = ({ index }: Props) => {
       <FieldComponent index={index} fieldType={fieldType} />
       {fieldType === 'time' && (<Time index={index} />)}
       {fieldType === 'values' && (
-        <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" bsSize="small" />
+        <FormikFormGroup label="Limit"
+                         name={`groupBy.groupings.${index}.limit`}
+                         type="number"
+                         bsSize="small" />
       )}
     </Wrapper>
   );
 };
 
-export default GroupBy;
+export default React.memo(GroupBy);

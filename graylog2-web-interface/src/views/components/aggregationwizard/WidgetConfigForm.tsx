@@ -38,6 +38,7 @@ export type GroupingDirection = 'row' | 'column';
 
 export type BaseGrouping = {
   direction: GroupingDirection,
+  id: string,
 };
 
 export type DateGrouping = BaseGrouping & {

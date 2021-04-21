@@ -19,7 +19,8 @@ import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
-import { HoverForHelp } from 'components/common';
+import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
+import { HoverForHelp, SortableList } from 'components/common';
 import { Checkbox } from 'components/graylog';
 
 import ElementConfigurationContainer from './ElementConfigurationContainer';
@@ -72,22 +73,22 @@ const GroupByConfiguration = () => {
       </Field>
       )}
       <FieldArray name="groupBy.groupings"
-                  render={() => (
-                    <>
-                      <div>
-                        {groupBy?.groupings?.map((grouping, index) => {
-                          return (
-                            // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationContainer key={`grouping-${index}`}
-                                                           onRemove={() => removeGrouping(index)}
-                                                           elementTitle={GroupByElement.title}>
-                              <GroupBy index={index} />
-                            </ElementConfigurationContainer>
-                          );
-                        })}
-                      </div>
-                    </>
+                  render={({ move }) => (
+                    <SortableList items={groupBy?.groupings}
+                                  onMoveItem={(_, newIndex, oldIndex) => { move(newIndex, oldIndex); }}
+                                  customListItemRender={({ index, dragHandleProps, draggableProps, className, ref }) => (
+                                    <ElementConfigurationContainer key={`sort-${index}`}
+                                                                   dragHandleProps={dragHandleProps}
+                                                                   draggableProps={draggableProps}
+                                                                   className={className}
+                                                                   onRemove={() => removeGrouping(index)}
+                                                                   elementTitle={GroupByElement.title}
+                                                                   ref={ref}>
+                                      <GroupBy index={index} />
+                                    </ElementConfigurationContainer>
+                                  )} />
                   )} />
+
     </>
   );
 };

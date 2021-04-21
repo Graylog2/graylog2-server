@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty } from 'lodash';
+import ObjectID from 'bson-objectid';
 
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
@@ -22,6 +23,7 @@ import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregation
 import type { AggregationElement } from './AggregationElementType';
 
 import type {
+  BaseGrouping,
   DateGrouping,
   GroupByFormValues,
   GroupingDirection,
@@ -109,12 +111,17 @@ const validateGroupBy = (values: WidgetConfigFormValues) => {
   return hasErrors(groupByErrors) ? { groupBy: { groupings: groupByErrors } } : emptyErrors;
 };
 
+const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<GroupingType, 'id'>) => ({
+  ...baseGrouping,
+  id: new ObjectID().toString(),
+});
+
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
   const { field, config } = pivot;
 
   const { interval } = config as TimeConfigType;
 
-  return ({
+  return addRandomId<DateGrouping>({
     direction,
     field: { field, type: 'time' },
     interval,
@@ -125,7 +132,7 @@ const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): Valu
   const { field, config } = pivot;
   const { limit } = config as ValuesConfigType;
 
-  return ({
+  return addRandomId<ValuesGrouping>({
     direction,
     field: { field, type: 'values' },
     limit,
@@ -172,14 +179,14 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
     .rollup(columnRollup);
 };
 
-export const emptyGrouping: ValuesGrouping = {
+export const emptyGrouping: ValuesGrouping = addRandomId<ValuesGrouping>({
   direction: 'row',
   field: {
     field: undefined,
     type: 'values',
   },
   limit: 15,
-};
+});
 
 const GroupByElement: AggregationElement = {
   sectionTitle: 'Group By',
