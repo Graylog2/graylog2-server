@@ -26,14 +26,13 @@ import { WidgetConfigFormValues } from 'views/components/aggregationwizard/Widge
 import SortElement from '../aggregationElements/SortElement';
 
 const SortConfiguration = () => {
-  const { values } = useFormikContext<WidgetConfigFormValues>();
-  const { sort } = values;
+  const { values: { sort }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <FieldArray name="sort"
                 render={({ move, remove }) => (
                   <SortableList items={sort}
-                                onMoveItem={(_, oldIndex, newIndex) => move(oldIndex, newIndex)}
+                                onMoveItem={(newSort) => setFieldValue('sort', newSort)}
                                 customListItemRender={({ index, dragHandleProps, draggableProps, className, ref }) => (
                                   <ElementConfigurationContainer key={`sort-${index}`}
                                                                  dragHandleProps={dragHandleProps}

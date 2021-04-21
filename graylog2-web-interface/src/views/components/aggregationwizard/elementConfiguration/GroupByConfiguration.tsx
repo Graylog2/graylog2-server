@@ -44,8 +44,13 @@ const RollupHoverForHelp = styled(HoverForHelp)`
 `;
 
 const GroupByConfiguration = () => {
+<<<<<<< HEAD
   const { values: { groupBy }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
+=======
+  const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
+>>>>>>> Use `setFieldValue` instead of Formik `FieldArray` helper to update
   const removeGrouping = useCallback((index) => {
     setValues(GroupByElement.onRemove(index, values));
   }, [setValues, values]);
@@ -72,11 +77,11 @@ const GroupByConfiguration = () => {
       </Field>
       )}
       <FieldArray name="groupBy.groupings"
-                  render={({ move }) => (
+                  render={() => (
                     <SortableList items={groupBy?.groupings}
-                                  onMoveItem={(_, oldIndex, newIndex) => move(oldIndex, newIndex)}
+                                  onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
                                   customListItemRender={({ index, dragHandleProps, draggableProps, className, ref }) => (
-                                    <ElementConfigurationContainer key={`sort-${index}`}
+                                    <ElementConfigurationContainer key={`groupBy-${index}`}
                                                                    dragHandleProps={dragHandleProps}
                                                                    draggableProps={draggableProps}
                                                                    className={className}
