@@ -17,7 +17,7 @@
 import express from 'express';
 import nodeFetch from 'node-fetch';
 
-import fetch from './FetchProvider';
+import fetch, { fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
 
@@ -51,17 +51,29 @@ const setUpServer = () => {
     res.status(204).end();
   });
 
+  app.post('/failIfWrongAcceptHeader', (req, res) => {
+    if (req.accepts().includes('text/csv')) {
+      res.send('foo,bar,baz');
+    } else {
+      res.status(500).end();
+    }
+  });
 
   return app.listen(PORT, () => {});
 };
 
 describe('FetchProvider', () => {
-  let server;
+  let server: ReturnType<typeof setUpServer>;
+  let baseUrl;
 
   beforeAll(() => {
     server = setUpServer();
     // eslint-disable-next-line global-require
     window.fetch = nodeFetch;
+
+    // @ts-ignore Types do not match actual result for some reason
+    const { port } = server.address();
+    baseUrl = `http://localhost:${port}`;
   });
 
   afterAll(() => {
@@ -69,14 +81,20 @@ describe('FetchProvider', () => {
   });
 
   it.each([
-    ['a GET with json', 'GET', 'test1', { text: 'test' }],
-    ['a POST with json', 'POST', 'test2', { text: 'test' }],
-    ['a POST with text', 'POST', 'test3', 'uuid-beef-feed'],
-    ['a POST without content', 'POST', 'test4', null],
-    ['a DELETE without content and status 204', 'DELETE', 'test5', null],
+    ['GET with json', 'GET', 'test1', { text: 'test' }],
+    ['POST with json', 'POST', 'test2', { text: 'test' }],
+    ['POST with text', 'POST', 'test3', 'uuid-beef-feed'],
+    ['POST without content', 'POST', 'test4', null],
+    ['DELETE without content and status 204', 'DELETE', 'test5', null],
   ])('should receive a %s', async (text, method, url, expectedResponse) => {
-    return fetch(method, `http://localhost:${server.address().port}/${url}`, undefined).then((response) => {
+    return fetch(method, `${baseUrl}/${url}`, undefined).then((response) => {
       expect(response).toStrictEqual(expectedResponse);
     });
+  });
+
+  it('sets correct accept header', async () => {
+    const result = await fetchFile('POST', `${baseUrl}/failIfWrongAcceptHeader`, {}, 'text/csv');
+
+    expect(result).toEqual('foo,bar,baz');
   });
 });
