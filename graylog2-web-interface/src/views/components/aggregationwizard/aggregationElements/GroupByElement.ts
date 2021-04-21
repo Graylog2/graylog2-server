@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { isEmpty } from 'lodash';
-import ObjectID from 'bson-objectid';
+import uuid from 'uuid/v4';
 
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
@@ -113,7 +113,7 @@ const validateGroupBy = (values: WidgetConfigFormValues) => {
 
 const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<GroupingType, 'id'>) => ({
   ...baseGrouping,
-  id: new ObjectID().toString(),
+  id: uuid(),
 });
 
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {

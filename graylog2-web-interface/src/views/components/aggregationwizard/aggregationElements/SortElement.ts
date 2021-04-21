@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import ObjectID from 'bson-objectid';
+import uuid from 'uuid/v4';
 
 import AggregationWidgetConfig, { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -58,6 +58,11 @@ const validateSorts = (values: WidgetConfigFormValues) => {
   return hasErrors(sortErrors) ? { sort: sortErrors } : {};
 };
 
+const addRandomId = (baseSort = {}) => ({
+  ...baseSort,
+  id: uuid(),
+});
+
 const configTypeToFormValueType = (type: 'pivot' | 'series') => {
   switch (type) {
     case 'pivot': return 'groupBy';
@@ -83,15 +88,12 @@ const SortElement: AggregationElement = {
     ...formValues,
     sort: [
       ...formValues.sort,
-      {
-        id: new ObjectID().toString(),
-      },
+      addRandomId({}),
     ],
   }),
   component: SortConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
-    sort: config.sort.map((s) => ({
-      id: new ObjectID().toString(),
+    sort: config.sort.map((s) => addRandomId({
       type: configTypeToFormValueType(s.type),
       field: s.field,
       direction: s.direction?.direction,
