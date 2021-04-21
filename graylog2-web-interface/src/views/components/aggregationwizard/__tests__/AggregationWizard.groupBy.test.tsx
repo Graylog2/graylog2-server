@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { act, fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { act, findByTestId, fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
@@ -214,6 +214,40 @@ describe('AggregationWizard', () => {
     const updatedConfig = widgetConfig
       .toBuilder()
       .rowPivots([pivot1])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should correctly update sort of groupings', async () => {
+    const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
+    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const config = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot0, pivot1])
+      .build();
+
+    const onChange = jest.fn();
+    renderSUT({ onChange, config });
+
+    const groupBySection = await screen.findByTestId('Group By-section');
+
+    const firstItem = within(groupBySection).getByTestId('grouping-0-drag-handle');
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have lifted an item/i);
+    fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
+    await screen.findByText(/You have moved the item/i);
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have dropped the item/i);
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    fireEvent.click(applyButton);
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot1, pivot0])
       .build();
 
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));

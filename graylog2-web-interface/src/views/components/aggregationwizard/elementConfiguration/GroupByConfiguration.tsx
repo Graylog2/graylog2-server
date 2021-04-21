@@ -81,10 +81,11 @@ const GroupByConfiguration = () => {
                     <SortableList items={groupBy?.groupings}
                                   onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
                                   customListItemRender={({ index, dragHandleProps, draggableProps, className, ref }) => (
-                                    <ElementConfigurationContainer key={`groupBy-${index}`}
+                                    <ElementConfigurationContainer key={`grouping-${index}`}
                                                                    dragHandleProps={dragHandleProps}
                                                                    draggableProps={draggableProps}
                                                                    className={className}
+                                                                   testIdPrefix={`grouping-${index}`}
                                                                    onRemove={() => removeGrouping(index)}
                                                                    elementTitle={GroupByElement.title}
                                                                    ref={ref}>

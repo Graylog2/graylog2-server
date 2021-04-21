@@ -111,11 +111,13 @@ const ElementConfigurationSection = ({
   onCreate,
   sectionTitle,
 }: Props) => {
+  const title = sectionTitle ?? elementTitle;
+
   return (
-    <Wrapper data-testid={`${sectionTitle}-configuration`}>
+    <Wrapper data-testid={`${title}-configuration`}>
       <Header $isEmpty={isEmpty}>
         <ElementTitle $isEmpty={isEmpty}>
-          {sectionTitle ?? elementTitle}
+          {title}
         </ElementTitle>
         <ElementActions>
           {allowCreate && (
