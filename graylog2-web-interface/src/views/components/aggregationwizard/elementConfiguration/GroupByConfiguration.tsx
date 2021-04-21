@@ -19,7 +19,6 @@ import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
-import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
 import { HoverForHelp, SortableList } from 'components/common';
 import { Checkbox } from 'components/graylog';
 
