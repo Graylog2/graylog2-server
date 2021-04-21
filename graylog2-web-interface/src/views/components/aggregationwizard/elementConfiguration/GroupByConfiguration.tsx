@@ -45,16 +45,20 @@ const RollupHoverForHelp = styled(HoverForHelp)`
 
 const GroupByConfiguration = () => {
   const { values: { groupBy }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
-  const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
+  const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => {
     setValues(GroupByElement.onRemove(index, values));
   }, [setValues, values]);
 
+  const isEmpty = !groupBy?.groupings;
+
   return (
     <>
+      {!isEmpty
+      && (
       <Field name="groupBy.columnRollup">
         {({ field: { name, onChange, value } }) => (
-          <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
+          <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
                                  checked={value}
                                  disabled={disableColumnRollup}>
             <RollupColumnsLabel>
@@ -66,11 +70,12 @@ const GroupByConfiguration = () => {
           </RollupColumnsCheckbox>
         )}
       </Field>
+      )}
       <FieldArray name="groupBy.groupings"
                   render={() => (
                     <>
                       <div>
-                        {groupBy.groupings.map((grouping, index) => {
+                        {groupBy?.groupings?.map((grouping, index) => {
                           return (
                             // eslint-disable-next-line react/no-array-index-key
                             <ElementConfigurationContainer key={`grouping-${index}`}

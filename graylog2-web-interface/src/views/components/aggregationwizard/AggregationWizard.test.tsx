@@ -20,6 +20,7 @@ import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
@@ -76,14 +77,12 @@ describe('AggregationWizard', () => {
     renderSUT({ config });
 
     const addElementSection = await screen.findByTestId('add-element-section');
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
     const notConfiguredElements = [
       'Metric',
       'Grouping',
       'Sort',
     ];
-
-    await selectEvent.openMenu(aggregationElementSelect);
 
     notConfiguredElements.forEach((elementTitle) => {
       expect(within(addElementSection).getByText(elementTitle)).toBeInTheDocument();
@@ -93,14 +92,14 @@ describe('AggregationWizard', () => {
   it('should display newly selected aggregation element', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-    const configureElementsSection = screen.getByTestId('configure-elements-section');
+    const metricsSection = await screen.findByTestId('Metrics-configuration');
 
-    expect(within(configureElementsSection).queryByText('Metric')).not.toBeInTheDocument();
+    expect(within(metricsSection).queryByText('Function')).not.toBeInTheDocument();
 
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
 
-    await waitFor(() => expect(within(configureElementsSection).getByText('Metrics')).toBeInTheDocument());
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
+
+    await waitFor(() => within(metricsSection).findByText('Function'));
   });
 });
