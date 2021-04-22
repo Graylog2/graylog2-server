@@ -22,18 +22,22 @@ import ElementConfigurationContainer
   from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationContainer';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
+import SortElement from '../aggregationElements/SortElement';
+
 const SortConfiguration = () => {
   const { values } = useFormikContext<WidgetConfigFormValues>();
   const { sort } = values;
 
   return (
     <FieldArray name="sort"
-                render={() => (
+                render={({ remove }) => (
                   <>
                     <div>
                       {sort.map((s, index) => (
                         // eslint-disable-next-line react/no-array-index-key
-                        <ElementConfigurationContainer key={`sort-${index}`}>
+                        <ElementConfigurationContainer key={`sort-${index}`}
+                                                       onRemove={() => remove(index)}
+                                                       elementTitle={SortElement.title}>
                           <Sort index={index} />
                         </ElementConfigurationContainer>
                       ))}
