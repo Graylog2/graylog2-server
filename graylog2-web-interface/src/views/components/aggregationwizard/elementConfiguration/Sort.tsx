@@ -34,12 +34,21 @@ const directionOptions = [
   { label: 'Descending', value: 'Descending' },
 ];
 
-const formatSeries = (metric: MetricFormValues) => (metric.name ? metric.name : `${metric.function}(${metric.field ?? ''})`);
+const formatSeries = (metric: MetricFormValues) => {
+  const readableField = `${metric.function}(${metric.field ?? ''})`;
+
+  return {
+    label: metric.name || readableField,
+    field: readableField,
+  };
+};
+
 const formatGrouping = (grouping: GroupByFormValues) => grouping.field.field;
 
 type OptionValue = {
   type: 'metric' | 'groupBy',
   field: string,
+  label: string
 };
 
 type Option = {
@@ -50,15 +59,14 @@ type Option = {
 const Sort = ({ index }: Props) => {
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const { metrics = [], groupBy: { groupings = [] } = {} } = values;
-
-  const metricsOptions: Array<OptionValue> = metrics.map(formatSeries).map((metric) => ({ type: 'metric', field: metric }));
-  const rowPivotOptions: Array<OptionValue> = groupings.filter((grouping) => (grouping.direction === 'row')).map(formatGrouping).map((groupBy) => ({ type: 'groupBy', field: groupBy }));
+  const metricsOptions: Array<OptionValue> = metrics.map(formatSeries).map(({ field, label }) => ({ type: 'metric', field, label }));
+  const rowPivotOptions: Array<OptionValue> = groupings.filter((grouping) => (grouping.direction === 'row')).map(formatGrouping).map((groupBy) => ({ type: 'groupBy', field: groupBy, label: groupBy }));
   const options = [
     ...metricsOptions,
     ...rowPivotOptions,
   ];
 
-  const numberIndexedOptions: Array<Option> = options.map((option, idx) => ({ label: option.field, value: idx }));
+  const numberIndexedOptions: Array<Option> = options.map((option, idx) => ({ label: option.label, value: idx }));
 
   const currentSort = values.sort[index];
   const selectedOption = currentSort ? options.findIndex((option) => (option.type === currentSort.type && option.field === currentSort.field)) : undefined;
