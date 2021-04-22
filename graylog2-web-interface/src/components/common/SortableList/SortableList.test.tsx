@@ -41,7 +41,7 @@ describe('SortableList', () => {
     await screen.findByText(/You have lifted an item/i);
     fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
     await screen.findByText(/You have moved the item/i);
-    fireEvent.keyDown(firstItem, { key: 'ArrowUp', keyCode: 32 });
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
     await screen.findByText(/You have dropped the item/i);
 
     await waitFor(() => expect(onMoveItemStub).toHaveBeenCalledTimes(1));
