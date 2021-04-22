@@ -30,6 +30,8 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -66,15 +68,16 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
     }
 
     private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation) {
-        final ElasticsearchInstanceFactory factory = instantiateFactory(annotation.elasticsearchFactory());
-        return GraylogBackend.createStarted(annotation.extraPorts(), factory);
+        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
+        final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
+        return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars);
     }
 
-    private ElasticsearchInstanceFactory instantiateFactory(Class<? extends ElasticsearchInstanceFactory> factoryClass) {
+    private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
-            return factoryClass.newInstance();
+            return providerClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Unable to construct Elasticsearch factory: ", e);
+            throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
     }
 

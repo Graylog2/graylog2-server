@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -48,7 +49,7 @@ public class NodeContainerFactory {
     // sha2 for password "admin"
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
-    public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
+    public static GenericContainer<?> buildContainer(NodeContainerConfig config, List<Path> pluginJars) {
         if (!config.skipPackaging) {
             MavenPackager.packageJarIfNecessary(property("server_project_dir"));
         } else {
@@ -56,7 +57,7 @@ public class NodeContainerFactory {
         }
         ImageFromDockerfile image = createImage(config);
 
-        return createRunningContainer(config, image);
+        return createRunningContainer(config, image, pluginJars);
     }
 
     private static ImageFromDockerfile createImage(NodeContainerConfig config) {
@@ -75,16 +76,12 @@ public class NodeContainerFactory {
         return image;
     }
 
-    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
+    private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image,
+            List<Path> pluginJars) {
         String graylogHome = "/usr/share/graylog";
 
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), graylogHome + "/graylog.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("storage_module_elasticsearch6_jar"), graylogHome + "/plugin/graylog-storage-elasticsearch6.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("storage_module_elasticsearch7_jar"), graylogHome + "/plugin/graylog-storage-elasticsearch7.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("aws_plugin_jar"), graylogHome + "/plugin/graylog-plugin-aws.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("threatintel_plugin_jar"), graylogHome + "/plugin/graylog-plugin-threatintel.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("collector_plugin_jar"), graylogHome + "/plugin/graylog-plugin-collector.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
                 .withEnv("DEVELOPMENT", "true")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
@@ -116,6 +113,11 @@ public class NodeContainerFactory {
                                 })))
                 .withExposedPorts(config.portsToExpose())
                 .withStartupTimeout(Duration.of(120, SECONDS));
+
+        pluginJars.forEach(hostPath -> {
+            final Path containerPath = Paths.get(graylogHome, "plugin", hostPath.getFileName().toString());
+            container.addFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+        });
 
         container.start();
 

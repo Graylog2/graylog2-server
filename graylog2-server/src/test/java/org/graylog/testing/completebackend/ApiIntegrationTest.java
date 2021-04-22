@@ -41,4 +41,6 @@ public @interface ApiIntegrationTest {
     int[] extraPorts() default {};
 
     Class<? extends ElasticsearchInstanceFactory> elasticsearchFactory();
+
+    Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
 }

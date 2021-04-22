@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,9 +40,10 @@ public class GraylogBackend {
 
     private static GraylogBackend instance;
 
-    public static GraylogBackend createStarted(int[] extraPorts, ElasticsearchInstanceFactory elasticsearchInstanceFactory) {
+    public static GraylogBackend createStarted(int[] extraPorts,
+            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars) {
         if (instance == null) {
-            instance = createStartedBackend(extraPorts, elasticsearchInstanceFactory);
+            instance = createStartedBackend(extraPorts, elasticsearchInstanceFactory, pluginJars);
         } else {
             instance.fullReset();
             LOG.info("Reusing running backend");
@@ -52,7 +55,8 @@ public class GraylogBackend {
     // Starting ES instance in parallel thread to save time.
     // MongoDB and the node have to be started in sequence however, because the the node might crash,
     // if a MongoDb instance isn't already present while it's starting up.
-    private static GraylogBackend createStartedBackend(int[] extraPorts, ElasticsearchInstanceFactory elasticsearchInstanceFactory) {
+    private static GraylogBackend createStartedBackend(int[] extraPorts,
+            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars) {
         Network network = Network.newNetwork();
 
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
@@ -69,7 +73,8 @@ public class GraylogBackend {
                     MongoDBInstance.internalUri(),
                     ElasticsearchInstance.internalUri(),
                     elasticsearchInstanceFactory.version(),
-                    extraPorts);
+                    extraPorts,
+                    pluginJars);
 
             return new GraylogBackend(esInstance, mongoDB, node);
         } catch (InterruptedException | ExecutionException e) {
