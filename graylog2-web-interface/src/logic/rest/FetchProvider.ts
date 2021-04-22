@@ -57,6 +57,11 @@ const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
 
 const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSON.stringify(body) : body);
 
+type RequestHeaders = {
+  Accept?: string,
+  'Content-Type'?: string,
+};
+
 export class Builder {
   private options = {};
 
@@ -185,9 +190,13 @@ export class Builder {
   }
 
   build() {
-    const headers = this.body
+    const headers: RequestHeaders = this.body
       ? { ...this.options, 'Content-Type': this.body.mimeType }
       : this.options;
+
+    if (this.accept) {
+      headers.Accept = this.accept;
+    }
 
     return window.fetch(this.url, {
       method: this.method,
