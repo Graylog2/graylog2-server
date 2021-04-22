@@ -19,27 +19,27 @@ import styled, { css } from 'styled-components';
 
 import { IconButton } from 'components/common';
 
-const SectionContainer = styled.div(({ theme }) => css`
+const Container = styled.div(({ theme }) => css`
   display: flex;
-  background-color: ${theme.colors.variant.lightest.default};
+  padding: 6px 5px 3px 7px;
   margin-bottom: 5px;
   border-radius: 3px;
   border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: 6px 5px 3px 7px;
+  background-color: ${theme.colors.variant.lightest.default};
 
   :last-of-type {
     margin-bottom: 0;
   }
 `);
 
-const SectionActions = styled.div`
+const ElementActions = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 25px;
   margin-left: 5px;
 `;
 
-const SectionConfiguration = styled.div`
+const ElementConfiguration = styled.div`
   flex: 1;
 `;
 
@@ -50,14 +50,14 @@ type Props = {
 };
 
 const ElementConfigurationContainer = ({ children, onRemove, elementTitle }: Props) => (
-  <SectionContainer>
-    <SectionConfiguration>
+  <Container>
+    <ElementConfiguration>
       {children}
-    </SectionConfiguration>
-    <SectionActions>
+    </ElementConfiguration>
+    <ElementActions>
       {onRemove && <IconButton onClick={onRemove} name="trash" title={`Remove ${elementTitle}`} />}
-    </SectionActions>
-  </SectionContainer>
+    </ElementActions>
+  </Container>
 );
 
 ElementConfigurationContainer.defaultProps = {

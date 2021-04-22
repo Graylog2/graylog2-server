@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 import IconButton from 'components/common/IconButton';
 
 const Wrapper = styled.div(({ theme }) => css`
-  margin-bottom: 6px;
   border-radius: 6px;
+  margin-bottom: 6px;
 
   :last-child {
     margin-bottom: 0;
@@ -46,10 +46,16 @@ const Wrapper = styled.div(({ theme }) => css`
     padding-top: 5px;
     font-weight: normal;
     text-align: left;
+    hyphens: auto;
   }
 
   .help-block {
     margin: 0;
+    hyphens: auto;
+  }
+
+  .checkbox {
+    min-height: auto;
   }
 `);
 

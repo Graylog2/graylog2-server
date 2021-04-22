@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { Field, getIn, useFormikContext } from 'formik';
 import { ConfigurationField } from 'views/types';
+import styled from 'styled-components';
 
 import BooleanField from 'views/components/aggregationwizard/elementConfiguration/configurationFields/BooleanField';
 import { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
@@ -32,6 +33,15 @@ type Props = {
 
 const NumericField = (props) => <InputField type="number" {...props} />;
 
+const TitleLabelWithHelp = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const TitleHoverForHelp = styled(HoverForHelp)`
+  margin-left: 5px;
+`;
+
 const componentForType = (type: string) => {
   switch (type) {
     case 'select': return SelectField;
@@ -45,7 +55,14 @@ const titleForField = (field: ConfigurationField) => {
   const { helpComponent: HelpComponent } = field;
 
   return HelpComponent
-    ? <>{field.title}<HoverForHelp title={`Help for ${field.title}`}><HelpComponent /></HoverForHelp></>
+    ? (
+      <TitleLabelWithHelp>
+        {field.title}
+        <TitleHoverForHelp title={`Help for ${field.title}`} placement="top">
+          <HelpComponent />
+        </TitleHoverForHelp>
+      </TitleLabelWithHelp>
+    )
     : field.title;
 };
 

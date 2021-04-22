@@ -130,7 +130,7 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const nameInput = await screen.findByLabelText('Name');
+    const nameInput = await screen.findByLabelText(/Name/);
     const functionSelect = screen.getByLabelText('Select a function');
     const fieldSelect = screen.getByLabelText('Select a field');
 
@@ -208,7 +208,7 @@ describe('AggregationWizard', () => {
     fireEvent.click(addMetricButton);
 
     await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
-    const newNameInput = screen.getAllByLabelText('Name')[1];
+    const newNameInput = screen.getAllByLabelText(/Name/)[1];
     const newFunctionSelect = screen.getAllByLabelText('Select a function')[1];
     const newFieldSelect = screen.getAllByLabelText('Select a field')[1];
 
