@@ -46,15 +46,16 @@ const ElementConfiguration = styled.div`
 type Props = {
   children: React.ReactNode,
   onRemove?: () => void,
+  elementTitle: string,
 };
 
-const ElementConfigurationContainer = ({ children, onRemove }: Props) => (
+const ElementConfigurationContainer = ({ children, onRemove, elementTitle }: Props) => (
   <Container>
     <ElementConfiguration>
       {children}
     </ElementConfiguration>
     <ElementActions>
-      {onRemove && <IconButton onClick={onRemove} name="trash" title="Remove" />}
+      {onRemove && <IconButton onClick={onRemove} name="trash" title={`Remove ${elementTitle}`} />}
     </ElementActions>
   </Container>
 );

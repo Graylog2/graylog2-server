@@ -30,6 +30,8 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 
 import ElementConfigurationContainer from './ElementConfigurationContainer';
 
+import VisualizationElement from '../aggregationElements/VisualizationElement';
+
 const EventAnnotationCheckbox = styled(Checkbox)`
   input[type="checkbox"] {
     margin-right: 0;
@@ -73,7 +75,7 @@ const VisualizationConfiguration = () => {
   const supportsEventAnnotations = currentVisualizationType.capabilities?.includes('event-annotations') ?? false;
 
   return (
-    <ElementConfigurationContainer>
+    <ElementConfigurationContainer elementTitle={VisualizationElement.title}>
       <Field name="visualization.type">
         {({ field: { name, value }, meta: { error } }) => (
           <Input id="visualization-type-select"

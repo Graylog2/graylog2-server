@@ -73,7 +73,9 @@ const GroupByConfiguration = () => {
                         {groupBy.groupings.map((grouping, index) => {
                           return (
                             // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationContainer key={`grouping-${index}`} onRemove={() => removeGrouping(index)}>
+                            <ElementConfigurationContainer key={`grouping-${index}`}
+                                                           onRemove={() => removeGrouping(index)}
+                                                           elementTitle={GroupByElement.title}>
                               <GroupBy index={index} />
                             </ElementConfigurationContainer>
                           );
