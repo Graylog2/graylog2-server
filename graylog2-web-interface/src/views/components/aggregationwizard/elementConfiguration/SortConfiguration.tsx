@@ -30,7 +30,7 @@ const SortConfiguration = () => {
 
   return (
     <FieldArray name="sort"
-                render={({ move, remove }) => (
+                render={({ remove }) => (
                   <SortableList items={sort}
                                 onMoveItem={(newSort) => setFieldValue('sort', newSort)}
                                 customListItemRender={({ index, dragHandleProps, draggableProps, className, ref }) => (

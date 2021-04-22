@@ -58,7 +58,7 @@ type Props = {
   testIdPrefix?: string,
 };
 
-const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ children, onRemove, testIdPrefix, dragHandleProps, className, draggableProps }: Props, ref) => (
+const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ children, onRemove, testIdPrefix, dragHandleProps, className, draggableProps, elementTitle }: Props, ref) => (
   <Container className={className} ref={ref} {...(draggableProps ?? {})}>
     <ElementConfiguration>
       {children}
