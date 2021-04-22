@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
 
@@ -26,9 +26,19 @@ const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const IndexSetsStore = Reflux.createStore({
   listenables: [IndexSetsActions],
+  indexSetsCount: undefined,
+  indexSets: undefined,
+  indexSetStats: undefined,
 
+  getInitialState() {
+    return {
+      indexSetsCount: this.indexSetsCount,
+      indexSets: this.indexSets,
+      indexSetStats: this.indexSetStats,
+    };
+  },
   list(stats) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
     const promise = fetch('GET', url);
 
     promise
@@ -48,7 +58,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   listPaginated(skip, limit, stats) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url);
     const promise = fetch('GET', url);
 
     promise
@@ -68,7 +78,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   get(indexSetId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url);
     const promise = fetch('GET', url);
 
     promise.then(
@@ -86,7 +96,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   update(indexSet) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSet.id).url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSet.id).url);
     const promise = fetch('PUT', url, indexSet);
 
     promise.then(
@@ -105,7 +115,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   create(indexSet) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.create().url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.create().url);
     const promise = fetch('POST', url, indexSet);
 
     promise.then(
@@ -124,7 +134,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   delete(indexSet, deleteIndices) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
     const promise = fetch('DELETE', url);
 
     promise.then(
@@ -140,7 +150,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   setDefault(indexSet) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
     const promise = fetch('PUT', url);
 
     promise.then(
@@ -156,7 +166,7 @@ const IndexSetsStore = Reflux.createStore({
   },
 
   stats() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url);
+    const url = qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url);
     const promise = fetch('GET', url);
 
     promise

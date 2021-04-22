@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
@@ -25,8 +25,18 @@ const IndexerOverviewActions = ActionsProvider.getActions('IndexerOverview');
 
 const IndexerOverviewStore = Reflux.createStore({
   listenables: [IndexerOverviewActions],
+  indexerOverview: undefined,
+  indexerOverviewError: undefined,
+
+  getInitialState() {
+    return {
+      indexerOverview: this.indexerOverview,
+      indexerOverviewError: this.indexerOverviewError,
+    };
+  },
+
   list(indexSetId) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
+    const url = qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
     const promise = fetch('GET', url);
 
     promise.then(
