@@ -38,6 +38,7 @@ const SortConfiguration = () => {
                                                                  dragHandleProps={dragHandleProps}
                                                                  draggableProps={draggableProps}
                                                                  className={className}
+                                                                 testIdPrefix={`sort-${index}`}
                                                                  onRemove={() => remove(index)}
                                                                  elementTitle={SortElement.title}
                                                                  ref={ref}>
