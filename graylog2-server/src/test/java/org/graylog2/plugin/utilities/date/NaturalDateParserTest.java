@@ -17,6 +17,7 @@
 package org.graylog2.plugin.utilities.date;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
@@ -220,6 +221,24 @@ https://github.com/Graylog2/graylog2-server/issues/6857
     public void testLast4hoursArtificialReference() throws Exception {
         DateTime reference = DateTime.now().minusHours(7);
         NaturalDateParser.Result last4 = naturalDateParserBerlin.parse("last 4 hours", reference.toDate());
+        assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(reference.minusHours(4));
+        assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
+
+        reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        last4 = naturalDateParserBerlin.parse("last 4 hours", reference.toDate());
+        assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(reference.minusHours(4));
+        assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
+    }
+
+    @Test
+    public void testLast4hoursArtificialReferenceDSTChange() throws Exception {
+        DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin")).parseDateTime("28.03.2021 03:45:23");
+        NaturalDateParser.Result last4 = naturalDateParserBerlin.parse("last 4 hours", reference.toDate());
+        assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(reference.minusHours(4));
+        assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
+
+        reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin")).parseDateTime("31.10.2021 03:45:23");
+        last4 = naturalDateParserBerlin.parse("last 4 hours", reference.toDate());
         assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(reference.minusHours(4));
         assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
     }
