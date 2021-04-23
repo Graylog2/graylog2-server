@@ -67,6 +67,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static org.graylog.events.search.MoreSearch.luceneEscape;
+
 public class AggregationEventProcessor implements EventProcessor {
     public interface Factory extends EventProcessor.Factory<AggregationEventProcessor> {
         @Override
@@ -177,13 +179,14 @@ public class AggregationEventProcessor implements EventProcessor {
         }
     }
 
-    // Return the ES query string for the group by fields specified in event; or empty if none specified
+    // Return the ES query string for the group by fields specified in event; or empty if none specified.
+    // Search value is escaped and enclosed in quotes.
     private ElasticsearchQueryString groupByQueryString(Event event) {
         ElasticsearchQueryString result = ElasticsearchQueryString.empty();
         if (!config.groupBy().isEmpty()) {
             for (String key : event.getGroupByFields().keySet()) {
                 String value = event.getGroupByFields().get(key);
-                String query = key + ":" + value;
+                String query = new StringBuilder(key).append(":\"").append(luceneEscape(value)).append("\"").toString();
                 result = result.concatenate(ElasticsearchQueryString.builder().queryString(query).build());
             }
         }

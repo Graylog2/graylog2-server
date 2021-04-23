@@ -49,6 +49,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -487,12 +488,56 @@ public class AggregationEventProcessorTest {
 
     @Test
     public void testGroupByQueryString() throws EventProcessorException {
+        Map<String, String> groupByFields = ImmutableMap.of(
+                "group_field_one", "one",
+                "group_field_two", "two"
+        );
+        sourceMessagesWithAggregation(groupByFields, 1);
+
+        String expectedQueryString = "aQueryString AND group_field_one:\"one\" AND group_field_two:\"two\"";
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(1), any());
+    }
+
+    @Test
+    public void testGroupByQueryStringEscapedValues() throws EventProcessorException {
+        Map<String, String> groupByFields = ImmutableMap.of(
+                "group_field_one", "\" \" * & ? - \\",
+                "group_field_two", "/ / ~ | []{}"
+        );
+        sourceMessagesWithAggregation(groupByFields, 1);
+
+        String expectedQueryString = "aQueryString AND group_field_one:\"\\\" \\\" \\* \\& \\? \\- \\\\\" AND group_field_two:\"\\/ \\/ \\~ \\| \\[\\]\\{\\}\"";
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(1), any());
+    }
+
+    @Test
+    public void testGroupByQuerySingleValue() throws EventProcessorException {
+        Map<String, String> groupByFields = ImmutableMap.of(
+                "group_field_one", "group_value_one"
+        );
+        sourceMessagesWithAggregation(groupByFields, 5);
+
+        String expectedQueryString = "aQueryString AND group_field_one:\"group_value_one\"";
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(5), any());
+    }
+
+    @Test
+    public void testGroupByQueryEmpty() throws EventProcessorException {
+        Map<String, String> groupByFields = ImmutableMap.of();
+        sourceMessagesWithAggregation(groupByFields, 5);
+
+        String expectedQueryString = "aQueryString";
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(5), any());
+    }
+
+    // Helper to call sourceMessagesForEvent when testing query string values - we don't care about anything else
+    private void sourceMessagesWithAggregation(Map<String, String> groupByFields, int batchLimit) throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
-        final TestEvent event = new TestEvent(timerange.to());
-        event.setTimerangeStart(timerange.from());
-        event.setTimerangeEnd(timerange.to());
-        event.setGroupByFields(ImmutableMap.of("group_field_one", "one", "group_field_two", "two"));
+        final AbsoluteRange timeRange = AbsoluteRange.create(now.minusHours(1), now.plusHours(1));
+        final TestEvent event = new TestEvent(timeRange.to());
+        event.setTimerangeStart(timeRange.from());
+        event.setTimerangeEnd(timeRange.to());
+        event.setGroupByFields(groupByFields);
 
         final AggregationSeries series = AggregationSeries.builder()
                 .id("abc123")
@@ -503,9 +548,7 @@ public class AggregationEventProcessorTest {
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(
                 eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, streamService, messages);
 
-        eventProcessor.sourceMessagesForEvent(event, messageConsumer, 1);
-
-        verify(moreSearch).scrollQuery(eq("aQueryString AND group_field_one:one AND group_field_two:two"), any(), any(), any(), eq(1), any());
+        eventProcessor.sourceMessagesForEvent(event, messageConsumer, batchLimit);
     }
 
     // Helper method to build test AggregationResult, since we only care about a few of the values
