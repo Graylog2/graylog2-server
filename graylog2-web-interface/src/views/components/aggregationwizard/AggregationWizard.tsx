@@ -21,7 +21,6 @@ import { EditWidgetComponentProps } from 'views/types';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
-import AggregationElementSelect from './AggregationElementSelect';
 import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElements';
 
@@ -114,13 +113,8 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
         <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
                           initialValues={initialFormValues}
                           validate={validateForm}>
-          {({ values, setValues }) => (
+          {() => (
             <>
-              <Section data-testid="add-element-section">
-                <AggregationElementSelect onSelect={(elementKey) => onCreateElement(elementKey, values, setValues)}
-                                          aggregationElements={aggregationElements}
-                                          formValues={values} />
-              </Section>
               <Section data-testid="configure-elements-section">
                 <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
                                        config={config}

@@ -50,6 +50,11 @@ jest.mock('views/stores/AggregationFunctionsStore', () => ({
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
+const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+};
+
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
@@ -72,10 +77,7 @@ describe('AggregationWizard', () => {
   it('should require metric function when adding a metric element', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await addElement('Metric');
 
     await waitFor(() => expect(screen.getByText('Function is required.')).toBeInTheDocument());
   });
@@ -83,10 +85,7 @@ describe('AggregationWizard', () => {
   it('should require metric field when metric function is not count', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await addElement('Metric');
 
     const functionSelect = await screen.findByLabelText('Select a function');
     await selectEvent.openMenu(functionSelect);
