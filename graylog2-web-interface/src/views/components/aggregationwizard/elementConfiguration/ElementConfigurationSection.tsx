@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 
 const Wrapper = styled.div(({ theme }) => css`
-  margin-bottom: 6px;
   border-radius: 6px;
+  margin-bottom: 6px;
 
   :last-child {
     margin-bottom: 0;
@@ -46,14 +46,20 @@ const Wrapper = styled.div(({ theme }) => css`
     padding-top: 5px;
     font-weight: normal;
     text-align: left;
+    hyphens: auto;
   }
 
   .help-block {
     margin: 0;
+    hyphens: auto;
+  }
+
+  .checkbox {
+    min-height: auto;
   }
 `);
 
-const Header = styled.div(({ theme }) => css`
+const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty: boolean }) => css`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -66,13 +72,14 @@ const Header = styled.div(({ theme }) => css`
     content: ' ';
     top: 50%;
     width: 100%;
-    border-bottom: 1px solid ${theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
+    border-bottom: 1px solid ${$isEmpty ? theme.colors.gray['70'] : theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
     position: absolute;
   }
 `);
 
-const ElementTitle = styled.div(({ theme }) => css`
+const ElementTitle = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty: boolean }) => css`
   background-color: ${theme.colors.global.contentBackground};
+  color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.global.textDefault};
   z-index: 1;
   padding-right: 8px;
 `);
@@ -93,19 +100,21 @@ type Props = {
   elementTitle: string,
   onCreate: () => void,
   sectionTitle?: string,
+  isEmpty?: boolean,
 }
 
 const ElementConfigurationSection = ({
   allowCreate,
   children,
   elementTitle,
+  isEmpty,
   onCreate,
   sectionTitle,
 }: Props) => {
   return (
-    <Wrapper>
-      <Header>
-        <ElementTitle>
+    <Wrapper data-testid={`${sectionTitle}-configuration`}>
+      <Header $isEmpty={isEmpty}>
+        <ElementTitle $isEmpty={isEmpty}>
           {sectionTitle ?? elementTitle}
         </ElementTitle>
         <ElementActions>
@@ -123,6 +132,7 @@ const ElementConfigurationSection = ({
 
 ElementConfigurationSection.defaultProps = {
   sectionTitle: undefined,
+  isEmpty: false,
 };
 
 export default ElementConfigurationSection;

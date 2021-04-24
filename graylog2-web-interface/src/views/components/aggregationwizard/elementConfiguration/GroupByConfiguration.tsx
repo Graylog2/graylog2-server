@@ -28,6 +28,12 @@ import GroupBy from './GroupBy';
 import GroupByElement from '../aggregationElements/GroupByElement';
 import { WidgetConfigFormValues } from '../WidgetConfigForm';
 
+const RollupColumnsCheckbox = styled(Checkbox)`
+  &.checkbox {
+    padding-top: 0;
+  }
+`;
+
 const RollupColumnsLabel = styled.div`
   display: flex;
   align-items: center;
@@ -39,35 +45,42 @@ const RollupHoverForHelp = styled(HoverForHelp)`
 
 const GroupByConfiguration = () => {
   const { values: { groupBy }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
-  const disableColumnRollup = !groupBy.groupings.find(({ direction }) => direction === 'column');
+  const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => {
     setValues(GroupByElement.onRemove(index, values));
   }, [setValues, values]);
 
+  const isEmpty = !groupBy?.groupings;
+
   return (
     <>
+      {!isEmpty
+      && (
       <Field name="groupBy.columnRollup">
         {({ field: { name, onChange, value } }) => (
-          <Checkbox onChange={() => onChange({ target: { name, value: !groupBy.columnRollup } })}
-                    checked={value}
-                    disabled={disableColumnRollup}>
+          <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
+                                 checked={value}
+                                 disabled={disableColumnRollup}>
             <RollupColumnsLabel>
               Rollup Columns
               <RollupHoverForHelp title="Rollup Columns">
                 When rollup is enabled, an additional trace totalling individual subtraces will be included.
               </RollupHoverForHelp>
             </RollupColumnsLabel>
-          </Checkbox>
+          </RollupColumnsCheckbox>
         )}
       </Field>
+      )}
       <FieldArray name="groupBy.groupings"
                   render={() => (
                     <>
                       <div>
-                        {groupBy.groupings.map((grouping, index) => {
+                        {groupBy?.groupings?.map((grouping, index) => {
                           return (
                             // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationContainer key={`grouping-${index}`} onRemove={() => removeGrouping(index)}>
+                            <ElementConfigurationContainer key={`grouping-${index}`}
+                                                           onRemove={() => removeGrouping(index)}
+                                                           elementTitle={GroupByElement.title}>
                               <GroupBy index={index} />
                             </ElementConfigurationContainer>
                           );

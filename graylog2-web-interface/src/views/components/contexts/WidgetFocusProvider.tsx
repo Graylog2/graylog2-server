@@ -145,7 +145,7 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   };
 
   const unsetWidgetEditing = () => updateFocusQueryParams({
-    id: focusUriParams.focusing && focusUriParams.id ? focusUriParams.id : undefined,
+    id: focusUriParams.focusing && focusUriParams.id ? focusUriParams.id as string : undefined,
     editing: false,
     focusing: focusUriParams.focusing,
   });

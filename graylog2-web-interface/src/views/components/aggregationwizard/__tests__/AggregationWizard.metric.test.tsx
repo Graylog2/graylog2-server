@@ -50,6 +50,11 @@ jest.mock('views/stores/AggregationFunctionsStore', () => ({
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
+const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+};
+
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
@@ -72,10 +77,7 @@ describe('AggregationWizard', () => {
   it('should require metric function when adding a metric element', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await addElement('Metric');
 
     await waitFor(() => expect(screen.getByText('Function is required.')).toBeInTheDocument());
   });
@@ -83,10 +85,7 @@ describe('AggregationWizard', () => {
   it('should require metric field when metric function is not count', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await addElement('Metric');
 
     const functionSelect = await screen.findByLabelText('Select a function');
     await selectEvent.openMenu(functionSelect);
@@ -130,7 +129,7 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const nameInput = await screen.findByLabelText('Name');
+    const nameInput = await screen.findByLabelText(/Name/);
     const functionSelect = screen.getByLabelText('Select a function');
     const fieldSelect = screen.getByLabelText('Select a field');
 
@@ -208,7 +207,7 @@ describe('AggregationWizard', () => {
     fireEvent.click(addMetricButton);
 
     await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
-    const newNameInput = screen.getAllByLabelText('Name')[1];
+    const newNameInput = screen.getAllByLabelText(/Name/)[1];
     const newFunctionSelect = screen.getAllByLabelText('Select a function')[1];
     const newFieldSelect = screen.getAllByLabelText('Select a field')[1];
 
@@ -231,6 +230,30 @@ describe('AggregationWizard', () => {
           .config(SeriesConfig.empty().toBuilder().name('New function').build())
           .build(),
       ])
+      .build();
+
+    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should remove metric', async () => {
+    const onChangeMock = jest.fn();
+    const config = widgetConfig
+      .toBuilder()
+      .series([Series.create('count')])
+      .build();
+    renderSUT({ config, onChange: onChangeMock });
+
+    const removeMetricElementButton = screen.getByRole('button', { name: 'Remove Metric' });
+    userEvent.click(removeMetricElementButton);
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    userEvent.click(applyButton);
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .series([])
       .build();
 
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));

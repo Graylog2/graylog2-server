@@ -99,10 +99,6 @@ const MetricElement: AggregationElement = {
   fromConfig: (config: AggregationWidgetConfig) => ({
     metrics: seriesToMetrics(config.series),
   }),
-  onRemove: ((index, formValues) => ({
-    ...formValues,
-    metrics: formValues.metrics.filter((value, i) => index !== i),
-  })),
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
     .series(metricsToSeries(formValues.metrics)),
   component: MetricsConfiguration,
