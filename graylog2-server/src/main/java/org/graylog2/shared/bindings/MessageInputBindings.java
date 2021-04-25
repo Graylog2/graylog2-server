@@ -37,6 +37,7 @@ import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.inputs.transports.TransportsModule;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.inputs.gelf.http.GELFHttpBatchInput;
 
 public class MessageInputBindings extends Graylog2Module {
     @Override
@@ -61,6 +62,7 @@ public class MessageInputBindings extends Graylog2Module {
         installInput(inputMapBinder, GELFAMQPInput.class, GELFAMQPInput.Factory.class);
         installInput(inputMapBinder, GELFKafkaInput.class, GELFKafkaInput.Factory.class);
         installInput(inputMapBinder, JsonPathInput.class, JsonPathInput.Factory.class);
+        installInput(inputMapBinder, GELFHttpBatchInput.class, GELFHttpBatchInput.Factory.class);
 
         install(new BeatsInputPluginModule());
     }
