@@ -85,6 +85,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.14.0",
     "react-day-picker": "^7.4.8",
+    "react-error-boundary": "^3.1.1",
     "react-grid-layout": "^0.18.3",
     "react-immutable-proptypes": "^2.1.0",
     "react-isolated-scroll": "^0.1.1",
