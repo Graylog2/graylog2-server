@@ -152,7 +152,7 @@ const ConfigurationsPage = () => {
     const pluginPromises = pluginSystemConfigs
       .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
 
-    Promise.all([...promises, ...pluginPromises]).then(() => setLoaded(true));
+    Promise.allSettled([...promises, ...pluginPromises]).then(() => setLoaded(true));
   }, [permissions, pluginSystemConfigs]);
 
   let Output = (
