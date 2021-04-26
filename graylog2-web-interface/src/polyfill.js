@@ -14,28 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  presets: [
-    ['@babel/env', {
-      modules: false,
-      useBuiltIns: 'entry',
-      corejs: '3.9',
-    }],
-    '@babel/react',
-    '@babel/flow',
-  ],
-  plugins: [
-    '@babel/plugin-syntax-dynamic-import',
-    '@babel/plugin-proposal-class-properties',
-    'babel-plugin-styled-components',
-  ],
-  env: {
-    test: {
-      presets: ['@babel/env'],
-      plugins: [
-        'babel-plugin-dynamic-import-node',
-        '@babel/plugin-transform-runtime',
-      ],
-    },
-  },
-};
+import 'core-js';
+import 'regenerator-runtime/runtime';
