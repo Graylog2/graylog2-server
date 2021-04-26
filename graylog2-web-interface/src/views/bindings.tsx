@@ -153,9 +153,9 @@ const exports: PluginExports = {
       defaultWidth: 4,
       reportStyle: () => ({ width: 600 }),
       visualizationComponent: AggregationBuilder,
-      editComponent: AppConfig.isFeatureEnabled('aggregation-wizard')
-        ? AggregationWizard
-        : AggregationControls,
+      editComponent: AppConfig.isFeatureEnabled('legacy-aggregation-wizard')
+        ? AggregationControls
+        : AggregationWizard,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
         const flexibleHeightWidgets = [
