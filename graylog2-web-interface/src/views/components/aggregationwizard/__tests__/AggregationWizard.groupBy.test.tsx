@@ -31,6 +31,9 @@ import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
+const timeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
+jest.setTimeout(timeout);
+
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)

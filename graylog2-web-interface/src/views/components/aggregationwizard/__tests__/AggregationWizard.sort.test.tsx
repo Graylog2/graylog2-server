@@ -33,6 +33,9 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import AggregationWizard from '../AggregationWizard';
 
+const timeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
+jest.setTimeout(timeout);
+
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
 const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
