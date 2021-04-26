@@ -114,7 +114,7 @@ const ElementConfigurationSection = ({
   const title = sectionTitle ?? elementTitle;
 
   return (
-    <Wrapper data-testid={`${title}-configuration`}>
+    <Wrapper data-testid={`${title}-section`}>
       <Header $isEmpty={isEmpty}>
         <ElementTitle $isEmpty={isEmpty}>
           {title}

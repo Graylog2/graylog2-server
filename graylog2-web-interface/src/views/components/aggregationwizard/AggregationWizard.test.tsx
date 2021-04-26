@@ -92,7 +92,7 @@ describe('AggregationWizard', () => {
   it('should display newly selected aggregation element', async () => {
     renderSUT();
 
-    const metricsSection = await screen.findByTestId('Metrics-configuration');
+    const metricsSection = await screen.findByTestId('Metrics-section');
 
     expect(within(metricsSection).queryByText('Function')).not.toBeInTheDocument();
 
