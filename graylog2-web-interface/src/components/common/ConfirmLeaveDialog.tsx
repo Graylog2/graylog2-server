@@ -33,6 +33,10 @@ const ConfirmLeaveDialog = ({ question }: Props) => {
   const isLeavingPage = useCallback((newLocation) => (newLocation.pathname !== location.pathname ? question : true), [location.pathname, question]);
 
   const handleLeavePage = useCallback((e) => {
+    if (AppConfig.gl2DevMode()) {
+      return null;
+    }
+
     e.returnValue = question;
 
     return question;
