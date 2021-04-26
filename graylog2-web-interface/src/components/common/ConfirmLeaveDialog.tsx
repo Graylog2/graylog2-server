@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Prompt } from 'react-router-dom';
+import { Prompt, useLocation } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
 
 import AppConfig from 'util/AppConfig';
@@ -29,6 +29,9 @@ type Props = {
 };
 
 const ConfirmLeaveDialog = ({ question }: Props) => {
+  const location = useLocation();
+  const isLeavingPage = useCallback((newLocation) => (newLocation.pathname !== location.pathname ? question : true), [location.pathname, question]);
+
   const handleLeavePage = useCallback((e) => {
     if (AppConfig.gl2DevMode()) {
       return null;
@@ -48,7 +51,7 @@ const ConfirmLeaveDialog = ({ question }: Props) => {
   }, [handleLeavePage]);
 
   return (
-    <Prompt when={!AppConfig.gl2DevMode()} message={question} />
+    <Prompt when={!AppConfig.gl2DevMode()} message={isLeavingPage} />
   );
 };
 
