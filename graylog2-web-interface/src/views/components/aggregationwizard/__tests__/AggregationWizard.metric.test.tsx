@@ -44,7 +44,12 @@ const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
 jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({ count: { type: 'count' }, min: { type: 'min' }, max: { type: 'max' }, percentile: { type: 'percentile' } })),
+  getInitialState: jest.fn(() => ({
+    count: { type: 'count', description: 'Count' },
+    min: { type: 'min', description: 'Minimum' },
+    max: { type: 'max', description: 'Maximum' },
+    percentile: { type: 'percentile', description: 'Percentile' },
+  })),
   listen: jest.fn(),
 }));
 
@@ -89,7 +94,7 @@ describe('AggregationWizard', () => {
 
     const functionSelect = await screen.findByLabelText('Select a function');
     await selectEvent.openMenu(functionSelect);
-    await selectEvent.select(functionSelect, 'min');
+    await selectEvent.select(functionSelect, 'Minimum');
 
     await waitFor(() => expect(screen.getByText('Field is required for function min.')).toBeInTheDocument());
   });
@@ -137,7 +142,7 @@ describe('AggregationWizard', () => {
 
     await act(async () => {
       await selectEvent.openMenu(functionSelect);
-      await selectEvent.select(functionSelect, 'count');
+      await selectEvent.select(functionSelect, 'Count');
       await selectEvent.openMenu(fieldSelect);
       await selectEvent.select(fieldSelect, 'http_method');
     });
@@ -170,7 +175,7 @@ describe('AggregationWizard', () => {
 
     await act(async () => {
       await selectEvent.openMenu(functionSelect);
-      await selectEvent.select(functionSelect, 'percentile');
+      await selectEvent.select(functionSelect, 'Percentile');
       await selectEvent.openMenu(fieldSelect);
       await selectEvent.select(fieldSelect, 'http_method');
     });
@@ -215,7 +220,7 @@ describe('AggregationWizard', () => {
 
     await act(async () => {
       await selectEvent.openMenu(newFunctionSelect);
-      await selectEvent.select(newFunctionSelect, 'min');
+      await selectEvent.select(newFunctionSelect, 'Minimum');
       await selectEvent.openMenu(newFieldSelect);
       await selectEvent.select(newFieldSelect, 'http_method');
     });

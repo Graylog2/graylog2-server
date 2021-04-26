@@ -23,8 +23,10 @@ import { Store } from 'stores/StoreTypes';
 
 const functionsUrl = URLUtils.qualifyUrl('/views/functions');
 
+type AggregationFunction = { type: string, description: string };
+
 type AggregationFunctionsStoreState = {
-  [functionName: string]: { type: string } | undefined,
+  [functionName: string]: AggregationFunction | undefined,
 }
 
 const AggregationFunctionsStore: Store<AggregationFunctionsStoreState> = singletonStore(
