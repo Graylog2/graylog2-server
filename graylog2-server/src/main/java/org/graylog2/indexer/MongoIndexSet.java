@@ -104,12 +104,12 @@ public class MongoIndexSet implements IndexSet {
         // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
         if (isNullOrEmpty(config.indexMatchPattern())) {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
-            this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-            this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
+            this.indexPattern = Pattern.compile("^" + Pattern.quote(config.indexPrefix()) + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+            this.deflectorIndexPattern = Pattern.compile("^" + Pattern.quote(config.indexPrefix()) + SEPARATOR + "\\d+");
         } else {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
-            this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-            this.deflectorIndexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+");
+            this.indexPattern = Pattern.compile("^" + Pattern.quote(config.indexMatchPattern()) + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+            this.deflectorIndexPattern = Pattern.compile("^" + Pattern.quote(config.indexMatchPattern()) + SEPARATOR + "\\d+");
         }
 
         // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
