@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 const WidgetWrap = styled.div(({ theme }) => css`
   height: inherit;
   margin: 0;
-  padding: 12px 15px 15px 15px;
+  padding: 12px 15px 6px 15px;
   display: flex;
   flex-direction: column;
 
@@ -176,6 +176,7 @@ export default class extends React.Component {
 
     return (
       <WidgetWrap ref={(elem) => { this._widgetNode = elem; }}
+                  style={{ overflow: 'hidden' }}
                   data-widget-id={widgetId}>
         {children}
       </WidgetWrap>

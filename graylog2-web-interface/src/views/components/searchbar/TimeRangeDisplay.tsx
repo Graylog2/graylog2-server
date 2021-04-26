@@ -22,6 +22,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import StoreProvider from 'injection/StoreProvider';
 import { isTypeKeyword, isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import { readableRange } from 'views/logic/queries/TimeRangeToString';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
@@ -54,11 +55,6 @@ const TimeRangeWrapper = styled.p(({ theme }) => css`
   }
 `);
 
-const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
-  return !timerange[fieldName] ? placeholder : DateTime.now()
-    .subtract(timerange[fieldName] * 1000)
-    .fromNow();
-};
 
 const dateOutput = (timerange: TimeRange) => {
   let from = EMPTY_RANGE;
