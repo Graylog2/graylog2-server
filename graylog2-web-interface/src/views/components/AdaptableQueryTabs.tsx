@@ -219,6 +219,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                    title={<Icon name="ellipsis-h" />}
                    className="query-tabs-more"
                    id="query-tabs-more"
+                   aria-label="More Dashboard Tabs"
                    noCaret
                    pullRight
                    active={openedMore}

@@ -22,11 +22,12 @@ import styled from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import { Col, Row } from 'components/graylog';
-import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import Query, { QueryId } from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
-import AdaptableQueryTabs from 'views/AdaptableQueryTabs';
+
+import QueryTitleEditModal from './queries/QueryTitleEditModal';
+import AdaptableQueryTabs from './AdaptableQueryTabs';
 
 type Props = {
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
