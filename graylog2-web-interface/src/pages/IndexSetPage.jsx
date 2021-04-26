@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 import numeral from 'numeral';
@@ -30,6 +31,9 @@ import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import connect from 'stores/connect';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
+import type { Indices } from 'stores/indices/IndicesStore';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesStore, IndicesActions } = CombinedProvider.get('Indices');
@@ -37,23 +41,50 @@ const { IndexerOverviewStore, IndexerOverviewActions } = CombinedProvider.get('I
 
 const REFRESH_INTERVAL = 2000;
 
-class IndexSetPage extends React.Component {
+type Props = {
+  params: {
+    indexSetId: ?string,
+  },
+  indexSet: ?IndexSet,
+  indexerOverview: ?IndexerOverview,
+  indexerOverviewError: ?string,
+  indexDetails: {
+    closedIndices: ?Indices,
+    indices: ?Indices,
+  },
+};
+
+type State = {
+  timerId: ?IntervalID,
+};
+
+class IndexSetPage extends React.Component<Props, State> {
   static propTypes = {
-    params: PropTypes.object.isRequired,
+    params: PropTypes.shape({
+      indexSetId: PropTypes.string,
+    }).isRequired,
     indexSet: PropTypes.object,
     indexerOverview: PropTypes.object,
     indexerOverviewError: PropTypes.object,
+    indexDetails: PropTypes.object,
   };
 
   static defaultProps = {
     indexerOverview: undefined,
     indexerOverviewError: undefined,
     indexSet: undefined,
+    indexDetails: {
+      indices: undefined,
+      closedIndices: undefined,
+    },
   }
 
   constructor(props) {
     super(props);
-    this.indexSet = undefined;
+
+    this.state = {
+      timerId: undefined,
+    };
   }
 
   componentDidMount() {
@@ -61,22 +92,25 @@ class IndexSetPage extends React.Component {
     IndexSetsActions.get(indexSetId);
     IndicesActions.list(indexSetId);
 
-    this.timerId = setInterval(() => {
+    const timerId = setInterval(() => {
       IndicesActions.multiple();
       IndexerOverviewActions.list(indexSetId);
     }, REFRESH_INTERVAL);
+    this.setState({ timerId: timerId });
   }
 
   componentWillUnmount() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
+    const { timerId } = this.state;
+
+    if (timerId) {
+      clearInterval(timerId);
     }
   }
 
   _totalIndexCount = () => {
     const { indexerOverview: indices } = this.props;
 
-    return Object.keys(indices).length;
+    return indices ? Object.keys(indices).length : null;
   };
 
   _renderElasticsearchUnavailableInformation = () => {
@@ -116,7 +150,7 @@ class IndexSetPage extends React.Component {
 
     const { indexSet, indexerOverview, indexerOverviewError, params: { indexSetId }, indexDetails: { indices, closedIndices } } = this.props;
 
-    const pageHeader = (
+    const pageHeader = indexSet && (
       <PageHeader title={`Index Set: ${indexSet?.title}`}>
         <span>
           This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
@@ -183,7 +217,7 @@ class IndexSetPage extends React.Component {
     }
 
     return (
-      <DocumentTitle title={`Index Set - ${indexSet.title}`}>
+      <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
         <div>
           {pageHeader}
 

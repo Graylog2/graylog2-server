@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// @flow strict
 import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
@@ -22,6 +23,49 @@ import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const IndexerOverviewActions = ActionsProvider.getActions('IndexerOverview');
+
+export type Indice = {
+  size: {
+    events: number,
+    deleted: number,
+    bytes: number,
+  },
+  range: {
+    index_name: string,
+    begin: string,
+    end: string,
+    calculated_at: string,
+    took_ms: number,
+  },
+  is_deflector: boolean,
+  is_closed: boolean,
+  is_reopened: boolean,
+};
+
+export type IndexerOverview = {
+  deflector: {
+    current_target: string,
+    is_up: boolean,
+  },
+  indexer_cluster: {
+    health: {
+      status: string,
+      name: string,
+      shards: {
+        active: number,
+        initializing: number,
+        relocating: number,
+        unassigned: number,
+      },
+    },
+  },
+  counts: {
+    [key: string]: number,
+  },
+  indices: {
+    [key: string]: Indice,
+  },
+};
 
 const IndexerOverviewStore = Reflux.createStore({
   listenables: [IndexerOverviewActions],
@@ -35,12 +79,12 @@ const IndexerOverviewStore = Reflux.createStore({
     };
   },
 
-  list(indexSetId) {
+  list(indexSetId: string) {
     const url = qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
     const promise = fetch('GET', url);
 
     promise.then(
-      (response) => {
+      (response: IndexerOverview) => {
         this.trigger({ indexerOverview: response, indexerOverviewError: undefined });
       },
       (error) => {
