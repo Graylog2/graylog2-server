@@ -92,6 +92,10 @@ public interface Event extends Indexable {
 
     boolean hasField(String name);
 
+    Map<String, String> getGroupByFields();
+
+    void setGroupByFields(Map<String, String> fields);
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -101,6 +105,7 @@ public interface Event extends Indexable {
         from.streams().forEach(event::addStream);
         from.sourceStreams().forEach(event::addSourceStream);
         event.setFields(from.fields());
+        event.setGroupByFields(from.groupByFields());
         event.setPriority(from.priority());
 
         from.timerangeStart().ifPresent(event::setTimerangeStart);
