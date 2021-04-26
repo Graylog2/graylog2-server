@@ -15,10 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { chunk } from 'lodash';
-import { ErrorBoundary } from 'react-error-boundary';
-import { SystemConfiguration } from 'views/types';
+import { useEffect, useState } from 'react';
 
 import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -35,6 +32,9 @@ import style from 'components/configurations/ConfigurationStyles.lazy.css';
 import { Store } from 'stores/StoreTypes';
 import usePluginEntities from 'views/logic/usePluginEntities';
 
+import ConfigletContainer from './configurations/ConfigletContainer';
+import PluginConfigRows from './configurations/PluginConfigRows';
+
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
@@ -46,39 +46,7 @@ const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration'
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
-type ErrorFallbackProps = {
-  error: {
-    message: string,
-  },
-  title: string,
-};
-
-const ErrorFallback = ({ error, title }: ErrorFallbackProps) => (
-  <>
-    <h2>{title}</h2>
-    <p>Something went wrong:</p>
-    <pre>{error.message}</pre>
-  </>
-);
-
-type BoundaryProps = {
-  children: React.ReactNode,
-  title: string,
-}
-
-const Boundary = ({ children, title }: BoundaryProps) => (
-  <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>
-    {children}
-  </ErrorBoundary>
-);
-
-const ConfigletContainer = ({ children, title }: BoundaryProps) => (
-  <Col md={6}>
-    <Boundary title={title}>
-      {children}
-    </Boundary>
-  </Col>
-);
+const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
 const _onUpdate = (configType: string) => {
   return (config) => {
@@ -91,38 +59,6 @@ const _onUpdate = (configType: string) => {
         return ConfigurationsActions.update(configType, config);
     }
   };
-};
-
-const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
-
-const _pluginConfigs = (systemConfigs, configuration) => systemConfigs
-  .map(({ component: SystemConfigComponent, configType }) => (
-    <ConfigletContainer title={configType}>
-      <SystemConfigComponent key={`system-configuration-${configType}`}
-                             config={_getConfig(configType, configuration) ?? undefined}
-                             updateConfig={_onUpdate(configType)} />
-    </ConfigletContainer>
-  ));
-
-type PluginConfigRowsProps = {
-  configuration: Record<string, any>,
-  systemConfigs: Array<SystemConfiguration>,
-};
-
-const PluginConfigRows = ({ configuration, systemConfigs }: PluginConfigRowsProps) => {
-  const pluginConfigs = useMemo(() => _pluginConfigs(systemConfigs, configuration), [configuration, systemConfigs]);
-
-  // Put two plugin config components per row.
-  const configRows = chunk(pluginConfigs, 2)
-    .map((configChunk, idx) => (
-      // eslint-disable-next-line react/no-array-index-key
-      <Row key={`plugin-config-row-${idx}`}>
-        {configChunk[0]}
-        {configChunk[1]}
-      </Row>
-    ));
-
-  return <>{configRows}</>;
 };
 
 const ConfigurationsPage = () => {
