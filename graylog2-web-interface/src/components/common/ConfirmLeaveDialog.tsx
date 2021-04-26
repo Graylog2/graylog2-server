@@ -47,7 +47,7 @@ const ConfirmLeaveDialog = ({ question }: Props) => {
   }, [handleLeavePage]);
 
   return (
-    <Prompt message={isLeavingPage} />
+    <Prompt when={!AppConfig.gl2DevMode()} message={isLeavingPage} />
   );
 };
 
