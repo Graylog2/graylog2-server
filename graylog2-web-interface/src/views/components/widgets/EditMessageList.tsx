@@ -70,7 +70,7 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
 
   return (
-    <Row style={{ height: '100%', paddingBottom: '15px' }}>
+    <Row style={{ height: '100%', paddingBottom: '15px', flex: 1 }}>
       <FullHeightCol md={3}>
         <DescriptionBox description="Fields">
           <FieldSelect fields={fields}

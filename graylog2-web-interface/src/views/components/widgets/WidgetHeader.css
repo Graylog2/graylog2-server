@@ -1,8 +1,5 @@
 :local(.widgetHeader) {
     grid-column: 1;
-    grid-row: 1;
-    -ms-grid-column: 1;
-    -ms-grid-row: 1;
     font-size: 1.125rem; /* theme.fonts.size.large */
     text-overflow: ellipsis;
     /* Using padding instead of margin / grid-gap because of IE11 grid compatibility */
