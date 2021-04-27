@@ -33,8 +33,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import AggregationWizard from '../AggregationWizard';
 
-const timeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
-jest.setTimeout(timeout);
+const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
@@ -194,7 +193,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should require field when creating a sort element', async () => {
     renderSUT();
@@ -277,5 +276,5 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 });

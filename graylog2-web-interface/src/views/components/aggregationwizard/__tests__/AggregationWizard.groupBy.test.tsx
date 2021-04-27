@@ -31,8 +31,7 @@ import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
-const timeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
-jest.setTimeout(timeout);
+const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -126,7 +125,7 @@ describe('AggregationWizard', () => {
     await userEvent.click(autoCheckbox);
 
     await screen.findByRole('button', { name: /minutes/i });
-  });
+  }, extendedTimeout);
 
   it('should create group by with multiple groupings', async () => {
     const onChange = jest.fn();
@@ -163,7 +162,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should display group by with values from config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
@@ -256,5 +255,5 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 });
