@@ -150,12 +150,21 @@ interface ExportFormat {
   fileExtension: string;
 }
 
+interface SystemConfiguration {
+  configType: string;
+  component: React.ComponentType<{
+    config: any,
+    updateConfig: (newConfig: any) => any,
+  }>;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     fieldActions?: Array<ActionDefinition>;
     searchTypes?: Array<SearchType>;
+    systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.elements.header'?: Array<React.ComponentType>;

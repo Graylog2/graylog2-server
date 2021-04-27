@@ -37,7 +37,9 @@ const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({
 
 const Metric = ({ index }: Props) => {
   const functions = useStore(AggregationFunctionsStore);
-  const functionOptions = Object.values(functions).map(({ type }) => ({ label: type, value: type })).sort(sortByLabel);
+  const functionOptions = Object.values(functions)
+    .map(({ type, description }) => ({ label: description, value: type }))
+    .sort(sortByLabel);
 
   const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
   const currentFunction = metrics[index].function;

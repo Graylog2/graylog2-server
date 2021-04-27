@@ -33,11 +33,13 @@ const Container = styled.div`
 const _sortConfiguredElements = (
   values: WidgetConfigFormValues,
   aggregationElementsByKey: { [elementKey: string]: AggregationElement },
-) => Object.entries(values).sort(
-  ([elementKey1], [elementKey2]) => (
-    aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
-  ),
-);
+) => Object.keys(aggregationElementsByKey)
+  .map((elementKey) => [elementKey, values[aggregationElementsByKey[elementKey].key]])
+  .sort(
+    ([elementKey1], [elementKey2]) => (
+      aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
+    ),
+  );
 
 type Props = {
   aggregationElementsByKey: { [elementKey: string]: AggregationElement }
@@ -51,15 +53,13 @@ type Props = {
 }
 
 const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate }: Props) => {
-  const { values, setValues, dirty } = useFormikContext<WidgetConfigFormValues>();
+  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <Container>
       <div>
         {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-          if (isEmpty(elementFormValues)) {
-            return null;
-          }
+          const empty = isEmpty(elementFormValues);
 
           const aggregationElement = aggregationElementsByKey[elementKey];
 
@@ -71,6 +71,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
 
           return (
             <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
+                                         isEmpty={empty}
                                          onCreate={() => onCreate(aggregationElement.key, values, setValues)}
                                          elementTitle={aggregationElement.title}
                                          sectionTitle={aggregationElement.sectionTitle}
@@ -80,7 +81,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
           );
         })}
       </div>
-      {dirty && <ElementsConfigurationActions />}
+      <ElementsConfigurationActions />
     </Container>
   );
 };

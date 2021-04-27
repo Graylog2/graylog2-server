@@ -66,10 +66,10 @@ import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
@@ -86,6 +86,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -224,10 +227,18 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
-        final PutTemplate request = new PutTemplate.Builder(templateName, template).build();
+        final PutTemplate request = new PutTemplate.Builder(uncheckedURLEncode(templateName), template).build();
 
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to create index template " + templateName);
         return jestResult.isSucceeded();
+    }
+
+    private String uncheckedURLEncode(String templateName) {
+        try {
+            return URLEncoder.encode(templateName, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

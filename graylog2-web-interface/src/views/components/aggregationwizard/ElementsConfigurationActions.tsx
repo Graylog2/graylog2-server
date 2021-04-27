@@ -21,8 +21,12 @@ import styled, { css } from 'styled-components';
 
 import { ButtonToolbar } from 'components/graylog';
 import Button from 'components/graylog/Button';
+import AggregationElementSelect from 'views/components/aggregationwizard/AggregationElementSelect';
+import aggregationElements from 'views/components/aggregationwizard/aggregationElements';
 
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
+
+const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 
 const ConfigActions = styled.div<{ scrolledToBottom: boolean }>(({ theme, scrolledToBottom }) => css`
   position: sticky;
@@ -78,17 +82,49 @@ const useScrolledToBottom = (): {
   return { setScrolledToBottomIndicatorRef, scrolledToBottom };
 };
 
+const onCreateElement = (
+  elementKey: string,
+  values: WidgetConfigFormValues,
+  setValues: (formValues: WidgetConfigFormValues) => void,
+) => {
+  const aggregationElement = aggregationElementsByKey[elementKey];
+
+  if (aggregationElement?.onCreate) {
+    setValues(aggregationElement.onCreate(values));
+  } else {
+    setValues({
+      ...values,
+      [elementKey]: [
+        ...(values[elementKey] ?? []),
+        {},
+      ],
+    });
+  }
+};
+
+const SelectContainer = styled.div`
+  margin-left: 5px;
+`;
+
 const ElementsConfigurationActions = () => {
-  const { isSubmitting, isValid } = useFormikContext<WidgetConfigFormValues>();
+  const { dirty, isSubmitting, isValid, values, setValues } = useFormikContext<WidgetConfigFormValues>();
   const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
 
   return (
     <>
       <ConfigActions scrolledToBottom={scrolledToBottom}>
         <ButtonToolbar>
+          <SelectContainer data-testid="add-element-section" className="pull-left">
+            <AggregationElementSelect onSelect={(elementKey) => onCreateElement(elementKey, values, setValues)}
+                                      aggregationElements={aggregationElements}
+                                      formValues={values} />
+          </SelectContainer>
+
+          {dirty && (
           <Button bsStyle="primary" className="pull-right" type="submit" disabled={!isValid || isSubmitting}>
             {isSubmitting ? 'Applying Changes' : 'Apply Changes'}
           </Button>
+          )}
         </ButtonToolbar>
       </ConfigActions>
       <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />

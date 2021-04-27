@@ -50,6 +50,11 @@ const widgetConfig = AggregationWidgetConfig
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
+const addSortElement = async () => {
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
+};
+
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
     <FieldTypesContext.Provider value={fieldTypes}>
@@ -125,10 +130,7 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Sort');
+    await addSortElement();
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const newSortFieldSelect = within(newSortContainer).getByLabelText('Select field for sorting');
@@ -194,10 +196,7 @@ describe('AggregationWizard', () => {
   it('should require field when creating a sort element', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Sort');
+    await addSortElement();
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
@@ -208,10 +207,7 @@ describe('AggregationWizard', () => {
   it('should require direction when creating a sort element', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Sort');
+    await addSortElement();
 
     const newSortContainer = await screen.findByTestId('sort-element-0');
     const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });

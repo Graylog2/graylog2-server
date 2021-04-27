@@ -17,6 +17,7 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
+import userEvent from '@testing-library/user-event';
 
 import AggregationElementSelect from './AggregationElementSelect';
 import type { AggregationElement } from './aggregationElements/AggregationElementType';
@@ -46,10 +47,9 @@ describe('AggregationElementSelect', () => {
                                      formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
 
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
 
     expect(onSelectMock).toHaveBeenCalledTimes(1);
     expect(onSelectMock).toHaveBeenCalledWith('metric');
@@ -60,9 +60,7 @@ describe('AggregationElementSelect', () => {
                                      formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
+    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
 
     expect(screen.queryByText('Sort')).not.toBeInTheDocument();
     expect(screen.getByText('Metric')).toBeInTheDocument();

@@ -14,10 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import 'core-js';
-import 'regenerator-runtime/runtime';
+import SortableList from './SortableList';
 
-// To support IE11 (remove if support is dropped)
-import 'promise-polyfill/src/polyfill';
-import 'whatwg-fetch';
-import 'intersection-observer';
+export default SortableList;
