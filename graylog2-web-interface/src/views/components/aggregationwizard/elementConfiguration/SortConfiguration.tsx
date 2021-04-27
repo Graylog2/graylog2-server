@@ -33,8 +33,8 @@ const SortConfiguration = () => {
                 render={({ remove }) => (
                   <SortableList items={sort}
                                 onMoveItem={(newSort) => setFieldValue('sort', newSort)}
-                                customListItemRender={({ index, dragHandleProps, draggableProps, className, ref }) => (
-                                  <ElementConfigurationContainer key={`sort-${index}`}
+                                customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+                                  <ElementConfigurationContainer key={`sort-${item.id}`}
                                                                  dragHandleProps={dragHandleProps}
                                                                  draggableProps={draggableProps}
                                                                  className={className}

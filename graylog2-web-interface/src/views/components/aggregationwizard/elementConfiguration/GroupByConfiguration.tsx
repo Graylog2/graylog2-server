@@ -54,29 +54,28 @@ const GroupByConfiguration = () => {
 
   return (
     <>
-      {!isEmpty
-      && (
-      <Field name="groupBy.columnRollup">
-        {({ field: { name, onChange, value } }) => (
-          <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
-                                 checked={value}
-                                 disabled={disableColumnRollup}>
-            <RollupColumnsLabel>
-              Rollup Columns
-              <RollupHoverForHelp title="Rollup Columns">
-                When rollup is enabled, an additional trace totalling individual subtraces will be included.
-              </RollupHoverForHelp>
-            </RollupColumnsLabel>
-          </RollupColumnsCheckbox>
-        )}
-      </Field>
+      {!isEmpty && (
+        <Field name="groupBy.columnRollup">
+          {({ field: { name, onChange, value } }) => (
+            <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
+                                   checked={value}
+                                   disabled={disableColumnRollup}>
+              <RollupColumnsLabel>
+                Rollup Columns
+                <RollupHoverForHelp title="Rollup Columns">
+                  When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                </RollupHoverForHelp>
+              </RollupColumnsLabel>
+            </RollupColumnsCheckbox>
+          )}
+        </Field>
       )}
       <FieldArray name="groupBy.groupings"
                   render={() => (
                     <SortableList items={groupBy?.groupings}
                                   onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
-                                  customListItemRender={({ index, dragHandleProps, draggableProps, className, ref }) => (
-                                    <ElementConfigurationContainer key={`grouping-${index}`}
+                                  customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+                                    <ElementConfigurationContainer key={`grouping-${item.id}`}
                                                                    dragHandleProps={dragHandleProps}
                                                                    draggableProps={draggableProps}
                                                                    className={className}
