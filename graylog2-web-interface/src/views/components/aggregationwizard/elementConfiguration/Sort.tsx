@@ -56,7 +56,7 @@ type Option = {
   value: number,
 };
 
-const Sort = ({ index }: Props) => {
+const Sort = React.memo(({ index }: Props) => {
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const { metrics = [], groupBy: { groupings = [] } = {} } = values;
   const metricsOptions: Array<OptionValue> = metrics.map(formatSeries).map(({ field, label }) => ({ type: 'metric', field, label }));
@@ -119,6 +119,6 @@ const Sort = ({ index }: Props) => {
       </Field>
     </div>
   );
-};
+});
 
-export default React.memo(Sort);
+export default Sort;

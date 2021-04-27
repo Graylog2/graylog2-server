@@ -31,7 +31,7 @@ type Props = {
   index: number,
 }
 
-const GroupBy = ({ index }: Props) => {
+const GroupBy = React.memo(({ index }: Props) => {
   const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
   const fieldType = groupBy.groupings[index].field.type;
 
@@ -48,6 +48,6 @@ const GroupBy = ({ index }: Props) => {
       )}
     </Wrapper>
   );
-};
+});
 
-export default React.memo(GroupBy);
+export default GroupBy;
