@@ -43,4 +43,6 @@ public @interface ApiIntegrationTest {
     Class<? extends ElasticsearchInstanceFactory> elasticsearchFactory();
 
     Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
+
+    Class<? extends MavenProjectDirProvider> mavenProjectDirProvider() default DefaultMavenProjectDirProvider.class;
 }

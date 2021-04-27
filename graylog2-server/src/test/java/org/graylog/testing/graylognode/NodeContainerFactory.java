@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
@@ -49,9 +50,10 @@ public class NodeContainerFactory {
     // sha2 for password "admin"
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
-    public static GenericContainer<?> buildContainer(NodeContainerConfig config, List<Path> pluginJars) {
+    public static GenericContainer<?> buildContainer(NodeContainerConfig config, List<Path> pluginJars,
+            Path mavenProjectDir) {
         if (!config.skipPackaging) {
-            MavenPackager.packageJarIfNecessary(property("server_project_dir"));
+            MavenPackager.packageJarIfNecessary(mavenProjectDir);
         } else {
             LOG.info("Skipping packaging");
         }

@@ -70,7 +70,8 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
     private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation) {
         final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
-        return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars);
+        final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
+        return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars, mavenProjectDir);
     }
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
