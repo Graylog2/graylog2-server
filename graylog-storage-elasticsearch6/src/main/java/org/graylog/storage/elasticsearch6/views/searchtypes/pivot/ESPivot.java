@@ -76,6 +76,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
     private static final String TERMS_SEPARATOR = "\u2E31";
 
+    private static final String ROWS_POSTFIX = "-rows";
+    private static final String COLUMNS_POSTFIX = "-columns";
+
+
     private static TimeRange allMessagesTimeRange() {
         try {
             return RelativeRange.create(0);
@@ -110,7 +114,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         }
 
         final String rowsAggregationName = queryContext.nextName();
-        contextMap.put(pivot.id() + "-rows", rowsAggregationName);
+        contextMap.put(pivot.id() + ROWS_POSTFIX, rowsAggregationName);
 
         final List<Order> bucketOrder = orderListForPivot(pivot, queryContext);
         final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
@@ -123,7 +127,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         if (!pivot.columnGroups().isEmpty()) {
             final String columnsAggregationName = queryContext.nextName();
-            contextMap.put(pivot.id() + "-columns", columnsAggregationName);
+            contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
             final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
 
             seriesAggregations.forEach(columnsAggregation::subAggregation);
@@ -207,7 +211,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
 
         // valid queryContext and queryResult are expected
-        final String rowKey = pivot.id() + "-rows";
+        final String rowKey = pivot.id() + ROWS_POSTFIX;
         if(queryContext.contextMap().containsKey(rowKey)) {
             final String rowsAggName = queryContext.contextMap().get(rowKey).toString();
             final TermsAggregation rowsResult = queryResult.getAggregations().getTermsAggregation(rowsAggName);
@@ -224,7 +228,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                         .forEach(value -> rowBuilder.addValue(value));
                             }
                             if (!pivot.columnGroups().isEmpty()) {
-                                final String columnsKey = pivot.id() + "-columns";
+                                final String columnsKey = pivot.id() + COLUMNS_POSTFIX;
                                 if(queryContext.contextMap().containsKey(columnsKey)) {
                                     final String columnsAggName = queryContext.contextMap().get(columnsKey).toString();
                                     final TermsAggregation columnsResult = bucket.getTermsAggregation(columnsAggName);

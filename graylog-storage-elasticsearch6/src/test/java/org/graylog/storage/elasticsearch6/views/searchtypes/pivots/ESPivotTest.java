@@ -140,13 +140,8 @@ public class ESPivotTest {
     }
 
     @Test
-    @Ignore
-    // TODO: remove or change, test is no longer possible this way
     public void generatesQueryWhenOnlyColumnPivotsArePresent() {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = mock(ESValuesHandler.class);
-
-        bucketHandlers.put(Values.NAME, bucketHandler);
 
         when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
         when(queryContext.nextName()).thenReturn("agg-1");
@@ -155,7 +150,11 @@ public class ESPivotTest {
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
-        verify(bucketHandler, times(1)).createAggregation(eq("agg-1"), eq(pivot), eq(values), eq(this.esPivot), eq(queryContext), eq(query));
+        final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
+        extractAggregation(context, "values-agg")
+                .isEqualTo("Values{type=values, field=action, limit=10}");
+        extractAggregation(context, "values-agg.time-agg")
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=1.0}}");
     }
 
     private void mockBucketSpecGeneratesComparableString(ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler) {
@@ -196,35 +195,24 @@ public class ESPivotTest {
     }
 
     @Test
-    @Ignore
-    // TODO: remove or change, test is no longer possible this way
-    public void rowPivotsShouldBeNested() {
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> valuesBucketHandler = mock(ESValuesHandler.class);
-        mockBucketSpecGeneratesComparableString(valuesBucketHandler);
-        final ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> timeBucketHandler = mock(ESTimeHandler.class);
-        mockBucketSpecGeneratesComparableString(timeBucketHandler);
+    public void rowPivotsShouldBeInOneScriptedTerm() {
+        final String AGG_NAME = "agg-1";
+        final String ROW1_NAME = "timestamp";
+        final String ROW2_NAME = "action";
 
-        bucketHandlers.put(Values.NAME, valuesBucketHandler);
-        bucketHandlers.put(Time.NAME, timeBucketHandler);
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
         when(queryContext.searchSourceBuilder(pivot)).thenReturn(searchSourceBuilder);
-        when(queryContext.nextName()).thenReturn("time-agg", "values-agg");
+        when(queryContext.nextName()).thenReturn(AGG_NAME);
 
-        final Time time = Time.builder().field("timestamp").interval(AutoInterval.create()).build();
-        final Values values = Values.builder().field("action").limit(10).build();
+        final Time time = Time.builder().field(ROW1_NAME).interval(AutoInterval.create()).build();
+        final Values values = Values.builder().field(ROW2_NAME).limit(10).build();
         when(pivot.rowGroups()).thenReturn(ImmutableList.of(time, values));
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
-        verify(valuesBucketHandler, times(1)).createAggregation(eq("values-agg"), eq(pivot), eq(values), eq(this.esPivot), eq(queryContext), eq(query));
-        verify(timeBucketHandler, times(1)).createAggregation(eq("time-agg"), eq(pivot), eq(time), eq(this.esPivot), eq(queryContext), eq(query));
-
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
-        extractAggregation(context, "time-agg")
-                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=1.0}}");
-        extractAggregation(context, "time-agg.values-agg")
-                .isEqualTo("Values{type=values, field=action, limit=10}");
+        extractScriptedTerm(context, AGG_NAME).isEqualTo("doc['" + ROW1_NAME + "'].value + '⸱' + doc['" + ROW2_NAME + "'].value");
     }
 
     @Test
@@ -320,6 +308,11 @@ public class ESPivotTest {
 
     private AbstractCharSequenceAssert<?, String> extractAggregation(DocumentContext context, String path) {
         final String fullPath = Stream.of(path.split("\\.")).map(s -> "['aggregations']['" + s + "']").reduce("$", (s1, s2) -> s1 + s2) + "['filter']['exists']['field']";
+        return JsonPathAssert.assertThat(context).jsonPathAsString(fullPath);
+    }
+
+    private AbstractCharSequenceAssert<?, String> extractScriptedTerm(DocumentContext context, String path) {
+        final String fullPath = Stream.of(path.split("\\.")).map(s -> "['aggregations']['" + s + "']").reduce("$", (s1, s2) -> s1 + s2) + "['terms']['script']['source']";
         return JsonPathAssert.assertThat(context).jsonPathAsString(fullPath);
     }
 
