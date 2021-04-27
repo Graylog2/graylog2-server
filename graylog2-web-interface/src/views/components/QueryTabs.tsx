@@ -20,6 +20,8 @@ import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { SizeMe } from 'react-sizeme';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import { List } from 'immutable';
 
 import { Col, Row } from 'components/graylog';
 import Query, { QueryId } from 'views/logic/queries/Query';
@@ -33,7 +35,7 @@ export interface QueryTabsProps {
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  queries: Array<QueryId>,
+  queries: List<QueryId>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
 }
@@ -79,7 +81,7 @@ QueryTabs.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
-  queries: PropTypes.object.isRequired,
+  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   selectedQueryId: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
 };

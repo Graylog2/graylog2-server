@@ -18,6 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useEffect, useMemo, useState, useRef, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { QueryId } from 'views/logic/queries/Query';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
@@ -159,7 +160,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
     const menuItems = [];
     const lockedItems = [];
 
-    Array.from(queries).forEach((id, index) => {
+    queries.forEach((id, index) => {
       const openTitleEditModal = (activeQueryTitle: string) => {
         if (queryTitleEditModal) {
           queryTitleEditModal.current.open(activeQueryTitle);
@@ -249,7 +250,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
 
 AdaptableQueryTabs.propTypes = {
   maxWidth: PropTypes.number.isRequired,
-  queries: PropTypes.object.isRequired,
+  queries: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   titles: PropTypes.object.isRequired,
   selectedQueryId: PropTypes.string.isRequired,
   onRemove: PropTypes.func.isRequired,

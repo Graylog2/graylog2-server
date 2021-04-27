@@ -17,17 +17,20 @@
 
 import { render, screen } from 'wrappedTestingLibrary';
 import React from 'react';
-import Immutable from 'immutable';
+import Immutable, { Map } from 'immutable';
+
+import { TitlesMap } from 'views/stores/TitleTypes';
 
 import AdaptableQueryTabs from './AdaptableQueryTabs';
 import QueryTitleEditModal from './queries/QueryTitleEditModal';
 
 const DEFAULT_PROPS = {
   maxWidth: 100,
-  queries: ['qwerty', 'asdfgh', 'zxcvbn'],
+  queries: Immutable.List(['qwerty', 'asdfgh', 'zxcvbn']),
   titles: Immutable.Map<string, string>([['qwerty', 'Tab 1'], ['asdfgh', 'Tab 2'], ['zxcvbn', 'Tab 3']]),
   selectedQueryId: 'qwerty',
   onRemove: () => Promise.resolve(),
+  onTitleChange: () => Promise.resolve(Map(['tab', Map(['qwerty', 'Tab 1'])]) as TitlesMap),
   onSelect: (id: string) => Promise.resolve(id),
   queryTitleEditModal: React.createRef<QueryTitleEditModal>(),
 };
