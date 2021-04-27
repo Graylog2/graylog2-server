@@ -22,11 +22,8 @@ const WidgetWrap = styled.div(({ theme }) => css`
   height: inherit;
   margin: 0;
   padding: 12px 15px 15px 15px;
-  display: grid;
-  display: -ms-grid;
-  grid-template-rows: auto minmax(10px, 1fr);
-  -ms-grid-rows: auto minmax(10px, 1fr);
-  -ms-grid-columns: 1fr;
+  display: flex;
+  flex-direction: column;
 
   .widget-top {
     position: relative;
@@ -179,7 +176,6 @@ export default class extends React.Component {
 
     return (
       <WidgetWrap ref={(elem) => { this._widgetNode = elem; }}
-                  style={{ overflow: 'hidden' }}
                   data-widget-id={widgetId}>
         {children}
       </WidgetWrap>

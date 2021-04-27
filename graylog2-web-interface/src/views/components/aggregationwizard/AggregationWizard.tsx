@@ -33,11 +33,6 @@ const _initialFormValues = (config: AggregationWidgetConfig) => {
   }), {});
 };
 
-const Wrapper = styled.div`
-  height: 100%;
-  display: flex;
-`;
-
 const Controls = styled.div`
   height: 100%;
   min-width: 315px;
@@ -108,7 +103,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   const initialFormValues = _initialFormValues(config);
 
   return (
-    <Wrapper>
+    <>
       <Controls>
         <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
                           initialValues={initialFormValues}
@@ -128,7 +123,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
       <Visualization>
         {children}
       </Visualization>
-    </Wrapper>
+    </>
   );
 };
 

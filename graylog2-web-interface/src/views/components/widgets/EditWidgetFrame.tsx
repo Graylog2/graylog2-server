@@ -30,40 +30,21 @@ import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 
 const Container = styled.div`
-  display: grid;
-  display: -ms-grid;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  grid-template-columns: 1fr;
-  -ms-grid-columns: 1fr;
-  grid-template-rows: auto minmax(200px, 1fr) auto;
-  -ms-grid-rows: auto minmax(200px, 1fr) auto;
-  grid-template-areas: "Query-Controls" "Visualization" "Footer";
+  flex: 1;
+  overflow: hidden;
 `;
 
 const QueryControls = styled.div`
   margin-bottom: 10px;
-  grid-area: Query-Controls;
-  grid-column: 1;
-  -ms-grid-column: 1;
-  grid-row: 1;
-  -ms-grid-row: 1;
 `;
 
 const Visualization = styled.div`
-  grid-area: Visualization;
+  display: flex;
+  flex 1;
   overflow: hidden;
-  grid-column: 1;
-  -ms-grid-column: 1;
-  grid-row: 2;
-  -ms-grid-row: 2;
-`;
-
-const Footer = styled.div`
-  grid-area: Footer;
-  grid-column: 1;
-  -ms-grid-column: 1;
-  grid-row: 3;
-  -ms-grid-row: 3;
 `;
 
 type Props = {
@@ -95,16 +76,14 @@ const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
             </QueryEditModeContext.Provider>
           </QueryControls>
         </IfDashboard>
-        <Visualization>
-          <div role="presentation" style={{ height: '100%' }}>
-            <WidgetOverrideElements>
-              {children}
-            </WidgetOverrideElements>
-          </div>
+        <Visualization role="presentation">
+          <WidgetOverrideElements>
+            {children}
+          </WidgetOverrideElements>
         </Visualization>
-        <Footer>
+        <div>
           <SaveOrCancelButtons onFinish={onFinish} onCancel={onCancel} disableSave={hasErrors} />
-        </Footer>
+        </div>
       </Container>
     </ValidationStateContext.Provider>
   );

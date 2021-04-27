@@ -138,10 +138,9 @@ const Table = styled.table(({ theme }) => css`
 `);
 
 const TableWrapper = styled.div(({ theme }) => css`
-  grid-row: 1;
-  -ms-grid-row: 1;
-  grid-column: 1;
-  -ms-grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 
   @media screen and (max-width: ${theme.breakpoints.max.md}) {
     &.table-responsive {
