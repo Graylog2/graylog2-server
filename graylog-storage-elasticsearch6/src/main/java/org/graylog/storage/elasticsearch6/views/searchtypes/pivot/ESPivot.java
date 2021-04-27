@@ -79,7 +79,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final String ROWS_POSTFIX = "-rows";
     private static final String COLUMNS_POSTFIX = "-columns";
 
-
     private static TimeRange allMessagesTimeRange() {
         try {
             return RelativeRange.create(0);
@@ -123,7 +122,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             seriesAggregations.forEach(rowsAggregation::subAggregation);
         }
 
-        searchSourceBuilder.aggregation(rowsAggregation);
+        // If the rowGroups does not have at least one field, the script stays empty ("") which leads to an error in ES
+        if(pivotHasFields(pivot.rowGroups()))
+            searchSourceBuilder.aggregation(rowsAggregation);
 
         if (!pivot.columnGroups().isEmpty()) {
             final String columnsAggregationName = queryContext.nextName();
@@ -147,6 +148,12 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .map(BucketSpec::field)
                 .map(field -> "doc['" + field + "'].value")
                 .collect(Collectors.joining(" + '" + TERMS_SEPARATOR + "' + "));
+    }
+
+    private Boolean pivotHasFields(List<BucketSpec> pivots) {
+        return pivots.stream()
+                .map(BucketSpec::field)
+                .findAny().isPresent();
     }
 
     private AggregationBuilder createAggregation(String name, List<BucketSpec> pivots, List<Order> bucketOrder) {

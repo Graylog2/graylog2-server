@@ -77,6 +77,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
     private static final String TERMS_SEPARATOR = "\u2E31";
 
+    private static final String ROWS_POSTFIX = "-rows";
+    private static final String COLUMNS_POSTFIX = "-columns";
+
     private static TimeRange allMessagesTimeRange() {
         try {
             return RelativeRange.create(0);
@@ -112,7 +115,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         }
 
         final String rowsAggregationName = queryContext.nextName();
-        contextMap.put(pivot.id() + "-rows", rowsAggregationName);
+        contextMap.put(pivot.id() + ROWS_POSTFIX, rowsAggregationName);
 
         final List<BucketOrder> bucketOrder = orderListForPivot(pivot, queryContext);
         final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
@@ -121,11 +124,13 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             seriesAggregations.forEach(rowsAggregation::subAggregation);
         }
 
-        searchSourceBuilder.aggregation(rowsAggregation);
+        // If the rowGroups does not have at least one field, the script stays empty ("") which leads to an error in ES
+        if(pivotHasFields(pivot.rowGroups()))
+            searchSourceBuilder.aggregation(rowsAggregation);
 
         if (!pivot.columnGroups().isEmpty()) {
             final String columnsAggregationName = queryContext.nextName();
-            contextMap.put(pivot.id() + "-columns", columnsAggregationName);
+            contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
             final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
 
             seriesAggregations.forEach(columnsAggregation::subAggregation);
@@ -140,6 +145,12 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
 
+    }
+
+    private Boolean pivotHasFields(List<BucketSpec> pivots) {
+        return pivots.stream()
+                .map(BucketSpec::field)
+                .findAny().isPresent();
     }
 
     private AggregationBuilder createAggregation(String name, List<BucketSpec> pivots, List<BucketOrder> bucketOrder) {
@@ -240,7 +251,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
 
         // valid queryContext and queryResult are expected
-        final String rowKey = pivot.id() + "-rows";
+        final String rowKey = pivot.id() + ROWS_POSTFIX;
         if(queryContext.contextMap().containsKey(rowKey)) {
             final String rowsAggName = queryContext.contextMap().get(rowKey).toString();
             final MultiBucketsAggregation rowsResult = queryResult.getAggregations().get(rowsAggName);
@@ -257,7 +268,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                         .forEach(value -> rowBuilder.addValue(value));
                             }
                             if (!pivot.columnGroups().isEmpty()) {
-                                final String columnsKey = pivot.id() + "-columns";
+                                final String columnsKey = pivot.id() + COLUMNS_POSTFIX;
                                 if(queryContext.contextMap().containsKey(columnsKey)) {
                                     final String columnsAggName = queryContext.contextMap().get(columnsKey).toString();
                                     final MultiBucketsAggregation columnsResult = bucket.getAggregations().get(columnsAggName);
