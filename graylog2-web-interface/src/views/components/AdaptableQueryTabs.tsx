@@ -15,26 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { useEffect, useMemo, useState, useRef, ReactNode } from 'react';
-import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
-import ViewState from 'views/logic/views/ViewState';
-import Query, { QueryId } from 'views/logic/queries/Query';
+import { QueryId } from 'views/logic/queries/Query';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import { Nav, NavItem, MenuItem } from 'components/graylog';
 import { ModifiedNavDropdown as NavDropdown } from 'components/graylog/NavDropdown';
 import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 
-interface Props {
+import { QueryTabsProps } from './QueryTabs';
+
+interface Props extends QueryTabsProps {
   maxWidth: number,
-  onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
-  onSelect: (queryId: string) => Promise<Query> | Promise<string>,
-  queries: Array<QueryId>,
   queryTitleEditModal: React.RefObject<QueryTitleEditModal>
-  selectedQueryId: string,
-  titles: Immutable.Map<string, string>,
 }
 
 interface TabsTypes {
@@ -45,6 +41,7 @@ interface TabsTypes {
 
 const CLASS_HIDDEN = 'hidden';
 const CLASS_LOCKED = 'locked';
+const NAV_PADDING = 15;
 
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
   &.nav.nav-tabs {
@@ -54,7 +51,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
     z-index: 2; /* without it renders under widget management icons */
     position: relative;
     margin-bottom: -1px;
-    padding-left: 15px;
+    padding-left: ${NAV_PADDING}px;
 
     > li {
       > a {
@@ -104,36 +101,33 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
 
 const adjustTabs = (maxWidth, lockedTab) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
-  const allTabs = dashboardTabs.querySelectorAll('li') as NodeListOf<HTMLElement>;
   const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)') as NodeListOf<HTMLElement>;
   const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li') as NodeListOf<HTMLElement>;
-  const lockedItems = dashboardTabs.querySelectorAll(`li.${CLASS_LOCKED}`);
   const moreBtn = dashboardTabs.querySelector('li.query-tabs-more') as HTMLElement;
   const newBtn = dashboardTabs.querySelector('li.query-tabs-new') as HTMLElement;
   const hiddenItems = [];
 
-  let currentWidth = moreBtn.offsetWidth + newBtn.offsetWidth + 15;
+  let buttonsWidth = moreBtn.offsetWidth + newBtn.offsetWidth + NAV_PADDING;
+  let topTabsWidth = 0;
 
-  if (lockedTab) {
-    currentWidth += tabItems[lockedTab].offsetWidth;
-  }
-
-  if (lockedItems.length) {
-    lockedItems.forEach((tabItem: HTMLElement) => {
-      currentWidth += tabItem.offsetWidth;
-    });
-  }
-
-  allTabs.forEach((tabItem) => {
+  tabItems.forEach((tabItem) => {
     tabItem.classList.remove(CLASS_HIDDEN);
+
+    if (lockedTab) {
+      const anchor = tabItem.querySelector('a');
+      const { tabId } = anchor.dataset;
+
+      if (tabId === lockedTab) {
+        buttonsWidth += tabItem.offsetWidth;
+      }
+    }
   });
 
-  tabItems.forEach((tabItem: HTMLElement, idx) => {
+  tabItems.forEach((tabItem, idx) => {
     if (!tabItem.classList.contains(CLASS_LOCKED)) {
-      currentWidth += tabItem.offsetWidth;
-      tabItem.classList.remove(CLASS_HIDDEN);
+      topTabsWidth += tabItem.offsetWidth;
 
-      if (maxWidth >= currentWidth) {
+      if (maxWidth >= topTabsWidth + buttonsWidth) {
         hiddenItems.splice(idx, 1);
       } else {
         tabItem.classList.add(CLASS_HIDDEN);
@@ -143,6 +137,8 @@ const adjustTabs = (maxWidth, lockedTab) => {
   });
 
   moreItems.forEach((tabItem: HTMLElement, idx) => {
+    tabItem.classList.remove(CLASS_HIDDEN);
+
     if (!hiddenItems.includes(idx)) {
       tabItem.classList.add(CLASS_HIDDEN);
     }
@@ -153,9 +149,9 @@ const adjustTabs = (maxWidth, lockedTab) => {
   }
 };
 
-const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal }:Props) => {
+const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal, onTitleChange }:Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
-  const [lockedTab, setLockedTab] = useState<number>();
+  const [lockedTab, setLockedTab] = useState<QueryId>();
   const currentTabs = useRef<TabsTypes>({ navItems: [], menuItems: [], lockedItems: [] });
 
   currentTabs.current = useMemo((): TabsTypes => {
@@ -170,8 +166,8 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
         }
       };
 
-      if (!titles.has(id) && lockedTab !== index && selectedQueryId === id) {
-        setLockedTab(index);
+      if (!titles.has(id) && lockedTab !== id && selectedQueryId === id) {
+        onTitleChange(id, `Page#${index + 1}`).then(() => setLockedTab(id));
       }
 
       const title = titles.get(id, `Page#${index + 1}`);
@@ -183,9 +179,10 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                     title={title} />
       );
 
-      navItems.push(lockedTab === index ? null : (
+      navItems.push(lockedTab === id ? null : (
         <NavItem eventKey={id}
                  key={id}
+                 data-tab-id={id}
                  onClick={() => {
                    setLockedTab(undefined);
                    onSelect(id);
@@ -193,23 +190,29 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
         </NavItem>
       ));
 
-      menuItems.push(lockedTab === index ? null : (
+      menuItems.push(lockedTab === id ? null : (
         <MenuItem eventKey={id}
                   key={id}
                   onClick={() => {
-                    setLockedTab(index);
+                    setLockedTab(id);
                     onSelect(id);
                   }}>{tabTitle}
         </MenuItem>
       ));
 
-      lockedItems.push(lockedTab !== index ? null : (
-        <NavItem eventKey={id} key={id} onClick={() => onSelect(id)} className={CLASS_LOCKED}>{tabTitle}</NavItem>
+      lockedItems.push(lockedTab !== id ? null : (
+        <NavItem eventKey={id}
+                 key={id}
+                 data-tab-id={id}
+                 onClick={() => onSelect(id)}
+                 className={CLASS_LOCKED}>
+          {tabTitle}
+        </NavItem>
       ));
     });
 
     return { navItems, menuItems, lockedItems };
-  }, [lockedTab, onRemove, onSelect, queries, queryTitleEditModal, selectedQueryId, titles]);
+  }, [lockedTab, onRemove, onSelect, onTitleChange, queries, queryTitleEditModal, selectedQueryId, titles]);
 
   useEffect(() => {
     adjustTabs(maxWidth, lockedTab);
@@ -242,6 +245,20 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
       </NavItem>
     </StyledQueryNav>
   );
+};
+
+AdaptableQueryTabs.propTypes = {
+  maxWidth: PropTypes.number.isRequired,
+  queries: PropTypes.object.isRequired,
+  titles: PropTypes.object.isRequired,
+  selectedQueryId: PropTypes.string.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  queryTitleEditModal: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.object }),
+  ]).isRequired,
+  onTitleChange: PropTypes.func.isRequired,
 };
 
 export default AdaptableQueryTabs;

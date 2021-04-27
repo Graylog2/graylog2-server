@@ -29,20 +29,20 @@ import ViewState from 'views/logic/views/ViewState';
 import QueryTitleEditModal from './queries/QueryTitleEditModal';
 import AdaptableQueryTabs from './AdaptableQueryTabs';
 
-type Props = {
+export interface QueryTabsProps {
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
   queries: Array<QueryId>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
-};
+}
 
 const StyledRow = styled(Row)`
   margin-bottom: 0;
 `;
 
-const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }:Props) => {
+const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId, titles }:QueryTabsProps) => {
   const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
 
   return (
@@ -57,7 +57,8 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
                                 selectedQueryId={selectedQueryId}
                                 onRemove={onRemove}
                                 onSelect={onSelect}
-                                queryTitleEditModal={queryTitleEditModal} />
+                                queryTitleEditModal={queryTitleEditModal}
+                                onTitleChange={onTitleChange} />
             );
           }}
         </SizeMe>
