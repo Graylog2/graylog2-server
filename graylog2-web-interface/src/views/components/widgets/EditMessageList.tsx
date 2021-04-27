@@ -31,6 +31,12 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 
+const FullHeightRow = styled(Row)`
+  height: 100%;
+  padding-bottom: 15px;
+  flex: 1;
+`;
+
 const FullHeightCol = styled(Col)`
   height: 100%;
   padding-bottom: 10px;
@@ -70,7 +76,7 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
 
   return (
-    <Row style={{ height: '100%', paddingBottom: '15px', flex: 1 }}>
+    <FullHeightRow>
       <FullHeightCol md={3}>
         <DescriptionBox description="Fields">
           <FieldSelect fields={fields}
@@ -98,7 +104,7 @@ const EditMessageList = ({ children, config, fields, onChange }: EditWidgetCompo
       <FullHeightCol md={9}>
         {children}
       </FullHeightCol>
-    </Row>
+    </FullHeightRow>
   );
 };
 
