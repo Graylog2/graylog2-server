@@ -112,7 +112,7 @@ const adjustTabs = (maxWidth, lockedTab) => {
   const newBtn = dashboardTabs.querySelector('li.query-tabs-new') as HTMLElement;
   const hiddenItems = [];
 
-  let currentWidth = moreBtn.offsetWidth + newBtn.offsetWidth;
+  let currentWidth = moreBtn.offsetWidth + newBtn.offsetWidth + 15;
 
   if (lockedTab) {
     currentWidth += tabItems[lockedTab].offsetWidth;
@@ -169,6 +169,10 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
           queryTitleEditModal.current.open(activeQueryTitle);
         }
       };
+
+      if (!titles.has(id) && lockedTab !== index && selectedQueryId === id) {
+        setLockedTab(index);
+      }
 
       const title = titles.get(id, `Page#${index + 1}`);
       const tabTitle = (
