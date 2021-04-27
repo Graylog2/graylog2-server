@@ -28,7 +28,14 @@ describe('TimerangeInfo', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     render(<TimerangeInfo widget={relativeWidget} />);
 
-    expect(screen.getByText('an hour ago')).toBeInTheDocument();
+    expect(screen.getByText('an hour ago - Now')).toBeInTheDocument();
+  });
+
+  it('should display a All Time', () => {
+    const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 0 }).build();
+    render(<TimerangeInfo widget={relativeWidget} />);
+
+    expect(screen.getByText('All Time')).toBeInTheDocument();
   });
 
   it('should display a absolute timerange', () => {

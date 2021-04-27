@@ -16,7 +16,7 @@
  */
 
 import { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
-import { isTypeRelative } from 'views/typeGuards/timeRange';
+import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import DateTime from 'logic/datetimes/DateTime';
 
 export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
@@ -26,11 +26,15 @@ export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' 
 };
 
 const relativeTimeRangeToString = (timerange: RelativeTimeRange): string => {
-  if (isTypeRelative(timerange)) {
-    return readableRange(timerange, 'range');
+  if (isTypeRelativeWithStartOnly(timerange)) {
+    if (timerange.range === 0) {
+      return 'All Time';
+    }
+
+    return `${readableRange(timerange, 'range')} - Now`;
   }
 
-  return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to')}`;
+  return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to', 'Now')}`;
 };
 
 const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange): string => {

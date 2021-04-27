@@ -36,6 +36,7 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -277,7 +278,9 @@ class Widget extends React.Component<Props, State> {
             </WidgetErrorBoundary>
           )}
           <WidgetFooter>
-            <TimerangeInfo widget={widget} />
+            <IfDashboard>
+              { !editing && <TimerangeInfo widget={widget} /> }
+            </IfDashboard>
           </WidgetFooter>
         </WidgetFrame>
       </WidgetColorContext>
