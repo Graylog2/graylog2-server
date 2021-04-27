@@ -55,9 +55,9 @@ const IndexSetDetails = ({ indexSet }: Props) => {
         <dl>
           <dt>Index prefix:</dt>
           <dd>{indexSet.index_prefix}</dd>
-          <dt>Shards:</dt>
-          <dd>{indexSet.shards}</dd>
           <HideOnCloud>
+            <dt>Shards:</dt>
+            <dd>{indexSet.shards}</dd>
             <dt>Replicas:</dt>
             <dd>{indexSet.replicas}</dd>
           </HideOnCloud>
