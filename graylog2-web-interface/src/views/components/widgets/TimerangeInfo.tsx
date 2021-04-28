@@ -21,10 +21,14 @@ import { TextOverflowEllipsis } from 'components/common';
 import Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { useStore } from 'stores/connect';
+import { SearchStore } from 'views/stores/SearchStore';
 
 type Props = {
   className?: string,
   widget: Widget,
+  activeQuery?: string,
+  widgetId?: string,
 };
 
 const Wrapper = styled.div(({ theme }) => css`
@@ -33,12 +37,16 @@ const Wrapper = styled.div(({ theme }) => css`
   width: max-content;
 `);
 
-const TimerangeInfo = ({ className, widget }: Props) => {
+const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE);
+  const { result, widgetMapping } = useStore(SearchStore);
+  const searchTypeId = widgetMapping.get(widgetId).first();
+  const effectiveTimerange = activeQuery && searchTypeId ? result?.results[activeQuery].searchTypes[searchTypeId].effective_timerange : {};
+  const effectiveTimerangeString = timerangeToString(effectiveTimerange);
 
   return (
     <Wrapper className={className}>
-      <TextOverflowEllipsis>
+      <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
         {configuredTimerange}
       </TextOverflowEllipsis>
     </Wrapper>
@@ -47,6 +55,8 @@ const TimerangeInfo = ({ className, widget }: Props) => {
 
 TimerangeInfo.defaultProps = {
   className: undefined,
+  activeQuery: undefined,
+  widgetId: undefined,
 };
 
 export default TimerangeInfo;

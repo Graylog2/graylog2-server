@@ -279,7 +279,7 @@ class Widget extends React.Component<Props, State> {
           )}
           <WidgetFooter>
             <IfDashboard>
-              { !editing && <TimerangeInfo widget={widget} /> }
+              { !editing && <TimerangeInfo widget={widget} activeQuery={view.activeQuery} widgetId={id} /> }
             </IfDashboard>
           </WidgetFooter>
         </WidgetFrame>
