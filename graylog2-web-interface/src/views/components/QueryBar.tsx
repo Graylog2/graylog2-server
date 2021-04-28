@@ -18,6 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
+import { List } from 'immutable';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
@@ -28,6 +29,7 @@ import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import { ViewMetaData, ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+import { QueryId } from 'views/logic/queries/Query';
 
 import QueryTabs from './QueryTabs';
 
@@ -56,7 +58,7 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 };
 
 type Props = {
-  queries: string[],
+  queries: List<QueryId>,
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };
