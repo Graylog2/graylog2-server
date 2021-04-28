@@ -176,7 +176,7 @@ const Search = ({ location }: Props) => {
   return (
     <WidgetFocusProvider>
       <WidgetFocusContext.Consumer>
-        {({ focusedWidget: { focusing: focusingWidget } = { focusing: false } }) => (
+        {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
           <CurrentViewTypeProvider>
             <IfInteractive>
               <IfDashboard>
@@ -199,7 +199,7 @@ const Search = ({ location }: Props) => {
                             <IfInteractive>
                               <HeaderElements />
                               <IfDashboard>
-                                <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                                {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
                               </IfDashboard>
                               <IfSearch>
                                 <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />

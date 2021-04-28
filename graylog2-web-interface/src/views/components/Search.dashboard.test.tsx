@@ -68,9 +68,27 @@ jest.mock('views/stores/QueryTitlesStore', () => ({
 }));
 
 jest.mock('views/components/SearchResult', () => () => <div>Mocked search results</div>);
-jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
+jest.mock('views/components/DashboardSearchBar', () => () => <div>Mocked dashboard search bar</div>);
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/contexts/WidgetFocusProvider', () => jest.fn());
+
+const mockWidgetEditing = () => {
+  asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
+    <WidgetFocusContext.Provider value={{
+      focusedWidget: {
+        id: 'widget-id',
+        editing: true,
+        focusing: true,
+      },
+      setWidgetFocusing: () => {},
+      setWidgetEditing: () => {},
+      unsetWidgetFocusing: () => {},
+      unsetWidgetEditing: () => {},
+    }}>
+      {children}
+    </WidgetFocusContext.Provider>
+  ));
+};
 
 describe('Dashboard Search', () => {
   beforeEach(() => {
@@ -120,26 +138,27 @@ describe('Dashboard Search', () => {
   });
 
   it('should not list tabs for pages when focusing a widget', async () => {
-    asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
-      <WidgetFocusContext.Provider value={{
-        focusedWidget: {
-          id: 'widget-id',
-          editing: true,
-          focusing: true,
-        },
-        setWidgetFocusing: () => {},
-        setWidgetEditing: () => {},
-        unsetWidgetFocusing: () => {},
-        unsetWidgetEditing: () => {},
-      }}>{children}
-      </WidgetFocusContext.Provider>
-    ));
-
+    mockWidgetEditing();
     render(<SimpleSearch />);
 
     await waitFor(() => expect(screen.getByText('Mocked search results')).toBeInTheDocument());
 
     expect(screen.queryByText('First dashboard page')).not.toBeInTheDocument();
     expect(screen.queryByText('Second dashboard page')).not.toBeInTheDocument();
+  });
+
+  it('should display dashboard search bar', async () => {
+    render(<SimpleSearch />);
+
+    await waitFor(() => expect(screen.getByText('Mocked dashboard search bar')).toBeInTheDocument());
+  });
+
+  it('should not display dashboard search bar on widget edit', async () => {
+    mockWidgetEditing();
+    render(<SimpleSearch />);
+
+    await waitFor(() => expect(screen.getByText('Mocked search results')).toBeInTheDocument());
+
+    expect(screen.queryByText('Mocked dashboard search bar')).not.toBeInTheDocument();
   });
 });
