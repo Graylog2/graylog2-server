@@ -119,7 +119,7 @@ describe('Dashboard Search', () => {
     expect(screen.getByText('Second dashboard page')).toBeInTheDocument();
   });
 
-  it('should not list tabs for pages when focussing a widget', async () => {
+  it('should not list tabs for pages when focusing a widget', async () => {
     asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
       <WidgetFocusContext.Provider value={{
         focusedWidget: {
