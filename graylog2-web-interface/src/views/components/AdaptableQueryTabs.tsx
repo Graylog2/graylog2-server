@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useEffect, useMemo, useState, useRef, ReactNode } from 'react';
+import { useEffect, useMemo, useState, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
@@ -100,7 +100,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
   }
 `);
 
-const adjustTabs = (maxWidth, lockedTab) => {
+const adjustTabsVisibility = (maxWidth, lockedTab) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
   const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)') as NodeListOf<HTMLElement>;
   const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li') as NodeListOf<HTMLElement>;
@@ -145,7 +145,9 @@ const adjustTabs = (maxWidth, lockedTab) => {
     }
   });
 
-  if (!hiddenItems.length) {
+  if (hiddenItems.length && moreBtn.classList.contains(CLASS_HIDDEN)) {
+    moreBtn.classList.remove(CLASS_HIDDEN);
+  } else if (!hiddenItems.length && !moreBtn.classList.contains(CLASS_HIDDEN)) {
     moreBtn.classList.add(CLASS_HIDDEN);
   }
 };
@@ -153,9 +155,8 @@ const adjustTabs = (maxWidth, lockedTab) => {
 const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal, onTitleChange }:Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
-  const currentTabs = useRef<TabsTypes>({ navItems: [], menuItems: [], lockedItems: [] });
 
-  currentTabs.current = useMemo((): TabsTypes => {
+  const currentTabs = useMemo((): TabsTypes => {
     const navItems = [];
     const menuItems = [];
     const lockedItems = [];
@@ -216,12 +217,12 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
   }, [lockedTab, onRemove, onSelect, onTitleChange, queries, queryTitleEditModal, selectedQueryId, titles]);
 
   useEffect(() => {
-    adjustTabs(maxWidth, lockedTab);
+    adjustTabsVisibility(maxWidth, lockedTab);
   }, [maxWidth, lockedTab, selectedQueryId]);
 
   return (
     <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
-      {currentTabs.current.navItems}
+      {currentTabs.navItems}
 
       <NavDropdown eventKey="more"
                    title={<Icon name="ellipsis-h" />}
@@ -233,10 +234,10 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                    active={openedMore}
                    open={openedMore}
                    onToggle={(isOpened) => setOpenedMore(isOpened)}>
-        {currentTabs.current.menuItems}
+        {currentTabs.menuItems}
       </NavDropdown>
 
-      {currentTabs.current.lockedItems}
+      {currentTabs.lockedItems}
 
       <NavItem key="new"
                eventKey="new"
