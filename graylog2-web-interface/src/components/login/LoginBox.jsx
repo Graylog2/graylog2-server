@@ -20,12 +20,13 @@ import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 
-import PublicNotifications from './PublicNotifications';
+import PublicNotifications from '../common/PublicNotifications';
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: 25vh;
   flex-direction: column;
   height: 100%;
   
@@ -57,7 +58,7 @@ const LoginBox = ({ children }) => {
     <Wrapper className="container">
       <Row>
         <Col md={8} mdOffset={2}>
-          <PublicNotifications />
+          <PublicNotifications fromConfig />
         </Col>
       </Row>
       <Row>

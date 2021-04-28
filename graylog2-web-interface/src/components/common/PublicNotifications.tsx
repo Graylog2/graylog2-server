@@ -14,13 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Alert, Button } from 'components/graylog';
 import AppConfig from 'util/AppConfig';
-import Store from 'logic/local-storage/Store';
+
+const customizationHook = PluginStore.exports('customization.publicNotifications');
+
+interface Props {
+  fromConfig?: boolean,
+}
 
 const FlexWrap = styled.div`
   display: flex;
@@ -39,12 +45,26 @@ const LongContent = styled.div(({ $visible }: {$visible: boolean}) => css`
   padding-top: 12px;
 `);
 
-const PublicNotifications = () => {
-  const localStorageItem = 'gl-notifications';
-  const notificationStore = new Set(Store.get(localStorageItem) || []);
-  const [showReadMore, setShowReadMore] = useState<string>(undefined);
+const defaultNotifications = {
+  usePublicNotifications: () => ({
+    notifications: undefined,
+    notificationStore: undefined,
+    onDismissPublicNotification: undefined,
+  }),
+};
 
-  const notifications = Object.keys(AppConfig.loginNotifications()).map((notificationId) => {
+const PublicNotifications = ({ fromConfig }: Props) => {
+  const { usePublicNotifications } = customizationHook[0]?.hooks || defaultNotifications;
+  const [showReadMore, setShowReadMore] = useState<string>(undefined);
+  const { notifications, notificationStore, onDismissPublicNotification } = usePublicNotifications();
+
+  if (!notifications && !notificationStore && !onDismissPublicNotification) {
+    return null;
+  }
+
+  const allNotification = fromConfig ? AppConfig.publicNotifications() : notifications;
+
+  const publicNotifications = Object.keys(allNotification).map((notificationId) => {
     if (notificationStore.has(notificationId)) {
       return null;
     }
@@ -53,27 +73,34 @@ const PublicNotifications = () => {
       setShowReadMore(showReadMore ? undefined : notificationId);
     };
 
-    const onDismiss = () => {
-      const dismissed = Array.from(notificationStore.add(notificationId));
-      Store.set(localStorageItem, dismissed);
-    };
-
-    const notification = AppConfig.loginNotifications()[notificationId];
+    const notification = allNotification[notificationId];
     const { variant, hiddenTitle, isDismissible, title, shortMessage, longMessage } = notification;
 
+    const _dismiss = () => {
+      return onDismissPublicNotification(notificationId);
+    };
+
     return (
-      <Alert bsStyle={variant} onDismiss={isDismissible ? onDismiss : undefined}>
+      <Alert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title}>
         {!hiddenTitle && (<h3>{title}</h3>)}
         <FlexWrap>
           <ShortContent>{shortMessage}</ShortContent>
-          {longMessage && <Button bsStyle="link" onClick={toggleReadMore}>Read {showReadMore ? 'Less' : 'More'}</Button>}
+          {longMessage && <Button bsStyle="link" onClick={toggleReadMore}>Read {showReadMore === notificationId ? 'Less' : 'More'}</Button>}
         </FlexWrap>
         {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
       </Alert>
     );
   });
 
-  return <>{notifications}</>;
+  return <>{publicNotifications}</>;
+};
+
+PublicNotifications.propTypes = {
+  fromConfig: PropTypes.bool,
+};
+
+PublicNotifications.defaultProps = {
+  fromConfig: false,
 };
 
 export default PublicNotifications;

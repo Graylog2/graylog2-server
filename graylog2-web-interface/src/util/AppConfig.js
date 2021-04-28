@@ -61,7 +61,7 @@ const AppConfig = {
     return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.theme'] ?? {};
   },
 
-  loginNotifications() {
+  publicNotifications() {
     return this.appConfig()?.pluginUISettings?.['org.graylog.plugins.customization.notifications'] ?? {};
   },
 
