@@ -21,7 +21,6 @@ import { EditWidgetComponentProps } from 'views/types';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import WidgetConfigForm, { WidgetConfigFormValues } from './WidgetConfigForm';
-import AggregationElementSelect from './AggregationElementSelect';
 import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElements';
 
@@ -33,11 +32,6 @@ const _initialFormValues = (config: AggregationWidgetConfig) => {
     ...(element.fromConfig ? element.fromConfig(config) : {}),
   }), {});
 };
-
-const Wrapper = styled.div`
-  height: 100%;
-  display: flex;
-`;
 
 const Controls = styled.div`
   height: 100%;
@@ -109,18 +103,13 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
   const initialFormValues = _initialFormValues(config);
 
   return (
-    <Wrapper>
+    <>
       <Controls>
         <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange)}
                           initialValues={initialFormValues}
                           validate={validateForm}>
-          {({ values, setValues }) => (
+          {() => (
             <>
-              <Section data-testid="add-element-section">
-                <AggregationElementSelect onSelect={(elementKey) => onCreateElement(elementKey, values, setValues)}
-                                          aggregationElements={aggregationElements}
-                                          formValues={values} />
-              </Section>
               <Section data-testid="configure-elements-section">
                 <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
                                        config={config}
@@ -134,7 +123,7 @@ const AggregationWizard = ({ onChange, config, children }: EditWidgetComponentPr
       <Visualization>
         {children}
       </Visualization>
-    </Wrapper>
+    </>
   );
 };
 

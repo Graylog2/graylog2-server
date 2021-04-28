@@ -141,16 +141,16 @@ public class ViewsBindings extends ViewsModule {
         // pivot specs
         registerJacksonSubtype(Values.class);
         registerJacksonSubtype(Time.class);
-        registerPivotAggregationFunction(Average.NAME, Average.class);
-        registerPivotAggregationFunction(Cardinality.NAME, Cardinality.class);
-        registerPivotAggregationFunction(Count.NAME, Count.class);
-        registerPivotAggregationFunction(Max.NAME, Max.class);
-        registerPivotAggregationFunction(Min.NAME, Min.class);
-        registerPivotAggregationFunction(StdDev.NAME, StdDev.class);
-        registerPivotAggregationFunction(Sum.NAME, Sum.class);
-        registerPivotAggregationFunction(SumOfSquares.NAME, SumOfSquares.class);
-        registerPivotAggregationFunction(Variance.NAME, Variance.class);
-        registerPivotAggregationFunction(Percentile.NAME, Percentile.class);
+        registerPivotAggregationFunction(Average.NAME, "Average", Average.class);
+        registerPivotAggregationFunction(Cardinality.NAME, "Cardinality", Cardinality.class);
+        registerPivotAggregationFunction(Count.NAME, "Count", Count.class);
+        registerPivotAggregationFunction(Max.NAME, "Maximum", Max.class);
+        registerPivotAggregationFunction(Min.NAME, "Minimum", Min.class);
+        registerPivotAggregationFunction(StdDev.NAME, "Standard Deviation", StdDev.class);
+        registerPivotAggregationFunction(Sum.NAME, "Sum", Sum.class);
+        registerPivotAggregationFunction(SumOfSquares.NAME, "Sum of Squares", SumOfSquares.class);
+        registerPivotAggregationFunction(Variance.NAME, "Variance", Variance.class);
+        registerPivotAggregationFunction(Percentile.NAME, "Percentile", Percentile.class);
 
         registerJacksonSubtype(TimeUnitInterval.class);
         registerJacksonSubtype(TimeUnitIntervalDTO.class);

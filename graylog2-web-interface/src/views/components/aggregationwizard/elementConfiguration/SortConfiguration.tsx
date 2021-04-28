@@ -17,28 +17,34 @@
 import * as React from 'react';
 import { FieldArray, useFormikContext } from 'formik';
 
+import { SortableList } from 'components/common';
 import Sort from 'views/components/aggregationwizard/elementConfiguration/Sort';
 import ElementConfigurationContainer
   from 'views/components/aggregationwizard/elementConfiguration/ElementConfigurationContainer';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
+import SortElement from '../aggregationElements/SortElement';
+
 const SortConfiguration = () => {
-  const { values } = useFormikContext<WidgetConfigFormValues>();
-  const { sort } = values;
+  const { values: { sort }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <FieldArray name="sort"
-                render={() => (
-                  <>
-                    <div>
-                      {sort.map((s, index) => (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <ElementConfigurationContainer key={`sort-${index}`}>
-                          <Sort index={index} />
-                        </ElementConfigurationContainer>
-                      ))}
-                    </div>
-                  </>
+                render={({ remove }) => (
+                  <SortableList items={sort}
+                                onMoveItem={(newSort) => setFieldValue('sort', newSort)}
+                                customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+                                  <ElementConfigurationContainer key={`sort-${item.id}`}
+                                                                 dragHandleProps={dragHandleProps}
+                                                                 draggableProps={draggableProps}
+                                                                 className={className}
+                                                                 testIdPrefix={`sort-${index}`}
+                                                                 onRemove={() => remove(index)}
+                                                                 elementTitle={SortElement.title}
+                                                                 ref={ref}>
+                                    <Sort index={index} />
+                                  </ElementConfigurationContainer>
+                                )} />
                 )} />
   );
 };

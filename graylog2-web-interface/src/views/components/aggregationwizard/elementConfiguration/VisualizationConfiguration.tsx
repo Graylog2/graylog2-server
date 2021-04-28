@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
+import styled from 'styled-components';
 
 import { Input } from 'components/bootstrap';
 import { Checkbox } from 'components/graylog';
@@ -28,6 +29,15 @@ import { WidgetConfigFormValues } from 'views/components/aggregationwizard/Widge
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
 import ElementConfigurationContainer from './ElementConfigurationContainer';
+
+import VisualizationElement from '../aggregationElements/VisualizationElement';
+
+const EventAnnotationCheckbox = styled(Checkbox)`
+  input[type="checkbox"] {
+    margin-right: 0;
+    right: 0;
+  }
+`;
 
 const isTimeline = (values: WidgetConfigFormValues) => {
   if (!values.groupBy?.groupings || values.groupBy.groupings.length === 0) {
@@ -65,7 +75,7 @@ const VisualizationConfiguration = () => {
   const supportsEventAnnotations = currentVisualizationType.capabilities?.includes('event-annotations') ?? false;
 
   return (
-    <ElementConfigurationContainer>
+    <ElementConfigurationContainer elementTitle={VisualizationElement.title}>
       <Field name="visualization.type">
         {({ field: { name, value }, meta: { error } }) => (
           <Input id="visualization-type-select"
@@ -95,7 +105,11 @@ const VisualizationConfiguration = () => {
                    error={error}
                    labelClassName="col-sm-11"
                    wrapperClassName="col-sm-1">
-              <Checkbox id={`${name}-input`} name={name} onChange={onChange} checked={value} />
+              <EventAnnotationCheckbox id={`${name}-input`}
+                                       name={name}
+                                       onChange={onChange}
+                                       checked={value}
+                                       className="pull-right" />
             </Input>
           )}
         </Field>

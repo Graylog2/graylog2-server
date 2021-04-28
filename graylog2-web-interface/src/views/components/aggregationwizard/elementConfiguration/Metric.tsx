@@ -23,7 +23,7 @@ import Select from 'components/common/Select';
 import { useStore } from 'stores/connect';
 import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import FormikInput from 'components/common/FormikInput';
+import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
 
 import FieldSelect from './FieldSelect';
 
@@ -37,7 +37,9 @@ const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({
 
 const Metric = ({ index }: Props) => {
   const functions = useStore(AggregationFunctionsStore);
-  const functionOptions = Object.values(functions).map(({ type }) => ({ label: type, value: type })).sort(sortByLabel);
+  const functionOptions = Object.values(functions)
+    .map(({ type, description }) => ({ label: description, value: type }))
+    .sort(sortByLabel);
 
   const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
   const currentFunction = metrics[index].function;
@@ -48,14 +50,6 @@ const Metric = ({ index }: Props) => {
 
   return (
     <>
-      <FormikInput id="name"
-                   label="Name"
-                   bsSize="small"
-                   placeholder="Specify optional name"
-                   name={`metrics.${index}.name`}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" />
-
       <Field name={`metrics.${index}.function`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
           <Input id="metric-function-select"
@@ -106,6 +100,13 @@ const Metric = ({ index }: Props) => {
           )}
         </Field>
       )}
+      <FormikInput id="name"
+                   label={<>Name <Opt /></>}
+                   bsSize="small"
+                   placeholder="Specify display name"
+                   name={`metrics.${index}.name`}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9" />
     </>
   );
 };

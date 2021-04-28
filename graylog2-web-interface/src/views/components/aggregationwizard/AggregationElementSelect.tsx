@@ -15,24 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
 
-import { Select } from 'components/common';
+import { DropdownButton, MenuItem } from 'components/graylog';
 
 import type { AggregationElement } from './aggregationElements/AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
-
-const _getOptions = (aggregationElements: Array<AggregationElement>, formValues: WidgetConfigFormValues) => {
-  return aggregationElements.reduce((availableElements, aggregationElement) => {
-    if (!aggregationElement.allowCreate(formValues)) {
-      return availableElements;
-    }
-
-    availableElements.push({ value: aggregationElement.key, label: aggregationElement.title });
-
-    return availableElements;
-  }, []);
-};
 
 type Props = {
   aggregationElements: Array<AggregationElement>,
@@ -41,20 +28,14 @@ type Props = {
 }
 
 const AggregationElementSelect = ({ aggregationElements, onSelect, formValues }: Props) => {
-  const selectRef = useRef(null);
-  const options = _getOptions(aggregationElements, formValues);
-
-  const _onSelect = (elementKey: string) => {
-    selectRef.current.clearValue();
-    onSelect(elementKey);
-  };
+  const menuItems = aggregationElements
+    .filter(({ allowCreate }) => allowCreate(formValues))
+    .map(({ key, title }) => <MenuItem key={`element-select-${key}`} onSelect={() => onSelect(key)}>{title}</MenuItem>);
 
   return (
-    <Select options={options}
-            onChange={_onSelect}
-            ref={selectRef}
-            placeholder="Select an element to add ..."
-            aria-label="Select an element to add ..." />
+    <DropdownButton id="add-aggregation-element" dropup title="Add">
+      {menuItems}
+    </DropdownButton>
   );
 };
 

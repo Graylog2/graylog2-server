@@ -31,6 +31,8 @@ import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
+const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
+
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
@@ -44,6 +46,11 @@ const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2, fieldTypeMa
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+
+const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+};
 
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
@@ -67,10 +74,8 @@ describe('AggregationWizard', () => {
   it('should require group by function when adding a group by element', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Grouping');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Grouping' }));
 
     await waitFor(() => expect(screen.getByText('Field is required.')).toBeInTheDocument());
   });
@@ -79,10 +84,7 @@ describe('AggregationWizard', () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Grouping');
+    await addElement('Grouping');
 
     const fieldSelection = await screen.findByLabelText('Field');
 
@@ -108,10 +110,7 @@ describe('AggregationWizard', () => {
   it('should handle timestamp field types', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Grouping');
+    await addElement('Grouping');
 
     const fieldSelection = await screen.findByLabelText('Field');
 
@@ -121,21 +120,18 @@ describe('AggregationWizard', () => {
     });
 
     const autoCheckbox = await screen.findByRole('checkbox', { name: 'Auto' });
-    await screen.findByText(/A smaller granularity leads to/);
+    await screen.findByRole('slider', { name: /interval/i });
 
     await userEvent.click(autoCheckbox);
 
-    await screen.findByText('The size of the buckets for this timestamp type.');
-  });
+    await screen.findByRole('button', { name: /minutes/i });
+  }, extendedTimeout);
 
   it('should create group by with multiple groupings', async () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Grouping');
+    await addElement('Grouping');
 
     const fieldSelection = await screen.findByLabelText('Field');
 
@@ -144,8 +140,7 @@ describe('AggregationWizard', () => {
       await selectEvent.select(fieldSelection, 'timestamp');
     });
 
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Grouping');
+    await addElement('Grouping');
 
     const fieldSelections = await screen.findAllByLabelText('Field');
 
@@ -167,7 +162,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should display group by with values from config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
@@ -183,7 +178,7 @@ describe('AggregationWizard', () => {
     await screen.findByText('timestamp');
   });
 
-  it('should not display group by section if config has no pivots', () => {
+  it('should display group by section even if config has no pivots', () => {
     const config = widgetConfig
       .toBuilder()
       .build();
@@ -192,7 +187,7 @@ describe('AggregationWizard', () => {
 
     const configureElementsSection = screen.getByTestId('configure-elements-section');
 
-    expect(within(configureElementsSection).queryByText('Group By')).not.toBeInTheDocument();
+    expect(within(configureElementsSection).queryByText('Group By')).toBeInTheDocument();
   });
 
   it('should correctly change config', async () => {
@@ -227,4 +222,38 @@ describe('AggregationWizard', () => {
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
   });
+
+  it('should correctly update sort of groupings', async () => {
+    const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
+    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const config = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot0, pivot1])
+      .build();
+
+    const onChange = jest.fn();
+    renderSUT({ onChange, config });
+
+    const groupBySection = await screen.findByTestId('Group By-section');
+
+    const firstItem = within(groupBySection).getByTestId('grouping-0-drag-handle');
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have lifted an item/i);
+    fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
+    await screen.findByText(/You have moved the item/i);
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have dropped the item/i);
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    fireEvent.click(applyButton);
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot1, pivot0])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  }, extendedTimeout);
 });

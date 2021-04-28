@@ -44,11 +44,21 @@ const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
 jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({ count: { type: 'count' }, min: { type: 'min' }, max: { type: 'max' }, percentile: { type: 'percentile' } })),
+  getInitialState: jest.fn(() => ({
+    count: { type: 'count', description: 'Count' },
+    min: { type: 'min', description: 'Minimum' },
+    max: { type: 'max', description: 'Maximum' },
+    percentile: { type: 'percentile', description: 'Percentile' },
+  })),
   listen: jest.fn(),
 }));
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+
+const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+};
 
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
@@ -72,10 +82,7 @@ describe('AggregationWizard', () => {
   it('should require metric function when adding a metric element', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await addElement('Metric');
 
     await waitFor(() => expect(screen.getByText('Function is required.')).toBeInTheDocument());
   });
@@ -83,14 +90,11 @@ describe('AggregationWizard', () => {
   it('should require metric field when metric function is not count', async () => {
     renderSUT();
 
-    const aggregationElementSelect = screen.getByLabelText('Select an element to add ...');
-
-    await selectEvent.openMenu(aggregationElementSelect);
-    await selectEvent.select(aggregationElementSelect, 'Metric');
+    await addElement('Metric');
 
     const functionSelect = await screen.findByLabelText('Select a function');
     await selectEvent.openMenu(functionSelect);
-    await selectEvent.select(functionSelect, 'min');
+    await selectEvent.select(functionSelect, 'Minimum');
 
     await waitFor(() => expect(screen.getByText('Field is required for function min.')).toBeInTheDocument());
   });
@@ -130,7 +134,7 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const nameInput = await screen.findByLabelText('Name');
+    const nameInput = await screen.findByLabelText(/Name/);
     const functionSelect = screen.getByLabelText('Select a function');
     const fieldSelect = screen.getByLabelText('Select a field');
 
@@ -138,7 +142,7 @@ describe('AggregationWizard', () => {
 
     await act(async () => {
       await selectEvent.openMenu(functionSelect);
-      await selectEvent.select(functionSelect, 'count');
+      await selectEvent.select(functionSelect, 'Count');
       await selectEvent.openMenu(fieldSelect);
       await selectEvent.select(fieldSelect, 'http_method');
     });
@@ -171,7 +175,7 @@ describe('AggregationWizard', () => {
 
     await act(async () => {
       await selectEvent.openMenu(functionSelect);
-      await selectEvent.select(functionSelect, 'percentile');
+      await selectEvent.select(functionSelect, 'Percentile');
       await selectEvent.openMenu(fieldSelect);
       await selectEvent.select(fieldSelect, 'http_method');
     });
@@ -208,7 +212,7 @@ describe('AggregationWizard', () => {
     fireEvent.click(addMetricButton);
 
     await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
-    const newNameInput = screen.getAllByLabelText('Name')[1];
+    const newNameInput = screen.getAllByLabelText(/Name/)[1];
     const newFunctionSelect = screen.getAllByLabelText('Select a function')[1];
     const newFieldSelect = screen.getAllByLabelText('Select a field')[1];
 
@@ -216,7 +220,7 @@ describe('AggregationWizard', () => {
 
     await act(async () => {
       await selectEvent.openMenu(newFunctionSelect);
-      await selectEvent.select(newFunctionSelect, 'min');
+      await selectEvent.select(newFunctionSelect, 'Minimum');
       await selectEvent.openMenu(newFieldSelect);
       await selectEvent.select(newFieldSelect, 'http_method');
     });
@@ -231,6 +235,30 @@ describe('AggregationWizard', () => {
           .config(SeriesConfig.empty().toBuilder().name('New function').build())
           .build(),
       ])
+      .build();
+
+    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should remove metric', async () => {
+    const onChangeMock = jest.fn();
+    const config = widgetConfig
+      .toBuilder()
+      .series([Series.create('count')])
+      .build();
+    renderSUT({ config, onChange: onChangeMock });
+
+    const removeMetricElementButton = screen.getByRole('button', { name: 'Remove Metric' });
+    userEvent.click(removeMetricElementButton);
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    userEvent.click(applyButton);
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .series([])
       .build();
 
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));

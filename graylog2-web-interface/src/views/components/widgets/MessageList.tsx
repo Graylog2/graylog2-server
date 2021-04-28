@@ -42,21 +42,10 @@ import RenderCompletionCallback from './RenderCompletionCallback';
 const { InputsActions } = CombinedProvider.get('Inputs');
 
 const Wrapper = styled.div`
-  display: grid;
-  display: -ms-grid;
-  -ms-grid-row: 2;
-  -ms-grid-column: 1;
-  grid-template-rows: 1fr auto;
-  -ms-grid-rows: 1fr auto;
-  -ms-grid-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-
-  .pagination-wrapper {
-    grid-row: 2;
-    -ms-grid-row: 2;
-    grid-column: 1;
-    -ms-grid-column: 1;
-  }
+  overflow: hidden;
 
   .pagination {
     margin-bottom: 0;

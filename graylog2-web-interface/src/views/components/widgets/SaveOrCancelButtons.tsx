@@ -15,8 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { Button, ButtonToolbar } from 'components/graylog';
+
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  margin-top: 6px;
+`;
 
 type Props = {
   onCancel: () => void,
@@ -25,10 +30,10 @@ type Props = {
 };
 
 const SaveOrCancelButtons = ({ onFinish, onCancel, disableSave = false }: Props) => (
-  <ButtonToolbar className="pull-right">
+  <StyledButtonToolbar className="pull-right">
     <Button onClick={onFinish} bsStyle="primary" disabled={disableSave}>Save</Button>
     <Button onClick={onCancel}>Cancel</Button>
-  </ButtonToolbar>
+  </StyledButtonToolbar>
 );
 
 SaveOrCancelButtons.defaultProps = {

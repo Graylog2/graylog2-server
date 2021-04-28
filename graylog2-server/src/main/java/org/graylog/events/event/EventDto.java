@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.joda.time.DateTime;
 
@@ -50,6 +51,7 @@ public abstract class EventDto {
     private static final String FIELD_KEY = "key";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_FIELDS = "fields";
+    private static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -103,6 +105,9 @@ public abstract class EventDto {
     @JsonProperty(FIELD_FIELDS)
     public abstract Map<String, String> fields();
 
+    @JsonProperty(FIELD_GROUP_BY_FIELDS)
+    public abstract Map<String, String> groupByFields();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -115,7 +120,7 @@ public abstract class EventDto {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDto.Builder().sourceStreams(ImmutableSet.of());
+            return new AutoValue_EventDto.Builder().sourceStreams(ImmutableSet.of()).groupByFields(ImmutableMap.of());
         }
 
         @JsonProperty(FIELD_ID)
@@ -172,6 +177,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_FIELDS)
         public abstract Builder fields(Map<String, String> fields);
+
+        @JsonProperty(FIELD_GROUP_BY_FIELDS)
+        public abstract Builder groupByFields(Map<String, String> fields);
 
         public abstract EventDto build();
     }
