@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled from 'styled-components';
 
-import { HoverForHelp } from 'components/common';
+import { HoverForHelp, SortableList } from 'components/common';
 import { Checkbox } from 'components/graylog';
 
 import ElementConfigurationContainer from './ElementConfigurationContainer';
@@ -44,7 +44,7 @@ const RollupHoverForHelp = styled(HoverForHelp)`
 `;
 
 const GroupByConfiguration = () => {
-  const { values: { groupBy }, values, setValues } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback((index) => {
     setValues(GroupByElement.onRemove(index, values));
@@ -54,40 +54,40 @@ const GroupByConfiguration = () => {
 
   return (
     <>
-      {!isEmpty
-      && (
-      <Field name="groupBy.columnRollup">
-        {({ field: { name, onChange, value } }) => (
-          <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
-                                 checked={value}
-                                 disabled={disableColumnRollup}>
-            <RollupColumnsLabel>
-              Rollup Columns
-              <RollupHoverForHelp title="Rollup Columns">
-                When rollup is enabled, an additional trace totalling individual subtraces will be included.
-              </RollupHoverForHelp>
-            </RollupColumnsLabel>
-          </RollupColumnsCheckbox>
-        )}
-      </Field>
+      {!isEmpty && (
+        <Field name="groupBy.columnRollup">
+          {({ field: { name, onChange, value } }) => (
+            <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
+                                   checked={value}
+                                   disabled={disableColumnRollup}>
+              <RollupColumnsLabel>
+                Rollup Columns
+                <RollupHoverForHelp title="Rollup Columns">
+                  When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                </RollupHoverForHelp>
+              </RollupColumnsLabel>
+            </RollupColumnsCheckbox>
+          )}
+        </Field>
       )}
       <FieldArray name="groupBy.groupings"
                   render={() => (
-                    <>
-                      <div>
-                        {groupBy?.groupings?.map((grouping, index) => {
-                          return (
-                            // eslint-disable-next-line react/no-array-index-key
-                            <ElementConfigurationContainer key={`grouping-${index}`}
-                                                           onRemove={() => removeGrouping(index)}
-                                                           elementTitle={GroupByElement.title}>
-                              <GroupBy index={index} />
-                            </ElementConfigurationContainer>
-                          );
-                        })}
-                      </div>
-                    </>
+                    <SortableList items={groupBy?.groupings}
+                                  onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
+                                  customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+                                    <ElementConfigurationContainer key={`grouping-${item.id}`}
+                                                                   dragHandleProps={dragHandleProps}
+                                                                   draggableProps={draggableProps}
+                                                                   className={className}
+                                                                   testIdPrefix={`grouping-${index}`}
+                                                                   onRemove={() => removeGrouping(index)}
+                                                                   elementTitle={GroupByElement.title}
+                                                                   ref={ref}>
+                                      <GroupBy index={index} />
+                                    </ElementConfigurationContainer>
+                                  )} />
                   )} />
+
     </>
   );
 };

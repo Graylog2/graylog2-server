@@ -73,7 +73,7 @@ const DragHandle = styled.div`
   margin-right: 5px;
 `;
 
-const SortableListItem = forwardRef(<ItemType extends ListItemType>({
+const ListItem = forwardRef(<ItemType extends ListItemType>({
   item,
   index,
   className,
@@ -111,11 +111,11 @@ const SortableListItem = forwardRef(<ItemType extends ListItemType>({
   );
 });
 
-SortableListItem.defaultProps = {
+ListItem.defaultProps = {
   className: undefined,
   disableDragging: false,
   customListItemRender: undefined,
   customContentRender: undefined,
 };
 
-export default SortableListItem;
+export default ListItem;

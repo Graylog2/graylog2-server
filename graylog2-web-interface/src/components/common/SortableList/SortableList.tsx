@@ -98,7 +98,7 @@ SortableList.propTypes = {
    * and will be used for sorting the item. `title` is used to display the
    * element name in the list.
    */
-  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  items: PropTypes.arrayOf(PropTypes.object),
   /**
    * Function that will be called when an item of the list was moved.
    * The function will receive the newly sorted list as an argument
@@ -118,6 +118,7 @@ SortableList.propTypes = {
 };
 
 SortableList.defaultProps = {
+  items: [],
   disableDragging: false,
   customContentRender: undefined,
   customListItemRender: undefined,

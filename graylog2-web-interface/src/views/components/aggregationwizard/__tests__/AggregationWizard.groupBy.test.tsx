@@ -31,6 +31,8 @@ import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
+const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
+
 const widgetConfig = AggregationWidgetConfig
   .builder()
   .visualization(DataTable.type)
@@ -123,7 +125,7 @@ describe('AggregationWizard', () => {
     await userEvent.click(autoCheckbox);
 
     await screen.findByRole('button', { name: /minutes/i });
-  });
+  }, extendedTimeout);
 
   it('should create group by with multiple groupings', async () => {
     const onChange = jest.fn();
@@ -160,7 +162,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should display group by with values from config', async () => {
     const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
@@ -220,4 +222,38 @@ describe('AggregationWizard', () => {
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
   });
+
+  it('should correctly update sort of groupings', async () => {
+    const pivot0 = Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } });
+    const pivot1 = Pivot.create('took_ms', 'values', { limit: 15 });
+    const config = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot0, pivot1])
+      .build();
+
+    const onChange = jest.fn();
+    renderSUT({ onChange, config });
+
+    const groupBySection = await screen.findByTestId('Group By-section');
+
+    const firstItem = within(groupBySection).getByTestId('grouping-0-drag-handle');
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have lifted an item/i);
+    fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
+    await screen.findByText(/You have moved the item/i);
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have dropped the item/i);
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    fireEvent.click(applyButton);
+
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot1, pivot0])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  }, extendedTimeout);
 });
