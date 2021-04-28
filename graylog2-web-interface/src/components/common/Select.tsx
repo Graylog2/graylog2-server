@@ -191,6 +191,7 @@ const _styles = ({ size, theme }) => ({
 
 type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>,
+  SelectContainer?: React.ComponentType<any>,
 };
 
 type Props = {
