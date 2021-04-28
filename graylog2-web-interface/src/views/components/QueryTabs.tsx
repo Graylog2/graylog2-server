@@ -51,8 +51,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
     <StyledRow>
       <Col>
         <SizeMe>
-          {({ size }) => {
-            return size.width && (
+          {({ size }) => (size.width ? (
             <AdaptableQueryTabs maxWidth={size.width}
                                 queries={queries}
                                 titles={titles}
@@ -61,8 +60,7 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, selectedQueryId
                                 onSelect={onSelect}
                                 queryTitleEditModal={queryTitleEditModal}
                                 onTitleChange={onTitleChange} />
-            );
-          }}
+          ) : null)}
         </SizeMe>
 
         {/*
