@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { TextOverflowEllipsis } from 'components/common';
@@ -23,6 +24,7 @@ import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { useStore } from 'stores/connect';
 import { SearchStore } from 'views/stores/SearchStore';
+import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
 
 type Props = {
   className?: string,
@@ -38,11 +40,13 @@ const Wrapper = styled.div(({ theme }) => css`
 `);
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
-  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE);
+  const { localizeTime } = useContext(TimeLocalizeContext);
+  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, localizeTime);
   const { result, widgetMapping } = useStore(SearchStore);
   const searchTypeId = widgetId ? widgetMapping.get(widgetId).first() : undefined;
-  const effectiveTimerange = activeQuery && searchTypeId ? result?.results[activeQuery].searchTypes[searchTypeId].effective_timerange : {};
-  const effectiveTimerangeString = timerangeToString(effectiveTimerange);
+  const effectiveTimerange = activeQuery && searchTypeId ? result?.results[activeQuery]
+    .searchTypes[searchTypeId].effective_timerange : {};
+  const effectiveTimerangeString = timerangeToString(effectiveTimerange, localizeTime);
 
   return (
     <Wrapper className={className}>

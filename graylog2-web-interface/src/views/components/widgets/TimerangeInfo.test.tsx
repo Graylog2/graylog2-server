@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { MockStore } from 'helpers/mocking';
 
 import Widget from 'views/logic/widgets/Widget';
+import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
 
 import TimerangeInfo from './TimerangeInfo';
 
@@ -53,30 +53,36 @@ jest.mock('views/stores/SearchStore', () => ({
 describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
+  const SUT = (props) => (
+    <TimeLocalizeContext.Provider value={{ localizeTime: (str) => str }}>
+      <TimerangeInfo {...props} />
+    </TimeLocalizeContext.Provider>
+  );
+
   it('should display the effective timerange as title', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-    render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
+    render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
     expect(screen.getByTitle('2021-03-27T14:32:31.894Z - 2021-04-26T14:32:48.000Z')).toBeInTheDocument();
   });
 
   it('should display a relative timerange', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-    render(<TimerangeInfo widget={relativeWidget} />);
+    render(<SUT widget={relativeWidget} />);
 
     expect(screen.getByText('an hour ago - Now')).toBeInTheDocument();
   });
 
   it('should display a relative timerange with from and to', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', from: 3000, to: 2000 }).build();
-    render(<TimerangeInfo widget={relativeWidget} />);
+    render(<SUT widget={relativeWidget} />);
 
     expect(screen.getByText('an hour ago - 33 minutes ago')).toBeInTheDocument();
   });
 
   it('should display a All Time', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 0 }).build();
-    render(<TimerangeInfo widget={relativeWidget} />);
+    render(<SUT widget={relativeWidget} />);
 
     expect(screen.getByText('All Time')).toBeInTheDocument();
   });
@@ -85,7 +91,7 @@ describe('TimerangeInfo', () => {
     const absoluteWidget = widget.toBuilder()
       .timerange({ type: 'absolute', from: '2021-03-27T14:32:31.894Z', to: '2021-04-26T14:32:48.000Z' })
       .build();
-    render(<TimerangeInfo widget={absoluteWidget} />);
+    render(<SUT widget={absoluteWidget} />);
 
     expect(screen.getByText('2021-03-27T14:32:31.894Z - 2021-04-26T14:32:48.000Z')).toBeInTheDocument();
   });
@@ -94,7 +100,7 @@ describe('TimerangeInfo', () => {
     const keywordWidget = widget.toBuilder()
       .timerange({ type: 'keyword', keyword: '5 minutes ago' })
       .build();
-    render(<TimerangeInfo widget={keywordWidget} />);
+    render(<SUT widget={keywordWidget} />);
 
     expect(screen.getByText('5 minutes ago')).toBeInTheDocument();
   });
