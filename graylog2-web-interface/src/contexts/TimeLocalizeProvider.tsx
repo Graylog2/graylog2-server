@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Server Side Public License, version 1,
  * as published by MongoDB, Inc.
