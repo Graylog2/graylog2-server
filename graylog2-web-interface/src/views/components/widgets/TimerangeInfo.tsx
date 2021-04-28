@@ -40,7 +40,7 @@ const Wrapper = styled.div(({ theme }) => css`
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE);
   const { result, widgetMapping } = useStore(SearchStore);
-  const searchTypeId = widgetMapping.get(widgetId).first();
+  const searchTypeId = widgetId ? widgetMapping.get(widgetId).first() : undefined;
   const effectiveTimerange = activeQuery && searchTypeId ? result?.results[activeQuery].searchTypes[searchTypeId].effective_timerange : {};
   const effectiveTimerangeString = timerangeToString(effectiveTimerange);
 
