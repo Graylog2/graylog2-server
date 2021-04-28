@@ -1,36 +1,71 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] = `
-.c0.content {
+.c1.content {
   background-color: #fff;
   border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
 
-.c1 {
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding-top: 25vh;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  height: 100%;
+}
+
+.c0 .row {
+  width: 100%;
+}
+
+.c0::before,
+.c0::after {
+  content: none;
+}
+
+.c2 {
   padding: 15px;
   background-color: #fff;
   border: 1px solid #a6a6a6;
   border-radius: 4px;
   box-shadow: 0 0 21px rgba(243,243,243,0.5);
-  margin-top: 120px;
 }
 
-.c1 legend {
+.c2 legend {
   color: #575757;
   border-color: #737373;
 }
 
 <div>
   <div
-    class="container"
+    class="c0 container"
   >
     <div
-      class="c0 row"
+      class="c1 row"
     >
       <div
-        class="c1 col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3"
+        class="col-md-8 col-md-offset-2"
+      />
+    </div>
+    <div
+      class="c1 row"
+    >
+      <div
+        class="c2 col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3"
       >
         <div />
       </div>
