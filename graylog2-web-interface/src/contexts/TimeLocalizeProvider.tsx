@@ -15,22 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
-import { get } from 'lodash';
+import { useCallback, useContext } from 'react';
 import moment from 'moment-timezone';
 
-import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
-import { useStore } from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
+import TimeLocalizeContext, { TimeLocalizeContextType } from 'contexts/TimeLocalizeContext';
 import AppConfig from 'util/AppConfig';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 type Props = {
-  children: React.ReactChildren | React.ReactChild,
+  children: React.ReactChildren | React.ReactChild | ((timeLocalize: TimeLocalizeContextType) => Element),
 };
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-const ACCEPTED_FORMATS = {
+export const ACCEPTED_FORMATS = {
   DATE: 'YYYY-MM-DD',
   TIME: 'HH:mm:ss.SSS',
   DATETIME: 'YYYY-MM-DD HH:mm:ss', // Use to show local times when decimal second precision is not important
@@ -42,8 +38,12 @@ const ACCEPTED_FORMATS = {
   ISO_8601: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // Standard, but not really nice to read. Mostly used for machine communication
 };
 
+/**
+ * Provides a function to convert a ACCEPTED_FORMAT of a timestamp into a timestamp converted to the users timezone.
+ * @param children React components.
+ */
 const TimeLocalizeProvider = ({ children }: Props) => {
-  const currentUser = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
+  const currentUser = useContext(CurrentUserContext);
 
   const getUserTimezone = useCallback(() => {
     if (currentUser?.timezone) {
