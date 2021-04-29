@@ -26,7 +26,7 @@ import { readableRange } from 'views/logic/queries/TimeRangeToString';
 
 type Props = {
   timerange: TimeRange | NoTimeRangeOverride | null | undefined,
-  toggleDropdownShow: () => void,
+  toggleDropdownShow?: () => void,
 };
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
@@ -126,6 +126,10 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
         )}
     </TimeRangeWrapper>
   );
+};
+
+TimeRangeDisplay.defaultProps = {
+  toggleDropdownShow: undefined,
 };
 
 export default TimeRangeDisplay;
