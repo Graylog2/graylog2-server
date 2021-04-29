@@ -23,7 +23,9 @@ import { Button } from 'components/graylog';
 import QueryInput from './searchbar/AsyncQueryInput';
 
 const Wrapper = styled.div`
-  width: 30%;
+  width: 25%;
+  min-width: 300px;
+  max-width: 500px;
   display: flex;
   align-items: center;
 
