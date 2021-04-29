@@ -31,6 +31,7 @@ export type GlobalOverrideActionsType = RefluxActions<{
   query: (newQueryString: string) => Promise<GlobalOverrideStoreState>,
   set: (newTimeRange?: TimeRange, newQueryString?: string) => Promise<GlobalOverrideStoreState>,
   reset: () => Promise<GlobalOverrideStoreState>,
+  resetQuery: () => Promise<GlobalOverrideStoreState>,
   timerange: (newTimeRange?: TimeRange) => Promise<GlobalOverrideStoreState>,
 }>;
 
@@ -39,6 +40,7 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
   () => Reflux.createActions({
     query: { asyncResult: true },
     reset: { asyncResult: true },
+    resetQuery: { asyncResult: true },
     set: { asyncResult: true },
     timerange: { asyncResult: true },
   }),
@@ -61,12 +63,9 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
       }
     },
     getInitialState() {
-      console.log('override', this.globalOverride);
-
       return this.globalOverride;
     },
     set(newTimeRange: TimeRange | undefined, newQueryString?: string): Promise<GlobalOverride | undefined> {
-      console.log({ newTimeRange });
       const newQuery = newQueryString ? createElasticsearchQueryString(newQueryString) : undefined;
       const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
       const newGlobalOverride = currentGlobalOverride.toBuilder().query(newQuery).timerange(newTimeRange).build();
@@ -91,6 +90,14 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
       const promise = this._propagateNewGlobalOverride(undefined);
 
       GlobalOverrideActions.reset.promise(promise);
+
+      return promise;
+    },
+    resetQuery() {
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(this.globalOverride.timerange) : undefined;
+      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+
+      GlobalOverrideActions.resetQuery.promise(promise);
 
       return promise;
     },

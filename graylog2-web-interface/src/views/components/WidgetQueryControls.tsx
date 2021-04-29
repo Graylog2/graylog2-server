@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import { useContext } from 'react';
+import styled from 'styled-components';
 
 import { StreamsStore } from 'views/stores/StreamsStore';
 import connect, { useStore } from 'stores/connect';
@@ -42,6 +43,15 @@ import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
 import SearchBarForm from './searchbar/SearchBarForm';
+import QueryOverrideInfo from './QueryOverrideInfo';
+
+const SecondRow = styled.div`
+  display: flex;
+
+  .query {
+    flex: 1;
+  }
+`;
 
 type Props = {
   availableStreams: Array<any>,
@@ -60,6 +70,7 @@ const _onSubmit = (values, widget: Widget) => {
 };
 
 const _resetTimeRangeOverride = () => GlobalOverrideActions.timerange(undefined).then(SearchActions.refresh);
+const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(SearchActions.refresh);
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const widget = useContext(WidgetContext);
@@ -69,6 +80,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
   const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
+  const hasQueryOverride = globalOverride?.query !== undefined;
 
   return (
     <>
@@ -102,30 +114,30 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
               </Col>
             </TopRow>
 
-            <Row className="no-bm">
-              <Col md={12}>
-                <div className="pull-right search-help">
-                  <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                     title="Search query syntax documentation"
-                                     text={<Icon name="lightbulb" type="regular" />} />
-                </div>
-                <SearchButton disabled={isSubmitting || !isValid}
-                              dirty={dirty} />
+            <SecondRow>
+              <SearchButton disabled={isSubmitting || !isValid}
+                            dirty={dirty} />
 
-                <Field name="queryString">
-                  {({ field: { name, value, onChange } }) => (
-                    <QueryInput value={value}
-                                placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                onChange={(newQuery) => {
-                                  onChange({ target: { value: newQuery, name } });
+              <Field name="queryString">
+                {({ field: { name, value, onChange } }) => (
+                  <QueryInput value={value}
+                              placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                              onChange={(newQuery) => {
+                                onChange({ target: { value: newQuery, name } });
 
-                                  return Promise.resolve(newQuery);
-                                }}
-                                onExecute={handleSubmit as () => void} />
-                  )}
-                </Field>
-              </Col>
-            </Row>
+                                return Promise.resolve(newQuery);
+                              }}
+                              onExecute={handleSubmit as () => void} />
+                )}
+              </Field>
+
+              <div className="pull-right search-help">
+                <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                   title="Search query syntax documentation"
+                                   text={<Icon name="lightbulb" type="regular" />} />
+              </div>
+              {hasQueryOverride && <QueryOverrideInfo query={globalOverride?.query} onReset={_resetQueryOverride} />}
+            </SecondRow>
           </>
         )}
       </SearchBarForm>

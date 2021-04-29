@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import type { ElasticsearchQueryString } from 'views/logic/queries/Query';
 import { Button } from 'components/graylog';
 
-import QueryInput from './searchbar/QueryInput';
+import QueryInput from './searchbar/AsyncQueryInput';
 
 const Wrapper = styled.div`
   width: 30%;
