@@ -26,6 +26,7 @@ const Wrapper = styled.div`
   width: 30%;
   display: flex;
   align-items: center;
+
   &::before {
     box-shadow: 17px 0 16px -16px rgb(0 0 0 / 40%) inset;
   }
@@ -37,7 +38,8 @@ const TimeRangeInfo = styled.div(({ theme }) => `
   display: flex;
   align-items: center;
   width: 100%;
-  border-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
   padding: 0 5px;
   min-height: 34px;
   border-left: 0;
@@ -60,7 +62,7 @@ const TimeRangeOverrideInfo = ({ value, onReset }: Props) => {
   return (
     <Wrapper>
       <TimeRangeInfo>
-        <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} />
+        <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} height={32} />
         <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset}>Reset Global Filter</ResetButton>
       </TimeRangeInfo>
     </Wrapper>
