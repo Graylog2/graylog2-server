@@ -114,30 +114,44 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                     .forEach(searchSourceBuilder::aggregation);
         }
 
-        final String rowsAggregationName = queryContext.nextName();
-        contextMap.put(pivot.id() + ROWS_POSTFIX, rowsAggregationName);
-
         final List<BucketOrder> bucketOrder = orderListForPivot(pivot, queryContext);
-        final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
 
-        if (pivot.rollup()) {
-            seriesAggregations.forEach(rowsAggregation::subAggregation);
-        }
+        // if we have at least one row defined:
+        if(pivotHasFields(pivot.rowGroups())) {
+            final String rowsAggregationName = queryContext.nextName();
+            contextMap.put(pivot.id() + ROWS_POSTFIX, rowsAggregationName);
 
-        // If the rowGroups does not have at least one field, the script stays empty ("") which leads to an error in ES
-        if(pivotHasFields(pivot.rowGroups()))
+            final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
+
+            if (pivot.rollup()) {
+                seriesAggregations.forEach(rowsAggregation::subAggregation);
+            }
+
             searchSourceBuilder.aggregation(rowsAggregation);
 
-        if (!pivot.columnGroups().isEmpty()) {
-            final String columnsAggregationName = queryContext.nextName();
-            contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
-            final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
+            if (!pivot.columnGroups().isEmpty()) {
+                final String columnsAggregationName = queryContext.nextName();
+                contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
+                final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
 
-            seriesAggregations.forEach(columnsAggregation::subAggregation);
+                seriesAggregations.forEach(columnsAggregation::subAggregation);
 
-            rowsAggregation.subAggregation(columnsAggregation);
+                rowsAggregation.subAggregation(columnsAggregation);
+            }
+        } else {
+            // if we have only columns defined
+            if (!pivot.columnGroups().isEmpty()) {
+                final String columnsAggregationName = queryContext.nextName();
+                contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
+                final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
+
+                if (pivot.rollup()) {
+                    seriesAggregations.forEach(columnsAggregation::subAggregation);
+                }
+
+                searchSourceBuilder.aggregation(columnsAggregation);
+            }
         }
-
 
         final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
         final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
@@ -295,10 +309,34 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 LOG.warn("Expected aggregation '{}' not found in aggregations.", rowsAggName);
             }
         } else {
-            LOG.warn("Expected row-key '{}' not found in queryContext", rowKey);
+            // in the case that only columns were defined
+            final String colKey = pivot.id() + COLUMNS_POSTFIX;
+            if(queryContext.contextMap().containsKey(colKey)) {
+                final String colsAggName = queryContext.contextMap().get(colKey).toString();
+                final MultiBucketsAggregation columnsResult = queryResult.getAggregations().get(colsAggName);
+                if (columnsResult != null) {
+                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.<String>builder().build()).source("leaf");
+
+                    if (pivot.rollup()) {
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
+                    }
+
+                    columnsResult.getBuckets().forEach(columnBucket -> {
+                        final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                        pivot.series().stream()
+                                .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
+                                .forEach(rowBuilder::addValue);
+                     });
+
+                    resultBuilder.addRow(rowBuilder.build());
+                } else {
+                    LOG.warn("Expected aggregation '{}' not found in aggregations.", colsAggName);
+                }
+            }
         }
 
-        return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+        final PivotResult pvr = pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+        return pvr;
     }
 
     private Stream<PivotResult.Value> createRowValuesForSeries(Pivot pivot, SearchResponse queryResult, ESGeneratedQueryContext queryContext, MultiBucketsAggregation.Bucket bucket, SeriesSpec seriesSpec) {
