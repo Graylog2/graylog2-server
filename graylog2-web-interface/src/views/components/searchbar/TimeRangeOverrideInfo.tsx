@@ -54,7 +54,9 @@ const TimeRangeOverrideInfo = ({ value, onReset }: Props) => {
       <TimeRangeButton disabled />
       <TimeRangeInfo>
         <TimeRangeDisplay timerange={value} />
-        <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset}>Reset Global Override</ResetButton>
+        <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
+          Reset Global Override
+        </ResetButton>
       </TimeRangeInfo>
     </Wrapper>
   );
