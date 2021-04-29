@@ -161,7 +161,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
     const menuItems = [];
     const lockedItems = [];
 
-    queries.forEach((id, index) => {
+    queries.forEach((id) => {
       const openTitleEditModal = (activeQueryTitle: string) => {
         if (queryTitleEditModal) {
           queryTitleEditModal.current.open(activeQueryTitle);
@@ -169,10 +169,10 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
       };
 
       if (!titles.has(id) && lockedTab !== id && selectedQueryId === id) {
-        onTitleChange(id, `Page#${index + 1}`).then(() => setLockedTab(id));
+        onTitleChange(id, `Page#${queries.size}`).then(() => setLockedTab(id));
       }
 
-      const title = titles.get(id, `Page#${index + 1}`);
+      const title = titles.get(id, `Page#${queries.size}`);
       const tabTitle = (
         <QueryTitle active={id === selectedQueryId}
                     id={id}
