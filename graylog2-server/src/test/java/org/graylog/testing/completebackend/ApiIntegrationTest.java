@@ -45,4 +45,6 @@ public @interface ApiIntegrationTest {
     Class<? extends PluginJarsProvider> pluginJarsProvider() default DefaultPluginJarsProvider.class;
 
     Class<? extends MavenProjectDirProvider> mavenProjectDirProvider() default DefaultMavenProjectDirProvider.class;
+
+    String[] mongoDBFixtures() default {};
 }

@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -67,8 +69,11 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
     }
 
-    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle) {
+    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, List<URL> fixtureResources) {
         MongoDBInstance mongoDb = createWithDefaults(network, lifecycle);
+        if (! fixtureResources.isEmpty()) {
+            mongoDb.fixtureImporter = new MongoDBFixtureImporter(fixtureResources);
+        }
         mongoDb.start();
         return mongoDb;
     }

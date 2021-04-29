@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -41,9 +42,11 @@ public class GraylogBackend {
     private static GraylogBackend instance;
 
     public static GraylogBackend createStarted(int[] extraPorts,
-            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir) {
+            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+            List<URL> mongoDBFixtures) {
         if (instance == null) {
-            instance = createStartedBackend(extraPorts, elasticsearchInstanceFactory, pluginJars, mavenProjectDir);
+            instance = createStartedBackend(extraPorts, elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
+                    mongoDBFixtures);
         } else {
             instance.fullReset();
             LOG.info("Reusing running backend");
@@ -56,14 +59,16 @@ public class GraylogBackend {
     // MongoDB and the node have to be started in sequence however, because the the node might crash,
     // if a MongoDb instance isn't already present while it's starting up.
     private static GraylogBackend createStartedBackend(int[] extraPorts,
-            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir) {
+            ElasticsearchInstanceFactory elasticsearchInstanceFactory, List<Path> pluginJars, Path mavenProjectDir,
+            List<URL> mongoDBFixtures) {
         Network network = Network.newNetwork();
 
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
 
         Future<ElasticsearchInstance> esFuture = executor.submit(() -> elasticsearchInstanceFactory.create(network));
 
-        MongoDBInstance mongoDB = MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
+        MongoDBInstance mongoDB =
+                MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS, mongoDBFixtures);
 
         try {
             // Wait for ES before starting the Graylog node to avoid any race conditions
