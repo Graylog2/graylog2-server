@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { TimeRange } from 'src/views/logic/queries/Query';
 import styled from 'styled-components';
 
+import { TimeRange } from 'views/logic/queries/Query';
 import { Button } from 'components/graylog';
 
 import TimeRangeButton from './TimeRangeButton';
