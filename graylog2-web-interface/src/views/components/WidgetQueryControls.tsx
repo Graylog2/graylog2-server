@@ -69,7 +69,7 @@ const _onSubmit = (values, widget: Widget) => {
   return WidgetActions.update(widget.id, newWidget);
 };
 
-const _resetTimeRangeOverride = () => GlobalOverrideActions.timerange(undefined).then(SearchActions.refresh);
+const _resetTimeRangeOverride = () => GlobalOverrideActions.resetTimeRange().then(SearchActions.refresh);
 const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(SearchActions.refresh);
 
 const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {

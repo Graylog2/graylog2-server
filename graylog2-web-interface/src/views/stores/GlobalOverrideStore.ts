@@ -32,6 +32,7 @@ export type GlobalOverrideActionsType = RefluxActions<{
   set: (newTimeRange?: TimeRange, newQueryString?: string) => Promise<GlobalOverrideStoreState>,
   reset: () => Promise<GlobalOverrideStoreState>,
   resetQuery: () => Promise<GlobalOverrideStoreState>,
+  resetTimeRange: () => Promise<GlobalOverrideStoreState>,
   timerange: (newTimeRange?: TimeRange) => Promise<GlobalOverrideStoreState>,
 }>;
 
@@ -41,6 +42,7 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
     query: { asyncResult: true },
     reset: { asyncResult: true },
     resetQuery: { asyncResult: true },
+    resetTimeRange: { asyncResult: true },
     set: { asyncResult: true },
     timerange: { asyncResult: true },
   }),
@@ -90,6 +92,14 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
       const promise = this._propagateNewGlobalOverride(undefined);
 
       GlobalOverrideActions.reset.promise(promise);
+
+      return promise;
+    },
+    resetTimeRange() {
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(undefined, this.globalOverride.query) : undefined;
+      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+
+      GlobalOverrideActions.resetTimeRange.promise(promise);
 
       return promise;
     },
