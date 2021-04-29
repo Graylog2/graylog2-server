@@ -136,7 +136,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                    title="Search query syntax documentation"
                                    text={<Icon name="lightbulb" type="regular" />} />
               </div>
-              {hasQueryOverride && <QueryOverrideInfo query={globalOverride?.query} onReset={_resetQueryOverride} />}
+              {hasQueryOverride && <QueryOverrideInfo value={globalOverride?.query} onReset={_resetQueryOverride} />}
             </SecondRow>
           </>
         )}

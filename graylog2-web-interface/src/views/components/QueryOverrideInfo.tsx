@@ -52,17 +52,16 @@ const ResetButton = styled(Button)`
 `;
 
 type Props = {
-  query: ElasticsearchQueryString,
+  value: ElasticsearchQueryString,
   onReset: () => void
 };
 
-const TimeRangeOverrideInfo = ({ query, onReset }: Props) => {
+const TimeRangeOverrideInfo = ({ value, onReset }: Props) => {
   return (
     <Wrapper>
       <TimeRangeInfo>
-        Filter:
-        <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={query.query_string} />
-        <ResetButton bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={onReset}>Reset</ResetButton>
+        <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} />
+        <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset}>Reset Global Filter</ResetButton>
       </TimeRangeInfo>
     </Wrapper>
   );
