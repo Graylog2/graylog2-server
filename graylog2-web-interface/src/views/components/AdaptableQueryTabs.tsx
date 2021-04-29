@@ -100,7 +100,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
   }
 `);
 
-const adjustTabsVisibility = (maxWidth, lockedTab) => {
+const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
   const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)') as NodeListOf<HTMLElement>;
   const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li') as NodeListOf<HTMLElement>;
@@ -142,6 +142,11 @@ const adjustTabsVisibility = (maxWidth, lockedTab) => {
 
     if (!hiddenItems.includes(idx)) {
       tabItem.classList.add(CLASS_HIDDEN);
+
+      if (tabItem.classList.contains('active')) {
+        const { tabId } = tabItem.querySelector('a').dataset;
+        setLockedTab(tabId);
+      }
     }
   });
 
@@ -181,43 +186,52 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                     title={title} />
       );
 
-      navItems.push(lockedTab === id ? null : (
-        <NavItem eventKey={id}
-                 key={id}
-                 data-tab-id={id}
-                 onClick={() => {
-                   setLockedTab(undefined);
-                   onSelect(id);
-                 }}>{tabTitle}
-        </NavItem>
-      ));
+      if (lockedTab === id) {
+        navItems.push(null);
 
-      menuItems.push(lockedTab === id ? null : (
-        <MenuItem eventKey={id}
-                  key={id}
-                  onClick={() => {
-                    setLockedTab(id);
-                    onSelect(id);
-                  }}>{tabTitle}
-        </MenuItem>
-      ));
+        menuItems.push(null);
 
-      lockedItems.push(lockedTab !== id ? null : (
-        <NavItem eventKey={id}
-                 key={id}
-                 data-tab-id={id}
-                 onClick={() => onSelect(id)}
-                 className={CLASS_LOCKED}>
-          {tabTitle}
-        </NavItem>
-      ));
+        lockedItems.push((
+          <NavItem eventKey={id}
+                   key={id}
+                   data-tab-id={id}
+                   onClick={() => onSelect(id)}
+                   className={CLASS_LOCKED}>
+            {tabTitle}
+          </NavItem>
+        ));
+      } else {
+        navItems.push((
+          <NavItem eventKey={id}
+                   key={id}
+                   data-tab-id={id}
+                   onClick={() => {
+                     setLockedTab(undefined);
+                     onSelect(id);
+                   }}>
+            {tabTitle}
+          </NavItem>
+        ));
+
+        menuItems.push((
+          <MenuItem eventKey={id}
+                    key={id}
+                    onClick={() => {
+                      setLockedTab(id);
+                      onSelect(id);
+                    }}>{tabTitle}
+          </MenuItem>
+        ));
+
+        lockedItems.push(null);
+      }
     });
 
     return { navItems, menuItems, lockedItems };
   }, [lockedTab, onRemove, onSelect, onTitleChange, queries, queryTitleEditModal, selectedQueryId, titles]);
 
   useEffect(() => {
-    adjustTabsVisibility(maxWidth, lockedTab);
+    adjustTabsVisibility(maxWidth, lockedTab, setLockedTab);
   }, [maxWidth, lockedTab, selectedQueryId]);
 
   return (
