@@ -42,6 +42,7 @@ interface TabsTypes {
 
 const CLASS_HIDDEN = 'hidden';
 const CLASS_LOCKED = 'locked';
+const CLASS_ACTIVE = 'active';
 const NAV_PADDING = 15;
 
 const StyledQueryNav = styled(Nav)(({ theme }) => css`
@@ -142,11 +143,10 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
 
     if (!hiddenItems.includes(idx)) {
       tabItem.classList.add(CLASS_HIDDEN);
+    } else if (tabItem.classList.contains(CLASS_ACTIVE)) {
+      const { tabId } = tabItem.querySelector('a').dataset;
 
-      if (tabItem.classList.contains('active')) {
-        const { tabId } = tabItem.querySelector('a').dataset;
-        setLockedTab(tabId);
-      }
+      setLockedTab(tabId);
     }
   });
 
@@ -186,45 +186,38 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                     title={title} />
       );
 
-      if (lockedTab === id) {
-        navItems.push(null);
+      navItems.push(lockedTab === id ? null : (
+        <NavItem eventKey={id}
+                 key={id}
+                 data-tab-id={id}
+                 onClick={() => {
+                   setLockedTab(undefined);
+                   onSelect(id);
+                 }}>
+          {tabTitle}
+        </NavItem>
+      ));
 
-        menuItems.push(null);
+      menuItems.push(lockedTab === id ? null : (
+        <MenuItem eventKey={id}
+                  key={id}
+                  data-tab-id={id}
+                  onClick={() => {
+                    setLockedTab(id);
+                    onSelect(id);
+                  }}>{tabTitle}
+        </MenuItem>
+      ));
 
-        lockedItems.push((
-          <NavItem eventKey={id}
-                   key={id}
-                   data-tab-id={id}
-                   onClick={() => onSelect(id)}
-                   className={CLASS_LOCKED}>
-            {tabTitle}
-          </NavItem>
-        ));
-      } else {
-        navItems.push((
-          <NavItem eventKey={id}
-                   key={id}
-                   data-tab-id={id}
-                   onClick={() => {
-                     setLockedTab(undefined);
-                     onSelect(id);
-                   }}>
-            {tabTitle}
-          </NavItem>
-        ));
-
-        menuItems.push((
-          <MenuItem eventKey={id}
-                    key={id}
-                    onClick={() => {
-                      setLockedTab(id);
-                      onSelect(id);
-                    }}>{tabTitle}
-          </MenuItem>
-        ));
-
-        lockedItems.push(null);
-      }
+      lockedItems.push(lockedTab !== id ? null : (
+        <NavItem eventKey={id}
+                 key={id}
+                 data-tab-id={id}
+                 onClick={() => onSelect(id)}
+                 className={CLASS_LOCKED}>
+          {tabTitle}
+        </NavItem>
+      ));
     });
 
     return { navItems, menuItems, lockedItems };
