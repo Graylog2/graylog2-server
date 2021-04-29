@@ -17,11 +17,22 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { MockStore } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
 
 import Widget from 'views/logic/widgets/Widget';
 import TimeLocalizeContext from 'contexts/TimeLocalizeContext';
+import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import TimerangeInfo from './TimerangeInfo';
+
+jest.mock('views/stores/GlobalOverrideStore', () => ({
+  GlobalOverrideStore: MockStore(
+    ['listen', () => jest.fn()],
+    'get',
+    ['getInitialState', jest.fn()],
+  ),
+}));
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
@@ -103,5 +114,18 @@ describe('TimerangeInfo', () => {
     render(<SUT widget={keywordWidget} />);
 
     expect(screen.getByText('5 minutes ago')).toBeInTheDocument();
+  });
+
+  it('should display global override', () => {
+    const state: GlobalOverrideStoreState = GlobalOverride.empty().toBuilder().timerange({ type: 'relative', range: 3000 }).build();
+    asMock(GlobalOverrideStore.getInitialState).mockReturnValue(state);
+
+    const keywordWidget = widget.toBuilder()
+      .timerange({ type: 'keyword', keyword: '5 minutes ago' })
+      .build();
+
+    render(<SUT widget={keywordWidget} />);
+
+    expect(screen.getByText('Global Override: an hour ago - Now')).toBeInTheDocument();
   });
 });
