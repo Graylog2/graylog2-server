@@ -15,31 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
+import { singleton } from 'views/logic/singleton';
 
-type Props = {
-  children: string,
-  titleOverride?: string,
+export type TimeLocalizeContextType = {
+  localizeTime: (string) => string,
 };
 
-/**
- * Component that signals text overflow to users by using an ellipsis.
- * The parent component needs a concrete width.
- */
-const TextOverflowEllipsis = ({ children, titleOverride }: Props) => (
-  <Wrapper title={titleOverride || children}>
-    {children}
-  </Wrapper>
-);
+const TimeLocalizeContext = React.createContext<TimeLocalizeContextType | undefined>(undefined);
 
-TextOverflowEllipsis.defaultProps = {
-  titleOverride: undefined,
-};
-
-export default TextOverflowEllipsis;
+export default singleton('contexts.TimeLocalizeContext', () => TimeLocalizeContext);

@@ -26,7 +26,6 @@ import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
-import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 
 const Container = styled.div`
@@ -71,7 +70,6 @@ const EditWidgetFrame = ({ children, onCancel, onFinish }: Props) => {
         <IfDashboard>
           <QueryControls>
             <QueryEditModeContext.Provider value="widget">
-              <HeaderElements />
               <WidgetQueryControls />
             </QueryEditModeContext.Provider>
           </QueryControls>
