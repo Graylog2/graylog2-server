@@ -59,7 +59,7 @@ const DeleteButton = styled.span`
 const DEFAULT_PAGINATION = {
   query: '',
   page: 1,
-  perPage: 5,
+  perPage: 10,
 };
 
 class SavedSearchList extends React.Component<Props, State> {
@@ -172,8 +172,7 @@ class SavedSearchList extends React.Component<Props, State> {
         <PaginatedList onChange={this.handlePageChange}
                        activePage={page}
                        totalItems={total}
-                       pageSize={perPage}
-                       pageSizes={[5, 10, 15]}>
+                       pageSize={perPage}>
           <ListGroup>{savedSearchList}</ListGroup>
         </PaginatedList>
       )
