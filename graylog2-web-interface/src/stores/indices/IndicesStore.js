@@ -38,7 +38,7 @@ export type IndexShardRouting = {
   relocating_to: null,
 };
 
-export type Indice = {
+export type IndexInfo = {
   primary_shards: {
     flush: IndiceElement,
     get: IndiceElement,
