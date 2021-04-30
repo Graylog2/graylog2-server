@@ -60,17 +60,15 @@ type Props = {
   onReset: () => void
 };
 
-const TimeRangeOverrideInfo = ({ value, onReset }: Props) => {
-  return (
-    <Wrapper>
-      <TimeRangeInfo>
-        <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} height={32} />
-        <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
-          Reset Global Filter
-        </ResetButton>
-      </TimeRangeInfo>
-    </Wrapper>
-  );
-};
+const WidgetQueryOverride = ({ value, onReset }: Props) => (
+  <Wrapper>
+    <TimeRangeInfo>
+      <QueryInput onChange={() => Promise.resolve('')} onExecute={() => {}} disabled value={value.query_string} height={32} />
+      <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
+        Reset Global Filter
+      </ResetButton>
+    </TimeRangeInfo>
+  </Wrapper>
+);
 
-export default TimeRangeOverrideInfo;
+export default WidgetQueryOverride;

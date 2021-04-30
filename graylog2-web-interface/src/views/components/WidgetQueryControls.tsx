@@ -43,7 +43,7 @@ import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
 import SearchBarForm from './searchbar/SearchBarForm';
-import QueryOverrideInfo from './QueryOverrideInfo';
+import WidgetQueryOverride from './WidgetQueryOverride';
 
 const SecondRow = styled.div`
   display: flex;
@@ -136,7 +136,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                    title="Search query syntax documentation"
                                    text={<Icon name="lightbulb" type="regular" />} />
               </div>
-              {hasQueryOverride && <QueryOverrideInfo value={globalOverride?.query} onReset={_resetQueryOverride} />}
+              {hasQueryOverride && <WidgetQueryOverride value={globalOverride?.query} onReset={_resetQueryOverride} />}
             </SecondRow>
           </>
         )}
