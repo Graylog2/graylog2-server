@@ -24,7 +24,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const IndexerOverviewActions = ActionsProvider.getActions('IndexerOverview');
 
-export type Indice = {
+export type IndexSummary = {
   size: {
     events: number,
     deleted: number,
