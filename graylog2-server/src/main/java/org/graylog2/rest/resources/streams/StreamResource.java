@@ -122,6 +122,7 @@ public class StreamResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put("id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.ID))
             .put(StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE))
             .put(StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION))
             .build();
