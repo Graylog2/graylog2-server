@@ -50,7 +50,7 @@ import static java.util.Locale.ENGLISH;
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
             .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
             .build();
