@@ -24,6 +24,7 @@ import Spinner from 'components/common/Spinner';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
+import StreamQueryHelp from './StreamQueryHelp';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
@@ -160,7 +161,10 @@ class StreamComponent extends React.Component {
         <PaginatedList onChange={this._onPageChange}
                        totalItems={pagination.total}>
           <div style={{ marginBottom: 15 }}>
-            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+            <SearchForm onSearch={this._onSearch}
+                        onReset={this._onReset}
+                        queryHelpComponent={<StreamQueryHelp />}
+                        useLoadingState />
           </div>
           <div>{streamListComp}</div>
         </PaginatedList>
