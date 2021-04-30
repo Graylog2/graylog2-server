@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
 import MockStore from 'helpers/mocking/StoreMock';
 
@@ -116,65 +116,67 @@ describe('WidgetQueryControls', () => {
   });
 
   describe('displays if global override is set', () => {
-    const resetTimeRangeButtonId = 'reset-global-time-range';
-    const resetQueryButtonId = 'reset-global-query';
+    const resetTimeRangeButtonTitle = /reset global override/i;
+    const resetQueryButtonTitle = /reset global filter/i;
+    const timeRangeOverrideInfo = '2020-01-01T10:00:00.850Z - 2020-01-02T10:00:00.000Z';
+    const queryOverrideInfo = globalOverrideWithQuery.query.query_string;
 
     it('shows preview of global override time range', async () => {
-      const { findByText, findByTestId } = renderSUT({ globalOverride: globalOverrideWithTimeRange });
+      renderSUT({ globalOverride: globalOverrideWithTimeRange });
 
-      await findByTestId(resetTimeRangeButtonId);
-      await findByText(globalOverrideWithTimeRange.timerange.from);
+      await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
+      await screen.findByText(timeRangeOverrideInfo);
     });
 
     it('shows preview of global override query', async () => {
-      const { findByText, findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      renderSUT({ globalOverride: globalOverrideWithQuery });
 
-      await findByTestId(resetQueryButtonId);
-      await findByText(globalOverrideWithQuery.query.query_string);
+      await screen.findByRole('button', { name: resetQueryButtonTitle });
+      await screen.findByText(queryOverrideInfo);
     });
 
     it('does not show any indicator if global override is not set', async () => {
-      const { queryByTestId } = renderSUT({ globalOverride: emptyGlobalOverride });
+      renderSUT({ globalOverride: emptyGlobalOverride });
 
-      expect(queryByTestId(resetQueryButtonId)).toBeNull();
-      expect(queryByTestId(resetTimeRangeButtonId)).toBeNull();
+      expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
+      expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
     });
 
     it('triggers resetting global override when reset time range override button is clicked', async () => {
-      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithTimeRange });
-      const resetTimeRangeOverrideButton = await findByTestId(resetTimeRangeButtonId);
+      renderSUT({ globalOverride: globalOverrideWithTimeRange });
+      const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       fireEvent.click(resetTimeRangeOverrideButton);
 
       expect(GlobalOverrideActions.resetTimeRange).toHaveBeenCalled();
     });
 
     it('triggers resetting global override when reset query filter button is clicked', async () => {
-      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const resetQueryFilterButton = await findByTestId(resetQueryButtonId);
+      renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);
 
       expect(GlobalOverrideActions.resetQuery).toHaveBeenCalled();
     });
 
     it('executes search when reset time range override button is clicked', async () => {
-      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithTimeRange });
-      const resetTimeRangeOverrideButton = await findByTestId(resetTimeRangeButtonId);
+      renderSUT({ globalOverride: globalOverrideWithTimeRange });
+      const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       fireEvent.click(resetTimeRangeOverrideButton);
       await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('executes search when reset query filter button is clicked', async () => {
-      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const resetQueryFilterButton = await findByTestId(resetQueryButtonId);
+      renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);
       await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notifications', async () => {
-      const { findByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQueryAndTimeRange });
+      const { rerender } = renderSUT({ globalOverride: globalOverrideWithQueryAndTimeRange });
 
-      await findByText(globalOverrideWithQuery.query.query_string);
-      await findByText(globalOverrideWithTimeRange.timerange.from);
+      await screen.findByText(queryOverrideInfo);
+      await screen.findByText(timeRangeOverrideInfo);
 
       rerender(
         <Wrapper>
@@ -182,8 +184,8 @@ describe('WidgetQueryControls', () => {
         </Wrapper>,
       );
 
-      expect(queryByText(globalOverrideWithQuery.query.query_string)).toBeNull();
-      expect(queryByText(globalOverrideWithTimeRange.timerange.from)).toBeNull();
+      expect(screen.queryByText(queryOverrideInfo)).toBeNull();
+      expect(screen.queryByText(timeRangeOverrideInfo)).toBeNull();
     });
   });
 });
