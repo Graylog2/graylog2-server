@@ -17,7 +17,8 @@
 import React, { useRef, useMemo } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
-import ReactSelect, { components as Components, Creatable as CreatableSelect, createFilter } from 'react-select';
+import ReactSelect, { components as Components, createFilter } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { Overlay } from 'react-overlays';
 import { useTheme } from 'styled-components';
 
