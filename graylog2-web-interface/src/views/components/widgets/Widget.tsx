@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import connect from 'stores/connect';
@@ -34,6 +35,8 @@ import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -94,6 +97,12 @@ const _visualizationForType = (type) => {
 const _editComponentForType = (type) => {
   return widgetDefinition(type).editComponent;
 };
+
+const WidgetFooter = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`;
 
 class Widget extends React.Component<Props, State> {
   static propTypes = {
@@ -268,6 +277,11 @@ class Widget extends React.Component<Props, State> {
               {visualization}
             </WidgetErrorBoundary>
           )}
+          <WidgetFooter>
+            <IfDashboard>
+              { !editing && <TimerangeInfo widget={widget} activeQuery={view.activeQuery} widgetId={id} /> }
+            </IfDashboard>
+          </WidgetFooter>
         </WidgetFrame>
       </WidgetColorContext>
     );
