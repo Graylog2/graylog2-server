@@ -40,6 +40,9 @@ const Wrapper = styled.div(({ theme }) => css`
   width: max-content;
 `);
 
+const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results[activeQuery]
+  .searchTypes[searchTypeId]?.effective_timerange;
+
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { localizeTime } = useContext(TimeLocalizeContext);
   const { result, widgetMapping } = useStore(SearchStore);
@@ -51,9 +54,9 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, localizeTime);
 
   const searchTypeId = widgetId ? widgetMapping.get(widgetId).first() : undefined;
-  const effectiveTimerange = activeQuery && searchTypeId ? result?.results[activeQuery]
-    .searchTypes[searchTypeId].effective_timerange : {};
-  const effectiveTimerangeString = timerangeToString(effectiveTimerange, localizeTime);
+
+  const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
+  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, localizeTime) : 'Effective widget time range is currently not available.';
 
   return (
     <Wrapper className={className}>
