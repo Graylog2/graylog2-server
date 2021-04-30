@@ -19,9 +19,9 @@ import styled from 'styled-components';
 
 import { TimeRange } from 'views/logic/queries/Query';
 import { Button } from 'components/graylog';
+import timerangeToString from 'views/logic/queries/TimeRangeToString';
 
 import TimeRangeButton from './TimeRangeButton';
-import TimeRangeDisplay from './TimeRangeDisplay';
 
 const Wrapper = styled.div`
   display: flex;
@@ -31,16 +31,30 @@ const Wrapper = styled.div`
 const TimeRangeInfo = styled.div(({ theme }) => `
   margin-left: 10px;
   border: 1px dashed ${theme.colors.input.border};
-  display: flex;
-  align-items: center;
   width: 100%;
   border-radius: 4px;
-  padding: 3px 5px;
+  padding: 0 5px;
   min-height: 34px;
 `);
 
+const TimeRangeString = styled.div(({ theme }) => `
+  display: inline-block;
+  margin-left: 0;
+  margin-top: 5px;
+  padding: 0 3px;
+  border-radius: 4px;
+  background-color: ${theme.colors.variant.lightest.primary};
+  color: ${theme.colors.variant.darker.primary};
+  font-size: ${theme.fonts.size.body};
+  font-family: ${theme.fonts.family.monospace};
+`);
+
 const ResetButton = styled(Button)`
+  margin-top: 5px;
+  margin-bottom: 5px;
   margin-left: 5px;
+  display: inline-block;
+  float: right;
 `;
 
 type Props = {
@@ -53,7 +67,7 @@ const TimeRangeOverrideInfo = ({ value, onReset }: Props) => {
     <Wrapper>
       <TimeRangeButton disabled />
       <TimeRangeInfo>
-        <TimeRangeDisplay timerange={value} />
+        <TimeRangeString>{timerangeToString(value)}</TimeRangeString>
         <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
           Reset Global Override
         </ResetButton>

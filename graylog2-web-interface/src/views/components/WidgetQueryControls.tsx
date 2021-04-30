@@ -27,7 +27,7 @@ import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { Col, Row } from 'components/graylog';
+import { Col } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
@@ -91,7 +91,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
         {({ dirty, isValid, isSubmitting, handleSubmit, values, setFieldValue }) => (
           <>
             <TopRow>
-              <Col md={4}>
+              <Col md={6}>
                 {!hasTimeRangeOverride && (
                   <TimeRangeInput disabled={hasTimeRangeOverride}
                                   onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
@@ -103,7 +103,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                 )}
               </Col>
 
-              <Col md={8}>
+              <Col md={6}>
                 <Field name="streams">
                   {({ field: { name, value, onChange } }) => (
                     <StreamsFilter value={value}
