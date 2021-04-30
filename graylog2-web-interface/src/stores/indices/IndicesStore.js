@@ -27,7 +27,7 @@ export type IndiceElement = {
   time_seconds: number,
 };
 
-export type IndiceRoutingItem = {
+export type IndexShardRouting = {
   id: number,
   state: string,
   active: boolean,
