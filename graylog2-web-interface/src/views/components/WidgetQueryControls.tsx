@@ -37,7 +37,7 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 
-import TimeRangeOverrideInfo from './searchbar/TimeRangeOverrideInfo';
+import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';

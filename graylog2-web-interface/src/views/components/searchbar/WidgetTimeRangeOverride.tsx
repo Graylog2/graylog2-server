@@ -62,18 +62,16 @@ type Props = {
   value: TimeRange,
 };
 
-const TimeRangeOverrideInfo = ({ value, onReset }: Props) => {
-  return (
-    <Wrapper>
-      <TimeRangeButton disabled />
-      <TimeRangeInfo>
-        <TimeRangeString>{timerangeToString(value)}</TimeRangeString>
-        <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
-          Reset Global Override
-        </ResetButton>
-      </TimeRangeInfo>
-    </Wrapper>
-  );
-};
+const WidgetTimeRangeOverride = ({ value, onReset }: Props) => (
+  <Wrapper>
+    <TimeRangeButton disabled />
+    <TimeRangeInfo>
+      <TimeRangeString>{timerangeToString(value)}</TimeRangeString>
+      <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
+        Reset Global Override
+      </ResetButton>
+    </TimeRangeInfo>
+  </Wrapper>
+);
 
-export default TimeRangeOverrideInfo;
+export default WidgetTimeRangeOverride;
