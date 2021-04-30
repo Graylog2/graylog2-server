@@ -50,7 +50,7 @@ type Props = {
 
 const IndexSetDetails = ({ indexSet }: Props) => {
   return (
-    <StyledRow className="index-set-details">
+    <StyledRow>
       <Col md={3}>
         <dl>
           <dt>Index prefix:</dt>
