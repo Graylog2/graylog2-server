@@ -39,6 +39,10 @@ type State = {
   perPage: number,
 };
 
+const StyledListGroup = styled.div`
+  clear: both;
+`;
+
 const AlertIcon = styled(Icon)(({ theme }) => css`
   margin-right: 6px;
   color: ${theme.colors.variant.primary};
@@ -173,7 +177,7 @@ class SavedSearchList extends React.Component<Props, State> {
                        activePage={page}
                        totalItems={total}
                        pageSize={perPage}>
-          <ListGroup>{savedSearchList}</ListGroup>
+          <StyledListGroup>{savedSearchList}</StyledListGroup>
         </PaginatedList>
       )
       : (
