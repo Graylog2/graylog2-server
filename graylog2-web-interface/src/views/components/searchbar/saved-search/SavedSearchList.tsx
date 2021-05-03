@@ -14,193 +14,164 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
-import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
-import connect from 'stores/connect';
+import type { PaginatedViews } from 'views/stores/ViewManagementStore';
+import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
-import { Icon, PaginatedList, SearchForm } from 'components/common';
+import { Icon, PaginatedList, SearchForm, Spinner } from 'components/common';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 
 type Props = {
   toggleModal: () => void,
   deleteSavedSearch: (view: View) => Promise<View>,
-  views: SavedSearchesState,
+  activeSavedSearchId: string,
 };
 
-type State = {
-  selectedSavedSearch?: string,
-  query: string,
-  page: number,
-  perPage: number,
-};
-
-const StyledListGroup = styled.div`
+const StyledListGroup = styled(ListGroup)`
   clear: both;
 `;
-
-const AlertIcon = styled(Icon)(({ theme }) => css`
-  margin-right: 6px;
-  color: ${theme.colors.variant.primary};
-`);
 
 const NoSavedSearches = styled(Alert)`
   clear: right;
   display: flex;
   align-items: center;
+  margin-top: 15px;
 `;
 
-const DeleteButton = styled.span`
-  position: absolute;
-  top: 10px;
-  right: 10px;
+const ListContainer = styled.div`
+  margin-top: 15px;
 `;
+
+const LoadingSpinner = styled(Spinner)`
+  margin-top: 15px;
+`;
+
+const DeleteButton = styled.span(({ theme }) => `
+  position: absolute;
+  margin-right: 10px;
+  width: 25px;
+  height: 25px;
+  right: 0;
+  top: 5px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${theme.colors.gray[60]};
+`);
 
 const DEFAULT_PAGINATION = {
   query: '',
   page: 1,
   perPage: 10,
+  count: 0,
 };
 
-class SavedSearchList extends React.Component<Props, State> {
-  static propTypes = {
-    toggleModal: PropTypes.func.isRequired,
-    deleteSavedSearch: PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    // eslint-disable-next-line react/default-props-match-prop-types
-    views: {
-      list: [],
-      pagination: {
-        ...DEFAULT_PAGINATION,
-        total: undefined,
-        count: undefined,
-      },
-    },
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      ...DEFAULT_PAGINATION,
-      selectedSavedSearch: undefined,
-    };
+const onLoad = (toggleModal, selectedSavedSearchId, loadFunc) => {
+  if (!selectedSavedSearchId || !loadFunc) {
+    return;
   }
 
-  componentDidMount() {
-    this.execSearch();
+  loadFunc(selectedSavedSearchId);
+
+  toggleModal();
+};
+
+const onDelete = (e, savedSearches, deleteSavedSearch, selectedSavedSearchId) => {
+  e.stopPropagation();
+
+  const selectedSavedSearch = savedSearches?.find((savedSearch) => savedSearch.id === selectedSavedSearchId);
+
+  if (savedSearches) {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`You are about to delete saved search: "${selectedSavedSearch.title}". Are you sure?`)) {
+      deleteSavedSearch(selectedSavedSearch);
+    }
   }
+};
 
-  execSearch = () => {
-    const { query, page, perPage } = this.state;
+const _loadSavesSearches = (pagination, setLoading, setPaginatedSavedSearches) => {
+  setLoading(true);
 
-    SavedSearchesActions.search(query, page, perPage);
-  };
+  SavedSearchesActions.search(pagination).then((paginatedSavedSearches) => {
+    setPaginatedSavedSearches(paginatedSavedSearches);
+    setLoading(false);
+  });
+};
 
-  handlePageChange = (page, perPage) => {
-    this.setState({ page: page, perPage: perPage }, this.execSearch);
-  };
+const _updateListOnSearchDelete = (perPage, query, setPagination) => ViewManagementActions.delete.completed.listen(() => setPagination({ page: DEFAULT_PAGINATION.page, perPage, query }));
 
-  handleSearch = (query) => {
-    this.setState({ query: query, page: 1 }, this.execSearch);
-  };
+const SavedSearchList = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => {
+  const [paginatedSavedSearches, setPaginatedSavedSearches] = useState<PaginatedViews | undefined>();
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [loading, setLoading] = useState(false);
+  const { page, query, perPage } = pagination;
+  const { list: savedSearches, pagination: { total = 0 } = {} } = paginatedSavedSearches || {};
 
-  handleSearchReset = () => {
-    this.setState({ query: '', page: 1 }, this.execSearch);
-  };
+  useEffect(() => _loadSavesSearches(pagination, setLoading, setPaginatedSavedSearches), [pagination]);
+  useEffect(() => _updateListOnSearchDelete(perPage, query, setPagination), [perPage, query]);
 
-  onLoad = (selectedSavedSearch, loadFunc) => {
-    const { toggleModal } = this.props;
+  const handleSearch = (newQuery: string) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page });
+  const handlePageSizeChange = (newPage: number, newPerPage: number) => setPagination({ ...pagination, page: newPage, perPage: newPerPage });
 
-    if (!selectedSavedSearch || !loadFunc) {
-      return;
-    }
-
-    loadFunc(selectedSavedSearch);
-
-    toggleModal();
-  };
-
-  onDelete = (e, selectedSavedSearch) => {
-    const { views, deleteSavedSearch } = this.props;
-    const { list } = views;
-
-    e.stopPropagation();
-
-    if (list) {
-      const viewIndex = list.findIndex((v) => v.id === selectedSavedSearch);
-
-      if (viewIndex < 0) {
-        return;
-      }
-
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`You are about to delete saved search: "${list[viewIndex].title}". Are you sure?`)) {
-        deleteSavedSearch(list[viewIndex]).then(() => {
-          this.execSearch();
-        });
-      }
-    }
-  };
-
-  render() {
-    const { views, toggleModal } = this.props;
-    const { total, page, perPage } = views.pagination;
-    const { selectedSavedSearch } = this.state;
-    const savedSearchList = (views.list || []).map((savedSearch) => {
-      return (
-        <ViewLoaderContext.Consumer key={savedSearch.id}>
-          {(loaderFunc) => (
-            <ListGroupItem active={selectedSavedSearch === savedSearch.id}
-                           onClick={() => this.onLoad(savedSearch.id, loaderFunc)}>
-              {savedSearch.title}
-              <span>
-                <DeleteButton onClick={(e) => this.onDelete(e, savedSearch.id)}>
-                  <Icon name="trash" title="Delete" data-testid={`delete-${savedSearch.id}`} />
-                </DeleteButton>
-              </span>
-            </ListGroupItem>
-          )}
-        </ViewLoaderContext.Consumer>
-      );
-    });
-
-    const renderResult = ((views && views.list) && views.list.length > 0)
-      ? (
-        <PaginatedList onChange={this.handlePageChange}
+  return (
+    <Modal show>
+      <Modal.Body>
+        <PaginatedList onChange={handlePageSizeChange}
                        activePage={page}
                        totalItems={total}
                        pageSize={perPage}>
-          <StyledListGroup>{savedSearchList}</StyledListGroup>
-        </PaginatedList>
-      )
-      : (
-        <NoSavedSearches>
-          <AlertIcon name="exclamation-triangle" size="lg" />
-          <span>No saved searches found.</span>
-        </NoSavedSearches>
-      );
-
-    return (
-      <Modal show>
-        <Modal.Body>
           <SearchForm focusAfterMount
-                      onSearch={this.handleSearch}
-                      onReset={this.handleSearchReset} />
-          {renderResult}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={toggleModal}>Cancel</Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  }
-}
+                      onSearch={handleSearch}
+                      topMargin={0}
+                      onReset={() => handleSearch('')} />
+          {loading && (<LoadingSpinner />)}
+          <ListContainer>
+            {!loading && total === 0 && (
+              <NoSavedSearches>
+                No saved searches found.
+              </NoSavedSearches>
+            )}
+            {savedSearches?.length > 0 && (
+              <StyledListGroup>
+                {savedSearches.map((savedSearch) => (
+                  <ViewLoaderContext.Consumer key={savedSearch.id}>
+                    {(loaderFunc) => (
+                      <ListGroupItem onClick={() => onLoad(toggleModal, savedSearch.id, loaderFunc)}
+                                     header={savedSearch.title}
+                                     active={savedSearch.id === activeSavedSearchId}>
+                        {savedSearch.summary}
+                        <DeleteButton onClick={(e) => onDelete(e, savedSearches, deleteSavedSearch, savedSearch.id)}
+                                      role="button"
+                                      title={`Delete search ${savedSearch.title}`}
+                                      tabIndex={0}>
+                          <Icon name="trash-alt" />
+                        </DeleteButton>
+                      </ListGroupItem>
+                    )}
+                  </ViewLoaderContext.Consumer>
+                ))}
+              </StyledListGroup>
+            )}
+          </ListContainer>
+        </PaginatedList>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={toggleModal}>Cancel</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
 
-export default connect(SavedSearchList, { views: SavedSearchesStore });
+SavedSearchList.propTypes = {
+  toggleModal: PropTypes.func.isRequired,
+  deleteSavedSearch: PropTypes.func.isRequired,
+};
+
+export default SavedSearchList;
