@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, within, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, within, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
@@ -32,6 +32,8 @@ import dataTable from 'views/components/datatable/bindings';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import AggregationWizard from '../AggregationWizard';
+
+const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
@@ -191,7 +193,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should require field when creating a sort element', async () => {
     renderSUT();
@@ -239,4 +241,40 @@ describe('AggregationWizard', () => {
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
   });
+
+  it('should correctly update sort of sort elements', async () => {
+    const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);
+    const sort2 = new SortConfig('pivot', 'took_ms', Direction.Descending);
+
+    const config = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot0, pivot1])
+      .sort([sort1, sort2])
+      .build();
+
+    const onChange = jest.fn();
+    renderSUT({ onChange, config });
+
+    const sortSection = await screen.findByTestId('Sort-section');
+
+    const firstItem = within(sortSection).getByTestId('sort-0-drag-handle');
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have lifted an item/i);
+    fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
+    await screen.findByText(/You have moved the item/i);
+    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+    await screen.findByText(/You have dropped the item/i);
+
+    const applyButton = await screen.findByRole('button', { name: 'Apply Changes' });
+    fireEvent.click(applyButton);
+
+    const updatedConfig = config
+      .toBuilder()
+      .sort([sort2, sort1])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  }, extendedTimeout);
 });

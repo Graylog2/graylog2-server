@@ -14,32 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
-
-const Wrapper = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-type Props = {
-  children: string,
-  titleOverride?: string,
+const config = {
+  preset: 'jest-preset-graylog',
+  setupFiles: [
+    '<rootDir>/test/setup-jest.js',
+  ],
+  setupFilesAfterEnv: [
+    'jest-enzyme',
+    '<rootDir>/test/configure-testing-library.js',
+  ],
+  testEnvironment: '<rootDir>/test/integration-environment.js',
+  testRegex: '\\.it\\.[jt]sx?$',
 };
 
-/**
- * Component that signals text overflow to users by using an ellipsis.
- * The parent component needs a concrete width.
- */
-const TextOverflowEllipsis = ({ children, titleOverride }: Props) => (
-  <Wrapper title={titleOverride || children}>
-    {children}
-  </Wrapper>
-);
-
-TextOverflowEllipsis.defaultProps = {
-  titleOverride: undefined,
-};
-
-export default TextOverflowEllipsis;
+module.exports = config;

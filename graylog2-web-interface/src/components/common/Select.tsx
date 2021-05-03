@@ -18,7 +18,8 @@ import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
 import { DefaultTheme, withTheme } from 'styled-components';
-import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
+import ReactSelect, { components as Components, createFilter } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 import { themePropTypes } from 'theme';
 
@@ -191,6 +192,7 @@ const _styles = ({ size, theme }) => ({
 
 type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>,
+  SelectContainer?: React.ComponentType<any>,
 };
 
 type Props = {
@@ -481,7 +483,7 @@ class Select extends React.Component<Props, State> {
       onReactSelectChange,
     } = this.props;
     const { customComponents, value } = this.state;
-    const SelectComponent = allowCreate ? Creatable : ReactSelect;
+    const SelectComponent = allowCreate ? CreatableSelect : ReactSelect;
 
     let formattedValue = value;
 

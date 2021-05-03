@@ -175,52 +175,56 @@ const Search = ({ location }: Props) => {
 
   return (
     <WidgetFocusProvider>
-      <CurrentViewTypeProvider>
-        <IfInteractive>
-          <IfDashboard>
-            <WindowLeaveMessage />
-          </IfDashboard>
-        </IfInteractive>
-        <InteractiveContext.Consumer>
-          {(interactive) => (
-            <SearchPageLayoutProvider>
-              <DefaultFieldTypesProvider>
-                <ViewAdditionalContextProvider>
-                  <HighlightingRulesProvider>
-                    <GridContainer id="main-row" interactive={interactive}>
-                      <IfInteractive>
-                        <ConnectedSidebar>
-                          <FieldsOverview />
-                        </ConnectedSidebar>
-                      </IfInteractive>
-                      <SearchArea>
-                        <IfInteractive>
-                          <HeaderElements />
-                          <IfDashboard>
-                            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                          </IfDashboard>
-                          <IfSearch>
-                            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                          </IfSearch>
+      <WidgetFocusContext.Consumer>
+        {({ focusedWidget: { focusing: focusingWidget, editing: editingWidget } = { focusing: false, editing: false } }) => (
+          <CurrentViewTypeProvider>
+            <IfInteractive>
+              <IfDashboard>
+                <WindowLeaveMessage />
+              </IfDashboard>
+            </IfInteractive>
+            <InteractiveContext.Consumer>
+              {(interactive) => (
+                <SearchPageLayoutProvider>
+                  <DefaultFieldTypesProvider>
+                    <ViewAdditionalContextProvider>
+                      <HighlightingRulesProvider>
+                        <GridContainer id="main-row" interactive={interactive}>
+                          <IfInteractive>
+                            <ConnectedSidebar>
+                              <FieldsOverview />
+                            </ConnectedSidebar>
+                          </IfInteractive>
+                          <SearchArea>
+                            <IfInteractive>
+                              <HeaderElements />
+                              <IfDashboard>
+                                {!editingWidget && <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />}
+                              </IfDashboard>
+                              <IfSearch>
+                                <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                              </IfSearch>
 
-                          <QueryBarElements />
+                              <QueryBarElements />
 
-                          <IfDashboard>
-                            <QueryBar />
-                          </IfDashboard>
-                        </IfInteractive>
-                        <HighlightMessageInQuery>
-                          <SearchResult />
-                        </HighlightMessageInQuery>
-                      </SearchArea>
-                    </GridContainer>
-                  </HighlightingRulesProvider>
-                </ViewAdditionalContextProvider>
-              </DefaultFieldTypesProvider>
-            </SearchPageLayoutProvider>
-          )}
-        </InteractiveContext.Consumer>
-      </CurrentViewTypeProvider>
+                              <IfDashboard>
+                                {!focusingWidget && <QueryBar />}
+                              </IfDashboard>
+                            </IfInteractive>
+                            <HighlightMessageInQuery>
+                              <SearchResult />
+                            </HighlightMessageInQuery>
+                          </SearchArea>
+                        </GridContainer>
+                      </HighlightingRulesProvider>
+                    </ViewAdditionalContextProvider>
+                  </DefaultFieldTypesProvider>
+                </SearchPageLayoutProvider>
+              )}
+            </InteractiveContext.Consumer>
+          </CurrentViewTypeProvider>
+        )}
+      </WidgetFocusContext.Consumer>
     </WidgetFocusProvider>
   );
 };

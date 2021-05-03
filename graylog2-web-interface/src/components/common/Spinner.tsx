@@ -26,7 +26,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 type Props = {
-  delay: number,
+  delay?: number,
   name?: string,
   text?: string,
 };

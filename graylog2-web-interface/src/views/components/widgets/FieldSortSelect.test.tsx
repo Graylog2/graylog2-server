@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
+import selectEvent from 'react-select-event';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import FieldType, { Property } from 'views/logic/fieldtypes/FieldType';
@@ -35,14 +36,23 @@ describe('FieldSortSelect', () => {
   const sort = [new SortConfig('pivot', 'http_method', Direction.Ascending)];
 
   it('should display current sort as selected option', () => {
-    const { getByText } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
+    render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
 
-    expect(getByText('http_method')).not.toBeNull();
+    expect(screen.getByText('http_method')).not.toBeNull();
   });
 
-  it('should open menu when focused', async () => {
-    const { findByText, container } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
-    fireEvent.focus(container.getElementsByTagName('input')[0]);
-    await findByText(/2 results available./);
+  it('should select field and update sort', async () => {
+    const onChangeStub = jest.fn();
+    render(<FieldSortSelect fields={fields} onChange={onChangeStub} sort={sort} />);
+
+    const fieldSelect = screen.getByLabelText('Select field for sorting');
+    await selectEvent.openMenu(fieldSelect);
+
+    await selectEvent.select(fieldSelect, 'date');
+
+    const updateSort = [new SortConfig('pivot', 'date', Direction.Ascending)];
+    await waitFor(() => expect(onChangeStub).toHaveBeenCalledTimes(1));
+
+    expect(onChangeStub).toHaveBeenCalledWith(updateSort);
   });
 });

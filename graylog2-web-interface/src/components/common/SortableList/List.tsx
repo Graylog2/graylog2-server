@@ -51,6 +51,7 @@ List.defaultProps = {
   disableDragging: false,
   customContentRender: undefined,
   customListItemRender: undefined,
+  items: [],
 };
 
 export default React.memo(List);

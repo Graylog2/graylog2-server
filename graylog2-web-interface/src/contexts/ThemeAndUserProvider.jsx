@@ -22,16 +22,19 @@ import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 import CurrentUserProvider from './CurrentUserProvider';
+import TimeLocalizeProvider from './TimeLocalizeProvider';
 
 const ThemeAndUserProvider = ({ children }) => {
   return (
     <CurrentUserProvider>
-      <CurrentUserPreferencesProvider>
-        <GraylogThemeProvider>
-          <GlobalThemeStyles />
-          {children}
-        </GraylogThemeProvider>
-      </CurrentUserPreferencesProvider>
+      <TimeLocalizeProvider>
+        <CurrentUserPreferencesProvider>
+          <GraylogThemeProvider>
+            <GlobalThemeStyles />
+            {children}
+          </GraylogThemeProvider>
+        </CurrentUserPreferencesProvider>
+      </TimeLocalizeProvider>
     </CurrentUserProvider>
   );
 };
