@@ -1,6 +1,3 @@
-/**
- * @jest-environment <rootDir>/test/integration-environment.js
- */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
