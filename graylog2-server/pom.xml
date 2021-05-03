@@ -972,7 +972,7 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>yarn test</id>
+                                <id>yarn test:integration</id>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
