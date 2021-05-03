@@ -148,10 +148,10 @@ class IndexSetPage extends React.Component<Props, State> {
       return <Spinner />;
     }
 
-    const { indexSet, indexerOverview, indexerOverviewError, params: { indexSetId }, indexDetails: { indices, closedIndices } } = this.props;
+    const { indexSet, indexerOverview, indexerOverviewError, params: { indexSetId }, indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } } = this.props;
 
     const pageHeader = indexSet && (
-      <PageHeader title={`Index Set: ${indexSet?.title}`}>
+      <PageHeader title={`Index Set: ${indexSet.title}`}>
         <span>
           This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
           for searches and analysis.
@@ -167,7 +167,7 @@ class IndexSetPage extends React.Component<Props, State> {
             <Button bsStyle="info">Index sets overview</Button>
           </LinkContainer>
           &nbsp;
-          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet?.id, 'details')}>
+          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
             <Button bsStyle="info">Edit Index Set</Button>
           </LinkContainer>
           &nbsp;
@@ -188,7 +188,7 @@ class IndexSetPage extends React.Component<Props, State> {
     let indicesInfo;
     let indicesOverview;
 
-    if (indexerOverview && closedIndices) {
+    if (indexerOverview && indexDetailsClosedIndices) {
       const deflectorInfo = indexerOverview.deflector;
 
       indicesInfo = (
@@ -206,9 +206,9 @@ class IndexSetPage extends React.Component<Props, State> {
 
       indicesOverview = (
         <IndicesOverview indices={indexerOverview.indices}
-                         indexDetails={indices}
+                         indexDetails={indexDetailsIndices}
                          indexSetId={indexSetId}
-                         closedIndices={closedIndices}
+                         closedIndices={indexDetailsClosedIndices}
                          deflector={indexerOverview.deflector} />
       );
     } else {

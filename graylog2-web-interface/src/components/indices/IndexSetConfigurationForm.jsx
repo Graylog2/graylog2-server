@@ -21,20 +21,20 @@ import moment from 'moment';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import HideOnCloud from 'util/conditional/HideOnCloud'; // Load rotation plugin UI plugins from core.
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/graylog/router';
 import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
-import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
-import {} from 'components/indices/retention';
+// import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
+// import {} from 'components/indices/retention';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 type Props = {
   indexSet: IndexSet,
-  rotationStrategies: any,
-  retentionStrategies: any,
+  rotationStrategies: Array<any>,
+  retentionStrategies: Array<any>,
   create: boolean,
   onUpdate: (indexSet: IndexSet) => void,
   cancelLink: string,
@@ -164,10 +164,10 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
       create,
       cancelLink,
       indexSet: {
-        rotation_strategy: rotationStrategy,
-        rotation_strategy_class: rotationStrategyClass,
-        retention_strategy: retentionStrategy,
-        retention_strategy_class: retentionStrategyClass,
+        rotation_strategy: indexSetRotationStrategy,
+        rotation_strategy_class: indexSetRotationStrategyClass,
+        retention_strategy: indexSetRetentionStrategy,
+        retention_strategy_class: IndexSetRetentionStrategyClass,
       },
     } = this.props;
     let rotationConfig;
@@ -175,8 +175,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     if (rotationStrategies) {
       // The component expects a different structure - legacy
       const activeConfig = {
-        config: rotationStrategy,
-        strategy: rotationStrategyClass,
+        config: indexSetRotationStrategy,
+        strategy: indexSetRotationStrategyClass,
       };
 
       rotationConfig = (
@@ -197,8 +197,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     if (retentionStrategies) {
       // The component expects a different structure - legacy
       const activeConfig = {
-        config: retentionStrategy,
-        strategy: retentionStrategyClass,
+        config: indexSetRetentionStrategy,
+        strategy: IndexSetRetentionStrategyClass,
       };
 
       retentionConfig = (

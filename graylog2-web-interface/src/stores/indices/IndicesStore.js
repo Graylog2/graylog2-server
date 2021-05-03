@@ -40,13 +40,13 @@ export type IndexShardRouting = {
 
 export type IndexInfo = {
   primary_shards: {
-    flush: IndiceElement,
-    get: IndiceElement,
-    index: IndiceElement,
-    merge: IndiceElement,
-    refresh: IndiceElement,
-    search_query: IndiceElement,
-    search_fetch: IndiceElement,
+    flush: IndexTimeAndTotalStats,
+    get: IndexTimeAndTotalStats,
+    index: IndexTimeAndTotalStats,
+    merge: IndexTimeAndTotalStats,
+    refresh: IndexTimeAndTotalStats,
+    search_query: IndexTimeAndTotalStats,
+    search_fetch: IndexTimeAndTotalStats,
     open_search_contexts: number,
     store_size_bytes: number,
     segments: number,
@@ -56,13 +56,13 @@ export type IndexInfo = {
     },
   },
   all_shards: {
-    flush: IndiceElement,
-    get: IndiceElement,
-    index: IndiceElement,
-    merge: IndiceElement,
-    refresh: IndiceElement,
-    search_query: IndiceElement,
-    search_fetch: IndiceElement,
+    flush: IndexTimeAndTotalStats,
+    get: IndexTimeAndTotalStats,
+    index: IndexTimeAndTotalStats,
+    merge: IndexTimeAndTotalStats,
+    refresh: IndexTimeAndTotalStats,
+    search_query: IndexTimeAndTotalStats,
+    search_fetch: IndexTimeAndTotalStats,
     open_search_contexts: number,
     store_size_bytes: number,
     segments: number,
@@ -71,16 +71,20 @@ export type IndexInfo = {
       deleted: number,
     },
   },
-  routing: Array<IndiceRoutingItem>,
+  routing: Array<IndexShardRouting>,
   reopened: boolean,
 };
 
 export type Indices = {
-  [key: string]: Indice,
+  [key: string]: IndexInfo,
 };
-type IndicesRequestResponse = {
-  all: Indices,
-  closed: Indices,
+type IndicesListResponse = {
+  all: {
+    indices: IndexInfo,
+  },
+  closed: {
+    indices: IndexInfo,
+  },
 };
 
 const IndicesActions = ActionsProvider.getActions('Indices');
@@ -97,7 +101,7 @@ const IndicesStore = Reflux.createStore({
 
   list(indexSetId: string) {
     const urlList = qualifyUrl(ApiRoutes.IndicesApiController.list(indexSetId).url);
-    const promise = fetch('GET', urlList).then((response: IndicesRequestResponse) => {
+    const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
@@ -110,7 +114,7 @@ const IndicesStore = Reflux.createStore({
 
   listAll() {
     const urlList = qualifyUrl(ApiRoutes.IndicesApiController.listAll().url);
-    const promise = fetch('GET', urlList).then((response: IndicesRequestResponse) => {
+    const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });

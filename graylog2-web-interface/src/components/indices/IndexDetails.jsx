@@ -23,12 +23,12 @@ import { Col, Row, Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider'; // To make IndexRangesActions work.
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
-import type { Indice } from 'stores/indices/IndicesStore';
+import type { IndexInfo } from 'stores/indices/IndicesStore';
 import type { IndexRange } from 'stores/indices/IndexRangesStore';
 import CombinedProvider from 'injection/CombinedProvider';
 
 type Props = {
-  index: Indice,
+  index: IndexInfo,
   indexName: string,
   indexRange: IndexRange,
   indexSetId: string,
@@ -48,6 +48,10 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
       IndicesActions.unsubscribe(indexName);
     };
   }, [indexName]);
+
+  if (!index || !index.all_shards) {
+    return <Spinner />;
+  }
 
   const _onRecalculateIndex = () => {
     if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
@@ -91,10 +95,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
       </span>
     );
   };
-
-  if (!index || !index.all_shards) {
-    return <Spinner />;
-  }
 
   return (
     <div className="index-info">

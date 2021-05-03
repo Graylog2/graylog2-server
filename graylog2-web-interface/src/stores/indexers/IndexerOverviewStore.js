@@ -63,7 +63,7 @@ export type IndexerOverview = {
     [key: string]: number,
   },
   indices: {
-    [key: string]: Indice,
+    [key: string]: IndexSummary,
   },
 };
 
