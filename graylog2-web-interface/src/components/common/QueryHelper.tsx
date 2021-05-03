@@ -37,7 +37,7 @@ type Props = {
 };
 
 const row = (field, description) => (
-  <tr>
+  <tr key={`row-field-${field}`}>
     <td>{field}</td>
     <td>{description}</td>
   </tr>

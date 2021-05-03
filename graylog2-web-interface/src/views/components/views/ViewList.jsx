@@ -20,11 +20,11 @@ import PropTypes from 'prop-types';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted, PaginatedList, SearchForm, Spinner, EntityList, ShareButton } from 'components/common';
 import EntityShareModal from 'components/permissions/EntityShareModal';
+import QueryHelper from 'components/common/QueryHelper';
 
 import View from './View';
 
 import ViewTypeLabel from '../ViewTypeLabel';
-import QueryHelper from '../../../components/common/QueryHelper';
 
 const itemActionsFactory = (view, onViewDelete, setViewToShare) => {
   return (

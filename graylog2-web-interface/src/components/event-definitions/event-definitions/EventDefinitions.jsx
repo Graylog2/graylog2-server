@@ -27,10 +27,10 @@ import {
   PaginatedList,
   SearchForm,
 } from 'components/common';
+import QueryHelper from 'components/common/QueryHelper';
 
 import styles from './EventDefinitions.css';
 import EventDefinitionEntry from './EventDefinitionEntry';
-import QueryHelper from '../../common/QueryHelper';
 
 class EventDefinitions extends React.Component {
   static propTypes = {

@@ -31,11 +31,11 @@ import {
   SearchForm,
   Spinner,
   Icon,
+  QueryHelper,
 } from 'components/common';
 import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';
-import QueryHelper from '../../common/QueryHelper';
 
 class EventNotifications extends React.Component {
   static propTypes = {
