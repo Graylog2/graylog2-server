@@ -972,6 +972,16 @@
                                 </configuration>
                             </execution>
                             <execution>
+                                <id>yarn test</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <arguments>test:integration</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>yarn tsc</id>
                                 <goals>
                                     <goal>yarn</goal>
