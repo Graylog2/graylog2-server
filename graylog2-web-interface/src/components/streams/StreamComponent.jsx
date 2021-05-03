@@ -21,10 +21,10 @@ import { Alert } from 'components/graylog';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
+import QueryHelper from 'components/common/QueryHelper';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
-import StreamQueryHelp from './StreamQueryHelp';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
@@ -163,7 +163,7 @@ class StreamComponent extends React.Component {
           <div style={{ marginBottom: 15 }}>
             <SearchForm onSearch={this._onSearch}
                         onReset={this._onReset}
-                        queryHelpComponent={<StreamQueryHelp />}
+                        queryHelpComponent={<QueryHelper entityName="stream" />}
                         useLoadingState />
           </div>
           <div>{streamListComp}</div>
