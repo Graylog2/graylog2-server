@@ -53,7 +53,7 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
 
   const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, localizeTime);
 
-  const searchTypeId = widgetId ? widgetMapping.get(widgetId).first() : undefined;
+  const searchTypeId = widgetId ? widgetMapping.get(widgetId)?.first() : undefined;
 
   const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
   const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, localizeTime) : 'Effective widget time range is currently not available.';

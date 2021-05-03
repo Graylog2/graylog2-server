@@ -81,24 +81,6 @@ describe('TimerangeInfo', () => {
     expect(screen.getByTitle('2021-03-27T14:32:31.894Z - 2021-04-26T14:32:48.000Z')).toBeInTheDocument();
   });
 
-  it('should not throw error when related search type is empty', () => {
-    const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-
-    asMock(SearchStore.getInitialState).mockReturnValueOnce(mockSearchStoreState({
-      result: {
-        results: {
-          'active-query-id': {
-            searchTypes: {},
-          },
-        },
-      },
-    }));
-
-    render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
-
-    expect(screen.getByText('an hour ago - Now')).toBeInTheDocument();
-  });
-
   it('should display a relative timerange', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     render(<SUT widget={relativeWidget} />);
@@ -149,5 +131,33 @@ describe('TimerangeInfo', () => {
     render(<SUT widget={keywordWidget} />);
 
     expect(screen.getByText('Global Override: an hour ago - Now')).toBeInTheDocument();
+  });
+
+  it('should not throw error when related search type is empty', () => {
+    const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
+
+    asMock(SearchStore.getInitialState).mockReturnValueOnce(mockSearchStoreState({
+      result: {
+        results: {
+          'active-query-id': {
+            searchTypes: {},
+          },
+        },
+      },
+    }));
+
+    render(<SUT widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
+
+    expect(screen.getByText('an hour ago - Now')).toBeInTheDocument();
+  });
+
+  it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
+    asMock(SearchStore.getInitialState).mockReturnValueOnce(mockSearchStoreState({
+      widgetMapping: Immutable.Map(),
+    }));
+
+    render(<SUT widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
+
+    expect(screen.getByText('5 minutes ago - Now')).toBeInTheDocument();
   });
 });
