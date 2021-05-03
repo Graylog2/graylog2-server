@@ -24,6 +24,7 @@ import FieldTypeMapping, { FieldTypeMappingJSON } from 'views/logic/fieldtypes/F
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query, { TimeRange } from 'views/logic/queries/Query';
+import { GlobalOverrideStore, GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
 
 import { QueryFiltersStore } from './QueryFiltersStore';
 
@@ -74,6 +75,7 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
       this.all();
       this.listenTo(QueryFiltersStore, this.onQueryFiltersUpdate, this.onQueryFiltersUpdate);
       this.listenTo(CurrentQueryStore, this.onCurrentQueryUpdate, this.onCurrentQueryUpdate);
+      this.listenTo(GlobalOverrideStore, this.onGlobalOverrideUpdate, this.onGlobalOverrideUpdate);
     },
 
     getInitialState() {
@@ -90,6 +92,11 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
       this.refresh();
     },
 
+    onGlobalOverrideUpdate(newGlobalOverride: GlobalOverrideStoreState) {
+      this._overrideTimerange = newGlobalOverride?.timerange;
+      this.refresh();
+    },
+
     all(timerange: TimeRange) {
       const promise = fetchAllFieldTypes(timerange)
         .then((response) => {
@@ -103,9 +110,10 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
     },
 
     refresh() {
-      const allFields = fetchAllFieldTypes(this._timerange);
+      const timerange = this._overrideTimerange ?? this._timerange;
+      const allFields = fetchAllFieldTypes(timerange);
       const promises = this._streamIds?.map((filters, queryId) => (filters.size > 0
-        ? this.forStreams(filters, this._timerange)
+        ? this.forStreams(filters, timerange)
         : allFields)
         .then((response) => ({
           queryId,
