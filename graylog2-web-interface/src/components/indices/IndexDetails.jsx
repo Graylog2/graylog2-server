@@ -14,39 +14,71 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col, Row, Button } from 'components/graylog';
 import { Spinner } from 'components/common';
-import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider'; // To make IndexRangesActions work.
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
+import type { IndexInfo } from 'stores/indices/IndicesStore';
+import type { IndexRange } from 'stores/indices/IndexRangesStore';
+import CombinedProvider from 'injection/CombinedProvider';
 
-const IndicesActions = ActionsProvider.getActions('Indices');
-const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+type Props = {
+  index: IndexInfo,
+  indexName: string,
+  indexRange: IndexRange,
+  indexSetId: string,
+  isDeflector: boolean,
+};
+
+const { IndicesActions } = CombinedProvider.get('Indices');
+const { IndexRangesActions } = CombinedProvider.get('IndexRanges');
 
 StoreProvider.getStore('IndexRanges');
 
-class IndexDetails extends React.Component {
-  static propTypes = {
-    index: PropTypes.object.isRequired,
-    indexName: PropTypes.string.isRequired,
-    indexRange: PropTypes.object.isRequired,
-    indexSetId: PropTypes.string.isRequired,
-    isDeflector: PropTypes.bool.isRequired,
+const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }: Props) => {
+  useEffect(() => {
+    IndicesActions.subscribe(indexName);
+
+    return () => {
+      IndicesActions.unsubscribe(indexName);
+    };
+  }, [indexName]);
+
+  if (!index || !index.all_shards) {
+    return <Spinner />;
+  }
+
+  const _onRecalculateIndex = () => {
+    if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
+      IndexRangesActions.recalculateIndex(indexName).then(() => {
+        IndicesActions.list(indexSetId);
+      });
+    }
   };
 
-  componentDidMount() {
-    IndicesActions.subscribe(this.props.indexName);
-  }
+  const _onCloseIndex = () => {
+    if (window.confirm(`Really close index ${indexName}?`)) {
+      IndicesActions.close(indexName).then(() => {
+        IndicesActions.list(indexSetId);
+      });
+    }
+  };
 
-  componentWillUnmount() {
-    IndicesActions.unsubscribe(this.props.indexName);
-  }
+  const _onDeleteIndex = () => {
+    if (window.confirm(`Really delete index ${indexName}?`)) {
+      IndicesActions.delete(indexName).then(() => {
+        IndicesActions.list(indexSetId);
+      });
+    }
+  };
 
-  _formatActionButtons = () => {
-    if (this.props.isDeflector) {
+  const _formatActionButtons = () => {
+    if (isDeflector) {
       return (
         <span>
           <Button bsStyle="warning" bsSize="xs" disabled>Active write index cannot be closed</Button>{' '}
@@ -57,52 +89,21 @@ class IndexDetails extends React.Component {
 
     return (
       <span>
-        <Button bsStyle="warning" bsSize="xs" onClick={this._onRecalculateIndex}>Recalculate index ranges</Button>{' '}
-        <Button bsStyle="warning" bsSize="xs" onClick={this._onCloseIndex}>Close index</Button>{' '}
-        <Button bsStyle="danger" bsSize="xs" onClick={this._onDeleteIndex}>Delete index</Button>
+        <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>Recalculate index ranges</Button>{' '}
+        <Button bsStyle="warning" bsSize="xs" onClick={_onCloseIndex}>Close index</Button>{' '}
+        <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>Delete index</Button>
       </span>
     );
   };
 
-  _onRecalculateIndex = () => {
-    if (window.confirm(`Really recalculate the index ranges for index ${this.props.indexName}?`)) {
-      IndexRangesActions.recalculateIndex(this.props.indexName).then(() => {
-        IndicesActions.list(this.props.indexSetId);
-      });
-    }
-  };
+  return (
+    <div className="index-info">
+      <IndexRangeSummary indexRange={indexRange} />{' '}
 
-  _onCloseIndex = () => {
-    if (window.confirm(`Really close index ${this.props.indexName}?`)) {
-      IndicesActions.close(this.props.indexName).then(() => {
-        IndicesActions.list(this.props.indexSetId);
-      });
-    }
-  };
-
-  _onDeleteIndex = () => {
-    if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
-      IndicesActions.delete(this.props.indexName).then(() => {
-        IndicesActions.list(this.props.indexSetId);
-      });
-    }
-  };
-
-  render() {
-    if (!this.props.index || !this.props.index.all_shards) {
-      return <Spinner />;
-    }
-
-    const { index, indexRange, indexName } = this.props;
-
-    return (
-      <div className="index-info">
-        <IndexRangeSummary indexRange={indexRange} />{' '}
-
+      <HideOnCloud>
         {index.all_shards.segments} segments,{' '}
         {index.all_shards.open_search_contexts} open search contexts,{' '}
         {index.all_shards.documents.deleted} deleted messages
-
         <Row style={{ marginBottom: '10' }}>
           <Col md={4} className="shard-meters">
             <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
@@ -111,15 +112,21 @@ class IndexDetails extends React.Component {
             <ShardMeter title="Total shard operations" shardMeter={index.all_shards} />
           </Col>
         </Row>
-
         <ShardRoutingOverview routing={index.routing} indexName={indexName} />
+      </HideOnCloud>
+      <hr style={{ marginBottom: '5', marginTop: '10' }} />
 
-        <hr style={{ marginBottom: '5', marginTop: '10' }} />
+      {_formatActionButtons()}
+    </div>
+  );
+};
 
-        {this._formatActionButtons()}
-      </div>
-    );
-  }
-}
+IndexDetails.propTypes = {
+  index: PropTypes.object.isRequired,
+  indexName: PropTypes.string.isRequired,
+  indexRange: PropTypes.object.isRequired,
+  indexSetId: PropTypes.string.isRequired,
+  isDeflector: PropTypes.bool.isRequired,
+};
 
 export default IndexDetails;

@@ -14,12 +14,78 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// @flow strict
 import Reflux from 'reflux';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+
+export type IndexTimeAndTotalStats = {
+  total: number,
+  time_seconds: number,
+};
+
+export type IndexShardRouting = {
+  id: number,
+  state: string,
+  active: boolean,
+  primary: boolean,
+  node_id: string,
+  node_name: string,
+  node_hostname: string,
+  relocating_to: null,
+};
+
+export type IndexInfo = {
+  primary_shards: {
+    flush: IndexTimeAndTotalStats,
+    get: IndexTimeAndTotalStats,
+    index: IndexTimeAndTotalStats,
+    merge: IndexTimeAndTotalStats,
+    refresh: IndexTimeAndTotalStats,
+    search_query: IndexTimeAndTotalStats,
+    search_fetch: IndexTimeAndTotalStats,
+    open_search_contexts: number,
+    store_size_bytes: number,
+    segments: number,
+    documents: {
+      count: number,
+      deleted: number,
+    },
+  },
+  all_shards: {
+    flush: IndexTimeAndTotalStats,
+    get: IndexTimeAndTotalStats,
+    index: IndexTimeAndTotalStats,
+    merge: IndexTimeAndTotalStats,
+    refresh: IndexTimeAndTotalStats,
+    search_query: IndexTimeAndTotalStats,
+    search_fetch: IndexTimeAndTotalStats,
+    open_search_contexts: number,
+    store_size_bytes: number,
+    segments: number,
+    documents: {
+      count: number,
+      deleted: number,
+    },
+  },
+  routing: Array<IndexShardRouting>,
+  reopened: boolean,
+};
+
+export type Indices = {
+  [key: string]: IndexInfo,
+};
+type IndicesListResponse = {
+  all: {
+    indices: IndexInfo,
+  },
+  closed: {
+    indices: IndexInfo,
+  },
+};
 
 const IndicesActions = ActionsProvider.getActions('Indices');
 
@@ -32,9 +98,10 @@ const IndicesStore = Reflux.createStore({
   getInitialState() {
     return { indices: this.indices, closedIndices: this.closedIndices };
   },
-  list(indexSetId) {
-    const urlList = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.list(indexSetId).url);
-    const promise = fetch('GET', urlList).then((response) => {
+
+  list(indexSetId: string) {
+    const urlList = qualifyUrl(ApiRoutes.IndicesApiController.list(indexSetId).url);
+    const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
@@ -44,9 +111,10 @@ const IndicesStore = Reflux.createStore({
 
     IndicesActions.list.promise(promise);
   },
+
   listAll() {
-    const urlList = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.listAll().url);
-    const promise = fetch('GET', urlList).then((response) => {
+    const urlList = qualifyUrl(ApiRoutes.IndicesApiController.listAll().url);
+    const promise = fetch('GET', urlList).then((response: IndicesListResponse) => {
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
@@ -56,6 +124,7 @@ const IndicesStore = Reflux.createStore({
 
     IndicesActions.listAll.promise(promise);
   },
+
   multiple() {
     const indexNames = Object.keys(this.registrations);
 
@@ -63,9 +132,9 @@ const IndicesStore = Reflux.createStore({
       return;
     }
 
-    const urlList = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
+    const urlList = qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
     const request = { indices: indexNames };
-    const promise = fetch('POST', urlList, request).then((response) => {
+    const promise = fetch('POST', urlList, request).then((response: Indices) => {
       this.indices = { ...this.indices, ...response };
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
 
@@ -74,28 +143,28 @@ const IndicesStore = Reflux.createStore({
 
     IndicesActions.multiple.promise(promise);
   },
-  close(indexName) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.close(indexName).url);
+  close(indexName: string) {
+    const url = qualifyUrl(ApiRoutes.IndicesApiController.close(indexName).url);
     const promise = fetch('POST', url);
 
     IndicesActions.close.promise(promise);
   },
-  delete(indexName) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.delete(indexName).url);
+  delete(indexName: string) {
+    const url = qualifyUrl(ApiRoutes.IndicesApiController.delete(indexName).url);
     const promise = fetch('DELETE', url);
 
     IndicesActions.delete.promise(promise);
   },
-  reopen(indexName) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.reopen(indexName).url);
+  reopen(indexName: string) {
+    const url = qualifyUrl(ApiRoutes.IndicesApiController.reopen(indexName).url);
     const promise = fetch('POST', url);
 
     IndicesActions.reopen.promise(promise);
   },
-  subscribe(indexName) {
+  subscribe(indexName: string) {
     this.registrations[indexName] = this.registrations[indexName] ? this.registrations[indexName] + 1 : 1;
   },
-  unsubscribe(indexName) {
+  unsubscribe(indexName: string) {
     this.registrations[indexName] = this.registrations[indexName] > 0 ? this.registrations[indexName] - 1 : 0;
 
     if (this.registrations[indexName] === 0) {
