@@ -189,7 +189,7 @@ public class ContentPackResource extends RestResource {
     ) {
         checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
-        ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
+        ContentPack contentPack = contentPackPersistenceService.findByIdAndRevisionFilteringInvalidStreamReferences(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
         return contentPack;
     }
