@@ -30,7 +30,7 @@ const COMMON_FIELD_MAP = {
 type CommonFields = keyof typeof COMMON_FIELD_MAP;
 
 type Props = {
-  commonFields?: CommonFields,
+  commonFields?: Array<CommonFields>,
   fieldMap?: { [field: string]: string },
   example?: string,
   entityName?: string,

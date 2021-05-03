@@ -27,6 +27,7 @@ import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
+import QueryHelper from 'components/common/QueryHelper';
 
 type Props = {
   toggleModal: () => void,
@@ -133,6 +134,7 @@ const SavedSearchList = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }
                        pageSize={perPage}>
           <SearchForm focusAfterMount
                       onSearch={handleSearch}
+                      queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
                       topMargin={0}
                       onReset={() => handleSearch('')} />
           {loading && (<LoadingSpinner />)}

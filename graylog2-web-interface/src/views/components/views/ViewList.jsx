@@ -24,6 +24,7 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import View from './View';
 
 import ViewTypeLabel from '../ViewTypeLabel';
+import QueryHelper from '../../../components/common/QueryHelper';
 
 const itemActionsFactory = (view, onViewDelete, setViewToShare) => {
   return (
@@ -106,6 +107,7 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
                      pageSizes={[10, 50, 100]}>
         <div style={{ marginBottom: 15 }}>
           <SearchForm onSearch={(newQuery) => dispatch({ type: 'search', payload: { newQuery } })}
+                      queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'summary']} />}
                       onReset={() => dispatch({ type: 'searchReset' })}
                       topMargin={0} />
         </div>

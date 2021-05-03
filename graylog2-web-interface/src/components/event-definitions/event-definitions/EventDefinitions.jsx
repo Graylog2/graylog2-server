@@ -30,6 +30,7 @@ import {
 
 import styles from './EventDefinitions.css';
 import EventDefinitionEntry from './EventDefinitionEntry';
+import QueryHelper from '../../common/QueryHelper';
 
 class EventDefinitions extends React.Component {
   static propTypes = {
@@ -92,6 +93,7 @@ class EventDefinitions extends React.Component {
                       searchButtonLabel="Find"
                       placeholder="Find Event Definitions"
                       wrapperClass={styles.inline}
+                      queryHelpComponent={<QueryHelper entityName="event definition" />}
                       queryWidth={200}
                       topMargin={0}
                       useLoadingState>

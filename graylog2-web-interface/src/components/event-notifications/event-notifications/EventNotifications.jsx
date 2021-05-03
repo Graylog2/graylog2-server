@@ -35,6 +35,7 @@ import {
 import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';
+import QueryHelper from '../../common/QueryHelper';
 
 class EventNotifications extends React.Component {
   static propTypes = {
@@ -172,6 +173,7 @@ class EventNotifications extends React.Component {
                         searchButtonLabel="Find"
                         placeholder="Find Notifications"
                         wrapperClass={styles.inline}
+                        queryHelpComponent={<QueryHelper entityName="notification" />}
                         queryWidth={200}
                         topMargin={0}
                         useLoadingState>
