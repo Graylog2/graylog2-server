@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
@@ -61,11 +61,11 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
   const [{ query, page, perPage }, dispatch] = useReducer(reducer, { query: '', page: 1, perPage: 10 });
   const [viewToShare, setViewToShare] = useState();
 
-  const execSearch = () => handleSearch(query, page, perPage);
+  const execSearch = useCallback(() => handleSearch(query, page, perPage), [handleSearch, page, perPage, query]);
 
   useEffect(() => {
     execSearch();
-  }, [query, page, perPage]);
+  }, [query, page, perPage, execSearch]);
 
   const onViewDelete = (view) => () => {
     handleViewDelete(view).then(() => {
@@ -107,7 +107,7 @@ const ViewList = ({ pagination, handleSearch, handleViewDelete, views }) => {
                      pageSizes={[10, 50, 100]}>
         <div style={{ marginBottom: 15 }}>
           <SearchForm onSearch={(newQuery) => dispatch({ type: 'search', payload: { newQuery } })}
-                      queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'summary']} />}
+                      queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
                       onReset={() => dispatch({ type: 'searchReset' })}
                       topMargin={0} />
         </div>
