@@ -35,7 +35,7 @@ const Container = styled.div`
   width: 100%;
 
   /* Bottom gap is defined by the footer */
-  padding: 15px 15px 0 15px;
+  padding: 9px 9px 0 9px;
 `;
 
 const StyledGrid = styled(Grid)`
