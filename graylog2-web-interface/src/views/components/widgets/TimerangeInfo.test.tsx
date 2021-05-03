@@ -122,7 +122,7 @@ describe('TimerangeInfo', () => {
 
   it('should display global override', () => {
     const state: GlobalOverrideStoreState = GlobalOverride.empty().toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-    asMock(GlobalOverrideStore.getInitialState).mockReturnValue(state);
+    asMock(GlobalOverrideStore.getInitialState).mockReturnValueOnce(state);
 
     const keywordWidget = widget.toBuilder()
       .timerange({ type: 'keyword', keyword: '5 minutes ago' })
