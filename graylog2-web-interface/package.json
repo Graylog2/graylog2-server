@@ -21,8 +21,8 @@
     "lint:styles": "stylelint './src/**/*.{js,jsx,ts,tsx}' --syntax css-in-js",
     "lint:styles:path": "stylelint --syntax css-in-js",
     "lint:changes": "./dev/lintChanges.sh",
-    "test": "jest",
-    "test:integration": "jest --config jest.it.config.js",
+    "test": "jest --maxWorkers=50%",
+    "test:integration": "jest --maxWorkers=50% --config jest.it.config.js",
     "check-production-build": "node checkProductionBuild.js"
   },
   "eslintConfig": {
