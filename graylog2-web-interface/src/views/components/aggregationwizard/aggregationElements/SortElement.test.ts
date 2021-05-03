@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { SortFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import SortElement from './SortElement';
 
