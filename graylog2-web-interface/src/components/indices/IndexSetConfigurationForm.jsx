@@ -27,8 +27,8 @@ import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
-// import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
-// import {} from 'components/indices/retention';
+import {} from 'components/indices/rotation';
+import {} from 'components/indices/retention';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 type Props = {
