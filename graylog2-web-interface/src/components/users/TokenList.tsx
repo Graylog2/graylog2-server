@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -54,14 +53,14 @@ const StyledLastAccess = styled.div`
 
 type Props = {
   creatingToken: boolean,
-  deletingToken: ?string,
+  deletingToken?: string,
   onCreate: (tokenName: string) => Promise<Token>,
   onDelete: (tokenId: string, tokenName: string) => void,
   tokens: TokenSummary[],
 };
 
 const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }: Props) => {
-  const [createdToken, setCreatedToken] = useState<?Token>();
+  const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
 
   const effectiveTokens = useMemo(() => {
@@ -88,7 +87,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
     };
   };
 
-  const updateQuery = (nextQuery: ?string) => setQuery(nextQuery || '');
+  const updateQuery = (nextQuery?: string) => setQuery(nextQuery || '');
 
   return (
     <span>
@@ -104,7 +103,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
               {createdToken.token}
               <StyledCopyTokenButton title={<Icon name="clipboard" fixedWidth />} text={createdToken.token} bsSize="xsmall" />
             </pre>
-            <Button bsStyle="primary" onClick={() => setCreatedToken()}>Done</Button>
+            <Button bsStyle="primary" onClick={() => setCreatedToken(undefined)}>Done</Button>
           </Panel.Body>
         </StyledTokenPanel>
       )}
