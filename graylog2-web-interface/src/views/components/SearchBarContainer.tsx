@@ -14,22 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Row as BootstrapRow } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-export const RowContentStyles = css(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  margin-bottom: 6px;
-  border-radius: 4px;
-`);
+import { RowContentStyles } from 'components/graylog/Row';
 
-const Row = styled(BootstrapRow)`
-  &.content {
-    ${RowContentStyles}
+const SearchBarContainer = styled.div`
+  ${RowContentStyles}
+  padding: 9px;
+  margin-left: -15px;
+  margin-right: -15px;
+
+  .row {
+    margin-left: -9px;
+    margin-right: -9px;
+  }
+
+  div[class*="col-"] {
+    padding-right: 9px;
+    padding-left: 9px;
   }
 `;
 
-/** @component */
-export default Row;
+export default SearchBarContainer;
