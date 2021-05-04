@@ -66,10 +66,10 @@ import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
@@ -86,6 +86,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -224,10 +227,18 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
-        final PutTemplate request = new PutTemplate.Builder(templateName, template).build();
+        final PutTemplate request = new PutTemplate.Builder(uncheckedURLEncode(templateName), template).build();
 
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to create index template " + templateName);
         return jestResult.isSucceeded();
+    }
+
+    private String uncheckedURLEncode(String templateName) {
+        try {
+            return URLEncoder.encode(templateName, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -362,7 +373,12 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public HealthStatus waitForRecovery(String index) {
-        final Health.Status status = waitForStatus(index, Health.Status.YELLOW);
+        return waitForRecovery(index, 30);
+    }
+
+    @Override
+    public HealthStatus waitForRecovery(String index, int timeout) {
+        final Health.Status status = waitForStatus(index, Health.Status.YELLOW, timeout);
         return mapHealthStatus(status);
     }
 
@@ -370,15 +386,20 @@ public class IndicesAdapterES6 implements IndicesAdapter {
         return HealthStatus.fromString(status.toString());
     }
 
-    private Health.Status waitForStatus(String index, @SuppressWarnings("SameParameterValue") Health.Status clusterHealthStatus) {
+    private Health.Status waitForStatus(String index, @SuppressWarnings("SameParameterValue") Health.Status clusterHealthStatus, int timeout) {
         final Health request = new Health.Builder()
                 .addIndex(index)
                 .waitForStatus(clusterHealthStatus)
+                .timeout(timeout)
                 .build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read health status for index " + index);
+        final JestResult jestResult = JestUtils.executeUnsafe(jestClient, null, request, () -> "Couldn't read health status for index " + index);
 
         final String status = jestResult.getJsonObject().path("status").asText();
         return Health.Status.valueOf(status.toUpperCase(Locale.ENGLISH));
+    }
+
+    private Health.Status waitForStatus(String index, @SuppressWarnings("SameParameterValue") Health.Status clusterHealthStatus) {
+        return waitForStatus(index, clusterHealthStatus, 30);
     }
 
     @Override

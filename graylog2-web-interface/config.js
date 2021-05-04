@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 window.appConfig = {
-  gl2ServerUrl: 'http://localhost:9000/api',
+  gl2ServerUrl: '/api',
   gl2AppPathPrefix: '',
-  rootTimeZone: 'Europe/Berlin',
+  rootTimeZone: 'UTC',
+  pluginUISettings: {
+    'org.graylog.plugins.customization.theme': {},
+  },
   isCloud: false,
 };

@@ -31,6 +31,7 @@ import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
+import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
@@ -62,6 +63,7 @@ import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
+import org.graylog2.web.PluginUISettingsProvider;
 
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
@@ -327,6 +329,27 @@ public abstract class PluginModule extends Graylog2Module {
         install(new FactoryModuleBuilder().implement(AuthServiceBackend.class, backendClass).build(factoryClass));
         authServiceBackendBinder().addBinding(name).to(factoryClass);
         registerJacksonSubtype(configClass, name);
+    }
+
+    protected MapBinder<String, PluginUISettingsProvider> pluginUISettingsProviderBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, PluginUISettingsProvider.class);
+    }
+
+    protected void addPluginUISettingsProvider(String providerKey,
+                                               Class<? extends PluginUISettingsProvider> uiSettingsProviderClass) {
+        pluginUISettingsProviderBinder().addBinding(providerKey).to(uiSettingsProviderClass);
+    }
+
+    private Multibinder<ExportFormat> exportFormatBinder() {
+        return Multibinder.newSetBinder(binder(), ExportFormat.class);
+    }
+
+    protected void addExportFormat(Class<? extends ExportFormat> exportFormat) {
+        exportFormatBinder().addBinding().to(exportFormat);
+    }
+
+    protected void addExportFormat(ExportFormat exportFormat) {
+        exportFormatBinder().addBinding().toInstance(exportFormat);
     }
 
     /**

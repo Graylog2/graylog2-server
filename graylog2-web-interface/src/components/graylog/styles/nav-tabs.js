@@ -17,7 +17,7 @@
 import { css } from 'styled-components';
 
 const navTabsStyles = css(({ theme }) => {
-  const borderColor = theme.utils.colorLevel(theme.colors.variant.info, -5);
+  const borderColor = theme.colors.variant.default;
 
   return css`
     .nav-tabs {
@@ -39,8 +39,8 @@ const navTabsStyles = css(({ theme }) => {
           &,
           &:hover,
           &:focus {
-            color: ${theme.colors.gray[10]};
-            background-color: ${theme.colors.gray[100]};
+            color: ${theme.colors.variant.darkest.default};
+            background-color: ${theme.colors.global.contentBackground};
             border-color: ${borderColor};
             border-bottom-color: transparent;
           }

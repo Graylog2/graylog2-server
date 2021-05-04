@@ -12,8 +12,6 @@
         <!-- Application Loggers -->
         <Logger name="org.graylog2" level="info"/>
         <Logger name="com.github.joschi.jadconfig" level="warn"/>
-        <!-- this emits a harmless warning for ActiveDirectory every time which we can't work around :( -->
-        <Logger name="org.apache.directory.api.ldap.model.message.BindRequestImpl" level="error"/>
         <!-- Prevent DEBUG message about Lucene Expressions not found. -->
         <Logger name="org.elasticsearch.script" level="warn"/>
         <!-- Disable messages from the version check -->

@@ -22,7 +22,7 @@ module.exports = {
       corejs: '3.9',
     }],
     '@babel/react',
-    '@babel/flow',
+    '@babel/typescript',
   ],
   plugins: [
     '@babel/plugin-syntax-dynamic-import',
@@ -31,7 +31,7 @@ module.exports = {
   ],
   env: {
     test: {
-      presets: ['@babel/env'],
+      presets: ['@babel/env', '@babel/typescript'],
       plugins: [
         'babel-plugin-dynamic-import-node',
         '@babel/plugin-transform-runtime',

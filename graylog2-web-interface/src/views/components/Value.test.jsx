@@ -16,11 +16,9 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import each from 'jest-each';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 
 import Value from './Value';
 import EmptyValue from './EmptyValue';
@@ -45,9 +43,9 @@ describe('Value', () => {
                                        queryId="someQueryId"
                                        value="2018-10-02T14:45:40Z"
                                        type={new FieldType('date', [], [])} />);
-      const valueActions = wrapper.find('ValueActions');
+      const userTimestamp = wrapper.find('UserTimezoneTimestamp');
 
-      expect(valueActions).toContainReact(<UserTimezoneTimestamp dateTime="2018-10-02T14:45:40Z" />);
+      expect(userTimestamp).toExist();
     });
 
     it('renders numeric timestamps with a custom component', () => {
@@ -55,9 +53,9 @@ describe('Value', () => {
                                        queryId="someQueryId"
                                        value={1571302317}
                                        type={new FieldType('date', [], [])} />);
-      const valueActions = wrapper.find('ValueActions');
+      const userTimeStamp = wrapper.find('UserTimezoneTimestamp');
 
-      expect(valueActions).toContainReact(<UserTimezoneTimestamp dateTime={1571302317} />);
+      expect(userTimeStamp).toExist();
     });
 
     it('renders booleans as strings', () => {
@@ -108,59 +106,31 @@ describe('Value', () => {
     });
   });
 
-  each([true, false]).describe('setting interactive context to `%p`', (interactive) => {
+  it.each`
+     interactive | value                     | type                                
+     ${true}     | ${42}                     | ${undefined}                        
+     ${true}     | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    
+     ${true}     | ${false}                  | ${new FieldType('boolean', [], [])} 
+     ${true}     | ${[23, 'foo']}            | ${FieldType.Unknown}                
+     ${true}     | ${{ foo: 23 }}            | ${FieldType.Unknown}                
+     ${false}    | ${42}                     | ${undefined}                        
+     ${false}    | ${'2018-10-02T14:45:40Z'} | ${new FieldType('date', [], [])}    
+     ${false}    | ${false}                  | ${new FieldType('boolean', [], [])} 
+     ${false}    | ${[23, 'foo']}            | ${FieldType.Unknown}                
+     ${false}    | ${{ foo: 23 }}            | ${FieldType.Unknown}                
+  `('verifying that value $value is rendered correctly when interactive=$interactive', ({ interactive, value, type }) => {
     const Component = (props) => (
       <InteractiveContext.Provider value={interactive}>
         <Value {...props} />
       </InteractiveContext.Provider>
     );
+    const wrapper = mount(<Component field="foo"
+                                     queryId="someQueryId"
+                                     value={value}
+                                     type={type} />);
+    const typeSpecificValue = wrapper.find('TypeSpecificValue');
 
-    it('renders without type information but no children', () => {
-      const wrapper = mount(<Component field="foo" queryId="someQueryId" value={42} />);
-      const typeSpecificValue = wrapper.find('TypeSpecificValue');
-
-      expect(typeSpecificValue).toHaveValue(42);
-    });
-
-    it('renders timestamps with a custom component', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value="2018-10-02T14:45:40Z"
-                                       type={new FieldType('date', [], [])} />);
-      const typeSpecificValue = wrapper.find('TypeSpecificValue');
-
-      expect(typeSpecificValue).toHaveValue('2018-10-02T14:45:40Z');
-    });
-
-    it('renders booleans', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value={false}
-                                       type={new FieldType('boolean', [], [])} />);
-      const typeSpecificValue = wrapper.find('TypeSpecificValue');
-
-      expect(typeSpecificValue).toHaveValue(false);
-    });
-
-    it('renders arrays', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value={[23, 'foo']}
-                                       type={FieldType.Unknown} />);
-      const typeSpecificValue = wrapper.find('TypeSpecificValue');
-
-      expect(typeSpecificValue).toHaveProp('value', [23, 'foo']);
-    });
-
-    it('renders objects', () => {
-      const wrapper = mount(<Component field="foo"
-                                       queryId="someQueryId"
-                                       value={{ foo: 23 }}
-                                       type={FieldType.Unknown} />);
-      const typeSpecificValue = wrapper.find('TypeSpecificValue');
-
-      expect(typeSpecificValue).toHaveProp('value', { foo: 23 });
-    });
+    expect(typeSpecificValue).toHaveValue(value);
   });
 
   describe('handles value action menu depending on interactive context', () => {

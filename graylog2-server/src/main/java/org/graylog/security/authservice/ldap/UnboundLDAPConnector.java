@@ -111,8 +111,7 @@ public class UnboundLDAPConnector {
 
             final SSLUtil sslUtil;
             if (ldapConfig.verifyCertificates()) {
-                // TODO support multiple hosts
-                sslUtil = new SSLUtil(trustManagerProvider.create(addresses[0]));
+                sslUtil = new SSLUtil(trustManagerProvider.create(Arrays.asList(addresses)));
             } else {
                 sslUtil = new SSLUtil(new TrustAllX509TrustManager());
             }
@@ -261,10 +260,6 @@ public class UnboundLDAPConnector {
             // No need to add the objectClass attribute to the attribute map, we already make it available
             // in LDAPEntry#objectClasses
             if (OBJECT_CLASS_ATTRIBUTE.equalsIgnoreCase(attribute.getBaseName())) {
-                continue;
-            }
-            // We already set the unique ID above
-            if (uniqueIdAttribute.equalsIgnoreCase(attribute.getBaseName())) {
                 continue;
             }
 

@@ -43,6 +43,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Create
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
@@ -447,7 +448,12 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public HealthStatus waitForRecovery(String index) {
-        final ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest(index);
+        return waitForRecovery(index, 30);
+    }
+
+    @Override
+    public HealthStatus waitForRecovery(String index, int timeout) {
+        final ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest(index).timeout(TimeValue.timeValueSeconds(timeout));
         clusterHealthRequest.waitForGreenStatus();
 
         final ClusterHealthResponse result = client.execute((c, requestOptions) -> c.cluster().health(clusterHealthRequest, requestOptions));

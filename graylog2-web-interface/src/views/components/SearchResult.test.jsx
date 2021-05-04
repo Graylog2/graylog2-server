@@ -82,14 +82,16 @@ describe('SearchResult', () => {
   };
 
   it('should show spinner with undefined fields', () => {
-    const { getByText } = render(<SearchResult />);
+    const { getByText } = render(
+      <SearchResult />,
+    );
 
     act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();
   });
 
-  it('should display loading indicator, when search is loading ', () => {
+  it('should display loading indicator, when search is loading', () => {
     asMock(SearchLoadingStateStore.getInitialState).mockImplementation(() => ({ isLoading: true }));
     const { getByText } = render(<SimpleSearchResult />);
 

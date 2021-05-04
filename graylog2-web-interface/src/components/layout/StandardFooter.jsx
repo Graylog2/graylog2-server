@@ -21,8 +21,20 @@ import PropTypes from 'prop-types';
 import { getFullVersion } from 'util/Version';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
+import { Store } from 'stores/StoreTypes';
 
 const SystemStore = StoreProvider.getStore('System');
+
+type SystemStoreState = {
+  system: {
+    version?: string,
+    hostname?: string,
+  };
+};
+
+type Jvm = {
+  info: string;
+};
 
 type Props = {
   system?: {
@@ -32,7 +44,7 @@ type Props = {
 };
 
 const StandardFooter = ({ system }: Props) => {
-  const [jvm, setJvm] = useState();
+  const [jvm, setJvm] = useState<Jvm | undefined>();
 
   useEffect(() => {
     let mounted = true;
@@ -72,4 +84,7 @@ StandardFooter.defaultProps = {
   system: undefined,
 };
 
-export default connect(StandardFooter, { system: SystemStore }, ({ system: { system } = {} }) => ({ system }));
+export default connect(
+  StandardFooter,
+  { system: SystemStore as Store<SystemStoreState> },
+  ({ system: { system } = { system: undefined } }) => ({ system }));

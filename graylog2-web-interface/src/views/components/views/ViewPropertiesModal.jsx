@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isEqual } from 'lodash';
 
-import FormsUtils from 'util/FormsUtils';
+import * as FormsUtils from 'util/FormsUtils';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
@@ -41,7 +41,6 @@ export default class ViewPropertiesModal extends React.Component {
     };
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { title } = this.props;
     const { view } = this.state;

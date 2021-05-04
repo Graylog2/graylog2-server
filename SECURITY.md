@@ -4,14 +4,13 @@
 
 Graylog is addressing vulnerabilities in the product for the current and the previous releases (a release is anything that increases either the major or the minor version part, in a [semver](https://semver.org) understanding) of the last twelve months.
 
-For the current release (3.1) this means:
+For the current release (4.0) this means:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 3.1.x   | :white_check_mark: |
-| 3.0.x   | :white_check_mark: |
-| 2.5.x   | :white_check_mark: |
-| < 2.5.0 | :x:                |
+| 4.0.x   | :white_check_mark: |
+| 3.3.x   | :white_check_mark: |
+| < 3.3.0 | :x:                |
 
 ## Reporting a Vulnerability
 

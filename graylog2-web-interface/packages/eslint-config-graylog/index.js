@@ -15,33 +15,65 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   env: {
     browser: true,
     jest: true,
   },
   overrides: [
     {
+      files: ['*.ts', '*.tsx'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['@typescript-eslint/eslint-plugin'],
+      rules: {
+        'no-undef': 'off',
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': ['error'],
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': ['error'],
+        'no-redeclare': 'off',
+        '@typescript-eslint/no-redeclare': ['error'],
+        'no-shadow': 'off',
+        '@typescript-eslint/no-shadow': ['error'],
+      },
+    },
+    {
       files: ['*.js', '*.jsx'],
+    },
+    {
+      files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx'],
+      plugins: [
+        'jest',
+        'testing-library',
+      ],
+      extends: [
+        'plugin:jest/recommended',
+        'plugin:testing-library/react',
+        'plugin:testing-library/recommended',
+      ],
+      rules: {
+        'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
+        'testing-library/no-debug': 'warn',
+      },
     },
   ],
   extends: [
     'eslint:recommended',
     'airbnb',
+    'plugin:compat/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/react',
-    'plugin:flowtype/recommended',
     'plugin:jest-formatting/strict',
   ],
   plugins: [
     'import',
     'react-hooks',
-    'flowtype',
     'jest-formatting',
   ],
   rules: {
     'arrow-body-style': 'off',
+    camelcase: 'off',
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
@@ -63,6 +95,9 @@ module.exports = {
       }, {
         name: 'create-react-class',
         message: 'Please use an ES6 or functional component instead.',
+      }, {
+        name: 'jest-each',
+        message: 'Please use `it.each` instead.',
       }],
     }],
     'no-underscore-dangle': 'off',
@@ -70,6 +105,7 @@ module.exports = {
     'object-shorthand': ['error', 'methods'],
     'react/forbid-prop-types': 'off',
     'react/jsx-closing-bracket-location': ['warn', 'after-props'],
+    'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
     'react/jsx-one-expression-per-line': 'off',
@@ -109,23 +145,6 @@ module.exports = {
         next: ['block', 'multiline-block-like', 'class', 'multiline-expression', 'return'],
       },
     ],
-
-    // eslint-plugin-flowtype configs, `recommended` is too weak in a couple of places:
-    'flowtype/delimiter-dangle': [1, 'always-multiline'],
-    'flowtype/no-weak-types': [
-      2,
-      {
-        any: false,
-      },
-    ],
-    'flowtype/require-valid-file-annotation': [
-      2,
-      'never', {
-        annotationStyle: 'line',
-        strict: true,
-      },
-    ],
-    'flowtype/semi': [2, 'always'],
   },
   settings: {
     'import/resolver': {
@@ -133,5 +152,9 @@ module.exports = {
         config: './webpack.config.js',
       },
     },
+    polyfills: [
+      'Promise',
+      'fetch',
+    ],
   },
 };

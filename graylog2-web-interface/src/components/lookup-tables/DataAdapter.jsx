@@ -22,11 +22,11 @@ import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ContentPackMarker } from 'components/common';
-import FormsUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import Styles from './ConfigSummary.css';
+import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
@@ -35,13 +35,17 @@ class DataAdapter extends React.Component {
     dataAdapter: PropTypes.object.isRequired,
   };
 
-  state = {
-    lookupKey: null,
-    lookupResult: null,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      lookupKey: null,
+      lookupResult: null,
+    };
+  }
 
   _onChange = (event) => {
-    this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
+    this.setState({ lookupKey: getValueFromInput(event.target) });
   };
 
   _lookupKey = (e) => {
@@ -81,16 +85,16 @@ class DataAdapter extends React.Component {
             {' '}
             <small>({plugin.displayName})</small>
           </h2>
-          <div className={Styles.config}>
+          <ConfigSummaryDefinitionListWrapper>
             <dl>
               <dt>Description</dt>
               <dd>{dataAdapter.description || <em>No description.</em>}</dd>
             </dl>
-          </div>
+          </ConfigSummaryDefinitionListWrapper>
           <h4>Configuration</h4>
-          <div className={Styles.config}>
+          <ConfigSummaryDefinitionListWrapper>
             {React.createElement(summary, { dataAdapter: dataAdapter })}
-          </div>
+          </ConfigSummaryDefinitionListWrapper>
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(dataAdapter.name)}>
             <Button bsStyle="success">Edit</Button>
           </LinkContainer>

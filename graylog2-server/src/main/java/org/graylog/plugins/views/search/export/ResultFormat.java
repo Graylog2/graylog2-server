@@ -21,12 +21,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
@@ -41,6 +44,9 @@ public abstract class ResultFormat {
     @JsonProperty(FIELD_FIELDS)
     @NotEmpty
     public abstract LinkedHashSet<String> fieldsInOrder();
+
+    @JsonProperty
+    public abstract Optional<AbsoluteRange> timerange();
 
     @JsonProperty
     @Positive
@@ -72,11 +78,10 @@ public abstract class ResultFormat {
         @JsonProperty
         public abstract Builder executionState(Map<String, Object> executionState);
 
-        abstract ResultFormat autoBuild();
+        @JsonProperty
+        public abstract Builder timerange(@Nullable AbsoluteRange timeRange);
 
-        public ResultFormat build() {
-            return autoBuild();
-        }
+        public abstract ResultFormat build();
 
         @JsonCreator
         public static ResultFormat.Builder create() {

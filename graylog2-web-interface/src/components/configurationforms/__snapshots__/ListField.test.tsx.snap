@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ListField> should render an empty field 1`] = `
+.c0 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c1 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c2 {
+  color: inherit;
+}
+
+<div>
+  <div
+    class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 form-group"
+  >
+    <label
+      class="c0 control-label"
+      for="list-example_list_field"
+    >
+      list field
+       
+      <span
+        class="configuration-field-optional"
+      >
+        (optional)
+      </span>
+    </label>
+    <span>
+      <div
+        class=" css-2b097c-container"
+      >
+        <span
+          aria-atomic="false"
+          aria-live="polite"
+          aria-relevant="additions text"
+          class="css-1f43avz-a11yText-A11yText"
+        />
+        <div
+          class=" css-9w5mt0-control"
+        >
+          <div
+            class=" css-d5r05u-ValueContainer"
+          >
+            <div
+              class=" css-cv6aql-placeholder"
+            >
+              Select list field
+            </div>
+            <div
+              class="css-200f6w-Input"
+            >
+              <div
+                class=""
+                style="display: inline-block;"
+              >
+                <input
+                  aria-autocomplete="list"
+                  autocapitalize="none"
+                  autocomplete="off"
+                  autocorrect="off"
+                  id="list-example_list_field"
+                  spellcheck="false"
+                  style="box-sizing: content-box; width: 2px; border: 0px; opacity: 1; outline: 0; padding: 0px;"
+                  tabindex="0"
+                  type="text"
+                  value=""
+                />
+                <div
+                  style="position: absolute; top: 0px; left: 0px; visibility: hidden; height: 0px; overflow: scroll; white-space: pre; font-family: -webkit-small-control; letter-spacing: normal; text-transform: none;"
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class=" css-1hb7zxy-IndicatorsContainer"
+          >
+            <div
+              aria-hidden="true"
+              style="color: rgb(166, 166, 166); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
+            >
+              <svg
+                class="svg-inline--fa fa-caret-down"
+              />
+            </div>
+          </div>
+        </div>
+        <input
+          name="configuration[example_list_field]"
+          type="hidden"
+          value=""
+        />
+      </div>
+      <span
+        class="c1 help-block"
+      >
+        <span
+          class="c2"
+        >
+          my list description
+        </span>
+      </span>
+    </span>
+  </div>
+</div>
+`;

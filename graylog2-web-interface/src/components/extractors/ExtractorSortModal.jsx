@@ -30,6 +30,14 @@ class ExtractorSortModal extends React.Component {
     extractors: PropTypes.array.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      sortedExtractors: props.extractors,
+    };
+  }
+
   open = () => {
     this.modal.open();
   };
@@ -38,38 +46,56 @@ class ExtractorSortModal extends React.Component {
     this.modal.close();
   };
 
+  _cancel = () => {
+    const { extractors } = this.props;
+
+    this.close();
+
+    this.setState({
+      sortedExtractors: extractors,
+    });
+  }
+
   _updateSorting = (newSorting) => {
-    this.sortedExtractors = newSorting;
+    this.setState({
+      sortedExtractors: newSorting,
+    });
   };
 
   _saveSorting = () => {
-    if (!this.sortedExtractors) {
+    const { input } = this.props;
+    const { sortedExtractors } = this.state;
+
+    if (!sortedExtractors) {
       this.close();
     }
 
-    const promise = ExtractorsActions.order.triggerPromise(this.props.input.id, this.sortedExtractors);
+    const promise = ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
 
     promise.then(() => this.close());
   };
 
   render() {
+    const { sortedExtractors } = this.state;
+    const { input } = this.props;
+
     return (
-      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }}>
+      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }} onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>
-            <span>Sort extractors for <em>{this.props.input.title}</em></span>
+            <span>Sort extractors for <em>{input.title}</em></span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>Drag and drop the extractors on the list to change the order in which they will be applied.</p>
           <Row className="row-sm">
             <Col md={12}>
-              <SortableList items={this.props.extractors} onMoveItem={this._updateSorting} />
+              <SortableList items={sortedExtractors} onMoveItem={this._updateSorting} displayOverlayInPortal />
             </Col>
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this.close}>Close</Button>
+          <Button type="button" onClick={this._cancel}>Close</Button>
           <Button type="button" bsStyle="info" onClick={this._saveSorting}>Save</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>

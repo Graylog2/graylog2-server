@@ -30,6 +30,14 @@ import org.graylog.security.authservice.backend.LDAPAuthServiceBackend;
 import org.graylog.security.authservice.backend.LDAPAuthServiceBackendConfig;
 import org.graylog.security.authservice.backend.MongoDBAuthServiceBackend;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
+import org.graylog.security.authservice.rest.AuthServiceBackendsResource;
+import org.graylog.security.authservice.rest.AuthServiceTestResource;
+import org.graylog.security.authservice.rest.AuthServicesResource;
+import org.graylog.security.authservice.rest.GlobalAuthServiceConfigResource;
+import org.graylog.security.authservice.rest.HTTPHeaderAuthenticationConfigResource;
+import org.graylog.security.authzroles.AuthzRolesResource;
+import org.graylog.security.rest.EntitySharesResource;
+import org.graylog.security.rest.GrantsOverviewResource;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
@@ -58,10 +66,14 @@ public class SecurityModule extends PluginModule {
 
         bind(AuthServiceBackend.class).annotatedWith(InternalAuthServiceBackend.class).to(MongoDBAuthServiceBackend.class);
 
-        // Add all rest resources in this package
-        // TODO: Check if we need to use addRestResource() here for the final version to make sure
-        //       we get the path prefix. Do we want this?
-        registerRestControllerPackage(getClass().getPackage().getName());
+        addSystemRestResource(AuthServiceBackendsResource.class);
+        addSystemRestResource(AuthServicesResource.class);
+        addSystemRestResource(AuthServiceTestResource.class);
+        addSystemRestResource(GlobalAuthServiceConfigResource.class);
+        addSystemRestResource(HTTPHeaderAuthenticationConfigResource.class);
+        addSystemRestResource(AuthzRolesResource.class);
+        addSystemRestResource(EntitySharesResource.class);
+        addSystemRestResource(GrantsOverviewResource.class);
 
         addAuditEventTypes(SecurityAuditEventTypes.class);
 

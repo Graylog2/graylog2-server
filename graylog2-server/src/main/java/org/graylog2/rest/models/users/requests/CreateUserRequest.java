@@ -33,6 +33,7 @@ import java.util.List;
 @AutoValue
 @WithBeanGetter
 public abstract class CreateUserRequest {
+
     @JsonProperty
     public abstract String username();
 

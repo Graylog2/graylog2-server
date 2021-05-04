@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.audit.AuditEventTypes.ES_WRITE_INDEX_UPDATE;
+import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
 
 public class MongoIndexSet implements IndexSet {
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
@@ -103,12 +104,12 @@ public class MongoIndexSet implements IndexSet {
         // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
         if (isNullOrEmpty(config.indexMatchPattern())) {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
-            this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-            this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
+            this.indexPattern = Pattern.compile("^" + Pattern.quote(config.indexPrefix()) + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+            this.deflectorIndexPattern = Pattern.compile("^" + Pattern.quote(config.indexPrefix()) + SEPARATOR + "\\d+");
         } else {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
-            this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-            this.deflectorIndexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+");
+            this.indexPattern = Pattern.compile("^" + Pattern.quote(config.indexMatchPattern()) + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+            this.deflectorIndexPattern = Pattern.compile("^" + Pattern.quote(config.indexMatchPattern()) + SEPARATOR + "\\d+");
         }
 
         // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
@@ -295,7 +296,8 @@ public class MongoIndexSet implements IndexSet {
         }
 
         LOG.info("Waiting for allocation of index <{}>.", newTarget);
-        HealthStatus healthStatus = indices.waitForRecovery(newTarget);
+        final HealthStatus healthStatus = indices.waitForRecovery(newTarget);
+        checkIfHealthy(healthStatus, (status) -> new RuntimeException("New target index did not become healthy (target index: <" + newTarget + ">)"));
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
         addDeflectorIndexRange(newTarget);

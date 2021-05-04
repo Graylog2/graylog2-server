@@ -13,7 +13,7 @@ exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] 
   background-color: #fff;
   border: 1px solid #a6a6a6;
   border-radius: 4px;
-  box-shadow: 0 0 21px rgba(115,115,115,0.25);
+  box-shadow: 0 0 21px rgba(243,243,243,0.5);
   margin-top: 120px;
 }
 

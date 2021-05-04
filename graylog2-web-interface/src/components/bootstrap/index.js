@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as BootstrapAccordion } from './BootstrapAccordion';
-export { default as BootstrapAccordionGroup } from './BootstrapAccordionGroup';
 export { default as BootstrapModalConfirm } from './BootstrapModalConfirm';
 export { default as BootstrapModalForm } from './BootstrapModalForm';
 export { default as BootstrapModalWrapper } from './BootstrapModalWrapper';

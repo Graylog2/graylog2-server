@@ -30,16 +30,20 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
+import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
+import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
 import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
 import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.graylog2.shared.security.SessionCreator;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
@@ -82,12 +86,18 @@ public class SessionsResource extends RestResource {
     private final SessionCreator sessionCreator;
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
     private final SessionResponseFactory sessionResponseFactory;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SessionsResource(UserService userService, DefaultSecurityManager securityManager,
-            ShiroAuthenticationFilter authenticationFilter, @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
-            @Context Request grizzlyRequest, SessionCreator sessionCreator,
-            ActorAwareAuthenticationTokenFactory tokenFactory, SessionResponseFactory sessionResponseFactory) {
+    public SessionsResource(UserService userService,
+                            DefaultSecurityManager securityManager,
+                            ShiroAuthenticationFilter authenticationFilter,
+                            @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
+                            @Context Request grizzlyRequest,
+                            SessionCreator sessionCreator,
+                            ActorAwareAuthenticationTokenFactory tokenFactory,
+                            SessionResponseFactory sessionResponseFactory,
+                            ClusterConfigService clusterConfigService) {
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
@@ -96,6 +106,7 @@ public class SessionsResource extends RestResource {
         this.sessionCreator = sessionCreator;
         this.tokenFactory = tokenFactory;
         this.sessionResponseFactory = sessionResponseFactory;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @POST
@@ -171,6 +182,12 @@ public class SessionsResource extends RestResource {
 
             session.setAttribute("username", user.getName());
 
+            final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
+            final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
+            if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
+                session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
+            }
+
             LOG.debug("Session created {}", session.getId());
             session.touch();
             // save subject in session, otherwise we can't get the username back in subsequent requests.
@@ -190,5 +207,9 @@ public class SessionsResource extends RestResource {
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
+    }
+
+    private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
+        return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
     }
 }

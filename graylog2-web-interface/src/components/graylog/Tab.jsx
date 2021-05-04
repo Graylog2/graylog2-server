@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 const Tab = styled(BootstrapTab)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.utils.colorLevel(theme.colors.variant.info, -5)};
+  border: 1px solid ${theme.colors.variant.default};
   border-top: 0;
   border-radius: 0 0 4px 4px;
   padding: 9px;

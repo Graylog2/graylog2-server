@@ -63,7 +63,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
         LOG.debug("Trying to load user <{}> from database", username);
         final User user = userService.load(username);
         if (user == null) {
-            LOG.warn("User <{}> not found in database", username);
+            LOG.debug("User <{}> not found in database", username);
             return Optional.empty();
         }
         if (user.isLocalAdmin()) {

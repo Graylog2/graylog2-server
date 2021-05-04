@@ -37,7 +37,6 @@ const JournalState = createReactClass({
 
   mixins: [Reflux.connect(MetricsStore)],
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     this.metricNames = {
       append: 'org.graylog2.journal.append.1-sec-rate',

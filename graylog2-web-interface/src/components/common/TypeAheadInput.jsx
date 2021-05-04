@@ -95,7 +95,6 @@ class TypeAheadInput extends React.Component {
     this._updateTypeahead({ suggestions, displayKey, suggestionText, onTypeaheadLoaded, onSuggestionSelected });
   }
 
-  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(newProps) {
     this._destroyTypeahead();
     this._updateTypeahead(newProps);

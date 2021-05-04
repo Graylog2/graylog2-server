@@ -41,6 +41,10 @@ const SourceCodeContainer = styled.div(({ resizable, theme }) => css`
   ${theme.components.aceEditor}
 `);
 
+const StyledTooltip = styled(Tooltip)`
+  width: 250px;
+`;
+
 const Toolbar = styled.div(({ theme }) => css`
   background: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.gray[80]};
@@ -143,6 +147,8 @@ class SourceCodeEditor extends React.Component {
       width: props.width,
       selectedText: '',
     };
+
+    this.overlayContainerRef = React.createRef();
   }
 
   componentDidMount() {
@@ -239,7 +245,7 @@ class SourceCodeEditor extends React.Component {
       value,
     } = this.props;
     const validCssWidth = lodash.isFinite(width) ? width : '100%';
-    const overlay = <Tooltip id="paste-button-tooltip">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
+    const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
 
     return (
       <div>
@@ -247,7 +253,7 @@ class SourceCodeEditor extends React.Component {
           && (
           <Toolbar style={{ width: validCssWidth }}>
             <ButtonToolbar>
-              <ButtonGroup>
+              <ButtonGroup ref={this.overlayContainerRef}>
                 <ClipboardButton title={<Icon name="copy" fixedWidth />}
                                  bsStyle="link"
                                  bsSize="sm"
@@ -255,7 +261,7 @@ class SourceCodeEditor extends React.Component {
                                  text={selectedText}
                                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
                                  disabled={this.isCopyDisabled()} />
-                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
+                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose container={this.overlayContainerRef.current}>
                   <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
                     <Icon name="clipboard" fixedWidth />
                   </Button>

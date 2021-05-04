@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 import URI from 'urijs';
 import lodash from 'lodash';
 
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -149,7 +149,6 @@ const EventDefinitionsStore = Reflux.createStore({
     // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
     // the flag from the form.
     const clonedEventDefinition = lodash.cloneDeep(eventDefinition);
-    // eslint-disable-next-line camelcase
     const { _is_scheduled } = lodash.pick(clonedEventDefinition.config, ['_is_scheduled']);
 
     clonedEventDefinition.config = lodash.omit(clonedEventDefinition.config, ['_is_scheduled']);

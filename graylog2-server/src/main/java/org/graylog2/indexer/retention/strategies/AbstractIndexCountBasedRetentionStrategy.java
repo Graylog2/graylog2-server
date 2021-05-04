@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -49,7 +50,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     }
 
     protected abstract Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet);
-    protected abstract void retain(String indexName, IndexSet indexSet);
+    protected abstract void retain(List<String> indexNames, IndexSet indexSet);
 
     @Override
     public void retain(IndexSet indexSet) {
@@ -89,19 +90,23 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             .filter(indexName -> !(deflectorIndices.getOrDefault(indexName, Collections.emptySet()).contains(indexSet.getWriteIndexAlias())))
             .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
             .collect(Collectors.toCollection(LinkedHashSet::new));
-        orderedIndices
-            .stream()
-            .skip(orderedIndices.size() - removeCount)
-             // reverse order to archive oldest index first
-            .collect(Collectors.toCollection(LinkedList::new)).descendingIterator()
-            .forEachRemaining(indexName -> {
-                final String strategyName = this.getClass().getCanonicalName();
-                final String msg = "Running retention strategy [" + strategyName + "] for index <" + indexName + ">";
-                LOG.info(msg);
-                activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
-                // Sorry if this should ever go mad. Run retention strategy!
-                retain(indexName, indexSet);
-            });
+        LinkedList<String> orderedIndicesDescending = new LinkedList<>();
+
+        orderedIndices
+                .stream()
+                .skip(orderedIndices.size() - removeCount)
+                // reverse order to archive oldest index first
+                .collect(Collectors.toCollection(LinkedList::new)).descendingIterator().
+                forEachRemaining(orderedIndicesDescending::add);
+
+        String indexNamesAsString = String.join(", ", orderedIndicesDescending);
+
+        final String strategyName = this.getClass().getCanonicalName();
+        final String msg = "Running retention strategy [" + strategyName + "] for indices <" + indexNamesAsString + ">";
+        LOG.info(msg);
+        activityWriter.write(new Activity(msg, IndexRetentionThread.class));
+
+        retain(orderedIndicesDescending, indexSet);
     }
 }

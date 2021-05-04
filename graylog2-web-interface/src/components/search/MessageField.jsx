@@ -18,8 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { MessageFieldDescription } from 'components/search';
+import { FULL_MESSAGE_FIELD } from 'views/Constants';
 
-const SPECIAL_FIELDS = ['full_message', 'level'];
+const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
 
 const MessageField = ({ message, value, fieldName, customFieldActions, renderForDisplay }) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;

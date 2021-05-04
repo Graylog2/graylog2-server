@@ -48,6 +48,7 @@ public class EntityDependencyResolver {
     // E.g. To view a stream with a custom output, a user does not need output permissions
     private static final Map<GRNType, Set<ModelType>> IGNORED_DEPENDENCIES = ImmutableMap.<GRNType, Set<ModelType>>builder()
             .put(GRNTypes.STREAM, ImmutableSet.of(ModelTypes.OUTPUT_V1))
+            .put(GRNTypes.DASHBOARD, ImmutableSet.of(ModelTypes.OUTPUT_V1))
             .build();
 
     @Inject

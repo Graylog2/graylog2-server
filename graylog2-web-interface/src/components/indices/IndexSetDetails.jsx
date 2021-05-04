@@ -17,32 +17,13 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Row, Col } from 'components/graylog';
+import { Col } from 'components/graylog';
 import { IndicesConfiguration } from 'components/indices';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-const StyledRow: StyledComponent<{}, void, Row> = styled(Row)`
-  dl {
-    margin-bottom: 0;
-  }
-  
-  dt {
-    float: left;
-    width: 160px;
-    overflow: hidden;
-    clear: left;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  dd {
-    margin-left: 180px;
-  }
-`;
+import StyledIndexSetDetailsRow from './StyledIndexSetDetailsRow';
 
 type Props = {
   indexSet: IndexSet,
@@ -50,8 +31,8 @@ type Props = {
 
 const IndexSetDetails = ({ indexSet }: Props) => {
   return (
-    <StyledRow>
-      <Col md={3}>
+    <StyledIndexSetDetailsRow>
+      <Col lg={3}>
         <dl>
           <dt>Index prefix:</dt>
           <dd>{indexSet.index_prefix}</dd>
@@ -66,10 +47,10 @@ const IndexSetDetails = ({ indexSet }: Props) => {
         </dl>
       </Col>
 
-      <Col md={6}>
+      <Col lg={6}>
         <IndicesConfiguration indexSet={indexSet} />
       </Col>
-    </StyledRow>
+    </StyledIndexSetDetailsRow>
   );
 };
 

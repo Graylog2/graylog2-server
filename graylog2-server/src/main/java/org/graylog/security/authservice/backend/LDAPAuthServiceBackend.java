@@ -16,6 +16,7 @@
  */
 package org.graylog.security.authservice.backend;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.unboundid.ldap.sdk.LDAPConnection;
@@ -26,11 +27,13 @@ import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.AuthenticationDetails;
 import org.graylog.security.authservice.ProvisionerService;
 import org.graylog.security.authservice.UserDetails;
+import org.graylog.security.authservice.ldap.LDAPConnectorConfig;
 import org.graylog.security.authservice.ldap.LDAPUser;
 import org.graylog.security.authservice.ldap.UnboundLDAPConfig;
 import org.graylog.security.authservice.ldap.UnboundLDAPConnector;
 import org.graylog.security.authservice.test.AuthServiceBackendTestResult;
 import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +41,11 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LDAPAuthServiceBackend implements AuthServiceBackend {
     public static final String TYPE_NAME = "ldap";
@@ -99,10 +105,10 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
             return Optional.of(AuthenticationDetails.builder().userDetails(userDetails).build());
         } catch (GeneralSecurityException e) {
             LOG.error("Error setting up TLS connection", e);
-            return Optional.empty();
+            throw new AuthenticationServiceUnavailableException("Error setting up TLS connection", e);
         } catch (LDAPException e) {
             LOG.error("LDAP error", e);
-            return Optional.empty();
+            throw new AuthenticationServiceUnavailableException("LDAP error", e);
         }
     }
 
@@ -172,14 +178,41 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
     public AuthServiceBackendTestResult testConnection(@Nullable AuthServiceBackendDTO existingBackendConfig) {
         final LDAPAuthServiceBackendConfig testConfig = buildTestConfig(existingBackendConfig);
 
-        try (final LDAPConnection connection = ldapConnector.connect(testConfig.getLDAPConnectorConfig())) {
+        final LDAPConnectorConfig config = testConfig.getLDAPConnectorConfig();
+
+        if (config.serverList().size() == 1) {
+            return testSingleConnection(config, config.serverList().get(0));
+        }
+
+        // Test each server separately, so we can see the result for each
+        final List<AuthServiceBackendTestResult> testResults = config.serverList().stream().map(server -> testSingleConnection(config, server)).collect(Collectors.toList());
+
+        if (testResults.stream().anyMatch(res -> !res.isSuccess())) {
+            return AuthServiceBackendTestResult
+                    .createFailure("Test failure",
+                            testResults.stream().map(r -> {
+                                if (r.isSuccess()) {
+                                    return r.message();
+                                } else {
+                                    return r.message() + " : " + String.join(",", r.errors());
+                                }
+                            }).collect(Collectors.toList()));
+        } else {
+            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + config.serverList());
+        }
+    }
+
+    private AuthServiceBackendTestResult testSingleConnection(LDAPConnectorConfig config, LDAPConnectorConfig.LDAPServer server) {
+        final LDAPConnectorConfig singleServerConfig = config.toBuilder().serverList(ImmutableList.of(server)).build();
+
+        try (final LDAPConnection connection = ldapConnector.connect(singleServerConfig)) {
             if (connection == null) {
-                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + testConfig.servers());
+                return AuthServiceBackendTestResult.createFailure("Couldn't establish connection to " + server);
             }
-            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + testConfig.servers());
+            return AuthServiceBackendTestResult.createSuccess("Successfully connected to " + server);
         } catch (Exception e) {
             return AuthServiceBackendTestResult.createFailure(
-                    "Couldn't establish connection to " + testConfig.servers(),
+                    "Couldn't establish connection to " + server,
                     Collections.singletonList(e.getMessage())
             );
         }
@@ -243,14 +276,19 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
                 .put("login_success", loginSuccess);
 
         if (user != null) {
-            userDetails.put("user_details", ImmutableMap.<String, String>builder()
-                    .put("dn", user.dn())
-                    .put(config.userUniqueIdAttribute(), user.base64UniqueId())
-                    .put(config.userNameAttribute(), user.username())
-                    .put(config.userFullNameAttribute(), user.fullName())
-                    .put("email", user.email())
-                    .build()
-            );
+            // Use regular HashMap to allow duplicates. Users might use the same attribute for name and full name.
+            // See: https://github.com/Graylog2/graylog2-server/issues/10069
+            final Map<String, String> attributes = new HashMap<>();
+
+            attributes.put("dn", user.dn());
+            // Use a special key for the unique ID attribute. If users use something like "uid" for the unique ID,
+            // it might be confusing to see a base64 encoded value instead of the plain text one.
+            attributes.put("unique_id (" + config.userUniqueIdAttribute() + ")", user.base64UniqueId());
+            attributes.put(config.userNameAttribute(), user.username());
+            attributes.put(config.userFullNameAttribute(), user.fullName());
+            attributes.put("email", user.email());
+
+            userDetails.put("user_details", ImmutableMap.copyOf(attributes));
         } else {
             userDetails.put("user_details", ImmutableMap.of());
         }

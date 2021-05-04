@@ -23,7 +23,7 @@ import Routes from 'routing/Routes';
 import { Row, Col, Button } from 'components/graylog';
 import { ContentPackMarker } from 'components/common';
 
-import Styles from './ConfigSummary.css';
+import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 
 const Cache = ({ cache }) => {
   const plugins = {};
@@ -49,16 +49,16 @@ const Cache = ({ cache }) => {
           {' '}
           <small>({plugin.displayName})</small>
         </h2>
-        <div className={Styles.config}>
+        <ConfigSummaryDefinitionListWrapper>
           <dl>
             <dt>Description</dt>
             <dd>{cache.description || <em>No description.</em>}</dd>
           </dl>
-        </div>
+        </ConfigSummaryDefinitionListWrapper>
         <h4>Configuration</h4>
-        <div className={Styles.config}>
+        <ConfigSummaryDefinitionListWrapper>
           {React.createElement(summary, { cache: cache })}
-        </div>
+        </ConfigSummaryDefinitionListWrapper>
         <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name)}>
           <Button bsStyle="success">Edit</Button>
         </LinkContainer>

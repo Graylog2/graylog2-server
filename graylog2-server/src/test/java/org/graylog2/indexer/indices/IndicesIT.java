@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.assertj.jodatime.api.Assertions;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -58,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -260,7 +260,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         final Optional<DateTime> indexCreationDate = indices.indexCreationDate(indexName);
         assertThat(indexCreationDate).isNotEmpty()
-                .hasValueSatisfying(date -> Assertions.assertThat(date).isEqualToIgnoringMillis(now));
+                .hasValueSatisfying(date -> assertThat(date.toDate()).isCloseTo(now.toDate(), TimeUnit.SECONDS.toMillis(1)));
     }
 
     @Test
@@ -434,6 +434,13 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         assertThat(indexSetStats.indices()).isEqualTo(2L);
         assertThat(indexSetStats.size()).isNotZero();
+    }
+
+    @Test
+    public void waitForRedIndexReturnsStatus() {
+        final HealthStatus healthStatus = indices.waitForRecovery("this_index_does_not_exist", 0);
+
+        assertThat(healthStatus).isEqualTo(HealthStatus.Red);
     }
 
     @Test

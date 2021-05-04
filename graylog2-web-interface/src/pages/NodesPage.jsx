@@ -19,7 +19,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import URI from 'urijs';
 
-import URLUtils from 'util/URLUtils';
+import * as URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
 import { NodesList } from 'components/nodes';

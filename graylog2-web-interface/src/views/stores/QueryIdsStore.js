@@ -27,12 +27,12 @@ export const QueryIdsStore = singletonStore(
   () => Reflux.createStore({
     state: {},
     init() {
-      this.listenTo(ViewStore, this.onViewStoreUpdate, this.onViewStoreUpdate);
+      this.listenTo(ViewStore, this.onViewsStoreUpdate, this.onViewsStoreUpdate);
     },
     getInitialState() {
       return this._state();
     },
-    onViewStoreUpdate(view) {
+    onViewsStoreUpdate(view) {
       const newState = view?.view?.state?.keySeq().toList();
 
       if (!isEqual(this.state, newState)) {

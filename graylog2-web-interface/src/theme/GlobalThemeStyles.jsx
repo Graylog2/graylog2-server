@@ -29,9 +29,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.colors.global.background};
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
-    overflow-x: hidden;
-    margin-top: 50px;
-    min-height: calc(100vh - 50px);
+    height: 100vh;
+  }
+
+  #app-root {
+    height: 100%;
   }
 
   ul {
@@ -170,21 +172,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 10px;
   }
 
-  .row {
-    margin-bottom: 15px;
-  }
-
   .no-bm {
     margin-bottom: 0;
   }
 
   .has-bm {
     margin-bottom: 10px;
-  }
-
-  .alert {
-    margin-bottom: 0;
-    margin-top: 5px;
   }
 
   .modal form {
@@ -255,28 +248,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 15px !important;
   }
 
-  dl.metric-def dt {
-    float: left;
-  }
-
   dl.metric-timer dd {
-    margin-left: 125px;
-  }
-
-  dl.metric-meter dd {
-    margin-left: 95px;
-  }
-
-  dl.metric-gauge dd {
-    margin-left: 80px;
-  }
-
-  dl.metric-counter dd {
-    margin-left: 80px;
-  }
-
-  dl.metric-histogram dd {
-    margin-left: 125px;
+    margin-left: 145px;
   }
 
   td.centered {
@@ -346,14 +319,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
   }
 
-  .system-system dt {
-    float: left;
-  }
-
-  .system-system dd {
-    margin-left: 75px;
-  }
-
   dl.system-journal {
     margin-top: 5px;
     margin-bottom: 0;
@@ -378,14 +343,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .system-dl dd {
     margin-left: 180px;
-  }
-
-  .system-rest dt {
-    float: left;
-  }
-
-  .system-rest dd {
-    margin-left: 120px;
   }
 
   .search-help {
@@ -568,12 +525,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   div.row-sm {
     margin-bottom: 5px;
-  }
-
-  dl.system-system,
-  dl.system-rest {
-    margin-top: 5px;
-    margin-bottom: 0;
   }
 
   .table-sm {

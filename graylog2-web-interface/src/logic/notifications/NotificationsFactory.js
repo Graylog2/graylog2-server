@@ -308,9 +308,10 @@ class NotificationsFactory {
         };
       case 'es_version_mismatch':
         const { initial_version: initialVersion, current_version: currentVersion } = notification.details;
+
         return {
           title: 'Elasticsearch version is incompatible',
-          description:(
+          description: (
             <span>
               The Elasticsearch version which is currently running ({currentVersion}) has a different major version than
               the one the Graylog master node was started with ({initialVersion}).{' '}
@@ -323,13 +324,14 @@ class NotificationsFactory {
 
             </span>
           ),
-        }
+        };
       case 'legacy_ldap_config_migration':
         const { auth_service_id: authServiceId } = notification.details;
         const authServiceLink = <Link to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(authServiceId)}>Authentication Service</Link>;
+
         return {
           title: 'Legacy LDAP/Active Directory configuration has been migrated to an Authentication Service',
-          description:(
+          description: (
             <span>
               The legacy LDAP/Active Directory configuration of this system has been upgraded to a new {authServiceLink}.
               Since the new {authServiceLink} requires some information that is not present in the legacy
@@ -337,14 +339,15 @@ class NotificationsFactory {
               <br />
               <br />
               <strong>After reviewing the {authServiceLink} it must be enabled to allow LDAP or Active Directory users
-              to log in again!</strong>
+                to log in again!
+              </strong>
               <br />
               <br />
               Please check the <DocumentationLink page={DocsHelper.PAGES.UPGRADE_GUIDE} text="upgrade guide" />
               for more details.
             </span>
           ),
-        }
+        };
       default:
         return { title: `unknown (${notification.type})`, description: 'unknown' };
     }

@@ -159,7 +159,7 @@ const SystemMenu = ({ location }) => {
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
       <HideOnCloud>
-        <IfPermitted permissions={['inputs:edit']}>
+        <IfPermitted permissions={['sidecars:read']}>
           <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
         </IfPermitted>
       </HideOnCloud>

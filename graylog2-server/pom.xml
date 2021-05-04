@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>4.0.7-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -506,8 +506,8 @@
             <artifactId>HdrHistogram</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.fusesource</groupId>
-            <artifactId>sigar</artifactId>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
@@ -740,13 +740,6 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <minimizeJar>false</minimizeJar>
                     <filters>
-                        <!-- http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ -->
-                        <filter>
-                            <artifact>commons-collections:commons-collections</artifact>
-                            <excludes>
-                                <exclude>org/apache/commons/collections/functors/InvokerTransformer.class</exclude>
-                            </excludes>
-                        </filter>
                         <!-- Bouncycastle's JARs are signed. When building a shaded JAR, either remove the signatures, or
                              add dependency to the main JAR's manifest. Otherwise running the application will fail. -->
                         <filter>
@@ -983,13 +976,23 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>yarn flow-check</id>
+                                <id>yarn test:integration</id>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
                                 <phase>test</phase>
                                 <configuration>
-                                    <arguments>flow-check</arguments>
+                                    <arguments>test:integration</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>yarn tsc</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <arguments>tsc</arguments>
                                 </configuration>
                             </execution>
                         </executions>

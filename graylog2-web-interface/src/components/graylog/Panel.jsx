@@ -22,7 +22,13 @@ import { Panel as BootstrapPanel } from 'react-bootstrap';
 
 import deprecationNotice from 'util/deprecationNotice';
 
-const PanelHeading = styled(BootstrapPanel.Heading)``;
+const PanelHeading = styled(BootstrapPanel.Heading)`
+  .panel-title {
+    > a {
+      display: block;
+    }
+  }
+`;
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};

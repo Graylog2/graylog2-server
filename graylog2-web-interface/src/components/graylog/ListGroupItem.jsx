@@ -16,8 +16,25 @@
  */
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
+
+const RefContainer = styled.div(({ theme }) => `
+  border: 1px solid ${theme.colors.variant.lighter.default};
+  margin-bottom: -1px;
+
+  &:first-child {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+`);
 
 const variantStyles = css(({ bsStyle, theme }) => {
   if (!bsStyle) {
@@ -61,7 +78,7 @@ const variantStyles = css(({ bsStyle, theme }) => {
 
 const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
-  border-color: ${theme.colors.variant.lighter.default};
+  border: 0;
 
   .list-group-item-heading {
     font-weight: bold;
@@ -132,8 +149,18 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   ${variantStyles}
 `);
 
-const ListGroupItem = forwardRef((props, ref) => {
-  return <StyledListGroupItem {...props} ref={ref} />;
-});
+const ListGroupItem = forwardRef(({ containerProps, ...rest }, ref) => (
+  <RefContainer ref={ref} {...containerProps}>
+    <StyledListGroupItem {...rest} />
+  </RefContainer>
+));
+
+ListGroupItem.propTypes = {
+  containerProps: PropTypes.object,
+};
+
+ListGroupItem.defaultProps = {
+  containerProps: {},
+};
 
 export default ListGroupItem;
