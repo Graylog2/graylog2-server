@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { StyledComponent } from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/graylog';
 import { Spinner } from 'components/common';
 
-const StyledForm: StyledComponent<{}, void, HTMLFormElement> = styled.form`
+const StyledForm: StyledComponent<'form', {}> = styled.form`
   margin-top: 10px;
   &.form-inline > .form-group {
     margin-right: 10px;
