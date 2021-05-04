@@ -14,22 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-
 import * as React from 'react';
 
 import AppConfig from '../AppConfig';
 
-type HideOnCloudProps = {
-  children: React.Node;
-};
-
-function HideOnCloud({ children }: HideOnCloudProps) {
+// eslint-disable-next-line react/prop-types
+const HideOnCloud: React.FunctionComponent = ({ children }) => {
   if (AppConfig.isCloud()) {
-    return null;
+    return <></>;
   }
 
-  return children;
-}
+  return <>{children}</>;
+};
 
 export default HideOnCloud;
