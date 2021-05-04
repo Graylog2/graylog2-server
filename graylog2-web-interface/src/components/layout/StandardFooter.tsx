@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -38,8 +37,8 @@ type Jvm = {
 
 type Props = {
   system?: {
-    version: string,
-    hostname: string,
+    version?: string,
+    hostname?: string,
   },
 };
 
@@ -87,4 +86,5 @@ StandardFooter.defaultProps = {
 export default connect(
   StandardFooter,
   { system: SystemStore as Store<SystemStoreState> },
-  ({ system: { system } = { system: undefined } }) => ({ system }));
+  ({ system: { system } = { system: undefined } }) => ({ system }),
+);

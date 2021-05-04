@@ -39,6 +39,10 @@ interface PluginPages {
   }
 }
 
+interface PluginPageFooter {
+  component: React.ComponentType
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -46,6 +50,7 @@ declare module 'graylog-web-plugin/plugin' {
     globalNotifications?: Array<GlobalNotification>
     routes?: Array<PluginRoute>;
     pages?: PluginPages;
+    pageFooter?: Array<PluginPageFooter>;
   }
 
   interface PluginRegistration {
