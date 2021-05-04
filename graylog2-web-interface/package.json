@@ -21,8 +21,8 @@
     "lint:styles": "stylelint './src/**/*.{js,jsx,ts,tsx}' --syntax css-in-js",
     "lint:styles:path": "stylelint --syntax css-in-js",
     "lint:changes": "./dev/lintChanges.sh",
-    "test": "jest",
-    "test:integration": "jest --config jest.it.config.js",
+    "test": "jest --maxWorkers=50%",
+    "test:integration": "jest --maxWorkers=50% --config jest.it.config.js",
     "check-production-build": "node checkProductionBuild.js"
   },
   "eslintConfig": {
@@ -166,7 +166,7 @@
     "webpack-dev-server": "^3.8.0",
     "webpack-hot-middleware": "^2.25.0",
     "webpack-merge": "^4.2.2",
-    "yargs": "^15.3.1"
+    "yargs": "^17.0.1"
   },
   "resolutions": {
     "jquery": "3.5.1"

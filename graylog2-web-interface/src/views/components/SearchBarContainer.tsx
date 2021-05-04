@@ -14,21 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  'chroma-js',
-  'create-react-class',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment-timezone',
-  'moment',
-  'react-bootstrap',
-  'react-dom',
-  'react-query',
-  'react-router-bootstrap',
-  'react-router',
-  'react',
-  'reflux-core',
-  'reflux',
-  'styled-components',
-];
+import styled from 'styled-components';
+
+import { RowContentStyles } from 'components/graylog/Row';
+
+const SearchBarContainer = styled.div`
+  ${RowContentStyles}
+  padding: 9px;
+  margin-left: -15px;
+  margin-right: -15px;
+
+  .row {
+    margin-left: -9px;
+    margin-right: -9px;
+  }
+
+  div[class*="col-"] {
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+`;
+
+export default SearchBarContainer;
