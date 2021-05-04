@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-
 import filterValueActions, { filterCloudValueActions } from './filterValueActions';
+
+declare let IS_CLOUD: boolean | undefined;
 
 describe('filterValueActions', () => {
   it('should filter items by type', () => {
@@ -32,6 +32,10 @@ describe('filterValueActions', () => {
 });
 
 describe('filterCloudValueActions', () => {
+  afterEach(() => {
+    IS_CLOUD = undefined;
+  });
+
   it('should not filter items by type when not on cloud', () => {
     const items = [
       { type: 'something', name: 'something' },
@@ -45,7 +49,8 @@ describe('filterCloudValueActions', () => {
   });
 
   it('should filter items by type when on cloud', () => {
-    window.IS_CLOUD = true;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    IS_CLOUD = true;
 
     const items = [
       { type: 'something', name: 'something' },
@@ -55,7 +60,5 @@ describe('filterCloudValueActions', () => {
     expect(filterCloudValueActions(items, ['delete-me'])).toEqual([
       { type: 'something', name: 'something' },
     ]);
-
-    window.IS_CLOUD = undefined;
   });
 });

@@ -15,27 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // @flow strict
+import * as React from 'react';
 
-import AppConfig from '../AppConfig';
+import HideOnCloud from './HideOnCloud';
 
-type ValueAction = { type: string };
+/**
+ * Higher order Component that will not render if environment is on cloud
+ *
+ * @param Component
+ * @returns Component | null
+ */
+const withHideOnCloud = <Props extends {}>(Component: React.ComponentType<Props>): React.ComponentType<Props> => {
+  return (props) => <HideOnCloud><Component {...props} /></HideOnCloud>;
+};
 
-function filterValueActions(
-  items: Array<ValueAction>,
-  toExclude: Array<string>,
-): Array<ValueAction> {
-  return items.filter((item) => !toExclude.includes(item.type));
-}
-
-export function filterCloudValueActions(
-  valueActions: Array<ValueAction>,
-  toExclude: Array<string>,
-): Array<ValueAction> {
-  if (!AppConfig.isCloud()) {
-    return valueActions;
-  }
-
-  return filterValueActions(valueActions, toExclude);
-}
-
-export default filterValueActions;
+export default withHideOnCloud;

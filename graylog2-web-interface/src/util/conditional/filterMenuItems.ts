@@ -14,21 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-import * as React from 'react';
+import AppConfig from '../AppConfig';
 
-import HideOnCloud from './HideOnCloud';
+type MenuItem = { path: string };
 
-/**
- * Higher order Component that will not render if environment is on cloud
- *
- * @param Component
- * @returns Component | null
- */
-function withHideOnCloud<Config: {}>(
-  Component: React.AbstractComponent<Config>,
-): React.AbstractComponent<Config> {
-  return (props) => <HideOnCloud><Component {...props} /></HideOnCloud>;
+function filterMenuItems(
+  menuItems: Array<MenuItem>,
+  toExclude: Array<string>,
+): Array<MenuItem> {
+  return menuItems.filter((item) => !toExclude.includes(item.path));
 }
 
-export default withHideOnCloud;
+export function filterCloudMenuItems(
+  menuItems: Array<MenuItem>,
+  toExclude: Array<string>,
+): Array<MenuItem> {
+  if (!AppConfig.isCloud()) {
+    return menuItems;
+  }
+
+  return filterMenuItems(menuItems, toExclude);
+}
+
+export default filterMenuItems;

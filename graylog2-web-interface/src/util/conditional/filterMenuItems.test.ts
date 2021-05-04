@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
-
 import filterMenuItems, { filterCloudMenuItems } from './filterMenuItems';
+
+declare let IS_CLOUD: boolean | undefined;
 
 describe('filterMenuItems', () => {
   it('should filter items by path', () => {
@@ -32,6 +32,10 @@ describe('filterMenuItems', () => {
 });
 
 describe('filterCloudMenuItem', () => {
+  afterEach(() => {
+    IS_CLOUD = undefined;
+  });
+
   it('should not filter items by path when not on cloud', () => {
     const items = [
       { path: 'something', name: 'something' },
@@ -45,7 +49,8 @@ describe('filterCloudMenuItem', () => {
   });
 
   it('should filter items by path when on cloud', () => {
-    window.IS_CLOUD = true;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    IS_CLOUD = true;
 
     const items = [
       { path: 'something', name: 'something' },
@@ -55,7 +60,5 @@ describe('filterCloudMenuItem', () => {
     expect(filterCloudMenuItems(items, ['delete-me'])).toEqual([
       { path: 'something', name: 'something' },
     ]);
-
-    window.IS_CLOUD = undefined;
   });
 });
