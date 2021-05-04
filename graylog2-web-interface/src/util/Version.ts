@@ -1,4 +1,3 @@
-// @flow strict
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -15,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// $FlowFixMe: Import fail in enterprise plugin
 import pjson from '../../package.json';
 
 const versionRegex = /(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(-(?<preRelease>[\w.\d]+))?(\+(?<buildMetadata>\w+))?/;
@@ -29,7 +27,7 @@ export type Version = {
   buildMetadata?: string,
 };
 
-export const parseVersion = (version?: string = defaultVersion): Version | void => {
+export const parseVersion = (version: string = defaultVersion): Version | void => {
   const result = versionRegex.exec(version);
 
   if (!result || !result.groups) {
@@ -39,14 +37,14 @@ export const parseVersion = (version?: string = defaultVersion): Version | void 
     return undefined;
   }
 
-  const versionGroups = (result.groups: Version);
+  const versionGroups = result.groups;
 
   return {
-    major: versionGroups.major,
-    minor: versionGroups.minor,
-    patch: versionGroups.patch,
-    preRelease: versionGroups.preRelease,
-    buildMetadata: versionGroups.buildMetadata,
+    major: versionGroups?.major,
+    minor: versionGroups?.minor,
+    patch: versionGroups?.patch,
+    preRelease: versionGroups?.preRelease,
+    buildMetadata: versionGroups?.buildMetadata,
   };
 };
 

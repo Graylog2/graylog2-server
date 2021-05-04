@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-// eslint-disable-next-line import/no-named-as-default
 import Version, { getFullVersion, getMajorAndMinorVersion, parseVersion } from './Version';
 
 jest.unmock('util/Version');
