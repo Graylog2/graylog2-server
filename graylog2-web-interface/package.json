@@ -91,7 +91,7 @@
     "react-grid-layout": "^0.18.3",
     "react-immutable-proptypes": "^2.1.0",
     "react-isolated-scroll": "^0.1.1",
-    "react-leaflet": "^2.3.0",
+    "react-leaflet": "^3.1.0",
     "react-mops": "v2.0.0-beta.0",
     "react-overlays": "^0.7.0",
     "react-plotly.js": "2.5.1",
