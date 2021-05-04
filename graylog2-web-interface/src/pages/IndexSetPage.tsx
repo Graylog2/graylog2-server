@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 import numeral from 'numeral';
@@ -43,19 +42,19 @@ const REFRESH_INTERVAL = 2000;
 
 type Props = {
   params: {
-    indexSetId: ?string,
+    indexSetId?: string,
   },
-  indexSet: ?IndexSet,
-  indexerOverview: ?IndexerOverview,
-  indexerOverviewError: ?string,
+  indexSet?: IndexSet,
+  indexerOverview?: IndexerOverview,
+  indexerOverviewError?: string,
   indexDetails: {
-    closedIndices: ?Indices,
-    indices: ?Indices,
+    closedIndices?: Indices,
+    indices?: Indices,
   },
 };
 
 type State = {
-  timerId: ?IntervalID,
+  timerId?: NodeJS.Timeout,
 };
 
 class IndexSetPage extends React.Component<Props, State> {
@@ -248,8 +247,11 @@ export default connect(
     indices: IndicesStore,
   },
   ({ indexSets, indexerOverview, indices }) => ({
+    // @ts-ignore
     indexSet: indexSets ? indexSets.indexSet : undefined,
+    // @ts-ignore
     indexerOverview: indexerOverview && indexerOverview.indexerOverview,
+    // @ts-ignore
     indexerOverviewError: indexerOverview && indexerOverview.indexerOverviewError,
     indexDetails: indices,
   }),
