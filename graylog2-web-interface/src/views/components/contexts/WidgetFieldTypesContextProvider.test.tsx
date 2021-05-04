@@ -8,6 +8,8 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import Widget from 'views/logic/widgets/Widget';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query from 'views/logic/queries/Query';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 
 import FieldTypesContext from './FieldTypesContext';
 
@@ -16,7 +18,8 @@ jest.mock('views/logic/queries/useCurrentQuery');
 
 describe('WidgetFieldTypesContextProvider', () => {
   it('retrieves field types based on streams and timerange of current widget', async () => {
-    asMock(useFieldTypes).mockReturnValue({ data: [] } as ReturnType<typeof useFieldTypes>);
+    const data: FieldTypeMapping[] = [FieldTypeMapping.create('foo', FieldTypes.LONG())];
+    asMock(useFieldTypes).mockReturnValue({ data } as ReturnType<typeof useFieldTypes>);
     asMock(useCurrentQuery).mockReturnValue(Query.builder().id('deadbeef').build());
 
     const widget = Widget.builder().streams(['stream1', 'stream2']).timerange({ type: 'relative', range: 3600 }).build();
@@ -26,15 +29,19 @@ describe('WidgetFieldTypesContextProvider', () => {
 
         <WidgetFieldTypesContextProvider>
           <FieldTypesContext.Consumer>
-            {({ all }) => (
-              <span>Got {all.size} field types</span>
+            {({ all, queryFields }) => (
+              <>
+                <span>Got {all.size} field type(s)</span>
+                <span>and {queryFields.get('deadbeef').size} field type(s) for query</span>
+              </>
             )}
           </FieldTypesContext.Consumer>
         </WidgetFieldTypesContextProvider>
       </WidgetContext.Provider>
     ));
 
-    await screen.findByText('Got 0 field types');
+    await screen.findByText('Got 1 field type(s)');
+    await screen.findByText('and 1 field type(s) for query');
 
     expect(useFieldTypes).toHaveBeenCalledWith(['stream1', 'stream2'], { type: 'relative', range: 3600 });
   });
