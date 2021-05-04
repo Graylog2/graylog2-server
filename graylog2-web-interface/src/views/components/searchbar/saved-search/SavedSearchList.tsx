@@ -26,6 +26,7 @@ import { Icon, PaginatedList, SearchForm, Spinner } from 'components/common';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import UserNotification from 'util/UserNotification';
 
 type Props = {
   toggleModal: () => void,
@@ -102,6 +103,9 @@ const _loadSavesSearches = (pagination, setLoading, setPaginatedSavedSearches) =
   SavedSearchesActions.search(pagination).then((paginatedSavedSearches) => {
     setPaginatedSavedSearches(paginatedSavedSearches);
     setLoading(false);
+  }).catch((error) => {
+    UserNotification.error(`Fetching saved searches failed with status: ${error}`,
+      'Could not retrieve saved searches');
   });
 };
 
