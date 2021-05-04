@@ -14,21 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  'chroma-js',
-  'create-react-class',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment-timezone',
-  'moment',
-  'react-bootstrap',
-  'react-dom',
-  'react-query',
-  'react-router-bootstrap',
-  'react-router',
-  'react',
-  'reflux-core',
-  'reflux',
-  'styled-components',
-];
+import * as React from 'react';
+import { useMemo } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+type Props = {
+  children: React.ReactNode,
+};
+
+const options = {
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+};
+
+const DefaultQueryClientProvider = ({ children }: Props) => {
+  const queryClient = useMemo(() => new QueryClient(options), []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+};
+
+export default DefaultQueryClientProvider;
