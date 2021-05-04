@@ -20,11 +20,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -35,6 +39,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MappedFieldTypesServiceTest {
@@ -49,6 +55,12 @@ public class MappedFieldTypesServiceTest {
 
     @Mock
     private IndexLookup indexLookup;
+
+    @Captor
+    private ArgumentCaptor<Set<String>> streamIdCaptor;
+
+    @Captor
+    private ArgumentCaptor<TimeRange> timeRangeCaptor;
 
     private MappedFieldTypesService mappedFieldTypesService;
 
@@ -75,6 +87,7 @@ public class MappedFieldTypesServiceTest {
                 )
         );
         when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
+        when(indexLookup.indexNamesForStreamsInTimeRange(Collections.singleton("stream1"), RelativeRange.allTime())).thenReturn(ImmutableSet.of("testIndex", "testIndex2"));
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
         assertThat(result).containsExactlyInAnyOrder(
@@ -100,12 +113,23 @@ public class MappedFieldTypesServiceTest {
                 )
         );
         when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
+        when(indexLookup.indexNamesForStreamsInTimeRange(Collections.singleton("stream1"), RelativeRange.allTime())).thenReturn(ImmutableSet.of("testIndex", "testIndex2"));
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
         assertThat(result).containsExactlyInAnyOrder(
                 MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))),
                 MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("compound(long,string)", ImmutableSet.of("compound")))
         );
+    }
+
+    @Test
+    public void requestsFieldTypesForRequestedTimeRange() throws Exception {
+        this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), AbsoluteRange.create("2010-05-17T23:28:14.000+02:00", "2021-05-05T12:09:23.213+02:00"));
+
+        verify(this.indexLookup, times(1)).indexNamesForStreamsInTimeRange(streamIdCaptor.capture(), timeRangeCaptor.capture());
+
+        assertThat(streamIdCaptor.getValue()).containsExactly("stream1");
+        assertThat(timeRangeCaptor.getValue()).isEqualTo(AbsoluteRange.create("2010-05-17T23:28:14.000+02:00", "2021-05-05T12:09:23.213+02:00"));
     }
 
     private IndexFieldTypesDTO createIndexTypes(String indexId, String indexName, FieldTypeDTO... fieldTypes) {

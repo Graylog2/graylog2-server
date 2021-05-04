@@ -113,6 +113,23 @@ public class FieldTypesResourceTest {
     }
 
     @Test
+    public void passesRequestedTimeRangeToMappedFieldTypesService() throws Exception {
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+
+        final FieldTypesForStreamsRequest request = FieldTypesForStreamsRequest.Builder.builder()
+                .streams(ImmutableSet.of("2323", "4242"))
+                .timerange(RelativeRange.create(300))
+                .build();
+
+        this.fieldTypesResource.byStreams(request);
+
+        verify(this.mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture(), timeRangeArgumentCaptor.capture());
+
+        assertThat(timeRangeArgumentCaptor.getValue()).isEqualTo(RelativeRange.create(300));
+    }
+
+    @Test
     public void byStreamChecksPermissionsForStream() {
         when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
         when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
