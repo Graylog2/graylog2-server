@@ -40,7 +40,20 @@ interface PluginPages {
 }
 
 interface PluginPageFooter {
-  component: React.ComponentType
+  component: React.ComponentType;
+}
+
+interface PluginCloud {
+  messageLoaders: {
+    ForwarderInputDropdown: React.ComponentType<{
+      autoLoadMessage?: boolean;
+      preselectedInputId?: string;
+      title?: string;
+      loadButtonDisabled?: boolean;
+      onLoadMessage: (selectedInput: string) => void;
+    }>;
+  };
+  oktaUserForm: React.ComponentType;
 }
 
 declare module 'graylog-web-plugin/plugin' {
@@ -51,6 +64,7 @@ declare module 'graylog-web-plugin/plugin' {
     routes?: Array<PluginRoute>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
+    cloud?: Array<PluginCloud>;
   }
 
   interface PluginRegistration {

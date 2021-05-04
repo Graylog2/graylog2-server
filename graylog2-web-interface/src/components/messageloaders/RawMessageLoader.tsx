@@ -1,4 +1,3 @@
-// @flow strict
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -53,7 +52,7 @@ type OptionsType = {
 type Props = {
   inputs?: Immutable.Map<string, InputType>,
   codecTypes: CodecTypes,
-  onMessageLoaded: (message: ?Message, option: OptionsType) => void,
+  onMessageLoaded: (message: Message | undefined, option: OptionsType) => void,
   inputIdSelector?: boolean,
 };
 
@@ -75,7 +74,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     }
   }, [inputIdSelector]);
 
-  const _loadMessage = (event: SyntheticEvent<*>) => {
+  const _loadMessage = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
     setLoading(true);
@@ -149,11 +148,11 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     setInputId(selectedInput);
   };
 
-  const _onMessageChange = (event: SyntheticInputEvent<HTMLTextAreaElement>) => {
+  const _onMessageChange = (event: React.SyntheticEvent<HTMLTextAreaElement>) => {
     setMessage(getValueFromInput(event.target));
   };
 
-  const _onRemoteAddressChange = (event: SyntheticInputEvent<HTMLSelectElement>) => {
+  const _onRemoteAddressChange = (event: React.SyntheticEvent<HTMLSelectElement>) => {
     setRemoteAddress(getValueFromInput(event.target));
   };
 
@@ -310,7 +309,9 @@ RawMessageLoader.defaultProps = {
 };
 
 export default connect(
+  // @ts-ignore
   RawMessageLoader,
   { inputs: InputsStore, codecTypes: CodecTypesStore },
+  // @ts-ignore
   ({ inputs: { inputs }, codecTypes: { codecTypes } }) => ({ inputs: (inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined), codecTypes }),
 );

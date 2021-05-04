@@ -1,4 +1,3 @@
-// @flow strict
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -35,7 +34,7 @@ const ForwarderInputDropdown = isCloud ? PluginStore.exports('cloud')[0].message
 
 type Props = {
   inputs: Immutable.Map<string, Input>,
-  onMessageLoaded: (message: ?Message) => void,
+  onMessageLoaded: (message?: Message) => void,
   selectedInputId?: string,
 };
 
