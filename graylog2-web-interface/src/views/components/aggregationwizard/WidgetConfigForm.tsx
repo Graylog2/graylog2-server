@@ -92,7 +92,7 @@ export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
   groupBy?: { groupings: Array<{ [key: string]: string }> },
   visualization?: { [key: string]: string | any },
-  sort?: { [key: string]: string },
+  sort?: Array<{ [key: string]: string }>,
 }
 
 type Props = {

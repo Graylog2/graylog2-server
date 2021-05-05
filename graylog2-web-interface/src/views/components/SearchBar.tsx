@@ -45,6 +45,7 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import type { SearchBarFormValues } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
+import SearchBarContainer from './SearchBarContainer';
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
@@ -66,7 +67,7 @@ const StreamWrap = styled.div`
   flex: 1;
   
   > div {
-    margin-right: 24px;
+    margin-right: 18px;
   }
 `;
 
@@ -109,72 +110,70 @@ const SearchBar = ({
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={query.query_string}>
-          <Row className="content">
-            <Col md={12}>
-              <SearchBarForm initialValues={{ timerange, streams, queryString }}
-                             limitDuration={limitDuration}
-                             onSubmit={_onSubmit}>
-                {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
-                  <>
-                    <TopRow>
-                      <Col md={5}>
-                        <TimeRangeInput disabled={disableSearch}
-                                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                        value={values?.timerange}
-                                        hasErrorOnMount={!isValid} />
-                      </Col>
+          <SearchBarContainer>
+            <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                           limitDuration={limitDuration}
+                           onSubmit={_onSubmit}>
+              {({ dirty, isSubmitting, isValid, handleSubmit, values, setFieldValue }) => (
+                <>
+                  <TopRow>
+                    <Col md={5}>
+                      <TimeRangeInput disabled={disableSearch}
+                                      onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                      value={values?.timerange}
+                                      hasErrorOnMount={!isValid} />
+                    </Col>
 
-                      <Col mdHidden lgHidden>
-                        <HorizontalSpacer />
-                      </Col>
+                    <Col mdHidden lgHidden>
+                      <HorizontalSpacer />
+                    </Col>
 
-                      <FlexCol md={7}>
-                        <StreamWrap>
-                          <Field name="streams">
-                            {({ field: { name, value, onChange } }) => (
-                              <StreamsFilter value={value}
-                                             streams={availableStreams}
-                                             onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
-                            )}
-                          </Field>
-                        </StreamWrap>
-
-                        <RefreshControls />
-                      </FlexCol>
-                    </TopRow>
-
-                    <Row className="no-bm">
-                      <Col md={9} xs={8}>
-                        <div className="pull-right search-help">
-                          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                             title="Search query syntax documentation"
-                                             text={<Icon name="lightbulb" />} />
-                        </div>
-                        <SearchButton disabled={disableSearch || isSubmitting || !isValid}
-                                      dirty={dirty} />
-
-                        <Field name="queryString">
+                    <FlexCol md={7}>
+                      <StreamWrap>
+                        <Field name="streams">
                           {({ field: { name, value, onChange } }) => (
-                            <QueryInput value={value}
-                                        placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                        onChange={(newQuery) => {
-                                          onChange({ target: { value: newQuery, name } });
-
-                                          return Promise.resolve(newQuery);
-                                        }}
-                                        onExecute={handleSubmit as () => void} />
+                            <StreamsFilter value={value}
+                                           streams={availableStreams}
+                                           onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
                           )}
                         </Field>
-                      </Col>
-                      <Col md={3} xs={4} className="pull-right" aria-label="Search Meta Buttons">
-                        {!editing && <SavedSearchControls />}
-                      </Col>
-                    </Row>
-                  </>
-                )}
-              </SearchBarForm>
-            </Col>
-          </Row>
+                      </StreamWrap>
+
+                      <RefreshControls />
+                    </FlexCol>
+                  </TopRow>
+
+                  <Row className="no-bm">
+                    <Col md={9} xs={8}>
+                      <div className="pull-right search-help">
+                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                           title="Search query syntax documentation"
+                                           text={<Icon name="lightbulb" />} />
+                      </div>
+                      <SearchButton disabled={disableSearch || isSubmitting || !isValid}
+                                    dirty={dirty} />
+
+                      <Field name="queryString">
+                        {({ field: { name, value, onChange } }) => (
+                          <QueryInput value={value}
+                                      placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                      onChange={(newQuery) => {
+                                        onChange({ target: { value: newQuery, name } });
+
+                                        return Promise.resolve(newQuery);
+                                      }}
+                                      onExecute={handleSubmit as () => void} />
+                        )}
+                      </Field>
+                    </Col>
+                    <Col md={3} xs={4} className="pull-right" aria-label="Search Meta Buttons">
+                      {!editing && <SavedSearchControls />}
+                    </Col>
+                  </Row>
+                </>
+              )}
+            </SearchBarForm>
+          </SearchBarContainer>
         </ScrollToHint>
       )}
     </WidgetFocusContext.Consumer>

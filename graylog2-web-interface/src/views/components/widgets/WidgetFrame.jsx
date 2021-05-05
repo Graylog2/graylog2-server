@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 const WidgetWrap = styled.div(({ theme }) => css`
   height: inherit;
   margin: 0;
-  padding: 12px 15px 6px 15px;
+  padding: 7px 9px 6px 9px;
   display: flex;
   flex-direction: column;
 
