@@ -103,6 +103,7 @@ public class GraylogBackend {
 
     public void fullReset() {
         purgeData();
+        mongodb.importFixtures();
         node.restart();
     }
 

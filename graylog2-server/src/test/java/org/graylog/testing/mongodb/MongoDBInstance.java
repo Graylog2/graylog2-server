@@ -115,9 +115,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
 
     public void start() {
         service.start();
-        if (fixtureImporter != null) {
-            fixtureImporter.importResources(service.mongoDatabase());
-        }
+        importFixtures();
     }
 
     @Override
@@ -162,6 +160,12 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
             service.close();
         } catch (Exception e) {
             LOG.error("Error closing service", e);
+        }
+    }
+
+    public void importFixtures() {
+        if (fixtureImporter != null) {
+            fixtureImporter.importResources(service.mongoDatabase());
         }
     }
 }
