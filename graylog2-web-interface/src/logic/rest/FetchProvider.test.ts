@@ -16,7 +16,6 @@
  */
 import express from 'express';
 import nodeFetch from 'node-fetch';
-import suppressConsole from 'helpers/suppressConsole';
 
 import fetch, { fetchFile } from './FetchProvider';
 
