@@ -71,6 +71,7 @@ const GroupByConfiguration = () => {
         </Field>
       )}
       <FieldArray name="groupBy.groupings"
+                  validateOnChange={false}
                   render={() => (
                     <SortableList items={groupBy?.groupings}
                                   onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
