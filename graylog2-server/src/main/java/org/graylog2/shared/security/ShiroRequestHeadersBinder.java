@@ -31,7 +31,7 @@ import java.util.Optional;
  * This filter makes the request headers accessible within Shiro's {@link ThreadContext}.
  */
 // Needs to run after RequestIdFilter
-@Priority(Priorities.AUTHORIZATION - 10)
+@Priority(Priorities.AUTHENTICATION - 8)
 public class ShiroRequestHeadersBinder implements ContainerRequestFilter {
     public static final String REQUEST_HEADERS = "REQUEST_HEADERS";
 
