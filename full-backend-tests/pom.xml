@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>3.3.13-SNAPSHOT</version>
+        <version>3.3.13</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -45,13 +45,13 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
-            <version>3.3.13-SNAPSHOT</version>
+            <version>3.3.13</version>
         </dependency>
 
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
-            <version>3.3.13-SNAPSHOT</version>
+            <version>3.3.13</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
