@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import asMock from 'helpers/mocking/AsMock';
+
+import AppConfig from 'util/AppConfig';
+
 import filterMenuItems, { filterCloudMenuItems } from './filterMenuItems';
 
-declare let IS_CLOUD: boolean | undefined;
+jest.mock('util/AppConfig', () => ({
+  isCloud: jest.fn(() => false),
+}));
 
 describe('filterMenuItems', () => {
   it('should filter items by path', () => {
@@ -33,7 +39,7 @@ describe('filterMenuItems', () => {
 
 describe('filterCloudMenuItem', () => {
   afterEach(() => {
-    IS_CLOUD = undefined;
+    jest.resetAllMocks();
   });
 
   it('should not filter items by path when not on cloud', () => {
@@ -49,8 +55,7 @@ describe('filterCloudMenuItem', () => {
   });
 
   it('should filter items by path when on cloud', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    IS_CLOUD = true;
+    asMock(AppConfig.isCloud).mockReturnValue(true);
 
     const items = [
       { path: 'something', name: 'something' },
