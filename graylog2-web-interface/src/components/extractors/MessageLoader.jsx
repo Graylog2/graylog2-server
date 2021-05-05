@@ -66,13 +66,15 @@ class MessageLoader extends React.Component {
     promise.then((data) => this.props.onMessageLoaded(data));
     promise.finally(() => this.setState({ loading: false }));
 
-    event.preventDefault();
+    if (event?.preventDefault) {
+      event.preventDefault();
+    }
   };
 
   submit = (messageId, index) => {
     this.messageId.value = messageId;
     this.index.value = index;
-    this.submitButton.click();
+    this.loadMessage();
   };
 
   render() {
