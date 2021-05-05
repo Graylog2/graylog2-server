@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import FetchError from 'logic/errors/FetchError';
+
 interface PluginRoute {
   path: string;
   component: React.ComponentType;
@@ -44,6 +46,11 @@ interface PluginPageFooter {
 }
 
 interface PluginCloud {
+  ForwarderReceivedBy: React.ComponentType<{
+    inputId: string;
+    forwarderNodeId: string;
+  }>;
+  isLocalNode: (nodeId: string) => NodeInfo;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
       autoLoadMessage?: boolean;
@@ -53,7 +60,18 @@ interface PluginCloud {
       onLoadMessage: (selectedInput: string) => void;
     }>;
   };
-  oktaUserForm: React.ComponentType;
+  oktaUserForm: {
+    fields: {
+      username: React.ComponentType<{}> | null;
+      email: React.ComponentType<{}>;
+      password: React.ComponentType<{}>;
+    };
+    validations: {
+      password: (errors: { [name: string]: string }, password: string, passwordRepeat: string) => { [name: string]: string };
+    };
+    extractSubmitError: (errors: FetchError) => string;
+    onCreate: (formData: { [name: string ]: string }) => { [name: string]: string };
+  };
 }
 
 declare module 'graylog-web-plugin/plugin' {
