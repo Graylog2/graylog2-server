@@ -305,13 +305,17 @@ public class PipelineInterpreter implements MessageProcessor {
                 anyRulesMatched |= ruleCondition;
                 allRulesMatched &= ruleCondition;
             } catch(Exception e) {
-                log.error("This exception was caused by \"{}\"/{} containing message: {}", rule.name(), rule.id(), message);
+                log.warn("Error evaluating condition for rule <{}/{}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), message, e.getMessage());
                 throw e;
             }
         }
 
         for (Rule rule : rulesToRun) {
             if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
+                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                log.warn("Error evaluating action for rule <{}/{}> with message: {} (Error: {})",
+                        rule.name(), rule.id(), message, lastError);
                 // if any of the rules raise an error, skip the rest of the rules
                 break;
             }
