@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
@@ -27,8 +26,8 @@ import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
-import {} from 'components/indices/rotation';
-import {} from 'components/indices/retention';
+import 'components/indices/rotation';
+import 'components/indices/retention';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 type Props = {
@@ -40,7 +39,7 @@ type Props = {
   cancelLink: string,
 };
 
-type Unit = 'SECONDS' | 'MINUTES';
+type Unit = 'seconds' | 'minutes';
 
 type State = {
   indexSet: IndexSet,
@@ -70,7 +69,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
     this.state = {
       indexSet: indexSet,
-      fieldTypeRefreshIntervalUnit: 'SECONDS',
+      fieldTypeRefreshIntervalUnit: 'seconds',
       validationErrors: {},
     };
   }
@@ -87,7 +86,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     });
   };
 
-  _validateIndexPrefix = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  _validateIndexPrefix = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     const { validationErrors } = this.state;
 
@@ -117,15 +116,15 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     this._onInputChange(event);
   };
 
-  _onInputChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  _onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this._updateConfig(event.target.name, event.target.value);
   };
 
-  _onDisableOptimizationClick = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  _onDisableOptimizationClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     this._updateConfig(event.target.name, event.target.checked);
   };
 
-  _saveConfiguration = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  _saveConfiguration = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const { indexSet, validationErrors } = this.state;
     const { onUpdate } = this.props;
@@ -309,7 +308,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                label="Field type refresh interval"
                                help="How often the field type information for the active write index will be updated."
                                value={moment.duration(indexSet.field_type_refresh_interval, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                               unit={fieldTypeRefreshIntervalUnit}
+                               unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
                                units={['SECONDS', 'MINUTES']}
                                required
                                update={this._onFieldTypeRefreshIntervalChange} />
