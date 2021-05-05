@@ -14,51 +14,40 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import asMock from 'helpers/mocking/AsMock';
+
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
+import AppConfig from 'util/AppConfig';
+
 import filterValueActions, { filterCloudValueActions } from './filterValueActions';
 
-declare let IS_CLOUD: boolean | undefined;
+jest.mock('util/AppConfig', () => ({
+  isCloud: jest.fn(() => false),
+}));
+
+const items: Array<ActionDefinition> = [
+  { type: 'something', title: 'something', resetFocus: false },
+  { type: 'delete-me', title: 'delete me', resetFocus: false },
+];
 
 describe('filterValueActions', () => {
   it('should filter items by type', () => {
-    const items = [
-      { type: 'something', name: 'something' },
-      { type: 'delete-me', name: 'delete me' },
-    ];
-
-    expect(filterValueActions(items, ['delete-me'])).toEqual([
-      { type: 'something', name: 'something' },
-    ]);
+    expect(filterValueActions(items, ['delete-me'])).toEqual(items.filter((item) => item.type !== 'delete-me'));
   });
 });
 
 describe('filterCloudValueActions', () => {
   afterEach(() => {
-    IS_CLOUD = undefined;
+    jest.resetAllMocks();
   });
 
   it('should not filter items by type when not on cloud', () => {
-    const items = [
-      { type: 'something', name: 'something' },
-      { type: 'delete-me', name: 'delete me' },
-    ];
-
-    expect(filterCloudValueActions(items, ['delete-me'])).toEqual([
-      { type: 'something', name: 'something' },
-      { type: 'delete-me', name: 'delete me' },
-    ]);
+    expect(filterCloudValueActions(items, ['delete-me'])).toEqual(items);
   });
 
   it('should filter items by type when on cloud', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    IS_CLOUD = true;
+    asMock(AppConfig.isCloud).mockReturnValue(true);
 
-    const items = [
-      { type: 'something', name: 'something' },
-      { type: 'delete-me', name: 'delete me' },
-    ];
-
-    expect(filterCloudValueActions(items, ['delete-me'])).toEqual([
-      { type: 'something', name: 'something' },
-    ]);
+    expect(filterCloudValueActions(items, ['delete-me'])).toEqual(items.filter((item) => item.type !== 'delete-me'));
   });
 });

@@ -14,21 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { ActionDefinition } from 'views/components/actions/ActionHandler';
+
 import AppConfig from '../AppConfig';
 
-type ValueAction = { type: string };
-
 function filterValueActions(
-  items: Array<ValueAction>,
+  items: Array<ActionDefinition>,
   toExclude: Array<string>,
-): Array<ValueAction> {
+): Array<ActionDefinition> {
   return items.filter((item) => !toExclude.includes(item.type));
 }
 
 export function filterCloudValueActions(
-  valueActions: Array<ValueAction>,
+  valueActions: Array<ActionDefinition>,
   toExclude: Array<string>,
-): Array<ValueAction> {
+): Array<ActionDefinition> {
   if (!AppConfig.isCloud()) {
     return valueActions;
   }
