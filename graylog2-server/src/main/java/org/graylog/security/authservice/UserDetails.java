@@ -51,6 +51,8 @@ public abstract class UserDetails {
      */
     public abstract Optional<String> fullName();
 
+    public abstract boolean isExternal();
+
     public abstract Set<String> defaultRoles();
 
     public UserDetails withDatabaseId(String id) {
@@ -90,6 +92,8 @@ public abstract class UserDetails {
         public abstract Builder lastName(@Nullable String lastName);
 
         public abstract Builder fullName(@Nullable String fullName);
+
+        public abstract Builder isExternal(boolean isExternal);
 
         public abstract Builder defaultRoles(Set<String> defaultRoles);
 
