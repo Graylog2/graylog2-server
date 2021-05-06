@@ -21,9 +21,26 @@ import fetch, { fetchFile } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
 
-jest.mock('stores/sessions/SessionStore', () => ({
-  isLoggedIn: jest.fn(() => true),
-  getSessionId: jest.fn(() => 'foobar'),
+jest.mock('injection/StoreProvider', () => ({
+  getStore: (key) => ({
+    Session: {
+      isLoggedIn: jest.fn(() => true),
+      getSessionId: jest.fn(() => 'foobar'),
+    },
+  }[key]),
+}));
+
+const mockLogout = jest.fn();
+
+jest.mock('injection/ActionsProvider', () => ({
+  getActions: (key) => ({
+    Session: {
+      logout: mockLogout,
+    },
+    ServerAvailability: {
+      reportSuccess: jest.fn(),
+    },
+  }[key]),
 }));
 
 const PORT = 0;
@@ -57,6 +74,10 @@ const setUpServer = () => {
     } else {
       res.status(500).end();
     }
+  });
+
+  app.get('/simulatesSessionExpiration', (req, res) => {
+    res.status(401).end();
   });
 
   return app.listen(PORT, () => {});
@@ -96,5 +117,14 @@ describe('FetchProvider', () => {
     const result = await fetchFile('POST', `${baseUrl}/failIfWrongAcceptHeader`, {}, 'text/csv');
 
     expect(result).toEqual('foo,bar,baz');
+  });
+
+  it('removes local session if 401 is returned', async () => {
+    const error = await fetch('GET', `${baseUrl}/simulatesSessionExpiration`).catch((e) => e);
+
+    expect(error.name).toEqual('FetchError');
+    expect(error.message).toEqual('There was an error fetching a resource: Unauthorized. Additional information: Not available');
+
+    expect(mockLogout).toHaveBeenCalledWith('foobar');
   });
 });
