@@ -19,8 +19,7 @@ import { useRef } from 'react';
 import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
 
-import { Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import TimeRangeButton from './TimeRangeButton';
 
 type Props = {
   children: React.ReactNode,
@@ -44,13 +43,9 @@ const TimeRangeDropdownButton = ({ children, disabled, hasErrorOnMount, show, to
 
   return (
     <RelativePosition ref={containerRef}>
-      <Button bsStyle={hasErrorOnMount ? 'danger' : 'info'}
-              disabled={disabled}
-              onClick={_onClick}
-              aria-label="Open Time Range Selector">
-        <Icon name={hasErrorOnMount ? 'exclamation-triangle' : 'clock'} />
-      </Button>
-
+      <TimeRangeButton hasError={hasErrorOnMount}
+                       disabled={disabled}
+                       onClick={_onClick} />
       <Overlay show={show}
                trigger="click"
                placement="bottom"
