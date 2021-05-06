@@ -50,7 +50,6 @@ export type Props = {
   closeModal: () => void,
   directExportWidgetId?: string,
   executionState: SearchExecutionState,
-  fields: List<FieldTypeMapping>,
   view: View,
 };
 

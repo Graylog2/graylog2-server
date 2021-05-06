@@ -20,6 +20,7 @@ import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
+import { StoreMock as MockStore } from 'helpers/mocking';
 
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
@@ -75,6 +76,14 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 jest.mock('views/stores/WidgetStore');
 jest.mock('views/stores/TitlesStore');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(),
+  FieldTypesActions: {
+    refresh: jest.fn(),
+  },
+}));
 
 describe('<Widget />', () => {
   const widget = WidgetModel.builder().newId()
