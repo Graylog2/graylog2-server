@@ -42,15 +42,14 @@ type Shape = {
   x0: string,
   x1: string,
   opacity: number,
-  line: {
+  line?: {
     color: string,
   },
 };
 
 export type Shapes = Array<Shape>;
 
-const eventsDisplayName = 'Alerts';
-const defaultColor = '#d3d3d3';
+export const eventsDisplayName = 'Alerts';
 
 const formatTimestamp = (timestamp, tz = 'UTC'): string => {
   // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
@@ -62,16 +61,15 @@ export default {
     return events;
   },
 
-  toVisualizationData(events: Events = [],
-    formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): { eventChartData: ChartDefinition, shapes: Shapes } {
+  toVisualizationData(events: Events = []): { eventChartData: ChartDefinition, shapes: Shapes } {
     const currentUser = CurrentUserStore.get();
     const tz = currentUser ? currentUser.timezone : 'UTC';
 
     const groupedEvents: GroupedEvents = groupBy(events, (e) => e.timestamp);
 
     return {
-      eventChartData: this.toChartData(groupedEvents, formattingSettings, tz),
-      shapes: this.toShapeData(Object.keys(groupedEvents), formattingSettings, tz),
+      eventChartData: this.toChartData(groupedEvents, tz),
+      shapes: this.toShapeData(Object.keys(groupedEvents), tz),
     };
   },
 
@@ -89,9 +87,7 @@ export default {
     });
   },
 
-  toChartData(events: GroupedEvents, formattingSettings: WidgetFormattingSettings, tz: string): ChartDefinition {
-    const { chartColors } = formattingSettings;
-    const chartColor = chartColors[eventsDisplayName] || defaultColor;
+  toChartData(events: GroupedEvents, tz: string): ChartDefinition {
     const values = this.transformGroupedEvents(events);
     const xValues: Array<string> = values.map((v) => formatTimestamp(v[0], tz));
     const textValues: Array<string> = values.map((e) => {
@@ -112,17 +108,10 @@ export default {
       x: xValues,
       y: yValues,
       text: textValues,
-      marker: {
-        size: 5,
-        color: chartColor,
-      },
     };
   },
 
-  toShapeData(timestamps: Array<string>, formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({}), tz: string): Shapes {
-    const { chartColors } = formattingSettings;
-    const shapeColor = chartColors[eventsDisplayName] || defaultColor;
-
+  toShapeData(timestamps: Array<string>, tz: string): Shapes {
     return timestamps.map((timestamp) => {
       const formattedTimestamp = formatTimestamp(timestamp, tz);
 
@@ -135,9 +124,6 @@ export default {
         x0: formattedTimestamp,
         x1: formattedTimestamp,
         opacity: 0.5,
-        line: {
-          color: shapeColor,
-        },
       };
     });
   },
