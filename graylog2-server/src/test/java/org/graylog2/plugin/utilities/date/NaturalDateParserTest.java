@@ -28,6 +28,27 @@ import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Tests for the NaturalDate parser. Currently uses Natty, which has some known flaws.
+ *
+ * Natty/Naturaldateparser related issues from github:
+ *
+ * https://github.com/Graylog2/graylog2-server/issues/10004
+ * https://github.com/Graylog2/graylog2-server/issues/8556
+ * https://github.com/Graylog2/graylog2-server/issues/8263
+ * https://github.com/Graylog2/graylog2-server/issues/6857
+ *
+ * relevant Natty issues:
+ * https://github.com/joestelmach/natty/issues
+ *
+ * Things to discuss:
+ * - why does Natty start the week on saturday?
+ * https://www.timeanddate.com/calendar/days/#:~:text=According%20to%20international%20standard%20ISO,last%20day%20of%20the%20week.
+ * - should we be able to set this to sun/mon depending on the tz/country?
+ *
+ *
+ * TODO: when we align to day start/end in the future, all timestamps have to be updated
+ */
 public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
     private NaturalDateParser naturalDateParserAntarctica;
@@ -117,76 +138,52 @@ public class NaturalDateParserTest {
         assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
     }
 
-/*
-Things to discuss:
-- why does Natty start the week on saturday?
-https://www.timeanddate.com/calendar/days/#:~:text=According%20to%20international%20standard%20ISO,last%20day%20of%20the%20week.
-- should we be able to set this to sun/mon depending on the tz/country?
-
-Missing tests:
-- intervals that have dst etc. in it
- */
-
-    /*
-    Natty/Naturaldateparser related issues from github:
-
-https://github.com/Graylog2/graylog2-server/issues/10004
-https://github.com/Graylog2/graylog2-server/issues/8556
-https://github.com/Graylog2/graylog2-server/issues/8263
-https://github.com/Graylog2/graylog2-server/issues/6857
-
-
-       relevant Natty issues:
-       https://github.com/joestelmach/natty/issues
-     */
-
     @Test
     public void testThisMonth() throws Exception {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
         NaturalDateParser.Result result = naturalDateParser.parse("this month", reference.toDate());
         assertThat(result.getFrom()).as("is the same as the reference date").isEqualTo(reference);
-//        assertThat(result.getFrom()).as("should start at the beginning of the month").isEqualTo(reference.minusDays(reference.getDayOfMonth()));
-//        assertThat(result.getTo()).as("should be the 1st day of the following month").isEqualTo(reference.minusDays(reference.getDayOfMonth()).minusMonths(-1));
+
+//        DateTime first = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.06.2021 09:45:23");
+//        DateTime firstNextMonth = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.07.2021 09:45:23");
+//        assertThat(result.getFrom()).as("should start at the beginning of the month").isEqualTo(first);
+//        assertThat(result.getTo()).as("should be the 1st day of the following month").isEqualTo(firstNextMonth);
     }
 
     @Test
     public void testMondayToFriday() throws Exception {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        DateTime monday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 09:45:23");
+        DateTime friday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("18.06.2021 09:45:23");
+
         NaturalDateParser.Result result = naturalDateParser.parse("monday to friday", reference.toDate());
-        assertThat(result.getFrom().getDayOfMonth()).as("should be Monday, 14.").isEqualTo(14);
-        assertThat(result.getTo().getDayOfMonth()).as("should be Friday, 18.").isEqualTo(18);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
 
         /* fails with current Natty implementation
+        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("06.06.2021 09:45:23");
+        DateTime lastFriday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("11.06.2021 09:45:23");
+
         result = naturalDateParser.parse("last monday to friday", reference.toDate());
-        assertThat(result.getFrom().getDayOfMonth()).as("should be Monday, 06.").isEqualTo(06);
-        assertThat(result.getTo().getDayOfMonth()).as("should be Friday, 11.").isEqualTo(11);
+        assertThat(result.getFrom()).as("should be Monday, 06.").isEqualTo(lastMonday);
+        assertThat(result.getTo()).as("should be Friday, 11.").isEqualTo(lastFriday);
         */
 
         result = naturalDateParser.parse("next monday to friday", reference.toDate());
-        assertThat(result.getFrom().getDayOfMonth()).as("should be Monday, 14.").isEqualTo(14);
-        assertThat(result.getTo().getDayOfMonth()).as("should be Friday, 18.").isEqualTo(18);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
 
         reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("08.06.2021 09:45:23");
         result = naturalDateParser.parse("next monday to friday", reference.toDate());
-        assertThat(result.getFrom().getDayOfMonth()).as("should be Monday, 14.").isEqualTo(14);
-        assertThat(result.getTo().getDayOfMonth()).as("should be Friday, 18.").isEqualTo(18);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
 
         /* fails with current Natty implementaiton
         reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 09:45:23");
         result = naturalDateParser.parse("monday to friday", reference.toDate());
-        assertThat(result.getFrom().getDayOfMonth()).as("should be Monday, 14.").isEqualTo(14);
-        assertThat(result.getTo().getDayOfMonth()).as("should be Friday, 18.").isEqualTo(18);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
          */
-    }
-
-    // TODO: fails with current Natty implementation
-    @Test
-    @Disabled
-    public void testThisWeek() throws Exception {
-        DateTime reference = DateTime.now(DateTimeZone.UTC);
-        NaturalDateParser.Result last4 = naturalDateParser.parse("monday to friday", reference.toDate());
-        assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(reference.minusHours(4));
-        assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
     }
 
     /**
@@ -197,9 +194,9 @@ https://github.com/Graylog2/graylog2-server/issues/6857
     @Disabled
     public void testNatty53() throws Exception {
         DateTime reference = DateTime.now(DateTimeZone.UTC);
-        NaturalDateParser.Result last4 = naturalDateParser.parse("Tue Jan 12 00:00:00 UTC 2016", reference.toDate());
-        assertThat(last4.getFrom().getYear()).as("from should be 2016").isEqualTo(2016);
-        assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
+        NaturalDateParser.Result natty53 = naturalDateParser.parse("Tue Jan 12 00:00:00 UTC 2016", reference.toDate());
+        assertThat(natty53.getFrom().getYear()).as("from should be 2016").isEqualTo(2016);
+        assertThat(natty53.getTo()).as("to should be the reference date").isEqualTo(reference);
     }
 
     @Test
@@ -226,8 +223,9 @@ https://github.com/Graylog2/graylog2-server/issues/6857
         assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
 
         reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        DateTime fourHoursAgo = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 05:45:23");
         last4 = naturalDateParserAntarctica.parse("last 4 hours", reference.toDate());
-        assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(reference.minusHours(4));
+        assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(fourHoursAgo);
         assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
     }
 
@@ -243,8 +241,6 @@ https://github.com/Graylog2/graylog2-server/issues/6857
         assertThat(last4.getFrom()).as("from should be exactly 4 hours in the past").isEqualTo(reference.minusHours(4));
         assertThat(last4.getTo()).as("to should be the reference date").isEqualTo(reference);
     }
-
-    // TODO: these tests will have to change in the near future when the alignment to start/end of day will be included
 
     @Test
     public void testParseToday() throws Exception {
@@ -264,9 +260,7 @@ https://github.com/Graylog2/graylog2-server/issues/6857
 
         DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("31.05.2021 09:45:23");
 
-        // TODO: in the future, this should compare to "07.06.2021 00:00:00"
         assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMonday);
-        // TODO: in the future, this should compare to "08.06.2021 00:00:00"
         assertThat(result.getTo()).as("should differ from").isNotEqualTo(lastMonday);
     }
 
@@ -277,9 +271,7 @@ https://github.com/Graylog2/graylog2-server/issues/6857
 
         DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("05.06.2021 09:45:23");
 
-        // TODO: in the future, this should compare to "07.06.2021 00:00:00"
         assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMonday);
-        // TODO: in the future, this should compare to "08.06.2021 00:00:00"
         assertThat(result.getTo()).as("should differ from").isNotEqualTo(lastMonday);
     }
 
@@ -291,11 +283,7 @@ https://github.com/Graylog2/graylog2-server/issues/6857
         DateTime monday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 09:45:23");
         DateTime friday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("18.06.2021 09:45:23");
 
-        // TODO: in the future, this should compare to "14.06.2021 00:00:00"
         assertThat(result.getFrom()).as("should be equal to").isEqualTo(monday);
-        // TODO: in the future, this should compare to "19.06.2021 00:00:00"
         assertThat(result.getTo()).as("should be equal to").isEqualTo(friday);
     }
-
-    // TODO: end of: these tests will have to change in the near future when the alignment to start/end of day will be included
 }
