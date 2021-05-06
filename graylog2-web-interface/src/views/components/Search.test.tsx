@@ -38,7 +38,6 @@ import { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 
 import Search from './Search';
-import DashboardSearchBar from './DashboardSearchBar';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
