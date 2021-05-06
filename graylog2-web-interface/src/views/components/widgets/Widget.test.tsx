@@ -20,7 +20,6 @@ import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
 import WidgetModel from 'views/logic/widgets/Widget';

@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import MockStore from 'helpers/mocking/StoreMock';
+
 import { StreamSearchPage } from 'views/pages';
 
 import bindings from './bindings';
@@ -23,6 +25,10 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => '/gl2/'),
   isFeatureEnabled: () => false,
   isCloud: jest.fn(() => false),
+}));
+
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesStore: MockStore(['getInitialState', () => ({ all: {}, queryFields: {} })]),
 }));
 
 describe('bindings.routes', () => {
