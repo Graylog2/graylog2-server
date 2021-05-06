@@ -281,123 +281,39 @@ exports[`SavedSearchControls Button handling has "Share" option which should be 
   color: rgb(88,73,5);
 }
 
-.c3 {
-  display: inline-block;
-}
-
 .c2 {
   display: inline-block;
 }
 
 .c1 {
+  display: inline-block;
+}
+
+.c3 {
   margin-left: 8px;
 }
 
 <button
-  className="c0 btn btn-default"
-  disabled={true}
-  onClick={[Function]}
+  class="c0 btn btn-default"
+  disabled=""
   title="Share"
   type="button"
 >
-  <Icon
-    name="user-plus"
-    type="solid"
+  <svg
+    class="svg-inline--fa fa-user-plus"
+  />
+   Share 
+  <div
+    class="c1"
   >
-    <FontAwesomeIcon
-      icon={
-        Object {
-          "iconName": "user-plus",
-          "prefix": "fas",
-        }
-      }
+    <span
+      class="c2 c3 "
+      role="button"
     >
       <svg
-        className="svg-inline--fa fa-user-plus"
+        class="svg-inline--fa fa-question-circle"
       />
-    </FontAwesomeIcon>
-  </Icon>
-   Share 
-  <SharingDisabledPopover
-    description="Only saved searches can be shared."
-    type="search"
-  >
-    <SharingDisabledPopover__StyledHoverForHelp
-      pullRight={false}
-      title="Sharing not possible"
-    >
-      <HoverForHelp
-        className="c1"
-        id="help-popover"
-        placement="bottom"
-        pullRight={false}
-        title="Sharing not possible"
-      >
-        <OverlayTrigger
-          container={null}
-          overlay={
-            <HoverForHelp__StyledPopover
-              id="help-popover"
-              title="Sharing not possible"
-            >
-              Only saved searches can be shared.
-            </HoverForHelp__StyledPopover>
-          }
-          placement="bottom"
-          rootClose={false}
-          trigger={
-            Array [
-              "hover",
-              "focus",
-            ]
-          }
-        >
-          <OverlayTrigger__Container>
-            <div
-              className="c2"
-            >
-              <OverlayTrigger__TriggerWrap
-                className="c1 "
-                role="button"
-              >
-                <span
-                  className="c3 c1 "
-                  role="button"
-                >
-                  <Icon
-                    className=""
-                    name="question-circle"
-                    onBlur={[Function]}
-                    onFocus={[Function]}
-                    onMouseEnter={[Function]}
-                    onMouseLeave={[Function]}
-                    type="solid"
-                  >
-                    <FontAwesomeIcon
-                      className=""
-                      icon={
-                        Object {
-                          "iconName": "question-circle",
-                          "prefix": "fas",
-                        }
-                      }
-                      onBlur={[Function]}
-                      onFocus={[Function]}
-                      onMouseEnter={[Function]}
-                      onMouseLeave={[Function]}
-                    >
-                      <svg
-                        className="svg-inline--fa fa-question-circle"
-                      />
-                    </FontAwesomeIcon>
-                  </Icon>
-                </span>
-              </OverlayTrigger__TriggerWrap>
-            </div>
-          </OverlayTrigger__Container>
-        </OverlayTrigger>
-      </HoverForHelp>
-    </SharingDisabledPopover__StyledHoverForHelp>
-  </SharingDisabledPopover>
+    </span>
+  </div>
 </button>
 `;
