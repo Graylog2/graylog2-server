@@ -41,13 +41,6 @@ import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFo
 
 jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    update: mockAction(jest.fn()),
-    get: mockAction(jest.fn()),
-  },
-}));
-
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 
@@ -73,17 +66,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
-jest.mock('views/stores/WidgetStore');
-jest.mock('views/stores/TitlesStore');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
-jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
-
-jest.mock('views/stores/FieldTypesStore', () => ({
-  FieldTypesStore: MockStore(),
-  FieldTypesActions: {
-    refresh: jest.fn(),
-  },
-}));
 
 describe('<Widget />', () => {
   const widget = WidgetModel.builder().newId()
