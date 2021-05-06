@@ -21,6 +21,7 @@ import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StoreMock as MockStore } from 'helpers/mocking';
+import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
 
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
@@ -39,36 +40,45 @@ import Widget, { Result } from './Widget';
 import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 
-jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
-
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
+jest.mock('./WidgetColorContext', () => ({ children }) => children);
 
-jest.mock('graylog-web-plugin/plugin', () => ({
-  PluginStore: {
-    exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
+const pluginManifest: PluginRegistration = {
+  exports: {
+    enterpriseWidgets: [
       {
         type: 'dummy',
         displayName: 'Some Dummy Visualization',
-        visualizationComponent: 'dummy-visualization',
+        visualizationComponent: () => <>dummy-visualization</>,
         // eslint-disable-next-line react/prop-types
         editComponent: ({ onChange }) => {
           // eslint-disable-next-line react/button-has-type
           return <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>;
         },
+        needsControlledHeight: () => true,
+        searchTypes: () => [],
       },
       {
         type: 'default',
         visualizationComponent: () => <span>Unknown widget</span>,
         editComponent: () => <span>Unknown widget in edit mode</span>,
+        needsControlledHeight: () => true,
+        searchTypes: () => [],
       },
-    ]),
+    ],
   },
-}));
-
-jest.mock('./WidgetColorContext', () => ({ children }) => children);
+};
 
 describe('<Widget />', () => {
+  beforeAll(() => {
+    PluginStore.register(pluginManifest);
+  });
+
+  afterAll(() => {
+    PluginStore.unregister(pluginManifest);
+  });
+
   const widget = WidgetModel.builder().newId()
     .type('dummy')
     .config({})
@@ -176,7 +186,7 @@ describe('<Widget />', () => {
     render(<DummyWidget data={{}} />);
 
     expect(screen.queryAllByTestId('loading-widget')).toHaveLength(0);
-    expect(screen.queryAllByTitle('Widget Title')).toHaveLength(2);
+    expect(screen.queryAllByTitle('Widget Title')).toHaveLength(1);
   });
 
   it('renders placeholder if widget type is unknown', async () => {
