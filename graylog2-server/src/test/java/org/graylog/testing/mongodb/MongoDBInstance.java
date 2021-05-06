@@ -69,11 +69,8 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
     }
 
-    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, List<URL> fixtureResources) {
+    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle) {
         MongoDBInstance mongoDb = createWithDefaults(network, lifecycle);
-        if (! fixtureResources.isEmpty()) {
-            mongoDb.fixtureImporter = new MongoDBFixtureImporter(fixtureResources);
-        }
         mongoDb.start();
         return mongoDb;
     }
@@ -115,7 +112,9 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
 
     public void start() {
         service.start();
-        importFixtures();
+        if (fixtureImporter != null) {
+            fixtureImporter.importResources(service.mongoDatabase());
+        }
     }
 
     @Override
@@ -163,9 +162,9 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         }
     }
 
-    public void importFixtures() {
-        if (fixtureImporter != null) {
-            fixtureImporter.importResources(service.mongoDatabase());
+    public void importFixtures(List<URL> fixtureResources) {
+        if (! fixtureResources.isEmpty()) {
+            new MongoDBFixtureImporter(fixtureResources).importResources(service.mongoDatabase());
         }
     }
 }

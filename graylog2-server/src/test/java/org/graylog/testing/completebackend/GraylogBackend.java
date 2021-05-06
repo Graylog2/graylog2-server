@@ -48,7 +48,7 @@ public class GraylogBackend {
             instance = createStartedBackend(extraPorts, elasticsearchInstanceFactory, pluginJars, mavenProjectDir,
                     mongoDBFixtures);
         } else {
-            instance.fullReset();
+            instance.fullReset(mongoDBFixtures);
             LOG.info("Reusing running backend");
         }
 
@@ -68,7 +68,9 @@ public class GraylogBackend {
         Future<ElasticsearchInstance> esFuture = executor.submit(() -> elasticsearchInstanceFactory.create(network));
 
         MongoDBInstance mongoDB =
-                MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS, mongoDBFixtures);
+                MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
+        mongoDB.dropDatabase();
+        mongoDB.importFixtures(mongoDBFixtures);
 
         try {
             // Wait for ES before starting the Graylog node to avoid any race conditions
@@ -101,9 +103,10 @@ public class GraylogBackend {
         es.cleanUp();
     }
 
-    public void fullReset() {
+    public void fullReset(List<URL> mongoDBFixtures) {
+        LOG.debug("Resetting backend.");
         purgeData();
-        mongodb.importFixtures();
+        mongodb.importFixtures(mongoDBFixtures);
         node.restart();
     }
 

@@ -63,10 +63,7 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
         Stopwatch sw = Stopwatch.createStarted();
 
-        final Class<?> testClass = context.getTestClass()
-                .orElseThrow(() -> new IllegalStateException("Unable to get test class from test context"));
-
-        backend = constructBackendFrom(annotation, testClass);
+        backend = constructBackendFrom(annotation, getMongoDBFixtures(context));
 
         context.getStore(NAMESPACE).put(context.getRequiredTestClass().getName(), backend);
 
@@ -75,17 +72,20 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         LOG.info("Backend started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
     }
 
-    private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation, Class<?> testClass) {
+    private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation, List<URL> mongoDBFixtures) {
         final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
         final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
         final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
-        final List<URL> mongoDBFixtures = getMongoDBFixtures(annotation.mongoDBFixtures(), testClass);
         return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars, mavenProjectDir,
                 mongoDBFixtures);
     }
 
-    private List<URL> getMongoDBFixtures(String[] mongoDBFixtures, Class<?> testClass) {
-        return Arrays.stream(mongoDBFixtures).map(resourceName -> {
+    private static List<URL> getMongoDBFixtures(ExtensionContext context) {
+        final Class<?> testClass = context.getTestClass()
+                .orElseThrow(() -> new IllegalStateException("Unable to get test class from extension context"));
+
+        final String[] fixtures = testClass.getAnnotation(ApiIntegrationTest.class).mongoDBFixtures();
+        return Arrays.stream(fixtures).map(resourceName -> {
             if (! Paths.get(resourceName).isAbsolute()) {
                 try {
                     return Resources.getResource(testClass, resourceName);
@@ -118,7 +118,7 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         if (context.getExecutionException().isPresent()) {
             backend.printServerLog();
         }
-        lifecycle.afterEach(backend);
+        lifecycle.afterEach(backend, getMongoDBFixtures(context));
     }
 
     @Override
