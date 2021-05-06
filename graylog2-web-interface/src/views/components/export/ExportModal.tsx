@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { List, Set } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -24,7 +24,6 @@ import { Field, Formik, Form } from 'formik';
 import connect from 'stores/connect';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
@@ -32,9 +31,9 @@ import { Icon, Spinner } from 'components/common';
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 import { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
@@ -77,7 +76,7 @@ type FormState = {
   format: string,
 };
 
-const ExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
+const ExportModal = ({ closeModal, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
   const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
@@ -85,6 +84,8 @@ const ExportModal = ({ closeModal, fields, view, directExportWidgetId, execution
   const [loading, setLoading] = useState(false);
   const initialSelectedWidget = initialWidget(exportableWidgets, directExportWidgetId);
   const initialSelectedFields = _getInitialFields(initialSelectedWidget);
+
+  const { all: fields } = useContext(FieldTypesContext);
 
   const singleWidgetDownload = !!directExportWidgetId;
 
@@ -166,7 +167,6 @@ const ExportModal = ({ closeModal, fields, view, directExportWidgetId, execution
 ExportModal.propTypes = {
   closeModal: PropTypes.func,
   directExportWidgetId: PropTypes.string,
-  fields: CustomPropTypes.FieldListType.isRequired,
 };
 
 ExportModal.defaultProps = {
@@ -177,12 +177,10 @@ ExportModal.defaultProps = {
 export default connect(
   ExportModal,
   {
-    fields: FieldTypesStore,
     executionState: SearchExecutionStateStore,
   },
-  ({ fields: { all }, executionState, ...rest }) => ({
+  ({ executionState, ...rest }) => ({
     ...rest,
     executionState,
-    fields: all,
   }),
 );
