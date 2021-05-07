@@ -82,13 +82,15 @@ jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Edito
 
 jest.unmock('logic/rest/FetchProvider');
 
+const viewsPlugin = new PluginManifest({}, viewsBindings);
+
 const finderTimeout = applyTimeoutMultiplier(15000);
 const testTimeout = applyTimeoutMultiplier(30000);
 
 describe('Create a new dashboard', () => {
-  beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, viewsBindings));
-  });
+  beforeAll(() => PluginStore.register(viewsPlugin));
+
+  afterAll(() => PluginStore.unregister(viewsPlugin));
 
   const SimpleAppRouter = () => (
     <CurrentUserProvider>
