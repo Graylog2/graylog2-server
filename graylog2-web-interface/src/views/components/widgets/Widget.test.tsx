@@ -21,6 +21,8 @@ import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import MockStore from 'helpers/mocking/StoreMock';
+import asMock from 'helpers/mocking/AsMock';
 
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions, Widgets } from 'views/stores/WidgetStore';
@@ -42,6 +44,13 @@ import WidgetFocusContext, { WidgetFocusContextType } from '../contexts/WidgetFo
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+
+jest.mock('views/stores/WidgetStore', () => ({
+  WidgetStore: MockStore(),
+  WidgetActions: {
+    update: mockAction(),
+  },
+}));
 
 const pluginManifest: PluginRegistration = {
   exports: {
