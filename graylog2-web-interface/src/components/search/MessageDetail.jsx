@@ -90,7 +90,7 @@ class MessageDetail extends React.Component {
       <ButtonGroup className="pull-right" bsSize="small">
         <Button href={messageUrl}>Permalink</Button>
 
-        <ClipboardButton title="Copy ID" text={message.id} />
+        <ClipboardButton title="Copy ID" bsSize="small" text={message.id} />
       </ButtonGroup>
     );
   };

@@ -18,6 +18,7 @@ package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.Resources;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -30,8 +31,14 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static io.restassured.http.ContentType.JSON;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
@@ -56,7 +63,7 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
         Stopwatch sw = Stopwatch.createStarted();
 
-        backend = constructBackendFrom(annotation);
+        backend = constructBackendFrom(annotation, getMongoDBFixtures(context));
 
         context.getStore(NAMESPACE).put(context.getRequiredTestClass().getName(), backend);
 
@@ -65,16 +72,35 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         LOG.info("Backend started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
     }
 
-    private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation) {
-        final ElasticsearchInstanceFactory factory = instantiateFactory(annotation.elasticsearchFactory());
-        return GraylogBackend.createStarted(annotation.extraPorts(), factory);
+    private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation, List<URL> mongoDBFixtures) {
+        final ElasticsearchInstanceFactory esInstanceFactory = instantiateFactory(annotation.elasticsearchFactory());
+        final List<Path> pluginJars = instantiateFactory(annotation.pluginJarsProvider()).getJars();
+        final Path mavenProjectDir = instantiateFactory(annotation.mavenProjectDirProvider()).getProjectDir();
+        return GraylogBackend.createStarted(annotation.extraPorts(), esInstanceFactory, pluginJars, mavenProjectDir,
+                mongoDBFixtures);
     }
 
-    private ElasticsearchInstanceFactory instantiateFactory(Class<? extends ElasticsearchInstanceFactory> factoryClass) {
+    private static List<URL> getMongoDBFixtures(ExtensionContext context) {
+        final Class<?> testClass = context.getTestClass()
+                .orElseThrow(() -> new IllegalStateException("Unable to get test class from extension context"));
+
+        final String[] fixtures = testClass.getAnnotation(ApiIntegrationTest.class).mongoDBFixtures();
+        return Arrays.stream(fixtures).map(resourceName -> {
+            if (! Paths.get(resourceName).isAbsolute()) {
+                try {
+                    return Resources.getResource(testClass, resourceName);
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+            return Resources.getResource(resourceName);
+        }).collect(Collectors.toList());
+    }
+
+    private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
-            return factoryClass.newInstance();
+            return providerClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Unable to construct Elasticsearch factory: ", e);
+            throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
     }
 
@@ -92,7 +118,7 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         if (context.getExecutionException().isPresent()) {
             backend.printServerLog();
         }
-        lifecycle.afterEach(backend);
+        lifecycle.afterEach(backend, getMongoDBFixtures(context));
     }
 
     @Override
