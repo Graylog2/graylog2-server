@@ -20,6 +20,7 @@ import { render, within, screen, waitFor, fireEvent } from 'wrappedTestingLibrar
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -33,7 +34,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import AggregationWizard from '../AggregationWizard';
 
-const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
+const extendedTimeout = applyTimeoutMultiplier(15000);
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);

@@ -20,6 +20,7 @@ import { act, fireEvent, render, screen, waitFor, within } from 'wrappedTestingL
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { PluginRegistration, PluginStore } from 'graylog-web-plugin/plugin';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
@@ -31,7 +32,7 @@ import dataTable from 'views/components/datatable/bindings';
 
 import AggregationWizard from '../AggregationWizard';
 
-const extendedTimeout = (Number(process.env.TIMEOUT_MULTIPLIER) || 1) * 15000;
+const extendedTimeout = applyTimeoutMultiplier(15000);
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
