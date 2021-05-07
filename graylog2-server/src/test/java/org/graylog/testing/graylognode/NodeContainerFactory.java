@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
@@ -66,7 +65,8 @@ public class NodeContainerFactory {
         // testcontainers only allows passing permissions if you pass a `File`
         File entrypointScript = resourceToTmpFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
 
-        ImageFromDockerfile image = new ImageFromDockerfile()
+        // Don't delete the image after running the tests so we don't have to rebuild it every time...
+        ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-full-backend-test-server:latest", false)
                 .withFileFromClasspath("Dockerfile", "org/graylog/testing/graylognode/Dockerfile")
                 // set mode here explicitly, because file system permissions can get lost when executing from maven
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
