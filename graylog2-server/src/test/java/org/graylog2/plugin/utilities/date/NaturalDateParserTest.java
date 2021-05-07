@@ -19,6 +19,7 @@ package org.graylog2.plugin.utilities.date;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,24 @@ public class NaturalDateParserTest {
     private NaturalDateParser naturalDateParser;
     private NaturalDateParser naturalDateParserAntarctica;
     private NaturalDateParser naturalDateParserUtc;
+
+    final String[] testsThatAlignToStartOfDay = {
+            "yesterday", "the day before yesterday", "today",
+            "monday", "monday to friday", "last week"
+    };
+
+    final String[][] singleDaytestsThatAlignToAGivenTime = {
+            {"yesterday at noon", "12:00:00"},
+            {"the day before yesterday at 10", "10:00:00"},
+            {"today at 5", "05:00:00"},
+            {"monday at 7", "07:00:00"}
+    };
+
+    final String[][] multipleDaytestsThatAlignToAGivenTime =  {
+            {"monday to friday at 7", "07:00:00"},
+            {"monday to friday at 7:59", "07:59:00"},
+            {"monday to friday at 7:59:59", "07:59:59"}
+    };
 
     @BeforeEach
     public void setUp() {
@@ -129,20 +148,21 @@ public class NaturalDateParserTest {
     @Test
     public void issue1226() throws Exception {
         NaturalDateParser.Result result99days = naturalDateParser.parse("last 99 days");
-        assertThat(result99days.getFrom()).isEqualToIgnoringMillis(result99days.getTo().minusDays(99));
+        assertThat(result99days.getFrom()).isEqualToIgnoringMillis(result99days.getTo().minusDays(100));
 
         NaturalDateParser.Result result100days = naturalDateParser.parse("last 100 days");
-        assertThat(result100days.getFrom()).isEqualToIgnoringMillis(result100days.getTo().minusDays(100));
+        assertThat(result100days.getFrom()).isEqualToIgnoringMillis(result100days.getTo().minusDays(101));
 
         NaturalDateParser.Result result101days = naturalDateParser.parse("last 101 days");
-        assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
+        assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(102));
     }
 
     @Test
     public void testThisMonth() throws Exception {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        DateTime startOfDay = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 00:00:00");
         NaturalDateParser.Result result = naturalDateParser.parse("this month", reference.toDate());
-        assertThat(result.getFrom()).as("is the same as the reference date").isEqualTo(reference);
+        assertThat(result.getFrom()).as("is the same as the start of the day of the reference date").isEqualTo(startOfDay);
 
 //        DateTime first = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.06.2021 09:45:23");
 //        DateTime firstNextMonth = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("01.07.2021 09:45:23");
@@ -153,36 +173,36 @@ public class NaturalDateParserTest {
     @Test
     public void testMondayToFriday() throws Exception {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
-        DateTime monday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 09:45:23");
-        DateTime friday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("18.06.2021 09:45:23");
+        DateTime startOfMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 00:00:00");
+        DateTime endOfFriday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("19.06.2021 00:00:00");
 
         NaturalDateParser.Result result = naturalDateParser.parse("monday to friday", reference.toDate());
-        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
-        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(startOfMonday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(endOfFriday);
 
         /* fails with current Natty implementation
-        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("06.06.2021 09:45:23");
-        DateTime lastFriday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("11.06.2021 09:45:23");
+        DateTime startOfLastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("06.06.2021 00:00:00");
+        DateTime endOfLastFriday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 00:00:00");
 
         result = naturalDateParser.parse("last monday to friday", reference.toDate());
-        assertThat(result.getFrom()).as("should be Monday, 06.").isEqualTo(lastMonday);
-        assertThat(result.getTo()).as("should be Friday, 11.").isEqualTo(lastFriday);
+        assertThat(result.getFrom()).as("should be Monday, 06.").isEqualTo(startOfLastMonday);
+        assertThat(result.getTo()).as("should be Friday, 11.").isEqualTo(endOfLastFriday);
         */
 
         result = naturalDateParser.parse("next monday to friday", reference.toDate());
-        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
-        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(startOfMonday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(endOfFriday);
 
         reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("08.06.2021 09:45:23");
         result = naturalDateParser.parse("next monday to friday", reference.toDate());
-        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
-        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(startOfMonday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(endOfFriday);
 
         /* fails with current Natty implementaiton
         reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 09:45:23");
         result = naturalDateParser.parse("monday to friday", reference.toDate());
-        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(monday);
-        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(friday);
+        assertThat(result.getFrom()).as("should be Monday, 14.").isEqualTo(startOfMonday);
+        assertThat(result.getTo()).as("should be Friday, 18.").isEqualTo(endOfFriday);
          */
     }
 
@@ -245,12 +265,11 @@ public class NaturalDateParserTest {
     @Test
     public void testParseToday() throws Exception {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
+        DateTime startOfToday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 00:00:00");
         NaturalDateParser.Result result = naturalDateParser.parse("today", reference.toDate());
 
-        // TODO: in the future, this should compare to "12.06.2021 00:00:00"
-        assertThat(result.getFrom()).as("should be equal to").isEqualTo(reference);
-        // TODO: in the future, this should compare to "13.06.2021 00:00:00"
-        assertThat(result.getTo()).as("should differ from").isNotEqualTo(reference);
+        assertThat(result.getFrom()).as("should be equal to").isEqualTo(startOfToday);
+        assertThat(result.getTo()).as("should differ from").isNotEqualTo(startOfToday);
      }
 
     @Test
@@ -258,7 +277,7 @@ public class NaturalDateParserTest {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
         NaturalDateParser.Result result = naturalDateParser.parse("last monday", reference.toDate());
 
-        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("31.05.2021 09:45:23");
+        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("31.05.2021 00:00:00");
 
         assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMonday);
         assertThat(result.getTo()).as("should differ from").isNotEqualTo(lastMonday);
@@ -269,7 +288,7 @@ public class NaturalDateParserTest {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
         NaturalDateParser.Result result = naturalDateParser.parse("last week", reference.toDate());
 
-        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("05.06.2021 09:45:23");
+        DateTime lastMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("05.06.2021 00:00:00");
 
         assertThat(result.getFrom()).as("should be equal to").isEqualTo(lastMonday);
         assertThat(result.getTo()).as("should differ from").isNotEqualTo(lastMonday);
@@ -280,10 +299,71 @@ public class NaturalDateParserTest {
         DateTime reference = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("12.06.2021 09:45:23");
         NaturalDateParser.Result result = naturalDateParser.parse("monday to friday", reference.toDate());
 
-        DateTime monday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 09:45:23");
-        DateTime friday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("18.06.2021 09:45:23");
+        DateTime startOfMonday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("14.06.2021 00:00:00");
+        DateTime endOfFriday = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("19.06.2021 00:00:00");
 
-        assertThat(result.getFrom()).as("should be equal to").isEqualTo(monday);
-        assertThat(result.getTo()).as("should be equal to").isEqualTo(friday);
+        assertThat(result.getFrom()).as("should be equal to").isEqualTo(startOfMonday);
+        assertThat(result.getTo()).as("should be equal to").isEqualTo(endOfFriday);
+    }
+
+    @Test
+    public void testParseAlignToStartOfDay() throws Exception {
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+
+        for(String test: testsThatAlignToStartOfDay) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+        }
+    }
+
+    @Test
+    @Disabled
+    /**
+     * This test should be ignored for now. The problem is, that the to-date has the hour subtracted by 1 - which is not reasonable
+     * at all in this context but without further digging into Natty not solvable. And that effort would be too much by now.
+     */
+    public void multipleDaytestParseAlignToAGivenTime() throws Exception {
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+
+        for(String[] test: multipleDaytestsThatAlignToAGivenTime) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
+            assertThat(df.print(result.getTo())).as("time part of date should equal " + test[1] + " in").isEqualTo(test[1]);
+        }
+    }
+
+    @Test
+    public void singleDaytestParseAlignToAGivenTime() throws Exception {
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+
+        for(String[] test: singleDaytestsThatAlignToAGivenTime) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal "+ test[1] + " in").isEqualTo(test[1]);
+        }
+    }
+
+    @Test
+    public void testParseAlignToStartOfDayEuropeBerlin() throws Exception {
+        final NaturalDateParser naturalDateParser = new NaturalDateParser("Antarctica/Palmer");
+        final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+
+        for(String test: testsThatAlignToStartOfDay) {
+            NaturalDateParser.Result result = naturalDateParser.parse(test);
+            assertNotNull(result.getFrom());
+            assertNotNull(result.getTo());
+
+            assertThat(df.print(result.getFrom())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+            assertThat(df.print(result.getTo())).as("time part of date should equal 00:00:00 in").isEqualTo("00:00:00");
+        }
     }
 }
