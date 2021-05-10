@@ -49,6 +49,7 @@ export type IndexSet = {
   writable: boolean,
   default: boolean,
 };
+
 type IndexSetsResponseType = {
   total: number,
   index_sets: Array<IndexSet>,
@@ -60,6 +61,7 @@ type IndexSetsResponseType = {
     },
   },
 };
+
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const IndexSetsStore = Reflux.createStore({

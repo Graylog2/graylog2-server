@@ -29,6 +29,7 @@ export type IndexRange = {
   calculated_at: string,
   took_ms: number,
 };
+
 const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 
 const IndexRangesStore = Reflux.createStore({
