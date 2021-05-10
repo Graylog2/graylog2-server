@@ -49,17 +49,30 @@ const timeRangeTypes = {
 const allTimeRangeTypes = Object.keys(timeRangeTypes) as Array<TimeRangeType>;
 
 type Props = {
-  noOverride?: boolean,
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
+  noOverride?: boolean,
+  position: 'bottom'|'right',
   setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
   validTypes?: Array<TimeRangeType>,
 };
 
+export type TimeRangeType = keyof typeof timeRangeTypes;
+
+type TimeRangeTabsArguments = {
+  activeTab: TimeRangeType,
+  limitDuration: number,
+  setValidatingKeyword: (status: boolean) => void,
+  tabs: Array<TimeRangeType>,
+}
+
 const StyledPopover = styled(Popover)(({ theme }) => css`
   min-width: 750px;
-  transform: translateX(-15px);
   background-color: ${theme.colors.variant.lightest.default};
+
+  .popover-title {
+    border: none;
+  }
 `);
 
 const StyledTabs = styled(Tabs)`
@@ -78,6 +91,10 @@ const PopoverTitle = styled.span`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  > span {
+    font-weight: 600;
+  }
 `;
 
 const LimitLabel = styled.span(({ theme }) => css`
@@ -112,15 +129,6 @@ const DEFAULT_RANGES = {
   },
   disabled: undefined,
 };
-
-export type TimeRangeType = keyof typeof timeRangeTypes;
-
-type TimeRangeTabsArguments = {
-  activeTab: TimeRangeType,
-  limitDuration: number,
-  setValidatingKeyword: (status: boolean) => void,
-  tabs: Array<TimeRangeType>,
-}
 
 const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) => availableTimeRangeTypes
   .filter(({ type }) => tabs.includes(type))
@@ -237,7 +245,14 @@ const onSettingCurrentTimeRange = (nextTimeRange: TimeRangeDropDownFormValues['n
   return (nextTimeRange as SearchBarFormValues['timerange']);
 };
 
-const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, setCurrentTimeRange, validTypes = allTimeRangeTypes }: Props) => {
+const TimeRangeDropdown = ({
+  noOverride,
+  toggleDropdownShow,
+  currentTimeRange,
+  setCurrentTimeRange,
+  validTypes = allTimeRangeTypes,
+  position,
+}: Props) => {
   const { limitDuration } = useContext(DateTimeContext);
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const [activeTab, setActiveTab] = useState('type' in currentTimeRange ? currentTimeRange.type : undefined);
@@ -271,10 +286,12 @@ const TimeRangeDropdown = ({ noOverride, toggleDropdownShow, currentTimeRange, s
   return (
     <StyledPopover id="timerange-type"
                    data-testid="timerange-type"
-                   placement="bottom"
-                   positionTop={36}
-                   title={title}
-                   arrowOffsetLeft={34}>
+                   placement={position}
+                   positionTop={position === 'bottom' ? 36 : -10}
+                   positionLeft={position === 'bottom' ? -15 : 45}
+                   arrowOffsetTop={position === 'bottom' ? undefined : 25}
+                   arrowOffsetLeft={position === 'bottom' ? 34 : -11}
+                   title={title}>
       <Formik initialValues={{ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }}
               validate={({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration)}
               onSubmit={handleSubmit}
