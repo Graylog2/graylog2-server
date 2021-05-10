@@ -95,8 +95,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         this.seriesHandlers = seriesHandlers;
     }
 
+    private String createAggregationName(final ESGeneratedQueryContext queryContext, final Pivot pivot, final String postfix) {
+        final String aggregationName = queryContext.nextName();
+        queryContext.contextMap().put(pivot.id() + postfix, aggregationName);
+        return aggregationName;
+    }
+
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    public void doGenerateQueryPart(final SearchJob job, final Query query, final Pivot pivot, final ESGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
@@ -104,52 +110,32 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
-        final List<AggregationBuilder> seriesAggregations = seriesStream(pivot, queryContext, "global rollup")
-                .collect(Collectors.toList());
+        final List<AggregationBuilder> seriesAggregations = seriesStream(pivot, queryContext, "global rollup").collect(Collectors.toList());
 
-        // add global rollup series if those were requested
-        if (pivot.rollup()) {
-            seriesAggregations
-                    .forEach(searchSourceBuilder::aggregation);
-        }
+        // add rollup series if those were requested
+        if (pivot.rollup()) seriesAggregations.forEach(searchSourceBuilder::aggregation);
 
         final List<BucketOrder> bucketOrder = orderListForPivot(pivot, queryContext);
 
-        // if we have at least one row defined:
-        if(pivotHasFields(pivot.rowGroups())) {
-            final String rowsAggregationName = queryContext.nextName();
-            contextMap.put(pivot.id() + ROWS_POSTFIX, rowsAggregationName);
+        // if rows are defined, begin nesting from the rows
+        if(!pivot.rowGroups().isEmpty()) {
+            final AggregationBuilder rowsAggregation = createAggregation(createAggregationName(queryContext, pivot, ROWS_POSTFIX), pivot.rowGroups(), bucketOrder);
 
-            final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
-
-            if (pivot.rollup()) {
-                seriesAggregations.forEach(rowsAggregation::subAggregation);
-            }
+            // add rollup series if those were requested
+            if (pivot.rollup()) seriesAggregations.forEach(rowsAggregation::subAggregation);
 
             searchSourceBuilder.aggregation(rowsAggregation);
 
-            if (!pivot.columnGroups().isEmpty()) {
-                final String columnsAggregationName = queryContext.nextName();
-                contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
-                final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
+            final AggregationBuilder columnsAggregation = createAggregation(createAggregationName(queryContext, pivot, COLUMNS_POSTFIX), pivot.columnGroups(), bucketOrder);
 
-                seriesAggregations.forEach(columnsAggregation::subAggregation);
-
-                rowsAggregation.subAggregation(columnsAggregation);
-            }
+            seriesAggregations.forEach(columnsAggregation::subAggregation);
+            rowsAggregation.subAggregation(columnsAggregation);
         } else {
-            // if we have only columns defined
-            if (!pivot.columnGroups().isEmpty()) {
-                final String columnsAggregationName = queryContext.nextName();
-                contextMap.put(pivot.id() + COLUMNS_POSTFIX, columnsAggregationName);
-                final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
+            // only columns are defined, still add an aggregation
+            final AggregationBuilder columnsAggregation = createAggregation(createAggregationName(queryContext, pivot, COLUMNS_POSTFIX), pivot.columnGroups(), bucketOrder);
 
-                if (pivot.rollup()) {
-                    seriesAggregations.forEach(columnsAggregation::subAggregation);
-                }
-
-                searchSourceBuilder.aggregation(columnsAggregation);
-            }
+            seriesAggregations.forEach(columnsAggregation::subAggregation);
+            searchSourceBuilder.aggregation(columnsAggregation);
         }
 
         final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
@@ -157,13 +143,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
-
-    }
-
-    private Boolean pivotHasFields(List<BucketSpec> pivots) {
-        return pivots.stream()
-                .map(BucketSpec::field)
-                .findAny().isPresent();
     }
 
     private AggregationBuilder createAggregation(String name, List<BucketSpec> pivots, List<BucketOrder> bucketOrder) {
@@ -252,7 +231,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
                 .effectiveTimerange(effectiveTimerange)
-                .total(extractDocumentCount(queryResult, pivot, queryContext));
+                .total(extractDocumentCount(queryResult));
 
         // pivot results are a table where cells can contain multiple "values" and not only scalars:
         // each combination of row and column groups can contain all series (if rollup is true)
@@ -273,8 +252,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         .stream()
                         .map(bucket -> {
                             final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
-                            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys)
-                                    .source("leaf");
+                            final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys).source("leaf");
                             if (pivot.rollup()) {
                                 pivot.series().stream()
                                         .flatMap(seriesSpec -> createRowValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec))
@@ -309,16 +287,15 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             }
         } else {
             // in the case that only columns were defined
-            final String colKey = pivot.id() + COLUMNS_POSTFIX;
-            if(queryContext.contextMap().containsKey(colKey)) {
-                final String colsAggName = queryContext.contextMap().get(colKey).toString();
+            final String columnsKey = pivot.id() + COLUMNS_POSTFIX;
+            if(queryContext.contextMap().containsKey(columnsKey)) {
+                final String colsAggName = queryContext.contextMap().get(columnsKey).toString();
                 final MultiBucketsAggregation columnsResult = queryResult.getAggregations().get(colsAggName);
                 if (columnsResult != null) {
                     final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.<String>builder().build()).source("leaf");
 
-                    if (pivot.rollup()) {
+                    if(pivot.rollup())
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), createInitialResult(queryResult), true, "row-leaf");
-                    }
 
                     columnsResult.getBuckets().forEach(columnBucket -> {
                         final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
@@ -361,7 +338,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return InitialBucket.create(queryResult);
     }
 
-    private long extractDocumentCount(SearchResponse queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
+    private long extractDocumentCount(final SearchResponse queryResult) {
         return queryResult.getHits().getTotalHits().value;
     }
 
